@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+
+
+# alchemy
+.alchemy
+
+# tmp files
+.#*
+
+# env
+.env*.local
+.env
+
+# opennext
+.open-next
+
+# misc
+.DS_Store
+
+.turbo
+.opencode
+.opencode.json
+
+.zed

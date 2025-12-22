@@ -1,0 +1,60 @@
+{
+  "name": "@laxdb/core",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "db": "drizzle-kit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "better-auth:gen": "npx @better-auth/cli@latest generate",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "format": "oxfmt ",
+    "format:check": "bun run format -- --check",
+    "fix": "oxlint --fix && oxfmt"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.956.0",
+    "@effect/experimental": "^0.56.0",
+    "@effect/platform": "^0.92.1",
+    "@effect/platform-bun": "^0.81.1",
+    "@effect/rpc": "^0.71.0",
+    "@effect/sql": "^0.46.0",
+    "@effect/sql-drizzle": "^0.45.0",
+    "@effect/sql-pg": "^0.47.0",
+    "@polar-sh/better-auth": "^1.6.3",
+    "@polar-sh/sdk": "^0.42.1",
+    "better-auth": "^1.4.7",
+    "drizzle-orm": "^0.44.6",
+    "effect": "latest",
+    "hono": "^4.9.11",
+    "ioredis": "^5.8.1",
+    "nanoid": "^5.1.6",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@effect/build-utils": "^0.7.9",
+    "@effect/vitest": "latest",
+    "@types/pg": "^8.15.5",
+    "@types/ws": "^8.18.1",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-zod": "^0.8.3",
+    "tsx": "^4.20.6"
+  },
+  "effect": {
+    "generateExports": {
+      "include": [
+        "**/*.ts"
+      ]
+    },
+    "generateIndex": {
+      "include": [
+        "**/*.ts"
+      ]
+    }
+  }
+}

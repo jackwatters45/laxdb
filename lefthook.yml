@@ -1,0 +1,23 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: '*.{js,ts,jsx,tsx}'
+      run: bun x oxlint {staged_files}
+    format:
+      glob: '*.{js,ts,jsx,tsx,json,jsonc,css,md}'
+      run: bun x oxfmt --no-error-on-unmatched-pattern {staged_files}
+    types:
+      run: bun run typecheck
+
+pre-push:
+  parallel: true
+  commands:
+    lint:
+      glob: '*.{js,ts,jsx,tsx}'
+      run: bun x oxlint {staged_files}
+    format:
+      glob: '*.{js,ts,jsx,tsx,json,md}'
+      run: bun x oxfmt --no-error-on-unmatched-pattern {staged_files}
+    types:
+      run: bun run typecheck

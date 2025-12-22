@@ -1,0 +1,39 @@
+{
+  "name": "@laxdb/api",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "format": "oxfmt ",
+    "format:check": "bun run format -- --check",
+    "fix": "oxlint --fix && oxfmt"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0"
+  },
+  "dependencies": {
+    "@effect-atom/atom-react": "^0.3.2",
+    "@effect/platform": "^0.92.1",
+    "@effect/rpc": "^0.71.0",
+    "@laxdb/core": "workspace:*"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "effect": {
+    "generateExports": {
+      "include": [
+        "**/*.ts"
+      ]
+    },
+    "generateIndex": {
+      "include": [
+        "**/*.ts"
+      ]
+    }
+  }
+}

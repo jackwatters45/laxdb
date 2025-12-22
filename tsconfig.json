@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/bun",
+  "compilerOptions": {
+    "module": "Preserve",
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+      },
+    ],
+  },
+}
