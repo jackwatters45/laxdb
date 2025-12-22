@@ -35,7 +35,6 @@ import {
   memberTable,
   organizationTable,
 } from './organization/organization.sql';
-import { RedisService } from './redis';
 import { teamMemberTable, teamTable } from './team/team.sql';
 import { userTable } from './user/user.sql';
 
@@ -44,14 +43,11 @@ const polarClient = new Polar({
   // server: Resource.Stage.value === 'production' ? 'production' : 'sandbox',
 });
 
-const runtime = ManagedRuntime.make(
-  Layer.mergeAll(RedisService.Default, DatabaseLive)
-);
+const runtime = ManagedRuntime.make(DatabaseLive);
 
 export class AuthService extends Effect.Service<AuthService>()('AuthService', {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
-    const redis = yield* RedisService;
 
     const auth = betterAuth({
       appName: 'Goalbound',
@@ -95,17 +91,6 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
             // });
           },
         },
-      },
-      rateLimit: {
-        window: 10, // time window in seconds
-        max: 100, // max requests in the window
-        storage: 'secondary-storage',
-      },
-      secondaryStorage: {
-        get: async (key) => await runtime.runPromise(redis.get(key)),
-        set: async (key, value, ttl) =>
-          await runtime.runPromise(redis.set(key, value, ttl)),
-        delete: async (key) => await runtime.runPromise(redis.delete(key)),
       },
       databaseHooks: {
         session: {
@@ -310,7 +295,7 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
         ),
     };
   }),
-  dependencies: [DatabaseLive, RedisService.Default],
+  dependencies: [DatabaseLive],
 }) {}
 
 const getClient = Effect.gen(function* () {
