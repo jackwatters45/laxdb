@@ -76,6 +76,10 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         },
       },
+      // TODO: Wire up KVService for rate limiting and session caching
+      // See packages/core/src/kv.ts - need to inject KVNamespace binding from worker env
+      // rateLimit: { window: 10, max: 100, storage: 'secondary-storage' },
+      // secondaryStorage: { get, set, delete }
       session: {
         cookieCache: {
           enabled: true,

@@ -1,5 +1,6 @@
 # TODO
 
+- update planning docs
 - get dev working
 - deployment
 - new package to just work on features tbh
