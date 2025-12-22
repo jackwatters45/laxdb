@@ -1,10 +1,11 @@
 # TODO
 
-- opencode code review
-- jj stacked prs
-- update planning docs
+- [x] code review
+- [ ] lefthook
+- [ ] update planning docs
+- [ ] env + env.example
+- [ ] jj stacked prs
 - get dev working
-- env + env.example
 - deployment
 - new package to just work on features tbh
 

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+#
+# jj-push: Pre-push checks wrapper for jj
+#
+# Usage:
+#   ./bin/jj-push [args...]       # Run checks then push
+#   ./bin/jj-push --skip-checks   # Skip checks and push directly
+#
+# Setup (choose one):
+#   1. Add to PATH: export PATH="$PATH:$(pwd)/bin"
+#   2. Create jj alias: jj config set --user aliases.push '!./bin/jj-push'
+#
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+cd "$REPO_ROOT"
+
+# Check for --skip-checks flag
+SKIP_CHECKS=false
+ARGS=()
+for arg in "$@"; do
+  if [[ "$arg" == "--skip-checks" ]]; then
+    SKIP_CHECKS=true
+  else
+    ARGS+=("$arg")
+  fi
+done
+
+if [[ "$SKIP_CHECKS" == true ]]; then
+  echo -e "${YELLOW}Skipping pre-push checks...${NC}"
+  exec jj git push "${ARGS[@]}"
+fi
+
+echo -e "${GREEN}Running pre-push checks...${NC}"
+
+# Track failures
+FAILED=false
+
+# Lint
+echo -e "\n${GREEN}[1/3] Linting...${NC}"
+if ! bun x oxlint; then
+  echo -e "${RED}Linting failed${NC}"
+  FAILED=true
+fi
+
+# Format check
+echo -e "\n${GREEN}[2/3] Checking formatting...${NC}"
+if ! bun x oxfmt --check; then
+  echo -e "${RED}Formatting check failed. Run 'bun run fix' to auto-fix.${NC}"
+  FAILED=true
+fi
+
+# Type check
+echo -e "\n${GREEN}[3/3] Type checking...${NC}"
+if ! bun run typecheck; then
+  echo -e "${RED}Type check failed${NC}"
+  FAILED=true
+fi
+
+# Exit if any check failed
+if [[ "$FAILED" == true ]]; then
+  echo -e "\n${RED}Pre-push checks failed. Push aborted.${NC}"
+  echo -e "Use ${YELLOW}--skip-checks${NC} to bypass (not recommended)."
+  exit 1
+fi
+
+echo -e "\n${GREEN}All checks passed! Pushing...${NC}"
+exec jj git push "${ARGS[@]}"
