@@ -1,10 +1,13 @@
 # TODO
 
-- how to handle teamId + org in core repo
+- get dev working
+- deployment
+- new package to just work on features tbh
 
 ## Pressing things to eventually do..
 
-- fix deploy for api + ts start
+- add marketing page to deployment
+- how to handle teamId + org in core repo
 - Permissions!!
 - Polar
 - Replace ui with base ui versions
