@@ -50,7 +50,9 @@ export function NavBar() {
           <Button
             aria-label={open ? "CloseNavigation Menu" : "Open Navigation Menu"}
             className="p-1.5 sm:hidden"
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              setOpen(!open);
+            }}
             variant="secondary"
           >
             {open ? (
@@ -74,7 +76,9 @@ export function NavBar() {
         >
           <ul className="space-y-4 font-medium">
             <li
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   setOpen(false);
@@ -84,7 +88,9 @@ export function NavBar() {
               <Link href="#solutions">Solutions</Link>
             </li>
             <li
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   setOpen(false);
@@ -94,7 +100,9 @@ export function NavBar() {
               <Link href="#farm-management">Farm Management</Link>
             </li>
             <li
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   setOpen(false);

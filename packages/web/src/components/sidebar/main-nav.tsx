@@ -14,17 +14,17 @@ export function MainNav() {
 
   // UGLY
   const isSettings =
-    routeMatch({ to: "/$organizationSlug/settings/general" }) ||
-    routeMatch({ to: "/$organizationSlug/settings/users" }) ||
+    routeMatch({ to: "/$organizationSlug/settings/general" }) ??
+    routeMatch({ to: "/$organizationSlug/settings/users" }) ??
     routeMatch({ to: "/$organizationSlug/settings/billing" });
 
   const isNotTeams =
-    routeMatch({ to: "/$organizationSlug/players", fuzzy: true }) ||
-    routeMatch({ to: "/$organizationSlug/games", fuzzy: true }) ||
-    routeMatch({ to: "/$organizationSlug/feedback", fuzzy: true }) ||
-    routeMatch({ to: "/$organizationSlug/plan", fuzzy: true }) ||
-    routeMatch({ to: "/$organizationSlug/organization/join" }) ||
-    routeMatch({ to: "/$organizationSlug/organization/create" }) ||
+    routeMatch({ to: "/$organizationSlug/players", fuzzy: true }) ??
+    routeMatch({ to: "/$organizationSlug/games", fuzzy: true }) ??
+    routeMatch({ to: "/$organizationSlug/feedback", fuzzy: true }) ??
+    routeMatch({ to: "/$organizationSlug/plan", fuzzy: true }) ??
+    routeMatch({ to: "/$organizationSlug/organization/join" }) ??
+    routeMatch({ to: "/$organizationSlug/organization/create" }) ??
     isSettings;
 
   const isTeams =

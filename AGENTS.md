@@ -2,7 +2,7 @@
 
 <alchemy_cloudflare>
 Always Apply: true - This rule should ALWAYS be applied by the AI
-Always apply this rule in these files: \*.ts
+Always apply this rule in these files: *.ts
 
 # Alchemy - TypeScript-native Infrastructure as Code
 
@@ -18,7 +18,6 @@ Alchemy is a TypeScript-native Infrastructure-as-Code framework that allows you 
 ## Basic Setup
 
 ### Project Structure
-
 ```typescript
 // alchemy.run.ts - Your infrastructure definition
 import alchemy from "alchemy";
@@ -38,7 +37,6 @@ await app.finalize(); // ⚠️ ALWAYS call finalize()
 ```
 
 ### Environment Setup
-
 ```bash
 # .env - Required for secret encryption
 ALCHEMY_PASSWORD=your-secure-password
@@ -48,7 +46,6 @@ ALCHEMY_STATE_STORE=cloudflare
 ```
 
 ### Commands
-
 ```bash
 bun alchemy deploy            # Deploy
 bun alchemy dev               # Local development
@@ -58,7 +55,6 @@ bun alchemy destroy           # Destroy all resources
 ## Workers
 
 ### Basic Worker
-
 ```typescript
 const worker = await Worker("api", {
   entrypoint: "./src/worker.ts",
@@ -67,7 +63,6 @@ const worker = await Worker("api", {
 ```
 
 ### Worker with Bindings
-
 ```typescript
 const worker = await Worker("api", {
   entrypoint: "./src/worker.ts",
@@ -78,7 +73,7 @@ const worker = await Worker("api", {
     COUNTER: durableObjectNamespace,
     QUEUE: queue,
     API: otherWorker,
-
+    
     // Environment variables
     API_KEY: alchemy.secret(process.env.API_KEY),
     DEBUG: "true"
@@ -87,7 +82,6 @@ const worker = await Worker("api", {
 ```
 
 ### Worker Implementation
-
 ```typescript
 // src/worker.ts
 import type { worker } from "../alchemy.run";
@@ -97,14 +91,13 @@ export default {
     // Type-safe access to all bindings
     const cached = await env.CACHE.get("key");
     const apiKey = env.API_KEY;
-
+    
     return new Response("Hello World");
   }
 };
 ```
 
 ### Type Safety Setup
-
 ```typescript
 // types/env.d.ts
 import type { worker } from "../alchemy.run";
@@ -119,7 +112,6 @@ declare module "cloudflare:workers" {
 ## Durable Objects
 
 ### Creating Durable Object Namespace
-
 ```typescript
 // Use 'new' instead of 'await' for DurableObjectNamespace
 const counter = DurableObjectNamespace("counter", {
@@ -136,7 +128,6 @@ const worker = await Worker("api", {
 ```
 
 ### Durable Object Implementation
-
 ```typescript
 // src/counter.ts
 import { DurableObject } from "cloudflare:workers";
@@ -157,7 +148,6 @@ export class Counter extends DurableObject {
 ```
 
 ### Using Durable Objects in Worker
-
 ```typescript
 // src/worker.ts
 export default {
@@ -165,7 +155,7 @@ export default {
     // Get a Durable Object instance
     const id = env.COUNTER.idFromName("global-counter");
     const obj = env.COUNTER.get(id);
-
+    
     // Call the Durable Object
     return obj.fetch(request);
   }
@@ -173,7 +163,6 @@ export default {
 ```
 
 ### Cross-Script Durable Objects
-
 ```typescript
 // Method 1: Re-export from provider worker
 const sharedCounter = host.bindings.SHARED_COUNTER;
@@ -188,7 +177,6 @@ const counter = DurableObjectNamespace("counter", {
 ## Key Resources
 
 ### KV Namespace
-
 ```typescript
 const cache = await KVNamespace("cache", {
   title: "my-cache-store"
@@ -200,7 +188,6 @@ await env.CACHE.put("key", "value", { expirationTtl: 3600 });
 ```
 
 ### R2 Bucket
-
 ```typescript
 const storage = await R2Bucket("storage", {
   allowPublicAccess: false
@@ -212,7 +199,6 @@ await env.STORAGE.put("file.txt", "content");
 ```
 
 ### Queue
-
 ```typescript
 // Typed queue
 const queue = await Queue<{ name: string; email: string }>("notifications");
@@ -241,7 +227,6 @@ export default {
 ```
 
 ### Custom Domains
-
 ```typescript
 const worker = await Worker("api", {
   entrypoint: "./src/worker.ts",
@@ -255,7 +240,6 @@ const worker = await Worker("api", {
 ## Converting Existing Cloudflare Projects
 
 ### 1. Migrate wrangler.toml Configuration
-
 ```toml
 # Old wrangler.toml
 name = "my-worker"
@@ -276,7 +260,7 @@ bucket_name = "my-bucket"
 const worker = await Worker("my-worker", {
   entrypoint: "./src/index.js",
   bindings: {
-    CACHE: await KVNamespace("cache", {
+    CACHE: await KVNamespace("cache", { 
       title: "cache-store",
       adopt: true // Use existing KV namespace
     }),
@@ -289,7 +273,6 @@ const worker = await Worker("my-worker", {
 ```
 
 ### 2. Enable Development Compatibility
-
 ```typescript
 // Generate wrangler.json for local development
 await WranglerJson({
@@ -298,7 +281,6 @@ await WranglerJson({
 ```
 
 ### 3. Adopt Existing Resources
-
 ```typescript
 // Use adopt: true to use existing resources instead of failing
 const bucket = await R2Bucket("storage", {
@@ -308,14 +290,13 @@ const bucket = await R2Bucket("storage", {
 ```
 
 ### 4. State Store Migration
-
 ```typescript
 // Local development (default)
 const app = await alchemy("my-app");
 
 // Production with Cloudflare state store
 const app = await alchemy("my-app", {
-  stateStore: process.env.NODE_ENV === "production"
+  stateStore: process.env.NODE_ENV === "production" 
     ? (scope) => new DOStateStore(scope)
     : undefined
 });
@@ -324,7 +305,6 @@ const app = await alchemy("my-app", {
 ## Advanced Patterns
 
 ### Framework Integration (Vite/React/etc.)
-
 ```typescript
 const website = await Vite("website", {
   entrypoint: "./src/worker.ts",
@@ -337,7 +317,6 @@ const website = await Vite("website", {
 ```
 
 ### Resource Scoping
-
 ```typescript
 // Organize resources into logical groups
 await alchemy.run("backend", async () => {
@@ -351,7 +330,6 @@ await alchemy.run("frontend", async () => {
 ```
 
 ### Testing Pattern
-
 ```typescript
 import { alchemy } from "../../src/alchemy";
 const test = alchemy.test(import.meta, { prefix: "test" });
@@ -361,7 +339,7 @@ describe("Worker Tests", () => {
     const worker = await Worker("test-worker", {
       entrypoint: "./src/worker.ts"
     });
-
+    
     expect(worker.url).toBeTruthy();
     // Resources auto-cleaned after test
   });
@@ -371,7 +349,7 @@ describe("Worker Tests", () => {
 ## Best Practices
 
 1. **Always call finalize()**: `await app.finalize()` at the end of your script
-2. **Use adoption for migrations**: `adopt: true` when converting existing projects
+2. **Use adoption for migrations**: `adopt: true` when converting existing projects  
 3. **Type-safe bindings**: Set up env.d.ts for full type safety
 4. **Resource naming**: Use consistent, descriptive names for resources
 5. **State store**: Use DOStateStore for production deployments
@@ -406,7 +384,6 @@ bun run dev
 # Clean up
 bun run destroy
 ```
-
 </alchemy_cloudflare>
 
 <!-- /vibe-rules Integration -->

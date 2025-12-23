@@ -9,9 +9,9 @@
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
     "fix": "oxlint --fix && oxfmt"
   },
   "dependencies": {

@@ -108,11 +108,11 @@ const Button = ({
   ref: forwardedRef,
   ...props
 }: ButtonProps) => {
-  const Component = asChild ? Slot : "button";
+  const Component = asChild === true ? Slot : "button";
   return (
     <Component
       className={cn(buttonVariants({ variant }), className)}
-      disabled={disabled || isLoading}
+      disabled={disabled ?? isLoading}
       ref={forwardedRef}
       tremor-id="tremor-raw"
       {...props}
@@ -123,10 +123,8 @@ const Button = ({
             aria-hidden="true"
             className="size-4 shrink-0 animate-spin"
           />
-          <span className="sr-only">
-            {loadingText ? loadingText : "Loading"}
-          </span>
-          {loadingText ? loadingText : children}
+          <span className="sr-only">{loadingText ?? "Loading"}</span>
+          {loadingText ?? children}
         </span>
       ) : (
         children

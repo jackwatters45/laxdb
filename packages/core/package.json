@@ -12,9 +12,9 @@
     "db:studio": "drizzle-kit studio",
     "better-auth:gen": "npx @better-auth/cli@latest generate",
     "test": "vitest",
-    "typecheck": "tsc --noEmit",
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
     "fix": "oxlint --fix && oxfmt"
   },
   "dependencies": {

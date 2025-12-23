@@ -7,9 +7,9 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",
-    "typecheck": "tsc --noEmit",
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
     "fix": "oxlint --fix && oxfmt"
   },
   "dependencies": {
