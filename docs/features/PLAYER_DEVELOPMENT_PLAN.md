@@ -711,13 +711,11 @@ const checkPlayerDevelopmentPermission = (
 ### Phase 1 - Core Features
 
 1. **Player Profiles**
-
    - Basic information and contact details
    - Position and physical attributes
    - Academic and personal information
 
 2. **Development Notes**
-
    - Skill assessments and observations
    - Behavioral notes and improvements
    - Action items and follow-ups
@@ -730,13 +728,11 @@ const checkPlayerDevelopmentPermission = (
 ### Phase 2 - Advanced Features
 
 4. **Skills Assessments**
-
    - Comprehensive skill rating system
    - Position-specific evaluations
    - Progress tracking over time
 
 5. **Resource Management**
-
    - Drill assignments and tutorials
    - Educational materials
    - Equipment recommendations
@@ -749,13 +745,11 @@ const checkPlayerDevelopmentPermission = (
 ### Phase 3 - Analytics & Intelligence
 
 7. **Advanced Analytics**
-
    - Performance prediction models
    - Strength/weakness analysis
    - Development pathway recommendations
 
 8. **Parent Portal**
-
    - Shared information access
    - Progress reports
    - Communication tools

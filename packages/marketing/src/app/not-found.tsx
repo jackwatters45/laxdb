@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { Button } from '@/components/button';
-import { SolarLogo } from '../../public/solar-logo';
-import { siteConfig } from './site-config';
+import Link from "next/link";
+import { Button } from "@/components/button";
+import { SolarLogo } from "../../public/solar-logo";
+import { siteConfig } from "./site-config";
 
 export default function NotFound() {
   return (

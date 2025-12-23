@@ -2,7 +2,7 @@
 
 export default {
   test: {
-    environment: 'bun',
+    environment: "bun",
     globals: true,
     setupFiles: [],
   },

@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router';
-import { Navbar, NavbarItem } from '@/components/nav/sub-nav';
+import { Link } from "@tanstack/react-router";
+import { Navbar, NavbarItem } from "@/components/nav/sub-nav";
 
 type SettingsHeaderProps = {
   organizationSlug: string;

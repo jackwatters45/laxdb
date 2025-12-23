@@ -1,14 +1,14 @@
-import { Rpc, RpcGroup } from '@effect/rpc';
-import { ContactInfoContract } from '@laxdb/core/player/contact-info/contact-info.contract';
-import { PlayerContactInfoService } from '@laxdb/core/player/contact-info/contact-info.service';
-import { Effect, Layer } from 'effect';
+import { Rpc, RpcGroup } from "@effect/rpc";
+import { ContactInfoContract } from "@laxdb/core/player/contact-info/contact-info.contract";
+import { PlayerContactInfoService } from "@laxdb/core/player/contact-info/contact-info.service";
+import { Effect, Layer } from "effect";
 
 export class ContactInfoRpcs extends RpcGroup.make(
-  Rpc.make('ContactInfoGetPlayerWithContactInfo', {
+  Rpc.make("ContactInfoGetPlayerWithContactInfo", {
     success: ContactInfoContract.getPlayerWithContactInfo.success,
     error: ContactInfoContract.getPlayerWithContactInfo.error,
     payload: ContactInfoContract.getPlayerWithContactInfo.payload,
-  })
+  }),
 ) {}
 
 export const ContactInfoHandlers = ContactInfoRpcs.toLayer(
@@ -19,5 +19,5 @@ export const ContactInfoHandlers = ContactInfoRpcs.toLayer(
       ContactInfoGetPlayerWithContactInfo: (payload) =>
         service.getPlayerWithContactInfo(payload),
     };
-  })
+  }),
 ).pipe(Layer.provide(PlayerContactInfoService.Default));

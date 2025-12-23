@@ -1,21 +1,21 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { AuthService } from '@laxdb/core/auth';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { createFileRoute } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { AlertTriangle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { AuthService } from "@laxdb/core/auth";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,15 +23,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { authMiddleware } from '@/lib/middleware';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { authMiddleware } from "@/lib/middleware";
 
 // Server function to delete organization and set new active org
-const deleteOrganization = createServerFn({ method: 'POST' })
+const deleteOrganization = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: { organizationId: string }) => data)
-  .handler(async ({ data, context }) =>
+  .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -41,7 +41,7 @@ const deleteOrganization = createServerFn({ method: 'POST' })
         try {
           // Get user's organizations before deleting
           const organizationsResult = yield* Effect.tryPromise(() =>
-            auth.auth.api.listOrganizations({ headers })
+            auth.auth.api.listOrganizations({ headers }),
           );
 
           // Check if this is the last organization
@@ -49,7 +49,7 @@ const deleteOrganization = createServerFn({ method: 'POST' })
             return {
               success: false,
               error:
-                'Cannot delete your last organization. You must have at least one organization.',
+                "Cannot delete your last organization. You must have at least one organization.",
             };
           }
 
@@ -58,12 +58,12 @@ const deleteOrganization = createServerFn({ method: 'POST' })
             auth.auth.api.deleteOrganization({
               body: { organizationId: data.organizationId },
               headers,
-            })
+            }),
           );
 
           // Find remaining organizations (excluding the one we just deleted)
           const remainingOrgs = organizationsResult.filter(
-            (org) => org.id !== data.organizationId
+            (org) => org.id !== data.organizationId,
           );
 
           // Set the first remaining organization as active
@@ -72,28 +72,28 @@ const deleteOrganization = createServerFn({ method: 'POST' })
               auth.auth.api.setActiveOrganization({
                 body: { organizationId: remainingOrgs[0]?.id },
                 headers,
-              })
+              }),
             );
           }
 
-          return { success: true, redirectPath: '/teams' };
+          return { success: true, redirectPath: "/teams" };
         } catch (error) {
           return {
             success: false,
             error:
               error instanceof Error
                 ? error.message
-                : 'Failed to delete organization',
+                : "Failed to delete organization",
           };
         }
-      })
-    )
+      }),
+    ),
   );
 
 // Server function to get dashboard data including organization count
 const getDashboardData = createServerFn()
   .middleware([authMiddleware])
-  .handler(async ({ context }) =>
+  .handler(({ context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -101,10 +101,10 @@ const getDashboardData = createServerFn()
         try {
           const [organization, organizations] = yield* Effect.all([
             Effect.tryPromise(() =>
-              auth.auth.api.getFullOrganization({ headers: context.headers })
+              auth.auth.api.getFullOrganization({ headers: context.headers }),
             ),
             Effect.tryPromise(() =>
-              auth.auth.api.listOrganizations({ headers: context.headers })
+              auth.auth.api.listOrganizations({ headers: context.headers }),
             ),
           ]);
 
@@ -113,30 +113,30 @@ const getDashboardData = createServerFn()
             canDeleteOrganization: organizations.length > 1,
             organizationCount: organizations.length,
           };
-        } catch (_error) {
+        } catch {
           return {
             organization: null,
             canDeleteOrganization: false,
             organizationCount: 0,
           };
         }
-      })
-    )
+      }),
+    ),
   );
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/settings/settings-old'
+  "/_protected/$organizationSlug/settings/settings-old",
 )({
   component: SettingsPage,
-  loader: async () => await getDashboardData(),
+  loader: () => getDashboardData(),
 });
 
 // Form schema for confirmation
 const confirmDeleteSchema = Schema.Struct({
   confirmText: Schema.String.pipe(
     Schema.minLength(1, {
-      message: () => 'Please enter the organization name',
-    })
+      message: () => "Please enter the organization name",
+    }),
   ),
 });
 
@@ -162,12 +162,12 @@ function SettingsPage() {
 
       if (result.success) {
         // Redirect based on server response
-        window.location.href = result.redirectPath || '/';
+        window.location.href = result.redirectPath ?? "/";
       } else {
-        toast.error(result.error || 'Failed to delete organization');
+        toast.error(result.error ?? "Failed to delete organization");
       }
-    } catch (_error) {
-      toast.error('Failed to delete organization. Please try again.');
+    } catch {
+      toast.error("Failed to delete organization. Please try again.");
     } finally {
       setIsDeleting(false);
       setShowConfirmDialog(false);
@@ -211,13 +211,13 @@ function SettingsPage() {
                 <span className="font-medium">Slug:</span> {organization.slug}
               </div>
               <div>
-                <span className="font-medium">Created:</span>{' '}
+                <span className="font-medium">Created:</span>{" "}
                 {new Date(organization.createdAt).toLocaleDateString()}
               </div>
               <div>
-                <span className="font-medium">Total Organizations:</span>{' '}
+                <span className="font-medium">Total Organizations:</span>{" "}
                 <span
-                  className={organizationCount === 1 ? 'text-yellow-600' : ''}
+                  className={organizationCount === 1 ? "text-yellow-600" : ""}
                 >
                   {organizationCount}
                 </span>
@@ -266,12 +266,14 @@ function SettingsPage() {
               <Button
                 className="gap-2"
                 disabled={!canDeleteOrganization}
-                onClick={() => setShowConfirmDialog(true)}
+                onClick={() => {
+                  setShowConfirmDialog(true);
+                }}
                 variant="destructive"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete Organization
-                {!canDeleteOrganization && ' (Last Organization)'}
+                {!canDeleteOrganization && " (Last Organization)"}
               </Button>
             </div>
           </CardContent>
@@ -282,7 +284,9 @@ function SettingsPage() {
       {showConfirmDialog && organization && canDeleteOrganization && (
         <ConfirmDeleteDialog
           isDeleting={isDeleting}
-          onCancel={() => setShowConfirmDialog(false)}
+          onCancel={() => {
+            setShowConfirmDialog(false);
+          }}
           onConfirm={handleDeleteOrganization}
           organization={organization}
         />
@@ -307,11 +311,11 @@ function ConfirmDeleteDialog({
       confirmDeleteSchema.pipe(
         Schema.filter((data) => data.confirmText === organization.name, {
           message: () => `Please type "${organization.name}" exactly`,
-        })
-      )
+        }),
+      ),
     ),
     defaultValues: {
-      confirmText: '',
+      confirmText: "",
     },
   });
 
@@ -335,7 +339,7 @@ function ConfirmDeleteDialog({
 
         <div className="mb-4 space-y-2">
           <p className="text-sm">
-            This action will permanently delete the organization{' '}
+            This action will permanently delete the organization{" "}
             <strong>{organization.name}</strong> and all associated data.
           </p>
           <p className="text-sm">
@@ -386,7 +390,7 @@ function ConfirmDeleteDialog({
                 type="submit"
                 variant="destructive"
               >
-                {isDeleting ? 'Deleting...' : 'Delete Organization'}
+                {isDeleting ? "Deleting..." : "Delete Organization"}
               </Button>
             </div>
           </form>

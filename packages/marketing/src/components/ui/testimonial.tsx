@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Testimonial() {
   return (
@@ -26,7 +26,7 @@ export default function Testimonial() {
             <p className="before:absolute before:top-0 before:right-full before:content-['“'] after:text-gray-900/70 after:content-['”']">
               <strong className="font-semibold">
                 Solar transformed our environmental monitoring capabilities.
-              </strong>{' '}
+              </strong>{" "}
               <span className="text-gray-900/70">
                 Their autonomous network provides real-time data on forest
                 health, wildlife patterns, and ecosystem changes with

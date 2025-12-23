@@ -6,12 +6,12 @@ This document explains how to integrate the `effect-cloudflare` package with the
 
 The `effect-cloudflare` package provides Effect-based wrappers around Cloudflare Workers bindings:
 
-| Module | Wraps | Key Features |
-|--------|-------|--------------|
-| `Worker` | Fetch handler | Entry point creation, automatic binding effectification |
-| `KVNamespace` | KV storage | Type-safe operations, granular error types |
-| `D1Database` | SQLite database | Prepared statements, batch operations, sessions |
-| `R2Bucket` | Object storage | Streaming, multipart uploads, conditional requests |
+| Module        | Wraps           | Key Features                                            |
+| ------------- | --------------- | ------------------------------------------------------- |
+| `Worker`      | Fetch handler   | Entry point creation, automatic binding effectification |
+| `KVNamespace` | KV storage      | Type-safe operations, granular error types              |
+| `D1Database`  | SQLite database | Prepared statements, batch operations, sessions         |
+| `R2Bucket`    | Object storage  | Streaming, multipart uploads, conditional requests      |
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ export default Worker.makeFetchEntryPoint(
     // env bindings are automatically "effectified"
     // env.MY_KV is now an Effect-based KVNamespace
     const value = yield* env.MY_KV.get("key");
-    
+
     return new Response(JSON.stringify({ value }));
   }),
   { layer: Layer.empty }
@@ -201,15 +201,15 @@ const program = Effect.gen(function* () {
 
 ### Error Type Reference
 
-| Error Class | Trigger | Recoverable |
-|------------|---------|-------------|
-| `KVRateLimitError` | >1 write/sec to same key | Yes (backoff) |
-| `KVInvalidKeyError` | Empty, ".", "..", >512 bytes | No |
-| `KVInvalidValueError` | Value >25 MiB | No |
-| `KVMetadataError` | Metadata >1024 bytes | No |
-| `KVExpirationError` | TTL <60 seconds | No |
-| `KVJsonParseError` | Non-JSON value with type "json" | Fallback to text |
-| `KVNetworkError` | Transient failures | Yes (retry) |
+| Error Class           | Trigger                         | Recoverable      |
+| --------------------- | ------------------------------- | ---------------- |
+| `KVRateLimitError`    | >1 write/sec to same key        | Yes (backoff)    |
+| `KVInvalidKeyError`   | Empty, ".", "..", >512 bytes    | No               |
+| `KVInvalidValueError` | Value >25 MiB                   | No               |
+| `KVMetadataError`     | Metadata >1024 bytes            | No               |
+| `KVExpirationError`   | TTL <60 seconds                 | No               |
+| `KVJsonParseError`    | Non-JSON value with type "json" | Fallback to text |
+| `KVNetworkError`      | Transient failures              | Yes (retry)      |
 
 ---
 
@@ -239,14 +239,14 @@ export const EffectD1DatabaseLive = (db: globalThis.D1Database) =>
 export class DrizzleService extends Effect.Service<DrizzleService>()("DrizzleService", {
   effect: Effect.gen(function* () {
     const d1 = yield* EffectD1Database;
-    
+
     // Access raw D1Database for Drizzle initialization
     // Note: Drizzle handles its own Promise-based API
     const db = drizzle(d1["~raw"], { schema });
 
     return {
       db,
-      
+
       /**
        * Run a raw SQL query with Effect error handling.
        */
@@ -281,7 +281,7 @@ import * as D1 from "effect-cloudflare/D1Database";
 
 const insertUser = Effect.gen(function* () {
   const { db } = yield* DrizzleService;
-  
+
   yield* Effect.tryPromise(() =>
     db.insert(users).values({ email: "user@example.com" })
   );
@@ -395,23 +395,23 @@ export class StorageService extends Effect.Service<StorageService>()("StorageSer
 ```typescript
 const uploadLargeFile = Effect.gen(function* () {
   const bucket = yield* EffectR2Bucket;
-  
+
   // Create multipart upload
   const upload = yield* bucket.createMultipartUpload("large-file.zip");
-  
+
   const parts: R2UploadedPart[] = [];
   let partNumber = 1;
-  
+
   // Upload parts (each part must be >= 5 MiB except the last)
   for (const chunk of chunks) {
     const part = yield* upload.uploadPart(partNumber, chunk);
     parts.push(part);
     partNumber++;
   }
-  
+
   // Complete the upload
   const result = yield* upload.complete(parts);
-  
+
   return result;
 }).pipe(
   Effect.catchTag("R2MultipartError", (e) =>
@@ -444,14 +444,14 @@ export default Worker.makeFetchEntryPoint(
   (req, env, ctx) => Effect.gen(function* () {
     // Your request handling logic
     const url = new URL(req.url);
-    
+
     if (url.pathname === "/api/health") {
       return new Response("OK");
     }
-    
+
     // Use services from the layer
     const result = yield* myBusinessLogic(req);
-    
+
     return new Response(JSON.stringify(result), {
       headers: { "Content-Type": "application/json" },
     });
@@ -504,7 +504,7 @@ export default {
   async fetch(req: Request, env: Cloudflare.Env, ctx: ExecutionContext) {
     // Create runtime with environment-specific bindings
     const runtime = ManagedRuntime.make(makeAppLayer(env));
-    
+
     try {
       const response = await runtime.runPromise(
         handleRequest(req)
@@ -531,7 +531,7 @@ export default Worker.makeFetchEntryPoint(
   (req, env, ctx) => Effect.gen(function* () {
     // Send response immediately
     const response = new Response("Accepted", { status: 202 });
-    
+
     // Schedule background work
     ctx.waitUntil(
       Effect.gen(function* () {
@@ -541,7 +541,7 @@ export default Worker.makeFetchEntryPoint(
         yield* Effect.log("Background work complete");
       })
     );
-    
+
     return response;
   }),
   { layer: Layer.empty }
@@ -590,23 +590,23 @@ describe("KVService", () => {
   test("should get and set values", async () => {
     const store = new Map<string, string>();
     const mockKV = createMockKV(store);
-    
+
     const TestLayer = Layer.succeed(EffectKVNamespace, mockKV).pipe(
       Layer.provideMerge(KVService.Default)
     );
-    
+
     const program = Effect.gen(function* () {
       const kv = yield* KVService;
-      
+
       // Set a value
       yield* kv.put("testKey", "testValue");
-      
+
       // Get the value
       const result = yield* kv.get("testKey");
-      
+
       return result;
     }).pipe(Effect.provide(TestLayer));
-    
+
     const result = await Effect.runPromise(program);
     expect(Option.isSome(result)).toBe(true);
     expect(Option.getOrNull(result)).toBe("testValue");

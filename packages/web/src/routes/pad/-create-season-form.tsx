@@ -1,19 +1,19 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { CreateSeasonInput } from '@laxdb/core/season/season.schema';
-import { SeasonService } from '@laxdb/core/season/season.service';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { CalendarIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { PageContainer } from '@/components/layout/page-content';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { CreateSeasonInput } from "@laxdb/core/season/season.schema";
+import { SeasonService } from "@laxdb/core/season/season.service";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { PageContainer } from "@/components/layout/page-content";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -21,34 +21,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { authMiddleware } from '@/lib/middleware';
+} from "@/components/ui/select";
+import { authMiddleware } from "@/lib/middleware";
 
-const createSeason = createServerFn({ method: 'POST' })
+const createSeason = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof CreateSeasonInput.Type) =>
-    Schema.decodeSync(CreateSeasonInput)(data)
+    Schema.decodeSync(CreateSeasonInput)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const seasonService = yield* SeasonService;
         return yield* seasonService.create(data);
-      })
-    )
+      }),
+    ),
   );
 
 type FormData = typeof CreateSeasonInput.Type;
@@ -70,7 +70,7 @@ export function CreateSeasonForm({
     defaultValues: {
       organizationId,
       teamId,
-      status: 'active',
+      status: "active",
       endDate: null,
       division: null,
     },
@@ -82,7 +82,7 @@ export function CreateSeasonForm({
       await router.invalidate();
     },
     onError: (_error, _variables) => {
-      toast.error('Failed to create season. Please try again.');
+      toast.error("Failed to create season. Please try again.");
     },
   });
 
@@ -95,8 +95,8 @@ export function CreateSeasonForm({
       <div>
         <h1 className="font-bold text-xl">Create a Season</h1>
         <p className="text-muted-foreground">
-          Add a season to manage games, rosters, and track your team's progress
-          throughout the year.
+          Add a season to manage games, rosters, and track your team&apos;s
+          progress throughout the year.
         </p>
       </div>
 
@@ -117,7 +117,9 @@ export function CreateSeasonForm({
                       <Input
                         placeholder="e.g., Spring 2025, Fall 2024"
                         {...field}
-                        onChange={(e) => field.onChange(e)}
+                        onChange={(e) => {
+                          field.onChange(e);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -139,12 +141,12 @@ export function CreateSeasonForm({
                           readOnly
                           value={
                             field.value instanceof Date
-                              ? field.value.toLocaleDateString('en-US', {
-                                  day: '2-digit',
-                                  month: 'long',
-                                  year: 'numeric',
+                              ? field.value.toLocaleDateString("en-US", {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
                                 })
-                              : ''
+                              : ""
                           }
                         />
                       </FormControl>
@@ -203,12 +205,12 @@ export function CreateSeasonForm({
                           readOnly
                           value={
                             field.value instanceof Date
-                              ? field.value.toLocaleDateString('en-US', {
-                                  day: '2-digit',
-                                  month: 'long',
-                                  year: 'numeric',
+                              ? field.value.toLocaleDateString("en-US", {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
                                 })
-                              : ''
+                              : ""
                           }
                         />
                       </FormControl>
@@ -233,7 +235,7 @@ export function CreateSeasonForm({
                             captionLayout="dropdown"
                             mode="single"
                             onSelect={(date) => {
-                              field.onChange(date || null);
+                              field.onChange(date ?? null);
                               setEndDateOpen(false);
                             }}
                             selected={
@@ -256,7 +258,10 @@ export function CreateSeasonForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} {...(field.value !== undefined && { value: field.value })}>
+                    <Select
+                      onValueChange={field.onChange}
+                      {...(field.value !== undefined && { value: field.value })}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -283,8 +288,10 @@ export function CreateSeasonForm({
                       <Input
                         placeholder="e.g., U15, Division 1, Premier"
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value || null)}
-                        value={field.value || ''}
+                        onChange={(e) => {
+                          field.onChange(e.target.value || null);
+                        }}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -295,8 +302,8 @@ export function CreateSeasonForm({
               <div className="flex gap-4 pt-4">
                 <Button disabled={createSeasonMutation.isPending} type="submit">
                   {createSeasonMutation.isPending
-                    ? 'Creating...'
-                    : 'Create Season'}
+                    ? "Creating..."
+                    : "Create Season"}
                 </Button>
               </div>
             </form>

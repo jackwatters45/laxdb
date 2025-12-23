@@ -1,19 +1,19 @@
-import { PlayerService } from '@laxdb/core/player/player.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { TeamIdSchema } from '@laxdb/core/schema';
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { useMemo } from 'react';
+import { PlayerService } from "@laxdb/core/player/player.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { TeamIdSchema } from "@laxdb/core/schema";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { useMemo } from "react";
 import {
   DataTableBody,
   DataTableContent,
   DataTableHeader,
   DataTableProvider,
   DataTableRoot,
-} from '@/components/data-table/data-table';
-import { PageBody } from '@/components/layout/page-content';
+} from "@/components/data-table/data-table";
+import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -24,37 +24,37 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { authMiddleware } from '@/lib/middleware';
-import { getTeamPlayersQK } from '@/mutations/players';
-import { TeamHeader } from '../-components/team-header';
-import { PlayerCards } from './-components/players-cards';
-import { createEditablePlayerColumns } from './-components/players-columns';
-import { PlayersFilterBar } from './-components/players-filterbar';
-import { PlayersToolbar } from './-components/players-toolbar';
+} from "@/components/ui/breadcrumb";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { authMiddleware } from "@/lib/middleware";
+import { getTeamPlayersQK } from "@/mutations/players";
+import { TeamHeader } from "../-components/team-header";
+import { PlayerCards } from "./-components/players-cards";
+import { createEditablePlayerColumns } from "./-components/players-columns";
+import { PlayersFilterBar } from "./-components/players-filterbar";
+import { PlayersToolbar } from "./-components/players-toolbar";
 
 const GetTeamPlayers = Schema.Struct({
   ...TeamIdSchema,
 });
 
-const getTeamPlayers = createServerFn({ method: 'GET' })
+const getTeamPlayers = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof GetTeamPlayers.Type) =>
-    Schema.decodeSync(GetTeamPlayers)(data)
+    Schema.decodeSync(GetTeamPlayers)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const playerService = yield* PlayerService;
         return yield* playerService.getTeamPlayers(data);
-      })
-    )
+      }),
+    ),
   );
 
-// TODO: more of a replace than an update - make sure updates add user options + exclude ids or something...
+// FIX: more of a replace than an update - make sure updates add user options + exclude ids or something...
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/players/'
+  "/_protected/$organizationSlug/$teamId/players/",
 )({
   component: RouteComponent,
   loader: async ({ params, context }) => {
@@ -94,12 +94,12 @@ function PlayersDataTable() {
         organizationSlug,
         teamId,
       }),
-    [activeOrganization.id, organizationSlug, teamId]
+    [activeOrganization.id, organizationSlug, teamId],
   );
 
   const excludePlayerIds = useMemo(
     () => players.map((p) => p.publicId),
-    [players]
+    [players],
   );
 
   return (

@@ -1,6 +1,6 @@
-import { FetchHttpClient } from '@effect/platform';
-import { RpcClient, RpcSerialization } from '@effect/rpc';
-import { Layer } from 'effect';
+import { FetchHttpClient } from "@effect/platform";
+import { RpcClient, RpcSerialization } from "@effect/rpc";
+import { Layer } from "effect";
 
 export const makeRpcProtocol = (apiUrl: string) =>
   RpcClient.layerProtocolHttp({

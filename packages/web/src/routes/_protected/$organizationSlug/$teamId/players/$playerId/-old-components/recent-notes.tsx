@@ -1,10 +1,10 @@
-import { Link } from '@tanstack/react-router';
-import { FileText, Plus } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerDetails } from '../-utils';
-import { formatDate, getPriorityColor } from '../-utils';
+import { Link } from "@tanstack/react-router";
+import { FileText, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PlayerDetails } from "../-utils";
+import { formatDate, getPriorityColor } from "../-utils";
 
 type RecentNotesProps = {
   player: PlayerDetails;

@@ -1,7 +1,7 @@
-import { Schema } from 'effect';
-import { EmailSchema, TimestampsSchema } from '../schema';
+import { Schema } from "effect";
+import { EmailSchema, TimestampsSchema } from "../schema";
 
-export class User extends Schema.Class<User>('User')({
+export class User extends Schema.Class<User>("User")({
   id: Schema.String,
   name: Schema.String,
   email: EmailSchema,
@@ -15,7 +15,7 @@ export class User extends Schema.Class<User>('User')({
 }) {}
 
 export class GetUserFromEmailInput extends Schema.Class<GetUserFromEmailInput>(
-  'GetUserFromEmailInput'
+  "GetUserFromEmailInput",
 )({
   email: EmailSchema,
 }) {}

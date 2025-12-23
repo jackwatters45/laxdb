@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { RiFilterLine } from '@remixicon/react';
-import type { Column } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RiFilterLine } from "@remixicon/react";
+import type { Column } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { DataTableColumnHeader } from './data-table-column-header';
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { DataTableColumnHeader } from "./data-table-column-header";
 
 type FacetedColumnHeaderProps<TData, TValue> = {
   column: Column<TData, TValue>;
@@ -58,10 +58,10 @@ export function FacetedColumnHeader<TData, TValue>({
           )}
           <RiFilterLine
             className={cn(
-              'h-3 w-3',
+              "h-3 w-3",
               selectedValues?.size > 0
-                ? 'text-primary'
-                : 'text-muted-foreground'
+                ? "text-primary"
+                : "text-muted-foreground",
             )}
           />
         </Button>
@@ -85,7 +85,7 @@ export function FacetedColumnHeader<TData, TValue>({
                     }
                     const filterValues = Array.from(selectedValues);
                     column.setFilterValue(
-                      filterValues.length > 0 ? filterValues : undefined
+                      filterValues.length > 0 ? filterValues : undefined,
                     );
                   }}
                 />
@@ -103,7 +103,9 @@ export function FacetedColumnHeader<TData, TValue>({
             <div className="p-2">
               <Button
                 className="w-full"
-                onClick={() => column.setFilterValue(undefined)}
+                onClick={() => {
+                  column.setFilterValue(undefined);
+                }}
                 size="sm"
                 variant="outline"
               >

@@ -66,9 +66,8 @@ export const make: (db: globalThis.D1Database) => D1Database = internal.make;
  * @since 1.0.0
  * @category layers
  */
-export const layer: (
-  db: globalThis.D1Database,
-) => Layer.Layer<D1Database> = internal.layer;
+export const layer: (db: globalThis.D1Database) => Layer.Layer<D1Database> =
+  internal.layer;
 
 /**
  * @since 1.0.0

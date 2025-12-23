@@ -1,21 +1,21 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { TeamService } from '@laxdb/core/team/team.service';
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import type { Team } from 'better-auth/plugins';
-import { Effect, Schema } from 'effect';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { DashboardHeader } from '@/components/sidebar/dashboard-header';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { TeamService } from "@laxdb/core/team/team.service";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import type { Team } from "better-auth/plugins";
+import { Effect, Schema } from "effect";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,11 +23,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { authMiddleware } from '@/lib/middleware';
-import { getUserOrganizationContext } from '@/query/organizations';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { authMiddleware } from "@/lib/middleware";
+import { getUserOrganizationContext } from "@/query/organizations";
 
 const UpdateTeamSchema = Schema.Struct({
   teamId: Schema.String,
@@ -35,43 +35,43 @@ const UpdateTeamSchema = Schema.Struct({
   description: Schema.String.pipe(Schema.optional),
 });
 
-const updateTeam = createServerFn({ method: 'POST' })
+const updateTeam = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof UpdateTeamSchema.Type) =>
-    Schema.decodeSync(UpdateTeamSchema)(data)
+    Schema.decodeSync(UpdateTeamSchema)(data),
   )
-  .handler(async ({ data, context }) =>
+  .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const teamService = yield* TeamService;
         return yield* teamService.updateTeam(data, context.headers);
-      })
-    )
+      }),
+    ),
   );
 
 const formSchema = Schema.Struct({
   name: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Team name is required' }),
+    Schema.minLength(1, { message: () => "Team name is required" }),
     Schema.minLength(2, {
-      message: () => 'Team name must be at least 2 characters',
+      message: () => "Team name must be at least 2 characters",
     }),
     Schema.maxLength(100, {
-      message: () => 'Team name must be less than 100 characters',
-    })
+      message: () => "Team name must be less than 100 characters",
+    }),
   ),
   description: Schema.optional(
     Schema.String.pipe(
       Schema.maxLength(500, {
-        message: () => 'Description must be less than 500 characters',
-      })
-    )
+        message: () => "Description must be less than 500 characters",
+      }),
+    ),
   ),
 });
 
 type FormData = typeof formSchema.Type;
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/setup'
+  "/_protected/$organizationSlug/$teamId/setup",
 )({
   component: SetupTeamPage,
   loader: async () => {
@@ -90,26 +90,26 @@ function SetupTeamPage() {
   const form = useForm<FormData>({
     resolver: effectTsResolver(formSchema),
     defaultValues: {
-      name: team?.name || '',
-      description: '',
+      name: team?.name ?? "",
+      description: "",
     },
   });
 
   const updateTeamMutation = useMutation({
-    mutationKey: ['updateTeam', teamId],
+    mutationKey: ["updateTeam", teamId],
     mutationFn: (data: FormData) => updateTeam({ data: { teamId, ...data } }),
     onSuccess: (_, variables) => {
       toast.success(`Team "${variables.name}" created successfully!`);
       router.invalidate();
       router.navigate({
-        to: '/$organizationSlug',
+        to: "/$organizationSlug",
         params: {
           organizationSlug,
         },
       });
     },
     onError: (_error) => {
-      toast.error('Failed to create team. Please try again.');
+      toast.error("Failed to create team. Please try again.");
     },
   });
 
@@ -228,8 +228,8 @@ function SetupTeamPage() {
                     type="submit"
                   >
                     {updateTeamMutation.isPending
-                      ? 'Creating...'
-                      : 'Create Team'}
+                      ? "Creating..."
+                      : "Create Team"}
                   </Button>
                 </div>
               </form>

@@ -1,6 +1,6 @@
-import type { TeamPlayerWithInfo } from '@laxdb/core/player/player.schema';
-import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { Checkbox } from '@/components/ui/checkbox';
+import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
+import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const columnHelper = createColumnHelper<TeamPlayerWithInfo>();
 
@@ -11,13 +11,13 @@ type EditablePlayerColumnsProps = {
 };
 
 export function createEditablePlayerColumns({
-  organizationId,
-  organizationSlug,
-  teamId,
+  organizationId: _organizationId,
+  organizationSlug: _organizationSlug,
+  teamId: _teamId,
 }: EditablePlayerColumnsProps) {
   return [
     columnHelper.display({
-      id: 'select',
+      id: "select",
       header: ({ table }) => (
         <Checkbox
           aria-label="Select all"
@@ -25,11 +25,13 @@ export function createEditablePlayerColumns({
             table.getIsAllPageRowsSelected()
               ? true
               : table.getIsSomeRowsSelected()
-                ? 'indeterminate'
+                ? "indeterminate"
                 : false
           }
           className="translate-y-0.5"
-          onCheckedChange={() => table.toggleAllPageRowsSelected()}
+          onCheckedChange={() => {
+            table.toggleAllPageRowsSelected();
+          }}
         />
       ),
       cell: ({ row }) => (
@@ -37,13 +39,15 @@ export function createEditablePlayerColumns({
           aria-label="Select row"
           checked={row.getIsSelected()}
           className="translate-y-0.5"
-          onCheckedChange={() => row.toggleSelected()}
+          onCheckedChange={() => {
+            row.toggleSelected();
+          }}
         />
       ),
       enableSorting: false,
       enableHiding: false,
       meta: {
-        displayName: 'Select',
+        displayName: "Select",
       },
     }),
   ] as ColumnDef<TeamPlayerWithInfo>[];

@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import type { SVGProps } from "react";
 export const LineChartIllustration = (props: SVGProps<SVGSVGElement>) => (
   <svg
     aria-label="Line Chart Illustration"

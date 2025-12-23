@@ -1,7 +1,7 @@
-import { Calendar, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerDetails } from '../-utils';
-import { formatDate } from '../-utils';
+import { Calendar, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PlayerDetails } from "../-utils";
+import { formatDate } from "../-utils";
 
 type UpcomingEventsProps = {
   player: PlayerDetails;

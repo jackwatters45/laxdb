@@ -1,52 +1,52 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Calendar, MapPin, Plus, Trophy, Users } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GamesHeader } from './-components/games-header';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Calendar, MapPin, Plus, Trophy, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GamesHeader } from "./-components/games-header";
 
 // Mock data for now - will replace with actual API calls
 const mockGames = [
   {
-    id: '1',
-    opponentName: 'Riverside Hawks',
-    gameDate: new Date('2024-09-25T15:00:00'),
-    venue: 'Memorial Stadium',
+    id: "1",
+    opponentName: "Riverside Hawks",
+    gameDate: new Date("2024-09-25T15:00:00"),
+    venue: "Memorial Stadium",
     isHomeGame: true,
-    gameType: 'regular' as const,
-    status: 'scheduled' as const,
+    gameType: "regular" as const,
+    status: "scheduled" as const,
     homeScore: 0,
     awayScore: 0,
   },
   {
-    id: '2',
-    opponentName: 'Central Valley Eagles',
-    gameDate: new Date('2024-09-18T18:30:00'),
-    venue: 'Eagle Field',
+    id: "2",
+    opponentName: "Central Valley Eagles",
+    gameDate: new Date("2024-09-18T18:30:00"),
+    venue: "Eagle Field",
     isHomeGame: false,
-    gameType: 'regular' as const,
-    status: 'completed' as const,
+    gameType: "regular" as const,
+    status: "completed" as const,
     homeScore: 8,
     awayScore: 12,
   },
   {
-    id: '3',
-    opponentName: 'North County Titans',
-    gameDate: new Date('2024-10-02T16:00:00'),
-    venue: 'Lions Field',
+    id: "3",
+    opponentName: "North County Titans",
+    gameDate: new Date("2024-10-02T16:00:00"),
+    venue: "Lions Field",
     isHomeGame: true,
-    gameType: 'playoff' as const,
-    status: 'scheduled' as const,
+    gameType: "playoff" as const,
+    status: "scheduled" as const,
     homeScore: 0,
     awayScore: 0,
   },
 ];
 
 // Server function for getting games (will implement proper API later)
-const getTeamGames = createServerFn().handler(async () => {
-  // TODO: Replace with actual API call
+const getTeamGames = createServerFn().handler(() => {
+  // FIX: Replace with actual API call
   // const { GamesAPI } = await import('@laxdb/core/games/index');
   // const request = getRequest();
   // return await GamesAPI.getTeamGames(teamId, request.headers);
@@ -55,8 +55,8 @@ const getTeamGames = createServerFn().handler(async () => {
 });
 
 // Server function for getting user permissions (simplified for now)
-const getUserPermissions = createServerFn().handler(async () => {
-  // TODO: Replace with actual permission check
+const getUserPermissions = createServerFn().handler(() => {
+  // FIX: Replace with actual permission check
   return {
     canManageGames: true, // Will check user role
     canEditGames: true,
@@ -64,7 +64,7 @@ const getUserPermissions = createServerFn().handler(async () => {
   };
 });
 
-export const Route = createFileRoute('/_protected/$organizationSlug/games/old')(
+export const Route = createFileRoute("/_protected/$organizationSlug/games/old")(
   {
     component: GamesPage,
     loader: async () => {
@@ -75,7 +75,7 @@ export const Route = createFileRoute('/_protected/$organizationSlug/games/old')(
         ]);
 
         return { games, permissions };
-      } catch (_error) {
+      } catch {
         return {
           games: mockGames,
           permissions: {
@@ -86,7 +86,7 @@ export const Route = createFileRoute('/_protected/$organizationSlug/games/old')(
         };
       }
     },
-  }
+  },
 );
 
 function GamesPage() {
@@ -95,13 +95,13 @@ function GamesPage() {
 
   const upcomingGames = games.filter(
     (game) =>
-      game.status === 'scheduled' && new Date(game.gameDate) > new Date()
+      game.status === "scheduled" && new Date(game.gameDate) > new Date(),
   );
 
-  const completedGames = games.filter((game) => game.status === 'completed');
+  const completedGames = games.filter((game) => game.status === "completed");
 
   const nextGame = upcomingGames.toSorted(
-    (a, b) => new Date(a.gameDate).getTime() - new Date(b.gameDate).getTime()
+    (a, b) => new Date(a.gameDate).getTime() - new Date(b.gameDate).getTime(),
   )[0];
 
   return (
@@ -112,7 +112,7 @@ function GamesPage() {
           <div>
             <h1 className="font-bold text-3xl">Games</h1>
             <p className="text-muted-foreground">
-              Manage your team's games and track performance
+              Manage your team&apos;s games and track performance
             </p>
           </div>
 
@@ -169,7 +169,7 @@ function GamesPage() {
                 .toSorted(
                   (a, b) =>
                     new Date(b.gameDate).getTime() -
-                    new Date(a.gameDate).getTime()
+                    new Date(a.gameDate).getTime(),
                 )
                 .slice(0, 6)
                 .map((game) => (
@@ -214,8 +214,8 @@ type Game = {
   gameDate: Date;
   venue: string;
   isHomeGame: boolean;
-  gameType: 'regular' | 'playoff' | 'tournament' | 'friendly' | 'practice';
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'postponed';
+  gameType: "regular" | "playoff" | "tournament" | "friendly" | "practice";
+  status: "scheduled" | "in_progress" | "completed" | "cancelled" | "postponed";
   homeScore: number;
   awayScore: number;
 };
@@ -224,6 +224,49 @@ type Permissions = {
   canManageGames: boolean;
   canEditGames: boolean;
   canViewStats: boolean;
+};
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+
+const getStatusColor = (status: Game["status"]) => {
+  switch (status) {
+    case "scheduled":
+      return "default";
+    case "in_progress":
+      return "destructive";
+    case "completed":
+      return "secondary";
+    case "cancelled":
+      return "outline";
+    case "postponed":
+      return "outline";
+    default:
+      return "default";
+  }
+};
+
+const getGameTypeLabel = (type: Game["gameType"]) => {
+  switch (type) {
+    case "regular":
+      return "Regular Season";
+    case "playoff":
+      return "Playoff";
+    case "tournament":
+      return "Tournament";
+    case "friendly":
+      return "Friendly";
+    case "practice":
+      return "Practice";
+    default:
+      return type;
+  }
 };
 
 function GameCard({
@@ -237,59 +280,16 @@ function GameCard({
 }) {
   const { organizationSlug } = Route.useParams();
 
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(date);
-
-  const getStatusColor = (status: Game['status']) => {
-    switch (status) {
-      case 'scheduled':
-        return 'default';
-      case 'in_progress':
-        return 'destructive';
-      case 'completed':
-        return 'secondary';
-      case 'cancelled':
-        return 'outline';
-      case 'postponed':
-        return 'outline';
-      default:
-        return 'default';
-    }
-  };
-
-  const getGameTypeLabel = (type: Game['gameType']) => {
-    switch (type) {
-      case 'regular':
-        return 'Regular Season';
-      case 'playoff':
-        return 'Playoff';
-      case 'tournament':
-        return 'Tournament';
-      case 'friendly':
-        return 'Friendly';
-      case 'practice':
-        return 'Practice';
-      default:
-        return type;
-    }
-  };
-
   return (
     <Card
-      className={`transition-shadow hover:shadow-md ${isHighlighted ? 'border-primary/50' : ''}`}
+      className={`transition-shadow hover:shadow-md ${isHighlighted ? "border-primary/50" : ""}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="text-lg">{game.opponentName}</CardTitle>
             <Badge variant={getStatusColor(game.status)}>
-              {game.status.replace('_', ' ').toUpperCase()}
+              {game.status.replace("_", " ").toUpperCase()}
             </Badge>
           </div>
           <Badge variant="outline">{getGameTypeLabel(game.gameType)}</Badge>
@@ -308,12 +308,12 @@ function GameCard({
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <span>{game.venue}</span>
           <Badge className="ml-auto text-xs" variant="outline">
-            {game.isHomeGame ? 'HOME' : 'AWAY'}
+            {game.isHomeGame ? "HOME" : "AWAY"}
           </Badge>
         </div>
 
         {/* Score (if completed) */}
-        {game.status === 'completed' && (
+        {game.status === "completed" && (
           <div className="rounded-md bg-muted p-3">
             <div className="flex items-center justify-between font-medium">
               <span>Final Score</span>
@@ -340,7 +340,7 @@ function GameCard({
             </Link>
           </Button>
 
-          {permissions.canEditGames && game.status !== 'completed' && (
+          {permissions.canEditGames && game.status !== "completed" && (
             <Button asChild size="sm" variant="outline">
               <Link
                 params={{
@@ -354,7 +354,7 @@ function GameCard({
             </Button>
           )}
 
-          {permissions.canViewStats && game.status === 'completed' && (
+          {permissions.canViewStats && game.status === "completed" && (
             <Button asChild size="sm" variant="outline">
               <Link
                 params={{

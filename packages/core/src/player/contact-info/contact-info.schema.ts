@@ -1,9 +1,9 @@
-import { PublicIdSchema, PublicPlayerIdSchema } from '@laxdb/core/schema';
-import { type Effect, Schema } from 'effect';
-import type { PlayerContactInfoService } from './contact-info.service';
+import { PublicIdSchema, PublicPlayerIdSchema } from "@laxdb/core/schema";
+import { type Effect, Schema } from "effect";
+import type { PlayerContactInfoService } from "./contact-info.service";
 
 export class PlayerWithContactInfo extends Schema.Class<PlayerWithContactInfo>(
-  'PlayerWithContactInfo'
+  "PlayerWithContactInfo",
 )({
   ...PublicIdSchema,
   ...PublicPlayerIdSchema,
@@ -20,7 +20,7 @@ export class PlayerWithContactInfo extends Schema.Class<PlayerWithContactInfo>(
 }) {}
 
 export class GetPlayerContactInfoInput extends Schema.Class<GetPlayerContactInfoInput>(
-  'GetPlayerContactInfoInput'
+  "GetPlayerContactInfoInput",
 )({
   playerId: Schema.Number,
 }) {}
@@ -31,7 +31,7 @@ type PlayerContactInfoServiceType = Effect.Effect.Success<
 >;
 
 type PlayerWithContactInfoResult = Effect.Effect.Success<
-  ReturnType<PlayerContactInfoServiceType['getPlayerWithContactInfo']>
+  ReturnType<PlayerContactInfoServiceType["getPlayerWithContactInfo"]>
 >;
 
 export type PlayerWithContactInfoNonNullable =

@@ -1,17 +1,17 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_protected/redirect')({
+export const Route = createFileRoute("/_protected/redirect")({
   beforeLoad: ({ context }) => {
     const organizationSlug = context.activeOrganization?.slug;
 
     if (!organizationSlug) {
       throw redirect({
-        to: '/organizations/create',
+        to: "/organizations/create",
       });
     }
 
     throw redirect({
-      to: '/$organizationSlug',
+      to: "/$organizationSlug",
       params: { organizationSlug },
     });
   },

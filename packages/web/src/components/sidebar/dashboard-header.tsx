@@ -1,6 +1,6 @@
-import { Link, useRouteContext } from '@tanstack/react-router';
-import type React from 'react';
-import { Fragment } from 'react';
+import { Link, useRouteContext } from "@tanstack/react-router";
+import type React from "react";
+import { Fragment } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,21 +8,21 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { NavUserHeader } from '../nav/nav-user';
+} from "@/components/ui/tooltip";
+import { NavUserHeader } from "../nav/nav-user";
 
 export function DashboardHeader({ children }: { children: React.ReactNode }) {
   const { activeOrganization } = useRouteContext({
-    from: '/_protected/$organizationSlug',
+    from: "/_protected/$organizationSlug",
   });
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b bg-background pr-2 pl-4">
@@ -45,7 +45,7 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
           params={{ organizationSlug: activeOrganization.slug }}
           to="/$organizationSlug/plan"
         >
-          <Button size={'sm'} variant="outline">
+          <Button size={"sm"} variant="outline">
             Plan
           </Button>
         </Link>
@@ -53,7 +53,7 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
           params={{ organizationSlug: activeOrganization.slug }}
           to="/$organizationSlug/feedback"
         >
-          <Button size={'sm'} variant="outline">
+          <Button size={"sm"} variant="outline">
             Feedback
           </Button>
         </Link>
@@ -90,13 +90,13 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
                 <BreadcrumbItem
                   className={
                     i === props.breadcrumbItems.length - 1
-                      ? 'min-w-0 flex-1'
-                      : ''
+                      ? "min-w-0 flex-1"
+                      : ""
                   }
                 >
                   {item.href ? (
                     <BreadcrumbLink
-                      className={`truncate ${i === props.breadcrumbItems.length - 1 ? 'max-w-full' : ''}`}
+                      className={`truncate ${i === props.breadcrumbItems.length - 1 ? "max-w-full" : ""}`}
                       href={item.href}
                       title={item.label}
                     >
@@ -104,7 +104,7 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
                     </BreadcrumbLink>
                   ) : (
                     <BreadcrumbPage
-                      className={`truncate ${i === props.breadcrumbItems.length - 1 ? 'max-w-full' : ''}`}
+                      className={`truncate ${i === props.breadcrumbItems.length - 1 ? "max-w-full" : ""}`}
                       title={item.label}
                     >
                       {item.label}

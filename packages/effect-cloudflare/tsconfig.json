@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     // Environment setup & latest features
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
@@ -29,9 +25,7 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
     //Types
-    "types": [
-      "./worker-configuration.d.ts"
-    ],
+    "types": ["./worker-configuration.d.ts"],
     // Plugins
     "plugins": [
       {
@@ -78,8 +72,5 @@
       }
     ]
   },
-  "include": [
-    "worker-configuration.d.ts",
-    "src/**/*.ts"
-  ]
+  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }

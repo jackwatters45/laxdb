@@ -15,7 +15,6 @@
   "rules": {
     "no-unused-vars": "warn",
     "no-console": "off",
-    "no-alert": "off",
     "no-empty": "off",
     "no-inline-comments": "off",
     "no-shadow": "off",
@@ -35,7 +34,8 @@
     "react/react-in-jsx-scope": "off",
     "react/self-closing-comp": "error",
     "react/jsx-key": "error",
-    "unicorn/no-nested-ternary": "off"
+    "unicorn/no-array-callback-reference": "off",
+    "max-lines": "off"
   },
   "ignorePatterns": [
     "node_modules/**",

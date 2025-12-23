@@ -1,11 +1,11 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { eq } from 'drizzle-orm';
-import { Array as Arr, Effect } from 'effect';
-import { DatabaseLive } from '../drizzle/drizzle.service';
-import type { GetUserFromEmailInput } from './user.schema';
-import { type UserSelect, userTable } from './user.sql';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { eq } from "drizzle-orm";
+import { Array as Arr, Effect } from "effect";
+import { DatabaseLive } from "../drizzle/drizzle.service";
+import type { GetUserFromEmailInput } from "./user.schema";
+import { type UserSelect, userTable } from "./user.sql";
 
-export class UserRepo extends Effect.Service<UserRepo>()('UserRepo', {
+export class UserRepo extends Effect.Service<UserRepo>()("UserRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 

@@ -1,16 +1,16 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { eq, getTableColumns } from 'drizzle-orm';
-import { Array as Arr, Effect } from 'effect';
-import { DatabaseLive } from '../../drizzle/drizzle.service';
-import { playerTable } from '../player.sql';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { eq, getTableColumns } from "drizzle-orm";
+import { Array as Arr, Effect } from "effect";
+import { DatabaseLive } from "../../drizzle/drizzle.service";
+import { playerTable } from "../player.sql";
 import type {
   GetPlayerContactInfoInput,
   PlayerWithContactInfo,
-} from './contact-info.schema';
-import { playerContactInfoTable } from './contact-info.sql';
+} from "./contact-info.schema";
+import { playerContactInfoTable } from "./contact-info.sql";
 
 export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
-  'ContactInfoRepo',
+  "ContactInfoRepo",
   {
     effect: Effect.gen(function* () {
       const db = yield* PgDrizzle;
@@ -28,7 +28,7 @@ export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
             .from(playerTable)
             .leftJoin(
               playerContactInfoTable,
-              eq(playerTable.id, playerContactInfoTable.playerId)
+              eq(playerTable.id, playerContactInfoTable.playerId),
             )
             .where(eq(playerTable.id, input.playerId))
             .limit(1)
@@ -40,10 +40,10 @@ export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
                   return null;
                 }
                 return result as PlayerWithContactInfo;
-              })
+              }),
             ),
       } as const;
     }),
     dependencies: [DatabaseLive],
-  }
+  },
 ) {}

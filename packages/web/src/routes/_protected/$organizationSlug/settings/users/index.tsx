@@ -1,37 +1,37 @@
-import { RiAddLine, RiMore2Fill } from '@remixicon/react';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { PageBody } from '@/components/layout/page-content';
+import { RiAddLine, RiMore2Fill } from "@remixicon/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { SettingsHeader } from '../-components/settings-header';
-import { invitedUsers, roles, users } from '../-data';
-import { ModalAddUser } from './-ModalAddUser';
+} from "@/components/ui/tooltip";
+import { SettingsHeader } from "../-components/settings-header";
+import { invitedUsers, roles, users } from "../-data";
+import { ModalAddUser } from "./-ModalAddUser";
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/settings/users/'
+  "/_protected/$organizationSlug/settings/users/",
 )({
   component: Users,
 });
@@ -88,14 +88,14 @@ function Users() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {user.role === 'admin' ? (
+                    {user.role === "admin" ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div>
                               <Select
                                 defaultValue={user.role}
-                                disabled={user.role === 'admin'}
+                                disabled={user.role === "admin"}
                               >
                                 <SelectTrigger className="h-8 w-32">
                                   <SelectValue placeholder="Select" />
@@ -103,7 +103,7 @@ function Users() {
                                 <SelectContent align="end">
                                   {roles.map((role) => (
                                     <SelectItem
-                                      disabled={role.value === 'admin'}
+                                      disabled={role.value === "admin"}
                                       key={role.value}
                                       value={role.value}
                                     >
@@ -125,7 +125,7 @@ function Users() {
                     ) : (
                       <Select
                         defaultValue={user.role}
-                        disabled={user.role === 'admin'}
+                        disabled={user.role === "admin"}
                       >
                         <SelectTrigger className="h-8 w-32">
                           <SelectValue placeholder="Select" />
@@ -133,7 +133,7 @@ function Users() {
                         <SelectContent align="end">
                           {roles.map((role) => (
                             <SelectItem
-                              disabled={role.value === 'admin'}
+                              disabled={role.value === "admin"}
                               key={role.value}
                               value={role.value}
                             >
@@ -156,12 +156,12 @@ function Users() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem disabled={user.role === 'admin'}>
+                        <DropdownMenuItem disabled={user.role === "admin"}>
                           View details
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-red-600 dark:text-red-500"
-                          disabled={user.role === 'admin'}
+                          disabled={user.role === "admin"}
                         >
                           Delete
                         </DropdownMenuItem>
@@ -209,7 +209,7 @@ function Users() {
                       <SelectContent align="end">
                         {roles.map((role) => (
                           <SelectItem
-                            disabled={role.value === 'admin'}
+                            disabled={role.value === "admin"}
                             key={role.value}
                             value={role.value}
                           >
@@ -233,7 +233,7 @@ function Users() {
                       <DropdownMenuContent align="end" className="w-36">
                         <DropdownMenuItem
                           className="text-red-600 dark:text-red-500"
-                          disabled={user.role === 'admin'}
+                          disabled={user.role === "admin"}
                         >
                           Revoke invitation
                         </DropdownMenuItem>

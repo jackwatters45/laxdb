@@ -1,13 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/players/$playerId'
+  "/_protected/$organizationSlug/$teamId/players/$playerId",
 )({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
-    <div>Hello "/_protected/$organizationSlug/$teamId/players/$playerId"!</div>
+    <div>
+      Hello &quot;/_protected/$organizationSlug/$teamId/players/$playerId&quot;!
+    </div>
   );
 }

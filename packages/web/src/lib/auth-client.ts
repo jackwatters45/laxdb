@@ -5,15 +5,15 @@ import {
   headCoach,
   parent,
   player,
-} from '@laxdb/core/auth/auth.permissions';
-import { polarClient } from '@polar-sh/better-auth';
-import type { AccessControl } from 'better-auth/plugins/access';
+} from "@laxdb/core/auth/auth.permissions";
+import { polarClient } from "@polar-sh/better-auth";
+import type { AccessControl } from "better-auth/plugins/access";
 import {
   adminClient,
   lastLoginMethodClient,
   organizationClient,
-} from 'better-auth/client/plugins';
-import { createAuthClient } from 'better-auth/react';
+} from "better-auth/client/plugins";
+import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
   plugins: [

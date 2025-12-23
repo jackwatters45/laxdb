@@ -1,5 +1,5 @@
-import { Link, useRouteContext, useRouter } from '@tanstack/react-router';
-import { ChevronsUpDown, Plus } from 'lucide-react';
+import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,15 +7,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useSwitchOrganization } from '@/mutations/organizations';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar';
+} from "@/components/ui/dropdown-menu";
+import { useSwitchOrganization } from "@/mutations/organizations";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 export function OrganizationSwitcher() {
   const router = useRouter();
   const { organizations, activeOrganization } = useRouteContext({
-    from: '/_protected/$organizationSlug',
+    from: "/_protected/$organizationSlug",
   });
 
   const switchOrg = useSwitchOrganization({ router });
@@ -31,7 +31,7 @@ export function OrganizationSwitcher() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  alt={activeOrganization.name ?? 'No Organization'}
+                  alt={activeOrganization.name ?? "No Organization"}
                   src={activeOrganization.logo ?? undefined}
                 />
                 <AvatarFallback className="rounded-lg uppercase">
@@ -40,7 +40,7 @@ export function OrganizationSwitcher() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {activeOrganization?.name || 'No Organization'}
+                  {activeOrganization?.name || "No Organization"}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />

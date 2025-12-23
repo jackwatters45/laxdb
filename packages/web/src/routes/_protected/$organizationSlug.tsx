@@ -1,25 +1,25 @@
-import { AuthService } from '@laxdb/core/auth';
-import { OrganizationOperationError } from '@laxdb/core/organization/organization.error';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { OrganizationSlugSchema } from '@laxdb/core/schema';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeader } from '@tanstack/react-start/server';
-import { Effect, Schema } from 'effect';
-import { AppSidebar } from '@/components/sidebar/app-sidebar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { authMiddleware } from '@/lib/middleware';
+import { AuthService } from "@laxdb/core/auth";
+import { OrganizationOperationError } from "@laxdb/core/organization/organization.error";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { OrganizationSlugSchema } from "@laxdb/core/schema";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { Effect, Schema } from "effect";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { authMiddleware } from "@/lib/middleware";
 
 const GetDashboardDataSchema = Schema.Struct({
   ...OrganizationSlugSchema,
 });
 
-const getDashboardData = createServerFn({ method: 'GET' })
+const getDashboardData = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof GetDashboardDataSchema.Type) =>
-    Schema.decodeSync(GetDashboardDataSchema)(data)
+    Schema.decodeSync(GetDashboardDataSchema)(data),
   )
-  .handler(async ({ context }) =>
+  .handler(({ context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -36,45 +36,45 @@ const getDashboardData = createServerFn({ method: 'GET' })
         const [organizations, activeOrganization] = yield* Effect.all(
           [
             Effect.tryPromise(() =>
-              auth.auth.api.listOrganizationTeams({ headers })
+              auth.auth.api.listOrganizationTeams({ headers }),
             ).pipe(
               Effect.mapError(
                 (cause) =>
                   new OrganizationOperationError({
-                    message: 'Failed to list organization teams',
+                    message: "Failed to list organization teams",
                     cause,
-                  })
-              )
+                  }),
+              ),
             ),
             Effect.tryPromise(() =>
-              auth.auth.api.getFullOrganization({ headers })
+              auth.auth.api.getFullOrganization({ headers }),
             ).pipe(
               Effect.mapError(
                 (cause) =>
                   new OrganizationOperationError({
-                    message: 'Failed to retrieve active organization',
+                    message: "Failed to retrieve active organization",
                     cause,
-                  })
-              )
+                  }),
+              ),
             ),
           ],
-          { concurrency: 'unbounded' }
+          { concurrency: "unbounded" },
         );
 
-        const cookie = getRequestHeader('Cookie');
+        const cookie = getRequestHeader("Cookie");
         const match = cookie?.match(/sidebar_state=([^;]+)/);
-        const sidebarOpen = match?.[1] !== 'false';
+        const sidebarOpen = match?.[1] !== "false";
 
         return {
           organizations,
           activeOrganization,
           sidebarOpen,
         };
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug')({
+export const Route = createFileRoute("/_protected/$organizationSlug")({
   beforeLoad: async ({ location, params }) => {
     const data = await getDashboardData({
       data: { organizationSlug: params.organizationSlug },
@@ -83,9 +83,9 @@ export const Route = createFileRoute('/_protected/$organizationSlug')({
     const activeOrganization = data.activeOrganization;
     if (!activeOrganization) {
       throw redirect({
-        to: '/organizations/create',
+        to: "/organizations/create",
         search: {
-          redirectUrl: location.pathname || '/teams',
+          redirectUrl: location.pathname || "/teams",
         },
       });
     }
@@ -96,8 +96,8 @@ export const Route = createFileRoute('/_protected/$organizationSlug')({
       sidebarOpen: data.sidebarOpen,
     };
   },
-  loader: async ({ params }) =>
-    await getDashboardData({
+  loader: ({ params }) =>
+    getDashboardData({
       data: { organizationSlug: params.organizationSlug },
     }),
   component: OrganizationLayout,

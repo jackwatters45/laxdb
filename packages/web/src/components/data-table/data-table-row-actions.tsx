@@ -1,8 +1,8 @@
-import type { RemixiconComponentType } from '@remixicon/react';
-import { RiDeleteBinLine, RiEdit2Line, RiMoreFill } from '@remixicon/react';
-import type { Row } from '@tanstack/react-table';
-import { UserMinus } from 'lucide-react';
-import * as React from 'react';
+import type { RemixiconComponentType } from "@remixicon/react";
+import { RiDeleteBinLine, RiEdit2Line, RiMoreFill } from "@remixicon/react";
+import type { Row } from "@tanstack/react-table";
+import { UserMinus } from "lucide-react";
+import * as React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,17 +13,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import type { ClassNameChildrenProp } from '@/types';
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import type { ClassNameChildrenProp } from "@/types";
 
 type RowActions<TData = unknown> = {
   onEdit?: (row: Row<TData>) => void;
@@ -37,13 +37,13 @@ type RowActionsContextValue<TData = unknown> = {
 };
 
 const RowActionsContext = React.createContext<RowActionsContextValue | null>(
-  null
+  null,
 );
 
 function useRowActions<TData = unknown>(): RowActionsContextValue<TData> {
   const context = React.useContext(RowActionsContext);
   if (!context) {
-    throw new Error('useRowActions must be used within a RowActionsProvider');
+    throw new Error("useRowActions must be used within a RowActionsProvider");
   }
   return context as RowActionsContextValue<TData>;
 }
@@ -64,7 +64,7 @@ function RowActionsProvider<TData>({
       row,
       actions,
     }),
-    [row, actions]
+    [row, actions],
   );
 
   return (
@@ -85,8 +85,8 @@ function RowActionsDropdown({ children, className }: RowActionsDropdownProps) {
       <DropdownMenuTrigger asChild>
         <Button
           className={cn(
-            'group aspect-square p-1.5 hover:border hover:border-border data-[state=open]:border-border data-[state=open]:bg-muted',
-            className
+            "group aspect-square p-1.5 hover:border hover:border-border data-[state=open]:border-border data-[state=open]:bg-muted",
+            className,
           )}
           variant="ghost"
         >
@@ -107,7 +107,7 @@ type RowActionItemProps = {
   icon?: RemixiconComponentType;
   children: React.ReactNode;
   onClick?: (() => void) | undefined;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
   className?: string | undefined;
 };
 
@@ -115,15 +115,15 @@ function RowActionItem({
   icon: Icon,
   children,
   onClick,
-  variant = 'default',
+  variant = "default",
   className,
 }: RowActionItemProps) {
   return (
     <DropdownMenuItem
       className={cn(
-        'gap-2',
-        variant === 'destructive' && 'text-destructive focus:text-destructive',
-        className
+        "gap-2",
+        variant === "destructive" && "text-destructive focus:text-destructive",
+        className,
       )}
       onClick={onClick}
     >
@@ -138,7 +138,7 @@ function RowActionEditItem({ className, children }: ClassNameChildrenProp) {
 
   if (!actions?.onEdit) {
     throw new Error(
-      'RowActionEditItem requires onEdit action to be provided to RowActionsProvider'
+      "RowActionEditItem requires onEdit action to be provided to RowActionsProvider",
     );
   }
 
@@ -156,12 +156,12 @@ function RowActionEditItem({ className, children }: ClassNameChildrenProp) {
 function RowActionDeleteItem({
   children,
   ...props
-}: Omit<RowActionAlertItemProps, 'icon' | 'onClick' | 'variant'>) {
+}: Omit<RowActionAlertItemProps, "icon" | "onClick" | "variant">) {
   const { actions, row } = useRowActions();
 
   if (!actions?.onDelete) {
     throw new Error(
-      'RowActionDeleteItem requires onDelete action to be provided to RowActionsProvider'
+      "RowActionDeleteItem requires onDelete action to be provided to RowActionsProvider",
     );
   }
 
@@ -180,12 +180,12 @@ function RowActionDeleteItem({
 function RowActionRemoveItem({
   children,
   ...props
-}: Omit<RowActionAlertItemProps, 'icon' | 'onClick'>) {
+}: Omit<RowActionAlertItemProps, "icon" | "onClick">) {
   const { actions, row } = useRowActions();
 
   if (!actions?.onRemove) {
     throw new Error(
-      'RowActionAlertItem requires onRemove action to be provided to RowActionsProvider'
+      "RowActionAlertItem requires onRemove action to be provided to RowActionsProvider",
     );
   }
 
@@ -205,7 +205,7 @@ type RowActionAlertItemProps = {
   icon?: RemixiconComponentType;
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
   className?: string;
   alertTitle: string;
   alertDescription: string;
@@ -220,9 +220,9 @@ function RowActionAlertItem({
   className,
   alertTitle,
   alertDescription,
-  variant = 'default',
-  alertActionText = 'Continue',
-  alertCancelText = 'Cancel',
+  variant = "default",
+  alertActionText = "Continue",
+  alertCancelText = "Cancel",
 }: RowActionAlertItemProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -235,7 +235,7 @@ function RowActionAlertItem({
     <AlertDialog onOpenChange={setOpen} open={open}>
       <AlertDialogTrigger asChild>
         <DropdownMenuItem
-          className={cn('gap-2', className)}
+          className={cn("gap-2", className)}
           onSelect={(e) => {
             e.preventDefault();
             setOpen(true);
@@ -254,8 +254,8 @@ function RowActionAlertItem({
           <AlertDialogCancel>{alertCancelText}</AlertDialogCancel>
           <AlertDialogAction
             className={cn(
-              variant === 'destructive' &&
-                'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              variant === "destructive" &&
+                "bg-destructive text-destructive-foreground hover:bg-destructive/90",
             )}
             onClick={handleConfirm}
           >

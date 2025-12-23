@@ -1,6 +1,6 @@
-import { Slot } from '@radix-ui/react-slot';
-import { ChevronRight, ChevronsUpDown, MoreHorizontal } from 'lucide-react';
-import type * as React from 'react';
+import { Slot } from "@radix-ui/react-slot";
+import { ChevronRight, ChevronsUpDown, MoreHorizontal } from "lucide-react";
+import type * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,111 +8,111 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const Breadcrumb = ({
   ref,
   ...props
-}: React.ComponentPropsWithoutRef<'nav'> & {
+}: React.ComponentPropsWithoutRef<"nav"> & {
   separator?: React.ReactNode;
 } & { ref?: React.Ref<HTMLElement> }) => (
   <nav aria-label="breadcrumb" ref={ref} {...props} />
 );
-Breadcrumb.displayName = 'Breadcrumb';
+Breadcrumb.displayName = "Breadcrumb";
 
 const BreadcrumbList = ({
   className,
   ref,
   ...props
-}: React.ComponentPropsWithoutRef<'ol'> & {
+}: React.ComponentPropsWithoutRef<"ol"> & {
   ref?: React.Ref<HTMLOListElement>;
 }) => (
   <ol
     className={cn(
-      'flex flex-wrap items-center gap-1.5 break-words text-muted-foreground text-sm sm:gap-2.5',
-      className
+      "flex flex-wrap items-center gap-1.5 break-words text-muted-foreground text-sm sm:gap-2.5",
+      className,
     )}
     ref={ref}
     {...props}
   />
 );
-BreadcrumbList.displayName = 'BreadcrumbList';
+BreadcrumbList.displayName = "BreadcrumbList";
 
 const BreadcrumbItem = ({
   className,
   ref,
   ...props
-}: React.ComponentPropsWithoutRef<'li'> & {
+}: React.ComponentPropsWithoutRef<"li"> & {
   ref?: React.Ref<HTMLLIElement>;
 }) => (
   <li
-    className={cn('inline-flex items-center gap-1.5', className)}
+    className={cn("inline-flex items-center gap-1.5", className)}
     ref={ref}
     {...props}
   />
 );
-BreadcrumbItem.displayName = 'BreadcrumbItem';
+BreadcrumbItem.displayName = "BreadcrumbItem";
 
 const BreadcrumbLink = ({
   asChild,
   className,
   ref,
   ...props
-}: React.ComponentPropsWithoutRef<'a'> & {
+}: React.ComponentPropsWithoutRef<"a"> & {
   asChild?: boolean;
 } & { ref?: React.Ref<HTMLAnchorElement> }) => {
-  const Comp = asChild ? Slot : 'a';
+  const Comp = asChild ? Slot : "a";
 
   return (
     <Comp
-      className={cn('transition-colors hover:text-foreground', className)}
+      className={cn("transition-colors hover:text-foreground", className)}
       ref={ref}
       {...props}
     />
   );
 };
-BreadcrumbLink.displayName = 'BreadcrumbLink';
+BreadcrumbLink.displayName = "BreadcrumbLink";
 
 const BreadcrumbPage = ({
   className,
   ref,
   ...props
-}: React.ComponentPropsWithoutRef<'span'> & {
+}: React.ComponentPropsWithoutRef<"span"> & {
   ref?: React.Ref<HTMLSpanElement>;
 }) => (
   <span
     aria-current="page"
-    className={cn('font-normal text-foreground', className)}
+    className={cn("font-normal text-foreground", className)}
     ref={ref}
     {...props}
   />
 );
-BreadcrumbPage.displayName = 'BreadcrumbPage';
+BreadcrumbPage.displayName = "BreadcrumbPage";
 
 const BreadcrumbSeparator = ({
   children,
   className,
   ...props
-}: React.ComponentProps<'li'>) => (
+}: React.ComponentProps<"li">) => (
   <li
     aria-hidden="true"
-    className={cn('[&>svg]:h-3.5 [&>svg]:w-3.5', className)}
+    className={cn("[&>svg]:h-3.5 [&>svg]:w-3.5", className)}
     role="presentation"
     {...props}
   >
     {children ?? <ChevronRight />}
   </li>
 );
-BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
+BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
 const BreadcrumbEllipsis = ({
   className,
   ...props
-}: React.ComponentProps<'span'>) => (
+}: React.ComponentProps<"span">) => (
   <span
     aria-hidden="true"
-    className={cn('flex h-9 w-9 items-center justify-center', className)}
+    className={cn("flex h-9 w-9 items-center justify-center", className)}
     role="presentation"
     {...props}
   >
@@ -120,10 +120,10 @@ const BreadcrumbEllipsis = ({
     <span className="sr-only">More</span>
   </span>
 );
-BreadcrumbEllipsis.displayName = 'BreadcrumbElipssis';
+BreadcrumbEllipsis.displayName = "BreadcrumbElipssis";
 
 const BreadcrumbDropdown = DropdownMenu;
-BreadcrumbDropdown.displayName = 'BreadcrumbDropdown';
+BreadcrumbDropdown.displayName = "BreadcrumbDropdown";
 
 const BreadcrumbDropdownTrigger = ({
   className,
@@ -134,8 +134,8 @@ const BreadcrumbDropdownTrigger = ({
 }) => (
   <DropdownMenuTrigger
     className={cn(
-      'flex items-center gap-1 p-0.5 transition-colors hover:text-foreground',
-      className
+      "flex items-center gap-1 p-0.5 transition-colors hover:text-foreground",
+      className,
     )}
     ref={ref}
     {...props}
@@ -143,10 +143,10 @@ const BreadcrumbDropdownTrigger = ({
     <ChevronsUpDown className="h-3 w-3" />
   </DropdownMenuTrigger>
 );
-BreadcrumbDropdownTrigger.displayName = 'BreadcrumbDropdownTrigger';
+BreadcrumbDropdownTrigger.displayName = "BreadcrumbDropdownTrigger";
 
 const BreadcrumbDropdownContent = DropdownMenuContent;
-BreadcrumbDropdownContent.displayName = 'BreadcrumbDropdownContent';
+BreadcrumbDropdownContent.displayName = "BreadcrumbDropdownContent";
 
 const BreadcrumbDropdownItem = ({
   asChild,
@@ -163,13 +163,13 @@ const BreadcrumbDropdownItem = ({
     {...props}
   />
 );
-BreadcrumbDropdownItem.displayName = 'BreadcrumbDropdownItem';
+BreadcrumbDropdownItem.displayName = "BreadcrumbDropdownItem";
 
 const BreadcrumbDropdownLabel = DropdownMenuLabel;
-BreadcrumbDropdownLabel.displayName = 'BreadcrumbDropdownLabel';
+BreadcrumbDropdownLabel.displayName = "BreadcrumbDropdownLabel";
 
 const BreadcrumbDropdownSeparator = DropdownMenuSeparator;
-BreadcrumbDropdownSeparator.displayName = 'BreadcrumbDropdownSeparator';
+BreadcrumbDropdownSeparator.displayName = "BreadcrumbDropdownSeparator";
 
 export {
   Breadcrumb,

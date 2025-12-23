@@ -1,24 +1,24 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import {
   checkout,
   polar,
   portal,
   usage,
   webhooks,
-} from '@polar-sh/better-auth';
-import { Polar } from '@polar-sh/sdk';
-import { betterAuth, type Session, type User } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+} from "@polar-sh/better-auth";
+import { Polar } from "@polar-sh/sdk";
+import { betterAuth, type Session, type User } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
   admin,
   lastLoginMethod,
   openAPI,
   organization,
-} from 'better-auth/plugins';
-import { tanstackStartCookies } from 'better-auth/tanstack-start';
-import { desc, eq } from 'drizzle-orm';
-import { Array as Arr, Effect, Layer, ManagedRuntime } from 'effect';
-import { OrganizationMembershipError } from './auth/auth.error';
+} from "better-auth/plugins";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
+import { desc, eq } from "drizzle-orm";
+import { Array as Arr, Effect, ManagedRuntime } from "effect";
+import { OrganizationMembershipError } from "./auth/auth.error";
 import {
   ac,
   assistantCoach,
@@ -26,17 +26,17 @@ import {
   headCoach,
   parent,
   player,
-} from './auth/auth.permissions';
-import * as authSchema from './auth/auth.sql';
-import { DatabaseLive } from './drizzle/drizzle.service';
-import { AuthenticationError, DatabaseError } from './error';
+} from "./auth/auth.permissions";
+import * as authSchema from "./auth/auth.sql";
+import { DatabaseLive } from "./drizzle/drizzle.service";
+import { AuthenticationError, DatabaseError } from "./error";
 import {
   invitationTable,
   memberTable,
   organizationTable,
-} from './organization/organization.sql';
-import { teamMemberTable, teamTable } from './team/team.sql';
-import { userTable } from './user/user.sql';
+} from "./organization/organization.sql";
+import { teamMemberTable, teamTable } from "./team/team.sql";
+import { userTable } from "./user/user.sql";
 
 const polarClient = new Polar({
   // accessToken: Resource.PolarAccessToken.value,
@@ -45,15 +45,15 @@ const polarClient = new Polar({
 
 const runtime = ManagedRuntime.make(DatabaseLive);
 
-export class AuthService extends Effect.Service<AuthService>()('AuthService', {
+export class AuthService extends Effect.Service<AuthService>()("AuthService", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
     const auth = betterAuth({
-      appName: 'Goalbound',
+      appName: "Goalbound",
       // secret: Resource.BetterAuthSecret.value,
       database: drizzleAdapter(db, {
-        provider: 'pg',
+        provider: "pg",
         schema: {
           user: userTable,
           session: authSchema.sessionTable,
@@ -76,7 +76,7 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         },
       },
-      // TODO: Wire up KVService for rate limiting and session caching
+      // FIX: Wire up KVService for rate limiting and session caching
       // See packages/core/src/kv.ts - need to inject KVNamespace binding from worker env
       // rateLimit: { window: 10, max: 100, storage: 'secondary-storage' },
       // secondaryStorage: { get, set, delete }
@@ -89,7 +89,7 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
       user: {
         deleteUser: {
           enabled: true,
-          afterDelete: async (user, request) => {
+          afterDelete: async (_user, _request) => {
             // await polar.customers.deleteExternal({
             //   externalId: user.id,
             // });
@@ -116,10 +116,10 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
                       (cause) =>
                         new DatabaseError({
                           message:
-                            'Failed to retrieve existing session from database',
+                            "Failed to retrieve existing session from database",
                           cause,
-                        })
-                    )
+                        }),
+                    ),
                   );
 
                 if (sessionFromDb?.activeOrganizationId) {
@@ -139,10 +139,10 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
                       (cause) =>
                         new OrganizationMembershipError({
                           message:
-                            'Failed to retrieve user organization membership',
+                            "Failed to retrieve user organization membership",
                           cause,
-                        })
-                    )
+                        }),
+                    ),
                   );
 
                 if (!membership) {
@@ -167,20 +167,21 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
         polar({
           client: polarClient,
           createCustomerOnSignUp: true,
+          // oxlint-disable-next-line require-await
           getCustomerCreateParams: async ({ user: _user }, _request) => ({
             metadata: {
-              myCustomProperty: '123',
+              myCustomProperty: "123",
             },
           }),
           use: [
             checkout({
               products: [
                 {
-                  productId: '9c95ece8-1776-4629-a58a-26f8b46b59b4',
-                  slug: 'teams',
+                  productId: "9c95ece8-1776-4629-a58a-26f8b46b59b4",
+                  slug: "teams",
                 },
               ],
-              successUrl: '/success?checkout_id={CHECKOUT_ID}',
+              successUrl: "/success?checkout_id={CHECKOUT_ID}",
               authenticatedUsersOnly: true,
             }),
             portal(),
@@ -205,13 +206,13 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
             parent,
           },
           teams: { enabled: true },
-          creatorRole: 'headCoach', // Club creator becomes head coach
+          creatorRole: "headCoach", // Club creator becomes head coach
           allowUserToCreateOrganization: true, // Allow creating new clubs
           sendInvitationEmail: async (data) => {
             const _ = await Promise.resolve();
-            const _inviteLink = `${process.env.APP_URL || 'http://localhost:3000'}/accept-invitation/${data.id}`;
+            const _inviteLink = `${process.env.APP_URL || "http://localhost:3000"}/accept-invitation/${data.id}`;
 
-            // TODO: Implement actual email sending
+            // FIX: Implement actual email sending
             // await sendEmail({
             //   to: data.email,
             //   subject: `Join ${data.organization.name} on LaxDB`,
@@ -244,9 +245,9 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
             (cause) =>
               new AuthenticationError({
                 cause,
-                message: 'Failed to get session',
-              })
-          )
+                message: "Failed to get session",
+              }),
+          ),
         ),
       getSessionOrThrow: (headers: Headers) =>
         Effect.tryPromise(async () => {
@@ -259,43 +260,43 @@ export class AuthService extends Effect.Service<AuthService>()('AuthService', {
             (cause) =>
               new AuthenticationError({
                 cause,
-                message: 'Failed to get session',
-              })
+                message: "Failed to get session",
+              }),
           ),
           Effect.filterOrFail(
             (session) => !!session,
             () =>
               new AuthenticationError({
-                message: 'Session is not valid',
-              })
-          )
+                message: "Session is not valid",
+              }),
+          ),
         ),
       getActiveOrganization: (headers: Headers) =>
         Effect.tryPromise(() => auth.api.getFullOrganization({ headers })).pipe(
           Effect.mapError(
             (cause) =>
               new OrganizationMembershipError({
-                message: 'Failed to retrieve active organization from session',
+                message: "Failed to retrieve active organization from session",
                 cause,
-              })
-          )
+              }),
+          ),
         ),
       getActiveOrganizationOrThrow: (headers: Headers) =>
         Effect.tryPromise(() => auth.api.getFullOrganization({ headers })).pipe(
           Effect.mapError(
             (cause) =>
               new OrganizationMembershipError({
-                message: 'Failed to retrieve active organization from session',
+                message: "Failed to retrieve active organization from session",
                 cause,
-              })
+              }),
           ),
           Effect.filterOrFail(
             (org) => !!org,
             () =>
               new OrganizationMembershipError({
-                message: 'No active organization found for the current session',
-              })
-          )
+                message: "No active organization found for the current session",
+              }),
+          ),
         ),
     };
   }),

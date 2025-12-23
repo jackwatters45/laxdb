@@ -1,7 +1,7 @@
-import { Schema } from 'effect';
-import { EmailSchema } from '../schema';
+import { Schema } from "effect";
+import { EmailSchema } from "../schema";
 
-export class Email extends Schema.Class<Email>('Email')({
+export class Email extends Schema.Class<Email>("Email")({
   to: Schema.Array(EmailSchema),
   subject: Schema.String,
   htmlBody: Schema.String,
@@ -10,7 +10,7 @@ export class Email extends Schema.Class<Email>('Email')({
 }) {}
 
 export class SendEmailInput extends Schema.Class<SendEmailInput>(
-  'SendEmailInput'
+  "SendEmailInput",
 )({
   to: Schema.Array(EmailSchema),
   subject: Schema.String,
@@ -20,7 +20,7 @@ export class SendEmailInput extends Schema.Class<SendEmailInput>(
 }) {}
 
 export class SendFeedbackEmailInput extends Schema.Class<SendFeedbackEmailInput>(
-  'SendFeedbackEmailInput'
+  "SendFeedbackEmailInput",
 )({
   feedbackId: Schema.Number,
   topic: Schema.String,

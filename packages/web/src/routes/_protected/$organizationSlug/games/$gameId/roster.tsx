@@ -1,50 +1,52 @@
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { ArrowLeft, Plus, Save, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Plus, Save, Trash2, Users } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Mock data
 const mockTeamPlayers = [
-  { id: '1', name: 'John Smith', position: 'Attack', jerseyNumber: 10 },
-  { id: '2', name: 'Mike Johnson', position: 'Midfield', jerseyNumber: 23 },
-  { id: '3', name: 'David Wilson', position: 'Defense', jerseyNumber: 5 },
-  { id: '4', name: 'Chris Brown', position: 'Goalie', jerseyNumber: 1 },
-  { id: '5', name: 'Alex Garcia', position: 'Attack', jerseyNumber: 15 },
-  { id: '6', name: 'Ryan Davis', position: 'Defense', jerseyNumber: 8 },
-  { id: '7', name: 'Tyler Martinez', position: 'Midfield', jerseyNumber: 12 },
-  { id: '8', name: 'Kevin Lee', position: 'Attack', jerseyNumber: 3 },
+  { id: "1", name: "John Smith", position: "Attack", jerseyNumber: 10 },
+  { id: "2", name: "Mike Johnson", position: "Midfield", jerseyNumber: 23 },
+  { id: "3", name: "David Wilson", position: "Defense", jerseyNumber: 5 },
+  { id: "4", name: "Chris Brown", position: "Goalie", jerseyNumber: 1 },
+  { id: "5", name: "Alex Garcia", position: "Attack", jerseyNumber: 15 },
+  { id: "6", name: "Ryan Davis", position: "Defense", jerseyNumber: 8 },
+  { id: "7", name: "Tyler Martinez", position: "Midfield", jerseyNumber: 12 },
+  { id: "8", name: "Kevin Lee", position: "Attack", jerseyNumber: 3 },
 ];
 
 const mockGameRoster = [
-  { playerId: '1', isStarter: true, isCaptain: false },
-  { playerId: '2', isStarter: true, isCaptain: true },
-  { playerId: '3', isStarter: true, isCaptain: false },
-  { playerId: '4', isStarter: true, isCaptain: false },
+  { playerId: "1", isStarter: true, isCaptain: false },
+  { playerId: "2", isStarter: true, isCaptain: true },
+  { playerId: "3", isStarter: true, isCaptain: false },
+  { playerId: "4", isStarter: true, isCaptain: false },
 ];
 
 // Server functions
-const getGameRoster = createServerFn({ method: 'GET' })
+const getGameRoster = createServerFn({ method: "GET" })
   .inputValidator((data: { gameId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API
+  .handler(({ data: _ }) => {
+    // FIX: Replace with actual API
     return mockGameRoster;
   });
 
-const getTeamPlayers = createServerFn().handler(async () => {
-  // TODO: Replace with actual API
+const getTeamPlayers = createServerFn().handler(() => {
+  // FIX: Replace with actual API
   return mockTeamPlayers;
 });
 
-const updateGameRoster = createServerFn({ method: 'POST' })
+const updateGameRoster = createServerFn({ method: "POST" })
   .inputValidator((data: { gameId: string; roster: RosterPlayer[] }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  .handler(async ({ data: _ }) => {
+    // FIX: Replace with actual API
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500);
+    });
     return { success: true };
   });
 
@@ -55,7 +57,7 @@ type RosterPlayer = {
 };
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/games/$gameId/roster'
+  "/_protected/$organizationSlug/games/$gameId/roster",
 )({
   component: RosterManagementPage,
   loader: async ({ params }) => {
@@ -75,15 +77,15 @@ function RosterManagementPage() {
   const [roster, setRoster] = useState<RosterPlayer[]>(initialRoster);
 
   const updateRosterMutation = useMutation({
-    mutationKey: ['updateRoster', gameId],
+    mutationKey: ["updateRoster", gameId],
     mutationFn: (newRoster: RosterPlayer[]) =>
       updateGameRoster({ data: { gameId, roster: newRoster } }),
     onSuccess: () => {
-      toast.success('Roster updated successfully!');
+      toast.success("Roster updated successfully!");
       router.invalidate();
     },
     onError: () => {
-      toast.error('Failed to update roster. Please try again.');
+      toast.error("Failed to update roster. Please try again.");
     },
   });
 
@@ -112,10 +114,10 @@ function RosterManagementPage() {
 
   const updatePlayerRosterInfo = (
     playerId: string,
-    updates: Partial<RosterPlayer>
+    updates: Partial<RosterPlayer>,
   ) => {
     setRoster((prev) =>
-      prev.map((r) => (r.playerId === playerId ? { ...r, ...updates } : r))
+      prev.map((r) => (r.playerId === playerId ? { ...r, ...updates } : r)),
     );
   };
 
@@ -161,7 +163,7 @@ function RosterManagementPage() {
             onClick={handleSave}
           >
             <Save className="mr-2 h-4 w-4" />
-            {updateRosterMutation.isPending ? 'Saving...' : 'Save Roster'}
+            {updateRosterMutation.isPending ? "Saving..." : "Save Roster"}
           </Button>
         </div>
       </div>
@@ -201,11 +203,11 @@ function RosterManagementPage() {
                           <Checkbox
                             checked={player.isStarter}
                             id={`starter-${player.id}`}
-                            onCheckedChange={(checked) =>
+                            onCheckedChange={(checked) => {
                               updatePlayerRosterInfo(player.id, {
                                 isStarter: checked === true,
-                              })
-                            }
+                              });
+                            }}
                           />
                           <label htmlFor={`starter-${player.id}`}>
                             Starter
@@ -215,11 +217,11 @@ function RosterManagementPage() {
                           <Checkbox
                             checked={player.isCaptain}
                             id={`captain-${player.id}`}
-                            onCheckedChange={(checked) =>
+                            onCheckedChange={(checked) => {
                               updatePlayerRosterInfo(player.id, {
                                 isCaptain: checked === true,
-                              })
-                            }
+                              });
+                            }}
                           />
                           <label htmlFor={`captain-${player.id}`}>
                             Captain
@@ -228,7 +230,9 @@ function RosterManagementPage() {
                       </div>
 
                       <Button
-                        onClick={() => removePlayerFromRoster(player.id)}
+                        onClick={() => {
+                          removePlayerFromRoster(player.id);
+                        }}
                         size="sm"
                         variant="ghost"
                       >
@@ -277,7 +281,9 @@ function RosterManagementPage() {
                     </div>
 
                     <Button
-                      onClick={() => addPlayerToRoster(player.id)}
+                      onClick={() => {
+                        addPlayerToRoster(player.id);
+                      }}
                       size="sm"
                       variant="outline"
                     >

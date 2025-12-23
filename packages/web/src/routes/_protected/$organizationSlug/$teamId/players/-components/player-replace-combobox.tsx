@@ -1,7 +1,7 @@
-import type { Player } from '@laxdb/core/player/player.sql';
-import { useQuery } from '@tanstack/react-query';
-import { Edit } from 'lucide-react';
-import { useMemo } from 'react';
+import type { Player } from "@laxdb/core/player/player.sql";
+import { useQuery } from "@tanstack/react-query";
+import { Edit } from "lucide-react";
+import { useMemo } from "react";
 import {
   SearchComboboxAction,
   SearchComboboxContent,
@@ -16,9 +16,9 @@ import {
   SearchComboboxSeparator,
   SearchComboboxTrigger,
   useSearchCombobox,
-} from '@/components/ui/search-combobox';
-import { getOrgPlayersQK } from '@/mutations/players';
-import { getOrganizationPlayers } from '@/query/players';
+} from "@/components/ui/search-combobox";
+import { getOrgPlayersQK } from "@/mutations/players";
+import { getOrganizationPlayers } from "@/query/players";
 
 export function PlayerReplaceCombobox({
   organizationId,
@@ -40,21 +40,21 @@ export function PlayerReplaceCombobox({
 
   const filteredPlayers = useMemo(() => {
     const availablePlayers = allPlayers.filter(
-      (player) => !excludePlayerIds.includes(player.publicId)
+      (player) => !excludePlayerIds.includes(player.publicId),
     );
     return availablePlayers;
   }, [allPlayers, excludePlayerIds]);
 
   return (
     <SearchComboboxProvider
-      getItemValue={(player) => player.name || ''}
+      getItemValue={(player) => player.name ?? ""}
       isLoading={isLoading}
       items={filteredPlayers}
       onSelect={onSelect}
       value={value}
     >
       <SearchComboboxRoot>
-        <SearchComboboxTrigger placeholder={'Search or swap player...'} />
+        <SearchComboboxTrigger placeholder={"Search or swap player..."} />
         <SearchComboboxContent>
           <SearchComboboxInput placeholder="Swap player..." />
           <SearchComboboxList>
@@ -66,7 +66,7 @@ export function PlayerReplaceCombobox({
                   {(query) =>
                     query
                       ? `No players found named '${query}'`
-                      : 'No players to add to team. Try creating a new player.'
+                      : "No players to add to team. Try creating a new player."
                   }
                 </SearchComboboxEmpty>
                 <FilteredPlayerItemsWithGroup />
@@ -91,9 +91,9 @@ function FilteredPlayerItemsWithGroup() {
     const query = searchQuery.toLowerCase();
     return items.filter(
       (player) =>
-        player.name?.toLowerCase().includes(query) ||
-        player.email?.toLowerCase().includes(query) ||
-        player.phone?.toLowerCase().includes(query)
+        player.name?.toLowerCase().includes(query) ??
+        player.email?.toLowerCase().includes(query) ??
+        player.phone?.toLowerCase().includes(query),
     );
   }, [items, searchQuery]);
 
@@ -107,10 +107,10 @@ function FilteredPlayerItemsWithGroup() {
         <SearchComboboxItem item={player} key={player.publicId}>
           {(player) => (
             <div className="flex flex-col">
-              <span>{player.name || 'Unnamed'}</span>
-              {(player.email || player.phone) && (
+              <span>{player.name ?? "Unnamed"}</span>
+              {(player.email ?? player.phone) && (
                 <span className="text-muted-foreground text-xs">
-                  {player.email || player.phone}
+                  {player.email ?? player.phone}
                 </span>
               )}
             </div>
@@ -136,10 +136,14 @@ function RenamePlayerOption({
     <>
       <SearchComboboxSeparator />
       <SearchComboboxGroup>
-        <SearchComboboxAction onSelect={() => onRename(searchQuery.trim())}>
+        <SearchComboboxAction
+          onSelect={() => {
+            onRename(searchQuery.trim());
+          }}
+        >
           <Edit className="h-4 w-4" />
           <span>
-            Rename to <strong>"{searchQuery.trim()}"</strong>
+            Rename to <strong>&quot;{searchQuery.trim()}&quot;</strong>
           </span>
         </SearchComboboxAction>
       </SearchComboboxGroup>

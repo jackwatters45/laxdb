@@ -9,10 +9,10 @@
     "format:check": "bun run format -- --check",
     "fix": "oxlint --fix && oxfmt"
   },
-  "devDependencies": {
-    "@vitest/ui": "^3.2.4"
-  },
   "dependencies": {
     "@laxdb/core": "*"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^3.2.4"
   }
 }

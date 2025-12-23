@@ -1,21 +1,21 @@
-import { Schema } from 'effect';
-import { TimestampsSchema } from '../schema';
+import { Schema } from "effect";
+import { TimestampsSchema } from "../schema";
 
 export const TOPIC_ENUM = [
-  'feature-request',
-  'bug-report',
-  'user-interface',
-  'performance',
-  'documentation',
-  'other',
+  "feature-request",
+  "bug-report",
+  "user-interface",
+  "performance",
+  "documentation",
+  "other",
 ] as const;
 
-export const RATING_ENUM = ['positive', 'neutral', 'negative'] as const;
+export const RATING_ENUM = ["positive", "neutral", "negative"] as const;
 
 export const TopicSchema = Schema.Literal(...TOPIC_ENUM);
 export const RatingSchema = Schema.Literal(...RATING_ENUM);
 
-export class Feedback extends Schema.Class<Feedback>('Feedback')({
+export class Feedback extends Schema.Class<Feedback>("Feedback")({
   publicId: Schema.String,
   topic: TopicSchema,
   rating: RatingSchema,
@@ -26,7 +26,7 @@ export class Feedback extends Schema.Class<Feedback>('Feedback')({
 }) {}
 
 export class CreateFeedbackInput extends Schema.Class<CreateFeedbackInput>(
-  'CreateFeedbackInput'
+  "CreateFeedbackInput",
 )({
   topic: TopicSchema,
   rating: RatingSchema,

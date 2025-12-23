@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router';
-import { ArrowLeft, Edit } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { getTrendColor, getTrendLabel } from '../-utils';
+import { Link } from "@tanstack/react-router";
+import { ArrowLeft, Edit } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { getTrendColor, getTrendLabel } from "../-utils";
 
 type PlayerHeaderProps = {
   player: any;

@@ -29,7 +29,7 @@ export function makeFetchEntryPoint<R, E>(
 ): ExportedHandler<Cloudflare.Env> {
   const runtime = ManagedRuntime.make(options.layer, options.memoMap);
 
-  const fetch = async (
+  const fetch = (
     req: Request,
     env: Cloudflare.Env,
     ctx: globalThis.ExecutionContext,

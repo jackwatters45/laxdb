@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Plus } from "lucide-react";
 import {
   FilterActions,
   FilterBar,
@@ -9,11 +9,11 @@ import {
   FilterClear,
   FilterGroup,
   FilterSearch,
-} from '@/components/data-table/data-table-filterbar';
-import { useDataTable } from '@/components/data-table/use-data-table';
-import { Button } from '@/components/ui/button';
-import { POSITION_SELECT_FIELDS } from '@/lib/constants';
-import { AddPlayerCommand } from './add-player-command';
+} from "@/components/data-table/data-table-filterbar";
+import { useDataTable } from "@/components/data-table/use-data-table";
+import { Button } from "@/components/ui/button";
+import { POSITION_SELECT_FIELDS } from "@/lib/constants";
+import { AddPlayerCommand } from "./add-player-command";
 
 export function PlayersFilterBar({
   organizationId,
@@ -26,12 +26,12 @@ export function PlayersFilterBar({
     <FilterBarProvider table={table}>
       <FilterBar>
         <FilterGroup>
-          {table.getColumn('name')?.getIsVisible() && (
+          {table.getColumn("name")?.getIsVisible() && (
             <FilterSearch column="name" placeholder="Search by name..." />
           )}
-          {table.getColumn('position')?.getIsVisible() && (
+          {table.getColumn("position")?.getIsVisible() && (
             <FilterCheckbox
-              column={table.getColumn('position')}
+              column={table.getColumn("position")}
               options={POSITION_SELECT_FIELDS}
               title="Position"
             />

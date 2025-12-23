@@ -3,59 +3,59 @@ import {
   RiSlackFill,
   RiTwitterXFill,
   RiYoutubeFill,
-} from '@remixicon/react';
-import Link from 'next/link';
-import { SolarLogo } from '../../../public/solar-logo';
+} from "@remixicon/react";
+import Link from "next/link";
+import { SolarLogo } from "../../../public/solar-logo";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 const Footer = () => {
   const sections = {
     solutions: {
-      title: 'Solutions',
+      title: "Solutions",
       items: [
-        { label: 'Crop Monitoring', href: '#' },
-        { label: 'Irrigation Control', href: '#' },
-        { label: 'Soil Analytics', href: '#' },
-        { label: 'Weather Integration', href: '#' },
-        { label: 'Documentation', href: '#' },
-        { label: 'Smart Farming Guide', href: '#' },
-        { label: 'Equipment', href: '#' },
+        { label: "Crop Monitoring", href: "#" },
+        { label: "Irrigation Control", href: "#" },
+        { label: "Soil Analytics", href: "#" },
+        { label: "Weather Integration", href: "#" },
+        { label: "Documentation", href: "#" },
+        { label: "Smart Farming Guide", href: "#" },
+        { label: "Equipment", href: "#" },
       ],
     },
     company: {
-      title: 'Company',
+      title: "Company",
       items: [
-        { label: 'About us', href: '#' },
-        { label: 'Blog', href: '#' },
-        { label: 'Careers', href: '#' },
-        { label: 'Success Stories', href: '#' },
-        { label: 'Sustainability', href: '#' },
+        { label: "About us", href: "#" },
+        { label: "Blog", href: "#" },
+        { label: "Careers", href: "#" },
+        { label: "Success Stories", href: "#" },
+        { label: "Sustainability", href: "#" },
       ],
     },
     resources: {
-      title: 'Resources',
+      title: "Resources",
       items: [
-        { label: 'Farmer Network', href: '#' },
+        { label: "Farmer Network", href: "#" },
         {
-          label: 'Community',
-          href: '#',
+          label: "Community",
+          href: "#",
           external: true,
         },
-        { label: 'Contact', href: '#' },
-        { label: 'Support', href: '#' },
-        { label: 'Privacy Policy', href: '#' },
-        { label: 'Terms of Service', href: '#' },
-        { label: 'Report an Issue', href: '#' },
+        { label: "Contact", href: "#" },
+        { label: "Support", href: "#" },
+        { label: "Privacy Policy", href: "#" },
+        { label: "Terms of Service", href: "#" },
+        { label: "Report an Issue", href: "#" },
       ],
     },
     partners: {
-      title: 'Partners',
+      title: "Partners",
       items: [
-        { label: 'Dealer Network', href: '#', external: true },
-        { label: 'System Status', href: '#', external: true },
-        { label: 'Research Partners', href: '#', external: true },
-        { label: 'Integration Guide', href: '#' },
+        { label: "Dealer Network", href: "#", external: true },
+        { label: "System Status", href: "#", external: true },
+        { label: "Research Partners", href: "#", external: true },
+        { label: "Integration Guide", href: "#" },
       ],
     },
   };
@@ -72,7 +72,7 @@ const Footer = () => {
           <div
             className="absolute inset-y-0 my-[-5rem] w-px"
             style={{
-              maskImage: 'linear-gradient(transparent, white 5rem)',
+              maskImage: "linear-gradient(transparent, white 5rem)",
             }}
           >
             <svg
@@ -96,7 +96,7 @@ const Footer = () => {
           <div
             className="absolute inset-y-0 right-0 my-[-5rem] w-px"
             style={{
-              maskImage: 'linear-gradient(transparent, white 5rem)',
+              maskImage: "linear-gradient(transparent, white 5rem)",
             }}
           >
             <svg

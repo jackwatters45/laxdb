@@ -1,76 +1,76 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { ArrowLeft, Calendar, FileText, Plus, User } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, FileText, Plus, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Mock data for player notes
 const mockPlayerNotes = [
   {
-    id: '1',
-    title: 'Excellent leadership in practice',
+    id: "1",
+    title: "Excellent leadership in practice",
     content:
       "Alex showed outstanding leadership during today's scrimmage. He effectively communicated with teammates, made smart decisions under pressure, and helped organize the offense when plays broke down.",
-    type: 'behavior',
-    date: new Date('2024-09-20'),
-    priority: 'medium' as const,
-    coach: 'Coach Johnson',
-    tags: ['leadership', 'communication', 'game-sense'],
+    type: "behavior",
+    date: new Date("2024-09-20"),
+    priority: "medium" as const,
+    coach: "Coach Johnson",
+    tags: ["leadership", "communication", "game-sense"],
   },
   {
-    id: '2',
-    title: 'Shot mechanics improvement needed',
+    id: "2",
+    title: "Shot mechanics improvement needed",
     content:
       "While Alex's shot accuracy has improved to 62%, his mechanics still need work. His follow-through is inconsistent and he tends to rush shots when under pressure. Recommend additional one-on-one shooting sessions.",
-    type: 'skill_assessment',
-    date: new Date('2024-09-18'),
-    priority: 'high' as const,
-    coach: 'Coach Smith',
-    tags: ['shooting', 'mechanics', 'accuracy'],
+    type: "skill_assessment",
+    date: new Date("2024-09-18"),
+    priority: "high" as const,
+    coach: "Coach Smith",
+    tags: ["shooting", "mechanics", "accuracy"],
   },
   {
-    id: '3',
-    title: 'Academic check-in - positive progress',
+    id: "3",
+    title: "Academic check-in - positive progress",
     content:
       "Met with Alex about his academic performance. Current GPA is 3.7, up from 3.5 last semester. He's staying on top of assignments and has good study habits. Continue to monitor but no concerns at this time.",
-    type: 'general',
-    date: new Date('2024-09-15'),
-    priority: 'low' as const,
-    coach: 'Coach Johnson',
-    tags: ['academics', 'progress'],
+    type: "general",
+    date: new Date("2024-09-15"),
+    priority: "low" as const,
+    coach: "Coach Johnson",
+    tags: ["academics", "progress"],
   },
   {
-    id: '4',
-    title: 'Injury update - shoulder cleared',
+    id: "4",
+    title: "Injury update - shoulder cleared",
     content:
-      'Alex was cleared by the trainer for full contact. Shoulder injury from last month has healed completely. No restrictions on practice or game participation.',
-    type: 'medical',
-    date: new Date('2024-09-12'),
-    priority: 'medium' as const,
-    coach: 'Athletic Trainer Davis',
-    tags: ['injury', 'medical', 'cleared'],
+      "Alex was cleared by the trainer for full contact. Shoulder injury from last month has healed completely. No restrictions on practice or game participation.",
+    type: "medical",
+    date: new Date("2024-09-12"),
+    priority: "medium" as const,
+    coach: "Athletic Trainer Davis",
+    tags: ["injury", "medical", "cleared"],
   },
 ];
 
-const getPlayerNotes = createServerFn({ method: 'GET' })
+const getPlayerNotes = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _ }) => {
+    // FIX: Replace with actual API call
     return {
-      playerName: 'Alex Johnson',
+      playerName: "Alex Johnson",
       notes: mockPlayerNotes,
     };
   });
 
-const getPlayerPermissions = createServerFn().handler(async () => ({
+const getPlayerPermissions = createServerFn().handler(() => ({
   canCreateNotes: true,
   canEditNotes: true,
   canDeleteNotes: true,
 }));
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/$playerId/notes'
+  "/_protected/$organizationSlug/players/$playerId/notes",
 )({
   component: PlayerNotesPage,
   loader: async ({ params }) => {
@@ -83,43 +83,43 @@ export const Route = createFileRoute(
   },
 });
 
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+
+const getPriorityColor = (priority: "low" | "medium" | "high") => {
+  switch (priority) {
+    case "high":
+      return "destructive";
+    case "medium":
+      return "default";
+    case "low":
+      return "secondary";
+    default:
+      return "default";
+  }
+};
+
+const getTypeIcon = (type: string) => {
+  switch (type) {
+    case "behavior":
+      return <User className="h-4 w-4" />;
+    case "skill_assessment":
+      return <FileText className="h-4 w-4" />;
+    case "medical":
+      return <Calendar className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+};
+
 function PlayerNotesPage() {
   const { playerName, notes, permissions } = Route.useLoaderData();
   const { organizationSlug, playerId } = Route.useParams();
-
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date);
-
-  const getPriorityColor = (priority: 'low' | 'medium' | 'high') => {
-    switch (priority) {
-      case 'high':
-        return 'destructive';
-      case 'medium':
-        return 'default';
-      case 'low':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'behavior':
-        return <User className="h-4 w-4" />;
-      case 'skill_assessment':
-        return <FileText className="h-4 w-4" />;
-      case 'medical':
-        return <Calendar className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
 
   return (
     <div className="container mx-auto py-8">
@@ -179,7 +179,7 @@ function PlayerNotesPage() {
                       {note.priority.toUpperCase()}
                     </Badge>
                     <Badge variant="outline">
-                      {note.type.replace('_', ' ').toUpperCase()}
+                      {note.type.replace("_", " ").toUpperCase()}
                     </Badge>
                   </div>
                 </div>

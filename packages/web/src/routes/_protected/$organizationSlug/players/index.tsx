@@ -1,47 +1,47 @@
-import { PlayerService } from '@laxdb/core/player/player.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { OrganizationIdSchema } from '@laxdb/core/schema';
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { useMemo } from 'react';
+import { PlayerService } from "@laxdb/core/player/player.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { OrganizationIdSchema } from "@laxdb/core/schema";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { useMemo } from "react";
 import {
   DataTableBody,
   DataTableContent,
   DataTableHeader,
   DataTableProvider,
   DataTableRoot,
-} from '@/components/data-table/data-table';
-import { PageBody } from '@/components/layout/page-content';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { authMiddleware } from '@/lib/middleware';
-import { getOrgPlayersQK } from '@/mutations/players';
-import { createEditablePlayerColumns } from './-components/players-columns';
-import { PlayersFilterBar } from './-components/players-filterbar';
-import { PlayersHeader } from './-components/players-header';
-import { PlayersToolbar } from './-components/players-toolbar';
+} from "@/components/data-table/data-table";
+import { PageBody } from "@/components/layout/page-content";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { authMiddleware } from "@/lib/middleware";
+import { getOrgPlayersQK } from "@/mutations/players";
+import { createEditablePlayerColumns } from "./-components/players-columns";
+import { PlayersFilterBar } from "./-components/players-filterbar";
+import { PlayersHeader } from "./-components/players-header";
+import { PlayersToolbar } from "./-components/players-toolbar";
 
 const GetPlayers = Schema.Struct({
   ...OrganizationIdSchema,
 });
 
-const getPlayers = createServerFn({ method: 'GET' })
+const getPlayers = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof GetPlayers.Type) =>
-    Schema.decodeSync(GetPlayers)(data)
+    Schema.decodeSync(GetPlayers)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const playerService = yield* PlayerService;
         return yield* playerService.getAll(data);
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug/players/')({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/")({
   component: RouteComponent,
   loader: async ({ context }) => {
     await context.queryClient.prefetchQuery({
@@ -83,7 +83,7 @@ function PlayersDataTable() {
         organizationId: activeOrganization.id,
         organizationSlug,
       }),
-    [activeOrganization.id, organizationSlug]
+    [activeOrganization.id, organizationSlug],
   );
 
   return (

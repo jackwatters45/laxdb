@@ -1,17 +1,17 @@
-import type { Member } from 'better-auth/plugins/organization';
-import { Array as Arr, Effect, Option, Schema } from 'effect';
-import { AuthService } from '../auth';
-import { NotFoundError } from '../error';
-import { OrganizationNotFoundError } from './organization.error';
-import { OrganizationRepo } from './organization.repo';
+import type { Member } from "better-auth/plugins/organization";
+import { Array as Arr, Effect, Option, Schema } from "effect";
+import { AuthService } from "../auth";
+import { NotFoundError } from "../error";
+import { OrganizationNotFoundError } from "./organization.error";
+import { OrganizationRepo } from "./organization.repo";
 import {
   AcceptInvitationInput,
   CreateOrganizationInput,
   type DashboardData,
-} from './organization.schema';
+} from "./organization.schema";
 
 export class OrganizationService extends Effect.Service<OrganizationService>()(
-  'OrganizationService',
+  "OrganizationService",
   {
     effect: Effect.gen(function* () {
       const auth = yield* AuthService;
@@ -20,11 +20,11 @@ export class OrganizationService extends Effect.Service<OrganizationService>()(
       return {
         createOrganization: (
           input: CreateOrganizationInput,
-          headers: Headers
+          headers: Headers,
         ) =>
           Effect.gen(function* () {
             const validated = yield* Schema.decode(CreateOrganizationInput)(
-              input
+              input,
             );
 
             yield* repo.checkOrganizationSlug(validated.slug);
@@ -40,21 +40,21 @@ export class OrganizationService extends Effect.Service<OrganizationService>()(
                   Option.match(
                     Arr.findFirst(
                       teams,
-                      (team) => team.name === validated.name
+                      (team) => team.name === validated.name,
                     ),
                     {
                       onNone: () =>
                         Effect.fail(
                           new NotFoundError({
-                            domain: 'organization',
+                            domain: "organization",
                             id: org.id,
-                            message: 'Team not found',
-                          })
+                            message: "Team not found",
+                          }),
                         ),
                       onSome: Effect.succeed,
-                    }
-                  )
-                )
+                    },
+                  ),
+                ),
               );
 
             return { teamId: team.id };
@@ -63,12 +63,12 @@ export class OrganizationService extends Effect.Service<OrganizationService>()(
         acceptInvitation: (input: AcceptInvitationInput, headers: Headers) =>
           Effect.gen(function* () {
             const validated = yield* Schema.decode(AcceptInvitationInput)(
-              input
+              input,
             );
 
             return yield* repo.acceptInvitation(
               headers,
-              validated.invitationId
+              validated.invitationId,
             );
           }),
 
@@ -81,26 +81,26 @@ export class OrganizationService extends Effect.Service<OrganizationService>()(
                 auth.getActiveOrganization(headers),
                 repo.listOrganizationTeams(headers),
               ],
-              { concurrency: 'unbounded' }
+              { concurrency: "unbounded" },
             ).pipe(
               Effect.flatMap(([org, teams]) =>
                 org
                   ? Effect.succeed([org, teams] as const)
                   : Effect.fail(
                       new OrganizationNotFoundError({
-                        message: 'User has no active organization',
-                      })
-                    )
-              )
+                        message: "User has no active organization",
+                      }),
+                    ),
+              ),
             );
 
             const teamsWithMembers = yield* Effect.all(
               teams.map((team) =>
                 repo
                   .getTeamMembers(headers, team.id)
-                  .pipe(Effect.map((members) => ({ ...team, members })))
+                  .pipe(Effect.map((members) => ({ ...team, members }))),
               ),
-              { concurrency: 'unbounded' }
+              { concurrency: "unbounded" },
             );
 
             // Better Auth doesn't expose listTeams or getActiveMember APIs yet
@@ -121,5 +121,5 @@ export class OrganizationService extends Effect.Service<OrganizationService>()(
       } as const;
     }),
     dependencies: [OrganizationRepo.Default, AuthService.Default],
-  }
+  },
 ) {}

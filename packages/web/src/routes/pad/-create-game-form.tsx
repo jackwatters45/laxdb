@@ -1,16 +1,16 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { CreateGameInput } from '@laxdb/core/game/game.schema';
-import { GameService } from '@laxdb/core/game/game.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { PageContainer } from '@/components/layout/page-content';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { CreateGameInput } from "@laxdb/core/game/game.schema";
+import { GameService } from "@laxdb/core/game/game.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { PageContainer } from "@/components/layout/page-content";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,22 +18,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { authMiddleware } from '@/lib/middleware';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { authMiddleware } from "@/lib/middleware";
 
-const createGame = createServerFn({ method: 'POST' })
+const createGame = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof CreateGameInput.Type) =>
-    Schema.decodeSync(CreateGameInput)(data)
+    Schema.decodeSync(CreateGameInput)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const gameService = yield* GameService;
         return yield* gameService.create(data);
-      })
-    )
+      }),
+    ),
   );
 
 type FormData = typeof CreateGameInput.Type;
@@ -54,7 +54,7 @@ export function CreateGameForm({ organizationId }: { organizationId: string }) {
       await router.invalidate();
     },
     onError: (_error, _variables) => {
-      toast.error('Failed to create game. Please try again.');
+      toast.error("Failed to create game. Please try again.");
     },
   });
 
@@ -88,7 +88,9 @@ export function CreateGameForm({ organizationId }: { organizationId: string }) {
                       <Input
                         placeholder="e.g., Malvern Lacrosse Club"
                         {...field}
-                        onChange={(e) => field.onChange(e)}
+                        onChange={(e) => {
+                          field.onChange(e);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -98,7 +100,7 @@ export function CreateGameForm({ organizationId }: { organizationId: string }) {
 
               <div className="flex gap-4 pt-4">
                 <Button disabled={createGameMutation.isPending} type="submit">
-                  {createGameMutation.isPending ? 'Creating...' : 'Create Game'}
+                  {createGameMutation.isPending ? "Creating..." : "Create Game"}
                 </Button>
               </div>
             </form>

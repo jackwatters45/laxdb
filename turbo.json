@@ -1,14 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    ".env",
-    ".env.*",
-    "tsconfig.json"
-  ],
-  "globalEnv": [
-    "NODE_ENV",
-    "CI"
-  ],
+  "globalDependencies": [".env", ".env.*", "tsconfig.json"],
+  "globalEnv": ["NODE_ENV", "CI"],
   "tasks": {
     "typecheck": {
       "dependsOn": ["^typecheck"],
@@ -31,16 +24,8 @@
         "vite.config.ts",
         "next.config.ts"
       ],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        ".output/**",
-        "!.next/cache/**"
-      ],
-      "env": [
-        "VITE_*",
-        "NEXT_PUBLIC_*"
-      ]
+      "outputs": ["dist/**", ".next/**", ".output/**", "!.next/cache/**"],
+      "env": ["VITE_*", "NEXT_PUBLIC_*"]
     },
     "test": {
       "dependsOn": ["^build"],
@@ -53,10 +38,7 @@
         "package.json"
       ],
       "outputs": ["coverage/**"],
-      "env": [
-        "DATABASE_URL",
-        "TEST_*"
-      ]
+      "env": ["DATABASE_URL", "TEST_*"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -64,15 +46,15 @@
       "persistent": true
     },
     "//#lint": {
-      "inputs": [
-        "packages/**/*.ts",
-        "packages/**/*.tsx",
-        ".oxlintrc.json"
-      ],
+      "inputs": ["packages/**/*.ts", "packages/**/*.tsx", ".oxlintrc.json"],
       "outputs": []
     },
-    "//#fix": {
+    "fix": {
+      "dependsOn": ["^fix"],
       "cache": false
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
     }
   }
 }

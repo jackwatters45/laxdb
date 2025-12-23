@@ -1,7 +1,7 @@
-'use client';
-import { motion } from 'motion/react';
+"use client";
+import { motion } from "motion/react";
 
-import type { SVGProps } from 'react';
+import type { SVGProps } from "react";
 
 export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
   const width = 481;
@@ -672,7 +672,7 @@ export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
                 key={`${i}-${j}`}
                 r="0.5"
               />
-            ))
+            )),
           )}
         </pattern>
         <motion.linearGradient
@@ -693,7 +693,7 @@ export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
           transition={{
             duration: 3.5,
             repeat: Number.POSITIVE_INFINITY,
-            ease: 'linear',
+            ease: "linear",
             repeatDelay: 3,
           }}
         >
@@ -711,7 +711,7 @@ export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
           transition={{
             duration: 3,
             repeat: Number.POSITIVE_INFINITY,
-            ease: 'linear',
+            ease: "linear",
             repeatDelay: 2,
           }}
         >

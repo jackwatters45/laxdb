@@ -1,4 +1,4 @@
-import { LineChartIllustration } from '../../../public/images/line-chart-illustration';
+import { LineChartIllustration } from "../../../public/images/line-chart-illustration";
 import {
   Table,
   TableBody,
@@ -7,41 +7,41 @@ import {
   TableHeaderCell,
   TableRoot,
   TableRow,
-} from '../table';
+} from "../table";
 
 const summary = [
   {
-    name: 'North Field Corn',
-    value: '21,349 bu',
-    planted: '19,000 bu',
-    water: '14,033 gal',
-    yield: '+11.2%',
-    efficiency: '+7.8%',
-    nutrients: '+4.9%',
-    bgColor: 'bg-amber-500',
-    changeType: 'positive',
+    name: "North Field Corn",
+    value: "21,349 bu",
+    planted: "19,000 bu",
+    water: "14,033 gal",
+    yield: "+11.2%",
+    efficiency: "+7.8%",
+    nutrients: "+4.9%",
+    bgColor: "bg-amber-500",
+    changeType: "positive",
   },
   {
-    name: 'West Field Soybeans',
-    value: '25,943 bu',
-    planted: '23,600 bu',
-    water: '11,033 gal',
-    yield: '+3.1%',
-    efficiency: '+5.6%',
-    nutrients: '+2.9%',
-    bgColor: 'bg-emerald-500',
-    changeType: 'positive',
+    name: "West Field Soybeans",
+    value: "25,943 bu",
+    planted: "23,600 bu",
+    water: "11,033 gal",
+    yield: "+3.1%",
+    efficiency: "+5.6%",
+    nutrients: "+2.9%",
+    bgColor: "bg-emerald-500",
+    changeType: "positive",
   },
   {
-    name: 'South Field Wheat',
-    value: '9,443 bu',
-    planted: '14,600 bu',
-    water: '2,033 gal',
-    yield: '-5.1%',
-    efficiency: '-6.3%',
-    nutrients: '-9.9%',
-    bgColor: 'bg-yellow-400',
-    changeType: 'negative',
+    name: "South Field Wheat",
+    value: "9,443 bu",
+    planted: "14,600 bu",
+    water: "2,033 gal",
+    yield: "-5.1%",
+    efficiency: "-6.3%",
+    nutrients: "-9.9%",
+    bgColor: "bg-yellow-400",
+    changeType: "negative",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function FieldPerformance() {
           32,227 bushels
         </p>
         <p className="mt-1 text-sm font-medium">
-          <span className="text-emerald-700">+430 bushels (4.1%)</span>{' '}
+          <span className="text-emerald-700">+430 bushels (4.1%)</span>{" "}
           <span className="font-normal text-gray-500">Past growing season</span>
         </p>
         <LineChartIllustration className="mt-8 w-full min-w-200 shrink-0" />
@@ -100,9 +100,9 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === 'positive'
-                          ? 'text-emerald-700'
-                          : 'text-red-700'
+                        item.changeType === "positive"
+                          ? "text-emerald-700"
+                          : "text-red-700"
                       }
                     >
                       {item.yield}
@@ -111,9 +111,9 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === 'positive'
-                          ? 'text-emerald-700'
-                          : 'text-red-700'
+                        item.changeType === "positive"
+                          ? "text-emerald-700"
+                          : "text-red-700"
                       }
                     >
                       {item.efficiency}
@@ -122,9 +122,9 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === 'positive'
-                          ? 'text-emerald-700'
-                          : 'text-red-700'
+                        item.changeType === "positive"
+                          ? "text-emerald-700"
+                          : "text-red-700"
                       }
                     >
                       {item.nutrients}

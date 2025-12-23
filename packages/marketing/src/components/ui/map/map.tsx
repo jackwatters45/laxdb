@@ -3,9 +3,9 @@ import {
   RiPlaneLine,
   RiSignalTowerFill,
   RiTruckFill,
-} from '@remixicon/react';
-import { Icons } from '@/components/icons';
-import { SVGMap } from './svg-map';
+} from "@remixicon/react";
+import { Icons } from "@/components/icons";
+import { SVGMap } from "./svg-map";
 
 export const MapComponent = () => (
   <section
@@ -18,7 +18,7 @@ export const MapComponent = () => (
         className="h-full w-8 border-r border-zinc-900 stroke-zinc-800 sm:w-20"
         style={{
           maskImage:
-            'linear-gradient(transparent, white 10rem, white calc(100% - 10rem), transparent)',
+            "linear-gradient(transparent, white 10rem, white calc(100% - 10rem), transparent)",
         }}
       >
         <title>Map Diagonal Border Pattern</title>
@@ -50,7 +50,7 @@ export const MapComponent = () => (
         className="h-full w-8 border-r border-zinc-900 stroke-zinc-800 sm:w-20"
         style={{
           maskImage:
-            'linear-gradient(transparent, white 10rem, white calc(100% - 10rem), transparent)',
+            "linear-gradient(transparent, white 10rem, white calc(100% - 10rem), transparent)",
         }}
       >
         <title>Map Diagonal Border Pattern</title>
@@ -105,7 +105,7 @@ export const MapComponent = () => (
           <div
             className="absolute size-10 animate-[ping_5s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
             style={{
-              animationDelay: '3.5s',
+              animationDelay: "3.5s",
             }}
           />
         </div>
@@ -120,7 +120,7 @@ export const MapComponent = () => (
           <div
             className="absolute size-10 animate-[ping_5s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
             style={{
-              animationDelay: '3.5s',
+              animationDelay: "3.5s",
             }}
           />
         </div>
@@ -135,7 +135,7 @@ export const MapComponent = () => (
           <div
             className="absolute size-10 animate-[ping_5s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
             style={{
-              animationDelay: '3.5s',
+              animationDelay: "3.5s",
             }}
           />
         </div>

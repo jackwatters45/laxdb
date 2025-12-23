@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerDetails } from '../-utils';
-import { formatDate, getStatusColor } from '../-utils';
+import { Link } from "@tanstack/react-router";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PlayerDetails } from "../-utils";
+import { formatDate, getStatusColor } from "../-utils";
 
 type AssignedResourcesProps = {
   player: PlayerDetails;
@@ -34,7 +34,7 @@ export function AssignedResources({
                   </div>
                 </div>
                 <Badge variant={getStatusColor(resource.status)}>
-                  {resource.status.replace('_', ' ')}
+                  {resource.status.replace("_", " ")}
                 </Badge>
               </div>
             ))}

@@ -1,12 +1,12 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Schema } from 'effect';
-import { ArrowLeft, Calendar, Target } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Schema } from "effect";
+import { ArrowLeft, Calendar, Target } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -15,34 +15,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 // Form schema
 const goalFormSchema = Schema.Struct({
   title: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Title is required' }),
+    Schema.minLength(1, { message: () => "Title is required" }),
     Schema.maxLength(100, {
-      message: () => 'Title must be less than 100 characters',
-    })
+      message: () => "Title must be less than 100 characters",
+    }),
   ),
   description: Schema.optional(Schema.String),
-  category: Schema.Literal('skill', 'academic', 'team', 'personal'),
+  category: Schema.Literal("skill", "academic", "team", "personal"),
   currentValue: Schema.optional(Schema.String),
   targetValue: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Target value is required' })
+    Schema.minLength(1, { message: () => "Target value is required" }),
   ),
   dueDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Due date is required' })
+    Schema.minLength(1, { message: () => "Due date is required" }),
   ),
-  priority: Schema.Literal('low', 'medium', 'high'),
+  priority: Schema.Literal("low", "medium", "high"),
 });
 
 type GoalFormValues = typeof goalFormSchema.Type;
 
 // Server function to create a goal
-const createPlayerGoal = createServerFn({ method: 'POST' })
+const createPlayerGoal = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       playerId: string;
@@ -53,31 +53,31 @@ const createPlayerGoal = createServerFn({ method: 'POST' })
       currentValue?: string | undefined;
       dueDate: string;
       priority: string;
-    }) => data
+    }) => data,
   )
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _data }) => {
+    // FIX: Replace with actual API call
     // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
     // return await PlayerDevelopmentAPI.createGoal(data, headers);
 
-    return { success: true, goalId: 'goal-123' };
+    return { success: true, goalId: "goal-123" };
   });
 
 // Server function to get player info
-const getPlayerInfo = createServerFn({ method: 'GET' })
+const getPlayerInfo = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data }) => {
+    // FIX: Replace with actual API call
     return {
       id: data.playerId,
-      name: 'Alex Johnson',
-      position: 'attack',
-      gradeLevel: 'junior',
+      name: "Alex Johnson",
+      position: "attack",
+      gradeLevel: "junior",
     };
   });
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/goals/create'
+  "/_protected/$organizationSlug/players/goals/create",
 )({
   component: CreateGoalPage,
   validateSearch: (search: Record<string, unknown>) => ({
@@ -86,7 +86,7 @@ export const Route = createFileRoute(
   loaderDeps: ({ search }) => ({ playerId: search.playerId }),
   loader: async ({ deps }) => {
     if (!deps.playerId) {
-      throw new Error('Player ID is required');
+      throw new Error("Player ID is required");
     }
 
     const player = await getPlayerInfo({ data: { playerId: deps.playerId } });
@@ -103,13 +103,13 @@ function CreateGoalPage() {
   const form = useForm<GoalFormValues>({
     resolver: effectTsResolver(goalFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      category: 'skill',
-      currentValue: '',
-      targetValue: '',
-      dueDate: '',
-      priority: 'medium',
+      title: "",
+      description: "",
+      category: "skill",
+      currentValue: "",
+      targetValue: "",
+      dueDate: "",
+      priority: "medium",
     },
   });
 
@@ -124,23 +124,23 @@ function CreateGoalPage() {
 
       // Navigate back to player page
       router.navigate({
-        to: '/$organizationSlug/players/$playerId',
+        to: "/$organizationSlug/players/$playerId",
         params: { organizationSlug, playerId },
       });
-    } catch (_error) {}
+    } catch {}
   };
 
   const categories = [
-    { value: 'skill', label: 'Skill Development', icon: '🎯' },
-    { value: 'academic', label: 'Academic', icon: '📚' },
-    { value: 'team', label: 'Team Performance', icon: '🏆' },
-    { value: 'personal', label: 'Personal Development', icon: '🌟' },
+    { value: "skill", label: "Skill Development", icon: "🎯" },
+    { value: "academic", label: "Academic", icon: "📚" },
+    { value: "team", label: "Team Performance", icon: "🏆" },
+    { value: "personal", label: "Personal Development", icon: "🌟" },
   ] as const;
 
   const priorities = [
-    { value: 'low', label: 'Low', color: 'secondary' },
-    { value: 'medium', label: 'Medium', color: 'default' },
-    { value: 'high', label: 'High', color: 'destructive' },
+    { value: "low", label: "Low", color: "secondary" },
+    { value: "medium", label: "Medium", color: "default" },
+    { value: "high", label: "High", color: "destructive" },
   ] as const;
 
   return (
@@ -227,11 +227,13 @@ function CreateGoalPage() {
                           <button
                             className={`flex items-center gap-2 rounded-md border p-3 text-left transition-colors ${
                               field.value === category.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-input hover:bg-muted'
+                                ? "border-primary bg-primary/5"
+                                : "border-input hover:bg-muted"
                             }`}
                             key={category.value}
-                            onClick={() => field.onChange(category.value)}
+                            onClick={() => {
+                              field.onChange(category.value);
+                            }}
                             type="button"
                           >
                             <span className="text-lg">{category.icon}</span>
@@ -308,11 +310,13 @@ function CreateGoalPage() {
                           <button
                             className={`flex-1 rounded-md border p-2 text-center transition-colors ${
                               field.value === priority.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-input hover:bg-muted'
+                                ? "border-primary bg-primary/5"
+                                : "border-input hover:bg-muted"
                             }`}
                             key={priority.value}
-                            onClick={() => field.onChange(priority.value)}
+                            onClick={() => {
+                              field.onChange(priority.value);
+                            }}
                             type="button"
                           >
                             <Badge className="w-full" variant={priority.color}>
@@ -347,7 +351,7 @@ function CreateGoalPage() {
                   disabled={form.formState.isSubmitting}
                   type="submit"
                 >
-                  {form.formState.isSubmitting ? 'Creating...' : 'Create Goal'}
+                  {form.formState.isSubmitting ? "Creating..." : "Create Goal"}
                 </Button>
               </div>
             </form>

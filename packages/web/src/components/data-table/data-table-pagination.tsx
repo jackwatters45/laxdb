@@ -3,17 +3,17 @@ import {
   RiArrowLeftSLine,
   RiArrowRightDoubleLine,
   RiArrowRightSLine,
-} from '@remixicon/react';
-import type { Table } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button';
+} from "@remixicon/react";
+import type { Table } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>;
@@ -64,10 +64,10 @@ function PaginationInfo<TData>({ table }: { table: Table<TData> }) {
 
   return (
     <p className="hidden text-muted-foreground text-sm tabular-nums sm:block">
-      Showing{' '}
+      Showing{" "}
       <span className="font-medium text-foreground">
         {firstRowIndex}-{lastRowIndex}
-      </span>{' '}
+      </span>{" "}
       of <span className="font-medium text-foreground">{totalRows}</span>
     </p>
   );
@@ -77,31 +77,39 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
   const paginationButtons = [
     {
       icon: RiArrowLeftDoubleLine,
-      onClick: () => table.setPageIndex(0),
+      onClick: () => {
+        table.setPageIndex(0);
+      },
       disabled: !table.getCanPreviousPage(),
-      srText: 'First page',
-      mobileView: 'hidden sm:block',
+      srText: "First page",
+      mobileView: "hidden sm:block",
     },
     {
       icon: RiArrowLeftSLine,
-      onClick: () => table.previousPage(),
+      onClick: () => {
+        table.previousPage();
+      },
       disabled: !table.getCanPreviousPage(),
-      srText: 'Previous page',
-      mobileView: '',
+      srText: "Previous page",
+      mobileView: "",
     },
     {
       icon: RiArrowRightSLine,
-      onClick: () => table.nextPage(),
+      onClick: () => {
+        table.nextPage();
+      },
       disabled: !table.getCanNextPage(),
-      srText: 'Next page',
-      mobileView: '',
+      srText: "Next page",
+      mobileView: "",
     },
     {
       icon: RiArrowRightDoubleLine,
-      onClick: () => table.setPageIndex(table.getPageCount() - 1),
+      onClick: () => {
+        table.setPageIndex(table.getPageCount() - 1);
+      },
       disabled: !table.getCanNextPage(),
-      srText: 'Last page',
-      mobileView: 'hidden sm:block',
+      srText: "Last page",
+      mobileView: "hidden sm:block",
     },
   ];
 
@@ -109,7 +117,7 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
     <div className="flex items-center gap-x-1.5">
       {paginationButtons.map((button) => (
         <Button
-          className={cn(button.mobileView, 'h-7 px-1.5')}
+          className={cn(button.mobileView, "h-7 px-1.5")}
           disabled={button.disabled}
           key={button.srText}
           onClick={() => {

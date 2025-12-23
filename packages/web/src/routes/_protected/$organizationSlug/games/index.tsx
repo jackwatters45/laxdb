@@ -1,61 +1,49 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { PageBody } from '@/components/layout/page-content';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { GamesHeader } from './-components/games-header';
-
-type Game = {
-  id: string;
-  opponentName: string;
-  gameDate: Date;
-  venue: string;
-  isHomeGame: boolean;
-  gameType: 'regular' | 'playoff' | 'tournament' | 'friendly' | 'practice';
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'postponed';
-  homeScore: number;
-  awayScore: number;
-};
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { PageBody } from "@/components/layout/page-content";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { GamesHeader } from "./-components/games-header";
 
 // Mock data for now - will replace with actual API calls
 const mockGames = [
   {
-    id: '1',
-    opponentName: 'Riverside Hawks',
-    gameDate: new Date('2024-09-25T15:00:00'),
-    venue: 'Memorial Stadium',
+    id: "1",
+    opponentName: "Riverside Hawks",
+    gameDate: new Date("2024-09-25T15:00:00"),
+    venue: "Memorial Stadium",
     isHomeGame: true,
-    gameType: 'regular' as const,
-    status: 'scheduled' as const,
+    gameType: "regular" as const,
+    status: "scheduled" as const,
     homeScore: 0,
     awayScore: 0,
   },
   {
-    id: '2',
-    opponentName: 'Central Valley Eagles',
-    gameDate: new Date('2024-09-18T18:30:00'),
-    venue: 'Eagle Field',
+    id: "2",
+    opponentName: "Central Valley Eagles",
+    gameDate: new Date("2024-09-18T18:30:00"),
+    venue: "Eagle Field",
     isHomeGame: false,
-    gameType: 'regular' as const,
-    status: 'completed' as const,
+    gameType: "regular" as const,
+    status: "completed" as const,
     homeScore: 8,
     awayScore: 12,
   },
   {
-    id: '3',
-    opponentName: 'North County Titans',
-    gameDate: new Date('2024-10-02T16:00:00'),
-    venue: 'Lions Field',
+    id: "3",
+    opponentName: "North County Titans",
+    gameDate: new Date("2024-10-02T16:00:00"),
+    venue: "Lions Field",
     isHomeGame: true,
-    gameType: 'playoff' as const,
-    status: 'scheduled' as const,
+    gameType: "playoff" as const,
+    status: "scheduled" as const,
     homeScore: 0,
     awayScore: 0,
   },
 ];
 
 // Server function for getting games (will implement proper API later)
-const getTeamGames = createServerFn().handler(async () => {
-  // TODO: Replace with actual API call
+const getTeamGames = createServerFn().handler(() => {
+  // FIX: Replace with actual API call
   // const { GamesAPI } = await import('@laxdb/core/games/index');
   // const request = getRequest();
   // return await GamesAPI.getTeamGames(teamId, request.headers);
@@ -63,15 +51,9 @@ const getTeamGames = createServerFn().handler(async () => {
   return mockGames;
 });
 
-type Permissions = {
-  canManageGames: boolean;
-  canEditGames: boolean;
-  canViewStats: boolean;
-};
-
 // Server function for getting user permissions (simplified for now)
-const getUserPermissions = createServerFn().handler(async () => {
-  // TODO: Replace with actual permission check
+const getUserPermissions = createServerFn().handler(() => {
+  // FIX: Replace with actual permission check
   return {
     canManageGames: true, // Will check user role
     canEditGames: true,
@@ -79,7 +61,7 @@ const getUserPermissions = createServerFn().handler(async () => {
   };
 });
 
-export const Route = createFileRoute('/_protected/$organizationSlug/games/')({
+export const Route = createFileRoute("/_protected/$organizationSlug/games/")({
   component: GamesPage,
   loader: async () => {
     try {
@@ -89,7 +71,7 @@ export const Route = createFileRoute('/_protected/$organizationSlug/games/')({
       ]);
 
       return { games, permissions };
-    } catch (_error) {
+    } catch {
       return {
         games: mockGames,
         permissions: {
@@ -103,8 +85,8 @@ export const Route = createFileRoute('/_protected/$organizationSlug/games/')({
 });
 
 function GamesPage() {
-  const { organizationSlug } = Route.useParams();
-  const { games, permissions } = Route.useLoaderData();
+  const { organizationSlug: _organizationSlug } = Route.useParams();
+  const { games: _games, permissions: _permissions } = Route.useLoaderData();
 
   return (
     <>

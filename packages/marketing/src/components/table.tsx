@@ -1,8 +1,8 @@
 // Tremor Table [v0.0.3]
 
-import type React from 'react';
+import type React from "react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 const TableRoot = ({
   className,
@@ -19,7 +19,7 @@ const TableRoot = ({
   >
     <div
       // make table scrollable on mobile
-      className={cn('w-full whitespace-nowrap', className)}
+      className={cn("w-full whitespace-nowrap", className)}
       {...props}
     >
       {children}
@@ -27,7 +27,7 @@ const TableRoot = ({
   </div>
 );
 
-TableRoot.displayName = 'TableRoot';
+TableRoot.displayName = "TableRoot";
 
 const Table = ({
   className,
@@ -39,10 +39,10 @@ const Table = ({
   <table
     className={cn(
       // base
-      'w-full caption-bottom border-b',
+      "w-full caption-bottom border-b",
       // border color
-      'border-gray-200',
-      className
+      "border-gray-200",
+      className,
     )}
     ref={forwardedRef}
     tremor-id="tremor-raw"
@@ -50,7 +50,7 @@ const Table = ({
   />
 );
 
-Table.displayName = 'Table';
+Table.displayName = "Table";
 
 const TableHead = ({
   className,
@@ -60,7 +60,7 @@ const TableHead = ({
   ref?: React.RefObject<HTMLTableSectionElement | null>;
 }) => <thead className={cn(className)} ref={forwardedRef} {...props} />;
 
-TableHead.displayName = 'TableHead';
+TableHead.displayName = "TableHead";
 
 const TableHeaderCell = ({
   className,
@@ -72,19 +72,19 @@ const TableHeaderCell = ({
   <th
     className={cn(
       // base
-      'border-b px-4 py-3.5 text-left text-sm font-semibold',
+      "border-b px-4 py-3.5 text-left text-sm font-semibold",
       // text color
-      'text-gray-900',
+      "text-gray-900",
       // border color
-      'border-gray-200',
-      className
+      "border-gray-200",
+      className,
     )}
     ref={forwardedRef}
     {...props}
   />
 );
 
-TableHeaderCell.displayName = 'TableHeaderCell';
+TableHeaderCell.displayName = "TableHeaderCell";
 
 const TableBody = ({
   className,
@@ -96,17 +96,17 @@ const TableBody = ({
   <tbody
     className={cn(
       // base
-      'divide-y',
+      "divide-y",
       // divide color
-      'divide-gray-200',
-      className
+      "divide-gray-200",
+      className,
     )}
     ref={forwardedRef}
     {...props}
   />
 );
 
-TableBody.displayName = 'TableBody';
+TableBody.displayName = "TableBody";
 
 const TableRow = ({
   className,
@@ -117,16 +117,16 @@ const TableRow = ({
 }) => (
   <tr
     className={cn(
-      '[&_td:last-child]:pr-4 [&_th:last-child]:pr-4',
-      '[&_td:first-child]:pl-4 [&_th:first-child]:pl-4',
-      className
+      "[&_td:last-child]:pr-4 [&_th:last-child]:pr-4",
+      "[&_td:first-child]:pl-4 [&_th:first-child]:pl-4",
+      className,
     )}
     ref={forwardedRef}
     {...props}
   />
 );
 
-TableRow.displayName = 'TableRow';
+TableRow.displayName = "TableRow";
 
 const TableCell = ({
   className,
@@ -138,17 +138,17 @@ const TableCell = ({
   <td
     className={cn(
       // base
-      'p-4 text-sm',
+      "p-4 text-sm",
       // text color
-      'text-gray-600',
-      className
+      "text-gray-600",
+      className,
     )}
     ref={forwardedRef}
     {...props}
   />
 );
 
-TableCell.displayName = 'TableCell';
+TableCell.displayName = "TableCell";
 
 const TableFoot = ({
   className,
@@ -161,12 +161,12 @@ const TableFoot = ({
     <tfoot
       className={cn(
         // base
-        'border-t text-left font-medium',
+        "border-t text-left font-medium",
         // text color
-        'text-gray-900',
+        "text-gray-900",
         // border color
-        'border-gray-200',
-        className
+        "border-gray-200",
+        className,
       )}
       ref={forwardedRef}
       {...props}
@@ -174,7 +174,7 @@ const TableFoot = ({
   );
 };
 
-TableFoot.displayName = 'TableFoot';
+TableFoot.displayName = "TableFoot";
 
 const TableCaption = ({
   className,
@@ -186,17 +186,17 @@ const TableCaption = ({
   <caption
     className={cn(
       // base
-      'mt-3 px-3 text-center text-sm',
+      "mt-3 px-3 text-center text-sm",
       // text color
-      'text-gray-500',
-      className
+      "text-gray-500",
+      className,
     )}
     ref={forwardedRef}
     {...props}
   />
 );
 
-TableCaption.displayName = 'TableCaption';
+TableCaption.displayName = "TableCaption";
 
 export {
   Table,

@@ -3,7 +3,7 @@ import {
   useNavigate,
   useRouteContext,
   useRouter,
-} from '@tanstack/react-router';
+} from "@tanstack/react-router";
 import {
   BookOpen,
   Building2,
@@ -18,10 +18,10 @@ import {
   User,
   Users,
   Video,
-} from 'lucide-react';
-import React from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -31,12 +31,12 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command';
-import { useSwitchOrganization } from '@/mutations/organizations';
+} from "@/components/ui/command";
+import { useSwitchOrganization } from "@/mutations/organizations";
 
 export function SearchCommand() {
   const { organizations, activeOrganization } = useRouteContext({
-    from: '/_protected/$organizationSlug',
+    from: "/_protected/$organizationSlug",
   });
 
   const [open, setOpen] = React.useState(false);
@@ -45,235 +45,237 @@ export function SearchCommand() {
 
   const switchOrg = useSwitchOrganization({ setOpen, router });
 
-  useHotkeys('meta+k', () => setOpen(true));
+  useHotkeys("meta+k", () => {
+    setOpen(true);
+  });
 
   const navigationItems = activeOrganization
     ? [
         {
-          label: 'Teams',
-          href: '/$organizationSlug',
+          label: "Teams",
+          href: "/$organizationSlug",
           icon: Users,
-          shortcut: '⌘⇧T',
+          shortcut: "⌘⇧T",
         },
         {
-          label: 'Players',
-          href: '/$organizationSlug/players',
+          label: "Players",
+          href: "/$organizationSlug/players",
           icon: User,
-          shortcut: '⌘⇧P',
+          shortcut: "⌘⇧P",
         },
         {
-          label: 'Games',
-          href: '/$organizationSlug/games',
+          label: "Games",
+          href: "/$organizationSlug/games",
           icon: Trophy,
-          shortcut: '⌘⇧G',
+          shortcut: "⌘⇧G",
         },
         {
-          label: 'Playbook',
-          href: '/$organizationSlug/playbook',
+          label: "Playbook",
+          href: "/$organizationSlug/playbook",
           icon: BookOpen,
-          shortcut: '⌘⇧B',
+          shortcut: "⌘⇧B",
         },
         {
-          label: 'Practice',
-          href: '/$organizationSlug/practice',
+          label: "Practice",
+          href: "/$organizationSlug/practice",
           icon: Dumbbell,
-          shortcut: '⌘⇧R',
+          shortcut: "⌘⇧R",
         },
         {
-          label: 'Film',
-          href: '/$organizationSlug/film',
+          label: "Film",
+          href: "/$organizationSlug/film",
           icon: Video,
-          shortcut: '⌘⇧V',
+          shortcut: "⌘⇧V",
         },
         {
-          label: 'Scouting',
-          href: '/$organizationSlug/scouting',
+          label: "Scouting",
+          href: "/$organizationSlug/scouting",
           icon: Search,
-          shortcut: '⌘⇧S',
+          shortcut: "⌘⇧S",
         },
       ]
     : [
         {
-          label: 'Home',
-          href: '/',
+          label: "Home",
+          href: "/",
           icon: Home,
-          shortcut: '⌘⇧T',
+          shortcut: "⌘⇧T",
         },
       ];
 
   const settingsItems = activeOrganization
     ? [
         {
-          label: 'Organization Settings',
-          href: '/$organizationSlug/settings',
+          label: "Organization Settings",
+          href: "/$organizationSlug/settings",
           icon: Settings,
-          shortcut: '⌘⇧,',
+          shortcut: "⌘⇧,",
         },
       ]
     : [];
 
   const generalItems = [
     {
-      label: 'Plan',
-      href: '/$organizationSlug/plan',
+      label: "Plan",
+      href: "/$organizationSlug/plan",
       icon: FileText,
-      shortcut: '⌘⇧L',
+      shortcut: "⌘⇧L",
     },
     {
-      label: 'Feedback',
-      href: '/$organizationSlug/feedback',
+      label: "Feedback",
+      href: "/$organizationSlug/feedback",
       icon: MessageSquare,
-      shortcut: '⌘⇧E',
+      shortcut: "⌘⇧E",
     },
   ];
 
   // Set up hotkeys for navigation
-  useHotkeys('meta+shift+t', () => {
+  useHotkeys("meta+shift+t", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug',
+        to: "/$organizationSlug",
         params: { organizationSlug: activeOrganization.slug },
       });
     } else {
-      navigate({ to: '/' });
+      navigate({ to: "/" });
     }
   });
 
-  useHotkeys('meta+shift+p', () => {
+  useHotkeys("meta+shift+p", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/players',
+        to: "/$organizationSlug/players",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+g', () => {
+  useHotkeys("meta+shift+g", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/games',
+        to: "/$organizationSlug/games",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+b', () => {
+  useHotkeys("meta+shift+b", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/playbook',
+        to: "/$organizationSlug/playbook",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+r', () => {
+  useHotkeys("meta+shift+r", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/practice',
+        to: "/$organizationSlug/practice",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+v', () => {
+  useHotkeys("meta+shift+v", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/film',
+        to: "/$organizationSlug/film",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+s', () => {
+  useHotkeys("meta+shift+s", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/scouting',
+        to: "/$organizationSlug/scouting",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+comma', () => {
+  useHotkeys("meta+shift+comma", () => {
     if (activeOrganization) {
       navigate({
-        to: '/$organizationSlug/settings/general',
+        to: "/$organizationSlug/settings/general",
         params: { organizationSlug: activeOrganization.slug },
       });
     }
   });
 
-  useHotkeys('meta+shift+l', () => {
+  useHotkeys("meta+shift+l", () => {
     navigate({
-      to: '/$organizationSlug/plan',
+      to: "/$organizationSlug/plan",
       params: { organizationSlug: activeOrganization.slug },
     });
   });
 
-  useHotkeys('meta+shift+e', () => {
+  useHotkeys("meta+shift+e", () => {
     navigate({
-      to: '/$organizationSlug/feedback',
+      to: "/$organizationSlug/feedback",
       params: { organizationSlug: activeOrganization.slug },
     });
   });
 
   // Organization switching hotkeys (⌘⇧1-9 for first 9 organizations)
-  useHotkeys('meta+shift+1', () => {
+  useHotkeys("meta+shift+1", () => {
     const org = organizations[0];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+2', () => {
+  useHotkeys("meta+shift+2", () => {
     const org = organizations[1];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+3', () => {
+  useHotkeys("meta+shift+3", () => {
     const org = organizations[2];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+4', () => {
+  useHotkeys("meta+shift+4", () => {
     const org = organizations[3];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+5', () => {
+  useHotkeys("meta+shift+5", () => {
     const org = organizations[4];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+6', () => {
+  useHotkeys("meta+shift+6", () => {
     const org = organizations[5];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+7', () => {
+  useHotkeys("meta+shift+7", () => {
     const org = organizations[6];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+8', () => {
+  useHotkeys("meta+shift+8", () => {
     const org = organizations[7];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
     }
   });
 
-  useHotkeys('meta+shift+9', () => {
+  useHotkeys("meta+shift+9", () => {
     const org = organizations[8];
     if (org && org.id !== activeOrganization?.id) {
       switchOrg.mutate(org.id);
@@ -330,7 +332,12 @@ export function SearchCommand() {
                   </CommandItem>
                 );
               })}
-              <CommandItem asChild onSelect={() => setOpen(false)}>
+              <CommandItem
+                asChild
+                onSelect={() => {
+                  setOpen(false);
+                }}
+              >
                 <Link
                   params={{ organizationSlug: activeOrganization.slug }}
                   to="/$organizationSlug/organization/create"
@@ -339,7 +346,12 @@ export function SearchCommand() {
                   <span>Create Organization</span>
                 </Link>
               </CommandItem>
-              <CommandItem asChild onSelect={() => setOpen(false)}>
+              <CommandItem
+                asChild
+                onSelect={() => {
+                  setOpen(false);
+                }}
+              >
                 <Link
                   params={{ organizationSlug: activeOrganization.slug }}
                   to="/$organizationSlug/organization/join"
@@ -358,7 +370,9 @@ export function SearchCommand() {
               <CommandItem
                 asChild
                 key={item.href}
-                onSelect={() => setOpen(false)}
+                onSelect={() => {
+                  setOpen(false);
+                }}
               >
                 <Link to={item.href}>
                   <item.icon className="mr-2 h-4 w-4" />
@@ -379,7 +393,9 @@ export function SearchCommand() {
                   <CommandItem
                     asChild
                     key={item.href}
-                    onSelect={() => setOpen(false)}
+                    onSelect={() => {
+                      setOpen(false);
+                    }}
                   >
                     <Link to={item.href}>
                       <item.icon className="mr-2 h-4 w-4" />
@@ -402,7 +418,9 @@ export function SearchCommand() {
                   <CommandItem
                     asChild
                     key={item.href}
-                    onSelect={() => setOpen(false)}
+                    onSelect={() => {
+                      setOpen(false);
+                    }}
                   >
                     <Link to={item.href}>
                       <item.icon className="mr-2 h-4 w-4" />

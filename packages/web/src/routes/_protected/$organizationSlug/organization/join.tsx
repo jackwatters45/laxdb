@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { PageBody } from '@/components/layout/page-content';
-import { JoinOrganizationForm } from '@/components/organizations/join-form';
-import { DashboardHeader } from '@/components/sidebar/dashboard-header';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageBody } from "@/components/layout/page-content";
+import { JoinOrganizationForm } from "@/components/organizations/join-form";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/organization/join'
+  "/_protected/$organizationSlug/organization/join",
 )({
   component: CreateOrganizationPage,
 });

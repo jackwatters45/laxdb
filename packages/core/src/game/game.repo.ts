@@ -1,17 +1,17 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { and, eq, getTableColumns, isNull } from 'drizzle-orm';
-import { Array as Arr, Effect } from 'effect';
-import { DatabaseLive } from '../drizzle/drizzle.service';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { and, eq, getTableColumns, isNull } from "drizzle-orm";
+import { Array as Arr, Effect } from "effect";
+import { DatabaseLive } from "../drizzle/drizzle.service";
 import type {
   CreateGameInput,
   DeleteGameInput,
   GetAllGamesInput,
   GetGameInput,
   UpdateGameInput,
-} from './game.schema';
-import { type GameSelect, gameTable } from './game.sql';
+} from "./game.schema";
+import { type GameSelect, gameTable } from "./game.sql";
 
-export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
+export class GameRepo extends Effect.Service<GameRepo>()("GameRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
@@ -27,8 +27,8 @@ export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
               and(
                 eq(gameTable.organizationId, input.organizationId),
                 input.teamId ? eq(gameTable.teamId, input.teamId) : undefined,
-                isNull(gameTable.deletedAt)
-              )
+                isNull(gameTable.deletedAt),
+              ),
             )
             .pipe(Effect.tapError(Effect.logError));
 
@@ -44,8 +44,8 @@ export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
                 eq(gameTable.publicId, input.publicId),
                 eq(gameTable.organizationId, input.organizationId),
                 input.teamId ? eq(gameTable.teamId, input.teamId) : undefined,
-                isNull(gameTable.deletedAt)
-              )
+                isNull(gameTable.deletedAt),
+              ),
             )
             .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError));
 
@@ -63,8 +63,8 @@ export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
               gameDate: input.gameDate,
               venue: input.venue,
               isHomeGame: input.isHomeGame,
-              gameType: input.gameType ?? 'regular',
-              status: input.status ?? 'scheduled',
+              gameType: input.gameType ?? "regular",
+              status: input.status ?? "scheduled",
             })
             .returning(rest)
             .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError));
@@ -117,8 +117,8 @@ export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
               eq(gameTable.publicId, input.publicId),
               eq(gameTable.organizationId, input.organizationId),
               input.teamId ? eq(gameTable.teamId, input.teamId) : undefined,
-              isNull(gameTable.deletedAt)
-            )
+              isNull(gameTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -131,8 +131,8 @@ export class GameRepo extends Effect.Service<GameRepo>()('GameRepo', {
               eq(gameTable.publicId, input.publicId),
               eq(gameTable.organizationId, input.organizationId),
               input.teamId ? eq(gameTable.teamId, input.teamId) : undefined,
-              isNull(gameTable.deletedAt)
-            )
+              isNull(gameTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),

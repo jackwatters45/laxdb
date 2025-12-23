@@ -1,13 +1,13 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { ArrowLeft, Calendar, TrendingUp, Trophy } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, TrendingUp, Trophy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Mock detailed stats data
 const mockPlayerStats = {
-  playerName: 'Alex Johnson',
+  playerName: "Alex Johnson",
   season: {
     gamesPlayed: 12,
     goals: 18,
@@ -25,10 +25,10 @@ const mockPlayerStats = {
   },
   gameLog: [
     {
-      id: '1',
-      date: new Date('2024-09-15'),
-      opponent: 'Valley High',
-      result: 'W 12-8',
+      id: "1",
+      date: new Date("2024-09-15"),
+      opponent: "Valley High",
+      result: "W 12-8",
       goals: 2,
       assists: 1,
       shots: 4,
@@ -36,10 +36,10 @@ const mockPlayerStats = {
       minutes: 38,
     },
     {
-      id: '2',
-      date: new Date('2024-09-08'),
-      opponent: 'Mountain View',
-      result: 'L 9-11',
+      id: "2",
+      date: new Date("2024-09-08"),
+      opponent: "Mountain View",
+      result: "L 9-11",
       goals: 1,
       assists: 2,
       shots: 5,
@@ -47,10 +47,10 @@ const mockPlayerStats = {
       minutes: 42,
     },
     {
-      id: '3',
-      date: new Date('2024-09-01'),
-      opponent: 'Central Academy',
-      result: 'W 15-6',
+      id: "3",
+      date: new Date("2024-09-01"),
+      opponent: "Central Academy",
+      result: "W 15-6",
       goals: 3,
       assists: 1,
       shots: 6,
@@ -65,15 +65,15 @@ const mockPlayerStats = {
   },
 };
 
-const getPlayerDetailedStats = createServerFn({ method: 'GET' })
+const getPlayerDetailedStats = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _ }) => {
+    // FIX: Replace with actual API call
     return mockPlayerStats;
   });
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/$playerId/stats'
+  "/_protected/$organizationSlug/players/$playerId/stats",
 )({
   component: PlayerStatsPage,
   loader: async ({ params }) => {
@@ -84,15 +84,15 @@ export const Route = createFileRoute(
   },
 });
 
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+
 function PlayerStatsPage() {
   const stats = Route.useLoaderData();
   const { organizationSlug, playerId } = Route.useParams();
-
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
 
   return (
     <div className="container mx-auto py-8">
@@ -218,9 +218,9 @@ function PlayerStatsPage() {
                       </div>
                       <Badge
                         variant={
-                          game.result.startsWith('W')
-                            ? 'default'
-                            : 'destructive'
+                          game.result.startsWith("W")
+                            ? "default"
+                            : "destructive"
                         }
                       >
                         {game.result}

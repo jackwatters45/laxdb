@@ -5,6 +5,8 @@
 - [x] update planning docs
 - [x] env + env.example
 - [x] jj stacked prs
+- [x] linting + fmting
+- [ ] remove old aws
 - [ ] get dev working
 - [ ] deployment
 - [ ] new package to just work on features tbh
@@ -19,6 +21,5 @@
 
 ## Rando
 
-- Remove warns from biome and fix issues
 - Blog some of the specific/unique technical challenges
   - http + rpc

@@ -1,59 +1,59 @@
-import { Rpc, RpcGroup } from '@effect/rpc';
-import { PlayerContract } from '@laxdb/core/player/player.contract';
-import { PlayerService } from '@laxdb/core/player/player.service';
-import { Effect, Layer } from 'effect';
+import { Rpc, RpcGroup } from "@effect/rpc";
+import { PlayerContract } from "@laxdb/core/player/player.contract";
+import { PlayerService } from "@laxdb/core/player/player.service";
+import { Effect, Layer } from "effect";
 
 export class PlayerRpcs extends RpcGroup.make(
-  Rpc.make('PlayerList', {
+  Rpc.make("PlayerList", {
     success: PlayerContract.list.success,
     error: PlayerContract.list.error,
     payload: PlayerContract.list.payload,
   }),
-  Rpc.make('PlayerCreate', {
+  Rpc.make("PlayerCreate", {
     success: PlayerContract.create.success,
     error: PlayerContract.create.error,
     payload: PlayerContract.create.payload,
   }),
-  Rpc.make('PlayerUpdate', {
+  Rpc.make("PlayerUpdate", {
     success: PlayerContract.update.success,
     error: PlayerContract.update.error,
     payload: PlayerContract.update.payload,
   }),
-  Rpc.make('PlayerDelete', {
+  Rpc.make("PlayerDelete", {
     success: PlayerContract.delete.success,
     error: PlayerContract.delete.error,
     payload: PlayerContract.delete.payload,
   }),
-  Rpc.make('PlayerBulkDelete', {
+  Rpc.make("PlayerBulkDelete", {
     success: PlayerContract.bulkDelete.success,
     error: PlayerContract.bulkDelete.error,
     payload: PlayerContract.bulkDelete.payload,
   }),
-  Rpc.make('PlayerGetTeamPlayers', {
+  Rpc.make("PlayerGetTeamPlayers", {
     success: PlayerContract.getTeamPlayers.success,
     error: PlayerContract.getTeamPlayers.error,
     payload: PlayerContract.getTeamPlayers.payload,
   }),
-  Rpc.make('PlayerAddToTeam', {
+  Rpc.make("PlayerAddToTeam", {
     success: PlayerContract.addPlayerToTeam.success,
     error: PlayerContract.addPlayerToTeam.error,
     payload: PlayerContract.addPlayerToTeam.payload,
   }),
-  Rpc.make('PlayerUpdateTeam', {
+  Rpc.make("PlayerUpdateTeam", {
     success: PlayerContract.updateTeamPlayer.success,
     error: PlayerContract.updateTeamPlayer.error,
     payload: PlayerContract.updateTeamPlayer.payload,
   }),
-  Rpc.make('PlayerRemoveFromTeam', {
+  Rpc.make("PlayerRemoveFromTeam", {
     success: PlayerContract.removePlayerFromTeam.success,
     error: PlayerContract.removePlayerFromTeam.error,
     payload: PlayerContract.removePlayerFromTeam.payload,
   }),
-  Rpc.make('PlayerBulkRemoveFromTeam', {
+  Rpc.make("PlayerBulkRemoveFromTeam", {
     success: PlayerContract.bulkRemovePlayersFromTeam.success,
     error: PlayerContract.bulkRemovePlayersFromTeam.error,
     payload: PlayerContract.bulkRemovePlayersFromTeam.payload,
-  })
+  }),
 ) {}
 
 export const PlayerHandlers = PlayerRpcs.toLayer(
@@ -73,5 +73,5 @@ export const PlayerHandlers = PlayerRpcs.toLayer(
       PlayerBulkRemoveFromTeam: (payload) =>
         service.bulkRemovePlayersFromTeam(payload),
     };
-  })
+  }),
 ).pipe(Layer.provide(PlayerService.Default));

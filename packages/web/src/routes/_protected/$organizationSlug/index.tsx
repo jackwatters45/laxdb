@@ -1,18 +1,18 @@
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { TeamIdSchema } from '@laxdb/core/schema';
-import { TeamService } from '@laxdb/core/team/team.service';
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { TeamIdSchema } from "@laxdb/core/schema";
+import { TeamService } from "@laxdb/core/team/team.service";
 import {
   createFileRoute,
   Link,
   useRouteContext,
   useRouter,
-} from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import type { Team, TeamMember } from 'better-auth/plugins';
-import { Effect, Schema } from 'effect';
-import { ArrowRight, Plus, Trash2, Users } from 'lucide-react';
-import { toast } from 'sonner';
-import { DashboardHeader } from '@/components/sidebar/dashboard-header';
+} from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import type { Team, TeamMember } from "better-auth/plugins";
+import { Effect, Schema } from "effect";
+import { ArrowRight, Plus, Trash2, Users } from "lucide-react";
+import { toast } from "sonner";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,42 +23,42 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { authMiddleware } from '@/lib/middleware';
-import { getUserOrganizationContext } from '@/query/organizations';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authMiddleware } from "@/lib/middleware";
+import { getUserOrganizationContext } from "@/query/organizations";
 
 const DeleteTeamSchema = Schema.Struct({
   ...TeamIdSchema,
 });
 
-const deleteTeam = createServerFn({ method: 'POST' })
+const deleteTeam = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof DeleteTeamSchema.Type) =>
-    Schema.decodeSync(DeleteTeamSchema)(data)
+    Schema.decodeSync(DeleteTeamSchema)(data),
   )
-  .handler(async ({ data, context }) =>
+  .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const teamService = yield* TeamService;
         return yield* teamService.deleteTeam(data, context.headers);
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug/')({
+export const Route = createFileRoute("/_protected/$organizationSlug/")({
   component: TeamsOverviewPage,
-  loader: async () => getUserOrganizationContext(),
+  loader: () => getUserOrganizationContext(),
 });
 
 function TeamsOverviewPage() {
   const { organizationSlug } = Route.useParams();
   const { teams, canManageTeams } = Route.useLoaderData();
   const { activeOrganization } = useRouteContext({
-    from: '/_protected/$organizationSlug',
+    from: "/_protected/$organizationSlug",
   });
 
   return (
@@ -172,8 +172,8 @@ function TeamOverviewCard({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Team</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete "{team.name}"? This action
-                      cannot be undone.
+                      Are you sure you want to delete &quot;{team.name}&quot;?
+                      This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

@@ -1,11 +1,11 @@
-import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
-import { Effect, Schema } from 'effect';
-import { AppConfig } from '../config';
-import { EmailSendError } from './email.error';
-import { SendEmailInput, SendFeedbackEmailInput } from './email.schema';
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { Effect, Schema } from "effect";
+import { AppConfig } from "../config";
+import { EmailSendError } from "./email.error";
+import { SendEmailInput, SendFeedbackEmailInput } from "./email.schema";
 
 export class EmailService extends Effect.Service<EmailService>()(
-  'EmailService',
+  "EmailService",
   {
     effect: Effect.gen(function* () {
       return {
@@ -30,17 +30,17 @@ export class EmailService extends Effect.Service<EmailService>()(
                 Simple: {
                   Subject: {
                     Data: validated.subject,
-                    Charset: 'UTF-8',
+                    Charset: "UTF-8",
                   },
                   Body: {
                     Html: {
                       Data: validated.htmlBody,
-                      Charset: 'UTF-8',
+                      Charset: "UTF-8",
                     },
                     ...(validated.textBody && {
                       Text: {
                         Data: validated.textBody,
-                        Charset: 'UTF-8',
+                        Charset: "UTF-8",
                       },
                     }),
                   },
@@ -52,25 +52,25 @@ export class EmailService extends Effect.Service<EmailService>()(
               Effect.mapError(
                 (cause) =>
                   new EmailSendError({
-                    message: 'Failed to send email via SES',
-                    recipient: validated.to.join(', '),
+                    message: "Failed to send email via SES",
+                    recipient: validated.to.join(", "),
                     cause,
-                  })
-              )
+                  }),
+              ),
             );
           }),
         sendFeedbackNotification: (input: SendFeedbackEmailInput) =>
           Effect.gen(function* () {
             const validated = yield* Schema.decode(SendFeedbackEmailInput)(
-              input
+              input,
             );
 
             const ratingEmoji =
               {
-                positive: '😊',
-                neutral: '😐',
-                negative: '😞',
-              }[validated.rating] || '❓';
+                positive: "😊",
+                neutral: "😐",
+                negative: "😞",
+              }[validated.rating] || "❓";
 
             const subject = `New Feedback: ${validated.topic} (${validated.rating})`;
 
@@ -84,11 +84,11 @@ export class EmailService extends Effect.Service<EmailService>()(
 
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                   <h3 style="margin-top: 0; color: #374151;">Feedback Details</h3>
-                  <p><strong>Topic:</strong> ${validated.topic.replace('-', ' ').toUpperCase()}</p>
+                  <p><strong>Topic:</strong> ${validated.topic.replace("-", " ").toUpperCase()}</p>
                   <p><strong>Rating:</strong> ${validated.rating.toUpperCase()} ${ratingEmoji}</p>
                   <p><strong>Feedback ID:</strong> <code>${validated.feedbackId}</code></p>
-                  ${validated.userEmail ? `<p><strong>User Email:</strong> ${validated.userEmail}</p>` : ''}
-                  ${validated.userId ? `<p><strong>User ID:</strong> ${validated.userId}</p>` : '<p><em>Anonymous feedback</em></p>'}
+                  ${validated.userEmail ? `<p><strong>User Email:</strong> ${validated.userEmail}</p>` : ""}
+                  ${validated.userId ? `<p><strong>User ID:</strong> ${validated.userId}</p>` : "<p><em>Anonymous feedback</em></p>"}
                 </div>
 
                 <div style="background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
@@ -110,10 +110,10 @@ export class EmailService extends Effect.Service<EmailService>()(
             const textBody = `
         New Feedback Received
 
-        Topic: ${validated.topic.replace('-', ' ').toUpperCase()}
+        Topic: ${validated.topic.replace("-", " ").toUpperCase()}
         Rating: ${validated.rating.toUpperCase()}
         Feedback ID: ${validated.feedbackId}
-        ${validated.userEmail ? `User Email: ${validated.userEmail}` : 'Anonymous feedback'}
+        ${validated.userEmail ? `User Email: ${validated.userEmail}` : "Anonymous feedback"}
 
         Message:
         ${validated.feedback}
@@ -123,12 +123,12 @@ export class EmailService extends Effect.Service<EmailService>()(
 
             // Use direct SES implementation to avoid circular dependency
             const sesClient = new SESv2Client({
-              region: process.env.AWS_REGION || 'us-west-2',
+              region: process.env.AWS_REGION || "us-west-2",
             });
 
-            const FromEmailAddress = process.env.SENDER || 'noreply@laxdb.io';
+            const FromEmailAddress = process.env.SENDER || "noreply@laxdb.io";
             const toEmailAddress =
-              process.env.SUPPORT_EMAIL || 'support@laxdb.io';
+              process.env.SUPPORT_EMAIL || "support@laxdb.io";
 
             const command = new SendEmailCommand({
               FromEmailAddress,
@@ -139,16 +139,16 @@ export class EmailService extends Effect.Service<EmailService>()(
                 Simple: {
                   Subject: {
                     Data: subject,
-                    Charset: 'UTF-8',
+                    Charset: "UTF-8",
                   },
                   Body: {
                     Html: {
                       Data: htmlBody,
-                      Charset: 'UTF-8',
+                      Charset: "UTF-8",
                     },
                     Text: {
                       Data: textBody,
-                      Charset: 'UTF-8',
+                      Charset: "UTF-8",
                     },
                   },
                 },
@@ -159,13 +159,13 @@ export class EmailService extends Effect.Service<EmailService>()(
               Effect.mapError(
                 (cause) =>
                   new EmailSendError({
-                    message: 'Failed to send feedback notification email',
+                    message: "Failed to send feedback notification email",
                     cause,
-                  })
-              )
+                  }),
+              ),
             );
           }),
       } as const;
     }),
-  }
+  },
 ) {}

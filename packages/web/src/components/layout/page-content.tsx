@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 type PageBodyProps = {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ type PageBodyProps = {
  */
 export function PageBody({ children, className }: PageBodyProps) {
   return (
-    <div className={cn('flex-1 overflow-auto', className)}>{children}</div>
+    <div className={cn("flex-1 overflow-auto", className)}>{children}</div>
   );
 }
 
@@ -21,6 +21,6 @@ export function PageBody({ children, className }: PageBodyProps) {
  */
 export function PageContainer({ children, className }: PageBodyProps) {
   return (
-    <div className={cn('container mx-auto py-8', className)}>{children}</div>
+    <div className={cn("container mx-auto py-8", className)}>{children}</div>
   );
 }

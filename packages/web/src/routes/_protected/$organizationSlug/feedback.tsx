@@ -1,18 +1,18 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { RATING_ENUM, TOPIC_ENUM } from '@laxdb/core/feedback/feedback.schema';
-import { FeedbackService } from '@laxdb/core/feedback/feedback.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { PageBody } from '@/components/layout/page-content';
-import { DashboardHeader } from '@/components/sidebar/dashboard-header';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { RATING_ENUM, TOPIC_ENUM } from "@laxdb/core/feedback/feedback.schema";
+import { FeedbackService } from "@laxdb/core/feedback/feedback.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { PageBody } from "@/components/layout/page-content";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -20,37 +20,37 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { authMiddleware } from '@/lib/middleware';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { authMiddleware } from "@/lib/middleware";
 
 const FeedbackSchema = Schema.Struct({
   topic: Schema.Literal(...TOPIC_ENUM),
   rating: Schema.Literal(...RATING_ENUM),
   feedback: Schema.String.pipe(
     Schema.minLength(10, {
-      message: () => 'Feedback must be at least 10 characters long',
-    })
+      message: () => "Feedback must be at least 10 characters long",
+    }),
   ),
 });
 
 type FeedbackFormValues = typeof FeedbackSchema.Type;
 
 // Server function for submitting feedback
-const submitFeedback = createServerFn({ method: 'POST' })
+const submitFeedback = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: FeedbackFormValues) =>
-    Schema.decodeSync(FeedbackSchema)(data)
+    Schema.decodeSync(FeedbackSchema)(data),
   )
-  .handler(async ({ data, context: { session } }) =>
+  .handler(({ data, context: { session } }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const feedbackService = yield* FeedbackService;
@@ -62,11 +62,11 @@ const submitFeedback = createServerFn({ method: 'POST' })
         };
 
         return yield* feedbackService.create(feedbackData);
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug/feedback')({
+export const Route = createFileRoute("/_protected/$organizationSlug/feedback")({
   component: FeedbackPage,
 });
 
@@ -76,13 +76,13 @@ function FeedbackPage() {
   const submitFeedbackMutation = useMutation({
     mutationFn: (data: FeedbackFormValues) => submitFeedback({ data }),
     onSuccess: () => {
-      toast.success('Thank you for your feedback! We appreciate your input.');
-      // TODO: eventually just go back to previous page
-      router.navigate({ href: '/teams' });
+      toast.success("Thank you for your feedback! We appreciate your input.");
+      // FIX: eventually just go back to previous page
+      router.navigate({ href: "/teams" });
     },
     onError: (_error) => {
       toast.error(
-        'There was an error submitting your feedback. Please try again.'
+        "There was an error submitting your feedback. Please try again.",
       );
     },
   });
@@ -90,7 +90,7 @@ function FeedbackPage() {
   const form = useForm<FeedbackFormValues>({
     resolver: effectTsResolver(FeedbackSchema),
     defaultValues: {
-      feedback: '',
+      feedback: "",
     },
   });
 
@@ -172,7 +172,7 @@ function FeedbackPage() {
                                 <RadioGroupItem value="positive" />
                               </FormControl>
                               <FormLabel className="font-normal text-green-600">
-                                Positive - I'm happy with this
+                                Positive - I&apos;m happy with this
                                 feature/experience
                               </FormLabel>
                             </FormItem>
@@ -181,7 +181,7 @@ function FeedbackPage() {
                                 <RadioGroupItem value="neutral" />
                               </FormControl>
                               <FormLabel className="font-normal text-yellow-600">
-                                Neutral - It's okay, but could be improved
+                                Neutral - It&apos;s okay, but could be improved
                               </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center gap-3">
@@ -189,7 +189,8 @@ function FeedbackPage() {
                                 <RadioGroupItem value="negative" />
                               </FormControl>
                               <FormLabel className="font-normal text-red-600">
-                                Negative - I'm frustrated or encountering issues
+                                Negative - I&apos;m frustrated or encountering
+                                issues
                               </FormLabel>
                             </FormItem>
                           </RadioGroup>
@@ -224,8 +225,8 @@ function FeedbackPage() {
                     type="submit"
                   >
                     {submitFeedbackMutation.isPending
-                      ? 'Submitting...'
-                      : 'Submit Feedback'}
+                      ? "Submitting..."
+                      : "Submit Feedback"}
                   </Button>
                 </form>
               </Form>

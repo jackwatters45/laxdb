@@ -1,6 +1,6 @@
-import type { PlayerWithContactInfoNonNullable } from '@laxdb/core/player/contact-info/contact-info.schema';
-import { ArrowUpRightIcon, UserPen } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import type { PlayerWithContactInfoNonNullable } from "@laxdb/core/player/contact-info/contact-info.schema";
+import { ArrowUpRightIcon, UserPen } from "lucide-react";
+import { useForm } from "react-hook-form";
 import {
   EmailContactCard,
   EmergencyContactNameCard,
@@ -11,7 +11,7 @@ import {
   LinkedInContactCard,
   PhoneContactCard,
   WhatsAppContactCard,
-} from '@/components/players/contact-card';
+} from "@/components/players/contact-card";
 import {
   EmailEditCard,
   EmergencyContactNameEditCard,
@@ -22,8 +22,8 @@ import {
   LinkedInEditCard,
   PhoneEditCard,
   WhatsAppEditCard,
-} from '@/components/players/contact-edit-card';
-import { Button } from '@/components/ui/button';
+} from "@/components/players/contact-edit-card";
+import { Button } from "@/components/ui/button";
 import {
   Empty,
   EmptyContent,
@@ -31,8 +31,8 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@/components/ui/empty';
-import { Form } from '@/components/ui/form';
+} from "@/components/ui/empty";
+import { Form } from "@/components/ui/form";
 
 type ContactInfoCardWrapperProps = {
   children: React.ReactNode;
@@ -43,7 +43,7 @@ function ContactInfoCardWrapper({ children }: ContactInfoCardWrapperProps) {
     <div
       className="grid gap-4"
       style={{
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(18rem, 100%), 1fr))',
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(18rem, 100%), 1fr))",
       }}
     >
       {children}
@@ -72,7 +72,9 @@ function EmptyContactInfo({ setIsEditing }: EmptyContactInfoProps) {
         <Button
           asChild
           className="text-muted-foreground"
-          onClick={() => setIsEditing(true)}
+          onClick={() => {
+            setIsEditing(true);
+          }}
           size="sm"
           variant="link"
         >

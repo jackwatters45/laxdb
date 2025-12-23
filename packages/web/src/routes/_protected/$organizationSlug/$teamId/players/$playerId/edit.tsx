@@ -1,20 +1,20 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { PageBody, PageContainer } from '@/components/layout/page-content';
-import { TeamBreadcrumbSwitcher } from '@/components/nav/team-breadcrumb-switcher';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { PageBody, PageContainer } from "@/components/layout/page-content";
+import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { PlayerHeader } from './-components/player-header';
-import { mockPlayerDetails } from './-utils';
+} from "@/components/ui/breadcrumb";
+import { PlayerHeader } from "./-components/player-header";
+import { mockPlayerDetails } from "./-utils";
 
 // Server function for getting player details
-const getPlayerDetails = createServerFn({ method: 'GET' })
+const getPlayerDetails = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _data }) => {
+    // FIX: Replace with actual API call
     // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
     // return await PlayerDevelopmentAPI.getPlayerProfile(data.playerId, headers);
 
@@ -22,7 +22,7 @@ const getPlayerDetails = createServerFn({ method: 'GET' })
   });
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/players/$playerId/edit'
+  "/_protected/$organizationSlug/$teamId/players/$playerId/edit",
 )({
   component: RouteComponent,
   loader: async ({ params }) => {

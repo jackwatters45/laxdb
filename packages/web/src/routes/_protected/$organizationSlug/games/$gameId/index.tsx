@@ -1,55 +1,55 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { ArrowLeft, Calendar, Edit, MapPin, Trophy, Users } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, Edit, MapPin, Trophy, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Mock data - will replace with actual API calls
 const mockGameDetails = {
-  id: '1',
-  opponentName: 'Riverside Hawks',
-  gameDate: new Date('2024-09-25T15:00:00'),
-  venue: 'Memorial Stadium',
+  id: "1",
+  opponentName: "Riverside Hawks",
+  gameDate: new Date("2024-09-25T15:00:00"),
+  venue: "Memorial Stadium",
   isHomeGame: true,
-  gameType: 'regular' as const,
-  status: 'scheduled' as
-    | 'scheduled'
-    | 'in_progress'
-    | 'completed'
-    | 'cancelled'
-    | 'postponed',
+  gameType: "regular" as const,
+  status: "scheduled" as
+    | "scheduled"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "postponed",
   homeScore: 0,
   awayScore: 0,
-  weatherConditions: '',
-  fieldConditions: '',
-  coachNotes: 'Focus on ball control and transition defense.',
+  weatherConditions: "",
+  fieldConditions: "",
+  coachNotes: "Focus on ball control and transition defense.",
   roster: [
     {
-      id: '1',
-      name: 'John Smith',
-      position: 'Attack',
+      id: "1",
+      name: "John Smith",
+      position: "Attack",
       jerseyNumber: 10,
       isStarter: true,
     },
     {
-      id: '2',
-      name: 'Mike Johnson',
-      position: 'Midfield',
+      id: "2",
+      name: "Mike Johnson",
+      position: "Midfield",
       jerseyNumber: 23,
       isStarter: true,
     },
     {
-      id: '3',
-      name: 'David Wilson',
-      position: 'Defense',
+      id: "3",
+      name: "David Wilson",
+      position: "Defense",
       jerseyNumber: 5,
       isStarter: true,
     },
     {
-      id: '4',
-      name: 'Chris Brown',
-      position: 'Goalie',
+      id: "4",
+      name: "Chris Brown",
+      position: "Goalie",
       jerseyNumber: 1,
       isStarter: true,
     },
@@ -57,10 +57,10 @@ const mockGameDetails = {
 };
 
 // Server function for getting game details
-const getGameDetails = createServerFn({ method: 'GET' })
+const getGameDetails = createServerFn({ method: "GET" })
   .inputValidator((data: { gameId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _data }) => {
+    // FIX: Replace with actual API call
     // const { GamesAPI } = await import('@laxdb/core/games/index');
     // return await GamesAPI.getGame(data.gameId, headers);
 
@@ -68,14 +68,58 @@ const getGameDetails = createServerFn({ method: 'GET' })
   });
 
 // Server function for permissions
-const getGamePermissions = createServerFn().handler(async () => ({
+const getGamePermissions = createServerFn().handler(() => ({
   canEdit: true,
   canManageRoster: true,
   canViewStats: true,
 }));
 
+const gameDetailsFormatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+
+const getGameDetailsStatusColor = (status: string) => {
+  switch (status) {
+    case "scheduled":
+      return "default";
+    case "in_progress":
+      return "destructive";
+    case "completed":
+      return "secondary";
+    case "cancelled":
+      return "outline";
+    case "postponed":
+      return "outline";
+    default:
+      return "default";
+  }
+};
+
+const getGameDetailsTypeLabel = (type: string) => {
+  switch (type) {
+    case "regular":
+      return "Regular Season";
+    case "playoff":
+      return "Playoff";
+    case "tournament":
+      return "Tournament";
+    case "friendly":
+      return "Friendly";
+    case "practice":
+      return "Practice";
+    default:
+      return type;
+  }
+};
+
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/games/$gameId/'
+  "/_protected/$organizationSlug/games/$gameId/",
 )({
   component: GameDetailsPage,
   loader: async ({ params }) => {
@@ -92,50 +136,6 @@ function GameDetailsPage() {
   const { organizationSlug } = Route.useParams();
   const { game, permissions } = Route.useLoaderData();
 
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(date);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'scheduled':
-        return 'default';
-      case 'in_progress':
-        return 'destructive';
-      case 'completed':
-        return 'secondary';
-      case 'cancelled':
-        return 'outline';
-      case 'postponed':
-        return 'outline';
-      default:
-        return 'default';
-    }
-  };
-
-  const getGameTypeLabel = (type: string) => {
-    switch (type) {
-      case 'regular':
-        return 'Regular Season';
-      case 'playoff':
-        return 'Playoff';
-      case 'tournament':
-        return 'Tournament';
-      case 'friendly':
-        return 'Friendly';
-      case 'practice':
-        return 'Practice';
-      default:
-        return type;
-    }
-  };
-
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
@@ -150,15 +150,15 @@ function GameDetailsPage() {
           <div>
             <h1 className="font-bold text-3xl">{game.opponentName}</h1>
             <p className="text-muted-foreground">
-              {getGameTypeLabel(game.gameType)} Game
+              {getGameDetailsTypeLabel(game.gameType)} Game
             </p>
           </div>
 
           <div className="flex gap-2">
-            <Badge variant={getStatusColor(game.status)}>
-              {game.status.replace('_', ' ').toUpperCase()}
+            <Badge variant={getGameDetailsStatusColor(game.status)}>
+              {game.status.replace("_", " ").toUpperCase()}
             </Badge>
-            {permissions.canEdit && game.status !== 'completed' && (
+            {permissions.canEdit && game.status !== "completed" && (
               <Button asChild size="sm" variant="outline">
                 <Link
                   params={{
@@ -187,18 +187,18 @@ function GameDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{formatDate(game.gameDate)}</span>
+                <span>{gameDetailsFormatDate(game.gameDate)}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span>{game.venue}</span>
                 <Badge className="ml-auto" variant="outline">
-                  {game.isHomeGame ? 'HOME' : 'AWAY'}
+                  {game.isHomeGame ? "HOME" : "AWAY"}
                 </Badge>
               </div>
 
-              {game.status === 'completed' && (
+              {game.status === "completed" && (
                 <div className="rounded-md bg-muted p-4">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Final Score</span>
@@ -336,12 +336,12 @@ function GameDetailsPage() {
                     to="/$organizationSlug/games/$gameId/stats"
                   >
                     <Trophy className="mr-2 h-4 w-4" />
-                    {game.status === 'completed' ? 'View Stats' : 'Enter Stats'}
+                    {game.status === "completed" ? "View Stats" : "Enter Stats"}
                   </Link>
                 </Button>
               )}
 
-              {permissions.canEdit && game.status !== 'completed' && (
+              {permissions.canEdit && game.status !== "completed" && (
                 <Button
                   asChild
                   className="w-full justify-start"
@@ -371,22 +371,22 @@ function GameDetailsPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Status</span>
-                  <Badge variant={getStatusColor(game.status)}>
-                    {game.status.replace('_', ' ').toUpperCase()}
+                  <Badge variant={getGameDetailsStatusColor(game.status)}>
+                    {game.status.replace("_", " ").toUpperCase()}
                   </Badge>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Type</span>
                   <span className="text-sm">
-                    {getGameTypeLabel(game.gameType)}
+                    {getGameDetailsTypeLabel(game.gameType)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Location</span>
                   <span className="text-sm">
-                    {game.isHomeGame ? 'Home' : 'Away'}
+                    {game.isHomeGame ? "Home" : "Away"}
                   </span>
                 </div>
 

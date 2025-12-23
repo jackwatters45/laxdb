@@ -1,15 +1,15 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { OrganizationService } from '@laxdb/core/organization/organization.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { useMutation } from '@tanstack/react-query';
-import { Link, useCanGoBack, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { Effect, Schema } from 'effect';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { OrganizationService } from "@laxdb/core/organization/organization.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
+import { Effect, Schema } from "effect";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,33 +18,33 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { PageContainer } from '../layout/page-content';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PageContainer } from "../layout/page-content";
 
 const AcceptInvitationSchema = Schema.Struct({
   invitationId: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Invitation code is required' }),
+    Schema.minLength(1, { message: () => "Invitation code is required" }),
     Schema.minLength(10, {
-      message: () => 'Invitation code must be at least 10 characters',
-    })
+      message: () => "Invitation code must be at least 10 characters",
+    }),
   ),
 });
 type FormData = typeof AcceptInvitationSchema.Type;
 
-const acceptInvitation = createServerFn({ method: 'POST' })
+const acceptInvitation = createServerFn({ method: "POST" })
   .inputValidator((data: typeof AcceptInvitationSchema.Type) =>
-    Schema.decodeSync(AcceptInvitationSchema)(data)
+    Schema.decodeSync(AcceptInvitationSchema)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const organizationService = yield* OrganizationService;
         const headers = getRequestHeaders();
 
         return yield* organizationService.acceptInvitation(data, headers);
-      })
-    )
+      }),
+    ),
   );
 
 export function JoinOrganizationForm({
@@ -58,16 +58,16 @@ export function JoinOrganizationForm({
   const form = useForm<FormData>({
     resolver: effectTsResolver(AcceptInvitationSchema),
     defaultValues: {
-      invitationId: '',
+      invitationId: "",
     },
   });
 
   // Use React Query mutation for joining organization
   const joinOrgMutation = useMutation({
-    mutationKey: ['acceptInvitation'],
+    mutationKey: ["acceptInvitation"],
     mutationFn: (data: FormData) => acceptInvitation({ data }),
     onSuccess: () => {
-      toast.success('Successfully joined the organization!');
+      toast.success("Successfully joined the organization!");
       // router.navigate({
       //   to: '/$organizationSlug',
       //   params: { organizationSlug },
@@ -75,7 +75,7 @@ export function JoinOrganizationForm({
     },
     onError: (_error) => {
       toast.error(
-        'Failed to join organization. Please check your invitation code.'
+        "Failed to join organization. Please check your invitation code.",
       );
     },
   });
@@ -142,7 +142,7 @@ export function JoinOrganizationForm({
                   </Button>
                 ) : null}
                 <Button disabled={joinOrgMutation.isPending} type="submit">
-                  {joinOrgMutation.isPending ? 'Joining...' : 'Join Club'}
+                  {joinOrgMutation.isPending ? "Joining..." : "Join Club"}
                 </Button>
               </div>
             </form>

@@ -622,14 +622,12 @@ const checkPlaybookPermission = (
 ### Phase 1 - Core Features
 
 1. **Play Management**
-
    - Basic play creation with categories
    - Text-based play descriptions
    - Step-by-step instructions
    - Simple organization and tagging
 
 2. **Player Assignments**
-
    - Assign plays to individual players
    - Track learning progress
    - Basic feedback system
@@ -642,13 +640,11 @@ const checkPlaybookPermission = (
 ### Phase 2 - Advanced Features
 
 4. **Practice Integration**
-
    - Practice session logging
    - Execution quality tracking
    - Progress monitoring
 
 5. **Analytics Dashboard**
-
    - Play effectiveness metrics
    - Usage patterns and trends
    - Success rate analysis
@@ -661,13 +657,11 @@ const checkPlaybookPermission = (
 ### Phase 3 - Visual Features
 
 7. **Canvas/Whiteboard Integration**
-
    - Visual play diagramming
    - Interactive field positioning
    - Animation of play movement
 
 8. **Video Integration**
-
    - Link practice videos to plays
    - Execution examples
    - Analysis footage
@@ -702,13 +696,11 @@ const checkPlaybookPermission = (
 ### Phase 3 Implementation Plan
 
 1. **Field Canvas Component**
-
    - Interactive lacrosse field overlay
    - Drag-and-drop player positioning
    - Ball movement paths
 
 2. **Animation System**
-
    - Step-by-step play animation
    - Timing visualization
    - Movement coordination

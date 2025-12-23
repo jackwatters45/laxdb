@@ -1,7 +1,7 @@
-import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
-import type { Column } from '@tanstack/react-table';
+import { RiArrowDownSLine, RiArrowUpSLine } from "@remixicon/react";
+import type { Column } from "@tanstack/react-table";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 type DataTableColumnHeaderProps<TData, TValue> =
   React.HTMLAttributes<HTMLButtonElement> & {
@@ -20,7 +20,7 @@ export function DataTableColumnHeader<TData, TValue>({
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       const sortingHandler = column.getToggleSortingHandler();
       if (sortingHandler) {
@@ -34,9 +34,9 @@ export function DataTableColumnHeader<TData, TValue>({
       aria-label={`Sort by ${title}`}
       className={cn(
         column.columnDef.enableSorting === true
-          ? '-mx-2 inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring'
-          : 'inline-flex items-center gap-2',
-        className
+          ? "-mx-2 inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+          : "inline-flex items-center gap-2",
+        className,
       )}
       onClick={column.getToggleSortingHandler()}
       onKeyDown={handleKeyDown}
@@ -49,15 +49,15 @@ export function DataTableColumnHeader<TData, TValue>({
           <RiArrowUpSLine
             aria-hidden="true"
             className={cn(
-              'size-3.5 text-foreground',
-              column.getIsSorted() === 'desc' ? 'opacity-30' : ''
+              "size-3.5 text-foreground",
+              column.getIsSorted() === "desc" ? "opacity-30" : "",
             )}
           />
           <RiArrowDownSLine
             aria-hidden="true"
             className={cn(
-              'size-3.5 text-foreground',
-              column.getIsSorted() === 'asc' ? 'opacity-30' : ''
+              "size-3.5 text-foreground",
+              column.getIsSorted() === "asc" ? "opacity-30" : "",
             )}
           />
         </div>

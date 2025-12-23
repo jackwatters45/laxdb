@@ -548,13 +548,11 @@ const checkScoutingPermission = (
 ### Phase 1 - Core Features
 
 1. **Team Management**
-
    - Create and manage opposing teams
    - Basic team information and contact details
    - Team archiving and organization
 
 2. **Basic Scouting Reports**
-
    - Structured report creation
    - Offensive and defensive analysis
    - Key player identification
@@ -568,13 +566,11 @@ const checkScoutingPermission = (
 ### Phase 2 - Advanced Features
 
 4. **Pattern Recognition**
-
    - Document common plays and formations
    - Visual play diagrams
    - Counter-strategy development
 
 5. **Head-to-Head Analysis**
-
    - Historical performance tracking
    - Trend analysis
    - Success/failure patterns
@@ -587,13 +583,11 @@ const checkScoutingPermission = (
 ### Phase 3 - Intelligence Features
 
 7. **Video Integration**
-
    - Link video clips to reports
    - Timestamp specific plays
    - Video annotation tools
 
 8. **Statistical Analysis**
-
    - Trend identification
    - Performance predictions
    - Comparative analysis

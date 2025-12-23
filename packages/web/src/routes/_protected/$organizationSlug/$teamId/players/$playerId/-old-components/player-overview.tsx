@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerDetails } from '../-utils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PlayerDetails } from "../-utils";
 
 type PlayerOverviewProps = {
   player: PlayerDetails;
@@ -36,8 +36,8 @@ export function PlayerOverview({ player }: PlayerOverviewProps) {
             <span>Secondary Positions:</span>
             <span className="font-medium">
               {player.secondaryPositions.length > 0
-                ? player.secondaryPositions.join(', ')
-                : 'None'}
+                ? player.secondaryPositions.join(", ")
+                : "None"}
             </span>
           </div>
         </div>

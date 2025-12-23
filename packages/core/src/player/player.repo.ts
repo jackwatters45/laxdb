@@ -1,7 +1,7 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { and, eq, getTableColumns, inArray, isNull } from 'drizzle-orm';
-import { Array as Arr, Effect } from 'effect';
-import { DatabaseLive } from '../drizzle/drizzle.service';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { and, eq, getTableColumns, inArray, isNull } from "drizzle-orm";
+import { Array as Arr, Effect } from "effect";
+import { DatabaseLive } from "../drizzle/drizzle.service";
 import type {
   AddPlayerToTeamInput,
   BulkDeletePlayersInput,
@@ -11,14 +11,14 @@ import type {
   GetTeamPlayersInput,
   UpdatePlayerInput,
   UpdateTeamPlayerInput,
-} from './player.schema';
+} from "./player.schema";
 import {
   type Player as PlayerSelect,
   playerTable,
   teamPlayerTable,
-} from './player.sql';
+} from "./player.sql";
 
-export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
+export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
@@ -33,8 +33,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
             .where(
               and(
                 eq(playerTable.organizationId, input.organizationId),
-                isNull(playerTable.deletedAt)
-              )
+                isNull(playerTable.deletedAt),
+              ),
             )
             .pipe(Effect.tapError(Effect.logError));
 
@@ -73,8 +73,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(playerTable.publicId, input.publicPlayerId),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -86,8 +86,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(playerTable.publicId, input.playerId),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -99,8 +99,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               inArray(playerTable.publicId, input.playerIds),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .pipe(Effect.tapError(Effect.logError)),
 
@@ -124,13 +124,13 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .from(playerTable)
           .innerJoin(
             teamPlayerTable,
-            eq(playerTable.id, teamPlayerTable.playerId)
+            eq(playerTable.id, teamPlayerTable.playerId),
           )
           .where(
             and(
               eq(teamPlayerTable.teamId, input.teamId),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .pipe(Effect.tapError(Effect.logError)),
 
@@ -141,8 +141,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(playerTable.publicId, publicId),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
 
@@ -170,8 +170,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(teamPlayerTable.teamId, input.teamId),
-              eq(teamPlayerTable.playerId, playerId)
-            )
+              eq(teamPlayerTable.playerId, playerId),
+            ),
           )
           .returning()
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -182,8 +182,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(teamPlayerTable.teamId, teamId),
-              eq(teamPlayerTable.playerId, playerId)
-            )
+              eq(teamPlayerTable.playerId, playerId),
+            ),
           )
           .pipe(Effect.tapError(Effect.logError)),
 
@@ -193,8 +193,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               eq(teamPlayerTable.teamId, teamId),
-              inArray(teamPlayerTable.playerId, playerIds)
-            )
+              inArray(teamPlayerTable.playerId, playerIds),
+            ),
           )
           .pipe(Effect.tapError(Effect.logError)),
 
@@ -205,8 +205,8 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()('PlayerRepo', {
           .where(
             and(
               inArray(playerTable.publicId, publicIds),
-              isNull(playerTable.deletedAt)
-            )
+              isNull(playerTable.deletedAt),
+            ),
           )
           .pipe(Effect.tapError(Effect.logError)),
     } as const;

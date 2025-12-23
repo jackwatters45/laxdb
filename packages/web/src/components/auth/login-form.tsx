@@ -1,10 +1,10 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { redirect } from '@tanstack/react-router';
-import { Schema } from 'effect';
-import { useEffect, useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { redirect } from "@tanstack/react-router";
+import { Schema } from "effect";
+import { useEffect, useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,24 +12,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 const LoginSchema = Schema.Struct({
   email: Schema.String.pipe(
     Schema.filter((email) => /\S+@\S+\.\S+/.test(email), {
-      message: () => 'Please enter a valid email address',
-    })
+      message: () => "Please enter a valid email address",
+    }),
   ),
   password: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Password is required' })
+    Schema.minLength(1, { message: () => "Password is required" }),
   ),
 });
 type LoginFormValues = typeof LoginSchema.Type;
 
-type LoginFormProps = React.ComponentPropsWithoutRef<'div'> & {
+type LoginFormProps = React.ComponentPropsWithoutRef<"div"> & {
   redirectUrl?: string | undefined;
 };
 
@@ -39,7 +39,7 @@ export function LoginForm({
   ...props
 }: LoginFormProps) {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [lastMethod, setLastMethod] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,13 +49,13 @@ export function LoginForm({
   const form = useForm<LoginFormValues>({
     resolver: effectTsResolver(LoginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
-    setError('');
+  const onSubmit = (data: LoginFormValues) => {
+    setError("");
 
     startTransition(async () => {
       try {
@@ -65,17 +65,17 @@ export function LoginForm({
         });
 
         if (result.error) {
-          setError(result.error.message || 'Login failed');
+          setError(result.error.message ?? "Login failed");
         } else {
           throw redirect({
-            to: redirectUrl || '/_protected/redirect',
+            to: redirectUrl ?? "/_protected/redirect",
           });
         }
       } catch (error) {
         setError(
           error instanceof Error
             ? error.message
-            : 'An unexpected error occurred'
+            : "An unexpected error occurred",
         );
       }
     });
@@ -84,22 +84,22 @@ export function LoginForm({
   const handleGoogleSignIn = async () => {
     try {
       const result = await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: redirectUrl || '/_protected/redirect',
+        provider: "google",
+        callbackURL: redirectUrl ?? "/_protected/redirect",
       });
 
       if (result.error) {
-        setError(result.error.message || 'Google sign in failed');
+        setError(result.error.message ?? "Google sign in failed");
       }
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : 'Google sign in failed'
+        error instanceof Error ? error.message : "Google sign in failed",
       );
     }
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="font-bold text-2xl">Login to your account</h1>
         <p className="text-balance text-muted-foreground text-sm">
@@ -158,9 +158,9 @@ export function LoginForm({
             variant="outline"
           >
             <span className="flex items-center justify-start gap-2">
-              {isPending ? 'Signing in...' : 'Sign in with Email'}
+              {isPending ? "Signing in..." : "Sign in with Email"}
             </span>
-            {lastMethod === 'email' && (
+            {lastMethod === "email" && (
               <Badge
                 className="-right-8 -translate-y-1/2 absolute top-1/2 shadow-md"
                 variant="secondary"
@@ -206,7 +206,7 @@ export function LoginForm({
           </svg>
           <span>Continue with Google</span>
         </div>
-        {lastMethod === 'google' && (
+        {lastMethod === "google" && (
           <Badge
             className="-right-8 -translate-y-1/2 absolute top-1/2 shadow-md"
             variant="secondary"
@@ -217,7 +217,7 @@ export function LoginForm({
       </Button>
 
       <div className="text-center text-sm">
-        Don&apos;t have an account?{' '}
+        Don&apos;t have an account?{" "}
         <a className="underline underline-offset-4" href="/register">
           Sign up
         </a>
