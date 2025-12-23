@@ -168,7 +168,7 @@ console.log({
 if (process.env.PULL_REQUEST) {
   await GitHubComment('preview-comment', {
     owner: 'jackwatters45',
-    repository: 'fines-app',
+    repository: 'laxdb',
     issueNumber: Number(process.env.PULL_REQUEST),
     body: `
      ## 🚀 Preview Deployed

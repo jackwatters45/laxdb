@@ -3,7 +3,7 @@
 - [x] code review
 - [x] lefthook
 - [x] update planning docs
-- [ ] env + env.example
+- [x] env + env.example
 - [ ] jj stacked prs
 - [ ] get dev working
 - [ ] deployment
