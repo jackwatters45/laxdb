@@ -265,7 +265,7 @@ function PracticeTemplatesPage() {
 
       return matchesSearch && matchesCategory && matchesDifficulty;
     })
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       switch (sortBy) {
         case 'recent':
           if (!(a.lastUsed || b.lastUsed)) {

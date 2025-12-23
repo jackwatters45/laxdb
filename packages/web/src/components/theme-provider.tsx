@@ -28,7 +28,7 @@ type ThemeProviderState = {
 };
 
 const MEDIA = '(prefers-color-scheme: dark)';
-const colorSchemes = ['light', 'dark'];
+const colorSchemes = new Set(['light', 'dark']);
 
 const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
   const media = e || window.matchMedia(MEDIA);
@@ -146,7 +146,7 @@ export function ThemeProvider({
         d.setAttribute(attribute, resolved);
       }
 
-      if (colorSchemes.includes(resolved)) {
+      if (colorSchemes.has(resolved)) {
         d.style.colorScheme = resolved;
       }
 

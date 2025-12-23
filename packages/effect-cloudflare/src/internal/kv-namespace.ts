@@ -1321,14 +1321,14 @@ export const make = <Key extends string = string>(
               keys,
               cacheStatus,
             } as const;
-          } else {
+          }
             return {
               listComplete: false,
               keys,
               cursor: result.cursor,
               cacheStatus,
             } as const;
-          }
+          
         },
         catch: (error) => mapError(error, "list"),
       });

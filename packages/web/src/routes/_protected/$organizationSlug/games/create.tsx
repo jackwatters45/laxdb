@@ -39,7 +39,7 @@ const createGame = createServerFn({ method: 'POST' })
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     return {
-      id: Math.random().toString(36).substring(2, 9),
+      id: Math.random().toString(36).slice(2, 9),
       ...data,
       status: 'scheduled' as const,
       homeScore: 0,

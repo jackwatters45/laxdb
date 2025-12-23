@@ -267,7 +267,7 @@ function FilmLibraryPage() {
 
       return matchesSearch && matchesType && matchesAnalyzed;
     })
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       switch (sortBy) {
         case 'Recent Upload':
           return (

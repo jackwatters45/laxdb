@@ -63,11 +63,11 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {
+    "//#lint": {
       "inputs": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "../.oxlintrc.json"
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        ".oxlintrc.json"
       ],
       "outputs": []
     },

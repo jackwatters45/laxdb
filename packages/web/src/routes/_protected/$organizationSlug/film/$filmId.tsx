@@ -726,7 +726,7 @@ function FilmViewerPage() {
             </CardHeader>
             <CardContent className="max-h-96 space-y-3 overflow-y-auto">
               {film.events
-                .sort((a, b) => a.timestamp - b.timestamp)
+                .toSorted((a, b) => a.timestamp - b.timestamp)
                 .map((event) => (
                   <button
                     aria-label={`Jump to ${event.type}: ${event.description}`}

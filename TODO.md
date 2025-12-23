@@ -4,7 +4,7 @@
 - [x] lefthook
 - [x] update planning docs
 - [x] env + env.example
-- [ ] jj stacked prs
+- [x] jj stacked prs
 - [ ] get dev working
 - [ ] deployment
 - [ ] new package to just work on features tbh

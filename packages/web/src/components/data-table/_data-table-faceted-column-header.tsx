@@ -85,7 +85,7 @@ export function FacetedColumnHeader<TData, TValue>({
                     }
                     const filterValues = Array.from(selectedValues);
                     column.setFilterValue(
-                      filterValues.length ? filterValues : undefined
+                      filterValues.length > 0 ? filterValues : undefined
                     );
                   }}
                 />

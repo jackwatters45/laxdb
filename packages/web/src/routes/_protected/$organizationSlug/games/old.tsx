@@ -100,7 +100,7 @@ function GamesPage() {
 
   const completedGames = games.filter((game) => game.status === 'completed');
 
-  const nextGame = upcomingGames.sort(
+  const nextGame = upcomingGames.toSorted(
     (a, b) => new Date(a.gameDate).getTime() - new Date(b.gameDate).getTime()
   )[0];
 
@@ -166,7 +166,7 @@ function GamesPage() {
             <h2 className="mb-4 font-semibold text-xl">Recent Games</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {completedGames
-                .sort(
+                .toSorted(
                   (a, b) =>
                     new Date(b.gameDate).getTime() -
                     new Date(a.gameDate).getTime()

@@ -13,6 +13,7 @@
     "destroy": "bun --env-file=.env alchemy destroy",
     "dev": "bun --env-file=.env alchemy dev",
     "typecheck": "turbo typecheck",
+    "lint": "oxlint",
     "format": "oxfmt ",
     "format:check": "bun run format -- --check",
     "fix": "oxlint --fix && oxfmt",
