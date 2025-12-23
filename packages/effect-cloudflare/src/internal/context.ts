@@ -36,7 +36,9 @@ export const makeExecutionContext = (
       ),
     );
   },
-  passThroughOnException: Effect.sync(() => ctx.passThroughOnException?.()),
+  passThroughOnException: Effect.sync(() => {
+    ctx.passThroughOnException?.();
+  }),
   ["~raw"]: ctx,
 });
 

@@ -24,16 +24,7 @@ const Divider = ({
     tremor-id="tremor-raw"
     {...props}
   >
-    {children === null ? (
-      <div
-        className={cn(
-          // base
-          "h-[1px] w-full",
-          // background color
-          "bg-linear-to-l from-transparent via-gray-200 to-transparent",
-        )}
-      />
-    ) : (
+    {children ? (
       <>
         <div
           className={cn(
@@ -53,6 +44,15 @@ const Divider = ({
           )}
         />
       </>
+    ) : (
+      <div
+        className={cn(
+          // base
+          "h-[1px] w-full",
+          // background color
+          "bg-linear-to-l from-transparent via-gray-200 to-transparent",
+        )}
+      />
     )}
   </div>
 );

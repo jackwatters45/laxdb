@@ -112,7 +112,7 @@ const Button = ({
   return (
     <Component
       className={cn(buttonVariants({ variant }), className)}
-      disabled={disabled ?? isLoading}
+      disabled={disabled || isLoading}
       ref={forwardedRef}
       tremor-id="tremor-raw"
       {...props}

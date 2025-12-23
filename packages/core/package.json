@@ -13,9 +13,9 @@
     "better-auth:gen": "npx @better-auth/cli@latest generate",
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint",
+    "lint": "oxlint --fix",
     "format": "oxfmt",
-    "fix": "oxlint --fix && oxfmt"
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.956.0",

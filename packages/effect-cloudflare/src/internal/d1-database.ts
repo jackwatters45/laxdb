@@ -930,7 +930,7 @@ const mapError = (
     /column not found/i.test(message)
   ) {
     const colMatch =
-      message.match(/\(([^)]+)\)/) ||
+      message.match(/\(([^)]+)\)/) ??
       message.match(/column not found[:\s]+([^\s]+)/i);
     return new D1ColumnNotFoundError({
       sql: sql ?? "",

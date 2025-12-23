@@ -9,9 +9,9 @@
 - [x] tsgo
 - [x] prepush not 100% confident
 - [ ] current pr fixes from claude
+- [ ] ts-aware thing - see api package.json
 - [ ] clean up jj log
 - [ ] add desciption + name claude wf
-- [ ] ts-aware thing
 - [ ] deployment
 - [ ] get dev working
 - [ ] remove old aws

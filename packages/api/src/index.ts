@@ -69,7 +69,7 @@ const ApiLive = Layer.mergeAll(
   DateTime.layerCurrentZoneLocal,
 );
 
-// @ts-expect-error
+// @ts-expect-error - we will fix this later
 const { handler } = HttpApiBuilder.toWebHandler(ApiLive, {
   middleware: HttpMiddleware.logger,
 });

@@ -5,9 +5,9 @@
   "scripts": {
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint",
+    "lint": "oxlint --fix",
     "format": "oxfmt",
-    "fix": "oxlint --fix && oxfmt"
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@laxdb/core": "*"

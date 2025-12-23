@@ -117,7 +117,7 @@ const SidebarProvider = ({
     } else {
       setOpen((open) => !open);
     }
-  }, [isMobile, setOpen]);
+  }, [isMobile, setOpen, setOpenMobile]);
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {

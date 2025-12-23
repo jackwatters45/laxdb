@@ -5,9 +5,9 @@
   "module": "src/scratch.ts",
   "scripts": {
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint",
+    "lint": "oxlint --fix",
     "format": "oxfmt",
-    "fix": "oxlint --fix && oxfmt"
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@effect/platform": "^0.93.2"

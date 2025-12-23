@@ -16,7 +16,7 @@ type EffectifyEnv<Env = Cloudflare.Env> = {
   [Binding in keyof Env]: EffectifyBinding<Env[Binding]>;
 };
 
-export interface CloudflareEnv extends EffectifyEnv<Cloudflare.Env> {
+export interface CloudflareEnv extends EffectifyEnv {
   ["~raw"]: Cloudflare.Env;
 }
 
