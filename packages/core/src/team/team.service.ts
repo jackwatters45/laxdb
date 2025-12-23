@@ -1,7 +1,7 @@
-import { Effect, Schema } from 'effect';
-import { AuthService } from '../auth';
-import { OrganizationRepo } from '../organization/organization.repo';
-import { TeamRepo } from './team.repo';
+import { Effect, Schema } from "effect";
+import { AuthService } from "../auth";
+import { OrganizationRepo } from "../organization/organization.repo";
+import { TeamRepo } from "./team.repo";
 import {
   CreateTeamInput,
   DeleteTeamInput,
@@ -9,10 +9,10 @@ import {
   InvitePlayerInput,
   RemoveTeamMemberInput,
   UpdateTeamInput,
-} from './team.schema';
+} from "./team.schema";
 
 // Teams Service
-export class TeamService extends Effect.Service<TeamService>()('TeamService', {
+export class TeamService extends Effect.Service<TeamService>()("TeamService", {
   effect: Effect.gen(function* () {
     const auth = yield* AuthService;
     const orgRepo = yield* OrganizationRepo;
@@ -31,7 +31,7 @@ export class TeamService extends Effect.Service<TeamService>()('TeamService', {
           const result = yield* teamRepo.create(
             headers,
             decoded,
-            activeOrganization.id
+            activeOrganization.id,
           );
 
           return result;

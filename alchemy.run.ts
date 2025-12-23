@@ -1,11 +1,17 @@
 import { Exec } from "alchemy/os";
 import { Branch, Database, Role } from "alchemy/planetscale";
 import alchemy from "alchemy";
-import { CloudflareStateStore } from 'alchemy/state';
-import { GitHubComment } from 'alchemy/github';
-import { Hyperdrive, KVNamespace, R2Bucket, TanStackStart, Worker } from 'alchemy/cloudflare';
+import { CloudflareStateStore } from "alchemy/state";
+import { GitHubComment } from "alchemy/github";
+import {
+  Hyperdrive,
+  KVNamespace,
+  R2Bucket,
+  TanStackStart,
+  Worker,
+} from "alchemy/cloudflare";
 
-export const app = await alchemy('laxdb', {
+export const app = await alchemy("laxdb", {
   stateStore: (scope) =>
     new CloudflareStateStore(scope, { scriptName: `app-state-${scope.stage}` }),
 });
@@ -13,16 +19,19 @@ export const app = await alchemy('laxdb', {
 // Stage
 export const stage = app.stage;
 
-export const prodStage = 'prod';
-export const devStage = 'dev';
+export const prodStage = "prod";
+export const devStage = "dev";
 export const isPermanentStage = [prodStage, devStage].includes(stage);
 
 // Domain
-const PRODUCTION = 'laxdb.io';
-const DEV = 'dev.laxdb.io';
+const PRODUCTION = "laxdb.io";
+const DEV = "dev.laxdb.io";
 export const domain =
-  stage === prodStage ? PRODUCTION : stage === devStage ? DEV : `${stage}.${DEV}`;
-
+  stage === prodStage
+    ? PRODUCTION
+    : stage === devStage
+      ? DEV
+      : `${stage}.${DEV}`;
 
 // DB
 const database = await Database("Database", {
@@ -108,10 +117,10 @@ if (app.local) {
 }
 
 // KV
-export const kv = await KVNamespace('kv', {});
+export const kv = await KVNamespace("kv", {});
 
 // Storage
-export const storage = await R2Bucket('storage', {});
+export const storage = await R2Bucket("storage", {});
 
 export const worker = await Worker("api", {
   entrypoint: "packages/api/src/index.ts",
@@ -124,12 +133,12 @@ export const worker = await Worker("api", {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
     GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
     POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
-    AWS_REGION: process.env.AWS_REGION ?? 'us-west-2',
-    EMAIL_SENDER: process.env.EMAIL_SENDER ?? 'noreply@laxdb.io',
+    AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
+    EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
   },
 });
 
-export const web = await TanStackStart('web', {
+export const web = await TanStackStart("web", {
   bindings: {
     DB: db,
     KV: kv,
@@ -139,10 +148,10 @@ export const web = await TanStackStart('web', {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
     GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
     POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
-    AWS_REGION: process.env.AWS_REGION ?? 'us-west-2',
-    EMAIL_SENDER: process.env.EMAIL_SENDER ?? 'noreply@laxdb.io',
+    AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
+    EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
   },
-  cwd: './packages/web',
+  cwd: "./packages/web",
   domains: [domain],
 });
 
@@ -166,9 +175,9 @@ console.log({
 });
 
 if (process.env.PULL_REQUEST) {
-  await GitHubComment('preview-comment', {
-    owner: 'jackwatters45',
-    repository: 'fines-app',
+  await GitHubComment("preview-comment", {
+    owner: "jackwatters45",
+    repository: "laxdb",
     issueNumber: Number(process.env.PULL_REQUEST),
     body: `
      ## 🚀 Preview Deployed

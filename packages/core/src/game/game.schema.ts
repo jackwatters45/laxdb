@@ -1,13 +1,13 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 import {
   NullableTeamIdSchema,
   OrganizationIdSchema,
   PublicIdSchema,
   TeamIdSchema,
   TimestampsSchema,
-} from '../schema';
+} from "../schema";
 
-export class Game extends Schema.Class<Game>('Game')({
+export class Game extends Schema.Class<Game>("Game")({
   ...PublicIdSchema,
   ...OrganizationIdSchema,
   ...TeamIdSchema,
@@ -24,20 +24,20 @@ export class Game extends Schema.Class<Game>('Game')({
 export const Games = Schema.Array(Game);
 
 export class GetAllGamesInput extends Schema.Class<GetAllGamesInput>(
-  'GetAllGamesInput'
+  "GetAllGamesInput",
 )({
   ...OrganizationIdSchema,
   ...NullableTeamIdSchema,
 }) {}
 
-export class GetGameInput extends Schema.Class<GetGameInput>('GetGameInput')({
+export class GetGameInput extends Schema.Class<GetGameInput>("GetGameInput")({
   ...PublicIdSchema,
   ...OrganizationIdSchema,
   ...NullableTeamIdSchema,
 }) {}
 
 export class CreateGameInput extends Schema.Class<CreateGameInput>(
-  'CreateGameInput'
+  "CreateGameInput",
 )({
   ...OrganizationIdSchema,
   ...TeamIdSchema,
@@ -51,13 +51,13 @@ export class CreateGameInput extends Schema.Class<CreateGameInput>(
 }) {}
 
 export class UpdateGameInput extends Schema.Class<UpdateGameInput>(
-  'UpdateGameInput'
+  "UpdateGameInput",
 )({
   ...PublicIdSchema,
   ...OrganizationIdSchema,
   ...TeamIdSchema,
   opponentName: Schema.optional(
-    Schema.String.pipe(Schema.minLength(2), Schema.maxLength(100))
+    Schema.String.pipe(Schema.minLength(2), Schema.maxLength(100)),
   ),
   gameDate: Schema.optional(Schema.DateFromSelf),
   venue: Schema.optional(Schema.String),
@@ -75,7 +75,7 @@ export class UpdateGameInput extends Schema.Class<UpdateGameInput>(
 }) {}
 
 export class DeleteGameInput extends Schema.Class<DeleteGameInput>(
-  'DeleteGameInput'
+  "DeleteGameInput",
 )({
   ...PublicIdSchema,
   ...OrganizationIdSchema,

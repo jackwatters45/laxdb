@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { CreateOrganizationForm } from '@/components/organizations/create-form';
+import { createFileRoute } from "@tanstack/react-router";
+import { CreateOrganizationForm } from "@/components/organizations/create-form";
 
-export const Route = createFileRoute('/_protected/organizations/create')({
+export const Route = createFileRoute("/_protected/organizations/create")({
   component: CreateOrganizationPage,
 });
 

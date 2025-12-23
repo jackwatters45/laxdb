@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router';
-import { Edit } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import type { PlayerInfoType } from '../-data-2';
+import { Link } from "@tanstack/react-router";
+import { Edit } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { PlayerInfoType } from "../-data-2";
 
 type PlayerInfoProps = {
   organizationSlug: string;
@@ -37,7 +37,7 @@ export function PlayerInfo({
                 ),
                 playerInfo.heightFeet && playerInfo.heightInches && (
                   <span key="height">
-                    {playerInfo.heightFeet}'{playerInfo.heightInches}"
+                    {playerInfo.heightFeet}&apos;{playerInfo.heightInches}&quot;
                   </span>
                 ),
                 playerInfo.weightPounds && (
@@ -49,7 +49,7 @@ export function PlayerInfo({
                   <>
                     {item}
                     {index < array.length - 1 && (
-                      <span key={item?.toString()}>{'•'}</span>
+                      <span key={item?.toString()}>{"•"}</span>
                     )}
                   </>
                 ))}

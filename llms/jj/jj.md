@@ -254,7 +254,7 @@ jj log   # Shows "conflict" marker on the commit
 jj edit <conflicted-rev>
 
 # File will have conflict markers:
-# <<<<<<< 
+# <<<<<<<
 # +++++++ (snapshot - one side)
 # %%%%%%% (diff - the change being applied)
 # >>>>>>>

@@ -520,7 +520,7 @@ export class KVExpirationError extends Schema.TaggedError<KVExpirationError>(
    */
   override get message(): string {
     const expMsg =
-      this.expirationValue !== undefined ? ` (${this.expirationValue})` : "";
+      this.expirationValue === undefined ? "" : ` (${this.expirationValue})`;
     return `Invalid KV expiration for key "${this.key}"${expMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -588,7 +588,7 @@ export class KVCacheTtlError extends Schema.TaggedError<KVCacheTtlError>(
    */
   override get message(): string {
     const ttlMsg =
-      this.cacheTtlValue !== undefined ? ` (${this.cacheTtlValue})` : "";
+      this.cacheTtlValue === undefined ? "" : ` (${this.cacheTtlValue})`;
     return `Invalid KV cacheTtl for key "${this.key}"${ttlMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -659,7 +659,7 @@ export class KVBulkLimitError extends Schema.TaggedError<KVBulkLimitError>(
    */
   override get message(): string {
     const countMsg =
-      this.requestedCount !== undefined ? ` (${this.requestedCount} keys)` : "";
+      this.requestedCount === undefined ? "" : ` (${this.requestedCount} keys)`;
     return `KV bulk operation limit exceeded${countMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -727,7 +727,7 @@ export class KVListLimitError extends Schema.TaggedError<KVListLimitError>(
    */
   override get message(): string {
     const limitMsg =
-      this.limitValue !== undefined ? ` (${this.limitValue})` : "";
+      this.limitValue === undefined ? "" : ` (${this.limitValue})`;
     return `KV list operation limit exceeded${limitMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -1115,7 +1115,7 @@ const mapError = (
           key: key ?? "",
           operation,
           reason: "Value exceeds 25 MiB limit",
-          sizeBytes: sizeMatch?.[1] ? parseInt(sizeMatch[1]) : undefined,
+          sizeBytes: sizeMatch?.[1] ? parseInt(sizeMatch[1], 10) : undefined,
         });
       } else if (message.includes("Metadata length")) {
         // PUT: Metadata exceeds 1024 bytes
@@ -1124,7 +1124,7 @@ const mapError = (
           key: key ?? "",
           operation,
           reason: "Metadata exceeds 1024 byte limit",
-          sizeBytes: sizeMatch?.[1] ? parseInt(sizeMatch[1]) : undefined,
+          sizeBytes: sizeMatch?.[1] ? parseInt(sizeMatch[1], 10) : undefined,
         });
       } else if (message.includes("Total size")) {
         // GET_BULK: Response exceeds 25 MB
@@ -1164,7 +1164,7 @@ const mapError = (
           operation,
           reason: extractReason(message),
           expirationValue: expirationMatch?.[1]
-            ? parseInt(expirationMatch[1])
+            ? parseInt(expirationMatch[1], 10)
             : undefined,
         });
       } else if (
@@ -1185,7 +1185,7 @@ const mapError = (
           key: key ?? "",
           operation,
           reason: extractReason(message),
-          cacheTtlValue: ttlMatch?.[1] ? parseInt(ttlMatch[1]) : undefined,
+          cacheTtlValue: ttlMatch?.[1] ? parseInt(ttlMatch[1], 10) : undefined,
         });
       } else if (
         message.includes("key_count_limit") ||
@@ -1198,13 +1198,17 @@ const mapError = (
           return new KVListLimitError({
             operation,
             reason: extractReason(message),
-            limitValue: countMatch?.[1] ? parseInt(countMatch[1]) : undefined,
+            limitValue: countMatch?.[1]
+              ? parseInt(countMatch[1], 10)
+              : undefined,
           });
         }
         return new KVBulkLimitError({
           operation,
           reason: extractReason(message),
-          requestedCount: countMatch?.[1] ? parseInt(countMatch[1]) : undefined,
+          requestedCount: countMatch?.[1]
+            ? parseInt(countMatch[1], 10)
+            : undefined,
         });
       }
       // Other 400 errors
@@ -1301,19 +1305,19 @@ export const make = <Key extends string = string>(
           const keys: Array<ListKey<Metadata, Key>> = result.keys.map((k) => ({
             name: k.name,
             expiration:
-              k.expiration !== undefined
-                ? Option.some(k.expiration)
-                : Option.none(),
+              k.expiration === undefined
+                ? Option.none()
+                : Option.some(k.expiration),
             metadata:
-              k.metadata !== undefined
-                ? Option.some(k.metadata as Metadata)
-                : Option.none(),
+              k.metadata === undefined
+                ? Option.none()
+                : Option.some(k.metadata as Metadata),
           }));
 
           const cacheStatus: Option.Option<string> =
-            result.cacheStatus !== null
-              ? Option.some(result.cacheStatus)
-              : Option.none();
+            result.cacheStatus === null
+              ? Option.none()
+              : Option.some(result.cacheStatus);
 
           if (result.list_complete) {
             return {
@@ -1321,14 +1325,13 @@ export const make = <Key extends string = string>(
               keys,
               cacheStatus,
             } as const;
-          } else {
-            return {
-              listComplete: false,
-              keys,
-              cursor: result.cursor,
-              cacheStatus,
-            } as const;
           }
+          return {
+            listComplete: false,
+            keys,
+            cursor: result.cursor,
+            cacheStatus,
+          } as const;
         },
         catch: (error) => mapError(error, "list"),
       });
@@ -1336,7 +1339,7 @@ export const make = <Key extends string = string>(
 
     put: (key, value, options) => {
       return Effect.tryPromise({
-        try: async () => {
+        try: () => {
           return kv.put(key, value, options);
         },
         catch: (error) => mapError(error, "put", key),
@@ -1418,7 +1421,7 @@ export const make = <Key extends string = string>(
 
     delete: (key) => {
       return Effect.tryPromise({
-        try: async () => {
+        try: () => {
           return kv.delete(key);
         },
         catch: (error) => mapError(error, "delete", key),

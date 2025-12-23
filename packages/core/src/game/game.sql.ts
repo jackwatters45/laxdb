@@ -1,66 +1,66 @@
-import { boolean, index, integer, pgTable, text } from 'drizzle-orm/pg-core';
-import { ids, timestamp, timestamps } from '../drizzle/drizzle.type';
-import { organizationTable } from '../organization/organization.sql';
-import { seasonTable } from '../season/season.sql';
-import { teamTable } from '../team/team.sql';
+import { boolean, index, integer, pgTable, text } from "drizzle-orm/pg-core";
+import { ids, timestamp, timestamps } from "../drizzle/drizzle.type";
+import { organizationTable } from "../organization/organization.sql";
+import { seasonTable } from "../season/season.sql";
+import { teamTable } from "../team/team.sql";
 
 export const gameTable = pgTable(
-  'game',
+  "game",
   {
     ...ids,
-    organizationId: text('organization_id')
+    organizationId: text("organization_id")
       .notNull()
-      .references(() => organizationTable.id, { onDelete: 'cascade' }),
-    teamId: text('team_id')
+      .references(() => organizationTable.id, { onDelete: "cascade" }),
+    teamId: text("team_id")
       .notNull()
-      .references(() => teamTable.id, { onDelete: 'cascade' }),
-    seasonId: integer('seasonId')
+      .references(() => teamTable.id, { onDelete: "cascade" }),
+    seasonId: integer("seasonId")
       .notNull()
-      .references(() => seasonTable.id, { onDelete: 'cascade' }),
+      .references(() => seasonTable.id, { onDelete: "cascade" }),
 
     // Opponent Information
-    opponentName: text('opponent_name').notNull(),
-    opponentTeamId: text('opponent_team_id'), // Optional: if opponent is also in system
+    opponentName: text("opponent_name").notNull(),
+    opponentTeamId: text("opponent_team_id"), // Optional: if opponent is also in system
 
     // Game Details
-    gameDate: timestamp('game_date').notNull(),
-    venue: text('venue').notNull(),
-    isHomeGame: boolean('is_home_game').notNull(), // 1 = home, 0 = away
+    gameDate: timestamp("game_date").notNull(),
+    venue: text("venue").notNull(),
+    isHomeGame: boolean("is_home_game").notNull(), // 1 = home, 0 = away
 
     // Game Classification
-    gameType: text('game_type').notNull().default('regular'),
+    gameType: text("game_type").notNull().default("regular"),
     // Values: 'regular' | 'playoff' | 'tournament' | 'friendly' | 'practice'
 
-    status: text('status').notNull().default('scheduled'),
+    status: text("status").notNull().default("scheduled"),
     // Values: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'postponed'
 
     // Scores
-    homeScore: integer('home_score').default(0),
-    awayScore: integer('away_score').default(0),
+    homeScore: integer("home_score").default(0),
+    awayScore: integer("away_score").default(0),
 
     // Optional Fields
-    notes: text('notes'),
-    location: text('location'), // For maps/directions
+    notes: text("notes"),
+    location: text("location"), // For maps/directions
 
     // Optional Fields V2
-    uniformColor: text('uniform_color'), // Practical need
-    arrivalTime: timestamp('arrival_time'), // Important for logistics
-    opponentLogoUrl: text('opponent_logo_url'), // UI enhancement
-    externalGameId: text('external_game_id'), // Integration with league systems
+    uniformColor: text("uniform_color"), // Practical need
+    arrivalTime: timestamp("arrival_time"), // Important for logistics
+    opponentLogoUrl: text("opponent_logo_url"), // UI enhancement
+    externalGameId: text("external_game_id"), // Integration with league systems
 
     ...timestamps,
   },
   (table) => [
-    index('idx_game_organization').on(table.organizationId),
-    index('idx_game_team').on(table.teamId),
-    index('idx_game_date').on(table.gameDate),
-    index('idx_game_status').on(table.status),
-    index('idx_game_team_date').on(table.teamId, table.gameDate),
-  ]
+    index("idx_game_organization").on(table.organizationId),
+    index("idx_game_team").on(table.teamId),
+    index("idx_game_date").on(table.gameDate),
+    index("idx_game_status").on(table.status),
+    index("idx_game_team_date").on(table.teamId, table.gameDate),
+  ],
 );
 
 type GameInternal = typeof gameTable.$inferSelect;
-export type GameSelect = Omit<GameInternal, 'id'>;
+export type GameSelect = Omit<GameInternal, "id">;
 
 export type GameInsert = typeof gameTable.$inferInsert;
 

@@ -1,8 +1,8 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 import {
   AcceptInvitationInput,
   CreateOrganizationInput,
-} from './organization.schema';
+} from "./organization.schema";
 
 export const Organization = Schema.Unknown;
 

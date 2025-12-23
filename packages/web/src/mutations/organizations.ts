@@ -1,24 +1,24 @@
-import { AuthService } from '@laxdb/core/auth';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { OrganizationIdSchema } from '@laxdb/core/schema';
-import { useMutation } from '@tanstack/react-query';
-import type { useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { toast } from 'sonner';
-import { authMiddleware } from '@/lib/middleware';
+import { AuthService } from "@laxdb/core/auth";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { OrganizationIdSchema } from "@laxdb/core/schema";
+import { useMutation } from "@tanstack/react-query";
+import type { useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { toast } from "sonner";
+import { authMiddleware } from "@/lib/middleware";
 
 // Mutation to switch organization
 const SwitchActiveOrganizationSchema = Schema.Struct({
   ...OrganizationIdSchema,
 });
 
-const switchActiveOrganization = createServerFn({ method: 'POST' })
+const switchActiveOrganization = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof SwitchActiveOrganizationSchema.Type) =>
-    Schema.decodeSync(SwitchActiveOrganizationSchema)(data)
+    Schema.decodeSync(SwitchActiveOrganizationSchema)(data),
   )
-  .handler(async ({ data, context }) =>
+  .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -28,12 +28,12 @@ const switchActiveOrganization = createServerFn({ method: 'POST' })
             body: {
               organizationId: data.organizationId,
             },
-          })
+          }),
         );
 
         return { organizationSlug: organization?.slug };
-      })
-    )
+      }),
+    ),
   );
 
 type SwitchOrgMutation = {
@@ -46,7 +46,7 @@ export const useSwitchOrganization = ({ setOpen, router }: SwitchOrgMutation) =>
     mutationFn: (organizationId: string) =>
       switchActiveOrganization({ data: { organizationId } }),
     onError: (_error) => {
-      toast.error('Failed to switch organization');
+      toast.error("Failed to switch organization");
     },
     onSuccess: (data, _variables, _result, context) => {
       context.client.invalidateQueries();

@@ -1,5 +1,5 @@
-import { useIsomorphicLayoutEffect } from 'motion/react';
-import * as React from 'react';
+import { useIsomorphicLayoutEffect } from "motion/react";
+import * as React from "react";
 
 let globalIsHydrated = false;
 

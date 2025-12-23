@@ -1,39 +1,40 @@
-import { GeistSans } from 'geist/font/sans';
-import type { Metadata } from 'next';
-import './globals.css';
+import { GeistSans } from "geist/font/sans";
+import type { Metadata } from "next";
+// oxlint-disable-next-line no-unassigned-import
+import "./globals.css";
 
-import Footer from '@/components/ui/footer';
-import { NavBar } from '@/components/ui/navbar';
-import { siteConfig } from './site-config';
+import Footer from "@/components/ui/footer";
+import { NavBar } from "@/components/ui/navbar";
+import { siteConfig } from "./site-config";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://yoururl.com'),
+  metadataBase: new URL("https://yoururl.com"),
   title: siteConfig.name,
   description: siteConfig.description,
-  keywords: ['Marketing', 'Database', 'Software'],
+  keywords: ["Marketing", "Database", "Software"],
   authors: [
     {
-      name: 'yourname',
-      url: '',
+      name: "yourname",
+      url: "",
     },
   ],
-  creator: 'yourname',
+  creator: "yourname",
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
+    type: "website",
+    locale: "en_US",
     url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    creator: '@yourname',
+    creator: "@yourname",
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
 };
 

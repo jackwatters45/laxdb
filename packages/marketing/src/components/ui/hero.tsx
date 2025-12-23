@@ -1,6 +1,6 @@
-import { RiArrowRightUpLine } from '@remixicon/react';
-import { FadeContainer, FadeDiv, FadeSpan } from '../fade';
-import GameOfLife from './hero-background';
+import { RiArrowRightUpLine } from "@remixicon/react";
+import { FadeContainer, FadeDiv, FadeSpan } from "../fade";
+import GameOfLife from "./hero-background";
 
 export function Hero() {
   return (
@@ -32,8 +32,8 @@ export function Hero() {
           <FadeSpan>every</FadeSpan> <FadeSpan>Farm</FadeSpan>
         </h1>
         <p className="mt-5 max-w-xl text-center text-base text-balance text-gray-700 sm:mt-8 sm:text-xl">
-          <FadeSpan>Revolutionizing agriculture with AI-powered</FadeSpan>{' '}
-          <FadeSpan>sensors, drones, and automation for</FadeSpan>{' '}
+          <FadeSpan>Revolutionizing agriculture with AI-powered</FadeSpan>{" "}
+          <FadeSpan>sensors, drones, and automation for</FadeSpan>{" "}
           <FadeSpan>sustainable and efficient farming.</FadeSpan>
         </p>
         <FadeDiv>

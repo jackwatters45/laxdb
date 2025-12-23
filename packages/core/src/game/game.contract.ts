@@ -1,10 +1,10 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 import {
   ConstraintViolationError,
   DatabaseError,
   NotFoundError,
   ValidationError,
-} from '../error';
+} from "../error";
 import {
   CreateGameInput,
   DeleteGameInput,
@@ -12,13 +12,13 @@ import {
   GetAllGamesInput,
   GetGameInput,
   UpdateGameInput,
-} from './game.schema';
+} from "./game.schema";
 
 export const GameErrors = Schema.Union(
   NotFoundError,
   ValidationError,
   DatabaseError,
-  ConstraintViolationError
+  ConstraintViolationError,
 );
 
 export const GameContract = {

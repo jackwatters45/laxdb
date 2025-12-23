@@ -1,4 +1,4 @@
-import type { LucideProps } from 'lucide-react';
+import type { LucideProps } from "lucide-react";
 
 export function InstagramIcon(props: LucideProps) {
   return (
@@ -38,23 +38,23 @@ export function WhatsAppIcon(props: LucideProps) {
 
 export const SOCIAL_PLATFORM_CONFIG = {
   facebook: {
-    prefix: 'facebook.com/',
-    placeholder: 'username',
+    prefix: "facebook.com/",
+    placeholder: "username",
   },
   instagram: {
-    prefix: 'instagram.com/',
-    placeholder: 'username',
+    prefix: "instagram.com/",
+    placeholder: "username",
   },
   whatsapp: {
-    prefix: 'wa.me/',
-    placeholder: 'phone',
+    prefix: "wa.me/",
+    placeholder: "phone",
   },
   groupme: {
-    prefix: 'groupme.com/contact/',
-    placeholder: 'username',
+    prefix: "groupme.com/contact/",
+    placeholder: "username",
   },
   linkedin: {
-    prefix: 'linkedin.com/in/',
-    placeholder: 'username',
+    prefix: "linkedin.com/in/",
+    placeholder: "username",
   },
 } as const;

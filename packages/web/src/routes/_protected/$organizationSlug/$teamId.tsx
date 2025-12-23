@@ -1,17 +1,17 @@
-import { AuthService } from '@laxdb/core/auth';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { TeamOperationError } from '@laxdb/core/team/team.error';
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect } from 'effect';
-import { authMiddleware } from '@/lib/middleware';
+import { AuthService } from "@laxdb/core/auth";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { TeamOperationError } from "@laxdb/core/team/team.error";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect } from "effect";
+import { authMiddleware } from "@/lib/middleware";
 
-const getTeamDashboardData = createServerFn({ method: 'GET' })
+const getTeamDashboardData = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(
-    (data: { activeOrganizationId: string; teamId: string }) => data
+    (data: { activeOrganizationId: string; teamId: string }) => data,
   )
-  .handler(async ({ data, context }) =>
+  .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -30,23 +30,23 @@ const getTeamDashboardData = createServerFn({ method: 'GET' })
               organizationId: data.activeOrganizationId,
             },
             headers,
-          })
+          }),
         ).pipe(
           Effect.mapError(
             (cause) =>
               new TeamOperationError({
-                message: 'Failed to list organization teams',
+                message: "Failed to list organization teams",
                 cause,
-              })
-          )
+              }),
+          ),
         );
 
         // Find the active team from the teamId parameter
         const activeTeam =
-          teams?.find((team) => team.id === data.teamId) || null;
+          teams?.find((team) => team.id === data.teamId) ?? null;
         if (!activeTeam) {
           throw redirect({
-            to: '/$organizationSlug',
+            to: "/$organizationSlug",
             params: { organizationSlug: data.activeOrganizationId },
           });
         }
@@ -55,11 +55,11 @@ const getTeamDashboardData = createServerFn({ method: 'GET' })
           teams,
           activeTeam,
         };
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug/$teamId')({
+export const Route = createFileRoute("/_protected/$organizationSlug/$teamId")({
   beforeLoad: async ({ params, context }) => {
     const data = await getTeamDashboardData({
       data: {
@@ -71,7 +71,7 @@ export const Route = createFileRoute('/_protected/$organizationSlug/$teamId')({
     const activeTeam = data.activeTeam;
     if (!activeTeam) {
       throw redirect({
-        to: '/$organizationSlug',
+        to: "/$organizationSlug",
         params: { organizationSlug: context.activeOrganization.id },
       });
     }
@@ -86,8 +86,8 @@ export const Route = createFileRoute('/_protected/$organizationSlug/$teamId')({
       activeTeam,
     };
   },
-  loader: async ({ params, context }) =>
-    await getTeamDashboardData({
+  loader: ({ params, context }) =>
+    getTeamDashboardData({
       data: {
         activeOrganizationId: context.activeOrganization.id,
         teamId: params.teamId,

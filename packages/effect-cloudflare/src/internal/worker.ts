@@ -3,7 +3,7 @@
  */
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
+import type * as Layer from "effect/Layer";
 import * as ManagedRuntime from "effect/ManagedRuntime";
 import { makeEnv, Env, type CloudflareEnv } from "./env";
 import {
@@ -29,7 +29,7 @@ export function makeFetchEntryPoint<R, E>(
 ): ExportedHandler<Cloudflare.Env> {
   const runtime = ManagedRuntime.make(options.layer, options.memoMap);
 
-  const fetch = async (
+  const fetch = (
     req: Request,
     env: Cloudflare.Env,
     ctx: globalThis.ExecutionContext,

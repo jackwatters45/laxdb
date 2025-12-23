@@ -11,8 +11,8 @@ import {
   type TableMeta,
   useReactTable,
   type VisibilityState,
-} from '@tanstack/react-table';
-import * as React from 'react';
+} from "@tanstack/react-table";
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -20,14 +20,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { cn } from '@/lib/utils';
-import type { ClassNameChildrenProp, ClassNameProp } from '@/types';
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import type { ClassNameChildrenProp, ClassNameProp } from "@/types";
 import {
   DataTableContext,
   type DataTableContextValue,
   useDataTable,
-} from './use-data-table';
+} from "./use-data-table";
 
 type DataTableProviderProps<TData> = {
   columns: ColumnDef<TData>[];
@@ -46,11 +46,11 @@ function DataTableProvider<TData>({
 }: DataTableProviderProps<TData>) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [globalFilter, setGlobalFilter] = React.useState('');
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -87,29 +87,29 @@ function DataTableProvider<TData>({
   };
 
   return (
-    <DataTableContext.Provider value={value as DataTableContextValue<unknown>}>
+    <DataTableContext.Provider value={value as DataTableContextValue}>
       {children}
     </DataTableContext.Provider>
   );
 }
 
-type DataTableRootProps = ClassNameChildrenProp & {};
+type DataTableRootProps = ClassNameChildrenProp;
 
 function DataTableRoot({ children, className }: DataTableRootProps) {
-  return <div className={cn('space-y-3', className)}>{children}</div>;
+  return <div className={cn("space-y-3", className)}>{children}</div>;
 }
 
-type DataTableContentProps = ClassNameChildrenProp & {};
+type DataTableContentProps = ClassNameChildrenProp;
 
 function DataTableContent({ children, className }: DataTableContentProps) {
   return (
-    <div className={cn('relative overflow-hidden overflow-x-auto', className)}>
+    <div className={cn("relative overflow-hidden overflow-x-auto", className)}>
       <Table className={className}>{children}</Table>
     </div>
   );
 }
 
-type DataTableHeaderProps = ClassNameProp & {};
+type DataTableHeaderProps = ClassNameProp;
 
 function DataTableHeader({ className }: DataTableHeaderProps) {
   const { table } = useDataTable();
@@ -121,9 +121,9 @@ function DataTableHeader({ className }: DataTableHeaderProps) {
           {headerGroup.headers.map((header, i) => (
             <TableHead
               className={cn(
-                'text-foreground',
+                "text-foreground",
                 header.column.columnDef.meta?.className,
-                i === headerGroup.headers.length - 1 ? '-translate-x-2' : ''
+                i === headerGroup.headers.length - 1 ? "-translate-x-2" : "",
               )}
               key={header.id}
             >
@@ -136,7 +136,7 @@ function DataTableHeader({ className }: DataTableHeaderProps) {
   );
 }
 
-type DataTableBodyProps = ClassNameProp & {};
+type DataTableBodyProps = ClassNameProp;
 
 function DataTableBody({ className }: DataTableBodyProps) {
   const { table, columns } = useDataTable();
@@ -164,16 +164,16 @@ type DataTableRowProps = ClassNameProp & {
 
 function DataTableRow({ row, className }: DataTableRowProps) {
   return (
-    <TableRow className={cn('group hover:bg-muted/50', className)}>
+    <TableRow className={cn("group hover:bg-muted/50", className)}>
       {row.getVisibleCells().map((cell, index) => (
         <TableCell
           className={cn(
-            row.getIsSelected() ? 'bg-muted/50' : '',
-            'relative whitespace-nowrap py-1 text-foreground first:w-8',
-            index === 0 ? '' : 'border-l',
-            index === 0 ? 'pl-2' : '',
-            index === row.getVisibleCells().length - 1 ? 'pr-2' : '',
-            cell.column.columnDef.meta?.className
+            row.getIsSelected() ? "bg-muted/50" : "",
+            "relative whitespace-nowrap py-1 text-foreground first:w-8",
+            index === 0 ? "" : "border-l",
+            index === 0 ? "pl-2" : "",
+            index === row.getVisibleCells().length - 1 ? "pr-2" : "",
+            cell.column.columnDef.meta?.className,
           )}
           key={cell.id}
         >

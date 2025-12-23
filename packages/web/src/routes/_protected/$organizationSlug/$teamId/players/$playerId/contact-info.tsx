@@ -1,31 +1,31 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { Pencil } from 'lucide-react';
-import { useState } from 'react';
-import { PageBody, PageContainer } from '@/components/layout/page-content';
-import { TeamBreadcrumbSwitcher } from '@/components/nav/team-breadcrumb-switcher';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
+import { PageBody, PageContainer } from "@/components/layout/page-content";
+import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
 import {
   ContactInfoEdit,
   ContactInfoView,
-} from '@/components/players/contact-info';
+} from "@/components/players/contact-info";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlayerHeader } from './-components/player-header';
-import { contactInfo } from './-data-2';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlayerHeader } from "./-components/player-header";
+import { contactInfo } from "./-data-2";
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/players/$playerId/contact-info'
+  "/_protected/$organizationSlug/$teamId/players/$playerId/contact-info",
 )({
   component: ContactInfo,
-  loader: async () => ({ contactInfo }),
+  loader: () => ({ contactInfo }),
 });
 
-// TODO: update edit version
-// TODO: backend
+// FIX: update edit version
+// FIX: backend
 function ContactInfo() {
   const { contactInfo } = Route.useLoaderData();
 
@@ -41,7 +41,9 @@ function ContactInfo() {
               <CardTitle>Contact Information</CardTitle>
               {!isEditing && (
                 <Button
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setIsEditing(true);
+                  }}
                   size="sm"
                   variant="ghost"
                 >
@@ -119,7 +121,7 @@ function Header() {
       </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title={contactInfo.name!}>
+        <BreadcrumbLink asChild title={contactInfo.name}>
           <Link
             params={{
               organizationSlug,
@@ -133,7 +135,7 @@ function Header() {
         </BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title={'Contact Info'}>
+        <BreadcrumbLink asChild title={"Contact Info"}>
           <Link
             params={{
               organizationSlug,

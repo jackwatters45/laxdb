@@ -1,13 +1,56 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env", ".env.*", "tsconfig.json"],
+  "globalEnv": ["NODE_ENV", "CI"],
   "tasks": {
-    "//#check": {},
-    "//#fix": {
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "tsconfig.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "public/**",
+        "tsconfig.json",
+        "package.json",
+        "vite.config.ts",
+        "next.config.ts"
+      ],
+      "outputs": ["dist/**", ".next/**", ".output/**", "!.next/cache/**"],
+      "env": ["VITE_*", "NEXT_PUBLIC_*"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "vitest.config.ts",
+        "package.json"
+      ],
+      "outputs": ["coverage/**"],
+      "env": ["DATABASE_URL", "TEST_*"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "fix": {
+      "dependsOn": ["^fix"],
       "cache": false
     },
-    "typecheck": {},
-    "build": {
-      "outputs": ["./dist"]
+    "lint": {
+      "dependsOn": ["^lint"]
     }
   }
 }

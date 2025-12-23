@@ -1,7 +1,7 @@
-import type { TeamPlayerWithInfo } from '@laxdb/core/player/player.schema';
-import { createFileRoute } from '@tanstack/react-router';
-import type { Table } from '@tanstack/react-table';
-import { Mail } from 'lucide-react';
+import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
+import { createFileRoute } from "@tanstack/react-router";
+import type { Table } from "@tanstack/react-table";
+import { Mail } from "lucide-react";
 import {
   BulkEditProvider,
   BulkEditToolbar,
@@ -10,12 +10,12 @@ import {
   BulkEditToolbarDeleteAction,
   BulkEditToolbarSelection,
   BulkEditToolbarSeparator,
-} from '@/components/data-table/data-table-bulk-edit-toolbar';
-import { useDataTable } from '@/components/data-table/use-data-table';
-import { useBulkDeletePlayers } from '../-mutations';
+} from "@/components/data-table/data-table-bulk-edit-toolbar";
+import { useDataTable } from "@/components/data-table/use-data-table";
+import { useBulkDeletePlayers } from "../-mutations";
 
 const Route = createFileRoute(
-  '/_protected/$organizationSlug/$teamId/players/'
+  "/_protected/$organizationSlug/$teamId/players/",
 )();
 
 const getPlayerIds = (table: Table<TeamPlayerWithInfo>) => {

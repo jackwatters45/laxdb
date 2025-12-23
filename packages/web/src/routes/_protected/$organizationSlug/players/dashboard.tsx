@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import {
   Calendar,
   FileText,
@@ -10,34 +10,34 @@ import {
   Target,
   TrendingUp,
   Users,
-} from 'lucide-react';
-import { useState } from 'react';
-import { PageBody, PageContainer } from '@/components/layout/page-content';
-import { Badge } from '@/components/ui/badge';
-import { BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlayersHeader } from './-components/players-header';
+} from "lucide-react";
+import { useState } from "react";
+import { PageBody, PageContainer } from "@/components/layout/page-content";
+import { Badge } from "@/components/ui/badge";
+import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlayersHeader } from "./-components/players-header";
 
 // Mock data for players
 const mockPlayers = [
   {
-    id: '1',
-    userId: 'user-1',
-    name: 'Alex Johnson',
+    id: "1",
+    userId: "user-1",
+    name: "Alex Johnson",
     jerseyNumber: 23,
-    primaryPosition: 'attack',
-    secondaryPositions: ['midfield'],
-    gradeLevel: 'junior',
+    primaryPosition: "attack",
+    secondaryPositions: ["midfield"],
+    gradeLevel: "junior",
     gpa: 3.7,
-    height: '6\'0"',
-    weight: '175 lbs',
-    dominantHand: 'right',
+    height: "6'0\"",
+    weight: "175 lbs",
+    dominantHand: "right",
 
     // Development Info
     recentNotesCount: 5,
-    lastNoteDate: new Date('2024-09-20'),
-    lastAssessmentDate: new Date('2024-09-15'),
+    lastNoteDate: new Date("2024-09-20"),
+    lastAssessmentDate: new Date("2024-09-15"),
     activeGoalsCount: 3,
     completedResourcesCount: 8,
     pendingResourcesCount: 2,
@@ -53,30 +53,30 @@ const mockPlayers = [
     // Assessment Summary
     overallRating: 7,
     potentialRating: 9,
-    improvementAreas: ['Shot Power', 'Defensive Positioning'],
-    strengths: ['Field Vision', 'Ball Handling', 'Leadership'],
+    improvementAreas: ["Shot Power", "Defensive Positioning"],
+    strengths: ["Field Vision", "Ball Handling", "Leadership"],
 
     // Development Status
-    developmentTrend: 'improving' as const,
-    priorityLevel: 'high' as const,
-    nextMeetingDate: new Date('2024-09-25'),
+    developmentTrend: "improving" as const,
+    priorityLevel: "high" as const,
+    nextMeetingDate: new Date("2024-09-25"),
   },
   {
-    id: '2',
-    userId: 'user-2',
-    name: 'Sarah Martinez',
+    id: "2",
+    userId: "user-2",
+    name: "Sarah Martinez",
     jerseyNumber: 1,
-    primaryPosition: 'goalie',
+    primaryPosition: "goalie",
     secondaryPositions: [],
-    gradeLevel: 'senior',
+    gradeLevel: "senior",
     gpa: 3.9,
-    height: '5\'8"',
-    weight: '140 lbs',
-    dominantHand: 'left',
+    height: "5'8\"",
+    weight: "140 lbs",
+    dominantHand: "left",
 
     recentNotesCount: 3,
-    lastNoteDate: new Date('2024-09-18'),
-    lastAssessmentDate: new Date('2024-09-10'),
+    lastNoteDate: new Date("2024-09-18"),
+    lastAssessmentDate: new Date("2024-09-10"),
     activeGoalsCount: 2,
     completedResourcesCount: 12,
     pendingResourcesCount: 1,
@@ -90,29 +90,29 @@ const mockPlayers = [
 
     overallRating: 8,
     potentialRating: 8,
-    improvementAreas: ['Distribution', 'Clearing Under Pressure'],
-    strengths: ['Reaction Time', 'Positioning', 'Communication'],
+    improvementAreas: ["Distribution", "Clearing Under Pressure"],
+    strengths: ["Reaction Time", "Positioning", "Communication"],
 
-    developmentTrend: 'stable' as const,
-    priorityLevel: 'medium' as const,
-    nextMeetingDate: new Date('2024-09-30'),
+    developmentTrend: "stable" as const,
+    priorityLevel: "medium" as const,
+    nextMeetingDate: new Date("2024-09-30"),
   },
   {
-    id: '3',
-    userId: 'user-3',
-    name: 'Marcus Davis',
+    id: "3",
+    userId: "user-3",
+    name: "Marcus Davis",
     jerseyNumber: 15,
-    primaryPosition: 'defense',
-    secondaryPositions: ['lsm'],
-    gradeLevel: 'sophomore',
+    primaryPosition: "defense",
+    secondaryPositions: ["lsm"],
+    gradeLevel: "sophomore",
     gpa: 3.2,
-    height: '6\'2"',
-    weight: '190 lbs',
-    dominantHand: 'right',
+    height: "6'2\"",
+    weight: "190 lbs",
+    dominantHand: "right",
 
     recentNotesCount: 7,
-    lastNoteDate: new Date('2024-09-22'),
-    lastAssessmentDate: new Date('2024-09-05'),
+    lastNoteDate: new Date("2024-09-22"),
+    lastAssessmentDate: new Date("2024-09-05"),
     activeGoalsCount: 4,
     completedResourcesCount: 6,
     pendingResourcesCount: 3,
@@ -126,29 +126,29 @@ const mockPlayers = [
 
     overallRating: 6,
     potentialRating: 8,
-    improvementAreas: ['Stick Skills', 'Academic Performance', 'Conditioning'],
-    strengths: ['Physicality', 'Determination', 'Team Spirit'],
+    improvementAreas: ["Stick Skills", "Academic Performance", "Conditioning"],
+    strengths: ["Physicality", "Determination", "Team Spirit"],
 
-    developmentTrend: 'needs_attention' as const,
-    priorityLevel: 'high' as const,
-    nextMeetingDate: new Date('2024-09-24'),
+    developmentTrend: "needs_attention" as const,
+    priorityLevel: "high" as const,
+    nextMeetingDate: new Date("2024-09-24"),
   },
   {
-    id: '4',
-    userId: 'user-4',
-    name: 'Tyler Chen',
+    id: "4",
+    userId: "user-4",
+    name: "Tyler Chen",
     jerseyNumber: 8,
-    primaryPosition: 'midfield',
-    secondaryPositions: ['fogo'],
-    gradeLevel: 'freshman',
+    primaryPosition: "midfield",
+    secondaryPositions: ["fogo"],
+    gradeLevel: "freshman",
     gpa: 3.8,
-    height: '5\'10"',
-    weight: '160 lbs',
-    dominantHand: 'right',
+    height: "5'10\"",
+    weight: "160 lbs",
+    dominantHand: "right",
 
     recentNotesCount: 4,
-    lastNoteDate: new Date('2024-09-19'),
-    lastAssessmentDate: new Date('2024-09-12'),
+    lastNoteDate: new Date("2024-09-19"),
+    lastAssessmentDate: new Date("2024-09-12"),
     activeGoalsCount: 5,
     completedResourcesCount: 4,
     pendingResourcesCount: 4,
@@ -162,27 +162,21 @@ const mockPlayers = [
 
     overallRating: 7,
     potentialRating: 9,
-    improvementAreas: ['Physical Strength', 'Shot Selection'],
-    strengths: ['Field Awareness', 'Face-offs', 'Coachability'],
+    improvementAreas: ["Physical Strength", "Shot Selection"],
+    strengths: ["Field Awareness", "Face-offs", "Coachability"],
 
-    developmentTrend: 'improving' as const,
-    priorityLevel: 'medium' as const,
-    nextMeetingDate: new Date('2024-10-01'),
+    developmentTrend: "improving" as const,
+    priorityLevel: "medium" as const,
+    nextMeetingDate: new Date("2024-10-01"),
   },
 ];
 
-// Server function for getting team players
-const getTeamPlayers = createServerFn().handler(async () => {
-  // TODO: Replace with actual API call
-  // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
-  // const request = getRequest();
-  // return await PlayerDevelopmentAPI.getTeamPlayers(teamId, request.headers);
-
+const getTeamPlayers = createServerFn().handler(() => {
   return mockPlayers;
 });
 
 // Server function for permissions
-const getPlayerPermissions = createServerFn().handler(async () => ({
+const getPlayerPermissions = createServerFn().handler(() => ({
   canViewAllPlayers: true,
   canCreateNotes: true,
   canAssess: true,
@@ -191,7 +185,7 @@ const getPlayerPermissions = createServerFn().handler(async () => ({
 }));
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/dashboard'
+  "/_protected/$organizationSlug/players/dashboard",
 )({
   component: PlayersPage,
   loader: async () => {
@@ -207,10 +201,10 @@ export const Route = createFileRoute(
 function PlayersPage() {
   const { organizationSlug } = Route.useParams();
   const { players, permissions } = Route.useLoaderData();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPosition, setSelectedPosition] = useState<string>('all');
-  const [selectedGrade, setSelectedGrade] = useState<string>('all');
-  const [selectedTrend, setSelectedTrend] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState<string>("all");
+  const [selectedGrade, setSelectedGrade] = useState<string>("all");
+  const [selectedTrend, setSelectedTrend] = useState<string>("all");
 
   // Get unique values for filters
   const positions = Array.from(new Set(players.map((p) => p.primaryPosition)));
@@ -224,11 +218,11 @@ function PlayersPage() {
       player.primaryPosition.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesPosition =
-      selectedPosition === 'all' || player.primaryPosition === selectedPosition;
+      selectedPosition === "all" || player.primaryPosition === selectedPosition;
     const matchesGrade =
-      selectedGrade === 'all' || player.gradeLevel === selectedGrade;
+      selectedGrade === "all" || player.gradeLevel === selectedGrade;
     const matchesTrend =
-      selectedTrend === 'all' || player.developmentTrend === selectedTrend;
+      selectedTrend === "all" || player.developmentTrend === selectedTrend;
 
     return matchesSearch && matchesPosition && matchesGrade && matchesTrend;
   });
@@ -239,7 +233,7 @@ function PlayersPage() {
     averageGPA:
       players.reduce((sum, p) => sum + (p.gpa || 0), 0) / players.length,
     needingAttention: players.filter(
-      (p) => p.developmentTrend === 'needs_attention'
+      (p) => p.developmentTrend === "needs_attention",
     ).length,
     highPotential: players.filter((p) => p.potentialRating >= 8).length,
   };
@@ -361,7 +355,9 @@ function PlayersPage() {
                   <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
                   <input
                     className="w-full rounded-md border border-input py-2 pr-3 pl-10 focus:outline-none focus:ring-2 focus:ring-ring"
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                    }}
                     placeholder="Search players by name, position, or number..."
                     type="text"
                     value={searchTerm}
@@ -371,7 +367,9 @@ function PlayersPage() {
                 <div className="flex gap-2">
                   <select
                     className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
-                    onChange={(e) => setSelectedPosition(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedPosition(e.target.value);
+                    }}
                     value={selectedPosition}
                   >
                     <option value="all">All Positions</option>
@@ -384,7 +382,9 @@ function PlayersPage() {
 
                   <select
                     className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
-                    onChange={(e) => setSelectedGrade(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedGrade(e.target.value);
+                    }}
                     value={selectedGrade}
                   >
                     <option value="all">All Grades</option>
@@ -397,7 +397,9 @@ function PlayersPage() {
 
                   <select
                     className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
-                    onChange={(e) => setSelectedTrend(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedTrend(e.target.value);
+                    }}
                     value={selectedTrend}
                   >
                     <option value="all">All Trends</option>
@@ -427,11 +429,11 @@ function PlayersPage() {
               <h2 className="mb-2 font-semibold text-xl">No players found</h2>
               <p className="mb-6 text-muted-foreground">
                 {searchTerm ||
-                selectedPosition !== 'all' ||
-                selectedGrade !== 'all' ||
-                selectedTrend !== 'all'
-                  ? 'Try adjusting your search or filters'
-                  : 'Players will appear here when added to the team'}
+                selectedPosition !== "all" ||
+                selectedGrade !== "all" ||
+                selectedTrend !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "Players will appear here when added to the team"}
               </p>
             </div>
           )}
@@ -450,6 +452,55 @@ type Permissions = {
   canSetGoals: boolean;
 };
 
+const formatPlayerDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+
+const getTrendColor = (trend: string) => {
+  switch (trend) {
+    case "improving":
+      return "default";
+    case "stable":
+      return "secondary";
+    case "needs_attention":
+      return "destructive";
+    default:
+      return "outline";
+  }
+};
+
+const getTrendLabel = (trend: string) => {
+  switch (trend) {
+    case "improving":
+      return "Improving";
+    case "stable":
+      return "Stable";
+    case "needs_attention":
+      return "Needs Attention";
+    default:
+      return trend;
+  }
+};
+
+const getPlayerPriorityColor = (priority: string) => {
+  switch (priority) {
+    case "high":
+      return "destructive";
+    case "medium":
+      return "default";
+    case "low":
+      return "secondary";
+    default:
+      return "outline";
+  }
+};
+
+const getPositionIcon = (_position: string) => {
+  return <Users className="h-4 w-4" />;
+};
+
 function PlayerCard({
   player,
   permissions,
@@ -458,56 +509,6 @@ function PlayerCard({
   permissions: Permissions;
 }) {
   const { organizationSlug } = Route.useParams();
-
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
-
-  const getTrendColor = (trend: string) => {
-    switch (trend) {
-      case 'improving':
-        return 'default';
-      case 'stable':
-        return 'secondary';
-      case 'needs_attention':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getTrendLabel = (trend: string) => {
-    switch (trend) {
-      case 'improving':
-        return 'Improving';
-      case 'stable':
-        return 'Stable';
-      case 'needs_attention':
-        return 'Needs Attention';
-      default:
-        return trend;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'destructive';
-      case 'medium':
-        return 'default';
-      case 'low':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getPositionIcon = (_position: string) => {
-    // You could add position-specific icons here
-    return <Users className="h-4 w-4" />;
-  };
 
   return (
     <Card className="transition-shadow hover:shadow-md">
@@ -537,7 +538,7 @@ function PlayerCard({
             <Badge variant={getTrendColor(player.developmentTrend)}>
               {getTrendLabel(player.developmentTrend)}
             </Badge>
-            <Badge variant={getPriorityColor(player.priorityLevel)}>
+            <Badge variant={getPlayerPriorityColor(player.priorityLevel)}>
               {player.priorityLevel.toUpperCase()}
             </Badge>
           </div>
@@ -557,7 +558,7 @@ function PlayerCard({
           </div>
           <div>
             <div className="font-bold text-lg">
-              {player.gpa?.toFixed(1) || 'N/A'}
+              {player.gpa?.toFixed(1) || "N/A"}
             </div>
             <div className="text-muted-foreground text-xs">GPA</div>
           </div>
@@ -586,7 +587,7 @@ function PlayerCard({
               Strengths
             </div>
             <div className="text-xs">
-              {player.strengths.slice(0, 2).join(', ')}
+              {player.strengths.slice(0, 2).join(", ")}
             </div>
           </div>
           <div>
@@ -594,7 +595,7 @@ function PlayerCard({
               Focus Areas
             </div>
             <div className="text-xs">
-              {player.improvementAreas.slice(0, 2).join(', ')}
+              {player.improvementAreas.slice(0, 2).join(", ")}
             </div>
           </div>
         </div>
@@ -603,7 +604,9 @@ function PlayerCard({
         {player.nextMeetingDate && (
           <div className="flex items-center gap-2 rounded bg-blue-50 p-2 text-sm">
             <Calendar className="h-4 w-4 text-blue-600" />
-            <span>Next meeting: {formatDate(player.nextMeetingDate)}</span>
+            <span>
+              Next meeting: {formatPlayerDate(player.nextMeetingDate)}
+            </span>
           </div>
         )}
 

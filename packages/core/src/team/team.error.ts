@@ -1,8 +1,8 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 
 export class TeamNotFoundError extends Schema.TaggedError<TeamNotFoundError>(
-  'TeamNotFoundError'
-)('TeamNotFoundError', {
+  "TeamNotFoundError",
+)("TeamNotFoundError", {
   message: Schema.String,
   teamId: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
@@ -10,8 +10,8 @@ export class TeamNotFoundError extends Schema.TaggedError<TeamNotFoundError>(
 }) {}
 
 export class TeamOperationError extends Schema.TaggedError<TeamOperationError>(
-  'TeamOperationError'
-)('TeamOperationError', {
+  "TeamOperationError",
+)("TeamOperationError", {
   message: Schema.String,
   teamId: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
@@ -19,8 +19,8 @@ export class TeamOperationError extends Schema.TaggedError<TeamOperationError>(
 }) {}
 
 export class TeamMemberError extends Schema.TaggedError<TeamMemberError>(
-  'TeamMemberError'
-)('TeamMemberError', {
+  "TeamMemberError",
+)("TeamMemberError", {
   message: Schema.String,
   teamId: Schema.optional(Schema.String),
   userId: Schema.optional(Schema.String),

@@ -1,18 +1,18 @@
-import type { SqlError } from '@effect/sql/SqlError';
-import { Effect, Schema } from 'effect';
+import type { SqlError } from "@effect/sql/SqlError";
+import { Effect, Schema } from "effect";
 import {
   ConstraintViolationError,
   DatabaseError,
   ValidationError,
-} from './error';
+} from "./error";
 
 export const decodeArguments = <A, I, R>(
   schema: Schema.Schema<A, I, R>,
-  input: I
+  input: I,
 ) =>
   Schema.decode(schema)(input).pipe(
     Effect.tapError(Effect.logError),
-    Effect.mapError((error) => new ValidationError({ cause: error }))
+    Effect.mapError((error) => new ValidationError({ cause: error })),
   );
 
 export const parsePostgresError = (error: SqlError) => {
@@ -20,67 +20,67 @@ export const parsePostgresError = (error: SqlError) => {
   const code = pgError?.code;
 
   switch (code) {
-    case '23505':
+    case "23505":
       return new ConstraintViolationError({
-        constraint: pgError.constraint || 'unknown',
+        constraint: pgError.constraint || "unknown",
         code,
         detail: pgError.detail,
         cause: error,
       });
 
-    case '23503':
+    case "23503":
       return new ConstraintViolationError({
-        constraint: pgError.constraint || 'unknown',
+        constraint: pgError.constraint || "unknown",
         code,
         detail: pgError.detail,
         cause: error,
       });
 
-    case '23502':
+    case "23502":
       return new ConstraintViolationError({
-        constraint: pgError.constraint || 'unknown',
+        constraint: pgError.constraint || "unknown",
         code,
-        detail: pgError.detail || 'Not null constraint violation',
+        detail: pgError.detail || "Not null constraint violation",
         cause: error,
       });
 
-    case '23514':
+    case "23514":
       return new ConstraintViolationError({
-        constraint: pgError.constraint || 'unknown',
+        constraint: pgError.constraint || "unknown",
         code,
-        detail: pgError.detail || 'Check constraint violation',
+        detail: pgError.detail || "Check constraint violation",
         cause: error,
       });
 
-    case '42501':
+    case "42501":
       return new DatabaseError({
         code,
-        message: 'Insufficient database privileges',
+        message: "Insufficient database privileges",
         cause: error,
       });
 
-    case '08000':
-    case '08003':
-    case '08006':
-    case '53300':
+    case "08000":
+    case "08003":
+    case "08006":
+    case "53300":
       return new DatabaseError({
         code,
-        message: 'Database connection error',
+        message: "Database connection error",
         cause: error,
       });
 
-    case '40001':
-    case '40P01':
+    case "40001":
+    case "40P01":
       return new DatabaseError({
         code,
-        message: 'Transaction conflict - please retry',
+        message: "Transaction conflict - please retry",
         cause: error,
       });
 
     default:
       return new DatabaseError({
         code,
-        message: pgError?.message || 'Unknown database error',
+        message: pgError?.message || "Unknown database error",
         cause: error,
       });
   }

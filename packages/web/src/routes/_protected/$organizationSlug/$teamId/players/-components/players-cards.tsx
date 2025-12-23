@@ -1,4 +1,4 @@
-import type { TeamPlayerWithInfo } from '@laxdb/core/player/player.schema';
+import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 
 export function PlayerCards({ players }: { players: TeamPlayerWithInfo[] }) {
   return (
@@ -14,7 +14,7 @@ export function PlayerCards({ players }: { players: TeamPlayerWithInfo[] }) {
       {[...players, ...players, ...players, ...players, ...players].map(
         (player, i) => (
           <PlayerCard key={`${player.publicId}-${i}`} player={player} />
-        )
+        ),
       )}
     </div>
   );

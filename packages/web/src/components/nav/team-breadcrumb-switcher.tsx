@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router';
-import type { Team } from 'better-auth/plugins';
+import { Link } from "@tanstack/react-router";
+import type { Team } from "better-auth/plugins";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -9,9 +9,9 @@ import {
   BreadcrumbDropdownTrigger,
   BreadcrumbItem,
   BreadcrumbLink,
-} from '../ui/breadcrumb';
+} from "../ui/breadcrumb";
 
-type TeamBasic = Pick<Team, 'id' | 'name'>;
+type TeamBasic = Pick<Team, "id" | "name">;
 
 type TeamSwitcherProps = {
   activeTeam: Team;

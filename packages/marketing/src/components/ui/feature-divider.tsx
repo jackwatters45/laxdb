@@ -1,4 +1,4 @@
-import { Divider } from '../divider';
+import { Divider } from "../divider";
 
 export default function FeatureDivider({ className }: { className?: string }) {
   return (
@@ -7,42 +7,42 @@ export default function FeatureDivider({ className }: { className?: string }) {
         <div
           className="absolute top-0 left-0 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${0 * 0.2}s`,
           }}
         />
         <div
           className="absolute top-0 left-4 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${0 * 0.2}s`,
           }}
         />
         <div
           className="absolute top-1 left-2 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${2 * 0.2}s`,
           }}
         />
         <div
           className="absolute top-2 left-0 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${3 * 0.2}s`,
           }}
         />
         <div
           className="absolute top-2 left-4 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${3 * 0.2}s`,
           }}
         />
         <div
           className="absolute top-3 left-2 size-1 rounded-full bg-gray-300"
           style={{
-            animation: 'wave 2s infinite ease-in-out',
+            animation: "wave 2s infinite ease-in-out",
             animationDelay: `${5 * 0.2}s`,
           }}
         />

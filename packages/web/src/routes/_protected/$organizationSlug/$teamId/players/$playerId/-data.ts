@@ -39,8 +39,8 @@ export const lacrosseStats = {
 
 export const playerGameStats = {
   // info
-  playerId: '1',
-  teamId: '1',
+  playerId: "1",
+  teamId: "1",
   // general stats
   played: true,
   started: true,
@@ -49,22 +49,22 @@ export const playerGameStats = {
 
 export const game = {
   // game info
-  date: '2023-01-01',
-  opponentId: '1', // need pages for opponents
+  date: "2023-01-01",
+  opponentId: "1", // need pages for opponents
   teamScore: 11, //
   opponentScore: 9,
-  homeAway: 'home', // home, away, neutral
+  homeAway: "home", // home, away, neutral
   teamsStats: lacrosseStats,
   opponentStats: lacrosseStats,
-  teamPlayerStats: new Array(8).fill(playerGameStats), // individual team player stats
-  opponentPlayerStats: new Array(8).fill(playerGameStats), // individual opponent player stats
+  teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats), // individual team player stats
+  opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats), // individual opponent player stats
 };
 
 export const playerSeasonStats = {
   gamesPlayed: 8,
   gamesStarted: 8,
   ...lacrosseStats,
-  gameByGameStats: new Array(8).fill(playerGameStats),
+  gameByGameStats: Array.from({ length: 8 }, () => playerGameStats),
 };
 
 export const playerSeasonStatsMock: typeof playerSeasonStats = {
@@ -72,8 +72,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
   gamesStarted: 10,
   gameByGameStats: [
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 2,
@@ -94,8 +94,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 1,
@@ -116,8 +116,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 3,
@@ -138,8 +138,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 1,
@@ -160,8 +160,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 2,
@@ -182,8 +182,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 0,
@@ -204,8 +204,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 2,
@@ -226,8 +226,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: false,
       goals: 1,
@@ -248,8 +248,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 3,
@@ -270,8 +270,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 2,
@@ -292,8 +292,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: false,
       goals: 1,
@@ -314,8 +314,8 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
       faceoffPercentage: 0,
     },
     {
-      playerId: '1',
-      teamId: '1',
+      playerId: "1",
+      teamId: "1",
       played: true,
       started: true,
       goals: 0,
@@ -356,11 +356,11 @@ export const playerSeasonStatsMock: typeof playerSeasonStats = {
 
 export const gamesMock: (typeof game)[] = [
   {
-    date: '2024-09-05',
-    opponentId: '2',
+    date: "2024-09-05",
+    opponentId: "2",
     teamScore: 12,
     opponentScore: 9,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 12,
       assists: 8,
@@ -397,15 +397,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 12,
       faceoffPercentage: 40.0,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-08',
-    opponentId: '3',
+    date: "2024-09-08",
+    opponentId: "3",
     teamScore: 10,
     opponentScore: 11,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 10,
       assists: 7,
@@ -442,15 +442,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 10,
       faceoffPercentage: 52.38,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-12',
-    opponentId: '4',
+    date: "2024-09-12",
+    opponentId: "4",
     teamScore: 15,
     opponentScore: 8,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 15,
       assists: 11,
@@ -487,15 +487,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 15,
       faceoffPercentage: 31.82,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-15',
-    opponentId: '5',
+    date: "2024-09-15",
+    opponentId: "5",
     teamScore: 11,
     opponentScore: 10,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 11,
       assists: 8,
@@ -532,15 +532,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 11,
       faceoffPercentage: 47.62,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-19',
-    opponentId: '6',
+    date: "2024-09-19",
+    opponentId: "6",
     teamScore: 14,
     opponentScore: 9,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 14,
       assists: 10,
@@ -577,15 +577,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 13,
       faceoffPercentage: 40.91,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-22',
-    opponentId: '7',
+    date: "2024-09-22",
+    opponentId: "7",
     teamScore: 9,
     opponentScore: 12,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 9,
       assists: 6,
@@ -622,15 +622,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 9,
       faceoffPercentage: 57.14,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-26',
-    opponentId: '8',
+    date: "2024-09-26",
+    opponentId: "8",
     teamScore: 13,
     opponentScore: 7,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 13,
       assists: 9,
@@ -667,15 +667,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 14,
       faceoffPercentage: 36.36,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-09-29',
-    opponentId: '9',
+    date: "2024-09-29",
+    opponentId: "9",
     teamScore: 11,
     opponentScore: 11,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 11,
       assists: 8,
@@ -712,15 +712,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 11,
       faceoffPercentage: 50.0,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-10-03',
-    opponentId: '10',
+    date: "2024-10-03",
+    opponentId: "10",
     teamScore: 16,
     opponentScore: 10,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 16,
       assists: 12,
@@ -757,15 +757,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 16,
       faceoffPercentage: 33.33,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-10-06',
-    opponentId: '11',
+    date: "2024-10-06",
+    opponentId: "11",
     teamScore: 12,
     opponentScore: 11,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 12,
       assists: 9,
@@ -802,15 +802,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 12,
       faceoffPercentage: 45.45,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-10-10',
-    opponentId: '12',
+    date: "2024-10-10",
+    opponentId: "12",
     teamScore: 10,
     opponentScore: 13,
-    homeAway: 'home',
+    homeAway: "home",
     teamsStats: {
       goals: 10,
       assists: 7,
@@ -847,15 +847,15 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 10,
       faceoffPercentage: 54.55,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
   {
-    date: '2024-10-13',
-    opponentId: '13',
+    date: "2024-10-13",
+    opponentId: "13",
     teamScore: 8,
     opponentScore: 9,
-    homeAway: 'away',
+    homeAway: "away",
     teamsStats: {
       goals: 8,
       assists: 5,
@@ -892,7 +892,7 @@ export const gamesMock: (typeof game)[] = [
       faceoffsLost: 8,
       faceoffPercentage: 61.9,
     },
-    teamPlayerStats: new Array(8).fill(playerGameStats),
-    opponentPlayerStats: new Array(8).fill(playerGameStats),
+    teamPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
+    opponentPlayerStats: Array.from({ length: 8 }, () => playerGameStats),
   },
 ];

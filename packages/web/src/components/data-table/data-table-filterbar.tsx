@@ -1,24 +1,24 @@
-import { RiEqualizer2Line } from '@remixicon/react';
-import type { Table } from '@tanstack/react-table';
-import { Grid2X2, List } from 'lucide-react';
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { RiEqualizer2Line } from "@remixicon/react";
+import type { Table } from "@tanstack/react-table";
+import { Grid2X2, List } from "lucide-react";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { ButtonGroup } from '../ui/button-group';
-import { TabsList, TabsTrigger } from '../ui/tabs';
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { ButtonGroup } from "../ui/button-group";
+import { TabsList, TabsTrigger } from "../ui/tabs";
 import {
   type FilterBarActions,
   FilterBarContext,
   type FilterBarContextValue,
   useFilterBar,
-} from './use-filterbar';
+} from "./use-filterbar";
 
 type FilterBarProviderProps<TData = unknown> = {
   table: Table<TData>;
@@ -36,11 +36,11 @@ function FilterBarProvider<TData>({
       table,
       actions,
     }),
-    [table, actions]
+    [table, actions],
   );
 
   return (
-    <FilterBarContext.Provider value={value as FilterBarContextValue<unknown>}>
+    <FilterBarContext.Provider value={value as FilterBarContextValue}>
       {children}
     </FilterBarContext.Provider>
   );
@@ -55,8 +55,8 @@ function FilterBar({ children, className }: FilterBarProps) {
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-2 px-4 sm:gap-x-6',
-        className
+        "flex flex-wrap items-center justify-between gap-2 px-4 sm:gap-x-6",
+        className,
       )}
     >
       {children}
@@ -73,8 +73,8 @@ function FilterGroup({ children, className }: FilterGroupProps) {
   return (
     <div
       className={cn(
-        'flex w-full flex-col gap-2 sm:w-fit sm:flex-row sm:items-center',
-        className
+        "flex w-full flex-col gap-2 sm:w-fit sm:flex-row sm:items-center",
+        className,
       )}
     >
       {children}
@@ -84,7 +84,7 @@ function FilterGroup({ children, className }: FilterGroupProps) {
 
 function FilterActions({ children, className }: FilterGroupProps) {
   return (
-    <ButtonGroup className={cn('flex items-center gap-2', className)}>
+    <ButtonGroup className={cn("flex items-center gap-2", className)}>
       {children}
     </ButtonGroup>
   );
@@ -128,7 +128,9 @@ function FilterBarViewOptions() {
                   aria-label={`Toggle ${label} column visibility`}
                   checked={column.getIsVisible()}
                   id={column.id}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  onCheckedChange={(value) => {
+                    column.toggleVisibility(!!value);
+                  }}
                 />
                 <Label
                   className="cursor-pointer font-normal text-sm"
@@ -153,7 +155,7 @@ function FilterBarAddButton({ children, className }: FilterBarAddButtonProps) {
   const { actions } = useFilterBar();
 
   return (
-    <Button className={className} onClick={actions?.onAdd} size={'sm'}>
+    <Button className={className} onClick={actions?.onAdd} size={"sm"}>
       {children}
     </Button>
   );
@@ -178,7 +180,7 @@ export {
   FilterNumber,
   FilterSearch,
   FilterSelect,
-} from './data-table-filters';
+} from "./data-table-filters";
 
 export {
   FilterActions,

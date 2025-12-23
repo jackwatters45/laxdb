@@ -1,21 +1,21 @@
-import { RiArrowRightUpLine } from '@remixicon/react';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import React from 'react';
-import { PageBody } from '@/components/layout/page-content';
+import { RiArrowRightUpLine } from "@remixicon/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import React from "react";
+import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
-import { SettingsHeader } from '../-components/settings-header';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { SettingsHeader } from "../-components/settings-header";
 
 const data: {
   name: string;
@@ -25,40 +25,40 @@ const data: {
   percentageValue?: number;
 }[] = [
   {
-    name: 'Starter plan',
-    description: 'Discounted plan for start-ups and growing companies',
-    value: '$90',
+    name: "Starter plan",
+    description: "Discounted plan for start-ups and growing companies",
+    value: "$90",
   },
   {
-    name: 'Storage',
-    description: 'Used 10.1 GB',
-    value: '$40',
-    capacity: '100 GB included',
+    name: "Storage",
+    description: "Used 10.1 GB",
+    value: "$40",
+    capacity: "100 GB included",
     percentageValue: 10.1,
   },
   {
-    name: 'Bandwith',
-    description: 'Used 2.9 GB',
-    value: '$10',
-    capacity: '5 GB included',
+    name: "Bandwith",
+    description: "Used 2.9 GB",
+    value: "$10",
+    capacity: "5 GB included",
     percentageValue: 58,
   },
   {
-    name: 'Users',
-    description: 'Used 9',
-    value: '$20',
-    capacity: '50 users included',
+    name: "Users",
+    description: "Used 9",
+    value: "$20",
+    capacity: "50 users included",
     percentageValue: 18,
   },
   {
-    name: 'Query super caching (EU-Central 1)',
-    description: '4 GB query cache, $120/mo',
-    value: '$120.00',
+    name: "Query super caching (EU-Central 1)",
+    description: "4 GB query cache, $120/mo",
+    value: "$120.00",
   },
 ];
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/settings/billing/'
+  "/_protected/$organizationSlug/settings/billing/",
 )({
   component: Billing,
 });
@@ -76,7 +76,7 @@ function Billing() {
             </h4>
             <p className="mt-1 max-w-2xl text-muted-foreground text-sm leading-6">
               Boost your analytics and unlock advanced features with our premium
-              plans.{' '}
+              plans.{" "}
               <a
                 className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-500"
                 href="#"
@@ -205,24 +205,24 @@ function Billing() {
                     </div>
                     <div
                       className={cn(
-                        'transform-gpu transition-all ease-smooth-bounce will-change-transform',
-                        isSpendMgmtEnabled ? 'h-52 md:h-32' : 'h-0'
+                        "transform-gpu transition-all ease-smooth-bounce will-change-transform",
+                        isSpendMgmtEnabled ? "h-52 md:h-32" : "h-0",
                       )}
                       style={{
-                        transitionDuration: '300ms',
-                        animationFillMode: 'backwards',
+                        transitionDuration: "300ms",
+                        animationFillMode: "backwards",
                       }}
                     >
                       <div
                         className={cn(
-                          'animate-slideDownAndFade transition',
-                          isSpendMgmtEnabled ? '' : 'hidden'
+                          "animate-slideDownAndFade transition",
+                          isSpendMgmtEnabled ? "" : "hidden",
                         )}
                         style={{
-                          animationDelay: '100ms',
-                          animationDuration: '300ms',
-                          transitionDuration: '300ms',
-                          animationFillMode: 'backwards',
+                          animationDelay: "100ms",
+                          animationDuration: "300ms",
+                          transitionDuration: "300ms",
+                          animationFillMode: "backwards",
                         }}
                       >
                         <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">

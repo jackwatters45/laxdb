@@ -3,30 +3,30 @@ import {
   DeletePlayerInput,
   PositionSchema,
   type TeamPlayerWithInfo,
-} from '@laxdb/core/player/player.schema';
-import { PlayerService } from '@laxdb/core/player/player.service';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
+} from "@laxdb/core/player/player.schema";
+import { PlayerService } from "@laxdb/core/player/player.service";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
 import {
   EmailSchema,
   NullableJerseyNumberSchema,
   NullablePlayerNameSchema,
   PublicPlayerIdSchema,
   TeamIdSchema,
-} from '@laxdb/core/schema';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { toast } from 'sonner';
-import { authMiddleware } from '@/lib/middleware';
+} from "@laxdb/core/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { toast } from "sonner";
+import { authMiddleware } from "@/lib/middleware";
 
 export const getTeamPlayersQK = (organizationId: string, teamId: string) =>
-  [organizationId, teamId, 'players'] as const;
+  [organizationId, teamId, "players"] as const;
 
 export const getOrgPlayersQK = (organizationId: string) =>
-  [organizationId, 'players'] as const;
+  [organizationId, "players"] as const;
 
 export class UpdatePlayerAndTeamInput extends Schema.Class<UpdatePlayerAndTeamInput>(
-  'UpdatePlayerAndTeamInput'
+  "UpdatePlayerAndTeamInput",
 )({
   ...PublicPlayerIdSchema,
   ...TeamIdSchema,
@@ -38,12 +38,12 @@ export class UpdatePlayerAndTeamInput extends Schema.Class<UpdatePlayerAndTeamIn
   position: Schema.optional(PositionSchema),
 }) {}
 
-export const updatePlayerFn = createServerFn({ method: 'POST' })
+export const updatePlayerFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof UpdatePlayerAndTeamInput.Type) =>
-    Schema.decodeSync(UpdatePlayerAndTeamInput)(data)
+    Schema.decodeSync(UpdatePlayerAndTeamInput)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const playerService = yield* PlayerService;
@@ -61,15 +61,15 @@ export const updatePlayerFn = createServerFn({ method: 'POST' })
               publicPlayerId: data.publicPlayerId,
               jerseyNumber,
               position,
-            })
+            }),
           );
         }
 
         if (updates.length > 0) {
-          yield* Effect.all(updates, { concurrency: 'unbounded' });
+          yield* Effect.all(updates, { concurrency: "unbounded" });
         }
-      })
-    )
+      }),
+    ),
   );
 
 export function useUpdatePlayerBase(queryKey: readonly string[]) {
@@ -91,11 +91,14 @@ export function useUpdatePlayerBase(queryKey: readonly string[]) {
           if (variables.name !== undefined) updates.name = variables.name;
           if (variables.email !== undefined) updates.email = variables.email;
           if (variables.phone !== undefined) updates.phone = variables.phone;
-          if (variables.dateOfBirth !== undefined) updates.dateOfBirth = variables.dateOfBirth;
-          if (variables.jerseyNumber !== undefined) updates.jerseyNumber = variables.jerseyNumber;
-          if (variables.position !== undefined) updates.position = variables.position;
+          if (variables.dateOfBirth !== undefined)
+            updates.dateOfBirth = variables.dateOfBirth;
+          if (variables.jerseyNumber !== undefined)
+            updates.jerseyNumber = variables.jerseyNumber;
+          if (variables.position !== undefined)
+            updates.position = variables.position;
           return { ...player, ...updates };
-        })
+        }),
       );
 
       return { previousPlayers };
@@ -104,23 +107,23 @@ export function useUpdatePlayerBase(queryKey: readonly string[]) {
       if (context?.previousPlayers) {
         queryClient.setQueryData(queryKey, context.previousPlayers);
       }
-      toast.error('Failed to update player');
+      toast.error("Failed to update player");
     },
   });
 }
 // Bulk delete players
-export const bulkDeletePlayersFn = createServerFn({ method: 'POST' })
+export const bulkDeletePlayersFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof BulkDeletePlayersInput.Type) =>
-    Schema.decodeSync(BulkDeletePlayersInput)(data)
+    Schema.decodeSync(BulkDeletePlayersInput)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const playerService = yield* PlayerService;
         return yield* playerService.bulkDeletePlayers(data);
-      })
-    )
+      }),
+    ),
   );
 
 export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
@@ -136,7 +139,7 @@ export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
         ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
-        old.filter((p) => !variables.playerIds.includes(p.publicId))
+        old.filter((p) => !variables.playerIds.includes(p.publicId)),
       );
 
       return { previousPlayers };
@@ -145,7 +148,7 @@ export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
       if (context?.previousPlayers) {
         queryClient.setQueryData(queryKey, context.previousPlayers);
       }
-      toast.error('Failed to delete players');
+      toast.error("Failed to delete players");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -154,18 +157,18 @@ export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
 }
 
 // Delete player
-export const deletePlayerFn = createServerFn({ method: 'POST' })
+export const deletePlayerFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof DeletePlayerInput.Type) =>
-    Schema.decodeSync(DeletePlayerInput)(data)
+    Schema.decodeSync(DeletePlayerInput)(data),
   )
-  .handler(async ({ data }) =>
+  .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const playerService = yield* PlayerService;
         return yield* playerService.deletePlayer(data);
-      })
-    )
+      }),
+    ),
   );
 
 export function useDeletePlayerBase(queryKey: readonly string[]) {
@@ -181,7 +184,7 @@ export function useDeletePlayerBase(queryKey: readonly string[]) {
         ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
-        old.filter((p) => p.publicId !== variables.playerId)
+        old.filter((p) => p.publicId !== variables.playerId),
       );
 
       return { previousPlayers };
@@ -190,7 +193,7 @@ export function useDeletePlayerBase(queryKey: readonly string[]) {
       if (context?.previousPlayers) {
         queryClient.setQueryData(queryKey, context.previousPlayers);
       }
-      toast.error('Failed to delete player');
+      toast.error("Failed to delete player");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });

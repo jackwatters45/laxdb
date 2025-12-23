@@ -3,7 +3,7 @@ import {
   useBulkDeletePlayersBase,
   useDeletePlayerBase,
   useUpdatePlayerBase,
-} from '@/mutations/players';
+} from "@/mutations/players";
 
 export const useBulkDeletePlayers = (organizationId: string) =>
   useBulkDeletePlayersBase(getOrgPlayersQK(organizationId));

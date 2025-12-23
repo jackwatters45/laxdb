@@ -1,15 +1,15 @@
-import { AuthService } from '@laxdb/core/auth';
-import { RuntimeServer } from '@laxdb/core/runtime.server';
-import { TeamIdSchema } from '@laxdb/core/schema';
-import { TeamOperationError } from '@laxdb/core/team/team.error';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Effect, Schema } from 'effect';
-import { Mail, Plus, Settings, UserMinus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { PageBody } from '@/components/layout/page-content';
-import { Badge } from '@/components/ui/badge';
+import { AuthService } from "@laxdb/core/auth";
+import { RuntimeServer } from "@laxdb/core/runtime.server";
+import { TeamIdSchema } from "@laxdb/core/schema";
+import { TeamOperationError } from "@laxdb/core/team/team.error";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { Mail, Plus, Settings, UserMinus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { PageBody } from "@/components/layout/page-content";
+import { Badge } from "@/components/ui/badge";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -20,23 +20,23 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { authClient } from '@/lib/auth-client';
-import { authMiddleware } from '@/lib/middleware';
-import { TeamHeader } from './-components/team-header';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authClient } from "@/lib/auth-client";
+import { authMiddleware } from "@/lib/middleware";
+import { TeamHeader } from "./-components/team-header";
 
 const GetTeamDataSchema = Schema.Struct({
   ...TeamIdSchema,
 });
 
-const getTeamData = createServerFn({ method: 'GET' })
+const getTeamData = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator((data: typeof GetTeamDataSchema.Type) =>
-    Schema.decodeSync(GetTeamDataSchema)(data)
+    Schema.decodeSync(GetTeamDataSchema)(data),
   )
-  .handler(async ({ data: { teamId }, context }) =>
+  .handler(({ data: { teamId }, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const auth = yield* AuthService;
@@ -48,39 +48,39 @@ const getTeamData = createServerFn({ method: 'GET' })
                 auth.auth.api.listTeamMembers({
                   query: { teamId },
                   headers: context.headers,
-                })
+                }),
               ).pipe(
                 Effect.mapError(
                   (cause) =>
                     new TeamOperationError({
-                      message: 'Failed to retrieve team members',
+                      message: "Failed to retrieve team members",
                       teamId,
                       cause,
-                    })
-                )
+                    }),
+                ),
               ),
               Effect.tryPromise(() =>
                 auth.auth.api.getActiveMember({
                   headers: context.headers,
-                })
+                }),
               ).pipe(
                 Effect.mapError(
                   (cause) =>
                     new TeamOperationError({
-                      message: 'Failed to retrieve active member',
+                      message: "Failed to retrieve active member",
                       cause,
-                    })
-                )
+                    }),
+                ),
               ),
             ],
-            { concurrency: 'unbounded' }
+            { concurrency: "unbounded" },
           );
 
           const members = membersResult || [];
-          const activeMember = activeMemberResult || null;
+          const activeMember = activeMemberResult ?? null;
           const canManageTeam =
-            activeMember?.role === 'coach' ||
-            activeMember?.role === 'headCoach';
+            activeMember?.role === "coach" ||
+            activeMember?.role === "headCoach";
 
           return {
             teamId,
@@ -88,7 +88,7 @@ const getTeamData = createServerFn({ method: 'GET' })
             activeMember,
             canManageTeam,
           };
-        } catch (_error) {
+        } catch {
           return {
             teamId,
             members: [],
@@ -96,19 +96,18 @@ const getTeamData = createServerFn({ method: 'GET' })
             canManageTeam: false,
           };
         }
-      })
-    )
+      }),
+    ),
   );
 
-export const Route = createFileRoute('/_protected/$organizationSlug/$teamId/')({
+export const Route = createFileRoute("/_protected/$organizationSlug/$teamId/")({
   component: TeamManagementPage,
-  loader: async ({ params }) =>
-    await getTeamData({ data: { teamId: params.teamId } }),
+  loader: ({ params }) => getTeamData({ data: { teamId: params.teamId } }),
 });
 
 function TeamManagementPage() {
   const { teamId, members, canManageTeam } = Route.useLoaderData();
-  const [teamName, setTeamName] = useState<string>('');
+  const [teamName, setTeamName] = useState<string>("");
   const [invitePlayerOpen, setInvitePlayerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -119,10 +118,12 @@ function TeamManagementPage() {
         // For now, we'll need to get team name from the teams list
         // In a real app, you'd have a getTeam(teamId) API
         const teamsResult = await (authClient.organization as any).listTeams();
-        const team = teamsResult.data?.find((t: { id: string; name: string }) => t.id === teamId);
-        setTeamName(team?.name || 'Unknown Team');
-      } catch (_error) {
-        setTeamName('Unknown Team');
+        const team = teamsResult.data?.find(
+          (t: { id: string; name: string }) => t.id === teamId,
+        );
+        setTeamName(team?.name ?? "Unknown Team");
+      } catch {
+        setTeamName("Unknown Team");
       } finally {
         setLoading(false);
       }
@@ -157,7 +158,11 @@ function TeamManagementPage() {
 
             {canManageTeam && (
               <div className="flex gap-2">
-                <Button onClick={() => setInvitePlayerOpen(true)}>
+                <Button
+                  onClick={() => {
+                    setInvitePlayerOpen(true);
+                  }}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Invite Player
                 </Button>
@@ -231,7 +236,11 @@ function TeamManagementPage() {
                     No players in this team yet
                   </div>
                   {canManageTeam && (
-                    <Button onClick={() => setInvitePlayerOpen(true)}>
+                    <Button
+                      onClick={() => {
+                        setInvitePlayerOpen(true);
+                      }}
+                    >
                       <Plus className="mr-2 h-4 w-4" />
                       Invite Your First Player
                     </Button>
@@ -244,7 +253,9 @@ function TeamManagementPage() {
           {/* Invite Player Dialog */}
           {invitePlayerOpen && (
             <InvitePlayerDialog
-              onClose={() => setInvitePlayerOpen(false)}
+              onClose={() => {
+                setInvitePlayerOpen(false);
+              }}
               open={invitePlayerOpen}
               teamId={teamId}
             />
@@ -258,7 +269,7 @@ function TeamManagementPage() {
 function TeamMemberCard({
   member,
   canManage,
-  teamId,
+  teamId: _teamId,
 }: {
   member: any;
   canManage: boolean;
@@ -270,15 +281,15 @@ function TeamMemberCard({
     // In a real app, you'd have an API to get user details by ID
     // For now, we'll use what's available in the member object
     setUserDetails({
-      name: member.user?.name || 'Unknown Player',
-      email: member.user?.email || '',
+      name: member.user?.name ?? "Unknown Player",
+      email: member.user?.email ?? "",
       image: member.user?.image,
     });
   }, [member]);
 
   const handleRemoveFromTeam = async () => {
     if (
-      !confirm('Are you sure you want to remove this player from the team?')
+      !confirm("Are you sure you want to remove this player from the team?")
     ) {
       return;
     }
@@ -289,12 +300,12 @@ function TeamMemberCard({
       });
 
       if (error) {
-        toast.error('Failed to remove player. Please try again.');
+        toast.error("Failed to remove player. Please try again.");
       } else {
         window.location.reload(); // Simple refresh for now
       }
-    } catch (_error) {
-      toast.error('Failed to remove player. Please try again.');
+    } catch {
+      toast.error("Failed to remove player. Please try again.");
     }
   };
 
@@ -361,7 +372,7 @@ function InvitePlayerDialog({
   onClose: () => void;
   teamId: string;
 }) {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleInvitePlayer = async (e: React.FormEvent) => {
@@ -374,19 +385,19 @@ function InvitePlayerDialog({
     try {
       const { error } = await authClient.organization.inviteMember({
         email: email.trim(),
-        role: 'player',
+        role: "player",
         teamId,
       });
 
       if (error) {
-        toast.error('Failed to send invitation. Please try again.');
+        toast.error("Failed to send invitation. Please try again.");
       } else {
-        setEmail('');
+        setEmail("");
         onClose();
-        toast.error('Invitation sent successfully!');
+        toast.error("Invitation sent successfully!");
       }
-    } catch (_error) {
-      toast.error('Failed to send invitation. Please try again.');
+    } catch {
+      toast.error("Failed to send invitation. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -412,7 +423,9 @@ function InvitePlayerDialog({
             <input
               className="w-full rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
               id="playerEmail"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
               placeholder="player@example.com"
               required
               type="email"
@@ -437,7 +450,7 @@ function InvitePlayerDialog({
               disabled={loading || !email.trim()}
               type="submit"
             >
-              {loading ? 'Sending...' : 'Send Invitation'}
+              {loading ? "Sending..." : "Send Invitation"}
             </Button>
           </div>
         </form>

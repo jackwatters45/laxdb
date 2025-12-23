@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
 import {
   RiAddLine,
   RiArrowDownSLine,
   RiCornerDownRightLine,
-} from '@remixicon/react';
-import type { Column } from '@tanstack/react-table';
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@remixicon/react";
+import type { Column } from "@tanstack/react-table";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { focusRing } from '@/lib/tw';
-import { cn } from '@/lib/utils';
-import { useFilterBar } from './use-filterbar';
+} from "@/components/ui/select";
+import { focusRing } from "@/lib/tw";
+import { cn } from "@/lib/utils";
+import { useFilterBar } from "./use-filterbar";
 
 export type ConditionFilter = {
   condition: string;
@@ -56,11 +56,11 @@ const ColumnFiltersLabel = ({
 
   if (columnFilterLabels.length < 3) {
     return (
-      <span className={cn('truncate', className)}>
+      <span className={cn("truncate", className)}>
         {columnFilterLabels.map((value, index) => (
-          <span className={cn('font-semibold text-primary')} key={value}>
+          <span className={cn("font-semibold text-primary")} key={value}>
             {value}
-            {index < columnFilterLabels.length - 1 && ', '}
+            {index < columnFilterLabels.length - 1 && ", "}
           </span>
         ))}
       </span>
@@ -68,7 +68,7 @@ const ColumnFiltersLabel = ({
   }
 
   return (
-    <span className={cn('font-semibold text-primary', className)}>
+    <span className={cn("font-semibold text-primary", className)}>
       {columnFilterLabels[0]} and {columnFilterLabels.length - 1} more
     </span>
   );
@@ -82,12 +82,12 @@ type FilterSearchProps = {
 
 function FilterSearch({
   column,
-  placeholder = 'Search...',
+  placeholder = "Search...",
   className,
 }: FilterSearchProps) {
   const { table } = useFilterBar();
 
-  const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -97,7 +97,7 @@ function FilterSearch({
 
   return (
     <Input
-      className={cn('h-7 w-full sm:max-w-[250px]', className)}
+      className={cn("h-7 w-full sm:max-w-[250px]", className)}
       onChange={handleSearchChange}
       placeholder={placeholder}
       value={searchTerm}
@@ -119,11 +119,13 @@ function FilterClear({ className }: FilterClearProps) {
   return (
     <Button
       className={cn(
-        'border border-border px-2 font-semibold text-primary sm:border-none sm:py-1',
-        className
+        "border border-border px-2 font-semibold text-primary sm:border-none sm:py-1",
+        className,
       )}
-      onClick={() => table.resetColumnFilters()}
-      size={'sm'}
+      onClick={() => {
+        table.resetColumnFilters();
+      }}
+      size={"sm"}
       variant="ghost"
     >
       Clear filters
@@ -141,7 +143,7 @@ function FilterSelect<TData, TValue>({
 }: FilterSelectProps<TData, TValue>) {
   const columnFilters = column?.getFilterValue() as string;
   const [selectedValues, setSelectedValues] = React.useState<string>(
-    columnFilters || ''
+    columnFilters || "",
   );
   const [open, setOpen] = React.useState(false);
 
@@ -153,7 +155,7 @@ function FilterSelect<TData, TValue>({
   }, [selectedValues]);
 
   React.useEffect(() => {
-    setSelectedValues(columnFilters || '');
+    setSelectedValues(columnFilters || "");
   }, [columnFilters]);
 
   return (
@@ -161,11 +163,11 @@ function FilterSelect<TData, TValue>({
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs',
+            "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
             selectedValues
-              ? 'text-foreground'
-              : 'border-dashed text-muted-foreground',
-            focusRing
+              ? "text-foreground"
+              : "border-dashed text-muted-foreground",
+            focusRing,
           )}
           type="button"
         >
@@ -174,16 +176,16 @@ function FilterSelect<TData, TValue>({
             onClick={(e) => {
               if (selectedValues) {
                 e.stopPropagation();
-                column?.setFilterValue('');
-                setSelectedValues('');
+                column?.setFilterValue("");
+                setSelectedValues("");
               }
             }}
           >
             <RiAddLine
               aria-hidden="true"
               className={cn(
-                '-ml-px size-5 shrink-0 transition sm:size-4',
-                selectedValues && 'rotate-45 hover:text-destructive'
+                "-ml-px size-5 shrink-0 transition sm:size-4",
+                selectedValues && "rotate-45 hover:text-destructive",
               )}
             />
           </span>
@@ -209,9 +211,9 @@ function FilterSelect<TData, TValue>({
         align="start"
         className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
         onInteractOutside={() => {
-          if (!columnFilters || columnFilters === '') {
-            column?.setFilterValue('');
-            setSelectedValues('');
+          if (!columnFilters || columnFilters === "") {
+            column?.setFilterValue("");
+            setSelectedValues("");
           }
         }}
         sideOffset={7}
@@ -250,8 +252,8 @@ function FilterSelect<TData, TValue>({
               <Button
                 className="w-full sm:py-1"
                 onClick={() => {
-                  column?.setFilterValue('');
-                  setSelectedValues('');
+                  column?.setFilterValue("");
+                  setSelectedValues("");
                 }}
                 type="button"
                 variant="secondary"
@@ -275,7 +277,7 @@ function FilterCheckbox<TData, TValue>({
 }: FilterCheckboxProps<TData, TValue>) {
   const columnFilters = column?.getFilterValue() as string[];
   const [selectedValues, setSelectedValues] = React.useState<string[]>(
-    columnFilters || []
+    columnFilters || [],
   );
   const [open, setOpen] = React.useState(false);
 
@@ -295,11 +297,11 @@ function FilterCheckbox<TData, TValue>({
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex h-7 w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium text-sm hover:bg-muted sm:w-fit',
+            "flex h-7 w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium text-sm hover:bg-muted sm:w-fit",
             selectedValues && selectedValues.length > 0
-              ? 'text-foreground'
-              : 'border-dashed text-muted-foreground',
-            focusRing
+              ? "text-foreground"
+              : "border-dashed text-muted-foreground",
+            focusRing,
           )}
           type="button"
         >
@@ -316,10 +318,10 @@ function FilterCheckbox<TData, TValue>({
             <RiAddLine
               aria-hidden="true"
               className={cn(
-                '-ml-px size-5 shrink-0 transition sm:size-4',
+                "-ml-px size-5 shrink-0 transition sm:size-4",
                 selectedValues &&
                   selectedValues.length > 0 &&
-                  'rotate-45 hover:text-destructive'
+                  "rotate-45 hover:text-destructive",
               )}
             />
           </span>
@@ -423,17 +425,17 @@ function FilterNumber<TData, TValue>({
 }: FilterNumberProps<TData, TValue>) {
   const columnFilters = column?.getFilterValue() as ConditionFilter;
   const [selectedValues, setSelectedValues] = React.useState<ConditionFilter>(
-    columnFilters || { condition: '', value: ['', ''] }
+    columnFilters || { condition: "", value: ["", ""] },
   );
   const [open, setOpen] = React.useState(false);
 
   const columnFilterLabels = React.useMemo(() => {
-    if (!selectedValues || selectedValues.condition === '') {
+    if (!selectedValues || selectedValues.condition === "") {
       return;
     }
 
     const condition = options.find(
-      (option) => option.value === selectedValues.condition
+      (option) => option.value === selectedValues.condition,
     )?.label;
     if (!condition) {
       return;
@@ -446,47 +448,47 @@ function FilterNumber<TData, TValue>({
     }
     return [
       `${condition} ${formatter(selectedValues.value?.[0])} and ${formatter(
-        selectedValues.value?.[1]
+        selectedValues.value?.[1],
       )}`,
     ];
   }, [selectedValues, options, formatter]);
 
   React.useEffect(() => {
-    setSelectedValues(columnFilters || { condition: '', value: ['', ''] });
+    setSelectedValues(columnFilters || { condition: "", value: ["", ""] });
   }, [columnFilters]);
 
-  const isBetween = selectedValues?.condition === 'is-between';
+  const isBetween = selectedValues?.condition === "is-between";
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs',
-            selectedValues && selectedValues.condition !== ''
-              ? 'text-foreground'
-              : 'border-dashed text-muted-foreground',
-            focusRing
+            "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
+            selectedValues && selectedValues.condition !== ""
+              ? "text-foreground"
+              : "border-dashed text-muted-foreground",
+            focusRing,
           )}
           type="button"
         >
           <span
             aria-hidden="true"
             onClick={(e) => {
-              if (selectedValues && selectedValues.condition !== '') {
+              if (selectedValues && selectedValues.condition !== "") {
                 e.stopPropagation();
-                column?.setFilterValue({ condition: '', value: ['', ''] });
-                setSelectedValues({ condition: '', value: ['', ''] });
+                column?.setFilterValue({ condition: "", value: ["", ""] });
+                setSelectedValues({ condition: "", value: ["", ""] });
               }
             }}
           >
             <RiAddLine
               aria-hidden="true"
               className={cn(
-                '-ml-px size-5 shrink-0 transition sm:size-4',
+                "-ml-px size-5 shrink-0 transition sm:size-4",
                 selectedValues &&
-                  selectedValues.condition !== '' &&
-                  'rotate-45 hover:text-destructive'
+                  selectedValues.condition !== "" &&
+                  "rotate-45 hover:text-destructive",
               )}
             />
           </span>
@@ -512,9 +514,9 @@ function FilterNumber<TData, TValue>({
         align="start"
         className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
         onInteractOutside={() => {
-          if (!columnFilters || columnFilters.condition === '') {
-            column?.setFilterValue({ condition: '', value: ['', ''] });
-            setSelectedValues({ condition: '', value: ['', ''] });
+          if (!columnFilters || columnFilters.condition === "") {
+            column?.setFilterValue({ condition: "", value: ["", ""] });
+            setSelectedValues({ condition: "", value: ["", ""] });
           }
         }}
         sideOffset={7}
@@ -536,7 +538,7 @@ function FilterNumber<TData, TValue>({
                   onValueChange={(value) => {
                     setSelectedValues((prev) => ({
                       condition: value,
-                      value: [value !== '' ? prev?.value?.[0] || '' : '', ''],
+                      value: [value === "" ? "" : prev?.value?.[0] || "", ""],
                     }));
                   }}
                   value={selectedValues?.condition}
@@ -563,18 +565,18 @@ function FilterNumber<TData, TValue>({
                     disabled={!selectedValues?.condition}
                     onChange={(e) => {
                       setSelectedValues((prev) => ({
-                        condition: prev?.condition || '',
+                        condition: prev?.condition || "",
                         value: [
                           e.target.value,
-                          isBetween ? prev?.value?.[1] || '' : '',
+                          isBetween ? prev?.value?.[1] || "" : "",
                         ],
                       }));
                     }}
                     placeholder="$0"
                     type="number"
-                    value={selectedValues?.value?.[0] || ''}
+                    value={selectedValues?.value?.[0] || ""}
                   />
-                  {selectedValues?.condition === 'is-between' && (
+                  {selectedValues?.condition === "is-between" && (
                     <>
                       <span className="font-medium text-muted-foreground text-xs">
                         and
@@ -584,13 +586,13 @@ function FilterNumber<TData, TValue>({
                         disabled={!selectedValues?.condition}
                         onChange={(e) => {
                           setSelectedValues((prev) => ({
-                            condition: prev?.condition || '',
-                            value: [prev?.value?.[0] || '', e.target.value],
+                            condition: prev?.condition || "",
+                            value: [prev?.value?.[0] || "", e.target.value],
                           }));
                         }}
                         placeholder="$0"
                         type="number"
-                        value={selectedValues?.value?.[1] || ''}
+                        value={selectedValues?.value?.[1] || ""}
                       />
                     </>
                   )}
@@ -601,8 +603,8 @@ function FilterNumber<TData, TValue>({
               <Button
                 className="w-full sm:py-1"
                 onClick={() => {
-                  column?.setFilterValue({ condition: '', value: ['', ''] });
-                  setSelectedValues({ condition: '', value: ['', ''] });
+                  column?.setFilterValue({ condition: "", value: ["", ""] });
+                  setSelectedValues({ condition: "", value: ["", ""] });
                 }}
                 type="button"
                 variant="secondary"

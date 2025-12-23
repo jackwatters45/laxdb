@@ -1,20 +1,20 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 import {
   ConstraintViolationError,
   DatabaseError,
   NotFoundError,
   ValidationError,
-} from '../../error';
+} from "../../error";
 import {
   GetPlayerContactInfoInput,
   PlayerWithContactInfo,
-} from './contact-info.schema';
+} from "./contact-info.schema";
 
 export const ContactInfoErrors = Schema.Union(
   NotFoundError,
   ValidationError,
   DatabaseError,
-  ConstraintViolationError
+  ConstraintViolationError,
 );
 
 export const ContactInfoContract = {

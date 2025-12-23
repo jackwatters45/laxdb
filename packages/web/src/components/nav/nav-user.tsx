@@ -1,6 +1,6 @@
-import { useRouteContext } from '@tanstack/react-router';
-import { ChevronsUpDown, LogOut, SunMoon } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useRouteContext } from "@tanstack/react-router";
+import { ChevronsUpDown, LogOut, SunMoon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,18 +9,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar';
-import { authClient } from '@/lib/auth-client';
-import { useTheme } from '../theme-provider';
+} from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
+import { useTheme } from "../theme-provider";
 
 export function NavUserSidebar() {
-  const { user } = useRouteContext({ from: '/_protected' });
+  const { user } = useRouteContext({ from: "/_protected" });
 
   return (
     <SidebarMenu>
@@ -51,7 +51,7 @@ export function NavUserSidebar() {
 }
 
 export function NavUserHeader() {
-  const { user } = useRouteContext({ from: '/_protected' });
+  const { user } = useRouteContext({ from: "/_protected" });
 
   return (
     <DropdownMenu>
@@ -71,13 +71,13 @@ function NavUserContent() {
   const { isMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
 
-  const { user } = useRouteContext({ from: '/_protected' });
+  const { user } = useRouteContext({ from: "/_protected" });
 
   return (
     <DropdownMenuContent
       align="end"
       className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-      side={isMobile ? 'bottom' : 'right'}
+      side={isMobile ? "bottom" : "right"}
       sideOffset={4}
     >
       <DropdownMenuLabel className="p-0 font-normal">
@@ -95,7 +95,9 @@ function NavUserContent() {
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
         <DropdownMenuItem
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          onClick={() => {
+            setTheme(theme === "dark" ? "light" : "dark");
+          }}
         >
           <SunMoon />
           Toggle theme
@@ -103,11 +105,11 @@ function NavUserContent() {
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem
-        onClick={async () => {
+        onClick={() => {
           authClient.signOut({
             fetchOptions: {
               onSuccess: () => {
-                window.location.href = '/login';
+                window.location.href = "/login";
               },
             },
           });

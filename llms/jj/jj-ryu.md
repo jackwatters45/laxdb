@@ -18,6 +18,7 @@ cargo install jj-ryu
 Binary name is `ryu`.
 
 **macOS quarantine fix:**
+
 ```bash
 xattr -d com.apple.quarantine $(which ryu)
 ```
@@ -103,6 +104,7 @@ ryu
 ```
 
 Shows all bookmark stacks with status:
+
 - `✓` = synced with remote
 - `↑` = needs push
 - `@` = working copy
@@ -133,11 +135,13 @@ Push all stacks to remote and update PRs.
 ### GitHub
 
 Uses (in order):
+
 1. `gh auth token` (GitHub CLI)
 2. `GITHUB_TOKEN` env var
 3. `GH_TOKEN` env var
 
 For GitHub Enterprise:
+
 ```bash
 export GH_HOST=github.mycompany.com
 ```
@@ -145,11 +149,13 @@ export GH_HOST=github.mycompany.com
 ### GitLab
 
 Uses (in order):
+
 1. `glab auth token` (GitLab CLI)
 2. `GITLAB_TOKEN` env var
 3. `GL_TOKEN` env var
 
 For self-hosted:
+
 ```bash
 export GITLAB_HOST=gitlab.mycompany.com
 ```

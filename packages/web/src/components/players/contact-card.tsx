@@ -6,17 +6,17 @@ import {
   Mail,
   MessageCircle,
   Phone,
-} from 'lucide-react';
-import { createContext, useContext } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import { createContext, useContext } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { InstagramIcon } from '../social-icons';
+} from "@/components/ui/tooltip";
+import { InstagramIcon } from "../social-icons";
 import {
   Item,
   ItemActions,
@@ -24,7 +24,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from '../ui/item';
+} from "../ui/item";
 
 type ContactCardContextType = {
   label: string;
@@ -37,7 +37,7 @@ const ContactCardContext = createContext<ContactCardContextType | null>(null);
 function useContactCard() {
   const context = useContext(ContactCardContext);
   if (!context) {
-    throw new Error('ContactCard components must be used within ContactCard');
+    throw new Error("ContactCard components must be used within ContactCard");
   }
   return context;
 }
@@ -60,8 +60,8 @@ function ContactCard({
   return (
     <ContactCardContext.Provider value={{ label, value, href }}>
       <Item
-        className={`w-full items-center justify-between gap-2 p-2 shadow-sm transition-shadow hover:shadow-md ${className || ''}`}
-        variant={'outline'}
+        className={`w-full items-center justify-between gap-2 p-2 shadow-sm transition-shadow hover:shadow-md ${className ?? ""}`}
+        variant={"outline"}
       >
         {children}
       </Item>
@@ -107,17 +107,19 @@ function ContactCardLabel() {
 
 function ContactCardValue() {
   const { href, value } = useContactCard();
-  return href ? (
+  if (!href) {
+    return <span className="break-all font-medium text-sm">{value}</span>;
+  }
+
+  const isExternal = href.startsWith("http");
+  return (
     <a
       className="break-all font-medium text-blue-600 text-sm hover:underline"
       href={href}
-      rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-      target={href.startsWith('http') ? '_blank' : undefined}
+      {...(isExternal && { rel: "noreferrer", target: "_blank" })}
     >
       {value}
     </a>
-  ) : (
-    <span className="break-all font-medium text-sm">{value}</span>
   );
 }
 
@@ -153,10 +155,10 @@ function ContactCardActions() {
               <Button asChild className="h-6 w-6 p-0" size="sm" variant="ghost">
                 <a
                   href={href}
-                  rel={
-                    href.startsWith('http') ? 'noopener noreferrer' : undefined
-                  }
-                  target={href.startsWith('http') ? '_blank' : undefined}
+                  {...(href.startsWith("http") && {
+                    rel: "noreferrer",
+                    target: "_blank",
+                  })}
                 >
                   <ExternalLink className="h-3 w-3" />
                 </a>

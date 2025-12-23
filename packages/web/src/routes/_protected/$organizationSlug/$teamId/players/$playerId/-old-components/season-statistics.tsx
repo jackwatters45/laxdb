@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerDetails } from '../-utils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PlayerDetails } from "../-utils";
 
 type SeasonStatisticsProps = {
   player: PlayerDetails;

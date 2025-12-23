@@ -1,7 +1,7 @@
-import { Effect } from 'effect';
-import { NotFoundError } from '../error';
-import { decodeArguments, parsePostgresError } from '../util';
-import { PlayerRepo } from './player.repo';
+import { Effect } from "effect";
+import { NotFoundError } from "../error";
+import { decodeArguments, parsePostgresError } from "../util";
+import { PlayerRepo } from "./player.repo";
 import {
   AddPlayerToTeamInput,
   BulkDeletePlayersInput,
@@ -13,10 +13,10 @@ import {
   RemovePlayerFromTeamInput,
   UpdatePlayerInput,
   UpdateTeamPlayerInput,
-} from './player.schema';
+} from "./player.schema";
 
 export class PlayerService extends Effect.Service<PlayerService>()(
-  'PlayerService',
+  "PlayerService",
   {
     effect: Effect.gen(function* () {
       const playerRepo = yield* PlayerRepo;
@@ -27,15 +27,15 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(GetAllPlayersInput, input);
             return yield* playerRepo.list(decoded);
           }).pipe(
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap((players) =>
-              Effect.log(`Found ${players.length} players`)
+              Effect.log(`Found ${players.length} players`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to list players', error)
-            )
+              Effect.logError("Failed to list players", error),
+            ),
           ),
 
         create: (input: CreatePlayerInput) =>
@@ -43,18 +43,20 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(CreatePlayerInput, input);
             return yield* playerRepo.create(decoded);
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
-              Effect.fail(new NotFoundError({ domain: 'Player', id: 'create' }))
+            Effect.catchTag("NoSuchElementException", () =>
+              Effect.fail(
+                new NotFoundError({ domain: "Player", id: "create" }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap((player) =>
-              Effect.log(`Created player: ${player.name}`)
+              Effect.log(`Created player: ${player.name}`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to create player', error)
-            )
+              Effect.logError("Failed to create player", error),
+            ),
           ),
 
         getTeamPlayers: (input: GetTeamPlayersInput) =>
@@ -62,15 +64,15 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(GetTeamPlayersInput, input);
             return yield* playerRepo.getTeamPlayers(decoded);
           }).pipe(
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap((players) =>
-              Effect.log(`Found ${players.length} team players`)
+              Effect.log(`Found ${players.length} team players`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to get team players', error)
-            )
+              Effect.logError("Failed to get team players", error),
+            ),
           ),
 
         updatePlayer: (input: UpdatePlayerInput) =>
@@ -78,58 +80,58 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(UpdatePlayerInput, input);
             return yield* playerRepo.update(decoded);
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
+            Effect.catchTag("NoSuchElementException", () =>
               Effect.fail(
                 new NotFoundError({
-                  domain: 'Player',
+                  domain: "Player",
                   id: input.publicPlayerId,
-                })
-              )
+                }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap((player) =>
-              Effect.log(`Updated player: ${player.name}`)
+              Effect.log(`Updated player: ${player.name}`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to update player', error)
-            )
+              Effect.logError("Failed to update player", error),
+            ),
           ),
 
         updateTeamPlayer: (input: UpdateTeamPlayerInput) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               UpdateTeamPlayerInput,
-              input
+              input,
             );
 
             const playerIdResult = yield* playerRepo.getPlayerIdByPublicId(
-              decoded.publicPlayerId
+              decoded.publicPlayerId,
             );
 
             return yield* playerRepo.updateTeamPlayer(
               playerIdResult.id,
-              decoded
+              decoded,
             );
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
+            Effect.catchTag("NoSuchElementException", () =>
               Effect.fail(
                 new NotFoundError({
-                  domain: 'Player',
+                  domain: "Player",
                   id: input.publicPlayerId,
-                })
-              )
+                }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap(() =>
-              Effect.log(`Updated team player: ${input.publicPlayerId}`)
+              Effect.log(`Updated team player: ${input.publicPlayerId}`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to update team player', error)
-            )
+              Effect.logError("Failed to update team player", error),
+            ),
           ),
 
         addPlayerToTeam: (input: AddPlayerToTeamInput) =>
@@ -137,74 +139,74 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(AddPlayerToTeamInput, input);
 
             const playerIdResult = yield* playerRepo.getPlayerIdByPublicId(
-              decoded.publicPlayerId
+              decoded.publicPlayerId,
             );
 
             return yield* playerRepo.addPlayerToTeam(
               playerIdResult.id,
-              decoded
+              decoded,
             );
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
+            Effect.catchTag("NoSuchElementException", () =>
               Effect.fail(
                 new NotFoundError({
-                  domain: 'Player',
+                  domain: "Player",
                   id: input.publicPlayerId,
-                })
-              )
+                }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap(() =>
               Effect.log(
-                `Added player ${input.publicPlayerId} to team ${input.teamId}`
-              )
+                `Added player ${input.publicPlayerId} to team ${input.teamId}`,
+              ),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to add player to team', error)
-            )
+              Effect.logError("Failed to add player to team", error),
+            ),
           ),
 
         removePlayerFromTeam: (input: RemovePlayerFromTeamInput) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               RemovePlayerFromTeamInput,
-              input
+              input,
             );
 
             const playerIdResult = yield* playerRepo.getPlayerIdByPublicId(
-              decoded.playerId
+              decoded.playerId,
             );
 
             yield* playerRepo.removePlayerFromTeam(
               playerIdResult.id,
-              decoded.teamId
+              decoded.teamId,
             );
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
+            Effect.catchTag("NoSuchElementException", () =>
               Effect.fail(
-                new NotFoundError({ domain: 'Player', id: input.playerId })
-              )
+                new NotFoundError({ domain: "Player", id: input.playerId }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap(() =>
               Effect.log(
-                `Removed player ${input.playerId} from team ${input.teamId}`
-              )
+                `Removed player ${input.playerId} from team ${input.teamId}`,
+              ),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to remove player from team', error)
-            )
+              Effect.logError("Failed to remove player from team", error),
+            ),
           ),
 
         bulkRemovePlayersFromTeam: (input: BulkRemovePlayersFromTeamInput) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               BulkRemovePlayersFromTeamInput,
-              input
+              input,
             );
 
             const players = yield* playerRepo.getPlayerIdsByPublicIds([
@@ -215,20 +217,20 @@ export class PlayerService extends Effect.Service<PlayerService>()(
 
             yield* playerRepo.bulkRemovePlayersFromTeam(
               playerIds,
-              decoded.teamId
+              decoded.teamId,
             );
           }).pipe(
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap(() =>
               Effect.log(
-                `Removed ${input.playerIds.length} players from team ${input.teamId}`
-              )
+                `Removed ${input.playerIds.length} players from team ${input.teamId}`,
+              ),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to bulk remove players from team', error)
-            )
+              Effect.logError("Failed to bulk remove players from team", error),
+            ),
           ),
 
         deletePlayer: (input: DeletePlayerInput) =>
@@ -236,42 +238,42 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(DeletePlayerInput, input);
             return yield* playerRepo.delete(decoded);
           }).pipe(
-            Effect.catchTag('NoSuchElementException', () =>
+            Effect.catchTag("NoSuchElementException", () =>
               Effect.fail(
-                new NotFoundError({ domain: 'Player', id: input.playerId })
-              )
+                new NotFoundError({ domain: "Player", id: input.playerId }),
+              ),
             ),
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap((player) =>
-              Effect.log(`Deleted player: ${player.name}`)
+              Effect.log(`Deleted player: ${player.name}`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to delete player', error)
-            )
+              Effect.logError("Failed to delete player", error),
+            ),
           ),
 
         bulkDeletePlayers: (input: BulkDeletePlayersInput) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               BulkDeletePlayersInput,
-              input
+              input,
             );
             yield* playerRepo.bulkDelete(decoded);
           }).pipe(
-            Effect.catchTag('SqlError', (error) =>
-              Effect.fail(parsePostgresError(error))
+            Effect.catchTag("SqlError", (error) =>
+              Effect.fail(parsePostgresError(error)),
             ),
             Effect.tap(() =>
-              Effect.log(`Deleted ${input.playerIds.length} players`)
+              Effect.log(`Deleted ${input.playerIds.length} players`),
             ),
             Effect.tapError((error) =>
-              Effect.logError('Failed to bulk delete players', error)
-            )
+              Effect.logError("Failed to bulk delete players", error),
+            ),
           ),
       } as const;
     }),
     dependencies: [PlayerRepo.Default],
-  }
+  },
 ) {}

@@ -3,10 +3,10 @@ import {
   RiNavigationFill,
   RiPieChartFill,
   RiRobot3Fill,
-} from '@remixicon/react';
-import { Divider } from '../divider';
-import AnalyticsIllustration from './analytics-illustration';
-import { StickerCard } from './sticker-card';
+} from "@remixicon/react";
+import { Divider } from "../divider";
+import AnalyticsIllustration from "./analytics-illustration";
+import { StickerCard } from "./sticker-card";
 
 export function SolarAnalytics() {
   return (

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -7,9 +7,9 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react';
+} from "react";
 
-type Theme = 'dark' | 'light' | 'system';
+type Theme = "dark" | "light" | "system";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -24,57 +24,57 @@ type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   resolvedTheme: Theme;
-  systemTheme?: 'light' | 'dark' | undefined;
+  systemTheme?: "light" | "dark" | undefined;
 };
 
-const MEDIA = '(prefers-color-scheme: dark)';
-const colorSchemes = ['light', 'dark'];
+const MEDIA = "(prefers-color-scheme: dark)";
+const colorSchemes = new Set(["light", "dark"]);
 
 const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
-  const media = e || window.matchMedia(MEDIA);
-  return media.matches ? 'dark' : 'light';
+  const media = e ?? window.matchMedia(MEDIA);
+  return media.matches ? "dark" : "light";
 };
 
 const getTheme = (key: string, fallback?: string) => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   try {
-    return localStorage.getItem(key) || fallback;
+    return localStorage.getItem(key) ?? fallback;
   } catch {
     return fallback;
   }
 };
 
 const disableAnimation = () => {
-  const css = document.createElement('style');
-  css.appendChild(
+  const css = document.createElement("style");
+  css.append(
     document.createTextNode(
-      '*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}'
-    )
+      "*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}",
+    ),
   );
-  document.head.appendChild(css);
+  document.head.append(css);
 
   return () => {
     (() => window.getComputedStyle(document.body))();
     setTimeout(() => {
-      document.head.removeChild(css);
+      css.remove();
     }, 1);
   };
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(
-  undefined
+  undefined,
 );
 
 function ThemeScript({
-  storageKey = 'laxdb-ui-theme',
-  defaultTheme = 'system',
-  attribute = 'class',
+  storageKey = "laxdb-ui-theme",
+  defaultTheme = "system",
+  attribute = "class",
   enableSystem = true,
 }: Pick<
   ThemeProviderProps,
-  'storageKey' | 'defaultTheme' | 'attribute' | 'enableSystem'
+  "storageKey" | "defaultTheme" | "attribute" | "enableSystem"
 >) {
   const themeScript = `
     (function() {
@@ -115,44 +115,44 @@ function ThemeScript({
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
-  storageKey = 'laxdb-ui-theme',
-  attribute = 'class',
+  defaultTheme = "system",
+  storageKey = "laxdb-ui-theme",
+  attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = false,
   ...props
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(
-    () => getTheme(storageKey, defaultTheme) as Theme
+    () => getTheme(storageKey, defaultTheme) as Theme,
   );
   const [resolvedTheme, setResolvedTheme] = useState<Theme>(() =>
-    theme === 'system' ? getSystemTheme() : theme
+    theme === "system" ? getSystemTheme() : theme,
   );
 
   const applyTheme = useCallback(
     (newTheme: Theme) => {
       let resolved = newTheme;
-      if (newTheme === 'system' && enableSystem) {
+      if (newTheme === "system" && enableSystem) {
         resolved = getSystemTheme();
       }
 
       const enable = disableTransitionOnChange ? disableAnimation() : null;
       const d = document.documentElement;
 
-      if (attribute === 'class') {
-        d.classList.remove('light', 'dark');
+      if (attribute === "class") {
+        d.classList.remove("light", "dark");
         d.classList.add(resolved);
       } else {
         d.setAttribute(attribute, resolved);
       }
 
-      if (colorSchemes.includes(resolved)) {
+      if (colorSchemes.has(resolved)) {
         d.style.colorScheme = resolved;
       }
 
       enable?.();
     },
-    [attribute, enableSystem, disableTransitionOnChange]
+    [attribute, enableSystem, disableTransitionOnChange],
   );
 
   const setTheme = useCallback(
@@ -164,7 +164,7 @@ export function ThemeProvider({
         // Unsupported
       }
     },
-    [storageKey]
+    [storageKey],
   );
 
   const handleMediaQuery = useCallback(
@@ -172,19 +172,21 @@ export function ThemeProvider({
       const resolved = getSystemTheme(e);
       setResolvedTheme(resolved);
 
-      if (theme === 'system' && enableSystem) {
-        applyTheme('system');
+      if (theme === "system" && enableSystem) {
+        applyTheme("system");
       }
     },
-    [theme, enableSystem, applyTheme]
+    [theme, enableSystem, applyTheme],
   );
 
   // Listen to system preference changes
   useEffect(() => {
     const media = window.matchMedia(MEDIA);
-    media.addEventListener('change', handleMediaQuery);
+    media.addEventListener("change", handleMediaQuery);
     handleMediaQuery(media);
-    return () => media.removeEventListener('change', handleMediaQuery);
+    return () => {
+      media.removeEventListener("change", handleMediaQuery);
+    };
   }, [handleMediaQuery]);
 
   // Listen to localStorage changes
@@ -196,8 +198,10 @@ export function ThemeProvider({
       setThemeState((e.newValue as Theme) || defaultTheme);
     };
 
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+    };
   }, [storageKey, defaultTheme]);
 
   // Apply theme changes
@@ -209,14 +213,14 @@ export function ThemeProvider({
     () => ({
       theme,
       setTheme,
-      resolvedTheme: theme === 'system' ? resolvedTheme : theme,
+      resolvedTheme: theme === "system" ? resolvedTheme : theme,
       systemTheme: enableSystem
-        ? resolvedTheme === 'system'
+        ? resolvedTheme === "system"
           ? undefined
           : resolvedTheme
         : undefined,
     }),
-    [theme, setTheme, resolvedTheme, enableSystem]
+    [theme, setTheme, resolvedTheme, enableSystem],
   );
 
   return (
@@ -235,15 +239,15 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
   if (context === undefined) {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return {
-        theme: 'system' as Theme,
+        theme: "system" as Theme,
         setTheme: () => {},
-        resolvedTheme: 'light' as Theme,
-        systemTheme: 'light' as 'light' | 'dark',
+        resolvedTheme: "light" as Theme,
+        systemTheme: "light" as "light" | "dark",
       };
     }
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 };

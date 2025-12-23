@@ -1,6 +1,6 @@
-import { Check, ChevronsUpDown } from 'lucide-react';
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
+import { Check, ChevronsUpDown } from "lucide-react";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -9,13 +9,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 type SearchComboboxContextValue<TItem> = {
   items: TItem[];
@@ -37,7 +37,7 @@ function useSearchCombobox<TItem>(): SearchComboboxContextValue<TItem> {
   const context = React.useContext(SearchComboboxContext);
   if (!context) {
     throw new Error(
-      'useSearchCombobox must be used within a SearchComboboxProvider'
+      "useSearchCombobox must be used within a SearchComboboxProvider",
     );
   }
   return context as SearchComboboxContextValue<TItem>;
@@ -53,7 +53,7 @@ type SearchComboboxProviderProps<TItem> = {
   children: React.ReactNode;
 };
 
-// TODO: don't think this is perfect -> def needs some work when we need a multi-select
+// FIX: needs work when we need a multi-select
 function SearchComboboxProvider<TItem>({
   items,
   isLoading = false,
@@ -64,7 +64,7 @@ function SearchComboboxProvider<TItem>({
   children,
 }: SearchComboboxProviderProps<TItem>) {
   const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const contextValue = React.useMemo(
     () => ({
@@ -88,7 +88,7 @@ function SearchComboboxProvider<TItem>({
       getItemValue,
       open,
       closeOnSelect,
-    ]
+    ],
   );
 
   return (
@@ -120,7 +120,7 @@ type SearchComboboxTriggerProps = {
 };
 
 function SearchComboboxTrigger({
-  placeholder = 'Select...',
+  placeholder = "Select...",
   className,
 }: SearchComboboxTriggerProps) {
   const { selectedValue, open } = useSearchCombobox();
@@ -131,14 +131,14 @@ function SearchComboboxTrigger({
       <Button
         aria-expanded={open}
         className={cn(
-          'h-9 w-full justify-between border-0 px-2 font-normal hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
-          className
+          "h-9 w-full justify-between border-0 px-2 font-normal hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0",
+          className,
         )}
         role="combobox"
         variant="ghost"
       >
-        <span className={cn(!selectedValue && 'text-muted-foreground')}>
-          {selectedValue || placeholder}
+        <span className={cn(!selectedValue && "text-muted-foreground")}>
+          {selectedValue ?? placeholder}
         </span>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
@@ -148,17 +148,17 @@ function SearchComboboxTrigger({
 
 type SearchComboboxContentProps = {
   children: React.ReactNode;
-  align?: 'start' | 'center' | 'end';
+  align?: "start" | "center" | "end";
   className?: string;
 };
 
 function SearchComboboxContent({
   children,
-  align = 'start',
+  align = "start",
   className,
 }: SearchComboboxContentProps) {
   return (
-    <PopoverContent align={align} className={cn('w-[300px] p-0', className)}>
+    <PopoverContent align={align} className={cn("w-[300px] p-0", className)}>
       <Command shouldFilter={false}>{children}</Command>
     </PopoverContent>
   );
@@ -169,7 +169,7 @@ type SearchComboboxInputProps = {
 };
 
 function SearchComboboxInput({
-  placeholder = 'Search...',
+  placeholder = "Search...",
 }: SearchComboboxInputProps) {
   const { searchQuery, setSearchQuery } = useSearchCombobox();
 
@@ -195,7 +195,7 @@ type SearchComboboxLoadingProps = {
 };
 
 function SearchComboboxLoading({
-  children = 'Loading...',
+  children = "Loading...",
 }: SearchComboboxLoadingProps) {
   return <div className="py-6 text-center text-sm">{children}</div>;
 }
@@ -205,13 +205,13 @@ type SearchComboboxEmptyProps = {
 };
 
 function SearchComboboxEmpty({
-  children = 'No results found.',
+  children = "No results found.",
 }: SearchComboboxEmptyProps) {
   const { searchQuery } = useSearchCombobox();
 
   return (
     <CommandEmpty>
-      {typeof children === 'function' ? children(searchQuery) : children}
+      {typeof children === "function" ? children(searchQuery) : children}
     </CommandEmpty>
   );
 }
@@ -252,7 +252,7 @@ function SearchComboboxItem<TItem>({
         onSelect(item);
         if (closeOnSelect) {
           setOpen(false);
-          setSearchQuery('');
+          setSearchQuery("");
         }
       }}
       value={itemValue}
@@ -260,8 +260,8 @@ function SearchComboboxItem<TItem>({
       {!closeOnSelect && (
         <Check
           className={cn(
-            'mr-2 h-4 w-4',
-            isSelected ? 'opacity-100' : 'opacity-0'
+            "mr-2 h-4 w-4",
+            isSelected ? "opacity-100" : "opacity-0",
           )}
         />
       )}
@@ -291,7 +291,7 @@ function SearchComboboxAction({
         onSelect();
         if (closeOnSelect) {
           setOpen(false);
-          setSearchQuery('');
+          setSearchQuery("");
         }
       }}
     >

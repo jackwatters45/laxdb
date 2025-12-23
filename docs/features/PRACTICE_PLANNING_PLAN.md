@@ -1,6 +1,7 @@
 # Practice Planning System - Architecture Plan
 
 ## Overview
+
 The Practice Planning System enables coaches to create a comprehensive drill bank and schedule structured practice sessions. This system focuses on efficient practice organization, drill management, and session planning.
 
 ## Database Schema
@@ -8,6 +9,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ### Core Tables
 
 #### 1. `drill_categories`
+
 - `id` (Primary Key)
 - `team_id` (Foreign Key to teams)
 - `name` (String) - Category name (e.g., "Shooting", "Passing", "Conditioning")
@@ -18,6 +20,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `updated_at` (Timestamp)
 
 #### 2. `drills`
+
 - `id` (Primary Key)
 - `team_id` (Foreign Key to teams)
 - `category_id` (Foreign Key to drill_categories)
@@ -38,6 +41,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `updated_at` (Timestamp)
 
 #### 3. `drill_variations`
+
 - `id` (Primary Key)
 - `drill_id` (Foreign Key to drills)
 - `name` (String) - Variation name
@@ -47,6 +51,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `created_at` (Timestamp)
 
 #### 4. `practice_templates`
+
 - `id` (Primary Key)
 - `team_id` (Foreign Key to teams)
 - `name` (String) - Template name
@@ -60,6 +65,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `updated_at` (Timestamp)
 
 #### 5. `practice_sessions`
+
 - `id` (Primary Key)
 - `team_id` (Foreign Key to teams)
 - `template_id` (Foreign Key to practice_templates, nullable)
@@ -81,6 +87,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `updated_at` (Timestamp)
 
 #### 6. `practice_drill_assignments`
+
 - `id` (Primary Key)
 - `practice_session_id` (Foreign Key to practice_sessions)
 - `drill_id` (Foreign Key to drills)
@@ -94,6 +101,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `created_at` (Timestamp)
 
 #### 7. `practice_attendance`
+
 - `id` (Primary Key)
 - `practice_session_id` (Foreign Key to practice_sessions)
 - `player_id` (Foreign Key to players)
@@ -105,6 +113,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `created_at` (Timestamp)
 
 #### 8. `drill_feedback`
+
 - `id` (Primary Key)
 - `drill_id` (Foreign Key to drills)
 - `practice_session_id` (Foreign Key to practice_sessions)
@@ -118,6 +127,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## API Endpoints Structure
 
 ### Drill Management
+
 - `GET /api/drills` - List drills with filtering
 - `POST /api/drills` - Create new drill
 - `GET /api/drills/:id` - Get drill details
@@ -126,12 +136,14 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `POST /api/drills/:id/favorite` - Toggle favorite status
 
 ### Drill Categories
+
 - `GET /api/drill-categories` - List categories
 - `POST /api/drill-categories` - Create category
 - `PUT /api/drill-categories/:id` - Update category
 - `DELETE /api/drill-categories/:id` - Delete category
 
 ### Practice Templates
+
 - `GET /api/practice-templates` - List templates
 - `POST /api/practice-templates` - Create template
 - `GET /api/practice-templates/:id` - Get template details
@@ -139,6 +151,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `DELETE /api/practice-templates/:id` - Delete template
 
 ### Practice Sessions
+
 - `GET /api/practice-sessions` - List sessions with filtering
 - `POST /api/practice-sessions` - Create/schedule practice
 - `GET /api/practice-sessions/:id` - Get session details
@@ -149,6 +162,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - `POST /api/practice-sessions/:id/attendance` - Record attendance
 
 ### Practice Analytics
+
 - `GET /api/analytics/drills/usage` - Drill usage statistics
 - `GET /api/analytics/practices/effectiveness` - Practice effectiveness metrics
 - `GET /api/analytics/player/attendance` - Player attendance patterns
@@ -156,10 +170,12 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## User Interface Structure
 
 ### Main Navigation
+
 - Add "Practice" tab to main navigation
 - Subnav: Dashboard, Drills, Schedule, Templates, Analytics
 
 ### Page Routes
+
 - `/practice` - Practice dashboard overview
 - `/practice/drills` - Drill bank management
 - `/practice/drills/create` - Create new drill
@@ -174,6 +190,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## Key Features
 
 ### Drill Bank Management
+
 - **Categorized Organization**: Drills organized by category (Shooting, Passing, etc.)
 - **Advanced Search & Filtering**: By category, difficulty, duration, skills, equipment
 - **Drill Variations**: Multiple variations of base drills
@@ -182,6 +199,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - **Usage Analytics**: Track which drills are most effective
 
 ### Practice Scheduling
+
 - **Calendar Interface**: Visual practice calendar with drag-and-drop
 - **Template System**: Pre-built practice templates for quick scheduling
 - **Drill Assignment**: Assign drills to practice sessions with timing
@@ -190,6 +208,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - **Location Management**: Track different practice locations
 
 ### Practice Session Management
+
 - **Real-time Updates**: Start/stop practice, track actual timing
 - **Attendance Tracking**: Mark player attendance and participation levels
 - **Dynamic Adjustments**: Modify drills during practice
@@ -197,6 +216,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 - **Effectiveness Ratings**: Rate drill effectiveness post-practice
 
 ### Analytics & Insights
+
 - **Drill Effectiveness**: Which drills work best for skill development
 - **Practice Patterns**: Optimal practice structures and timing
 - **Player Development**: Track individual player progress through drills
@@ -206,12 +226,14 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## Coach Workflow
 
 ### 1. Drill Bank Setup
+
 1. Create drill categories
 2. Add drills to the bank with detailed instructions
 3. Tag drills with skills and difficulty levels
 4. Create variations for different skill levels
 
 ### 2. Practice Planning
+
 1. Select practice template or create custom session
 2. Assign drills from the bank
 3. Set timing and order for each drill
@@ -219,6 +241,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 5. Schedule with date, time, and location
 
 ### 3. Practice Execution
+
 1. Start practice session
 2. Track attendance
 3. Execute drills with real-time timing
@@ -226,6 +249,7 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 5. Record effectiveness ratings and notes
 
 ### 4. Post-Practice Review
+
 1. Review session effectiveness
 2. Update drill ratings
 3. Add coach observations
@@ -234,16 +258,19 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## Integration Points
 
 ### Player Development System
+
 - Link drills to player skill assessments
 - Track individual player performance in drills
 - Assign specific drills for player development goals
 
 ### Playbook System
+
 - Reference plays during practice drills
 - Create drills that support specific plays
 - Link practice sessions to upcoming games
 
 ### Team Management
+
 - Consider roster availability for practice scheduling
 - Track player attendance and participation
 - Coordinate with game schedules
@@ -251,21 +278,25 @@ The Practice Planning System enables coaches to create a comprehensive drill ban
 ## Future Enhancements
 
 ### Video Integration
+
 - Attach instructional videos to drills
 - Record practice sessions for review
 - Create video libraries for drill demonstrations
 
 ### Mobile App
+
 - Coach mobile app for practice management
 - Real-time updates during practice
 - Offline access to drill instructions
 
 ### Advanced Analytics
+
 - AI-powered practice recommendations
 - Predictive analytics for optimal practice timing
 - Correlation analysis between drills and game performance
 
 ### Equipment Management
+
 - Track equipment inventory
 - Reserve equipment for practices
 - Maintenance scheduling and tracking

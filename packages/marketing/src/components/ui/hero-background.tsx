@@ -1,5 +1,5 @@
-'use client';
-import { useEffect, useRef } from 'react';
+"use client";
+import { useEffect, useRef } from "react";
 
 type Grid = { alive: boolean; opacity: number }[][];
 
@@ -11,7 +11,7 @@ const GameOfLife = () => {
     if (!canvas) {
       return;
     }
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) {
       return;
     }
@@ -22,12 +22,16 @@ const GameOfLife = () => {
     const rows = Math.floor(canvas.height / cellSize);
     const transitionSpeed = 0.2; // Controls fade speed
 
-    let grid: Grid = new Array(rows).fill(null).map(() =>
-      new Array(cols).fill(null).map(() => ({
-        alive: Math.random() > 0.85,
-        opacity: Math.random() > 0.85 ? 0.5 : 0,
-      }))
-    );
+    let grid: Grid = Array.from({ length: rows })
+      .fill(null)
+      .map(() =>
+        Array.from({ length: cols })
+          .fill(null)
+          .map(() => ({
+            alive: Math.random() > 0.85,
+            opacity: Math.random() > 0.85 ? 0.5 : 0,
+          })),
+      );
 
     const countNeighbors = (grid: Grid, x: number, y: number): number => {
       let sum = 0;
@@ -43,7 +47,7 @@ const GameOfLife = () => {
     };
 
     const draw = () => {
-      ctx.fillStyle = '#F9FAFB';
+      ctx.fillStyle = "#F9FAFB";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Update opacities
@@ -67,7 +71,7 @@ const GameOfLife = () => {
               i * cellSize + cellSize / 2,
               1,
               0,
-              Math.PI * 2
+              Math.PI * 2,
             );
             ctx.fill();
           }
@@ -84,7 +88,7 @@ const GameOfLife = () => {
             alive: willBeAlive,
             opacity: cell.opacity,
           };
-        })
+        }),
       );
 
       grid = next;

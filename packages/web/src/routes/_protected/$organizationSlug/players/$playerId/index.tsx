@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
   BookOpen,
@@ -13,44 +13,44 @@ import {
   Target,
   TrendingUp,
   Trophy,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Mock data for player details
 const mockPlayerDetails = {
-  id: '1',
-  userId: 'user-1',
-  name: 'Alex Johnson',
+  id: "1",
+  userId: "user-1",
+  name: "Alex Johnson",
   jerseyNumber: 23,
-  primaryPosition: 'attack',
-  secondaryPositions: ['midfield'],
-  gradeLevel: 'junior',
+  primaryPosition: "attack",
+  secondaryPositions: ["midfield"],
+  gradeLevel: "junior",
   gpa: 3.7,
-  height: '6\'0"',
-  weight: '175 lbs',
-  dominantHand: 'right',
-  academicStanding: 'good',
+  height: "6'0\"",
+  weight: "175 lbs",
+  dominantHand: "right",
+  academicStanding: "good",
 
   // Personal Information
-  emergencyContactName: 'Sarah Johnson (Mother)',
-  emergencyContactPhone: '(555) 123-4567',
+  emergencyContactName: "Sarah Johnson (Mother)",
+  emergencyContactPhone: "(555) 123-4567",
   seasonGoals:
-    'Score 25 goals, improve shot accuracy to 75%, become team captain',
-  collegeAspirations: 'Division I lacrosse scholarship, study business',
-  careerGoals: 'Professional lacrosse player or sports management',
+    "Score 25 goals, improve shot accuracy to 75%, become team captain",
+  collegeAspirations: "Division I lacrosse scholarship, study business",
+  careerGoals: "Professional lacrosse player or sports management",
 
   // Equipment & Medical
-  equipmentNeeds: 'New helmet (medium), backup stick',
-  medicalNotes: 'Minor shoulder injury (cleared), allergic to ibuprofen',
-  injuryHistory: 'Sprained ankle (2023), minor concussion (2022)',
+  equipmentNeeds: "New helmet (medium), backup stick",
+  medicalNotes: "Minor shoulder injury (cleared), allergic to ibuprofen",
+  injuryHistory: "Sprained ankle (2023), minor concussion (2022)",
 
   // Development Summary
   overallRating: 7,
   potentialRating: 9,
-  developmentTrend: 'improving' as const,
-  priorityLevel: 'high' as const,
+  developmentTrend: "improving" as const,
+  priorityLevel: "high" as const,
 
   // Season Statistics
   gamesPlayed: 12,
@@ -69,97 +69,97 @@ const mockPlayerDetails = {
   // Recent Development Activity
   recentNotes: [
     {
-      id: '1',
-      title: 'Excellent leadership in practice',
-      type: 'behavior',
-      date: new Date('2024-09-20'),
-      priority: 'medium' as const,
-      coach: 'Coach Johnson',
+      id: "1",
+      title: "Excellent leadership in practice",
+      type: "behavior",
+      date: new Date("2024-09-20"),
+      priority: "medium" as const,
+      coach: "Coach Johnson",
     },
     {
-      id: '2',
-      title: 'Shot mechanics improvement',
-      type: 'skill_assessment',
-      date: new Date('2024-09-18'),
-      priority: 'high' as const,
-      coach: 'Coach Smith',
+      id: "2",
+      title: "Shot mechanics improvement",
+      type: "skill_assessment",
+      date: new Date("2024-09-18"),
+      priority: "high" as const,
+      coach: "Coach Smith",
     },
     {
-      id: '3',
-      title: 'Academic check-in',
-      type: 'general',
-      date: new Date('2024-09-15'),
-      priority: 'low' as const,
-      coach: 'Coach Johnson',
+      id: "3",
+      title: "Academic check-in",
+      type: "general",
+      date: new Date("2024-09-15"),
+      priority: "low" as const,
+      coach: "Coach Johnson",
     },
   ],
 
   // Active Goals
   activeGoals: [
     {
-      id: '1',
-      title: 'Improve Shot Accuracy',
-      targetValue: '75% accuracy',
-      currentValue: '62% accuracy',
+      id: "1",
+      title: "Improve Shot Accuracy",
+      targetValue: "75% accuracy",
+      currentValue: "62% accuracy",
       progress: 65,
-      dueDate: new Date('2024-11-15'),
-      category: 'skill',
+      dueDate: new Date("2024-11-15"),
+      category: "skill",
     },
     {
-      id: '2',
-      title: 'Score 25 Goals This Season',
-      targetValue: '25 goals',
-      currentValue: '18 goals',
+      id: "2",
+      title: "Score 25 Goals This Season",
+      targetValue: "25 goals",
+      currentValue: "18 goals",
       progress: 72,
-      dueDate: new Date('2024-11-30'),
-      category: 'team',
+      dueDate: new Date("2024-11-30"),
+      category: "team",
     },
     {
-      id: '3',
-      title: 'Maintain 3.7+ GPA',
-      targetValue: '3.7 GPA',
-      currentValue: '3.7 GPA',
+      id: "3",
+      title: "Maintain 3.7+ GPA",
+      targetValue: "3.7 GPA",
+      currentValue: "3.7 GPA",
       progress: 100,
-      dueDate: new Date('2024-12-15'),
-      category: 'academic',
+      dueDate: new Date("2024-12-15"),
+      category: "academic",
     },
   ],
 
   // Assigned Resources
   assignedResources: [
     {
-      id: '1',
-      title: 'Advanced Shooting Drills',
-      type: 'drill',
-      status: 'in_progress' as const,
-      assignedDate: new Date('2024-09-15'),
-      dueDate: new Date('2024-09-30'),
-      priority: 'high' as const,
+      id: "1",
+      title: "Advanced Shooting Drills",
+      type: "drill",
+      status: "in_progress" as const,
+      assignedDate: new Date("2024-09-15"),
+      dueDate: new Date("2024-09-30"),
+      priority: "high" as const,
     },
     {
-      id: '2',
-      title: 'Leadership Skills Video Series',
-      type: 'video',
-      status: 'completed' as const,
-      assignedDate: new Date('2024-09-10'),
-      dueDate: new Date('2024-09-25'),
-      priority: 'medium' as const,
+      id: "2",
+      title: "Leadership Skills Video Series",
+      type: "video",
+      status: "completed" as const,
+      assignedDate: new Date("2024-09-10"),
+      dueDate: new Date("2024-09-25"),
+      priority: "medium" as const,
     },
     {
-      id: '3',
-      title: 'NCAA Recruiting Rules Guide',
-      type: 'article',
-      status: 'not_started' as const,
-      assignedDate: new Date('2024-09-22'),
-      dueDate: new Date('2024-10-05'),
-      priority: 'medium' as const,
+      id: "3",
+      title: "NCAA Recruiting Rules Guide",
+      type: "article",
+      status: "not_started" as const,
+      assignedDate: new Date("2024-09-22"),
+      dueDate: new Date("2024-10-05"),
+      priority: "medium" as const,
     },
   ],
 
   // Latest Skills Assessment
   latestAssessment: {
-    date: new Date('2024-09-15'),
-    assessedBy: 'Coach Johnson',
+    date: new Date("2024-09-15"),
+    assessedBy: "Coach Johnson",
 
     // Offensive Skills
     shootingAccuracy: 7,
@@ -185,20 +185,20 @@ const mockPlayerDetails = {
     leadership: 8,
     coachability: 9,
 
-    strengths: 'Excellent field vision, strong ball handling, natural leader',
-    areasForImprovement: 'Shot power, defensive positioning, physical strength',
+    strengths: "Excellent field vision, strong ball handling, natural leader",
+    areasForImprovement: "Shot power, defensive positioning, physical strength",
   },
 
   // Upcoming Events
-  nextMeetingDate: new Date('2024-09-25'),
-  nextAssessmentDate: new Date('2024-10-15'),
+  nextMeetingDate: new Date("2024-09-25"),
+  nextAssessmentDate: new Date("2024-10-15"),
 };
 
 // Server function for getting player details
-const getPlayerDetails = createServerFn({ method: 'GET' })
+const getPlayerDetails = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data: _ }) => {
+    // FIX: Replace with actual API call
     // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
     // return await PlayerDevelopmentAPI.getPlayerProfile(data.playerId, headers);
 
@@ -206,7 +206,7 @@ const getPlayerDetails = createServerFn({ method: 'GET' })
   });
 
 // Server function for permissions
-const getPlayerPermissions = createServerFn().handler(async () => ({
+const getPlayerPermissions = createServerFn().handler(() => ({
   canEdit: true,
   canCreateNotes: true,
   canAssess: true,
@@ -216,7 +216,7 @@ const getPlayerPermissions = createServerFn().handler(async () => ({
 }));
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/$playerId/'
+  "/_protected/$organizationSlug/players/$playerId/",
 )({
   component: PlayerDetailsPage,
   loader: async ({ params }) => {
@@ -229,81 +229,81 @@ export const Route = createFileRoute(
   },
 });
 
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+
+const getTrendColor = (trend: string) => {
+  switch (trend) {
+    case "improving":
+      return "default";
+    case "stable":
+      return "secondary";
+    case "needs_attention":
+      return "destructive";
+    default:
+      return "outline";
+  }
+};
+
+const getTrendLabel = (trend: string) => {
+  switch (trend) {
+    case "improving":
+      return "Improving";
+    case "stable":
+      return "Stable";
+    case "needs_attention":
+      return "Needs Attention";
+    default:
+      return trend;
+  }
+};
+
+const getPriorityColor = (priority: "low" | "medium" | "high") => {
+  switch (priority) {
+    case "high":
+      return "destructive";
+    case "medium":
+      return "default";
+    case "low":
+      return "secondary";
+    default:
+      return "default";
+  }
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "completed":
+      return "default";
+    case "in_progress":
+      return "secondary";
+    case "not_started":
+      return "outline";
+    default:
+      return "outline";
+  }
+};
+
+const getGoalCategoryIcon = (category: string) => {
+  switch (category) {
+    case "skill":
+      return <Target className="h-4 w-4" />;
+    case "academic":
+      return <GraduationCap className="h-4 w-4" />;
+    case "team":
+      return <Trophy className="h-4 w-4" />;
+    default:
+      return <Star className="h-4 w-4" />;
+  }
+};
+
 function PlayerDetailsPage() {
   const { organizationSlug } = Route.useParams();
   const { player, permissions } = Route.useLoaderData();
-
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date);
-
-  const getTrendColor = (trend: string) => {
-    switch (trend) {
-      case 'improving':
-        return 'default';
-      case 'stable':
-        return 'secondary';
-      case 'needs_attention':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getTrendLabel = (trend: string) => {
-    switch (trend) {
-      case 'improving':
-        return 'Improving';
-      case 'stable':
-        return 'Stable';
-      case 'needs_attention':
-        return 'Needs Attention';
-      default:
-        return trend;
-    }
-  };
-
-  const getPriorityColor = (priority: 'low' | 'medium' | 'high') => {
-    switch (priority) {
-      case 'high':
-        return 'destructive';
-      case 'medium':
-        return 'default';
-      case 'low':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'default';
-      case 'in_progress':
-        return 'secondary';
-      case 'not_started':
-        return 'outline';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getGoalCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'skill':
-        return <Target className="h-4 w-4" />;
-      case 'academic':
-        return <GraduationCap className="h-4 w-4" />;
-      case 'team':
-        return <Trophy className="h-4 w-4" />;
-      default:
-        return <Star className="h-4 w-4" />;
-    }
-  };
 
   return (
     <div className="container mx-auto py-8">
@@ -572,8 +572,8 @@ function PlayerDetailsPage() {
                   <span>Secondary Positions:</span>
                   <span className="font-medium">
                     {player.secondaryPositions.length > 0
-                      ? player.secondaryPositions.join(', ')
-                      : 'None'}
+                      ? player.secondaryPositions.join(", ")
+                      : "None"}
                   </span>
                 </div>
               </div>
@@ -693,7 +693,7 @@ function PlayerDetailsPage() {
                         </div>
                       </div>
                       <Badge variant={getStatusColor(resource.status)}>
-                        {resource.status.replace('_', ' ')}
+                        {resource.status.replace("_", " ")}
                       </Badge>
                     </div>
                   ))}

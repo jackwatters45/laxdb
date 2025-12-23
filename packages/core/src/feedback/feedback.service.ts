@@ -1,17 +1,17 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { isNull } from 'drizzle-orm';
-import { Effect, Schema } from 'effect';
-import { DatabaseLive } from '../drizzle/drizzle.service';
-import { EmailService } from '../email/email.service';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { isNull } from "drizzle-orm";
+import { Effect, Schema } from "effect";
+import { DatabaseLive } from "../drizzle/drizzle.service";
+import { EmailService } from "../email/email.service";
 import {
   FeedbackNotFoundError,
   FeedbackOperationError,
-} from './feedback.error';
-import { CreateFeedbackInput } from './feedback.schema';
-import { feedbackTable } from './feedback.sql';
+} from "./feedback.error";
+import { CreateFeedbackInput } from "./feedback.schema";
+import { feedbackTable } from "./feedback.sql";
 
 export class FeedbackService extends Effect.Service<FeedbackService>()(
-  'FeedbackService',
+  "FeedbackService",
   {
     effect: Effect.gen(function* () {
       const db = yield* PgDrizzle;
@@ -34,7 +34,7 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
 
                   if (!inserted) {
                     throw new FeedbackOperationError({
-                      message: 'Failed to insert feedback into database',
+                      message: "Failed to insert feedback into database",
                     });
                   }
 
@@ -55,12 +55,12 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
                           (cause) =>
                             new FeedbackOperationError({
                               message:
-                                'Failed to send feedback notification email',
+                                "Failed to send feedback notification email",
                               cause,
-                            })
+                            }),
                         ),
-                        Effect.catchAll(() => Effect.succeed(void 0))
-                      )
+                        Effect.catchAll(() => Effect.succeed(void 0)),
+                      ),
                   );
 
                   const result = await tx
@@ -81,7 +81,7 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
 
                   if (!result) {
                     throw new FeedbackNotFoundError({
-                      message: 'Feedback not found after insertion',
+                      message: "Feedback not found after insertion",
                     });
                   }
 
@@ -89,7 +89,7 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
                 }),
               catch: (cause) =>
                 new FeedbackOperationError({
-                  message: 'Failed to create feedback',
+                  message: "Failed to create feedback",
                   cause,
                 }),
             });
@@ -97,5 +97,5 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
       } as const;
     }),
     dependencies: [DatabaseLive, EmailService.Default],
-  }
+  },
 ) {}

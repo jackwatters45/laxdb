@@ -125,7 +125,7 @@ export class D1SQLSyntaxError extends Schema.TaggedError<D1SQLSyntaxError>(
    * @since 1.0.0
    */
   override get message(): string {
-    const lineMsg = this.line !== undefined ? ` (line ${this.line})` : "";
+    const lineMsg = this.line === undefined ? "" : ` (line ${this.line})`;
     return `D1 SQL syntax error${lineMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -798,6 +798,7 @@ export interface D1PreparedStatement {
 export type D1SessionConstraintOrBookmark =
   | "first-primary"
   | "first-unconstrained"
+  // oxlint-disable-next-line typescript/ban-types
   | (string & {});
 
 /**
@@ -907,7 +908,7 @@ const mapError = (
       sql: sql ?? "",
       operation,
       reason: extractReason(message),
-      line: lineMatch?.[1] ? parseInt(lineMatch[1]) : undefined,
+      line: lineMatch?.[1] ? parseInt(lineMatch[1], 10) : undefined,
     });
   }
 
@@ -1051,9 +1052,9 @@ const makePreparedStatement = (
       return Effect.tryPromise({
         try: async () => {
           const result =
-            columnName !== undefined
-              ? await stmt.first<T>(columnName)
-              : await stmt.first<T>();
+            columnName === undefined
+              ? await stmt.first<T>()
+              : await stmt.first<T>(columnName);
           return Option.fromNullable(result);
         },
         catch: (error) => mapError(error, "first", sql),
@@ -1088,7 +1089,7 @@ const makePreparedStatement = (
 
     raw: <T>(options?: { columnNames: boolean }) => {
       return Effect.tryPromise({
-        try: async () => {
+        try: () => {
           // @ts-expect-error overload type inference
           return stmt.raw<T>(options);
         },

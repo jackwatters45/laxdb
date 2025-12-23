@@ -1,29 +1,29 @@
-import { RiExternalLinkLine } from '@remixicon/react';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { PageBody } from '@/components/layout/page-content';
+import { RiExternalLinkLine } from "@remixicon/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { SettingsHeader } from '../-components/settings-header';
-import { roles } from '../-data';
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { SettingsHeader } from "../-components/settings-header";
+import { roles } from "../-data";
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/settings/general/'
+  "/_protected/$organizationSlug/settings/general/",
 )({
   component: General,
 });
@@ -237,7 +237,7 @@ function General() {
                   </h2>
                   <p className="mt-1 text-muted-foreground text-sm leading-6">
                     Manage general workspace. Contact system admin for more
-                    information.{' '}
+                    information.{" "}
                     <a
                       className="inline-flex items-center gap-1 text-indigo-600 hover:underline hover:underline-offset-4 dark:text-indigo-400"
                       href="#"

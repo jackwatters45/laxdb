@@ -1,7 +1,7 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import type * as React from 'react';
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+import type * as React from "react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 const Tabs = TabsPrimitive.Root;
 
@@ -14,8 +14,8 @@ const TabsList = ({
 }) => (
   <TabsPrimitive.List
     className={cn(
-      'inline-flex h-7 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground',
-      className
+      "inline-flex h-7 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      className,
     )}
     ref={ref}
     {...props}
@@ -32,8 +32,8 @@ const TabsTrigger = ({
 }) => (
   <TabsPrimitive.Trigger
     className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-0.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow',
-      className
+      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-0.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow",
+      className,
     )}
     ref={ref}
     {...props}
@@ -50,8 +50,8 @@ const TabsContent = ({
 }) => (
   <TabsPrimitive.Content
     className={cn(
-      'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-      className
+      "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      className,
     )}
     ref={ref}
     {...props}

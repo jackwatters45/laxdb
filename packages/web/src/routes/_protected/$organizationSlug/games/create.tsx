@@ -1,13 +1,13 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Schema } from 'effect';
-import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Schema } from "effect";
+import { ArrowLeft, Calendar, MapPin } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -15,33 +15,35 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 // Mock server function for creating games
-const createGame = createServerFn({ method: 'POST' })
+const createGame = createServerFn({ method: "POST" })
   .inputValidator((data: CreateGameInput) => data)
   .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+    // FIX: Replace with actual API call
     // const { GamesAPI } = await import('@laxdb/core/games/index');
     // const request = getRequest();
     // return await GamesAPI.createGame(data, request.headers);
 
     // Mock delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
 
     return {
-      id: Math.random().toString(36).substring(2, 9),
+      id: Math.random().toString(36).slice(2, 9),
       ...data,
-      status: 'scheduled' as const,
+      status: "scheduled" as const,
       homeScore: 0,
       awayScore: 0,
     };
@@ -50,21 +52,21 @@ const createGame = createServerFn({ method: 'POST' })
 // Form schema
 const createGameSchema = Schema.Struct({
   opponentName: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Opponent name is required' })
+    Schema.minLength(1, { message: () => "Opponent name is required" }),
   ),
   gameDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Date and time is required' })
+    Schema.minLength(1, { message: () => "Date and time is required" }),
   ),
   venue: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Venue is required' })
+    Schema.minLength(1, { message: () => "Venue is required" }),
   ),
   isHomeGame: Schema.Boolean,
   gameType: Schema.Literal(
-    'regular',
-    'playoff',
-    'tournament',
-    'friendly',
-    'practice'
+    "regular",
+    "playoff",
+    "tournament",
+    "friendly",
+    "practice",
   ),
 });
 
@@ -80,7 +82,7 @@ const formatDateTimeForInput = () => {
 };
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/games/create'
+  "/_protected/$organizationSlug/games/create",
 )({
   component: CreateGamePage,
 });
@@ -93,33 +95,33 @@ function CreateGamePage() {
   const form = useForm<CreateGameInput>({
     resolver: effectTsResolver(createGameSchema),
     defaultValues: {
-      opponentName: '',
+      opponentName: "",
       gameDate: formatDateTimeForInput(),
-      venue: '',
+      venue: "",
       isHomeGame: true,
-      gameType: 'regular',
+      gameType: "regular",
     },
   });
 
   const createGameMutation = useMutation({
-    mutationKey: ['createGame'],
+    mutationKey: ["createGame"],
     mutationFn: (data: CreateGameInput) => createGame({ data }),
     onSuccess: (game) => {
       toast.success(
-        `Game against ${game.opponentName} scheduled successfully!`
+        `Game against ${game.opponentName} scheduled successfully!`,
       );
       router.invalidate();
       router.navigate({
-        to: '/$organizationSlug/games',
+        to: "/$organizationSlug/games",
         params: { organizationSlug },
       });
     },
     onError: (_error) => {
-      toast.error('Failed to schedule game. Please try again.');
+      toast.error("Failed to schedule game. Please try again.");
     },
   });
 
-  const onSubmit = async (values: CreateGameInput) => {
+  const onSubmit = (values: CreateGameInput) => {
     createGameMutation.mutate(values);
   };
 
@@ -135,7 +137,7 @@ function CreateGamePage() {
 
         <h1 className="font-bold text-3xl">Schedule New Game</h1>
         <p className="text-muted-foreground">
-          Add a new game to your team's schedule
+          Add a new game to your team&apos;s schedule
         </p>
       </div>
 
@@ -209,10 +211,10 @@ function CreateGamePage() {
                     <FormControl>
                       <RadioGroup
                         className="grid grid-cols-2 gap-4"
-                        onValueChange={(value) =>
-                          field.onChange(value === 'true')
-                        }
-                        value={field.value ? 'true' : 'false'}
+                        onValueChange={(value) => {
+                          field.onChange(value === "true");
+                        }}
+                        value={field.value ? "true" : "false"}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem id="home" value="true" />
@@ -262,7 +264,7 @@ function CreateGamePage() {
                   className="flex-1"
                   onClick={() =>
                     router.navigate({
-                      to: '/$organizationSlug/games',
+                      to: "/$organizationSlug/games",
                       params: { organizationSlug },
                     })
                   }
@@ -279,8 +281,8 @@ function CreateGamePage() {
                   type="submit"
                 >
                   {createGameMutation.isPending
-                    ? 'Scheduling...'
-                    : 'Schedule Game'}
+                    ? "Scheduling..."
+                    : "Schedule Game"}
                 </Button>
               </div>
             </form>

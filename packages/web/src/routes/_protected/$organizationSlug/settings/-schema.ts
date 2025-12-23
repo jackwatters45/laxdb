@@ -9,12 +9,12 @@ export type Usage = {
 
 export type OverviewData = {
   date: string;
-  'Rows written': number;
-  'Rows read': number;
+  "Rows written": number;
+  "Rows read": number;
   Queries: number;
-  'Payments completed': number;
-  'Sign ups': number;
+  "Payments completed": number;
+  "Sign ups": number;
   Logins: number;
-  'Sign outs': number;
-  'Support calls': number;
+  "Sign outs": number;
+  "Support calls": number;
 };

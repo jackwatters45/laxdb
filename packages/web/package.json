@@ -1,8 +1,8 @@
 {
   "name": "@laxdb/web",
   "private": true,
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "dev": "vite dev --port 3000",
     "start": "node .output/server/index.mjs",
@@ -10,8 +10,9 @@
     "serve": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "npx ultracite@latest check",
-    "fix": "npx ultracite@latest fix --unsafe"
+    "format": "oxfmt ",
+    "format:check": "bun run format -- --check",
+    "fix": "oxlint --fix && oxfmt"
   },
   "dependencies": {
     "@effect-atom/atom-react": "^0.3.2",

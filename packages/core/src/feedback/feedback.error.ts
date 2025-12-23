@@ -1,8 +1,8 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 
 export class FeedbackOperationError extends Schema.TaggedError<FeedbackOperationError>(
-  'FeedbackOperationError'
-)('FeedbackOperationError', {
+  "FeedbackOperationError",
+)("FeedbackOperationError", {
   message: Schema.String,
   feedbackId: Schema.optional(Schema.Number),
   cause: Schema.optional(Schema.Unknown),
@@ -10,8 +10,8 @@ export class FeedbackOperationError extends Schema.TaggedError<FeedbackOperation
 }) {}
 
 export class FeedbackNotFoundError extends Schema.TaggedError<FeedbackNotFoundError>(
-  'FeedbackNotFoundError'
-)('FeedbackNotFoundError', {
+  "FeedbackNotFoundError",
+)("FeedbackNotFoundError", {
   message: Schema.String,
   feedbackId: Schema.optional(Schema.Number),
   cause: Schema.optional(Schema.Unknown),

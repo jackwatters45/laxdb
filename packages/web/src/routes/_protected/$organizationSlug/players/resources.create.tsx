@@ -1,12 +1,12 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
-import { Schema } from 'effect';
-import { ArrowLeft, BookOpen, Calendar } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Schema } from "effect";
+import { ArrowLeft, BookOpen, Calendar } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -15,35 +15,35 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 // Form schema
 const resourceFormSchema = Schema.Struct({
   title: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Title is required' }),
+    Schema.minLength(1, { message: () => "Title is required" }),
     Schema.maxLength(100, {
-      message: () => 'Title must be less than 100 characters',
-    })
+      message: () => "Title must be less than 100 characters",
+    }),
   ),
   description: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Description is required' }),
+    Schema.minLength(1, { message: () => "Description is required" }),
     Schema.maxLength(500, {
-      message: () => 'Description must be less than 500 characters',
-    })
+      message: () => "Description must be less than 500 characters",
+    }),
   ),
-  type: Schema.Literal('drill', 'video', 'article', 'program'),
+  type: Schema.Literal("drill", "video", "article", "program"),
   dueDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => 'Due date is required' })
+    Schema.minLength(1, { message: () => "Due date is required" }),
   ),
-  priority: Schema.Literal('low', 'medium', 'high'),
+  priority: Schema.Literal("low", "medium", "high"),
 });
 
 type ResourceFormValues = typeof resourceFormSchema.Type;
 
 // Server function to assign a resource
-const assignPlayerResource = createServerFn({ method: 'POST' })
+const assignPlayerResource = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       playerId: string;
@@ -52,28 +52,28 @@ const assignPlayerResource = createServerFn({ method: 'POST' })
       type: string;
       dueDate: string;
       priority: string;
-    }) => data
+    }) => data,
   )
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
-    return { success: true, resourceId: 'resource-123' };
+  .handler(({ data: _data }) => {
+    // FIX: Replace with actual API call
+    return { success: true, resourceId: "resource-123" };
   });
 
 // Server function to get player info
-const getPlayerInfo = createServerFn({ method: 'GET' })
+const getPlayerInfo = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
-  .handler(async ({ data }) => {
-    // TODO: Replace with actual API call
+  .handler(({ data }) => {
+    // FIX: Replace with actual API call
     return {
       id: data.playerId,
-      name: 'Alex Johnson',
-      position: 'attack',
-      gradeLevel: 'junior',
+      name: "Alex Johnson",
+      position: "attack",
+      gradeLevel: "junior",
     };
   });
 
 export const Route = createFileRoute(
-  '/_protected/$organizationSlug/players/resources/create'
+  "/_protected/$organizationSlug/players/resources/create",
 )({
   component: CreateResourcePage,
   validateSearch: (search: Record<string, unknown>) => ({
@@ -82,7 +82,7 @@ export const Route = createFileRoute(
   loaderDeps: ({ search }) => ({ playerId: search.playerId }),
   loader: async ({ deps }) => {
     if (!deps.playerId) {
-      throw new Error('Player ID is required');
+      throw new Error("Player ID is required");
     }
 
     const player = await getPlayerInfo({ data: { playerId: deps.playerId } });
@@ -99,11 +99,11 @@ function CreateResourcePage() {
   const form = useForm<ResourceFormValues>({
     resolver: effectTsResolver(resourceFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      type: 'drill',
-      dueDate: '',
-      priority: 'medium',
+      title: "",
+      description: "",
+      type: "drill",
+      dueDate: "",
+      priority: "medium",
     },
   });
 
@@ -118,46 +118,46 @@ function CreateResourcePage() {
 
       // Navigate back to player page
       router.navigate({
-        to: '/$organizationSlug/players/$playerId',
+        to: "/$organizationSlug/players/$playerId",
         params: {
           organizationSlug,
           playerId,
         },
       });
-    } catch (_error) {}
+    } catch {}
   };
 
   const resourceTypes = [
     {
-      value: 'drill',
-      label: 'Training Drill',
-      icon: '🏃',
-      description: 'Physical practice exercises',
+      value: "drill",
+      label: "Training Drill",
+      icon: "🏃",
+      description: "Physical practice exercises",
     },
     {
-      value: 'video',
-      label: 'Video Content',
-      icon: '📹',
-      description: 'Educational videos or tutorials',
+      value: "video",
+      label: "Video Content",
+      icon: "📹",
+      description: "Educational videos or tutorials",
     },
     {
-      value: 'article',
-      label: 'Article/Reading',
-      icon: '📖',
-      description: 'Written materials and guides',
+      value: "article",
+      label: "Article/Reading",
+      icon: "📖",
+      description: "Written materials and guides",
     },
     {
-      value: 'program',
-      label: 'Training Program',
-      icon: '📋',
-      description: 'Structured development programs',
+      value: "program",
+      label: "Training Program",
+      icon: "📋",
+      description: "Structured development programs",
     },
   ] as const;
 
   const priorities = [
-    { value: 'low', label: 'Low', color: 'secondary' },
-    { value: 'medium', label: 'Medium', color: 'default' },
-    { value: 'high', label: 'High', color: 'destructive' },
+    { value: "low", label: "Low", color: "secondary" },
+    { value: "medium", label: "Medium", color: "default" },
+    { value: "high", label: "High", color: "destructive" },
   ] as const;
 
   return (
@@ -168,7 +168,7 @@ function CreateResourcePage() {
             organizationSlug,
             playerId,
           }}
-          to={'/$organizationSlug/players/$playerId'}
+          to={"/$organizationSlug/players/$playerId"}
         >
           <Button className="mb-4" variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -227,7 +227,7 @@ function CreateResourcePage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Explain how this resource will help the player's
+                      Explain how this resource will help the player&apos;s
                       development
                     </FormDescription>
                     <FormMessage />
@@ -248,11 +248,13 @@ function CreateResourcePage() {
                           <button
                             className={`flex flex-col items-start gap-2 rounded-md border p-4 text-left transition-colors ${
                               field.value === type.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-input hover:bg-muted'
+                                ? "border-primary bg-primary/5"
+                                : "border-input hover:bg-muted"
                             }`}
                             key={type.value}
-                            onClick={() => field.onChange(type.value)}
+                            onClick={() => {
+                              field.onChange(type.value);
+                            }}
                             type="button"
                           >
                             <div className="flex items-center gap-2">
@@ -304,11 +306,13 @@ function CreateResourcePage() {
                           <button
                             className={`flex-1 rounded-md border p-2 text-center transition-colors ${
                               field.value === priority.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-input hover:bg-muted'
+                                ? "border-primary bg-primary/5"
+                                : "border-input hover:bg-muted"
                             }`}
                             key={priority.value}
-                            onClick={() => field.onChange(priority.value)}
+                            onClick={() => {
+                              field.onChange(priority.value);
+                            }}
                             type="button"
                           >
                             <Badge className="w-full" variant={priority.color}>
@@ -336,7 +340,7 @@ function CreateResourcePage() {
                       organizationSlug,
                       playerId,
                     }}
-                    to={'/$organizationSlug/players/$playerId'}
+                    to={"/$organizationSlug/players/$playerId"}
                   >
                     Cancel
                   </Link>
@@ -347,8 +351,8 @@ function CreateResourcePage() {
                   type="submit"
                 >
                   {form.formState.isSubmitting
-                    ? 'Assigning...'
-                    : 'Assign Resource'}
+                    ? "Assigning..."
+                    : "Assign Resource"}
                 </Button>
               </div>
             </form>

@@ -9,11 +9,11 @@ import {
   RiNotification2Line,
   RiPlaneFill,
   RiTruckFill,
-} from '@remixicon/react';
-import { SolarMark } from '../../../public/solar-mark';
-import { Icons } from '../icons';
-import { Orbit } from '../orbit';
-import ChipViz from './chip-viz';
+} from "@remixicon/react";
+import { SolarMark } from "../../../public/solar-mark";
+import { Icons } from "../icons";
+import { Orbit } from "../orbit";
+import ChipViz from "./chip-viz";
 
 export default function Features() {
   return (
@@ -29,7 +29,7 @@ export default function Features() {
           className="absolute inset-y-0 my-[-5rem] w-px"
           style={{
             maskImage:
-              'linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)',
+              "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
           <svg
@@ -54,7 +54,7 @@ export default function Features() {
           className="absolute inset-y-0 right-0 my-[-5rem] w-px"
           style={{
             maskImage:
-              'linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)',
+              "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
           <svg
@@ -78,7 +78,7 @@ export default function Features() {
           className="absolute inset-y-0 left-1/2 -z-10 my-[-5rem] w-px"
           style={{
             maskImage:
-              'linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)',
+              "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
           <svg
@@ -102,7 +102,7 @@ export default function Features() {
           className="absolute inset-y-0 left-1/4 -z-10 my-[-5rem] hidden w-px sm:block"
           style={{
             maskImage:
-              'linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)',
+              "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
           <svg
@@ -126,7 +126,7 @@ export default function Features() {
           className="absolute inset-y-0 left-3/4 -z-10 my-[-5rem] hidden w-px sm:block"
           style={{
             maskImage:
-              'linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)',
+              "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
           <svg
@@ -222,7 +222,7 @@ export default function Features() {
                     <div
                       className="absolute size-10 animate-[ping_7s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
                       style={{
-                        animationDelay: '1s',
+                        animationDelay: "1s",
                       }}
                     />
                   </div>,
@@ -246,7 +246,7 @@ export default function Features() {
                     <div
                       className="absolute size-10 animate-[ping_7s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
                       style={{
-                        animationDelay: '4s',
+                        animationDelay: "4s",
                       }}
                     />
                   </div>,
@@ -260,7 +260,7 @@ export default function Features() {
                     <div
                       className="absolute size-10 animate-[ping_7s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
                       style={{
-                        animationDelay: '2s',
+                        animationDelay: "2s",
                       }}
                     />
                   </div>,
@@ -284,7 +284,7 @@ export default function Features() {
                     <div
                       className="absolute size-10 animate-[ping_7s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
                       style={{
-                        animationDelay: '6s',
+                        animationDelay: "6s",
                       }}
                     />
                   </div>,
@@ -297,7 +297,7 @@ export default function Features() {
                     <div
                       className="absolute size-10 animate-[ping_7s_ease_infinite] rounded-full ring-1 ring-orange-500/50"
                       style={{
-                        animationDelay: '3s',
+                        animationDelay: "3s",
                       }}
                     />
                   </div>,
@@ -553,7 +553,7 @@ export default function Features() {
                       className="absolute top-0 left-0 h-0.5 w-28 bg-linear-to-r from-transparent via-orange-300 to-transparent"
                       style={{
                         animation: `gridMovingLine 5s linear infinite ${index * 1.2}s`,
-                        animationFillMode: 'backwards',
+                        animationFillMode: "backwards",
                       }}
                     />
                   </div>

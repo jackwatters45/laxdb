@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router';
-import { Navbar, NavbarItem } from '@/components/nav/sub-nav';
-import { DashboardHeader } from '@/components/sidebar/dashboard-header';
+import { Link } from "@tanstack/react-router";
+import { Navbar, NavbarItem } from "@/components/nav/sub-nav";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 
 type PlayersHeaderProps = {
   organizationSlug: string;

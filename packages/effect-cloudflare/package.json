@@ -1,9 +1,17 @@
 {
   "name": "effect-cloudflare",
-  "module": "src/scratch.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "src/scratch.ts",
+  "scripts": {
+    "format": "oxfmt ",
+    "format:check": "bun run format -- --check",
+    "fix": "oxlint --fix && oxfmt"
+  },
   "dependencies": {
     "@effect/platform": "^0.93.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.56.0"
   }
 }

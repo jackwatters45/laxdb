@@ -479,7 +479,7 @@ export class R2MultipartError extends Schema.TaggedError<R2MultipartError>(
     const keyMsg = this.key ? ` for key "${this.key}"` : "";
     const uploadMsg = this.uploadId ? ` (uploadId: ${this.uploadId})` : "";
     const partMsg =
-      this.partNumber !== undefined ? ` (part: ${this.partNumber})` : "";
+      this.partNumber === undefined ? "" : ` (part: ${this.partNumber})`;
     return `R2 multipart upload error${keyMsg}${uploadMsg}${partMsg} during ${this.operation}: ${this.reason}`;
   }
 }
@@ -735,7 +735,7 @@ export class R2ObjectTooSmallError extends Schema.TaggedError<R2ObjectTooSmallEr
   override get message(): string {
     const sizeMsg = this.sizeBytes ? ` (${this.sizeBytes} bytes)` : "";
     const partMsg =
-      this.partNumber !== undefined ? ` part ${this.partNumber}` : "";
+      this.partNumber === undefined ? "" : ` part ${this.partNumber}`;
     return `R2 object too small for key "${this.key}"${partMsg}${sizeMsg} during ${this.operation}. Parts must be >= 5 MiB except the last part.`;
   }
 }
@@ -842,7 +842,7 @@ export class R2InvalidMaxKeysError extends Schema.TaggedError<R2InvalidMaxKeysEr
    * @since 1.0.0
    */
   override get message(): string {
-    const limitMsg = this.limit !== undefined ? ` (${this.limit})` : "";
+    const limitMsg = this.limit === undefined ? "" : ` (${this.limit})`;
     return `R2 invalid MaxKeys parameter${limitMsg} during ${this.operation}. MaxKeys must be positive integer <= 1000.`;
   }
 }
@@ -1711,7 +1711,7 @@ export const make = (bucket: globalThis.R2Bucket): R2Bucket => {
 
     delete: (keys) =>
       Effect.tryPromise({
-        try: async () => {
+        try: () => {
           return bucket.delete(keys as any);
         },
         catch: (error) =>
@@ -1720,7 +1720,7 @@ export const make = (bucket: globalThis.R2Bucket): R2Bucket => {
 
     list: (options) =>
       Effect.tryPromise({
-        try: async () => {
+        try: () => {
           return bucket.list(options);
         },
         catch: (error) => mapError(error, "list"),

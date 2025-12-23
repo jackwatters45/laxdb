@@ -1,17 +1,17 @@
-import { PgDrizzle } from '@effect/sql-drizzle/Pg';
-import { and, eq, getTableColumns, isNull } from 'drizzle-orm';
-import { Array as Arr, Effect } from 'effect';
-import { DatabaseLive } from '../drizzle/drizzle.service';
+import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import { and, eq, getTableColumns, isNull } from "drizzle-orm";
+import { Array as Arr, Effect } from "effect";
+import { DatabaseLive } from "../drizzle/drizzle.service";
 import type {
   CreateSeasonInput,
   DeleteSeasonInput,
   GetAllSeasonsInput,
   GetSeasonInput,
   UpdateSeasonInput,
-} from './season.schema';
-import { type SeasonSelect, seasonTable } from './season.sql';
+} from "./season.schema";
+import { type SeasonSelect, seasonTable } from "./season.sql";
 
-export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
+export class SeasonRepo extends Effect.Service<SeasonRepo>()("SeasonRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
@@ -27,8 +27,8 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
               and(
                 eq(seasonTable.organizationId, input.organizationId),
                 input.teamId ? eq(seasonTable.teamId, input.teamId) : undefined,
-                isNull(seasonTable.deletedAt)
-              )
+                isNull(seasonTable.deletedAt),
+              ),
             )
             .pipe(Effect.tapError(Effect.logError));
 
@@ -44,8 +44,8 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
                 eq(seasonTable.publicId, input.publicId),
                 eq(seasonTable.organizationId, input.organizationId),
                 input.teamId ? eq(seasonTable.teamId, input.teamId) : undefined,
-                isNull(seasonTable.deletedAt)
-              )
+                isNull(seasonTable.deletedAt),
+              ),
             )
             .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError));
 
@@ -61,7 +61,7 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
               name: input.name,
               startDate: input.startDate,
               endDate: input.endDate ?? null,
-              status: input.status ?? 'active',
+              status: input.status ?? "active",
               division: input.division ?? null,
             })
             .returning(rest)
@@ -85,10 +85,10 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
             and(
               eq(seasonTable.publicId, input.publicId),
               eq(seasonTable.organizationId, input.organizationId),
-              // TODO: add nullish team id to this...
+              // FIX: add nullish team id to this...
               // ...{ decoded.teamId && { ...eq(seasonTable.teamId, decoded.teamId) } },
-              isNull(seasonTable.deletedAt)
-            )
+              isNull(seasonTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -100,10 +100,10 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()('SeasonRepo', {
             and(
               eq(seasonTable.publicId, input.publicId),
               eq(seasonTable.organizationId, input.organizationId),
-              // TODO: add nullish team id to this...
+              // FIX: add nullish team id to this...
               // ...{ decoded.teamId && { ...eq(seasonTable.teamId, decoded.teamId) } },
-              isNull(seasonTable.deletedAt)
-            )
+              isNull(seasonTable.deletedAt),
+            ),
           )
           .returning(rest)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),

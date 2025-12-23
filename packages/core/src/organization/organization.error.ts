@@ -1,8 +1,8 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 
 export class OrganizationNotFoundError extends Schema.TaggedError<OrganizationNotFoundError>(
-  'OrganizationNotFoundError'
-)('OrganizationNotFoundError', {
+  "OrganizationNotFoundError",
+)("OrganizationNotFoundError", {
   message: Schema.String,
   organizationId: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
@@ -10,8 +10,8 @@ export class OrganizationNotFoundError extends Schema.TaggedError<OrganizationNo
 }) {}
 
 export class OrganizationOperationError extends Schema.TaggedError<OrganizationOperationError>(
-  'OrganizationOperationError'
-)('OrganizationOperationError', {
+  "OrganizationOperationError",
+)("OrganizationOperationError", {
   message: Schema.String,
   organizationId: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
@@ -19,8 +19,8 @@ export class OrganizationOperationError extends Schema.TaggedError<OrganizationO
 }) {}
 
 export class OrganizationSlugError extends Schema.TaggedError<OrganizationSlugError>(
-  'OrganizationSlugError'
-)('OrganizationSlugError', {
+  "OrganizationSlugError",
+)("OrganizationSlugError", {
   message: Schema.String,
   slug: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
@@ -28,8 +28,8 @@ export class OrganizationSlugError extends Schema.TaggedError<OrganizationSlugEr
 }) {}
 
 export class InvitationOperationError extends Schema.TaggedError<InvitationOperationError>(
-  'InvitationOperationError'
-)('InvitationOperationError', {
+  "InvitationOperationError",
+)("InvitationOperationError", {
   message: Schema.String,
   invitationId: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),

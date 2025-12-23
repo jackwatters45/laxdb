@@ -1,7 +1,7 @@
-import { Schema } from 'effect';
-import { TimestampsSchema } from '../schema';
+import { Schema } from "effect";
+import { TimestampsSchema } from "../schema";
 
-export class Session extends Schema.Class<Session>('Session')({
+export class Session extends Schema.Class<Session>("Session")({
   id: Schema.String,
   expiresAt: Schema.String,
   token: Schema.String,
@@ -13,7 +13,7 @@ export class Session extends Schema.Class<Session>('Session')({
   ...TimestampsSchema,
 }) {}
 
-export class Account extends Schema.Class<Account>('Account')({
+export class Account extends Schema.Class<Account>("Account")({
   id: Schema.String,
   accountId: Schema.String,
   providerId: Schema.String,
@@ -28,7 +28,7 @@ export class Account extends Schema.Class<Account>('Account')({
   ...TimestampsSchema,
 }) {}
 
-export class Verification extends Schema.Class<Verification>('Verification')({
+export class Verification extends Schema.Class<Verification>("Verification")({
   id: Schema.String,
   identifier: Schema.String,
   value: Schema.String,

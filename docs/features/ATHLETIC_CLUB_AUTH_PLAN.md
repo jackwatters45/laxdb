@@ -119,7 +119,6 @@ export const auth = betterAuth({
 ### A. Player Management Flow
 
 1. **Adding Players to Club**:
-
    - Coach invites via email
    - Player accepts invitation → becomes club member
    - Coach assigns player to one or more teams
@@ -163,18 +162,15 @@ export const auth = betterAuth({
 ## 5. UI/UX Components to Build
 
 1. **Dashboard Views**:
-
    - Coach dashboard with team management
    - Player dashboard with team memberships
 
 2. **Team Management**:
-
    - Create/edit team forms
    - Team roster tables with player management
    - Drag-and-drop player assignment
 
 3. **Invitation System**:
-
    - Invite player form with team selection
    - Pending invitations list
    - Accept invitation page

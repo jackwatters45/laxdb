@@ -33,10 +33,10 @@ export const Orbit = ({
         className="absolute flex items-center justify-center"
         key={index}
         style={{
-          animationName: 'spin',
+          animationName: "spin",
           animationDuration: `${durationSeconds}s`,
-          animationTimingFunction: 'linear',
-          animationIterationCount: 'infinite',
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
           animationDelay: `${delaySeconds}s`,
           transformOrigin: `calc(50% + ${radiusPx}px) 50%`,
           left: `calc(50% - ${initialOffset}px)`,
@@ -51,12 +51,12 @@ export const Orbit = ({
           style={
             keepUpright
               ? {
-                  animationName: 'spin',
+                  animationName: "spin",
                   animationDuration: `${durationSeconds}s`,
-                  animationTimingFunction: 'linear',
-                  animationIterationCount: 'infinite',
+                  animationTimingFunction: "linear",
+                  animationIterationCount: "infinite",
                   animationDelay: `${delaySeconds}s`,
-                  animationDirection: 'reverse',
+                  animationDirection: "reverse",
                 }
               : undefined
           }

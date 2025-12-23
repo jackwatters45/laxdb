@@ -36,62 +36,62 @@ jjui -r "trunk()..@"    # Launch with custom revset
 
 ### Navigation
 
-| Key | Action |
-|-----|--------|
-| `j` / `k` | Move down / up |
-| `@` | Jump to working copy |
-| `/` | Quick search |
-| `'` | Jump to next match |
-| `L` | Change revset (with autocomplete) |
+| Key       | Action                            |
+| --------- | --------------------------------- |
+| `j` / `k` | Move down / up                    |
+| `@`       | Jump to working copy              |
+| `/`       | Quick search                      |
+| `'`       | Jump to next match                |
+| `L`       | Change revset (with autocomplete) |
 
 ### Views
 
-| Key | Action |
-|-----|--------|
-| `p` | Toggle preview pane |
+| Key | Action                         |
+| --- | ------------------------------ |
+| `p` | Toggle preview pane            |
 | `l` | Details view (files in commit) |
-| `o` | Operation log view |
-| `d` | Show diff |
-| `v` | Show evolog (evolution log) |
+| `o` | Operation log view             |
+| `d` | Show diff                      |
+| `v` | Show evolog (evolution log)    |
 
 ### Preview Scrolling
 
-| Key | Action |
-|-----|--------|
-| `ctrl+n` | Scroll down |
-| `ctrl+p` | Scroll up |
+| Key      | Action         |
+| -------- | -------------- |
+| `ctrl+n` | Scroll down    |
+| `ctrl+p` | Scroll up      |
 | `ctrl+d` | Half page down |
-| `ctrl+u` | Half page up |
+| `ctrl+u` | Half page up   |
 
 ### Revision Operations
 
-| Key | Action |
-|-----|--------|
-| `n` | New revision |
-| `e` | Edit revision |
-| `Enter` | Inline describe (edit message) |
-| `D` | Edit description (external editor) |
-| `a` | Abandon revision |
-| `A` | Absorb changes |
-| `r` | Rebase mode |
-| `s` | Split revision |
-| `S` | Squash revisions |
-| `y` | Duplicate revision |
+| Key     | Action                             |
+| ------- | ---------------------------------- |
+| `n`     | New revision                       |
+| `e`     | Edit revision                      |
+| `Enter` | Inline describe (edit message)     |
+| `D`     | Edit description (external editor) |
+| `a`     | Abandon revision                   |
+| `A`     | Absorb changes                     |
+| `r`     | Rebase mode                        |
+| `s`     | Split revision                     |
+| `S`     | Squash revisions                   |
+| `y`     | Duplicate revision                 |
 
 ### Bookmarks & Git
 
-| Key | Action |
-|-----|--------|
-| `b` | Bookmark menu |
-| `B` | Set/move bookmark |
+| Key | Action                |
+| --- | --------------------- |
+| `b` | Bookmark menu         |
+| `B` | Set/move bookmark     |
 | `g` | Git menu (push/fetch) |
 
 ### Undo/Redo
 
-| Key | Action |
-|-----|--------|
+| Key | Action           |
+| --- | ---------------- |
 | `u` | Undo last change |
-| `R` | Redo |
+| `R` | Redo             |
 
 ---
 
@@ -99,17 +99,18 @@ jjui -r "trunk()..@"    # Launch with custom revset
 
 Press `l` to enter details view for a revision. Here you can:
 
-| Key | Action |
-|-----|--------|
+| Key | Action                                              |
+| --- | --------------------------------------------------- |
 | `r` | Restore selected files (`i` for interactive chunks) |
-| `s` | Split selected files |
-| `d` | View diff of highlighted file |
+| `s` | Split selected files                                |
+| `d` | View diff of highlighted file                       |
 
 ---
 
 ## Rebase Mode
 
 Press `r` to enter rebase mode:
+
 - Select target revision
 - Move revisions, branches, or sources interactively
 
@@ -118,6 +119,7 @@ Press `r` to enter rebase mode:
 ## Operation Log
 
 Press `o` to view operation log:
+
 - Navigate operations
 - Press `r` to restore to selected operation
 

@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
 import {
   CreateTeamInput,
   DeleteTeamInput,
@@ -6,7 +6,7 @@ import {
   InvitePlayerInput,
   RemoveTeamMemberInput,
   UpdateTeamInput,
-} from './team.schema';
+} from "./team.schema";
 
 export const Team = Schema.Unknown;
 

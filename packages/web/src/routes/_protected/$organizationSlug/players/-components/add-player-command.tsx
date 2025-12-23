@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { UserPlus } from 'lucide-react';
-import { useState } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { UserPlus } from "lucide-react";
+import { useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -9,17 +9,30 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { getOrgPlayersQK } from '@/mutations/players';
-import { getOrganizationPlayers } from '@/query/players';
-import { usePlayerMutations } from '../-mutations';
+} from "@/components/ui/dialog";
+import { getOrgPlayersQK } from "@/mutations/players";
+import { getOrganizationPlayers } from "@/query/players";
+import { usePlayerMutations } from "../-mutations";
+
+const handleCreateNewPlayer = (_name: string) => {
+  // mutations.add.mutate({
+  //   organizationId,
+  //   name,
+  //   email: null,
+  //   phone: null,
+  //   dateOfBirth: null,
+  //   jerseyNumber: null,
+  //   position: null,
+  //   userId: null,
+  // });
+};
 
 export function AddPlayerCommand({
   organizationId,
@@ -29,7 +42,7 @@ export function AddPlayerCommand({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: allPlayers = [], isLoading } = useQuery({
     queryKey: getOrgPlayersQK(organizationId),
@@ -39,26 +52,13 @@ export function AddPlayerCommand({
 
   const _mutations = usePlayerMutations(organizationId);
 
-  const handleCreateNewPlayer = (_name: string) => {
-    // mutations.add.mutate({
-    //   organizationId,
-    //   name,
-    //   email: null,
-    //   phone: null,
-    //   dateOfBirth: null,
-    //   jerseyNumber: null,
-    //   position: null,
-    //   userId: null,
-    // });
-  };
-
   const handleCreate = () => {
     if (!searchQuery.trim()) {
       return;
     }
     handleCreateNewPlayer(searchQuery);
     setOpen(false);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   return (
@@ -88,10 +88,10 @@ export function AddPlayerCommand({
                           value={player.publicId}
                         >
                           <div className="flex flex-col">
-                            <span>{player.name || 'Unnamed'}</span>
-                            {(player.email || player.phone) && (
+                            <span>{player.name ?? "Unnamed"}</span>
+                            {(player.email ?? player.phone) && (
                               <span className="text-muted-foreground text-xs">
-                                {player.email || player.phone}
+                                {player.email ?? player.phone}
                               </span>
                             )}
                           </div>
@@ -105,7 +105,7 @@ export function AddPlayerCommand({
                   <CommandGroup>
                     <CommandItem onSelect={handleCreate}>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Create "{searchQuery}"
+                      Create &quot;{searchQuery}&quot;
                     </CommandItem>
                   </CommandGroup>
                 )}

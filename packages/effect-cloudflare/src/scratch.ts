@@ -2,7 +2,6 @@ import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";
 import * as Worker from "./internal/worker";
 import * as Layer from "effect/Layer";
-import { Env } from "./internal/env";
 
 export default Worker.makeFetchEntryPoint(
   Effect.fn(function* (_req, env, ctx) {
@@ -45,9 +44,10 @@ export const asyncEntryPoint = {
   ) {
     const maybeValue = env.KV.get("last_accessed");
 
-    const result = await env.DB.batch({} as D1PreparedStatement[]);
+    const _result = await env.DB.batch({} as D1PreparedStatement[]);
 
     ctx.waitUntil(
+      // oxlint-disable-next-line require-await
       (async () => {
         console.log("runs after response");
         env.KV.put("last_accessed", `${Date.now()}`);
@@ -68,15 +68,3 @@ export const asyncEntryPoint = {
     });
   },
 };
-
-function businessLogic() {
-  return Effect.gen(function* () {
-    const env = yield* Env;
-
-    env.BUCKET.head;
-
-    const maybeValue = yield* env.KV.get("myKey");
-
-    return maybeValue;
-  });
-}
