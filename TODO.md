@@ -1,13 +1,13 @@
 # TODO
 
 - [x] code review
-- [ ] lefthook
+- [x] lefthook
 - [ ] update planning docs
 - [ ] env + env.example
 - [ ] jj stacked prs
-- get dev working
-- deployment
-- new package to just work on features tbh
+- [ ] get dev working
+- [ ] deployment
+- [ ] new package to just work on features tbh
 
 ## Pressing things to eventually do..
 
