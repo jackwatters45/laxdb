@@ -2,7 +2,7 @@
 
 - [x] code review
 - [x] lefthook
-- [ ] update planning docs
+- [x] update planning docs
 - [ ] env + env.example
 - [ ] jj stacked prs
 - [ ] get dev working
