@@ -6,9 +6,9 @@
 - [x] env + env.example
 - [x] jj stacked prs
 - [ ] prepush still not working
-- [ ] add desciption + name claude wf
 - [ ] linting + fmting
 - [ ] ts-aware thing
+- [ ] add desciption + name claude wf
 - [ ] typego
 - [ ] get dev working
 - [ ] deployment

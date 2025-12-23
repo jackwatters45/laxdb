@@ -7,7 +7,8 @@ import { Effect } from "effect";
 
 export const authMiddleware = createMiddleware({
   type: "function",
-}).server(({ next }) =>
+  // oxlint-disable-next-line require-await
+}).server(async ({ next }) =>
   RuntimeServer.runPromise(
     Effect.gen(function* () {
       const auth = yield* AuthService;
