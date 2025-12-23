@@ -45,10 +45,6 @@
       "cache": false,
       "persistent": true
     },
-    "//#lint": {
-      "inputs": ["packages/**/*.ts", "packages/**/*.tsx", ".oxlintrc.json"],
-      "outputs": []
-    },
     "fix": {
       "dependsOn": ["^fix"],
       "cache": false

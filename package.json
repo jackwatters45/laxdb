@@ -13,10 +13,10 @@
     "destroy": "bun --env-file=.env alchemy destroy",
     "dev": "bun --env-file=.env alchemy dev",
     "typecheck": "turbo typecheck",
+    "fix": "turbo fix",
     "lint": "oxlint",
     "format": "oxfmt ",
     "format:check": "bun run format -- --check",
-    "fix": "oxlint --fix && oxfmt",
     "prepare": "effect-language-service patch",
     "postinstall": "vibe-rules install codex"
   },

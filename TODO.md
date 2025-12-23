@@ -5,10 +5,14 @@
 - [x] update planning docs
 - [x] env + env.example
 - [x] jj stacked prs
-- [x] linting + fmting
-- [ ] remove old aws
+- [ ] prepush still not working
+- [ ] add desciption + name claude wf
+- [ ] linting + fmting
+- [ ] ts-aware thing
+- [ ] typego
 - [ ] get dev working
 - [ ] deployment
+- [ ] remove old aws
 - [ ] new package to just work on features tbh
 
 ## Pressing things to eventually do..

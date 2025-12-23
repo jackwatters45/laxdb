@@ -27,7 +27,7 @@ jobs:
         run: bun x oxlint
 
       - name: Check formatting
-        run: bun x oxfmt --check
+        run: bun x oxfmt --check --ignore-path .gitignore --ignore-path .oxfmtignore
 
   typecheck:
     name: Typecheck
