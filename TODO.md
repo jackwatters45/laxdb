@@ -1,7 +1,10 @@
 # TODO
 
+- opencode code review
+- jj stacked prs
 - update planning docs
 - get dev working
+- env + env.example
 - deployment
 - new package to just work on features tbh
 
