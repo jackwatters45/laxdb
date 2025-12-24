@@ -26,6 +26,7 @@ export class DatabaseError extends Schema.TaggedError<DatabaseError>(
   message: Schema.String,
   cause: Schema.optional(Schema.Unknown),
   code: Schema.optionalWith(Schema.NumberFromString, { default: () => 500 }),
+  pgCode: Schema.optional(Schema.String),
 }) {}
 
 export class ConstraintViolationError extends Schema.TaggedError<ConstraintViolationError>(
@@ -36,6 +37,7 @@ export class ConstraintViolationError extends Schema.TaggedError<ConstraintViola
   detail: Schema.optional(Schema.String),
   message: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
+  pgCode: Schema.optional(Schema.String),
 }) {}
 
 export class AuthenticationError extends Schema.TaggedError<AuthenticationError>(

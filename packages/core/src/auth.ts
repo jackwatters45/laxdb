@@ -208,9 +208,9 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
           teams: { enabled: true },
           creatorRole: "headCoach", // Club creator becomes head coach
           allowUserToCreateOrganization: true, // Allow creating new clubs
+          // oxlint-disable-next-line require-await
           sendInvitationEmail: async (data) => {
-            const _ = await Promise.resolve();
-            const _inviteLink = `${process.env.APP_URL || "http://localhost:3000"}/accept-invitation/${data.id}`;
+            const _inviteLink = `${process.env.APP_URL ?? "http://localhost:3000"}/accept-invitation/${data.id}`;
 
             // FIX: Implement actual email sending
             // await sendEmail({

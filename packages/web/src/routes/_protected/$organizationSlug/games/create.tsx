@@ -147,7 +147,10 @@ function CreateGamePage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-6"
+              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+            >
               <FormField
                 control={form.control}
                 name="opponentName"

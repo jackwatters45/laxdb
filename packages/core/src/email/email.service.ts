@@ -22,7 +22,7 @@ export class EmailService extends Effect.Service<EmailService>()(
             const defaultFrom = emailSender;
 
             const command = new SendEmailCommand({
-              FromEmailAddress: validated.from || defaultFrom,
+              FromEmailAddress: validated.from ?? defaultFrom,
               Destination: {
                 ToAddresses: [...validated.to],
               },
@@ -70,7 +70,7 @@ export class EmailService extends Effect.Service<EmailService>()(
                 positive: "😊",
                 neutral: "😐",
                 negative: "😞",
-              }[validated.rating] || "❓";
+              }[validated.rating] ?? "❓";
 
             const subject = `New Feedback: ${validated.topic} (${validated.rating})`;
 
@@ -123,12 +123,12 @@ export class EmailService extends Effect.Service<EmailService>()(
 
             // Use direct SES implementation to avoid circular dependency
             const sesClient = new SESv2Client({
-              region: process.env.AWS_REGION || "us-west-2",
+              region: process.env.AWS_REGION ?? "us-west-2",
             });
 
-            const FromEmailAddress = process.env.SENDER || "noreply@laxdb.io";
+            const FromEmailAddress = process.env.SENDER ?? "noreply@laxdb.io";
             const toEmailAddress =
-              process.env.SUPPORT_EMAIL || "support@laxdb.io";
+              process.env.SUPPORT_EMAIL ?? "support@laxdb.io";
 
             const command = new SendEmailCommand({
               FromEmailAddress,

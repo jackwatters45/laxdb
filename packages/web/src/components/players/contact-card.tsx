@@ -1,7 +1,6 @@
 import {
   Copy,
   ExternalLink,
-  Facebook,
   Linkedin,
   Mail,
   MessageCircle,
@@ -25,6 +24,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "../ui/item";
+import { SiFacebook } from "@icons-pack/react-simple-icons";
 
 type ContactCardContextType = {
   label: string;
@@ -223,7 +223,7 @@ function FacebookContactCard({ username }: FacebookContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
-          <Facebook className="h-4 w-4 text-muted-foreground" />
+          <SiFacebook className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />
       </ContactCardContent>
@@ -307,6 +307,7 @@ function LinkedInContactCard({ username }: LinkedInContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
+          {/* oxlint-disable-next-line no-deprecated */}
           <Linkedin className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3002",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --fix",
+    "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"
   },

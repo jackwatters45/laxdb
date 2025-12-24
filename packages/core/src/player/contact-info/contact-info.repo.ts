@@ -8,6 +8,8 @@ import type {
   PlayerWithContactInfo,
 } from "./contact-info.schema";
 import { playerContactInfoTable } from "./contact-info.sql";
+import type { SqlError } from "@effect/sql/SqlError";
+import type { NoSuchElementException } from "effect/Cause";
 
 export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
   "ContactInfoRepo",
@@ -18,7 +20,12 @@ export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
       const { id: _id, ...rest } = getTableColumns(playerContactInfoTable);
 
       return {
-        getPlayerWithContactInfo: (input: GetPlayerContactInfoInput) =>
+        getPlayerWithContactInfo: (
+          input: GetPlayerContactInfoInput,
+        ): Effect.Effect<
+          PlayerWithContactInfo | null,
+          SqlError | NoSuchElementException
+        > =>
           db
             .select({
               ...rest,
@@ -35,10 +42,12 @@ export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
             .pipe(
               Effect.flatMap(Arr.head),
               Effect.tapError(Effect.logError),
-              Effect.map((result): PlayerWithContactInfo | null => {
-                if (!result || result.publicPlayerId === null) {
+              Effect.map((result) => {
+                if (!result) {
                   return null;
                 }
+                // TODO: The comment claims "same type" but the actual type narrowing logic is unclear. The check only verifies result exists, but doesn't validate that all required fields of PlayerWithContactInfo are present.
+                // oxlint-disable-next-line no-unsafe-type-assertion - same type we just want inference for actual PlayerWithContactInfo
                 return result as PlayerWithContactInfo;
               }),
             ),

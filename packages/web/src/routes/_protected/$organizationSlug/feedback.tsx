@@ -114,7 +114,7 @@ function FeedbackPage() {
               <Form {...form}>
                 <form
                   className="space-y-6"
-                  onSubmit={form.handleSubmit(onSubmit)}
+                  onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
                 >
                   <FormField
                     control={form.control}

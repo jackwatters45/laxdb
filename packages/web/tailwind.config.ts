@@ -104,6 +104,7 @@ const config: Config = {
       },
     },
   },
+  // oxlint-disable-next-line no-unsafe-assignment
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 };
 
