@@ -1,4 +1,4 @@
-# laxdb (Goalbound)
+# laxdb
 
 laxdb is a suite of management tools designed specifically for lacrosse teams and clubs. It provides a comprehensive platform for handling team operations, organization management, and player coordination.
 
