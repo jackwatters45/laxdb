@@ -23,6 +23,15 @@ export const prodStage = "prod";
 export const devStage = "dev";
 export const isPermanentStage = [prodStage, devStage].includes(stage);
 
+export const secrets = {
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+  GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
+  BETTER_AUTH_SECRET: alchemy.secret(process.env.BETTER_AUTH_SECRET!),
+  POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
+  AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
+  EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
+};
+
 // Domain
 const PRODUCTION = "laxdb.io";
 const DEV = "dev.laxdb.io";
@@ -38,27 +47,29 @@ const database = await Database("Database", {
   name: "laxdb",
   clusterSize: "PS_5",
   kind: "postgresql",
-  organization: "laxdb",
+  organization: "johnwatt",
   allowDataBranching: true,
-  automaticMigrations: true,
+  adopt: true
 });
 
 // Dev/staging branch
 const devBranch = await Branch("dev-branch", {
   name: "development",
-  organization: "laxdb",
+  organization: "johnwatt",
   database,
   parentBranch: "main",
   isProduction: false,
+  adopt: true
 });
 
 // Personal dev branch
 const personalBranch = await Branch("personal-branch", {
   name: "personal",
-  organization: "laxdb",
+  organization: "johnwatt",
   database,
   parentBranch: "development",
   isProduction: false,
+  adopt: true
 });
 
 // Branch selection based on stage
@@ -77,13 +88,13 @@ const dbRole = await Role(`db-role-${stage}`, {
 });
 
 // Hyperdrive connection pooling
-const db = await Hyperdrive("Hyperdrive", {
+const db = await Hyperdrive("hyperdrive", {
   origin: dbRole.connectionUrl,
 });
 
 // Generate Drizzle migrations
 await Exec("DrizzleGenerate", {
-  command: "cd laxdb/packages/core && bun run db:generate",
+  command: "cd packages/core && bun run db:generate",
   env: {
     DATABASE_URL: dbRole.connectionUrl,
   },
@@ -96,8 +107,8 @@ await Exec("DrizzleGenerate", {
 await Exec("DrizzleMigrate", {
   command:
     process.platform === "win32"
-      ? `cmd /C "cd laxdb/packages/core && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
-      : `sh -c 'cd laxdb/packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
+      ? `cmd /C "cd packages/core && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
+      : `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
   env: {
     DATABASE_URL: dbRole.connectionUrl,
   },
@@ -122,21 +133,17 @@ export const kv = await KVNamespace("kv", {});
 // Storage
 export const storage = await R2Bucket("storage", {});
 
-export const worker = await Worker("api", {
-  entrypoint: "packages/api/src/index.ts",
-  url: true,
-  bindings: {
-    DB: db,
-    KV: kv,
-    STORAGE: storage,
-    DATABASE_URL: dbRole.connectionUrl,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
-    GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
-    POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
-    AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
-    EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
-  },
-});
+// export const worker = await Worker("api", {
+//   entrypoint: "packages/api/src/index.ts",
+//   url: true,
+//   bindings: {
+//     DB: db,
+//     KV: kv,
+//     STORAGE: storage,
+//     DATABASE_URL: dbRole.connectionUrl,
+//     ...secrets,
+//   },
+// });
 
 export const web = await TanStackStart("web", {
   bindings: {
@@ -144,12 +151,8 @@ export const web = await TanStackStart("web", {
     KV: kv,
     STORAGE: storage,
     DATABASE_URL: dbRole.connectionUrl,
-    API_URL: worker.url!,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
-    GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
-    POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
-    AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
-    EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
+    // API_URL: worker.url!,
+    ...secrets,
   },
   cwd: "./packages/web",
   domains: [domain],
@@ -168,6 +171,7 @@ export const web = await TanStackStart("web", {
 console.log({
   domain,
   webWorkers: web.url,
+  // api: api.url,
   db: database.id,
   kv: kv.namespaceId,
   r2: storage.name,

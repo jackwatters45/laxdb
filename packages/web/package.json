@@ -15,6 +15,7 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
+    "@cloudflare/vite-plugin": "^1.19.0",
     "@effect-atom/atom-react": "^0.3.2",
     "@effect/rpc": "^0.71.0",
     "@hookform/resolvers": "^5.2.2",
@@ -41,7 +42,6 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "@remixicon/react": "^4.6.0",
-    "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-router": "^1.132.47",
     "@tanstack/react-router-ssr-query": "^1.132.47",

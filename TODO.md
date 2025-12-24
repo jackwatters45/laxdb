@@ -12,7 +12,7 @@
 - [x] clean up jj log
 - [x] ts-aware thing - see api package.json
 - [x] add description + name claude gh workflows
-- [ ] deployment
+- [x] deployment (infisical)
 - [ ] get dev working
 - [ ] remove old aws
 - [ ] new package/routes to just work on features tbh
