@@ -153,7 +153,10 @@ function ContactInfoEdit({ contactInfo, setIsEditing }: ContactInfoEditProps) {
 
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        className="space-y-6"
+        onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+      >
         <ContactInfoCardWrapper>
           <EmailEditCard form={form} />
           <PhoneEditCard form={form} />

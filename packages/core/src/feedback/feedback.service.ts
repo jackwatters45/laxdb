@@ -46,8 +46,8 @@ export class FeedbackService extends Effect.Service<FeedbackService>()(
                         topic: inserted.topic,
                         rating: inserted.rating,
                         feedback: inserted.feedback,
-                        userEmail: inserted.userEmail || undefined,
-                        userId: inserted.userId || undefined,
+                        userEmail: inserted.userEmail ?? undefined,
+                        userId: inserted.userId ?? undefined,
                       })
                       .pipe(
                         Effect.tapError(Effect.logError),

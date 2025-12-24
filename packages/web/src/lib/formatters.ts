@@ -33,5 +33,5 @@ export const formatters: { [key: string]: any } = {
       style: "currency",
       currency,
     }).format(number),
-  unit: (number: number) => `${usNumberformatter(number)}`,
+  unit: (number: number) => usNumberformatter(number),
 };

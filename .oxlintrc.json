@@ -35,7 +35,8 @@
     "react/self-closing-comp": "error",
     "react/jsx-key": "error",
     "unicorn/no-array-callback-reference": "off",
-    "max-lines": "off"
+    "max-lines": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off"
   },
   "ignorePatterns": [
     "node_modules/**",

@@ -5,7 +5,7 @@
   "module": "src/scratch.ts",
   "scripts": {
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --fix",
+    "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"
   },

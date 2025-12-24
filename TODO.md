@@ -8,17 +8,18 @@
 - [x] linting + fmting
 - [x] tsgo
 - [x] prepush not 100% confident
-- [ ] current pr fixes from claude
-- [ ] ts-aware thing - see api package.json
-- [ ] clean up jj log
+- [x] current pr fixes from claude
+- [x] clean up jj log
+- [x] ts-aware thing - see api package.json
 - [ ] add desciption + name claude wf
 - [ ] deployment
 - [ ] get dev working
 - [ ] remove old aws
-- [ ] new package to just work on features tbh
+- [ ] new package/routes to just work on features tbh
 
 ## Pressing things to eventually do..
 
+- ts-aware - web package
 - add marketing page to deployment
 - how to handle teamId + org in core repo
 - Permissions!!

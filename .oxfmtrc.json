@@ -9,5 +9,6 @@
   "ternaries": true,
   "experimental_sort_imports": {
     "order": "asc"
-  }
+  },
+  "ignorePatterns": ["*.md"]
 }

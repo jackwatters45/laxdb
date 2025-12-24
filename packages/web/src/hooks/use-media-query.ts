@@ -18,19 +18,10 @@ export function useMediaQuery(query: string): boolean {
     const matchMedia = window.matchMedia(query);
 
     handleChange();
-
-    if (matchMedia.addListener) {
-      matchMedia.addListener(handleChange);
-    } else {
-      matchMedia.addEventListener("change", handleChange);
-    }
+    matchMedia.addEventListener("change", handleChange);
 
     return () => {
-      if (matchMedia.removeListener) {
-        matchMedia.removeListener(handleChange);
-      } else {
-        matchMedia.removeEventListener("change", handleChange);
-      }
+      matchMedia.removeEventListener("change", handleChange);
     };
   }, [query, handleChange]);
 
