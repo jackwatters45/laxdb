@@ -1,16 +1,27 @@
 {
   "extends": "@tsconfig/bun",
   "compilerOptions": {
-    "module": "Preserve",
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
     "strictNullChecks": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
+    "incremental": true,
+    "composite": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "declaration": true,
+    "types": ["@cloudflare/workers-types"],
     "plugins": [
       {
-        "name": "@effect/language-service"
-      }
-    ]
-  }
+        "name": "@effect/language-service",
+      },
+    ],
+  },
 }

@@ -127,7 +127,6 @@ function SearchComboboxTrigger({
 
   return (
     <PopoverTrigger asChild>
-      {/* biome-ignore lint/a11y/useSemanticElements: <> */}
       <Button
         aria-expanded={open}
         className={cn(

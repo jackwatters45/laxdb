@@ -9,9 +9,9 @@
   "type": "module",
   "scripts": {
     "build": "turbo build",
-    "deploy": "bun --env-file=.env alchemy deploy",
-    "destroy": "bun --env-file=.env alchemy destroy",
-    "dev": "bun --env-file=.env alchemy dev",
+    "deploy": "alchemy deploy",
+    "destroy": "alchemy destroy",
+    "dev": "alchemy dev",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "turbo format",

@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],
+  "types": [ "../../types/env.d.ts"],
   "compilerOptions": {
     "paths": {
       "@laxdb/core/*": ["./src/*"]
