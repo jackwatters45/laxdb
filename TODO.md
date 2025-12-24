@@ -5,13 +5,15 @@
 - [x] update planning docs
 - [x] env + env.example
 - [x] jj stacked prs
-- [ ] prepush still not working
-- [ ] linting + fmting
-- [ ] ts-aware thing
+- [x] linting + fmting
+- [x] tsgo
+- [x] prepush not 100% confident
+- [ ] current pr fixes from claude
+- [ ] ts-aware thing - see api package.json
+- [ ] clean up jj log
 - [ ] add desciption + name claude wf
-- [ ] typego
-- [ ] get dev working
 - [ ] deployment
+- [ ] get dev working
 - [ ] remove old aws
 - [ ] new package to just work on features tbh
 

@@ -45,12 +45,14 @@
       "cache": false,
       "persistent": true
     },
+    "lint": {
+      "dependsOn": ["^lint"],
+    },
+    "format": {
+      "dependsOn": ["^format"],
+    },
     "fix": {
       "dependsOn": ["^fix"],
-      "cache": false
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
     }
   }
 }

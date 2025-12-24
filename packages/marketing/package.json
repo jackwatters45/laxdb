@@ -7,10 +7,10 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",
-    "typecheck": "tsc --noEmit",
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
-    "fix": "oxlint --fix && oxfmt"
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint --fix",
+    "format": "oxfmt",
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",

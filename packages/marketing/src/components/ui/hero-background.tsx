@@ -39,10 +39,10 @@ const GameOfLife = () => {
         for (let j = -1; j < 2; j++) {
           const row = (x + i + rows) % rows;
           const col = (y + j + cols) % cols;
-          sum += grid[row]?.[col]?.alive ? 1 : 0;
+          sum += grid[row]?.[col]?.alive === true ? 1 : 0;
         }
       }
-      sum -= grid[x]?.[y]?.alive ? 1 : 0;
+      sum -= grid[x]?.[y]?.alive === true ? 1 : 0;
       return sum;
     };
 

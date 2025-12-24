@@ -9,10 +9,10 @@
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
-    "fix": "oxlint --fix && oxfmt"
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint --fix",
+    "format": "oxfmt",
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@effect-atom/atom-react": "^0.3.2",

@@ -69,15 +69,8 @@ const ApiLive = Layer.mergeAll(
   DateTime.layerCurrentZoneLocal,
 );
 
-const webHandler = HttpApiBuilder.toWebHandler as (
-  layer: unknown,
-  options?: unknown,
-) => {
-  handler: (request: Request) => Promise<Response>;
-  dispose: () => Promise<void>;
-};
-
-const { handler } = webHandler(ApiLive, {
+// @ts-expect-error - we will fix this later
+const { handler } = HttpApiBuilder.toWebHandler(ApiLive, {
   middleware: HttpMiddleware.logger,
 });
 

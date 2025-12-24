@@ -4,9 +4,10 @@
   "type": "module",
   "module": "src/scratch.ts",
   "scripts": {
-    "format": "oxfmt ",
-    "format:check": "bun run format -- --check",
-    "fix": "oxlint --fix && oxfmt"
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint --fix",
+    "format": "oxfmt",
+    "fix": "bun run lint && bun run format"
   },
   "dependencies": {
     "@effect/platform": "^0.93.2"
