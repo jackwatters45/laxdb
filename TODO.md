@@ -11,7 +11,7 @@
 - [x] current pr fixes from claude
 - [x] clean up jj log
 - [x] ts-aware thing - see api package.json
-- [ ] add desciption + name claude wf
+- [x] add description + name claude gh workflows
 - [ ] deployment
 - [ ] get dev working
 - [ ] remove old aws
@@ -19,6 +19,7 @@
 
 ## Pressing things to eventually do..
 
+- fix http api
 - ts-aware - web package
 - add marketing page to deployment
 - how to handle teamId + org in core repo
