@@ -49,7 +49,7 @@ const database = await Database("Database", {
   kind: "postgresql",
   organization: "johnwatt",
   allowDataBranching: true,
-  adopt: true
+  adopt: true,
 });
 
 // Dev/staging branch

@@ -1,70 +1,20 @@
-import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { Input as InputPrimitive } from "@base-ui/react/input";
+
 import { cn } from "@/lib/utils";
 
-const inputVariants = cva(
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "",
-        data: "absolute inset-0 h-full rounded-0 rounded-none border-none px-2 py-0 shadow-none",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
-
-export interface InputProps
-  extends
-    React.InputHTMLAttributes<HTMLInputElement>,
-    VariantProps<typeof inputVariants> {}
-
-function Input({
-  className,
-  variant,
-  type,
-  ref,
-  ...props
-}: InputProps & { ref?: React.Ref<HTMLInputElement> }) {
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
-    <input
-      className={cn(inputVariants({ variant, className }))}
-      ref={ref}
+    <InputPrimitive
       type={type}
+      data-slot="input"
+      className={cn(
+        "dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 disabled:bg-input/50 dark:disabled:bg-input/80 h-8 rounded-none border bg-transparent px-2.5 py-1 text-xs transition-colors file:h-6 file:text-xs file:font-medium focus-visible:ring-1 aria-invalid:ring-1 md:text-xs file:text-foreground placeholder:text-muted-foreground w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
       {...props}
     />
   );
 }
-Input.displayName = "Input";
 
-export interface ControlledInput extends Omit<InputProps, "defaultValue"> {
-  onUpdate: (value: string | null) => void;
-}
-
-function ControlledInput({
-  value,
-  onUpdate,
-  ref,
-  ...props
-}: ControlledInput & { ref?: React.Ref<HTMLInputElement> }) {
-  const [localValue, setLocalValue] = React.useState(value?.toString() ?? "");
-
-  return (
-    <Input
-      {...props}
-      onBlur={() => {
-        onUpdate(localValue);
-      }}
-      onChange={(e) => {
-        setLocalValue(e.target.value);
-      }}
-      {...(ref !== undefined && { ref })}
-      value={localValue}
-    />
-  );
-}
-
-export { ControlledInput, Input };
+export { Input };
