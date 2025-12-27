@@ -51,7 +51,7 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
 
     const auth = betterAuth({
       appName: "Goalbound",
-      // secret: Resource.BetterAuthSecret.value,
+      secret: process.env.BETTER_AUTH_SECRET!,
       database: drizzleAdapter(db, {
         provider: "pg",
         schema: {

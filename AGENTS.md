@@ -400,3 +400,14 @@ Topics include: services and layers, data modeling, error handling, configuratio
 Search here for real implementations when docs aren't enough.
 
 <!-- effect-solutions:end -->
+
+<!-- Common Libs -->
+
+**Common libs can be found in the `~/.local/share` directory**
+
+- alchemy
+- drizzle-orm
+- tanstack router (start)
+- better-auth
+- tanstack query
+- tanstack table

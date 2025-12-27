@@ -12,10 +12,13 @@
 - [x] clean up jj log
 - [x] ts-aware thing - see api package.json
 - [x] add description + name claude gh workflows
-- [ ] deployment
+- [x] deployment (infisical)
+- [ ] deployment (vite)
 - [ ] get dev working
-- [ ] remove old aws
+- [x] remove old aws
 - [ ] new package/routes to just work on features tbh
+
+infisical run --env=staging
 
 ## Pressing things to eventually do..
 
