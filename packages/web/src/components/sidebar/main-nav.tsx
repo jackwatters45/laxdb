@@ -7,7 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../ui/sidebar";
+} from "../../../../ui/src/components/ui/sidebar";
 
 export function MainNav() {
   const routeMatch = useMatchRoute();

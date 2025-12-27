@@ -4,18 +4,19 @@
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "config": "../../packages/ui/tailwind.config.ts",
-    "css": "../../packages/ui/src/styles/globals.css",
+    "config": "tailwind.config.ts",
+    "css": "src/globals.css",
     "baseColor": "neutral",
-    "cssVariables": true
+    "cssVariables": true,
+    "prefix": ""
   },
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "hooks": "@/hooks",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
     "lib": "@/lib",
-    "utils": "@laxdb/ui/lib/utils",
-    "ui": "@laxdb/ui/components"
+    "hooks": "@/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

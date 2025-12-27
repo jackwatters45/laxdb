@@ -14,9 +14,10 @@
 - [x] add description + name claude gh workflows
 - [x] deployment (infisical)
 - [x] remove old aws
-- [ ] errs
-- [ ] sonner
 - [ ] ui package
+- [ ] forms
+- [ ] sonner
+- [ ] errs
 - [ ] deployment (vite)
 - [ ] get dev working
 - [ ] new package/routes to just work on features tbh

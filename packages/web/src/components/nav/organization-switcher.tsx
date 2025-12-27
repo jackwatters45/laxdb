@@ -9,8 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSwitchOrganization } from "@/mutations/organizations";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../../../ui/src/components/ui/avatar";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "../../../../ui/src/components/ui/sidebar";
 
 export function OrganizationSwitcher() {
   const router = useRouter();

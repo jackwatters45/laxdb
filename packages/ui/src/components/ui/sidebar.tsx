@@ -410,7 +410,7 @@ function SidebarGroupLabel({
       },
       props,
     ),
-    render,
+    ...(render !== undefined && { render }),
     state: {
       slot: "sidebar-group-label",
       sidebar: "group-label",
@@ -434,7 +434,7 @@ function SidebarGroupAction({
       },
       props,
     ),
-    render,
+    ...(render !== undefined && { render }),
     state: {
       slot: "sidebar-group-action",
       sidebar: "group-action",
@@ -514,22 +514,38 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
-  const comp = useRender({
-    defaultTagName: "button",
-    props: mergeProps<"button">(
-      {
-        className: cn(sidebarMenuButtonVariants({ variant, size }), className),
-      },
-      props,
-    ),
-    render: tooltip ? TooltipTrigger : render,
-    state: {
-      slot: "sidebar-menu-button",
-      sidebar: "menu-button",
-      size,
-      active: isActive,
+  const mergedProps = mergeProps<"button">(
+    {
+      className: cn(sidebarMenuButtonVariants({ variant, size }), className),
     },
-  });
+    props,
+  );
+  const renderState = {
+    slot: "sidebar-menu-button",
+    sidebar: "menu-button",
+    size,
+    active: isActive,
+  };
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const comp = tooltip
+    ? useRender({
+        defaultTagName: "button",
+        props: mergedProps,
+        render: TooltipTrigger as NonNullable<typeof render>,
+        state: renderState,
+      })
+    : render !== undefined
+      ? useRender({
+          defaultTagName: "button",
+          props: mergedProps,
+          render,
+          state: renderState,
+        })
+      : useRender({
+          defaultTagName: "button",
+          props: mergedProps,
+          state: renderState,
+        });
 
   if (!tooltip) {
     return comp;
@@ -576,7 +592,7 @@ function SidebarMenuAction({
       },
       props,
     ),
-    render,
+    ...(render !== undefined && { render }),
     state: {
       slot: "sidebar-menu-action",
       sidebar: "menu-action",
@@ -689,7 +705,7 @@ function SidebarMenuSubButton({
       },
       props,
     ),
-    render,
+    ...(render !== undefined && { render: render || "a" }),
     state: {
       slot: "sidebar-menu-sub-button",
       sidebar: "menu-sub-button",

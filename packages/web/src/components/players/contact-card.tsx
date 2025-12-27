@@ -23,7 +23,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "../ui/item";
+} from "../../../../ui/src/components/ui/item";
 import { SiFacebook } from "@icons-pack/react-simple-icons";
 
 type ContactCardContextType = {

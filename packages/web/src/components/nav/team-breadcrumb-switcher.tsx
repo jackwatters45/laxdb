@@ -9,7 +9,7 @@ import {
   BreadcrumbDropdownTrigger,
   BreadcrumbItem,
   BreadcrumbLink,
-} from "../ui/breadcrumb";
+} from "../../../../ui/src/components/ui/breadcrumb";
 
 type TeamBasic = Pick<Team, "id" | "name">;
 

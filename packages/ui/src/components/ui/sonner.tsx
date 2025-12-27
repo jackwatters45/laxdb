@@ -1,6 +1,5 @@
-// TODO: NEED TO REMPVE NEXT THEMES
-import { useTheme } from "next-themes";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { useTheme } from "@/components/theme-provider";
+import { Toaster as Sonner } from "sonner";
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -9,12 +8,14 @@ import {
   Loader2Icon,
 } from "lucide-react";
 
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
+type ToasterProps = React.ComponentProps<typeof Sonner>;
+
+const Toaster = ({ theme: themeProp, ...props }: ToasterProps) => {  const { theme: contextTheme = "system" } = useTheme();
+  const resolvedTheme = themeProp ?? contextTheme ?? "system";
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+    theme={resolvedTheme as NonNullable<ToasterProps["theme"]>}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,

@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { useTheme } from "../theme-provider";
+import { useTheme } from "../../../../ui/src/components/theme-provider";
 
 export function NavUserSidebar() {
   const { user } = useRouteContext({ from: "/_protected" });
