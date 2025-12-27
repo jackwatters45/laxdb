@@ -31,15 +31,20 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 
 ### Environment Setup
 
-Create a `.env` file in the root directory with the following variables:
+This project uses [Infisical](https://app.infisical.com) for secrets management.
 
-```env
-ALCHEMY_PASSWORD=your_alchemy_password
-CLOUDFLARE_API_TOKEN=your_cloudflare_token
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-POLAR_WEBHOOK_SECRET=your_polar_webhook_secret
+```bash
+# Login to Infisical (opens browser)
+infisical login
+
+# Initialize project config (one-time)
+infisical init
+
+# Run commands with secrets injected
+infisical run --env=dev -- bun run dev
 ```
+
+See [docs/infisical/cli.md](docs/infisical/cli.md) for more details.
 
 ### Installation
 
