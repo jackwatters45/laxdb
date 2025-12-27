@@ -232,7 +232,7 @@ function FilterSelect<TData, TValue>({
               </Label>
               <Select
                 onValueChange={(value) => {
-                  setSelectedValues(value);
+                  setSelectedValues(value ?? "");
                 }}
                 value={selectedValues}
               >
@@ -536,9 +536,10 @@ function FilterNumber<TData, TValue>({
               <div className="space-y-2">
                 <Select
                   onValueChange={(value) => {
+                    const v = value ?? "";
                     setSelectedValues((prev) => ({
-                      condition: value,
-                      value: [value === "" ? "" : prev?.value?.[0] || "", ""],
+                      condition: v,
+                      value: [v === "" ? "" : prev?.value?.[0] || "", ""],
                     }));
                   }}
                   value={selectedValues?.condition}

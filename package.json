@@ -38,7 +38,6 @@
     "oxlint": "^1.34.0",
     "oxlint-tsgolint": "^0.10.0",
     "turbo": "^2.7.2",
-    "typescript": "^5.9.3",
     "vibe-rules": "^0.3.91",
     "vitest": "latest"
   },

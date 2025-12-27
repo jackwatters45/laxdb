@@ -125,7 +125,7 @@ function RowActionItem({
         variant === "destructive" && "text-destructive focus:text-destructive",
         className,
       )}
-      onClick={onClick}
+      {...(onClick && { onClick })}
     >
       {Icon && <Icon className="h-4 w-4" />}
       {children}

@@ -155,7 +155,11 @@ function FilterBarAddButton({ children, className }: FilterBarAddButtonProps) {
   const { actions } = useFilterBar();
 
   return (
-    <Button className={className} onClick={actions?.onAdd} size={"sm"}>
+    <Button
+      {...(className && { className })}
+      {...(actions?.onAdd && { onClick: () => actions.onAdd?.() })}
+      size={"sm"}
+    >
       {children}
     </Button>
   );
