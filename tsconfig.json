@@ -17,7 +17,7 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "declaration": true,
-    "types": ["@cloudflare/workers-types"],
+    "types": ["@cloudflare/workers-types", "@types/node"],
     "plugins": [
       {
         "name": "@effect/language-service",

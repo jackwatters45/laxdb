@@ -36,7 +36,8 @@
     "react/jsx-key": "error",
     "unicorn/no-array-callback-reference": "off",
     "max-lines": "off",
-    "@typescript-eslint/strict-boolean-expressions": "off"
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "unicorn/no-empty-file": "warn"
   },
   "ignorePatterns": [
     "node_modules/**",

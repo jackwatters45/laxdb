@@ -8,7 +8,6 @@ import {
   KVNamespace,
   R2Bucket,
   TanStackStart,
-  Worker,
 } from "alchemy/cloudflare";
 
 export const app = await alchemy("laxdb", {
@@ -120,7 +119,7 @@ await Exec("DrizzleMigrate", {
 // Start Drizzle Studio in local development
 if (app.local) {
   Exec("DrizzleStudio", {
-    command: "bun run db:studio",
+    command: "cd packages/core && bun run db:studio",
     env: {
       DATABASE_URL: dbRole.connectionUrl,
     },

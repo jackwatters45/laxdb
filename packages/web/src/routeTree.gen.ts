@@ -8,61 +8,61 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as TestRouteImport } from "./routes/test";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestRouteImport } from './routes/test'
 
 const TestRoute = TestRouteImport.update({
-  id: "/test",
-  path: "/test",
+  id: '/test',
+  path: '/test',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/test": typeof TestRoute;
+  '/test': typeof TestRoute
 }
 export interface FileRoutesByTo {
-  "/test": typeof TestRoute;
+  '/test': typeof TestRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/test": typeof TestRoute;
+  __root__: typeof rootRouteImport
+  '/test': typeof TestRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/test";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/test";
-  id: "__root__" | "/test";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/test'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/test'
+  id: '__root__' | '/test'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  TestRoute: typeof TestRoute;
+  TestRoute: typeof TestRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/test": {
-      id: "/test";
-      path: "/test";
-      fullPath: "/test";
-      preLoaderRoute: typeof TestRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   TestRoute: TestRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }
