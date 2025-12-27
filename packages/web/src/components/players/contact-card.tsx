@@ -135,15 +135,17 @@ function ContactCardActions() {
     <TooltipProvider>
       <ItemActions className="gap-0.5">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="h-6 w-6 p-0"
-              onClick={handleCopy}
-              size="sm"
-              variant="ghost"
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
+          <TooltipTrigger
+            render={
+              <Button
+                className="h-6 w-6 p-0"
+                onClick={handleCopy}
+                size="sm"
+                variant="ghost"
+              />
+            }
+          >
+            <Copy className="h-3 w-3" />
           </TooltipTrigger>
           <TooltipContent>
             <p>Copy value</p>
@@ -152,16 +154,21 @@ function ContactCardActions() {
         {href && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild className="h-6 w-6 p-0" size="sm" variant="ghost">
-                <a
-                  href={href}
-                  {...(href.startsWith("http") && {
-                    rel: "noreferrer",
-                    target: "_blank",
-                  })}
-                >
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+              <Button
+                render={
+                  <a
+                    href={href}
+                    {...(href.startsWith("http") && {
+                      rel: "noreferrer",
+                      target: "_blank",
+                    })}
+                  />
+                }
+                className="h-6 w-6 p-0"
+                size="sm"
+                variant="ghost"
+              >
+                <ExternalLink className="h-3 w-3" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>

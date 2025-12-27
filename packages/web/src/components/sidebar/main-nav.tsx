@@ -41,39 +41,48 @@ export function MainNav() {
       <SidebarGroupLabel className={"sr-only"}>Main Nav</SidebarGroupLabel>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip={"Teams"}>
-            <Link
-              className={cn(isTeams && "bg-muted shadow")}
-              params={{ organizationSlug: activeOrganization.slug }}
-              to={"/$organizationSlug"}
-            >
-              <Users />
-              <span>Teams</span>
-            </Link>
+          <SidebarMenuButton
+            render={
+              <Link
+                className={cn(isTeams && "bg-muted shadow")}
+                params={{ organizationSlug: activeOrganization.slug }}
+                to={"/$organizationSlug"}
+              />
+            }
+            tooltip={"Teams"}
+          >
+            <Users />
+            <span>Teams</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip={"Players"}>
-            <Link
-              activeProps={{ className: "bg-muted shadow" }}
-              params={{ organizationSlug: activeOrganization.slug }}
-              to={"/$organizationSlug/players"}
-            >
-              <User />
-              <span>Players</span>
-            </Link>
+          <SidebarMenuButton
+            render={
+              <Link
+                activeProps={{ className: "bg-muted shadow" }}
+                params={{ organizationSlug: activeOrganization.slug }}
+                to={"/$organizationSlug/players"}
+              />
+            }
+            tooltip={"Players"}
+          >
+            <User />
+            <span>Players</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip={"Games"}>
-            <Link
-              activeProps={{ className: "bg-muted shadow" }}
-              params={{ organizationSlug: activeOrganization.slug }}
-              to={"/$organizationSlug/games"}
-            >
-              <Trophy />
-              <span>Games</span>
-            </Link>
+          <SidebarMenuButton
+            render={
+              <Link
+                activeProps={{ className: "bg-muted shadow" }}
+                params={{ organizationSlug: activeOrganization.slug }}
+                to={"/$organizationSlug/games"}
+              />
+            }
+            tooltip={"Games"}
+          >
+            <Trophy />
+            <span>Games</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
         {/*<SidebarMenuItem>
@@ -121,15 +130,18 @@ export function MainNav() {
           </SidebarMenuButton>
         </SidebarMenuItem>*/}
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip={"Settings"}>
-            <Link
-              className={cn(isSettings && "bg-muted shadow")}
-              params={{ organizationSlug: activeOrganization.slug }}
-              to={"/$organizationSlug/settings/general"}
-            >
-              <Settings />
-              <span>Settings</span>
-            </Link>
+          <SidebarMenuButton
+            render={
+              <Link
+                className={cn(isSettings && "bg-muted shadow")}
+                params={{ organizationSlug: activeOrganization.slug }}
+                to={"/$organizationSlug/settings/general"}
+              />
+            }
+            tooltip={"Settings"}
+          >
+            <Settings />
+            <span>Settings</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

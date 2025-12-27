@@ -29,13 +29,15 @@ export function TeamBreadcrumbSwitcher({
   return (
     <BreadcrumbItem>
       <BreadcrumbDropdown>
-        <BreadcrumbLink asChild>
-          <Link
-            params={{ organizationSlug, teamId: activeTeam.id }}
-            to="/$organizationSlug/$teamId"
-          >
-            {activeTeam.name}
-          </Link>
+        <BreadcrumbLink
+          render={
+            <Link
+              params={{ organizationSlug, teamId: activeTeam.id }}
+              to="/$organizationSlug/$teamId"
+            />
+          }
+        >
+          {activeTeam.name}
         </BreadcrumbLink>
         <BreadcrumbDropdownTrigger />
         <BreadcrumbDropdownContent>

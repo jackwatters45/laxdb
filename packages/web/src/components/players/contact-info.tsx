@@ -70,7 +70,6 @@ function EmptyContactInfo({ setIsEditing }: EmptyContactInfoProps) {
       </EmptyHeader>
       <EmptyContent>
         <Button
-          asChild
           className="text-muted-foreground"
           onClick={() => {
             setIsEditing(true);

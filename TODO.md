@@ -13,9 +13,12 @@
 - [x] ts-aware thing - see api package.json
 - [x] add description + name claude gh workflows
 - [x] deployment (infisical)
+- [x] remove old aws
+- [ ] errs
+- [ ] sonner
+- [ ] ui package
 - [ ] deployment (vite)
 - [ ] get dev working
-- [x] remove old aws
 - [ ] new package/routes to just work on features tbh
 
 infisical run --env=staging

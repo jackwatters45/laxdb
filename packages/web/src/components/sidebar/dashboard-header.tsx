@@ -29,9 +29,7 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <SidebarTrigger className="-ml-1" />
-            </TooltipTrigger>
+            <TooltipTrigger render={<SidebarTrigger className="-ml-1" />} />
             <TooltipContent side="bottom">Toggle Sidebar (⌘+B)</TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -76,9 +74,7 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <SidebarTrigger className="-ml-1" />
-            </TooltipTrigger>
+            <TooltipTrigger render={<SidebarTrigger className="-ml-1" />} />
             <TooltipContent side="bottom">Toggle Sidebar (⌘+B)</TooltipContent>
           </Tooltip>
         </TooltipProvider>

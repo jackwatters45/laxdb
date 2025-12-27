@@ -67,16 +67,18 @@ export default function Calendar28() {
           value={value}
         />
         <Popover onOpenChange={setOpen} open={open}>
-          <PopoverTrigger asChild>
-            <Button
-              className="-translate-y-1/2 absolute top-1/2 right-2 h-6 w-6"
-              id="date-picker"
-              size="icon"
-              variant="ghost"
-            >
-              <CalendarIcon className="size-3" />
-              <span className="sr-only">Select date</span>
-            </Button>
+          <PopoverTrigger
+            render={
+              <Button
+                className="-translate-y-1/2 absolute top-1/2 right-2 h-6 w-6"
+                id="date-picker"
+                size="icon"
+                variant="ghost"
+              />
+            }
+          >
+            <CalendarIcon className="size-3" />
+            <span className="sr-only">Select date</span>
           </PopoverTrigger>
           <PopoverContent
             align="end"

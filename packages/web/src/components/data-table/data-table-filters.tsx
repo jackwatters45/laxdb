@@ -160,52 +160,54 @@ function FilterSelect<TData, TValue>({
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger asChild>
-        <button
-          className={cn(
-            "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
-            selectedValues
-              ? "text-foreground"
-              : "border-dashed text-muted-foreground",
-            focusRing,
-          )}
-          type="button"
+      <PopoverTrigger
+        render={
+          <button
+            className={cn(
+              "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
+              selectedValues
+                ? "text-foreground"
+                : "border-dashed text-muted-foreground",
+              focusRing,
+            )}
+            type="button"
+          />
+        }
+      >
+        <span
+          aria-hidden="true"
+          onClick={(e) => {
+            if (selectedValues) {
+              e.stopPropagation();
+              column?.setFilterValue("");
+              setSelectedValues("");
+            }
+          }}
         >
-          <span
+          <RiAddLine
             aria-hidden="true"
-            onClick={(e) => {
-              if (selectedValues) {
-                e.stopPropagation();
-                column?.setFilterValue("");
-                setSelectedValues("");
-              }
-            }}
-          >
-            <RiAddLine
-              aria-hidden="true"
-              className={cn(
-                "-ml-px size-5 shrink-0 transition sm:size-4",
-                selectedValues && "rotate-45 hover:text-destructive",
-              )}
-            />
-          </span>
-          {columnFilterLabels && columnFilterLabels.length > 0 ? (
-            <span>{title}</span>
-          ) : (
-            <span className="w-full text-left sm:w-fit">{title}</span>
-          )}
-          {columnFilterLabels && columnFilterLabels.length > 0 && (
-            <span aria-hidden="true" className="h-4 w-px bg-border" />
-          )}
-          <ColumnFiltersLabel
-            className="w-full text-left sm:w-fit"
-            columnFilterLabels={columnFilterLabels}
+            className={cn(
+              "-ml-px size-5 shrink-0 transition sm:size-4",
+              selectedValues && "rotate-45 hover:text-destructive",
+            )}
           />
-          <RiArrowDownSLine
-            aria-hidden="true"
-            className="size-5 shrink-0 text-muted-foreground sm:size-4"
-          />
-        </button>
+        </span>
+        {columnFilterLabels && columnFilterLabels.length > 0 ? (
+          <span>{title}</span>
+        ) : (
+          <span className="w-full text-left sm:w-fit">{title}</span>
+        )}
+        {columnFilterLabels && columnFilterLabels.length > 0 && (
+          <span aria-hidden="true" className="h-4 w-px bg-border" />
+        )}
+        <ColumnFiltersLabel
+          className="w-full text-left sm:w-fit"
+          columnFilterLabels={columnFilterLabels}
+        />
+        <RiArrowDownSLine
+          aria-hidden="true"
+          className="size-5 shrink-0 text-muted-foreground sm:size-4"
+        />
       </PopoverTrigger>
       <PopoverContent
         align="start"
@@ -294,54 +296,56 @@ function FilterCheckbox<TData, TValue>({
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger asChild>
-        <button
-          className={cn(
-            "flex h-7 w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium text-sm hover:bg-muted sm:w-fit",
-            selectedValues && selectedValues.length > 0
-              ? "text-foreground"
-              : "border-dashed text-muted-foreground",
-            focusRing,
-          )}
-          type="button"
+      <PopoverTrigger
+        render={
+          <button
+            className={cn(
+              "flex h-7 w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium text-sm hover:bg-muted sm:w-fit",
+              selectedValues && selectedValues.length > 0
+                ? "text-foreground"
+                : "border-dashed text-muted-foreground",
+              focusRing,
+            )}
+            type="button"
+          />
+        }
+      >
+        <span
+          aria-hidden="true"
+          onClick={(e) => {
+            if (selectedValues && selectedValues.length > 0) {
+              e.stopPropagation();
+              column?.setFilterValue([]);
+              setSelectedValues([]);
+            }
+          }}
         >
-          <span
+          <RiAddLine
             aria-hidden="true"
-            onClick={(e) => {
-              if (selectedValues && selectedValues.length > 0) {
-                e.stopPropagation();
-                column?.setFilterValue([]);
-                setSelectedValues([]);
-              }
-            }}
-          >
-            <RiAddLine
-              aria-hidden="true"
-              className={cn(
-                "-ml-px size-5 shrink-0 transition sm:size-4",
-                selectedValues &&
-                  selectedValues.length > 0 &&
-                  "rotate-45 hover:text-destructive",
-              )}
-            />
-          </span>
-          {columnFilterLabels && columnFilterLabels.length > 0 ? (
-            <span>{title}</span>
-          ) : (
-            <span className="w-full text-left sm:w-fit">{title}</span>
-          )}
-          {columnFilterLabels && columnFilterLabels.length > 0 && (
-            <span aria-hidden="true" className="h-4 w-px bg-border" />
-          )}
-          <ColumnFiltersLabel
-            className="w-full text-left sm:w-fit"
-            columnFilterLabels={columnFilterLabels}
+            className={cn(
+              "-ml-px size-5 shrink-0 transition sm:size-4",
+              selectedValues &&
+                selectedValues.length > 0 &&
+                "rotate-45 hover:text-destructive",
+            )}
           />
-          <RiArrowDownSLine
-            aria-hidden="true"
-            className="size-5 shrink-0 text-muted-foreground sm:size-4"
-          />
-        </button>
+        </span>
+        {columnFilterLabels && columnFilterLabels.length > 0 ? (
+          <span>{title}</span>
+        ) : (
+          <span className="w-full text-left sm:w-fit">{title}</span>
+        )}
+        {columnFilterLabels && columnFilterLabels.length > 0 && (
+          <span aria-hidden="true" className="h-4 w-px bg-border" />
+        )}
+        <ColumnFiltersLabel
+          className="w-full text-left sm:w-fit"
+          columnFilterLabels={columnFilterLabels}
+        />
+        <RiArrowDownSLine
+          aria-hidden="true"
+          className="size-5 shrink-0 text-muted-foreground sm:size-4"
+        />
       </PopoverTrigger>
       <PopoverContent
         align="start"
@@ -461,54 +465,56 @@ function FilterNumber<TData, TValue>({
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger asChild>
-        <button
-          className={cn(
-            "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
-            selectedValues && selectedValues.condition !== ""
-              ? "text-foreground"
-              : "border-dashed text-muted-foreground",
-            focusRing,
-          )}
-          type="button"
+      <PopoverTrigger
+        render={
+          <button
+            className={cn(
+              "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
+              selectedValues && selectedValues.condition !== ""
+                ? "text-foreground"
+                : "border-dashed text-muted-foreground",
+              focusRing,
+            )}
+            type="button"
+          />
+        }
+      >
+        <span
+          aria-hidden="true"
+          onClick={(e) => {
+            if (selectedValues && selectedValues.condition !== "") {
+              e.stopPropagation();
+              column?.setFilterValue({ condition: "", value: ["", ""] });
+              setSelectedValues({ condition: "", value: ["", ""] });
+            }
+          }}
         >
-          <span
+          <RiAddLine
             aria-hidden="true"
-            onClick={(e) => {
-              if (selectedValues && selectedValues.condition !== "") {
-                e.stopPropagation();
-                column?.setFilterValue({ condition: "", value: ["", ""] });
-                setSelectedValues({ condition: "", value: ["", ""] });
-              }
-            }}
-          >
-            <RiAddLine
-              aria-hidden="true"
-              className={cn(
-                "-ml-px size-5 shrink-0 transition sm:size-4",
-                selectedValues &&
-                  selectedValues.condition !== "" &&
-                  "rotate-45 hover:text-destructive",
-              )}
-            />
-          </span>
-          {columnFilterLabels && columnFilterLabels.length > 0 ? (
-            <span>{title}</span>
-          ) : (
-            <span className="w-full text-left sm:w-fit">{title}</span>
-          )}
-          {columnFilterLabels && columnFilterLabels.length > 0 && (
-            <span aria-hidden="true" className="h-4 w-px bg-border" />
-          )}
-          <ColumnFiltersLabel
-            className="w-full text-left sm:w-fit"
-            columnFilterLabels={columnFilterLabels}
+            className={cn(
+              "-ml-px size-5 shrink-0 transition sm:size-4",
+              selectedValues &&
+                selectedValues.condition !== "" &&
+                "rotate-45 hover:text-destructive",
+            )}
           />
-          <RiArrowDownSLine
-            aria-hidden="true"
-            className="size-5 shrink-0 text-muted-foreground sm:size-4"
-          />
-        </button>
+        </span>
+        {columnFilterLabels && columnFilterLabels.length > 0 ? (
+          <span>{title}</span>
+        ) : (
+          <span className="w-full text-left sm:w-fit">{title}</span>
+        )}
+        {columnFilterLabels && columnFilterLabels.length > 0 && (
+          <span aria-hidden="true" className="h-4 w-px bg-border" />
+        )}
+        <ColumnFiltersLabel
+          className="w-full text-left sm:w-fit"
+          columnFilterLabels={columnFilterLabels}
+        />
+        <RiArrowDownSLine
+          aria-hidden="true"
+          className="size-5 shrink-0 text-muted-foreground sm:size-4"
+        />
       </PopoverTrigger>
       <PopoverContent
         align="start"

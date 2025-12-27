@@ -61,7 +61,7 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.87 0.00 0);
+    --primary: oklch(0.87 0 0);
     --primary-hover: 226, 85%, 53%;
     --primary-active: 229, 78%, 48%;
     --primary-foreground: oklch(0.205 0 0);
@@ -99,7 +99,7 @@
     --sidebar: oklch(0.205 0 0);
   }
   .theme {
-    --font-sans: 'DM Sans', sans-serif;
+    --font-sans: "DM Sans", sans-serif;
   }
   * {
     @apply border-border outline-ring/50;

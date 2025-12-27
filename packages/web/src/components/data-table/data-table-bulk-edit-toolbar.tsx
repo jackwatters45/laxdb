@@ -152,20 +152,22 @@ function BulkEditToolbarClear({ className }: BulkEditToolbarClearProps) {
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          className={cn(
-            "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
-            className,
-          )}
-          onClick={() => {
-            table.resetRowSelection();
-          }}
-          size="sm"
-          variant="ghost"
-        >
-          <X className="h-3 w-3" />
-        </Button>
+      <TooltipTrigger
+        render={
+          <Button
+            className={cn(
+              "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
+              className,
+            )}
+            onClick={() => {
+              table.resetRowSelection();
+            }}
+            size="sm"
+            variant="ghost"
+          />
+        }
+      >
+        <X className="h-3 w-3" />
       </TooltipTrigger>
       <TooltipContent>Clear selection</TooltipContent>
     </Tooltip>
@@ -199,20 +201,22 @@ function BulkEditToolbarAction({
 }: BulkEditToolbarActionProps) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          className={cn(
-            "h-7 w-7 p-0",
-            variant === "destructive" &&
-              "text-destructive hover:text-destructive",
-            className,
-          )}
-          onClick={onClick}
-          size="sm"
-          variant="ghost"
-        >
-          <Icon className="h-4 w-4" />
-        </Button>
+      <TooltipTrigger
+        render={
+          <Button
+            className={cn(
+              "h-7 w-7 p-0",
+              variant === "destructive" &&
+                "text-destructive hover:text-destructive",
+              className,
+            )}
+            onClick={onClick}
+            size="sm"
+            variant="ghost"
+          />
+        }
+      >
+        <Icon className="h-4 w-4" />
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
@@ -254,16 +258,20 @@ function BulkEditToolbarDeleteAction({ className }: { className?: string }) {
   return (
     <AlertDialog>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button
-              className={cn("h-7 w-7 p-0", className)}
-              size="sm"
-              variant="ghost"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </AlertDialogTrigger>
+        <TooltipTrigger
+          render={
+            <AlertDialogTrigger
+              render={
+                <Button
+                  className={cn("h-7 w-7 p-0", className)}
+                  size="sm"
+                  variant="ghost"
+                />
+              }
+            />
+          }
+        >
+          <Trash2 className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>Delete Permanently</TooltipContent>
       </Tooltip>
@@ -314,16 +322,20 @@ function BulkEditToolbarRemoveAction({
   return (
     <AlertDialog>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button
-              className={cn("h-7 w-7 p-0", className)}
-              size="sm"
-              variant="ghost"
-            >
-              <Icon className="h-4 w-4" />
-            </Button>
-          </AlertDialogTrigger>
+        <TooltipTrigger
+          render={
+            <AlertDialogTrigger
+              render={
+                <Button
+                  className={cn("h-7 w-7 p-0", className)}
+                  size="sm"
+                  variant="ghost"
+                />
+              }
+            />
+          }
+        >
+          <Icon className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>{tooltipContent ?? "Remove"}</TooltipContent>
       </Tooltip>
@@ -389,15 +401,17 @@ function BulkEditToolbarCopyAction({
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          className={cn("h-7 w-7 p-0", className)}
-          onClick={handleCopy}
-          size="sm"
-          variant="ghost"
-        >
-          <Icon className="h-4 w-4" />
-        </Button>
+      <TooltipTrigger
+        render={
+          <Button
+            className={cn("h-7 w-7 p-0", className)}
+            onClick={handleCopy}
+            size="sm"
+            variant="ghost"
+          />
+        }
+      >
+        <Icon className="h-4 w-4" />
       </TooltipTrigger>
       <TooltipContent>{tooltipContent ?? "Copy"}</TooltipContent>
     </Tooltip>

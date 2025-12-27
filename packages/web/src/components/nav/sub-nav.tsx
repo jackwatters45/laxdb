@@ -1,51 +1,45 @@
-import { Slot } from "@radix-ui/react-slot";
-import type * as React from "react";
-import { cn } from "../../lib/utils";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
+import { cn } from "@/lib/utils";
 
-const NavbarRoot = ({
+function NavbarRoot({
   className,
-  children,
-  ref,
+  render,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & {
-  ref?: React.Ref<HTMLDivElement>;
-}) => (
-  <div
-    className={cn("flex h-[46px] items-center [&>*]:shrink-0", className)}
-    ref={ref}
-    {...props}
-  >
-    {children}
-  </div>
-);
-NavbarRoot.displayName = "NavbarRoot";
+}: useRender.ComponentProps<"div">) {
+  return useRender({
+    defaultTagName: "div",
+    props: mergeProps<"div">(
+      {
+        className: cn("flex h-[46px] items-center [&>*]:shrink-0", className),
+      },
+      props,
+    ),
+    ...(render && { render }),
+  });
+}
 
-const NavbarItem = ({
+function NavbarItem({
   className,
-  children,
-  asChild = false,
-  ref,
+  render,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & {
-  asChild?: boolean;
-} & { ref?: React.Ref<HTMLDivElement> }) => {
-  const Comp = asChild ? Slot : "div";
-  return (
-    <Comp
-      className={cn(
-        "relative inline-block select-none border-transparent border-b-2 px-3 py-4 font-normal text-muted-foreground text-sm leading-[0.875rem] transition-colors duration-200 ease-out hover:bg-accent",
-        "[&.active]:border-foreground [&.active]:text-foreground [&.active]:no-underline",
-        className,
-      )}
-      ref={ref}
-      style={{ outlineOffset: "-6px" }}
-      {...props}
-    >
-      {children}
-    </Comp>
-  );
-};
-NavbarItem.displayName = "NavbarItem";
+}: useRender.ComponentProps<"div">) {
+  return useRender({
+    defaultTagName: "div",
+    props: mergeProps<"div">(
+      {
+        className: cn(
+          "relative inline-block select-none border-transparent border-b-2 px-3 py-4 font-normal text-muted-foreground text-sm leading-[0.875rem] transition-colors duration-200 ease-out hover:bg-accent",
+          "[&.active]:border-foreground [&.active]:text-foreground [&.active]:no-underline",
+          className,
+        ),
+        style: { outlineOffset: "-6px" },
+      },
+      props,
+    ),
+    ...(render && { render }),
+  });
+}
 
 const Navbar = NavbarRoot;
 

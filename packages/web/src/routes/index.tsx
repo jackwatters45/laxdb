@@ -4,7 +4,5 @@ import { ComponentExample } from "@/components/component-example";
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
-return (
-  <ComponentExample />
-);
+  return <ComponentExample />;
 }

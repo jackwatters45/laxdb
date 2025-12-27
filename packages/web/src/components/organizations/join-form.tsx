@@ -129,19 +129,23 @@ export function JoinOrganizationForm({
 
               <div className="flex gap-4 pt-4">
                 {organizationSlug ? (
-                  <Button asChild type="button" variant="outline">
-                    <Link
-                      onClick={(e) => {
-                        if (canGoBack) {
-                          e.preventDefault();
-                          router.history.back();
-                        }
-                      }}
-                      params={{ organizationSlug }}
-                      to="/$organizationSlug"
-                    >
-                      Cancel
-                    </Link>
+                  <Button
+                    render={
+                      <Link
+                        onClick={(e) => {
+                          if (canGoBack) {
+                            e.preventDefault();
+                            router.history.back();
+                          }
+                        }}
+                        params={{ organizationSlug }}
+                        to="/$organizationSlug"
+                      />
+                    }
+                    type="button"
+                    variant="outline"
+                  >
+                    Cancel
                   </Button>
                 ) : null}
                 <Button disabled={joinOrgMutation.isPending} type="submit">

@@ -7,8 +7,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { OrganizationSwitcher } from "../nav/organization-switcher";
-import { SearchCommand } from "../nav/search-command";
+import { OrganizationSwitcher } from "@/nav/organization-switcher";
+import { SearchCommand } from "@/nav/search-command";
 import { MainNav } from "./main-nav";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

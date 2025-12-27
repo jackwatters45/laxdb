@@ -8,79 +8,79 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestRouteImport } from './routes/test'
-import { Route as marketingIndexRouteImport } from './routes/(marketing)/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as TestRouteImport } from "./routes/test";
+import { Route as marketingIndexRouteImport } from "./routes/(marketing)/index";
 
 const TestRoute = TestRouteImport.update({
-  id: '/test',
-  path: '/test',
+  id: "/test",
+  path: "/test",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const marketingIndexRoute = marketingIndexRouteImport.update({
-  id: '/(marketing)/',
-  path: '/',
+  id: "/(marketing)/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/test': typeof TestRoute
-  '/': typeof marketingIndexRoute
+  "/test": typeof TestRoute;
+  "/": typeof marketingIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/test': typeof TestRoute
-  '/': typeof marketingIndexRoute
+  "/test": typeof TestRoute;
+  "/": typeof marketingIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/test': typeof TestRoute
-  '/(marketing)/': typeof marketingIndexRoute
+  __root__: typeof rootRouteImport;
+  "/test": typeof TestRoute;
+  "/(marketing)/": typeof marketingIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/test' | '/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/test' | '/'
-  id: '__root__' | '/test' | '/(marketing)/'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/test" | "/";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/test" | "/";
+  id: "__root__" | "/test" | "/(marketing)/";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  TestRoute: typeof TestRoute
-  marketingIndexRoute: typeof marketingIndexRoute
+  TestRoute: typeof TestRoute;
+  marketingIndexRoute: typeof marketingIndexRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(marketing)/': {
-      id: '/(marketing)/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof marketingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/test": {
+      id: "/test";
+      path: "/test";
+      fullPath: "/test";
+      preLoaderRoute: typeof TestRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(marketing)/": {
+      id: "/(marketing)/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof marketingIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   TestRoute: TestRoute,
   marketingIndexRoute: marketingIndexRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }
