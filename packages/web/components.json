@@ -15,7 +15,7 @@
     "hooks": "@/hooks",
     "lib": "@/lib",
     "utils": "@laxdb/ui/lib/utils",
-    "ui": "@laxdb/ui/components"
+    "ui": "@laxdb/ui/components/ui"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

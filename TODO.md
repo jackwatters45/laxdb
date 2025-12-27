@@ -14,15 +14,17 @@
 - [x] add description + name claude gh workflows
 - [x] deployment (infisical)
 - [x] remove old aws
-- [ ] ui package
-- [ ] forms
-- [ ] sonner
-- [ ] errs
+- [ ] ui - package
+  - [ ] fix errors
+  - [ ] imports
+  - [ ] add cmd
+  - [ ] tailwind - font
+  - [ ] forms
+  - [ ] errs
+- [ ] imports
 - [ ] deployment (vite)
 - [ ] get dev working
 - [ ] new package/routes to just work on features tbh
-
-infisical run --env=staging
 
 ## Pressing things to eventually do..
 

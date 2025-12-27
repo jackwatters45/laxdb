@@ -10,12 +10,13 @@ import {
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ theme: themeProp, ...props }: ToasterProps) => {  const { theme: contextTheme = "system" } = useTheme();
+const Toaster = ({ theme: themeProp, ...props }: ToasterProps) => {
+  const { theme: contextTheme = "system" } = useTheme();
   const resolvedTheme = themeProp ?? contextTheme ?? "system";
 
   return (
     <Sonner
-    theme={resolvedTheme as NonNullable<ToasterProps["theme"]>}
+      theme={resolvedTheme as NonNullable<ToasterProps["theme"]>}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,

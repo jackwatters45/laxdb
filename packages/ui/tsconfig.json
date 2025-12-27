@@ -4,6 +4,7 @@
   "exclude": ["node_modules"],
   "types": ["../../types/env.d.ts"],
   "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]

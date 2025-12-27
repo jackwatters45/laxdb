@@ -11,23 +11,6 @@ const config = defineConfig({
       external: ["node:async_hooks", "cloudflare:workers"],
     },
   },
-  // build: {
-  //   target: "esnext",
-  //   rollupOptions: {
-  //     external: [
-  //       "node:async_hooks",
-  //       "cloudflare:workers",
-  //       // non-standard
-  //       "node:stream",
-  //       "node:stream/web",
-  //       "node:perf_hooks",
-  //       "perf_hooks",
-  //       "postgres",
-  //       "@effect/sql-pg",
-  //       "pg",
-  //     ],
-  //   },
-  // },
   plugins: [
     viteTsConfigPaths({ projects: ["./tsconfig.json"] }),
     alchemy(),

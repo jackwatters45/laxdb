@@ -48,12 +48,10 @@ const getTheme = (key: string, fallback?: string) => {
 
 const disableAnimation = () => {
   const css = document.createElement("style");
-  css.append(
-    document.createTextNode(
-      "*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}",
-    ),
-  );
-  document.head.append(css);
+  css.textContent =
+    "*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}";
+  // oxlint-disable-next-line unicorn/prefer-dom-node-append
+  document.head.appendChild(css);
 
   return () => {
     (() => window.getComputedStyle(document.body))();

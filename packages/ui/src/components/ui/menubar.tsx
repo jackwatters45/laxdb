@@ -188,7 +188,7 @@ function MenubarSeparator({
   return (
     <DropdownMenuSeparator
       data-slot="menubar-separator"
-      className={cn("bg-border/50 -mx-1 my-1 h-px -mx-1 my-1 h-px", className)}
+      className={cn("bg-border/50 -mx-1 my-1 h-px", className)}
       {...props}
     />
   );

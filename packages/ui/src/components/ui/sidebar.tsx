@@ -514,38 +514,23 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
-  const mergedProps = mergeProps<"button">(
-    {
-      className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+
+  const comp = useRender({
+    defaultTagName: "button",
+    props: mergeProps<"button">(
+      {
+        className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+      },
+      props,
+    ),
+    render: tooltip ? TooltipTrigger : render,
+    state: {
+      slot: "sidebar-menu-button",
+      sidebar: "menu-button",
+      size,
+      active: isActive,
     },
-    props,
-  );
-  const renderState = {
-    slot: "sidebar-menu-button",
-    sidebar: "menu-button",
-    size,
-    active: isActive,
-  };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const comp = tooltip
-    ? useRender({
-        defaultTagName: "button",
-        props: mergedProps,
-        render: TooltipTrigger as NonNullable<typeof render>,
-        state: renderState,
-      })
-    : render !== undefined
-      ? useRender({
-          defaultTagName: "button",
-          props: mergedProps,
-          render,
-          state: renderState,
-        })
-      : useRender({
-          defaultTagName: "button",
-          props: mergedProps,
-          state: renderState,
-        });
+  });
 
   if (!tooltip) {
     return comp;
