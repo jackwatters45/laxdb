@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_protected/redirect")({
 
     if (!organizationSlug) {
       throw redirect({
-        to: "/organizations/create",
+        to: "/organization/create",
       });
     }
 

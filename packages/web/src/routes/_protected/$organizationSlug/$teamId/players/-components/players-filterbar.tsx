@@ -9,10 +9,10 @@ import {
   FilterClear,
   FilterGroup,
   FilterSearch,
-} from "@/components/data-table/data-table-filterbar";
-import { useDataTable } from "@/components/data-table/use-data-table";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
+} from "@laxdb/ui/components/data-table/data-table-filterbar";
+import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
 import { AddPlayerCommand } from "./add-player-command";
 

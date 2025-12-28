@@ -400,3 +400,81 @@ Topics include: services and layers, data modeling, error handling, configuratio
 Search here for real implementations when docs aren't enough.
 
 <!-- effect-solutions:end -->
+
+<!-- Monorepo Packages -->
+
+## Monorepo Structure
+
+This is a Bun monorepo with packages in `packages/*`.
+
+### @laxdb/ui - Shared UI Components
+
+Located at `packages/ui`. Contains shadcn/ui components built on Base UI (not Radix).
+
+**Adding shadcn components:**
+```bash
+cd packages/ui && bunx --bun shadcn@latest add <component>
+```
+
+**Importing in apps:**
+```tsx
+import { Button } from "@laxdb/ui/components/ui/button";
+import { cn } from "@laxdb/ui/lib/utils";
+```
+
+**Key differences from Radix-based shadcn:**
+
+1. **Select placeholder** - No `placeholder` prop on SelectValue. Use render function:
+   ```tsx
+   <SelectValue>{(value) => value ?? "Select..."}</SelectValue>
+   ```
+
+2. **Forms** - Use `Field` components with `Controller` from react-hook-form:
+   ```tsx
+   import { Controller } from "react-hook-form";
+   import { Field, FieldLabel, FieldError, FieldGroup } from "@laxdb/ui/components/ui/field";
+   
+   <Controller
+     name="email"
+     control={form.control}
+     render={({ field, fieldState }) => (
+       <Field data-invalid={fieldState.invalid}>
+         <FieldLabel htmlFor="email">Email</FieldLabel>
+         <Input {...field} id="email" aria-invalid={fieldState.invalid} />
+         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+       </Field>
+     )}
+   />
+   ```
+
+3. **Resizable** - Uses `Group`/`Separator` instead of `PanelGroup`/`PanelResizeHandle`
+
+**Package exports:**
+- `@laxdb/ui/components/ui/*` - UI components
+- `@laxdb/ui/components/*` - Non-UI components (social-icons, etc.)
+- `@laxdb/ui/lib/*` - Utilities (cn, utils)
+- `@laxdb/ui/hooks/*` - React hooks
+- `@laxdb/ui/globals.css` - Global styles
+
+### @laxdb/core - Business Logic & Database
+
+Located at `packages/core`. Contains Effect-based services, Drizzle schemas, and domain logic.
+
+### @laxdb/api - API Layer
+
+Located at `packages/api`. Effect RPC handlers and middleware.
+
+### @laxdb/web - Frontend App
+
+Located at `packages/web`. TanStack Router + React app.
+
+<!-- Common Libs -->
+
+**Common libs can be found in the `~/.local/share` directory**
+
+- alchemy
+- drizzle-orm
+- tanstack router (start)
+- better-auth
+- tanstack query
+- tanstack table

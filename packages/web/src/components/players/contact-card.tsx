@@ -1,21 +1,13 @@
-import {
-  Copy,
-  ExternalLink,
-  Linkedin,
-  Mail,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { Copy, ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
 import { createContext, useContext } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { InstagramIcon } from "../social-icons";
+} from "@laxdb/ui/components/ui/tooltip";
 import {
   Item,
   ItemActions,
@@ -23,8 +15,12 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "../ui/item";
-import { SiFacebook } from "@icons-pack/react-simple-icons";
+} from "@laxdb/ui/components/ui/item";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+} from "@laxdb/ui/components/social-icons";
 
 type ContactCardContextType = {
   label: string;
@@ -135,15 +131,17 @@ function ContactCardActions() {
     <TooltipProvider>
       <ItemActions className="gap-0.5">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="h-6 w-6 p-0"
-              onClick={handleCopy}
-              size="sm"
-              variant="ghost"
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
+          <TooltipTrigger
+            render={
+              <Button
+                className="h-6 w-6 p-0"
+                onClick={handleCopy}
+                size="sm"
+                variant="ghost"
+              />
+            }
+          >
+            <Copy className="h-3 w-3" />
           </TooltipTrigger>
           <TooltipContent>
             <p>Copy value</p>
@@ -151,18 +149,25 @@ function ContactCardActions() {
         </Tooltip>
         {href && (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button asChild className="h-6 w-6 p-0" size="sm" variant="ghost">
-                <a
-                  href={href}
-                  {...(href.startsWith("http") && {
-                    rel: "noreferrer",
-                    target: "_blank",
-                  })}
-                >
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </Button>
+            <TooltipTrigger
+              render={
+                <Button
+                  render={
+                    <a
+                      href={href}
+                      {...(href.startsWith("http") && {
+                        rel: "noreferrer",
+                        target: "_blank",
+                      })}
+                    />
+                  }
+                  className="h-6 w-6 p-0"
+                  size="sm"
+                  variant="ghost"
+                />
+              }
+            >
+              <ExternalLink className="h-3 w-3" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Open link</p>
@@ -223,7 +228,7 @@ function FacebookContactCard({ username }: FacebookContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
-          <SiFacebook className="h-4 w-4 text-muted-foreground" />
+          <FacebookIcon className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />
       </ContactCardContent>
@@ -307,8 +312,7 @@ function LinkedInContactCard({ username }: LinkedInContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
-          {/* oxlint-disable-next-line no-deprecated */}
-          <Linkedin className="h-4 w-4 text-muted-foreground" />
+          <LinkedInIcon className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />
       </ContactCardContent>

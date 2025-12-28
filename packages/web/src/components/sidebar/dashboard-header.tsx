@@ -8,16 +8,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
+import { SidebarTrigger } from "@laxdb/ui/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@laxdb/ui/components/ui/tooltip";
 import { NavUserHeader } from "../nav/nav-user";
 
 export function DashboardHeader({ children }: { children: React.ReactNode }) {
@@ -29,9 +29,7 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <SidebarTrigger className="-ml-1" />
-            </TooltipTrigger>
+            <TooltipTrigger render={<SidebarTrigger className="-ml-1" />} />
             <TooltipContent side="bottom">Toggle Sidebar (⌘+B)</TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -41,14 +39,6 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
         </Breadcrumb>
       </div>
       <div className="flex items-center gap-2">
-        <Link
-          params={{ organizationSlug: activeOrganization.slug }}
-          to="/$organizationSlug/plan"
-        >
-          <Button size={"sm"} variant="outline">
-            Plan
-          </Button>
-        </Link>
         <Link
           params={{ organizationSlug: activeOrganization.slug }}
           to="/$organizationSlug/feedback"
@@ -76,9 +66,7 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <SidebarTrigger className="-ml-1" />
-            </TooltipTrigger>
+            <TooltipTrigger render={<SidebarTrigger className="-ml-1" />} />
             <TooltipContent side="bottom">Toggle Sidebar (⌘+B)</TooltipContent>
           </Tooltip>
         </TooltipProvider>

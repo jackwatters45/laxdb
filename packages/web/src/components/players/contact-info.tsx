@@ -23,7 +23,7 @@ import {
   PhoneEditCard,
   WhatsAppEditCard,
 } from "@/components/players/contact-edit-card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Empty,
   EmptyContent,
@@ -31,8 +31,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import { Form } from "@/components/ui/form";
+} from "@laxdb/ui/components/ui/empty";
 
 type ContactInfoCardWrapperProps = {
   children: React.ReactNode;
@@ -70,7 +69,6 @@ function EmptyContactInfo({ setIsEditing }: EmptyContactInfoProps) {
       </EmptyHeader>
       <EmptyContent>
         <Button
-          asChild
           className="text-muted-foreground"
           onClick={() => {
             setIsEditing(true);
@@ -152,33 +150,31 @@ function ContactInfoEdit({ contactInfo, setIsEditing }: ContactInfoEditProps) {
   };
 
   return (
-    <Form {...form}>
-      <form
-        className="space-y-6"
-        onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-      >
-        <ContactInfoCardWrapper>
-          <EmailEditCard form={form} />
-          <PhoneEditCard form={form} />
-          <FacebookEditCard form={form} />
-          <InstagramEditCard form={form} />
-          <WhatsAppEditCard form={form} />
-          <LinkedInEditCard form={form} />
-          <GroupMeEditCard form={form} />
-          <EmergencyContactNameEditCard form={form} />
-          <EmergencyContactPhoneEditCard form={form} />
-        </ContactInfoCardWrapper>
-        <div className="flex gap-2">
-          <Button type="submit">Save Changes</Button>
-          <Button onClick={handleReset} type="button" variant="outline">
-            Reset
-          </Button>
-          <Button onClick={handleCancel} type="button" variant="outline">
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <form
+      className="space-y-6"
+      onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+    >
+      <ContactInfoCardWrapper>
+        <EmailEditCard form={form} />
+        <PhoneEditCard form={form} />
+        <FacebookEditCard form={form} />
+        <InstagramEditCard form={form} />
+        <WhatsAppEditCard form={form} />
+        <LinkedInEditCard form={form} />
+        <GroupMeEditCard form={form} />
+        <EmergencyContactNameEditCard form={form} />
+        <EmergencyContactPhoneEditCard form={form} />
+      </ContactInfoCardWrapper>
+      <div className="flex gap-2">
+        <Button type="submit">Save Changes</Button>
+        <Button onClick={handleReset} type="button" variant="outline">
+          Reset
+        </Button>
+        <Button onClick={handleCancel} type="button" variant="outline">
+          Cancel
+        </Button>
+      </div>
+    </form>
   );
 }
 

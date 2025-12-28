@@ -10,14 +10,14 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from "@laxdb/ui/components/ui/command";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@laxdb/ui/components/ui/dialog";
 import { getOrgPlayersQK } from "@/mutations/players";
 import { getOrganizationPlayers } from "@/query/players";
 import { usePlayerMutations } from "../-mutations";
@@ -99,7 +99,11 @@ export function AddPlayerCommand({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger
+      // asChild
+      >
+        {children}
+      </DialogTrigger>
       <DialogContent className="p-0">
         <DialogHeader className="px-4 pt-4">
           <DialogTitle>Add Player</DialogTitle>

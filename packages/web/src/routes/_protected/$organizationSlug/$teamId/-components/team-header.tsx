@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Navbar, NavbarItem } from "@/components/nav/sub-nav";
+import { Navbar, NavbarItem } from "@laxdb/ui/components/sub-nav";
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 
 type TeamHeaderProps = {
@@ -29,22 +29,26 @@ type TeamSubNavProps = {
 export function TeamSubNav({ organizationSlug, teamId }: TeamSubNavProps) {
   return (
     <Navbar className="border-b">
-      <NavbarItem asChild>
-        <Link
-          activeOptions={{ exact: true }}
-          params={{ organizationSlug, teamId }}
-          to="/$organizationSlug/$teamId"
-        >
-          Home
-        </Link>
+      <NavbarItem
+        render={
+          <Link
+            activeOptions={{ exact: true }}
+            params={{ organizationSlug, teamId }}
+            to="/$organizationSlug/$teamId"
+          />
+        }
+      >
+        Home
       </NavbarItem>
-      <NavbarItem asChild>
-        <Link
-          params={{ organizationSlug, teamId }}
-          to="/$organizationSlug/$teamId/players"
-        >
-          Players
-        </Link>
+      <NavbarItem
+        render={
+          <Link
+            params={{ organizationSlug, teamId }}
+            to="/$organizationSlug/$teamId/players"
+          />
+        }
+      >
+        Players
       </NavbarItem>
     </Navbar>
   );

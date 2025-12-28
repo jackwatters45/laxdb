@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@laxdb/ui/components/ui/card";
 
 export function PlayerCards({ players }: { players: TeamPlayerWithInfo[] }) {
   return (

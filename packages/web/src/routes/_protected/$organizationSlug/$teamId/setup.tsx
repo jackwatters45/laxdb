@@ -6,26 +6,24 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { Team } from "better-auth/plugins";
 import { Effect, Schema } from "effect";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { authMiddleware } from "@/lib/middleware";
 import { getUserOrganizationContext } from "@/query/organizations";
 
@@ -129,32 +127,41 @@ function SetupTeamPage() {
     <>
       <DashboardHeader>
         <BreadcrumbItem>
-          <BreadcrumbLink asChild title="Teams">
-            <Link params={{ organizationSlug }} to="/$organizationSlug">
-              Teams
-            </Link>
+          <BreadcrumbLink
+            title="Teams"
+            render={
+              <Link params={{ organizationSlug }} to="/$organizationSlug" />
+            }
+          >
+            Teams
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink asChild title={team.name}>
-            <Link
-              params={{ organizationSlug, teamId }}
-              to="/$organizationSlug/$teamId"
-            >
-              {team.name}
-            </Link>
+          <BreadcrumbLink
+            title={team.name}
+            render={
+              <Link
+                params={{ organizationSlug, teamId }}
+                to="/$organizationSlug/$teamId"
+              />
+            }
+          >
+            {team.name}
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink asChild title="Setup">
-            <Link
-              params={{ organizationSlug, teamId }}
-              to="/$organizationSlug/$teamId/setup"
-            >
-              Setup
-            </Link>
+          <BreadcrumbLink
+            title="Setup"
+            render={
+              <Link
+                params={{ organizationSlug, teamId }}
+                to="/$organizationSlug/$teamId/setup"
+              />
+            }
+          >
+            Setup
           </BreadcrumbLink>
         </BreadcrumbItem>
       </DashboardHeader>
@@ -171,69 +178,74 @@ function SetupTeamPage() {
             <CardTitle>Team Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form
-                className="space-y-6"
-                onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Team Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., U18s, Senior Men's A, Women's Team"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            <form
+              className="space-y-6"
+              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+            >
+              <Controller
+                control={form.control}
+                name="name"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="name">Team Name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="name"
+                      placeholder="e.g., U18s, Senior Men's A, Women's Team"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Brief description of the team..."
-                          rows={3}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <Controller
+                control={form.control}
+                name="description"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="description">
+                      Description (Optional)
+                    </FieldLabel>
+                    <Textarea
+                      {...field}
+                      id="description"
+                      placeholder="Brief description of the team..."
+                      rows={3}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <div className="flex gap-4 pt-4">
-                  <Button
-                    asChild
-                    className="flex-1"
-                    type="button"
-                    variant="outline"
-                  >
-                    <Link params={{ organizationSlug }} to="/$organizationSlug">
-                      Skip
-                    </Link>
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    disabled={updateTeamMutation.isPending}
-                    type="submit"
-                  >
-                    {updateTeamMutation.isPending
-                      ? "Creating..."
-                      : "Create Team"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+              <div className="flex gap-4 pt-4">
+                <Button
+                  className="flex-1"
+                  type="button"
+                  variant="outline"
+                  render={
+                    <Link
+                      params={{ organizationSlug }}
+                      to="/$organizationSlug"
+                    />
+                  }
+                >
+                  Skip
+                </Button>
+                <Button
+                  className="flex-1"
+                  disabled={updateTeamMutation.isPending}
+                  type="submit"
+                >
+                  {updateTeamMutation.isPending ? "Creating..." : "Create Team"}
+                </Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>

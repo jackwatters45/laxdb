@@ -1,20 +1,18 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Schema } from "effect";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Controller, useForm } from "react-hook-form";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 
 const registerSchema = Schema.Struct({
   name: Schema.String.pipe(
@@ -124,92 +122,109 @@ export function RegisterForm({
         </div>
       )}
 
-      <Form {...form}>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-        >
-          <FormField
-            control={form.control}
+      <form
+        className="space-y-4"
+        onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+      >
+        <FieldGroup>
+          <Controller
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="register-name">Full Name</FieldLabel>
+                <Input
+                  {...field}
+                  id="register-name"
+                  placeholder="John Doe"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="m@example.com" type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="register-email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  id="register-email"
+                  type="email"
+                  placeholder="m@example.com"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Create a password"
-                    type="password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
             control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Confirm your password"
-                    type="password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="register-password">Password</FieldLabel>
+                <Input
+                  {...field}
+                  id="register-password"
+                  type="password"
+                  placeholder="Create a password"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <Button
-            className="w-full"
-            disabled={isLoading}
-            type="submit"
-            variant={lastMethod === "email" ? "default" : "outline"}
-          >
-            <span className="flex items-center justify-center gap-2">
-              {isLoading ? "Creating Account..." : "Create Account with Email"}
-              {lastMethod === "email" && (
-                <Badge className="ml-2" variant="secondary">
-                  Last used
-                </Badge>
-              )}
-            </span>
-          </Button>
-        </form>
-      </Form>
+          <Controller
+            name="confirmPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="register-confirm-password">
+                  Confirm Password
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="register-confirm-password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </FieldGroup>
+
+        <Button
+          className="w-full"
+          disabled={isLoading}
+          type="submit"
+          variant={lastMethod === "email" ? "default" : "outline"}
+        >
+          <span className="flex items-center justify-center gap-2">
+            {isLoading ? "Creating Account..." : "Create Account with Email"}
+            {lastMethod === "email" && (
+              <Badge className="ml-2" variant="secondary">
+                Last used
+              </Badge>
+            )}
+          </span>
+        </Button>
+      </form>
 
       <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
         <span className="relative z-10 bg-background px-2 text-muted-foreground">

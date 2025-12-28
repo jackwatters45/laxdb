@@ -9,7 +9,13 @@ import { Mail, Plus, Settings, UserMinus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PageBody } from "@/components/layout/page-content";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -20,9 +26,14 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { authMiddleware } from "@/lib/middleware";
 import { TeamHeader } from "./-components/team-header";
@@ -41,62 +52,61 @@ const getTeamData = createServerFn({ method: "GET" })
       Effect.gen(function* () {
         const auth = yield* AuthService;
 
-        try {
-          const [membersResult, activeMemberResult] = yield* Effect.all(
-            [
-              Effect.tryPromise(() =>
-                auth.auth.api.listTeamMembers({
-                  query: { teamId },
-                  headers: context.headers,
-                }),
-              ).pipe(
-                Effect.mapError(
-                  (cause) =>
-                    new TeamOperationError({
-                      message: "Failed to retrieve team members",
-                      teamId,
-                      cause,
-                    }),
-                ),
+        const [membersResult, activeMemberResult] = yield* Effect.all(
+          [
+            Effect.tryPromise(() =>
+              auth.auth.api.listTeamMembers({
+                query: { teamId },
+                headers: context.headers,
+              }),
+            ).pipe(
+              Effect.mapError(
+                (cause) =>
+                  new TeamOperationError({
+                    message: "Failed to retrieve team members",
+                    teamId,
+                    cause,
+                  }),
               ),
-              Effect.tryPromise(() =>
-                auth.auth.api.getActiveMember({
-                  headers: context.headers,
-                }),
-              ).pipe(
-                Effect.mapError(
-                  (cause) =>
-                    new TeamOperationError({
-                      message: "Failed to retrieve active member",
-                      cause,
-                    }),
-                ),
+            ),
+            Effect.tryPromise(() =>
+              auth.auth.api.getActiveMember({
+                headers: context.headers,
+              }),
+            ).pipe(
+              Effect.mapError(
+                (cause) =>
+                  new TeamOperationError({
+                    message: "Failed to retrieve active member",
+                    cause,
+                  }),
               ),
-            ],
-            { concurrency: "unbounded" },
-          );
+            ),
+          ],
+          { concurrency: "unbounded" },
+        );
 
-          const members = membersResult || [];
-          const activeMember = activeMemberResult ?? null;
-          const canManageTeam =
-            activeMember?.role === "coach" ||
-            activeMember?.role === "headCoach";
+        const members = membersResult || [];
+        const activeMember = activeMemberResult ?? null;
+        const canManageTeam =
+          activeMember?.role === "coach" || activeMember?.role === "headCoach";
 
-          return {
+        return {
+          teamId,
+          members,
+          activeMember,
+          canManageTeam,
+        };
+      }).pipe(
+        Effect.catchAll(() =>
+          Effect.succeed({
             teamId,
-            members,
-            activeMember,
-            canManageTeam,
-          };
-        } catch {
-          return {
-            teamId,
-            members: [],
+            members: [] as never[],
             activeMember: null,
             canManageTeam: false,
-          };
-        }
-      }),
+          }),
+        ),
+      ),
     ),
   );
 
@@ -112,21 +122,16 @@ function TeamManagementPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load team details
     const loadTeamDetails = async () => {
-      try {
-        // For now, we'll need to get team name from the teams list
-        // In a real app, you'd have a getTeam(teamId) API
-        const teamsResult = await (authClient.organization as any).listTeams();
-        const team = teamsResult.data?.find(
-          (t: { id: string; name: string }) => t.id === teamId,
-        );
-        setTeamName(team?.name ?? "Unknown Team");
-      } catch {
-        setTeamName("Unknown Team");
-      } finally {
-        setLoading(false);
-      }
+      const teamsResult = await (authClient.organization as any)
+        .listTeams()
+        .catch(() => ({ data: null }));
+
+      const team = teamsResult.data?.find(
+        (t: { id: string; name: string }) => t.id === teamId,
+      );
+      setTeamName(team?.name ?? "Unknown Team");
+      setLoading(false);
     };
 
     loadTeamDetails();
@@ -294,18 +299,16 @@ function TeamMemberCard({
       return;
     }
 
-    try {
-      const { error } = await authClient.organization.removeMember({
+    const { error } = await authClient.organization
+      .removeMember({
         memberIdOrEmail: member.userId,
-      });
+      })
+      .catch(() => ({ error: { message: "Network error" } }));
 
-      if (error) {
-        toast.error("Failed to remove player. Please try again.");
-      } else {
-        window.location.reload(); // Simple refresh for now
-      }
-    } catch {
+    if (error) {
       toast.error("Failed to remove player. Please try again.");
+    } else {
+      window.location.reload();
     }
   };
 
@@ -382,25 +385,24 @@ function InvitePlayerDialog({
     }
 
     setLoading(true);
-    try {
-      const { error } = await authClient.organization.inviteMember({
+
+    const { error } = await authClient.organization
+      .inviteMember({
         email: email.trim(),
         role: "player",
         teamId,
-      });
+      })
+      .catch(() => ({ error: { message: "Network error" } }));
 
-      if (error) {
-        toast.error("Failed to send invitation. Please try again.");
-      } else {
-        setEmail("");
-        onClose();
-        toast.error("Invitation sent successfully!");
-      }
-    } catch {
+    if (error) {
       toast.error("Failed to send invitation. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      setEmail("");
+      onClose();
+      toast.success("Invitation sent successfully!");
     }
+
+    setLoading(false);
   };
 
   if (!open) {
@@ -413,15 +415,9 @@ function InvitePlayerDialog({
         <h2 className="mb-4 font-semibold text-xl">Invite Player to Team</h2>
 
         <form className="space-y-4" onSubmit={handleInvitePlayer}>
-          <div>
-            <label
-              className="mb-2 block font-medium text-sm"
-              htmlFor="playerEmail"
-            >
-              Player Email
-            </label>
-            <input
-              className="w-full rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+          <Field>
+            <FieldLabel htmlFor="playerEmail">Player Email</FieldLabel>
+            <Input
               id="playerEmail"
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -431,10 +427,10 @@ function InvitePlayerDialog({
               type="email"
               value={email}
             />
-            <p className="mt-1 text-muted-foreground text-xs">
+            <FieldDescription>
               They will receive an email invitation to join this team
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
 
           <div className="flex gap-3 pt-4">
             <Button
@@ -466,38 +462,47 @@ function Header() {
   return (
     <TeamHeader organizationSlug={organizationSlug} teamId={teamId}>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild className="max-w-full truncate" title="Teams">
-          <Link params={{ organizationSlug }} to="/$organizationSlug">
-            Teams
-          </Link>
+        <BreadcrumbLink
+          className="max-w-full truncate"
+          title="Teams"
+          render={
+            <Link params={{ organizationSlug }} to="/$organizationSlug" />
+          }
+        >
+          Teams
         </BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbDropdown>
-          <BreadcrumbLink asChild>
-            <Link
-              params={{ organizationSlug, teamId: activeTeam.id }}
-              to="/$organizationSlug/$teamId"
-            >
-              {activeTeam.name}
-            </Link>
+          <BreadcrumbLink
+            render={
+              <Link
+                params={{ organizationSlug, teamId: activeTeam.id }}
+                to="/$organizationSlug/$teamId"
+              />
+            }
+          >
+            {activeTeam.name}
           </BreadcrumbLink>
           <BreadcrumbDropdownTrigger />
           <BreadcrumbDropdownContent>
             <BreadcrumbDropdownLabel>Switch Team</BreadcrumbDropdownLabel>
             <BreadcrumbDropdownSeparator />
             {teams.map((team) => (
-              <BreadcrumbDropdownItem asChild key={team.id}>
-                <Link
-                  params={{
-                    organizationSlug,
-                    teamId: team.id,
-                  }}
-                  to="/$organizationSlug/$teamId"
-                >
-                  {team.name}
-                </Link>
+              <BreadcrumbDropdownItem
+                key={team.id}
+                render={
+                  <Link
+                    params={{
+                      organizationSlug,
+                      teamId: team.id,
+                    }}
+                    to="/$organizationSlug/$teamId"
+                  />
+                }
+              >
+                {team.name}
               </BreadcrumbDropdownItem>
             ))}
           </BreadcrumbDropdownContent>

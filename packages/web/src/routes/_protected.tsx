@@ -39,13 +39,13 @@ export const Route = createFileRoute("/_protected")({
   beforeLoad: async ({ location }) => {
     const sessionAndOrg = await getSessionAndOrg();
 
-    if (location.pathname === "/organizations/create") {
+    if (location.pathname === "/organization/create") {
       return sessionAndOrg;
     }
 
     // If no organization at all, redirect to create one
     if (!sessionAndOrg.activeOrganization) {
-      throw redirect({ to: "/organizations/create" });
+      throw redirect({ to: "/organization/create" });
     }
 
     return sessionAndOrg;

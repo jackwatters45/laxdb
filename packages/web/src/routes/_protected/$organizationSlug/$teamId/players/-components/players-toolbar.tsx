@@ -11,8 +11,8 @@ import {
   BulkEditToolbarRemoveAction,
   BulkEditToolbarSelection,
   BulkEditToolbarSeparator,
-} from "@/components/data-table/data-table-bulk-edit-toolbar";
-import { useDataTable } from "@/components/data-table/use-data-table";
+} from "@laxdb/ui/components/data-table/data-table-bulk-edit-toolbar";
+import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
 import { usePlayerMutations } from "../-mutations";
 
 const Route = createFileRoute(

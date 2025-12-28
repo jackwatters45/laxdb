@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageBody } from "@/components/layout/page-content";
 import { CreateOrganizationForm } from "@/components/organizations/create-form";
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
-import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@laxdb/ui/components/ui/breadcrumb";
 
 export const Route = createFileRoute(
   "/_protected/$organizationSlug/organization/create",
@@ -29,13 +32,16 @@ function Header() {
   return (
     <DashboardHeader>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title="Create Organization">
-          <Link
-            params={{ organizationSlug }}
-            to="/$organizationSlug/organization/create"
-          >
-            Create Organization
-          </Link>
+        <BreadcrumbLink
+          title="Create Organization"
+          render={
+            <Link
+              params={{ organizationSlug }}
+              to="/$organizationSlug/organization/create"
+            />
+          }
+        >
+          Create Organization
         </BreadcrumbLink>
       </BreadcrumbItem>
     </DashboardHeader>

@@ -6,30 +6,40 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PageBody } from "@/components/layout/page-content";
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
-import { BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
+import { Label } from "@laxdb/ui/components/ui/label";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@laxdb/ui/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from "@laxdb/ui/components/ui/select";
+import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { authMiddleware } from "@/lib/middleware";
 
 const FeedbackSchema = Schema.Struct({
@@ -44,7 +54,6 @@ const FeedbackSchema = Schema.Struct({
 
 type FeedbackFormValues = typeof FeedbackSchema.Type;
 
-// Server function for submitting feedback
 const submitFeedback = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator((data: FeedbackFormValues) =>
@@ -77,10 +86,9 @@ function FeedbackPage() {
     mutationFn: (data: FeedbackFormValues) => submitFeedback({ data }),
     onSuccess: () => {
       toast.success("Thank you for your feedback! We appreciate your input.");
-      // FIX: eventually just go back to previous page
       router.navigate({ href: "/teams" });
     },
-    onError: (_error) => {
+    onError: () => {
       toast.error(
         "There was an error submitting your feedback. Please try again.",
       );
@@ -111,26 +119,29 @@ function FeedbackPage() {
               </p>
             </CardHeader>
             <CardContent>
-              <Form {...form}>
-                <form
-                  className="space-y-6"
-                  onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-                >
-                  <FormField
-                    control={form.control}
+              <form
+                className="space-y-6"
+                onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+              >
+                <FieldGroup>
+                  <Controller
                     name="topic"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Topic</FormLabel>
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="feedback-topic">Topic</FieldLabel>
                         <Select
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a topic" />
-                            </SelectTrigger>
-                          </FormControl>
+                          <SelectTrigger
+                            id="feedback-topic"
+                            aria-invalid={fieldState.invalid}
+                          >
+                            <SelectValue>
+                              {(value) => value ?? "Select a topic"}
+                            </SelectValue>
+                          </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="feature-request">
                               Feature Request
@@ -150,86 +161,104 @@ function FeedbackPage() {
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
+                  <Controller
                     name="rating"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>Rating</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            className="flex flex-col"
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <FormItem className="flex items-center gap-3">
-                              <FormControl>
-                                <RadioGroupItem value="positive" />
-                              </FormControl>
-                              <FormLabel className="font-normal text-green-600">
-                                Positive - I&apos;m happy with this
-                                feature/experience
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center gap-3">
-                              <FormControl>
-                                <RadioGroupItem value="neutral" />
-                              </FormControl>
-                              <FormLabel className="font-normal text-yellow-600">
-                                Neutral - It&apos;s okay, but could be improved
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center gap-3">
-                              <FormControl>
-                                <RadioGroupItem value="negative" />
-                              </FormControl>
-                              <FormLabel className="font-normal text-red-600">
-                                Negative - I&apos;m frustrated or encountering
-                                issues
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
                     control={form.control}
-                    name="feedback"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Your Feedback</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="resize-none"
-                            placeholder="Tell us about your experience, suggestions, or any issues you've encountered..."
-                            rows={6}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel>Rating</FieldLabel>
+                        <RadioGroup
+                          className="flex flex-col gap-3"
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <div className="flex items-center gap-3">
+                            <RadioGroupItem
+                              value="positive"
+                              id="rating-positive"
+                            />
+                            <Label
+                              htmlFor="rating-positive"
+                              className="font-normal text-green-600"
+                            >
+                              Positive - I&apos;m happy with this
+                              feature/experience
+                            </Label>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <RadioGroupItem
+                              value="neutral"
+                              id="rating-neutral"
+                            />
+                            <Label
+                              htmlFor="rating-neutral"
+                              className="font-normal text-yellow-600"
+                            >
+                              Neutral - It&apos;s okay, but could be improved
+                            </Label>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <RadioGroupItem
+                              value="negative"
+                              id="rating-negative"
+                            />
+                            <Label
+                              htmlFor="rating-negative"
+                              className="font-normal text-red-600"
+                            >
+                              Negative - I&apos;m frustrated or encountering
+                              issues
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
                     )}
                   />
 
-                  <Button
-                    className="w-full"
-                    disabled={submitFeedbackMutation.isPending}
-                    type="submit"
-                  >
-                    {submitFeedbackMutation.isPending
-                      ? "Submitting..."
-                      : "Submit Feedback"}
-                  </Button>
-                </form>
-              </Form>
+                  <Controller
+                    name="feedback"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="feedback-text">
+                          Your Feedback
+                        </FieldLabel>
+                        <Textarea
+                          {...field}
+                          id="feedback-text"
+                          className="resize-none"
+                          placeholder="Tell us about your experience, suggestions, or any issues you've encountered..."
+                          rows={6}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </FieldGroup>
+
+                <Button
+                  className="w-full"
+                  disabled={submitFeedbackMutation.isPending}
+                  type="submit"
+                >
+                  {submitFeedbackMutation.isPending
+                    ? "Submitting..."
+                    : "Submit Feedback"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
@@ -244,10 +273,16 @@ function Header() {
   return (
     <DashboardHeader>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title="Feedback">
-          <Link params={{ organizationSlug }} to="/$organizationSlug/feedback">
-            Feedback
-          </Link>
+        <BreadcrumbLink
+          title="Feedback"
+          render={
+            <Link
+              params={{ organizationSlug }}
+              to="/$organizationSlug/feedback"
+            />
+          }
+        >
+          Feedback
         </BreadcrumbLink>
       </BreadcrumbItem>
     </DashboardHeader>

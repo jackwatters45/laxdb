@@ -16,7 +16,7 @@ import {
   SearchComboboxSeparator,
   SearchComboboxTrigger,
   useSearchCombobox,
-} from "@/components/ui/search-combobox";
+} from "@laxdb/ui/components/ui/search-combobox";
 import { getOrgPlayersQK } from "@/mutations/players";
 import { getOrganizationPlayers } from "@/query/players";
 

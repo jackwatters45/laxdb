@@ -9,7 +9,7 @@ import {
 import { Schema } from "effect";
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@laxdb/ui/components/data-table/data-table-column-header";
 import {
   RowActionDeleteItem,
   RowActionItem,
@@ -17,16 +17,16 @@ import {
   RowActionSeparator,
   RowActionsDropdown,
   RowActionsProvider,
-} from "@/components/data-table/data-table-row-actions";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ControlledInput } from "@/components/ui/input";
+} from "@laxdb/ui/components/data-table/data-table-row-actions";
+import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import { ControlledInput } from "@laxdb/ui/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@laxdb/ui/components/ui/select";
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
 import { usePlayerMutations } from "../-mutations";
 import { PlayerReplaceCombobox } from "./player-replace-combobox";
@@ -126,7 +126,7 @@ function PositionCell({ organizationId, teamId, player }: CellProps) {
       value={player.position ?? ""}
     >
       <SelectTrigger variant="data">
-        <SelectValue placeholder="Select position" />
+        <SelectValue>{(value) => value ?? "Select position"}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         {POSITION_SELECT_FIELDS.map((position) => (
@@ -189,12 +189,13 @@ function ActionsCell({
       row={row}
     >
       <RowActionsDropdown>
-        <Link
+        {/*TODO: uncomment */}
+        {/*<Link
           params={{ organizationSlug, teamId, playerId: player.publicId }}
           to="/$organizationSlug/$teamId/players/$playerId"
         >
           <RowActionItem icon={User2}>View</RowActionItem>
-        </Link>
+        </Link>*/}
         <RowActionSeparator />
         <RowActionRemoveItem
           alertDescription="Are you sure you want to remove this player from the team?"
@@ -230,13 +231,8 @@ export function createEditablePlayerColumns({
       header: ({ table }) => (
         <Checkbox
           aria-label="Select all"
-          checked={
-            table.getIsAllPageRowsSelected()
-              ? true
-              : table.getIsSomeRowsSelected()
-                ? "indeterminate"
-                : false
-          }
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomeRowsSelected()}
           className="translate-y-0.5"
           onCheckedChange={() => {
             table.toggleAllPageRowsSelected();

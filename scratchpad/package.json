@@ -5,7 +5,7 @@
   "scripts": {
     "start": "tsx",
     "test": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "format": "oxfmt ",
     "format:check": "bun run format -- --check",
     "fix": "oxlint --fix && oxfmt"

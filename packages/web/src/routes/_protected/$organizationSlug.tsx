@@ -7,7 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { Effect, Schema } from "effect";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@laxdb/ui/components/ui/sidebar";
 import { authMiddleware } from "@/lib/middleware";
 
 const GetDashboardDataSchema = Schema.Struct({
@@ -83,7 +83,7 @@ export const Route = createFileRoute("/_protected/$organizationSlug")({
     const activeOrganization = data.activeOrganization;
     if (!activeOrganization) {
       throw redirect({
-        to: "/organizations/create",
+        to: "/organization/create",
         search: {
           redirectUrl: location.pathname || "/teams",
         },

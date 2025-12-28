@@ -9,7 +9,7 @@ import {
   BreadcrumbDropdownTrigger,
   BreadcrumbItem,
   BreadcrumbLink,
-} from "../ui/breadcrumb";
+} from "@laxdb/ui/components/ui/breadcrumb";
 
 type TeamBasic = Pick<Team, "id" | "name">;
 
@@ -29,20 +29,25 @@ export function TeamBreadcrumbSwitcher({
   return (
     <BreadcrumbItem>
       <BreadcrumbDropdown>
-        <BreadcrumbLink asChild>
-          <Link
-            params={{ organizationSlug, teamId: activeTeam.id }}
-            to="/$organizationSlug/$teamId"
-          >
-            {activeTeam.name}
-          </Link>
+        <BreadcrumbLink
+          render={
+            <Link
+              params={{ organizationSlug, teamId: activeTeam.id }}
+              to="/$organizationSlug/$teamId"
+            />
+          }
+        >
+          {activeTeam.name}
         </BreadcrumbLink>
         <BreadcrumbDropdownTrigger />
         <BreadcrumbDropdownContent>
           <BreadcrumbDropdownLabel>Switch Team</BreadcrumbDropdownLabel>
           <BreadcrumbDropdownSeparator />
           {teams.map((team) => (
-            <BreadcrumbDropdownItem asChild key={team.id}>
+            <BreadcrumbDropdownItem
+              key={team.id}
+              // asChild
+            >
               {children({ team })}
             </BreadcrumbDropdownItem>
           ))}

@@ -6,20 +6,23 @@ import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { Effect, Schema } from "effect";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { PageContainer } from "../layout/page-content";
 
 const AcceptInvitationSchema = Schema.Struct({
@@ -102,34 +105,40 @@ export function JoinOrganizationForm({
           </p>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              className="space-y-6"
-              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-            >
-              <FormField
-                control={form.control}
+          <form
+            className="space-y-6"
+            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          >
+            <FieldGroup>
+              <Controller
                 name="invitationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Invitation Code</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your invitation code"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="invitation-code">
+                      Invitation Code
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="invitation-code"
+                      placeholder="Enter your invitation code"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldDescription>
                       This is usually a long string of letters and numbers
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
               />
+            </FieldGroup>
 
-              <div className="flex gap-4 pt-4">
-                {organizationSlug ? (
-                  <Button asChild type="button" variant="outline">
+            <div className="flex gap-4 pt-4">
+              {organizationSlug ? (
+                <Button
+                  render={
                     <Link
                       onClick={(e) => {
                         if (canGoBack) {
@@ -139,17 +148,19 @@ export function JoinOrganizationForm({
                       }}
                       params={{ organizationSlug }}
                       to="/$organizationSlug"
-                    >
-                      Cancel
-                    </Link>
-                  </Button>
-                ) : null}
-                <Button disabled={joinOrgMutation.isPending} type="submit">
-                  {joinOrgMutation.isPending ? "Joining..." : "Join Club"}
+                    />
+                  }
+                  type="button"
+                  variant="outline"
+                >
+                  Cancel
                 </Button>
-              </div>
-            </form>
-          </Form>
+              ) : null}
+              <Button disabled={joinOrgMutation.isPending} type="submit">
+                {joinOrgMutation.isPending ? "Joining..." : "Join Club"}
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </PageContainer>

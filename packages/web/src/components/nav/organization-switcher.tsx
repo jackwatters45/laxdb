@@ -7,10 +7,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@laxdb/ui/components/ui/dropdown-menu";
 import { useSwitchOrganization } from "@/mutations/organizations";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@laxdb/ui/components/ui/avatar";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@laxdb/ui/components/ui/sidebar";
 
 export function OrganizationSwitcher() {
   const router = useRouter();
@@ -24,27 +32,29 @@ export function OrganizationSwitcher() {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              size="lg"
-            >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  alt={activeOrganization.name ?? "No Organization"}
-                  src={activeOrganization.logo ?? undefined}
-                />
-                <AvatarFallback className="rounded-lg uppercase">
-                  {activeOrganization.name?.slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {activeOrganization?.name || "No Organization"}
-                </span>
-              </div>
-              <ChevronsUpDown className="ml-auto" />
-            </SidebarMenuButton>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                size="lg"
+              />
+            }
+          >
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarImage
+                alt={activeOrganization.name ?? "No Organization"}
+                src={activeOrganization.logo ?? undefined}
+              />
+              <AvatarFallback className="rounded-lg uppercase">
+                {activeOrganization.name?.slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">
+                {activeOrganization?.name || "No Organization"}
+              </span>
+            </div>
+            <ChevronsUpDown className="ml-auto" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
@@ -79,33 +89,37 @@ export function OrganizationSwitcher() {
               );
             })}
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link
-                className="flex items-center gap-2 p-2"
-                params={{ organizationSlug: activeOrganization.slug }}
-                to="/$organizationSlug/organization/create"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                  <Plus className="h-4" />
-                </div>
-                <div className="font-medium text-muted-foreground">
-                  Create Organization
-                </div>
-              </Link>
+            <DropdownMenuItem
+              render={
+                <Link
+                  className="flex items-center gap-2 p-2"
+                  params={{ organizationSlug: activeOrganization.slug }}
+                  to="/$organizationSlug/organization/create"
+                />
+              }
+            >
+              <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                <Plus className="h-4" />
+              </div>
+              <div className="font-medium text-muted-foreground">
+                Create Organization
+              </div>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                className="flex items-center gap-2 p-2"
-                params={{ organizationSlug: activeOrganization.slug }}
-                to="/$organizationSlug/organization/join"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                  <Plus className="h-4" />
-                </div>
-                <div className="font-medium text-muted-foreground">
-                  Join Organization
-                </div>
-              </Link>
+            <DropdownMenuItem
+              render={
+                <Link
+                  className="flex items-center gap-2 p-2"
+                  params={{ organizationSlug: activeOrganization.slug }}
+                  to="/$organizationSlug/organization/join"
+                />
+              }
+            >
+              <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                <Plus className="h-4" />
+              </div>
+              <div className="font-medium text-muted-foreground">
+                Join Organization
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

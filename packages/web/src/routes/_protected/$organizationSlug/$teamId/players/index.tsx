@@ -12,7 +12,7 @@ import {
   DataTableHeader,
   DataTableProvider,
   DataTableRoot,
-} from "@/components/data-table/data-table";
+} from "@laxdb/ui/components/data-table/data-table";
 import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbDropdown,
@@ -24,8 +24,8 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Tabs, TabsContent } from "@laxdb/ui/components/ui/tabs";
 import { authMiddleware } from "@/lib/middleware";
 import { getTeamPlayersQK } from "@/mutations/players";
 import { TeamHeader } from "../-components/team-header";
@@ -137,35 +137,44 @@ function Header() {
   return (
     <TeamHeader organizationSlug={organizationSlug} teamId={teamId}>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild className="max-w-full truncate" title="Teams">
-          <Link params={{ organizationSlug }} to="/$organizationSlug">
-            Teams
-          </Link>
+        <BreadcrumbLink
+          className="max-w-full truncate"
+          title="Teams"
+          render={
+            <Link params={{ organizationSlug }} to="/$organizationSlug" />
+          }
+        >
+          Teams
         </BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbDropdown>
-          <BreadcrumbLink asChild>
-            <Link
-              params={{ organizationSlug, teamId: activeTeam.id }}
-              to="/$organizationSlug/$teamId"
-            >
-              {activeTeam.name}
-            </Link>
+          <BreadcrumbLink
+            render={
+              <Link
+                params={{ organizationSlug, teamId: activeTeam.id }}
+                to="/$organizationSlug/$teamId"
+              />
+            }
+          >
+            {activeTeam.name}
           </BreadcrumbLink>
           <BreadcrumbDropdownTrigger />
           <BreadcrumbDropdownContent>
             <BreadcrumbDropdownLabel>Switch Team</BreadcrumbDropdownLabel>
             <BreadcrumbDropdownSeparator />
             {teams.map((team) => (
-              <BreadcrumbDropdownItem asChild key={team.id}>
-                <Link
-                  params={{ organizationSlug, teamId: team.id }}
-                  to="/$organizationSlug/$teamId/players"
-                >
-                  {team.name}
-                </Link>
+              <BreadcrumbDropdownItem
+                key={team.id}
+                render={
+                  <Link
+                    params={{ organizationSlug, teamId: team.id }}
+                    to="/$organizationSlug/$teamId/players"
+                  />
+                }
+              >
+                {team.name}
               </BreadcrumbDropdownItem>
             ))}
           </BreadcrumbDropdownContent>
@@ -173,13 +182,16 @@ function Header() {
       </BreadcrumbItem>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title="Players">
-          <Link
-            params={{ organizationSlug, teamId: activeTeam.id }}
-            to="/$organizationSlug/$teamId/players"
-          >
-            Players
-          </Link>
+        <BreadcrumbLink
+          title="Players"
+          render={
+            <Link
+              params={{ organizationSlug, teamId: activeTeam.id }}
+              to="/$organizationSlug/$teamId/players"
+            />
+          }
+        >
+          Players
         </BreadcrumbLink>
       </BreadcrumbItem>
     </TeamHeader>
