@@ -73,10 +73,13 @@ function TeamsOverviewPage() {
     <>
       <DashboardHeader>
         <BreadcrumbItem>
-          <BreadcrumbLink asChild title="Teams">
-            <Link params={{ organizationSlug }} to="/$organizationSlug">
-              Teams
-            </Link>
+          <BreadcrumbLink
+            title="Teams"
+            render={
+              <Link params={{ organizationSlug }} to="/$organizationSlug" />
+            }
+          >
+            Teams
           </BreadcrumbLink>
         </BreadcrumbItem>
       </DashboardHeader>
@@ -122,11 +125,9 @@ function TeamsOverviewPage() {
               Get started by creating your first team
             </p>
             {canManageTeams && (
-              <Button asChild>
-                <Link to="/organizations/create">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Your First Team
-                </Link>
+              <Button render={<Link to="/organization/create" />}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Team
               </Button>
             )}
           </div>
@@ -169,14 +170,16 @@ function TeamOverviewCard({
           {canManage && (
             <div className="flex gap-2">
               <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="text-destructive hover:text-destructive"
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      className="text-destructive hover:text-destructive"
+                      size="sm"
+                      variant="ghost"
+                    />
+                  }
+                >
+                  <Trash2 className="h-4 w-4" />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>

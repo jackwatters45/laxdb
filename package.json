@@ -27,6 +27,7 @@
     "@cloudflare/workers-types": "^4.20251221.0",
     "@effect/language-service": "^0.62.4",
     "@effect/vitest": "^0.27.0",
+    "@tanstack/react-table": "^8.21.3",
     "@tsconfig/bun": "^1.0.10",
     "@types/bun": "latest",
     "@types/node": "^24.10.4",
@@ -39,6 +40,7 @@
     "oxlint-tsgolint": "^0.10.0",
     "solid-js": "^1.9.10",
     "turbo": "^2.7.2",
+    "typescript": "^5.9.3",
     "vibe-rules": "^0.3.91",
     "vitest": "latest"
   },

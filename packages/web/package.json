@@ -15,6 +15,7 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
+    "@base-ui/react": "^1.0.0",
     "@cloudflare/vite-plugin": "^1.19.0",
     "@effect-atom/atom-react": "^0.3.4",
     "@effect/rpc": "^0.71.2",
@@ -37,6 +38,7 @@
     "react-hook-form": "^7.69.0",
     "react-hotkeys-hook": "^5.2.1",
     "shadcn": "^3.6.2",
+    "sonner": "^2.0.7",
     "use-debounce": "^10.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },

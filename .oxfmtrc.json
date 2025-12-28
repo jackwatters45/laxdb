@@ -10,5 +10,11 @@
   "experimental_sort_imports": {
     "order": "asc"
   },
-  "ignorePatterns": ["*.md"]
+  "ignorePatterns": ["*.md",
+    "node_modules/**",
+    "**/dist/**",
+    "**/*.gen.ts",
+    "**/migrations/**",
+    "bun.lock",
+  ]
 }

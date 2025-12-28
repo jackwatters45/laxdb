@@ -273,10 +273,16 @@ function Header() {
   return (
     <DashboardHeader>
       <BreadcrumbItem>
-        <BreadcrumbLink asChild title="Feedback">
-          <Link params={{ organizationSlug }} to="/$organizationSlug/feedback">
-            Feedback
-          </Link>
+        <BreadcrumbLink
+          title="Feedback"
+          render={
+            <Link
+              params={{ organizationSlug }}
+              to="/$organizationSlug/feedback"
+            />
+          }
+        >
+          Feedback
         </BreadcrumbLink>
       </BreadcrumbItem>
     </DashboardHeader>

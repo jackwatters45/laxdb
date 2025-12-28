@@ -1,7 +1,7 @@
-import { Atom } from "@effect-atom/atom-react";
-import { RpcClientLive } from "@laxdb/api/client";
+// import { Atom } from "@effect-atom/atom-react";
+// import { RpcClientLive } from "@laxdb/api/client";
 
-export const RuntimeAtom = Atom.runtime(RpcClientLive);
+// export const RuntimeAtom = Atom.runtime(RpcClientLive);
 
 // adding global layers
 // import { ConfigProvider, Layer } from "effect"

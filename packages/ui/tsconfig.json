@@ -13,6 +13,6 @@
       "@laxdb/ui/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../../types/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -20,8 +20,8 @@
     "types": ["@cloudflare/workers-types", "@types/node"],
     "plugins": [
       {
-        "name": "@effect/language-service",
-      },
-    ],
-  },
+        "name": "@effect/language-service"
+      }
+    ]
+  }
 }

@@ -26,9 +26,11 @@
   - [x] forms
 - [x] imports
 - [x] update agents file
-- [ ] errs
+- [x] errs
+- [x] get dev working
+- [ ] fix up types
+- [ ] rest of routes
 - [ ] deployment (vite)
-- [ ] get dev working
 - [ ] new package/routes to just work on features tbh
 
 ## Pressing things to eventually do..

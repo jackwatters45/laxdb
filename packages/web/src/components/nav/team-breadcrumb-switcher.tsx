@@ -44,7 +44,10 @@ export function TeamBreadcrumbSwitcher({
           <BreadcrumbDropdownLabel>Switch Team</BreadcrumbDropdownLabel>
           <BreadcrumbDropdownSeparator />
           {teams.map((team) => (
-            <BreadcrumbDropdownItem asChild key={team.id}>
+            <BreadcrumbDropdownItem
+              key={team.id}
+              // asChild
+            >
               {children({ team })}
             </BreadcrumbDropdownItem>
           ))}

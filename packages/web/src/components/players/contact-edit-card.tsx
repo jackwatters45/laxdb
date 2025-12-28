@@ -1,6 +1,6 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
-import { createContext, useContext } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import { createContext, useContext, useMemo } from "react";
+import type { Control, FieldValues, UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -11,34 +11,39 @@ import {
   SOCIAL_PLATFORM_CONFIG,
 } from "@laxdb/ui/components/social-icons";
 
-type ContactEditCardContextType<T extends FieldValues = FieldValues> = {
-  form: UseFormReturn<T>;
-  name: keyof T;
+type ContactEditCardContextValue = {
+  control: Control<FieldValues>;
+  name: string;
   label: string;
-  prefix?: string | undefined;
+  prefix: string | undefined;
 };
 
-const ContactEditCardContext = createContext<ContactEditCardContextType | null>(
-  null,
-);
+const ContactEditCardContext =
+  createContext<ContactEditCardContextValue | null>(null);
 
-function useContactEditCard<T extends FieldValues = FieldValues>() {
+function useContactEditCard(): ContactEditCardContextValue {
   const context = useContext(ContactEditCardContext);
   if (!context) {
     throw new Error(
       "ContactEditCard components must be used within ContactEditCard",
     );
   }
-  return context as ContactEditCardContextType<T>;
+  return context;
 }
 
-type ContactEditCardProps<T extends FieldValues = FieldValues> = {
+type ContactEditCardProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T>;
-  name: keyof T;
+  name: string;
   label: string;
   prefix?: string;
 };
+
+function eraseControlType<T extends FieldValues>(
+  control: Control<T>,
+): Control<FieldValues> {
+  return control as unknown as Control<FieldValues>;
+}
 
 function ContactEditCard<T extends FieldValues>({
   children,
@@ -47,24 +52,34 @@ function ContactEditCard<T extends FieldValues>({
   label,
   prefix,
 }: ContactEditCardProps<T>) {
+  const value = useMemo(
+    (): ContactEditCardContextValue => ({
+      control: eraseControlType(form.control),
+      name,
+      label,
+      prefix,
+    }),
+    [form.control, name, label, prefix],
+  );
+
   return (
-    <ContactEditCardContext.Provider value={{ form, name, label, prefix }}>
+    <ContactEditCardContext.Provider value={value}>
       {children}
     </ContactEditCardContext.Provider>
   );
 }
 
 function ContactEditCardField() {
-  const { form, name, prefix, label } = useContactEditCard();
+  const { control, name, prefix, label } = useContactEditCard();
 
   return (
     <Controller
-      control={form.control}
-      name={name as string}
+      control={control}
+      name={name}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel
-            htmlFor={`contact-${String(name)}`}
+            htmlFor={`contact-${name}`}
             className="font-medium text-muted-foreground text-xs"
           >
             {label}
@@ -73,7 +88,7 @@ function ContactEditCardField() {
             field={field}
             icon={null}
             prefix={prefix}
-            id={`contact-${String(name)}`}
+            id={`contact-${name}`}
             isInvalid={fieldState.invalid}
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -148,16 +163,16 @@ type ContactEditCardIconProps = {
 };
 
 function ContactEditCardIcon({ children }: ContactEditCardIconProps) {
-  const { form, name, prefix, label } = useContactEditCard();
+  const { control, name, prefix, label } = useContactEditCard();
 
   return (
     <Controller
-      control={form.control}
-      name={name as string}
+      control={control}
+      name={name}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel
-            htmlFor={`contact-${String(name)}`}
+            htmlFor={`contact-${name}`}
             className="font-medium text-muted-foreground text-xs"
           >
             {label}
@@ -166,7 +181,7 @@ function ContactEditCardIcon({ children }: ContactEditCardIconProps) {
             field={field}
             icon={children}
             prefix={prefix}
-            id={`contact-${String(name)}`}
+            id={`contact-${name}`}
             isInvalid={fieldState.invalid}
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -184,7 +199,7 @@ export function EmailEditCard<T extends FieldValues>({
   form,
 }: EmailEditCardProps<T>) {
   return (
-    <ContactEditCard form={form} label="Email" name={"email" as keyof T}>
+    <ContactEditCard form={form} label="Email" name="email">
       <ContactEditCardIcon>
         <Mail className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>
@@ -200,7 +215,7 @@ export function PhoneEditCard<T extends FieldValues>({
   form,
 }: PhoneEditCardProps<T>) {
   return (
-    <ContactEditCard form={form} label="Phone" name={"phone" as keyof T}>
+    <ContactEditCard form={form} label="Phone" name="phone">
       <ContactEditCardIcon>
         <Phone className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>
@@ -219,7 +234,7 @@ export function FacebookEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="Facebook"
-      name={"facebook" as keyof T}
+      name={"facebook"}
       prefix={SOCIAL_PLATFORM_CONFIG.facebook.prefix}
     >
       <ContactEditCardIcon>
@@ -240,7 +255,7 @@ export function InstagramEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="Instagram"
-      name={"instagram" as keyof T}
+      name={"instagram"}
       prefix={SOCIAL_PLATFORM_CONFIG.instagram.prefix}
     >
       <ContactEditCardIcon>
@@ -261,7 +276,7 @@ export function WhatsAppEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="WhatsApp"
-      name={"whatsapp" as keyof T}
+      name={"whatsapp"}
       prefix={SOCIAL_PLATFORM_CONFIG.whatsapp.prefix}
     >
       <ContactEditCardIcon>
@@ -282,7 +297,7 @@ export function GroupMeEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="GroupMe"
-      name={"groupme" as keyof T}
+      name={"groupme"}
       prefix={SOCIAL_PLATFORM_CONFIG.groupme.prefix}
     >
       <ContactEditCardIcon>
@@ -303,7 +318,7 @@ export function LinkedInEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="LinkedIn"
-      name={"linkedin" as keyof T}
+      name={"linkedin"}
       prefix={SOCIAL_PLATFORM_CONFIG.linkedin.prefix}
     >
       <ContactEditCardIcon>
@@ -324,7 +339,7 @@ export function EmergencyContactNameEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="Emergency Contact Name"
-      name={"emergencyContactName" as keyof T}
+      name={"emergencyContactName"}
     >
       <ContactEditCardIcon>
         <Phone className="h-4 w-4 text-muted-foreground" />
@@ -344,7 +359,7 @@ export function EmergencyContactPhoneEditCard<T extends FieldValues>({
     <ContactEditCard
       form={form}
       label="Emergency Contact Phone"
-      name={"emergencyContactPhone" as keyof T}
+      name={"emergencyContactPhone"}
     >
       <ContactEditCardIcon>
         <Phone className="h-4 w-4 text-muted-foreground" />

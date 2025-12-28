@@ -141,75 +141,32 @@ export function SearchCommand() {
     }
   });
 
-  useHotkeys("meta+shift+p", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/players",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
+  // useHotkeys("meta+shift+p", () => {
+  //   if (activeOrganization) {
+  //     navigate({
+  //       to: "/$organizationSlug/players",
+  //       params: { organizationSlug: activeOrganization.slug },
+  //     });
+  //   }
+  // });
 
-  useHotkeys("meta+shift+g", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/games",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
+  // useHotkeys("meta+shift+g", () => {
+  //   if (activeOrganization) {
+  //     navigate({
+  //       to: "/$organizationSlug/games",
+  //       params: { organizationSlug: activeOrganization.slug },
+  //     });
+  //   }
+  // });
 
-  useHotkeys("meta+shift+b", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/playbook",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
-
-  useHotkeys("meta+shift+r", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/practice",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
-
-  useHotkeys("meta+shift+v", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/film",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
-
-  useHotkeys("meta+shift+s", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/scouting",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
-
-  useHotkeys("meta+shift+comma", () => {
-    if (activeOrganization) {
-      navigate({
-        to: "/$organizationSlug/settings/general",
-        params: { organizationSlug: activeOrganization.slug },
-      });
-    }
-  });
-
-  useHotkeys("meta+shift+l", () => {
-    navigate({
-      to: "/$organizationSlug/plan",
-      params: { organizationSlug: activeOrganization.slug },
-    });
-  });
+  // useHotkeys("meta+shift+comma", () => {
+  //   if (activeOrganization) {
+  //     navigate({
+  //       to: "/$organizationSlug/settings/general",
+  //       params: { organizationSlug: activeOrganization.slug },
+  //     });
+  //   }
+  // });
 
   useHotkeys("meta+shift+e", () => {
     navigate({

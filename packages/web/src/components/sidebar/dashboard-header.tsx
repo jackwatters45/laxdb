@@ -41,14 +41,6 @@ export function DashboardHeader({ children }: { children: React.ReactNode }) {
       <div className="flex items-center gap-2">
         <Link
           params={{ organizationSlug: activeOrganization.slug }}
-          to="/$organizationSlug/plan"
-        >
-          <Button size={"sm"} variant="outline">
-            Plan
-          </Button>
-        </Link>
-        <Link
-          params={{ organizationSlug: activeOrganization.slug }}
           to="/$organizationSlug/feedback"
         >
           <Button size={"sm"} variant="outline">

@@ -44,8 +44,7 @@
     "**/dist/**",
     "**/*.gen.ts",
     "**/migrations/**",
+    "bun.lock",
     "**/tests/**",
-    "**/infra/**",
-    "bun.lock"
   ]
 }

@@ -83,7 +83,7 @@ export const Route = createFileRoute("/_protected/$organizationSlug")({
     const activeOrganization = data.activeOrganization;
     if (!activeOrganization) {
       throw redirect({
-        to: "/organizations/create",
+        to: "/organization/create",
         search: {
           redirectUrl: location.pathname || "/teams",
         },
