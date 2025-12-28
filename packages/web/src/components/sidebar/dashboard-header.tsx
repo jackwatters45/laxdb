@@ -8,16 +8,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
+import { SidebarTrigger } from "@laxdb/ui/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@laxdb/ui/components/ui/tooltip";
 import { NavUserHeader } from "../nav/nav-user";
 
 export function DashboardHeader({ children }: { children: React.ReactNode }) {

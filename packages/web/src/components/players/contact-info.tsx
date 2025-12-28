@@ -23,7 +23,7 @@ import {
   PhoneEditCard,
   WhatsAppEditCard,
 } from "@/components/players/contact-edit-card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Empty,
   EmptyContent,
@@ -31,8 +31,8 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import { Form } from "@/components/ui/form";
+} from "@laxdb/ui/components/ui/empty";
+import { Form } from "@laxdb/ui/components/ui/form";
 
 type ContactInfoCardWrapperProps = {
   children: React.ReactNode;

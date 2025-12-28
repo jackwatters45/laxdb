@@ -7,18 +7,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@laxdb/ui/components/ui/dropdown-menu";
 import { useSwitchOrganization } from "@/mutations/organizations";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../../../ui/src/components/ui/avatar";
+} from "@laxdb/ui/components/ui/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../../../../ui/src/components/ui/sidebar";
+} from "@laxdb/ui/components/ui/sidebar";
 
 export function OrganizationSwitcher() {
   const router = useRouter();

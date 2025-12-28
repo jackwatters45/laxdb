@@ -1,9 +1,21 @@
 import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import {
+  ChevronRightIcon,
+  ChevronsUpDownIcon,
+  MoreHorizontalIcon,
+} from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
+import { cn } from "@laxdb/ui/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@laxdb/ui/components/ui/dropdown-menu";
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -111,6 +123,54 @@ function BreadcrumbEllipsis({
   );
 }
 
+function BreadcrumbDropdown({
+  ...props
+}: React.ComponentProps<typeof DropdownMenu>) {
+  return <DropdownMenu {...props} />;
+}
+
+function BreadcrumbDropdownTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuTrigger>) {
+  return (
+    <DropdownMenuTrigger
+      className={cn(
+        "flex items-center gap-1 p-0.5 transition-colors hover:text-foreground",
+        className,
+      )}
+      {...props}
+    >
+      {children ?? <ChevronsUpDownIcon className="size-3" />}
+    </DropdownMenuTrigger>
+  );
+}
+
+function BreadcrumbDropdownContent({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuContent>) {
+  return <DropdownMenuContent {...props} />;
+}
+
+function BreadcrumbDropdownItem({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuItem>) {
+  return <DropdownMenuItem {...props} />;
+}
+
+function BreadcrumbDropdownLabel({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuLabel>) {
+  return <DropdownMenuLabel {...props} />;
+}
+
+function BreadcrumbDropdownSeparator({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuSeparator>) {
+  return <DropdownMenuSeparator {...props} />;
+}
+
 export {
   Breadcrumb,
   BreadcrumbList,
@@ -119,4 +179,10 @@ export {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
+  BreadcrumbDropdown,
+  BreadcrumbDropdownTrigger,
+  BreadcrumbDropdownContent,
+  BreadcrumbDropdownItem,
+  BreadcrumbDropdownLabel,
+  BreadcrumbDropdownSeparator,
 };

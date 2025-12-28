@@ -1,30 +1,26 @@
 "use client";
 
-import {
-  RiAddLine,
-  RiArrowDownSLine,
-  RiCornerDownRightLine,
-} from "@remixicon/react";
 import type { Column } from "@tanstack/react-table";
+import { ChevronDown, CornerDownRight, Plus } from "lucide-react";
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Label } from "@laxdb/ui/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@laxdb/ui/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { focusRing } from "@/lib/tw";
-import { cn } from "@/lib/utils";
+} from "@laxdb/ui/components/ui/select";
+import { focusRing } from "@laxdb/ui/lib/tw";
+import { cn } from "@laxdb/ui/lib/utils";
 import { useFilterBar } from "./use-filterbar";
 
 export type ConditionFilter = {
@@ -184,7 +180,7 @@ function FilterSelect<TData, TValue>({
             }
           }}
         >
-          <RiAddLine
+          <Plus
             aria-hidden="true"
             className={cn(
               "-ml-px size-5 shrink-0 transition sm:size-4",
@@ -204,7 +200,7 @@ function FilterSelect<TData, TValue>({
           className="w-full text-left sm:w-fit"
           columnFilterLabels={columnFilterLabels}
         />
-        <RiArrowDownSLine
+        <ChevronDown
           aria-hidden="true"
           className="size-5 shrink-0 text-muted-foreground sm:size-4"
         />
@@ -239,7 +235,7 @@ function FilterSelect<TData, TValue>({
                 value={selectedValues}
               >
                 <SelectTrigger className="mt-2 sm:py-1">
-                  <SelectValue placeholder="Select" />
+                  <SelectValue>{(value) => value ?? "Select"}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {options.map((item) => (
@@ -320,7 +316,7 @@ function FilterCheckbox<TData, TValue>({
             }
           }}
         >
-          <RiAddLine
+          <Plus
             aria-hidden="true"
             className={cn(
               "-ml-px size-5 shrink-0 transition sm:size-4",
@@ -342,7 +338,7 @@ function FilterCheckbox<TData, TValue>({
           className="w-full text-left sm:w-fit"
           columnFilterLabels={columnFilterLabels}
         />
-        <RiArrowDownSLine
+        <ChevronDown
           aria-hidden="true"
           className="size-5 shrink-0 text-muted-foreground sm:size-4"
         />
@@ -489,7 +485,7 @@ function FilterNumber<TData, TValue>({
             }
           }}
         >
-          <RiAddLine
+          <Plus
             aria-hidden="true"
             className={cn(
               "-ml-px size-5 shrink-0 transition sm:size-4",
@@ -511,7 +507,7 @@ function FilterNumber<TData, TValue>({
           className="w-full text-left sm:w-fit"
           columnFilterLabels={columnFilterLabels}
         />
-        <RiArrowDownSLine
+        <ChevronDown
           aria-hidden="true"
           className="size-5 shrink-0 text-muted-foreground sm:size-4"
         />
@@ -551,7 +547,7 @@ function FilterNumber<TData, TValue>({
                   value={selectedValues?.condition}
                 >
                   <SelectTrigger className="mt-2 sm:py-1">
-                    <SelectValue placeholder="Select condition" />
+                    <SelectValue>{(value) => value ?? "Select condition"}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {options.map((item) => (
@@ -563,7 +559,7 @@ function FilterNumber<TData, TValue>({
                 </Select>
 
                 <div className="flex w-full items-center gap-2">
-                  <RiCornerDownRightLine
+                  <CornerDownRight
                     aria-hidden="true"
                     className="size-4 shrink-0 text-muted-foreground"
                   />

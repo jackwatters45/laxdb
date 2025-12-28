@@ -1,13 +1,18 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"],
-  "types": ["../../types/env.d.ts"],
   "compilerOptions": {
     "exactOptionalPropertyTypes": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@laxdb/ui/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }

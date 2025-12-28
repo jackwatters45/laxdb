@@ -7,10 +7,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@laxdb/ui/components/ui/form";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { InstagramIcon, SOCIAL_PLATFORM_CONFIG } from "../social-icons";
-import { SiFacebook } from "@icons-pack/react-simple-icons";
 
 type ContactEditCardContextType<T extends FieldValues = any> = {
   form: UseFormReturn<T>;

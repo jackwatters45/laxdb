@@ -15,10 +15,14 @@
 - [x] deployment (infisical)
 - [x] remove old aws
 - [ ] ui - package
-  - [ ] fix errors
-  - [ ] imports
-  - [ ] add cmd
-  - [ ] tailwind - font
+  - [x] fix errors
+  - [x] imports
+  - [x] breadcrumb
+  - [x] alert dialog cancel
+  - [x] switch out rest of icons
+  - [x] select placeholder
+  - [x] tailwind - fix font family in tw config
+  - [x] add cmd (bunx --bun @shadcn add )
   - [ ] forms
   - [ ] errs
 - [ ] imports

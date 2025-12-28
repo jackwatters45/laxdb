@@ -2,8 +2,8 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Schema } from "effect";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Form,
   FormControl,
@@ -11,10 +11,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@laxdb/ui/components/ui/form";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 
 const registerSchema = Schema.Struct({
   name: Schema.String.pipe(

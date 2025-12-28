@@ -15,8 +15,8 @@ const config: Config = {
       },
     },
     fontFamily: {
-      sans: ["Helectiva", "sans-serif"],
-      inter: ["Inter", "sans-serif"],
+      sans: ["DM Sans Variable", "DM Sans", "sans-serif"],
+      helectiva: ["Helectiva", "sans-serif"],
       serif: ["Newsreader", "serif"],
       mono: ["Newsreader", "serif"],
     },

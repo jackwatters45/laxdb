@@ -1,18 +1,17 @@
-import { RiEqualizer2Line } from "@remixicon/react";
 import type { Table } from "@tanstack/react-table";
-import { Grid2X2, List } from "lucide-react";
+import { Grid2X2, List, SlidersHorizontal } from "lucide-react";
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import { Label } from "@laxdb/ui/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { ButtonGroup } from "../ui/button-group";
-import { TabsList, TabsTrigger } from "../ui/tabs";
+} from "@laxdb/ui/components/ui/popover";
+import { cn } from "@laxdb/ui/lib/utils";
+import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
+import { TabsList, TabsTrigger } from "@laxdb/ui/components/ui/tabs";
 import {
   type FilterBarActions,
   FilterBarContext,
@@ -96,15 +95,17 @@ function FilterBarViewOptions() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          // className="ml-auto flex h-7 gap-x-2 text-sm sm:text-xs"
-        >
-          <RiEqualizer2Line aria-hidden="true" className="size-4" />
-          View
-        </Button>
+      <PopoverTrigger
+        render={
+          <Button
+            size="sm"
+            variant="outline"
+            // className="ml-auto flex h-7 gap-x-2 text-sm sm:text-xs"
+          />
+        }
+      >
+        <SlidersHorizontal aria-hidden="true" className="size-4" />
+        View
       </PopoverTrigger>
       <PopoverContent
         align="end"

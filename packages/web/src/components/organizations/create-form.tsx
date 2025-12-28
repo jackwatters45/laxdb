@@ -9,8 +9,13 @@ import { Effect, Schema } from "effect";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-content";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
 import {
   Form,
   FormControl,
@@ -19,8 +24,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@laxdb/ui/components/ui/form";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { authMiddleware } from "@/lib/middleware";
 
 const createOrganization = createServerFn({ method: "POST" })

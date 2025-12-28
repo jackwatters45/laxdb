@@ -1,7 +1,7 @@
-import { RiArrowDownSLine, RiArrowUpSLine } from "@remixicon/react";
 import type { Column } from "@tanstack/react-table";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 
 type DataTableColumnHeaderProps<TData, TValue> =
   React.HTMLAttributes<HTMLButtonElement> & {
@@ -46,14 +46,14 @@ export function DataTableColumnHeader<TData, TValue>({
       <span>{title}</span>
       {column.getCanSort() ? (
         <div className="-space-y-2">
-          <RiArrowUpSLine
+          <ChevronUp
             aria-hidden="true"
             className={cn(
               "size-3.5 text-foreground",
               column.getIsSorted() === "desc" ? "opacity-30" : "",
             )}
           />
-          <RiArrowDownSLine
+          <ChevronDown
             aria-hidden="true"
             className={cn(
               "size-3.5 text-foreground",

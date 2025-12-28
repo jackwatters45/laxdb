@@ -1,13 +1,13 @@
 import { Link, useMatchRoute, useRouteContext } from "@tanstack/react-router";
 import { Settings, Trophy, User, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../../../../ui/src/components/ui/sidebar";
+} from "@laxdb/ui/components/ui/sidebar";
 
 export function MainNav() {
   const routeMatch = useMatchRoute();

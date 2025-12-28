@@ -3,8 +3,8 @@ import { redirect } from "@tanstack/react-router";
 import { Schema } from "effect";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,10 +12,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@laxdb/ui/components/ui/form";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 
 const LoginSchema = Schema.Struct({
   email: Schema.String.pipe(

@@ -6,9 +6,9 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import { OrganizationSwitcher } from "@/nav/organization-switcher";
-import { SearchCommand } from "@/nav/search-command";
+} from "@laxdb/ui/components/ui/sidebar";
+import { OrganizationSwitcher } from "@/components/nav/organization-switcher";
+import { SearchCommand } from "@/components/nav/search-command";
 import { MainNav } from "./main-nav";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

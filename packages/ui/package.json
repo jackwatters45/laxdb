@@ -6,12 +6,22 @@
   "exports": {
     "./globals.css": "./src/styles/globals.css",
     "./postcss.config": "./postcss.config.mjs",
-    "./lib/*": "./src/lib/*.ts",
-    "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./lib/*": {
+      "types": "./dist/lib/*.d.ts",
+      "default": "./src/lib/*.ts"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "default": "./src/components/*.tsx"
+    },
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "default": "./src/hooks/*.tsx"
+    }
   },
   "scripts": {
-    "typecheck": "tsgo --noEmit",
+    "build": "tsgo --build",
+    "typecheck": "tsgo --build",
     "lint": "oxlint --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"

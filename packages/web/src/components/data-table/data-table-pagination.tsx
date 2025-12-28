@@ -1,19 +1,19 @@
-import {
-  RiArrowLeftDoubleLine,
-  RiArrowLeftSLine,
-  RiArrowRightDoubleLine,
-  RiArrowRightSLine,
-} from "@remixicon/react";
 import type { Table } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+} from "@laxdb/ui/components/ui/select";
+import { cn } from "@laxdb/ui/lib/utils";
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>;
@@ -41,7 +41,7 @@ function PaginationPageSizeSelect<TData>({ table }: { table: Table<TData> }) {
         value={`${table.getState().pagination.pageSize}`}
       >
         <SelectTrigger className="h-7 w-[70px]">
-          <SelectValue placeholder={table.getState().pagination.pageSize} />
+          <SelectValue />
         </SelectTrigger>
         <SelectContent side="top">
           {[10, 25, 50, 75, 100].map((pageSize) => (
@@ -76,7 +76,7 @@ function PaginationInfo<TData>({ table }: { table: Table<TData> }) {
 function PaginationControls<TData>({ table }: { table: Table<TData> }) {
   const paginationButtons = [
     {
-      icon: RiArrowLeftDoubleLine,
+      icon: ChevronsLeft,
       onClick: () => {
         table.setPageIndex(0);
       },
@@ -85,7 +85,7 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
       mobileView: "hidden sm:block",
     },
     {
-      icon: RiArrowLeftSLine,
+      icon: ChevronLeft,
       onClick: () => {
         table.previousPage();
       },
@@ -94,7 +94,7 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
       mobileView: "",
     },
     {
-      icon: RiArrowRightSLine,
+      icon: ChevronRight,
       onClick: () => {
         table.nextPage();
       },
@@ -103,7 +103,7 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
       mobileView: "",
     },
     {
-      icon: RiArrowRightDoubleLine,
+      icon: ChevronsRight,
       onClick: () => {
         table.setPageIndex(table.getPageCount() - 1);
       },

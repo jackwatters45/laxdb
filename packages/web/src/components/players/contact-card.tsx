@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 import { createContext, useContext } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@laxdb/ui/components/ui/tooltip";
 import { InstagramIcon } from "../social-icons";
 import {
   Item,
@@ -23,8 +23,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "../../../../ui/src/components/ui/item";
-import { SiFacebook } from "@icons-pack/react-simple-icons";
+} from "@laxdb/ui/components/ui/item";
 
 type ContactCardContextType = {
   label: string;
@@ -153,23 +152,25 @@ function ContactCardActions() {
         </Tooltip>
         {href && (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                render={
-                  <a
-                    href={href}
-                    {...(href.startsWith("http") && {
-                      rel: "noreferrer",
-                      target: "_blank",
-                    })}
-                  />
-                }
-                className="h-6 w-6 p-0"
-                size="sm"
-                variant="ghost"
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
+            <TooltipTrigger
+              render={
+                <Button
+                  render={
+                    <a
+                      href={href}
+                      {...(href.startsWith("http") && {
+                        rel: "noreferrer",
+                        target: "_blank",
+                      })}
+                    />
+                  }
+                  className="h-6 w-6 p-0"
+                  size="sm"
+                  variant="ghost"
+                />
+              }
+            >
+              <ExternalLink className="h-3 w-3" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Open link</p>

@@ -13,17 +13,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+} from "@laxdb/ui/components/ui/alert-dialog";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+} from "@laxdb/ui/components/ui/tooltip";
+import { cn } from "@laxdb/ui/lib/utils";
 
 type BulkEditActions = {
   onRemove?: () => void;

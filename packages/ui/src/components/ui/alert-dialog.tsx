@@ -1,8 +1,8 @@
 import * as React from "react";
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@laxdb/ui/lib/utils";
+import { Button } from "@laxdb/ui/components/ui/button";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
@@ -158,7 +158,7 @@ function AlertDialogCancel({
   size = "default",
   ...props
 }: AlertDialogPrimitive.Close.Props &
-  Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
+  Partial<Pick<React.ComponentProps<typeof Button>, "variant" | "size">>) {
   return (
     <AlertDialogPrimitive.Close
       data-slot="alert-dialog-cancel"

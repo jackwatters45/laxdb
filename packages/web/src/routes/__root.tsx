@@ -11,8 +11,8 @@ import { lazy, Suspense } from "react";
 import type * as React from "react";
 import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
 import { NotFound } from "@/components/not-found";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
+import { Toaster } from "@laxdb/ui/components/ui/sonner";
 import globalsCss from "@/globals.css?url";
 import { seo } from "@/lib/seo";
 

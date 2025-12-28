@@ -1,7 +1,6 @@
-import type { RemixiconComponentType } from "@remixicon/react";
-import { RiDeleteBinLine, RiEdit2Line, RiMoreFill } from "@remixicon/react";
 import type { Row } from "@tanstack/react-table";
-import { UserMinus } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, UserMinus } from "lucide-react";
 import * as React from "react";
 import {
   AlertDialog,
@@ -13,16 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@laxdb/ui/components/ui/alert-dialog";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from "@laxdb/ui/components/ui/dropdown-menu";
+import { cn } from "@laxdb/ui/lib/utils";
 import type { ClassNameChildrenProp } from "@/types";
 
 type RowActions<TData = unknown> = {
@@ -82,19 +81,21 @@ type RowActionsDropdownProps = {
 function RowActionsDropdown({ children, className }: RowActionsDropdownProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className={cn(
-            "group aspect-square p-1.5 hover:border hover:border-border data-[state=open]:border-border data-[state=open]:bg-muted",
-            className,
-          )}
-          variant="ghost"
-        >
-          <RiMoreFill
-            aria-hidden="true"
-            className="size-4 shrink-0 text-muted-foreground group-hover:text-foreground group-data-[state=open]:text-foreground"
+      <DropdownMenuTrigger
+        render={
+          <Button
+            className={cn(
+              "group aspect-square p-1.5 hover:border hover:border-border data-[state=open]:border-border data-[state=open]:bg-muted",
+              className,
+            )}
+            variant="ghost"
           />
-        </Button>
+        }
+      >
+        <MoreHorizontal
+          aria-hidden="true"
+          className="size-4 shrink-0 text-muted-foreground group-hover:text-foreground group-data-[state=open]:text-foreground"
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-40">
         {children}
@@ -104,7 +105,7 @@ function RowActionsDropdown({ children, className }: RowActionsDropdownProps) {
 }
 
 type RowActionItemProps = {
-  icon?: RemixiconComponentType;
+  icon?: LucideIcon;
   children: React.ReactNode;
   onClick?: (() => void) | undefined;
   variant?: "default" | "destructive";
@@ -145,7 +146,7 @@ function RowActionEditItem({ className, children }: ClassNameChildrenProp) {
   return (
     <RowActionItem
       className={className}
-      icon={RiEdit2Line}
+      icon={Pencil}
       onClick={() => actions.onEdit?.(row)}
     >
       {children}
@@ -168,7 +169,7 @@ function RowActionDeleteItem({
   return (
     <RowActionAlertItem
       {...props}
-      icon={RiDeleteBinLine}
+      icon={Trash2}
       onClick={() => actions.onDelete?.(row)}
       variant="destructive"
     >
@@ -202,7 +203,7 @@ function RowActionRemoveItem({
 }
 
 type RowActionAlertItemProps = {
-  icon?: RemixiconComponentType;
+  icon?: LucideIcon;
   children: React.ReactNode;
   onClick?: () => void;
   variant?: "default" | "destructive";
@@ -233,17 +234,19 @@ function RowActionAlertItem({
 
   return (
     <AlertDialog onOpenChange={setOpen} open={open}>
-      <AlertDialogTrigger asChild>
-        <DropdownMenuItem
-          className={cn("gap-2", className)}
-          onSelect={(e) => {
-            e.preventDefault();
-            setOpen(true);
-          }}
-        >
-          {Icon && <Icon className="h-4 w-4" />}
-          {children}
-        </DropdownMenuItem>
+      <AlertDialogTrigger
+        render={
+          <DropdownMenuItem
+            className={cn("gap-2", className)}
+            onSelect={(e) => {
+              e.preventDefault();
+              setOpen(true);
+            }}
+          />
+        }
+      >
+        {Icon && <Icon className="h-4 w-4" />}
+        {children}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -20,8 +20,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+} from "@laxdb/ui/components/ui/table";
+import { cn } from "@laxdb/ui/lib/utils";
 import type { ClassNameChildrenProp, ClassNameProp } from "@/types";
 import {
   DataTableContext,

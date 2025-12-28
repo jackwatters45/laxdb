@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@laxdb/ui/lib/utils";
 
 type PageBodyProps = {
   children: React.ReactNode;

@@ -3,8 +3,8 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@laxdb/ui/lib/utils";
+import { Button } from "@laxdb/ui/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 type CarouselApi = UseEmblaCarouselType[1];

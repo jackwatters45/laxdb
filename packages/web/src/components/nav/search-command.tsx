@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Button } from "@/components/ui/button";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -31,7 +31,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command";
+} from "@laxdb/ui/components/ui/command";
 import { useSwitchOrganization } from "@/mutations/organizations";
 
 export function SearchCommand() {
