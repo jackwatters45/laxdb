@@ -25,7 +25,7 @@
   - [x] add cmd (bunx --bun @shadcn add )
   - [x] forms
 - [x] imports
-- [ ] update agents file
+- [x] update agents file
 - [ ] errs
 - [ ] deployment (vite)
 - [ ] get dev working

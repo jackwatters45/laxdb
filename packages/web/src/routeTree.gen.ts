@@ -10,11 +10,28 @@
 
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as TestRouteImport } from "./routes/test";
+import { Route as ProtectedRouteImport } from "./routes/_protected";
 import { Route as marketingIndexRouteImport } from "./routes/(marketing)/index";
+import { Route as ProtectedRedirectRouteImport } from "./routes/_protected/redirect";
+import { Route as ProtectedOrganizationSlugRouteImport } from "./routes/_protected/$organizationSlug";
+import { Route as authRegisterRouteImport } from "./routes/(auth)/register";
+import { Route as authLogoutRouteImport } from "./routes/(auth)/logout";
+import { Route as authLoginRouteImport } from "./routes/(auth)/login";
+import { Route as ProtectedOrganizationSlugIndexRouteImport } from "./routes/_protected/$organizationSlug/index";
+import { Route as ApiAuthSplatRouteImport } from "./routes/api/auth/$";
+import { Route as ProtectedOrganizationsJoinRouteImport } from "./routes/_protected/organizations/join";
+import { Route as ProtectedOrganizationsCreateRouteImport } from "./routes/_protected/organizations/create";
+import { Route as ProtectedOrganizationSlugFeedbackRouteImport } from "./routes/_protected/$organizationSlug/feedback";
+import { Route as ProtectedOrganizationSlugTeamIdRouteImport } from "./routes/_protected/$organizationSlug/$teamId";
+import { Route as ProtectedOrganizationSlugTeamCreateRouteImport } from "./routes/_protected/$organizationSlug/team.create";
 
 const TestRoute = TestRouteImport.update({
   id: "/test",
   path: "/test",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: "/_protected",
   getParentRoute: () => rootRouteImport,
 } as any);
 const marketingIndexRoute = marketingIndexRouteImport.update({
@@ -22,31 +39,182 @@ const marketingIndexRoute = marketingIndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const ProtectedRedirectRoute = ProtectedRedirectRouteImport.update({
+  id: "/redirect",
+  path: "/redirect",
+  getParentRoute: () => ProtectedRoute,
+} as any);
+const ProtectedOrganizationSlugRoute =
+  ProtectedOrganizationSlugRouteImport.update({
+    id: "/$organizationSlug",
+    path: "/$organizationSlug",
+    getParentRoute: () => ProtectedRoute,
+  } as any);
+const authRegisterRoute = authRegisterRouteImport.update({
+  id: "/(auth)/register",
+  path: "/register",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const authLogoutRoute = authLogoutRouteImport.update({
+  id: "/(auth)/logout",
+  path: "/logout",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const authLoginRoute = authLoginRouteImport.update({
+  id: "/(auth)/login",
+  path: "/login",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ProtectedOrganizationSlugIndexRoute =
+  ProtectedOrganizationSlugIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => ProtectedOrganizationSlugRoute,
+  } as any);
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: "/api/auth/$",
+  path: "/api/auth/$",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ProtectedOrganizationsJoinRoute =
+  ProtectedOrganizationsJoinRouteImport.update({
+    id: "/organizations/join",
+    path: "/organizations/join",
+    getParentRoute: () => ProtectedRoute,
+  } as any);
+const ProtectedOrganizationsCreateRoute =
+  ProtectedOrganizationsCreateRouteImport.update({
+    id: "/organizations/create",
+    path: "/organizations/create",
+    getParentRoute: () => ProtectedRoute,
+  } as any);
+const ProtectedOrganizationSlugFeedbackRoute =
+  ProtectedOrganizationSlugFeedbackRouteImport.update({
+    id: "/feedback",
+    path: "/feedback",
+    getParentRoute: () => ProtectedOrganizationSlugRoute,
+  } as any);
+const ProtectedOrganizationSlugTeamIdRoute =
+  ProtectedOrganizationSlugTeamIdRouteImport.update({
+    id: "/$teamId",
+    path: "/$teamId",
+    getParentRoute: () => ProtectedOrganizationSlugRoute,
+  } as any);
+const ProtectedOrganizationSlugTeamCreateRoute =
+  ProtectedOrganizationSlugTeamCreateRouteImport.update({
+    id: "/team/create",
+    path: "/team/create",
+    getParentRoute: () => ProtectedOrganizationSlugRoute,
+  } as any);
 
 export interface FileRoutesByFullPath {
   "/test": typeof TestRoute;
+  "/login": typeof authLoginRoute;
+  "/logout": typeof authLogoutRoute;
+  "/register": typeof authRegisterRoute;
+  "/$organizationSlug": typeof ProtectedOrganizationSlugRouteWithChildren;
+  "/redirect": typeof ProtectedRedirectRoute;
   "/": typeof marketingIndexRoute;
+  "/$organizationSlug/$teamId": typeof ProtectedOrganizationSlugTeamIdRoute;
+  "/$organizationSlug/feedback": typeof ProtectedOrganizationSlugFeedbackRoute;
+  "/organizations/create": typeof ProtectedOrganizationsCreateRoute;
+  "/organizations/join": typeof ProtectedOrganizationsJoinRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/$organizationSlug/": typeof ProtectedOrganizationSlugIndexRoute;
+  "/$organizationSlug/team/create": typeof ProtectedOrganizationSlugTeamCreateRoute;
 }
 export interface FileRoutesByTo {
   "/test": typeof TestRoute;
+  "/login": typeof authLoginRoute;
+  "/logout": typeof authLogoutRoute;
+  "/register": typeof authRegisterRoute;
+  "/redirect": typeof ProtectedRedirectRoute;
   "/": typeof marketingIndexRoute;
+  "/$organizationSlug/$teamId": typeof ProtectedOrganizationSlugTeamIdRoute;
+  "/$organizationSlug/feedback": typeof ProtectedOrganizationSlugFeedbackRoute;
+  "/organizations/create": typeof ProtectedOrganizationsCreateRoute;
+  "/organizations/join": typeof ProtectedOrganizationsJoinRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/$organizationSlug": typeof ProtectedOrganizationSlugIndexRoute;
+  "/$organizationSlug/team/create": typeof ProtectedOrganizationSlugTeamCreateRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
+  "/_protected": typeof ProtectedRouteWithChildren;
   "/test": typeof TestRoute;
+  "/(auth)/login": typeof authLoginRoute;
+  "/(auth)/logout": typeof authLogoutRoute;
+  "/(auth)/register": typeof authRegisterRoute;
+  "/_protected/$organizationSlug": typeof ProtectedOrganizationSlugRouteWithChildren;
+  "/_protected/redirect": typeof ProtectedRedirectRoute;
   "/(marketing)/": typeof marketingIndexRoute;
+  "/_protected/$organizationSlug/$teamId": typeof ProtectedOrganizationSlugTeamIdRoute;
+  "/_protected/$organizationSlug/feedback": typeof ProtectedOrganizationSlugFeedbackRoute;
+  "/_protected/organizations/create": typeof ProtectedOrganizationsCreateRoute;
+  "/_protected/organizations/join": typeof ProtectedOrganizationsJoinRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/_protected/$organizationSlug/": typeof ProtectedOrganizationSlugIndexRoute;
+  "/_protected/$organizationSlug/team/create": typeof ProtectedOrganizationSlugTeamCreateRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/test" | "/";
+  fullPaths:
+    | "/test"
+    | "/login"
+    | "/logout"
+    | "/register"
+    | "/$organizationSlug"
+    | "/redirect"
+    | "/"
+    | "/$organizationSlug/$teamId"
+    | "/$organizationSlug/feedback"
+    | "/organizations/create"
+    | "/organizations/join"
+    | "/api/auth/$"
+    | "/$organizationSlug/"
+    | "/$organizationSlug/team/create";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/test" | "/";
-  id: "__root__" | "/test" | "/(marketing)/";
+  to:
+    | "/test"
+    | "/login"
+    | "/logout"
+    | "/register"
+    | "/redirect"
+    | "/"
+    | "/$organizationSlug/$teamId"
+    | "/$organizationSlug/feedback"
+    | "/organizations/create"
+    | "/organizations/join"
+    | "/api/auth/$"
+    | "/$organizationSlug"
+    | "/$organizationSlug/team/create";
+  id:
+    | "__root__"
+    | "/_protected"
+    | "/test"
+    | "/(auth)/login"
+    | "/(auth)/logout"
+    | "/(auth)/register"
+    | "/_protected/$organizationSlug"
+    | "/_protected/redirect"
+    | "/(marketing)/"
+    | "/_protected/$organizationSlug/$teamId"
+    | "/_protected/$organizationSlug/feedback"
+    | "/_protected/organizations/create"
+    | "/_protected/organizations/join"
+    | "/api/auth/$"
+    | "/_protected/$organizationSlug/"
+    | "/_protected/$organizationSlug/team/create";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
+  ProtectedRoute: typeof ProtectedRouteWithChildren;
   TestRoute: typeof TestRoute;
+  authLoginRoute: typeof authLoginRoute;
+  authLogoutRoute: typeof authLogoutRoute;
+  authRegisterRoute: typeof authRegisterRoute;
   marketingIndexRoute: typeof marketingIndexRoute;
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -58,6 +226,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof TestRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/_protected": {
+      id: "/_protected";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof ProtectedRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/(marketing)/": {
       id: "/(marketing)/";
       path: "/";
@@ -65,12 +240,141 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof marketingIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/_protected/redirect": {
+      id: "/_protected/redirect";
+      path: "/redirect";
+      fullPath: "/redirect";
+      preLoaderRoute: typeof ProtectedRedirectRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/$organizationSlug": {
+      id: "/_protected/$organizationSlug";
+      path: "/$organizationSlug";
+      fullPath: "/$organizationSlug";
+      preLoaderRoute: typeof ProtectedOrganizationSlugRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/(auth)/register": {
+      id: "/(auth)/register";
+      path: "/register";
+      fullPath: "/register";
+      preLoaderRoute: typeof authRegisterRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(auth)/logout": {
+      id: "/(auth)/logout";
+      path: "/logout";
+      fullPath: "/logout";
+      preLoaderRoute: typeof authLogoutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(auth)/login": {
+      id: "/(auth)/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof authLoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_protected/$organizationSlug/": {
+      id: "/_protected/$organizationSlug/";
+      path: "/";
+      fullPath: "/$organizationSlug/";
+      preLoaderRoute: typeof ProtectedOrganizationSlugIndexRouteImport;
+      parentRoute: typeof ProtectedOrganizationSlugRoute;
+    };
+    "/api/auth/$": {
+      id: "/api/auth/$";
+      path: "/api/auth/$";
+      fullPath: "/api/auth/$";
+      preLoaderRoute: typeof ApiAuthSplatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_protected/organizations/join": {
+      id: "/_protected/organizations/join";
+      path: "/organizations/join";
+      fullPath: "/organizations/join";
+      preLoaderRoute: typeof ProtectedOrganizationsJoinRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/organizations/create": {
+      id: "/_protected/organizations/create";
+      path: "/organizations/create";
+      fullPath: "/organizations/create";
+      preLoaderRoute: typeof ProtectedOrganizationsCreateRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/$organizationSlug/feedback": {
+      id: "/_protected/$organizationSlug/feedback";
+      path: "/feedback";
+      fullPath: "/$organizationSlug/feedback";
+      preLoaderRoute: typeof ProtectedOrganizationSlugFeedbackRouteImport;
+      parentRoute: typeof ProtectedOrganizationSlugRoute;
+    };
+    "/_protected/$organizationSlug/$teamId": {
+      id: "/_protected/$organizationSlug/$teamId";
+      path: "/$teamId";
+      fullPath: "/$organizationSlug/$teamId";
+      preLoaderRoute: typeof ProtectedOrganizationSlugTeamIdRouteImport;
+      parentRoute: typeof ProtectedOrganizationSlugRoute;
+    };
+    "/_protected/$organizationSlug/team/create": {
+      id: "/_protected/$organizationSlug/team/create";
+      path: "/team/create";
+      fullPath: "/$organizationSlug/team/create";
+      preLoaderRoute: typeof ProtectedOrganizationSlugTeamCreateRouteImport;
+      parentRoute: typeof ProtectedOrganizationSlugRoute;
+    };
   }
 }
 
+interface ProtectedOrganizationSlugRouteChildren {
+  ProtectedOrganizationSlugTeamIdRoute: typeof ProtectedOrganizationSlugTeamIdRoute;
+  ProtectedOrganizationSlugFeedbackRoute: typeof ProtectedOrganizationSlugFeedbackRoute;
+  ProtectedOrganizationSlugIndexRoute: typeof ProtectedOrganizationSlugIndexRoute;
+  ProtectedOrganizationSlugTeamCreateRoute: typeof ProtectedOrganizationSlugTeamCreateRoute;
+}
+
+const ProtectedOrganizationSlugRouteChildren: ProtectedOrganizationSlugRouteChildren =
+  {
+    ProtectedOrganizationSlugTeamIdRoute: ProtectedOrganizationSlugTeamIdRoute,
+    ProtectedOrganizationSlugFeedbackRoute:
+      ProtectedOrganizationSlugFeedbackRoute,
+    ProtectedOrganizationSlugIndexRoute: ProtectedOrganizationSlugIndexRoute,
+    ProtectedOrganizationSlugTeamCreateRoute:
+      ProtectedOrganizationSlugTeamCreateRoute,
+  };
+
+const ProtectedOrganizationSlugRouteWithChildren =
+  ProtectedOrganizationSlugRoute._addFileChildren(
+    ProtectedOrganizationSlugRouteChildren,
+  );
+
+interface ProtectedRouteChildren {
+  ProtectedOrganizationSlugRoute: typeof ProtectedOrganizationSlugRouteWithChildren;
+  ProtectedRedirectRoute: typeof ProtectedRedirectRoute;
+  ProtectedOrganizationsCreateRoute: typeof ProtectedOrganizationsCreateRoute;
+  ProtectedOrganizationsJoinRoute: typeof ProtectedOrganizationsJoinRoute;
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedOrganizationSlugRoute: ProtectedOrganizationSlugRouteWithChildren,
+  ProtectedRedirectRoute: ProtectedRedirectRoute,
+  ProtectedOrganizationsCreateRoute: ProtectedOrganizationsCreateRoute,
+  ProtectedOrganizationsJoinRoute: ProtectedOrganizationsJoinRoute,
+};
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+);
+
 const rootRouteChildren: RootRouteChildren = {
+  ProtectedRoute: ProtectedRouteWithChildren,
   TestRoute: TestRoute,
+  authLoginRoute: authLoginRoute,
+  authLogoutRoute: authLogoutRoute,
+  authRegisterRoute: authRegisterRoute,
   marketingIndexRoute: marketingIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

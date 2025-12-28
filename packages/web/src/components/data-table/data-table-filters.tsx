@@ -155,7 +155,16 @@ function FilterSelect<TData, TValue>({
   }, [columnFilters]);
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
+    <Popover
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (!newOpen && (!columnFilters || columnFilters === "")) {
+          column?.setFilterValue("");
+          setSelectedValues("");
+        }
+        setOpen(newOpen);
+      }}
+    >
       <PopoverTrigger
         render={
           <button
@@ -208,12 +217,6 @@ function FilterSelect<TData, TValue>({
       <PopoverContent
         align="start"
         className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
-        onInteractOutside={() => {
-          if (!columnFilters || columnFilters === "") {
-            column?.setFilterValue("");
-            setSelectedValues("");
-          }
-        }}
         sideOffset={7}
       >
         <form
@@ -291,7 +294,16 @@ function FilterCheckbox<TData, TValue>({
   }, [columnFilters]);
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
+    <Popover
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (!newOpen && (!columnFilters || columnFilters.length === 0)) {
+          column?.setFilterValue([]);
+          setSelectedValues([]);
+        }
+        setOpen(newOpen);
+      }}
+    >
       <PopoverTrigger
         render={
           <button
@@ -346,12 +358,6 @@ function FilterCheckbox<TData, TValue>({
       <PopoverContent
         align="start"
         className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
-        onInteractOutside={() => {
-          if (!columnFilters || columnFilters.length === 0) {
-            column?.setFilterValue([]);
-            setSelectedValues([]);
-          }
-        }}
         sideOffset={7}
       >
         <form
@@ -460,7 +466,16 @@ function FilterNumber<TData, TValue>({
   const isBetween = selectedValues?.condition === "is-between";
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
+    <Popover
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (!newOpen && (!columnFilters || columnFilters.condition === "")) {
+          column?.setFilterValue({ condition: "", value: ["", ""] });
+          setSelectedValues({ condition: "", value: ["", ""] });
+        }
+        setOpen(newOpen);
+      }}
+    >
       <PopoverTrigger
         render={
           <button
@@ -515,12 +530,6 @@ function FilterNumber<TData, TValue>({
       <PopoverContent
         align="start"
         className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
-        onInteractOutside={() => {
-          if (!columnFilters || columnFilters.condition === "") {
-            column?.setFilterValue({ condition: "", value: ["", ""] });
-            setSelectedValues({ condition: "", value: ["", ""] });
-          }
-        }}
         sideOffset={7}
       >
         <form
