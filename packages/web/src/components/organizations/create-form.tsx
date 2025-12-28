@@ -5,8 +5,7 @@ import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { Effect } from "effect";
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-content";
@@ -165,19 +164,23 @@ export function CreateOrganizationForm({
 
             <div className="flex gap-4 pt-4">
               {organizationSlug ? (
-                <Button asChild type="button" variant="outline">
-                  <Link
-                    onClick={(e) => {
-                      if (canGoBack) {
-                        e.preventDefault();
-                        router.history.back();
-                      }
-                    }}
-                    params={{ organizationSlug }}
-                    to="/$organizationSlug"
-                  >
-                    Cancel
-                  </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  render={
+                    <Link
+                      onClick={(e) => {
+                        if (canGoBack) {
+                          e.preventDefault();
+                          router.history.back();
+                        }
+                      }}
+                      params={{ organizationSlug }}
+                      to="/$organizationSlug"
+                    />
+                  }
+                >
+                  Cancel
                 </Button>
               ) : null}
               <Button disabled={createOrgMutation.isPending} type="submit">

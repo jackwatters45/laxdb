@@ -11,7 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@laxdb/ui/components/ui/dialog";
-import { InputGroup, InputGroupAddon } from "@laxdb/ui/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+} from "@laxdb/ui/components/ui/input-group";
 import { SearchIcon, CheckIcon } from "lucide-react";
 
 function Command({

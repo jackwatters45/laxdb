@@ -1,10 +1,15 @@
-import { Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { createContext, useContext } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
-import { InstagramIcon, SOCIAL_PLATFORM_CONFIG } from "../social-icons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  SOCIAL_PLATFORM_CONFIG,
+} from "@laxdb/ui/components/social-icons";
 
 type ContactEditCardContextType<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
@@ -218,7 +223,7 @@ export function FacebookEditCard<T extends FieldValues>({
       prefix={SOCIAL_PLATFORM_CONFIG.facebook.prefix}
     >
       <ContactEditCardIcon>
-        <SiFacebook className="h-4 w-4 text-muted-foreground" />
+        <FacebookIcon className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>
     </ContactEditCard>
   );
@@ -302,8 +307,7 @@ export function LinkedInEditCard<T extends FieldValues>({
       prefix={SOCIAL_PLATFORM_CONFIG.linkedin.prefix}
     >
       <ContactEditCardIcon>
-        {/* oxlint-disable-next-line no-deprecated */}
-        <Linkedin className="h-4 w-4 text-muted-foreground" />
+        <LinkedInIcon className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>
     </ContactEditCard>
   );

@@ -1,11 +1,4 @@
-import {
-  Copy,
-  ExternalLink,
-  Linkedin,
-  Mail,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { Copy, ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
 import { createContext, useContext } from "react";
 import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
@@ -15,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@laxdb/ui/components/ui/tooltip";
-import { InstagramIcon } from "../social-icons";
 import {
   Item,
   ItemActions,
@@ -24,6 +16,11 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@laxdb/ui/components/ui/item";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+} from "@laxdb/ui/components/social-icons";
 
 type ContactCardContextType = {
   label: string;
@@ -231,7 +228,7 @@ function FacebookContactCard({ username }: FacebookContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
-          <SiFacebook className="h-4 w-4 text-muted-foreground" />
+          <FacebookIcon className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />
       </ContactCardContent>
@@ -315,8 +312,7 @@ function LinkedInContactCard({ username }: LinkedInContactCardProps) {
     >
       <ContactCardContent>
         <ContactCardIcon>
-          {/* oxlint-disable-next-line no-deprecated */}
-          <Linkedin className="h-4 w-4 text-muted-foreground" />
+          <LinkedInIcon className="h-4 w-4 text-muted-foreground" />
         </ContactCardIcon>
         <ContactCardData />
       </ContactCardContent>

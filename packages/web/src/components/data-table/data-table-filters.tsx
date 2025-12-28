@@ -547,7 +547,9 @@ function FilterNumber<TData, TValue>({
                   value={selectedValues?.condition}
                 >
                   <SelectTrigger className="mt-2 sm:py-1">
-                    <SelectValue>{(value) => value ?? "Select condition"}</SelectValue>
+                    <SelectValue>
+                      {(value) => value ?? "Select condition"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {options.map((item) => (
