@@ -32,7 +32,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@laxdb/ui/components/ui/empty";
-import { Form } from "@laxdb/ui/components/ui/form";
 
 type ContactInfoCardWrapperProps = {
   children: React.ReactNode;
@@ -151,33 +150,31 @@ function ContactInfoEdit({ contactInfo, setIsEditing }: ContactInfoEditProps) {
   };
 
   return (
-    <Form {...form}>
-      <form
-        className="space-y-6"
-        onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-      >
-        <ContactInfoCardWrapper>
-          <EmailEditCard form={form} />
-          <PhoneEditCard form={form} />
-          <FacebookEditCard form={form} />
-          <InstagramEditCard form={form} />
-          <WhatsAppEditCard form={form} />
-          <LinkedInEditCard form={form} />
-          <GroupMeEditCard form={form} />
-          <EmergencyContactNameEditCard form={form} />
-          <EmergencyContactPhoneEditCard form={form} />
-        </ContactInfoCardWrapper>
-        <div className="flex gap-2">
-          <Button type="submit">Save Changes</Button>
-          <Button onClick={handleReset} type="button" variant="outline">
-            Reset
-          </Button>
-          <Button onClick={handleCancel} type="button" variant="outline">
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <form
+      className="space-y-6"
+      onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+    >
+      <ContactInfoCardWrapper>
+        <EmailEditCard form={form} />
+        <PhoneEditCard form={form} />
+        <FacebookEditCard form={form} />
+        <InstagramEditCard form={form} />
+        <WhatsAppEditCard form={form} />
+        <LinkedInEditCard form={form} />
+        <GroupMeEditCard form={form} />
+        <EmergencyContactNameEditCard form={form} />
+        <EmergencyContactPhoneEditCard form={form} />
+      </ContactInfoCardWrapper>
+      <div className="flex gap-2">
+        <Button type="submit">Save Changes</Button>
+        <Button onClick={handleReset} type="button" variant="outline">
+          Reset
+        </Button>
+        <Button onClick={handleCancel} type="button" variant="outline">
+          Cancel
+        </Button>
+      </div>
+    </form>
   );
 }
 

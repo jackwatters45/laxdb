@@ -2,17 +2,15 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { redirect } from "@tanstack/react-router";
 import { Schema } from "effect";
 import { useEffect, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@laxdb/ui/components/ui/form";
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@laxdb/ui/lib/utils";
@@ -113,29 +111,35 @@ export function LoginForm({
         </div>
       )}
 
-      <Form {...form}>
-        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-          <FormField
-            control={form.control}
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <Controller
             name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="m@example.com" type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  id="login-email"
+                  type="email"
+                  placeholder="m@example.com"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="password"
-            render={({ field }) => (
-              <FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
                 <div className="flex items-center justify-between">
-                  <FormLabel>Password</FormLabel>
+                  <FieldLabel htmlFor="login-password">Password</FieldLabel>
                   <a
                     className="text-sm underline-offset-4 hover:underline"
                     href="forgot-password"
@@ -143,34 +147,39 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <Input
+                  {...field}
+                  id="login-password"
+                  type="password"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
+        </FieldGroup>
 
-          <Button
-            className="relative w-full"
-            disabled={isPending}
-            type="submit"
-            variant="outline"
-          >
-            <span className="flex items-center justify-start gap-2">
-              {isPending ? "Signing in..." : "Sign in with Email"}
-            </span>
-            {lastMethod === "email" && (
-              <Badge
-                className="-right-8 -translate-y-1/2 absolute top-1/2 shadow-md"
-                variant="secondary"
-              >
-                Last used
-              </Badge>
-            )}
-          </Button>
-        </form>
-      </Form>
+        <Button
+          className="relative w-full"
+          disabled={isPending}
+          type="submit"
+          variant="outline"
+        >
+          <span className="flex items-center justify-start gap-2">
+            {isPending ? "Signing in..." : "Sign in with Email"}
+          </span>
+          {lastMethod === "email" && (
+            <Badge
+              className="-right-8 -translate-y-1/2 absolute top-1/2 shadow-md"
+              variant="secondary"
+            >
+              Last used
+            </Badge>
+          )}
+        </Button>
+      </form>
 
       <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
         <span className="relative z-10 bg-background px-2 text-muted-foreground">

@@ -5,8 +5,9 @@ import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { Effect, Schema } from "effect";
-import { useForm } from "react-hook-form";
+import { Effect } from "effect";
+import { Schema } from "effect";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-content";
 import { Button } from "@laxdb/ui/components/ui/button";
@@ -17,14 +18,12 @@ import {
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@laxdb/ui/components/ui/form";
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { authMiddleware } from "@/lib/middleware";
 
@@ -113,72 +112,79 @@ export function CreateOrganizationForm({
           <CardTitle>Organization Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              className="space-y-6"
-              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-            >
-              <FormField
-                control={form.control}
+          <form
+            className="space-y-6"
+            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          >
+            <FieldGroup>
+              <Controller
                 name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Club Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., Malvern Lacrosse Club"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          handleNameChange(e.target.value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
                 control={form.control}
-                name="slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Club Slug (URL)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="malvern-lacrosse-club" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This will be used in your club&apos;s URL
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="org-name">Club Name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="org-name"
+                      placeholder="e.g., Malvern Lacrosse Club"
+                      aria-invalid={fieldState.invalid}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleNameChange(e.target.value);
+                      }}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
               />
 
-              <div className="flex gap-4 pt-4">
-                {organizationSlug ? (
-                  <Button asChild type="button" variant="outline">
-                    <Link
-                      onClick={(e) => {
-                        if (canGoBack) {
-                          e.preventDefault();
-                          router.history.back();
-                        }
-                      }}
-                      params={{ organizationSlug }}
-                      to="/$organizationSlug"
-                    >
-                      Cancel
-                    </Link>
-                  </Button>
-                ) : null}
-                <Button disabled={createOrgMutation.isPending} type="submit">
-                  {createOrgMutation.isPending ? "Creating..." : "Create Club"}
+              <Controller
+                name="slug"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="org-slug">Club Slug (URL)</FieldLabel>
+                    <Input
+                      {...field}
+                      id="org-slug"
+                      placeholder="malvern-lacrosse-club"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldDescription>
+                      This will be used in your club&apos;s URL
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+
+            <div className="flex gap-4 pt-4">
+              {organizationSlug ? (
+                <Button asChild type="button" variant="outline">
+                  <Link
+                    onClick={(e) => {
+                      if (canGoBack) {
+                        e.preventDefault();
+                        router.history.back();
+                      }
+                    }}
+                    params={{ organizationSlug }}
+                    to="/$organizationSlug"
+                  >
+                    Cancel
+                  </Link>
                 </Button>
-              </div>
-            </form>
-          </Form>
+              ) : null}
+              <Button disabled={createOrgMutation.isPending} type="submit">
+                {createOrgMutation.isPending ? "Creating..." : "Create Club"}
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </PageContainer>

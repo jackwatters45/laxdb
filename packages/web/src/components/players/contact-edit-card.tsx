@@ -1,17 +1,12 @@
 import { Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
 import { createContext, useContext } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@laxdb/ui/components/ui/form";
+import { Controller } from "react-hook-form";
+import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { InstagramIcon, SOCIAL_PLATFORM_CONFIG } from "../social-icons";
 
-type ContactEditCardContextType<T extends FieldValues = any> = {
+type ContactEditCardContextType<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
   name: keyof T;
   label: string;
@@ -22,7 +17,7 @@ const ContactEditCardContext = createContext<ContactEditCardContextType | null>(
   null,
 );
 
-function useContactEditCard<T extends FieldValues = any>() {
+function useContactEditCard<T extends FieldValues = FieldValues>() {
   const context = useContext(ContactEditCardContext);
   if (!context) {
     throw new Error(
@@ -32,7 +27,7 @@ function useContactEditCard<T extends FieldValues = any>() {
   return context as ContactEditCardContextType<T>;
 }
 
-type ContactEditCardProps<T extends FieldValues = any> = {
+type ContactEditCardProps<T extends FieldValues = FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T>;
   name: keyof T;
@@ -55,61 +50,90 @@ function ContactEditCard<T extends FieldValues>({
 }
 
 function ContactEditCardField() {
-  const { form, name, prefix } = useContactEditCard();
+  const { form, name, prefix, label } = useContactEditCard();
 
   return (
-    <FormField
+    <Controller
       control={form.control}
-      name={name as any}
-      render={({ field }) => (
-        <FormItem>
-          <ContactEditCardLabel />
-          <ContactEditCardInput field={field} icon={null} prefix={prefix} />
-          <FormMessage />
-        </FormItem>
+      name={name as string}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel
+            htmlFor={`contact-${String(name)}`}
+            className="font-medium text-muted-foreground text-xs"
+          >
+            {label}
+          </FieldLabel>
+          <ContactEditCardInput
+            field={field}
+            icon={null}
+            prefix={prefix}
+            id={`contact-${String(name)}`}
+            isInvalid={fieldState.invalid}
+          />
+          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+        </Field>
       )}
     />
   );
 }
 
 function ContactEditCardLabel() {
-  const { label } = useContactEditCard();
+  const { label, name } = useContactEditCard();
   return (
-    <FormLabel className="font-medium text-muted-foreground text-xs">
+    <FieldLabel
+      htmlFor={`contact-${String(name)}`}
+      className="font-medium text-muted-foreground text-xs"
+    >
       {label}
-    </FormLabel>
+    </FieldLabel>
   );
 }
 
 type ContactEditCardInputProps = {
   icon: React.ReactNode;
   prefix?: string | undefined;
-  field: any;
+  field: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+    name: string;
+    ref: React.Ref<HTMLInputElement>;
+  };
+  id?: string;
+  isInvalid?: boolean;
 };
 
 function ContactEditCardInput({
   icon,
   prefix,
   field,
+  id,
+  isInvalid,
 }: ContactEditCardInputProps) {
   return (
     <div className="flex items-center gap-2">
       {icon}
-      <FormControl>
-        {prefix ? (
-          <div className="flex flex-1 items-center rounded-md border">
-            <span className="flex h-8 items-center border-r bg-muted px-3 text-muted-foreground text-sm">
-              {prefix}
-            </span>
-            <Input
-              {...field}
-              className="h-8 border-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-          </div>
-        ) : (
-          <Input {...field} className="h-8 text-sm" />
-        )}
-      </FormControl>
+      {prefix ? (
+        <div className="flex flex-1 items-center rounded-md border">
+          <span className="flex h-8 items-center border-r bg-muted px-3 text-muted-foreground text-sm">
+            {prefix}
+          </span>
+          <Input
+            {...field}
+            id={id}
+            aria-invalid={isInvalid}
+            className="h-8 border-0 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+      ) : (
+        <Input
+          {...field}
+          id={id}
+          aria-invalid={isInvalid}
+          className="h-8 text-sm"
+        />
+      )}
     </div>
   );
 }
@@ -119,25 +143,35 @@ type ContactEditCardIconProps = {
 };
 
 function ContactEditCardIcon({ children }: ContactEditCardIconProps) {
-  const { form, name, prefix } = useContactEditCard();
+  const { form, name, prefix, label } = useContactEditCard();
 
   return (
-    <FormField
+    <Controller
       control={form.control}
-      name={name as any}
-      render={({ field }) => (
-        <FormItem>
-          <ContactEditCardLabel />
-          <ContactEditCardInput field={field} icon={children} prefix={prefix} />
-          <FormMessage />
-        </FormItem>
+      name={name as string}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel
+            htmlFor={`contact-${String(name)}`}
+            className="font-medium text-muted-foreground text-xs"
+          >
+            {label}
+          </FieldLabel>
+          <ContactEditCardInput
+            field={field}
+            icon={children}
+            prefix={prefix}
+            id={`contact-${String(name)}`}
+            isInvalid={fieldState.invalid}
+          />
+          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+        </Field>
       )}
     />
   );
 }
 
-// Individual card components
-type EmailEditCardProps<T extends FieldValues = any> = {
+type EmailEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -153,7 +187,7 @@ export function EmailEditCard<T extends FieldValues>({
   );
 }
 
-type PhoneEditCardProps<T extends FieldValues = any> = {
+type PhoneEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -169,7 +203,7 @@ export function PhoneEditCard<T extends FieldValues>({
   );
 }
 
-type FacebookEditCardProps<T extends FieldValues = any> = {
+type FacebookEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -190,7 +224,7 @@ export function FacebookEditCard<T extends FieldValues>({
   );
 }
 
-type InstagramEditCardProps<T extends FieldValues = any> = {
+type InstagramEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -211,7 +245,7 @@ export function InstagramEditCard<T extends FieldValues>({
   );
 }
 
-type WhatsAppEditCardProps<T extends FieldValues = any> = {
+type WhatsAppEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -232,7 +266,7 @@ export function WhatsAppEditCard<T extends FieldValues>({
   );
 }
 
-type GroupMeEditCardProps<T extends FieldValues = any> = {
+type GroupMeEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -253,7 +287,7 @@ export function GroupMeEditCard<T extends FieldValues>({
   );
 }
 
-type LinkedInEditCardProps<T extends FieldValues = any> = {
+type LinkedInEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -275,7 +309,7 @@ export function LinkedInEditCard<T extends FieldValues>({
   );
 }
 
-type EmergencyContactNameEditCardProps<T extends FieldValues = any> = {
+type EmergencyContactNameEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
@@ -295,7 +329,7 @@ export function EmergencyContactNameEditCard<T extends FieldValues>({
   );
 }
 
-type EmergencyContactPhoneEditCardProps<T extends FieldValues = any> = {
+type EmergencyContactPhoneEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
