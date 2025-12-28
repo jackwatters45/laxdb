@@ -23,10 +23,10 @@
   - [x] select placeholder
   - [x] tailwind - fix font family in tw config
   - [x] add cmd (bunx --bun @shadcn add )
-  - [ ] forms
-  - [ ] errs
+  - [x] forms
 - [x] imports
 - [ ] update agents file
+- [ ] errs
 - [ ] deployment (vite)
 - [ ] get dev working
 - [ ] new package/routes to just work on features tbh
