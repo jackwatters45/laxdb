@@ -14,7 +14,7 @@
 - [x] add description + name claude gh workflows
 - [x] deployment (infisical)
 - [x] remove old aws
-- [ ] ui - package
+- [x] ui - package
   - [x] fix errors
   - [x] imports
   - [x] breadcrumb
@@ -28,10 +28,9 @@
 - [x] update agents file
 - [x] errs
 - [x] get dev working
-- [ ] fix up types
+- [x] fix up types / build shit
 - [ ] rest of routes
 - [ ] deployment (vite)
-- [ ] new package/routes to just work on features tbh
 
 ## Pressing things to eventually do..
 

@@ -20,7 +20,6 @@
     }
   },
   "scripts": {
-    "build": "tsgo --build",
     "typecheck": "tsgo --build",
     "lint": "oxlint --fix",
     "format": "oxfmt",
