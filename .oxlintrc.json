@@ -37,7 +37,8 @@
     "unicorn/no-array-callback-reference": "off",
     "max-lines": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
-    "unicorn/no-empty-file": "warn"
+    "unicorn/no-empty-file": "warn",
+    "@typescript-eslint/no-floating-promises" : "warn"
   },
   "ignorePatterns": [
     "node_modules/**",

@@ -6,6 +6,11 @@ node_modules
 
 # wrangler
 .wrangler
+wrangler.jsonc
+wrangler.json
+
+#content collections
+.content-collections
 
 # alchemy
 .alchemy

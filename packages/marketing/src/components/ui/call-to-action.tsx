@@ -1,5 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { Button } from "../button";
 
 export function CallToAction() {
@@ -19,15 +18,15 @@ export function CallToAction() {
           </p>
           <div className="flex flex-wrap gap-4">
             <Button asChild className="text-md">
-              <Link href="#">Start now</Link>
+              <Link to="#">Start now</Link>
             </Button>
             <Button asChild className="text-md" variant="secondary">
-              <Link href="#">Find nearest dealer</Link>
+              <Link to="#">Find nearest dealer</Link>
             </Button>
           </div>
         </div>
         <div className="relative isolate rounded-xl sm:col-span-4 sm:h-full">
-          <Image
+          <img
             alt="Farm with vehicles"
             aria-hidden
             className="absolute inset-0 -z-10 rounded-2xl blur-xl"
@@ -35,7 +34,7 @@ export function CallToAction() {
             src="/images/farm-footer.webp"
             width={1000}
           />
-          <Image
+          <img
             alt="Farm with vehicles"
             className="relative z-10 rounded-2xl"
             height={1000}

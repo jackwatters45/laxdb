@@ -5,8 +5,20 @@
 - [ ] add blog
   - [ ] deployment
   - [ ] improve functionality (mdx, styling)
-- [ ] update marketing
+- [ ] write
+  - [ ] missing tools
+  - [ ] overall plans
+  - [ ] wikipedia like lacrosse repo
+- [ ] update marketing page
+  - [ ] blog
+  - [ ] tool plans
+- [ ] add changesets
+- [ ] contributing docs site
 
+- [ ] build web
+- [ ] migrate to tailwind v4
+
+- [ ] figure out staging branching for pg
 - [ ] get dev working
 - [ ] deployment (vite)
 

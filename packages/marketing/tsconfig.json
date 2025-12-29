@@ -1,18 +1,18 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../types/**/*.d.ts",
+    ".content-collections/generated/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".output"],
   "compilerOptions": {
+    "types": ["@cloudflare/workers-types"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
-      "@/*": ["./src/*"]
-    },
-    "incremental": true,
-    "jsx": "preserve"
+      "@/*": ["./src/*"],
+      "content-collections": ["./.content-collections/generated/index.ts"]
+    }
   }
 }

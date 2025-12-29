@@ -1,18 +1,16 @@
-import Image from "next/image";
-
 export default function Testimonial() {
   return (
     <section className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-xl shadow-2xl shadow-[#366A79]/70">
       <div className="absolute inset-0 object-cover">
-        <Image
+        <img
           alt="clouds background"
           className="object-cover"
-          fill
+          // fill
           src="/images/field.png"
         />
       </div>
       <div className="absolute top-[19rem] -right-14 w-[19rem] sm:top-[12rem] sm:right-3 sm:w-[23rem] md:top-[12rem] md:right-0 md:w-[25rem] lg:top-[16rem] lg:right-12 lg:w-[34rem]">
-        <Image
+        <img
           alt="clouds background"
           className="animate-hover"
           height={554}
@@ -37,7 +35,7 @@ export default function Testimonial() {
         </div>
         <div className="mt-14 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
           <div className="relative shrink-0 rounded-full bg-white/15 p-0.5 ring-1 ring-white/20">
-            <Image
+            <img
               alt="Dr. Sarah Miller"
               className="rounded-full border object-contain"
               height={56}

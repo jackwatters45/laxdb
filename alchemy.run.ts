@@ -144,32 +144,29 @@ export const storage = await R2Bucket("storage", {});
 //   },
 // });
 
-export const web = await TanStackStart("web", {
-  bindings: {
-    DB: db,
-    KV: kv,
-    STORAGE: storage,
-    DATABASE_URL: dbRole.connectionUrl,
-    // API_URL: worker.url!,
-    ...secrets,
-  },
-  cwd: "./packages/web",
-  domains: [domain],
-});
-
-// export const marketing = await TanStackStart('marketing', {
+// export const web = await TanStackStart("web", {
 //   bindings: {
 //     DB: db,
 //     KV: kv,
 //     STORAGE: storage,
+//     DATABASE_URL: dbRole.connectionUrl,
+//     // API_URL: worker.url!,
+//     ...secrets,
 //   },
-//   cwd: './packages/marketing',
+//   cwd: "./packages/web",
 //   domains: [domain],
 // });
 
+export const marketing = await TanStackStart('marketing', {
+  bindings: {},
+  cwd: './packages/marketing',
+  domains: [domain],
+});
+
 console.log({
   domain,
-  webWorkers: web.url,
+  // web: web.url,
+  marketing: marketing.url,
   // api: api.url,
   db: database.id,
   kv: kv.namespaceId,
@@ -187,7 +184,7 @@ if (process.env.PULL_REQUEST) {
 
      Your changes have been deployed to a preview environment:
 
-     **🌐 Website:** ${web.url}
+     **🌐 Website:** ${"web.url"}
 
      Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
 

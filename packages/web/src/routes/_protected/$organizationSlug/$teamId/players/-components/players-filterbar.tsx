@@ -10,7 +10,7 @@ import {
   FilterGroup,
   FilterSearch,
 } from "@laxdb/ui/components/data-table/data-table-filterbar";
-import { useDataTable } from "../../../../../../../../ui/dist/components/data-table/use-data-table";
+import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
