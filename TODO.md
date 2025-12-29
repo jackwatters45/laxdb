@@ -3,10 +3,14 @@
 ## Setting back up
 
 - [ ] indeterminate checkboxes
-- [ ] claude description not consistently working
-- [ ] ts-aware - web package
+- [ ] add marketing
+- [ ] add blog
+
 - [ ] get dev working
 - [ ] deployment (vite)
+
+- [ ] ts-aware - web package
+- [ ] claude description not consistently working
 - [ ] fix http api
 
 ## Pressing things to eventually do..
