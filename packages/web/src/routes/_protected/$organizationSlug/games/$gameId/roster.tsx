@@ -36,19 +36,19 @@ const mockGameRoster = [
 const getGameRoster = createServerFn({ method: "GET" })
   .inputValidator((data: { gameId: string }) => data)
   .handler(({ data: _ }) => {
-    // FIX: Replace with actual API
+    // TODO: Replace with actual API
     return mockGameRoster;
   });
 
 const getTeamPlayers = createServerFn().handler(() => {
-  // FIX: Replace with actual API
+  // TODO: Replace with actual API
   return mockTeamPlayers;
 });
 
 const updateGameRoster = createServerFn({ method: "POST" })
   .inputValidator((data: { gameId: string; roster: RosterPlayer[] }) => data)
   .handler(async ({ data: _ }) => {
-    // FIX: Replace with actual API
+    // TODO: Replace with actual API
     await new Promise((resolve) => {
       setTimeout(resolve, 500);
     });
@@ -210,7 +210,7 @@ function RosterManagementPage() {
                             id={`starter-${player.id}`}
                             onCheckedChange={(checked) => {
                               updatePlayerRosterInfo(player.id, {
-                                isStarter: checked === true,
+                                isStarter: checked,
                               });
                             }}
                           />
@@ -224,7 +224,7 @@ function RosterManagementPage() {
                             id={`captain-${player.id}`}
                             onCheckedChange={(checked) => {
                               updatePlayerRosterInfo(player.id, {
-                                isCaptain: checked === true,
+                                isCaptain: checked,
                               });
                             }}
                           />

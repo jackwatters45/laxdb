@@ -26,7 +26,7 @@ import { mockPlayerDetails } from "./-utils";
 const getPlayerDetails = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
   .handler(({ data: _data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
     // return await PlayerDevelopmentAPI.getPlayerProfile(data.playerId, headers);
 

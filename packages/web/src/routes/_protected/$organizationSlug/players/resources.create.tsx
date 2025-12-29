@@ -58,7 +58,7 @@ const assignPlayerResource = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(({ data: _data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     return { success: true, resourceId: "resource-123" };
   });
 
@@ -66,7 +66,7 @@ const assignPlayerResource = createServerFn({ method: "POST" })
 const getPlayerInfo = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
   .handler(({ data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     return {
       id: data.playerId,
       name: "Alex Johnson",

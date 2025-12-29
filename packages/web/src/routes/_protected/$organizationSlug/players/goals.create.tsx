@@ -59,7 +59,7 @@ const createPlayerGoal = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(({ data: _data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     // const { PlayerDevelopmentAPI } = await import('@laxdb/core/player-development/index');
     // return await PlayerDevelopmentAPI.createGoal(data, headers);
 
@@ -70,7 +70,7 @@ const createPlayerGoal = createServerFn({ method: "POST" })
 const getPlayerInfo = createServerFn({ method: "GET" })
   .inputValidator((data: { playerId: string }) => data)
   .handler(({ data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     return {
       id: data.playerId,
       name: "Alex Johnson",

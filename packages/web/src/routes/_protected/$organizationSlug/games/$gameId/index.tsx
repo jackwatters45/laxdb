@@ -65,7 +65,7 @@ const mockGameDetails = {
 const getGameDetails = createServerFn({ method: "GET" })
   .inputValidator((data: { gameId: string }) => data)
   .handler(({ data: _data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     // const { GamesAPI } = await import('@laxdb/core/games/index');
     // return await GamesAPI.getGame(data.gameId, headers);
 
