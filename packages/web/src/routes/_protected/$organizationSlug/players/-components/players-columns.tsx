@@ -90,13 +90,9 @@ export function createEditablePlayerColumns({
       header: ({ table }) => (
         <Checkbox
           aria-label="Select all"
-          // @ts-expect-error we need to add indeterminate to checkboxes
-          checked={
-            table.getIsAllPageRowsSelected()
-              ? true
-              : table.getIsSomeRowsSelected()
-                ? "indeterminate"
-                : false
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={
+            table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()
           }
           className="translate-y-0.5"
           onCheckedChange={() => {

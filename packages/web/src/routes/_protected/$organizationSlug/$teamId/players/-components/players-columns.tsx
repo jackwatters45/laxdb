@@ -232,7 +232,9 @@ export function createEditablePlayerColumns({
         <Checkbox
           aria-label="Select all"
           checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomeRowsSelected()}
+          indeterminate={
+            table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()
+          }
           className="translate-y-0.5"
           onCheckedChange={() => {
             table.toggleAllPageRowsSelected();
