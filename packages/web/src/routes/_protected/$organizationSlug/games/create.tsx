@@ -37,7 +37,7 @@ import {
 const createGame = createServerFn({ method: "POST" })
   .inputValidator((data: CreateGameInput) => data)
   .handler(async ({ data }) => {
-    // FIX: Replace with actual API call
+    // TODO: Replace with actual API call
     // const { GamesAPI } = await import('@laxdb/core/games/index');
     // const request = getRequest();
     // return await GamesAPI.createGame(data, request.headers);

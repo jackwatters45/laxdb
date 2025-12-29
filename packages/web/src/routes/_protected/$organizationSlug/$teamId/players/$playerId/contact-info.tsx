@@ -29,8 +29,8 @@ export const Route = createFileRoute(
   loader: () => ({ contactInfo }),
 });
 
-// FIX: update edit version
-// FIX: backend
+// TODO: update edit version
+// TODO: backend
 function ContactInfo() {
   const { contactInfo } = Route.useLoaderData();
 

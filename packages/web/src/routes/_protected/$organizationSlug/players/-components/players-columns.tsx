@@ -188,7 +188,7 @@ export function createEditablePlayerColumns({
                 }
               }
 
-              // FIX: mutation.mutate(player.publicId, { name: nameValue });
+              // TODO: mutation.mutate(player.publicId, { name: nameValue });
             }}
             placeholder="Player name"
             type="text"
@@ -222,7 +222,7 @@ export function createEditablePlayerColumns({
             value={player.position ?? ""}
           >
             <SelectTrigger variant="data">
-              <SelectValue>{(value) => value || "Select position"}</SelectValue>
+              <SelectValue>{(value) => value ?? "Select position"}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {POSITION_SELECT_FIELDS.map((position) => (

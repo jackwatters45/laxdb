@@ -1,6 +1,6 @@
 import type { PlayerWithContactInfoNonNullable } from "@laxdb/core/player/contact-info/contact-info.schema";
 
-// FIX: need to move this to props
+// TODO: need to move this to props
 export const playerInfo = {
   id: "1",
   name: "Jack Watters",

@@ -54,7 +54,7 @@ const mockGames = [
 
 // Server function for getting games (will implement proper API later)
 const getTeamGames = createServerFn().handler(() => {
-  // FIX: Replace with actual API call
+  // TODO: Replace with actual API call
   // const { GamesAPI } = await import('@laxdb/core/games/index');
   // const request = getRequest();
   // return await GamesAPI.getTeamGames(teamId, request.headers);
@@ -64,7 +64,7 @@ const getTeamGames = createServerFn().handler(() => {
 
 // Server function for getting user permissions (simplified for now)
 const getUserPermissions = createServerFn().handler(() => {
-  // FIX: Replace with actual permission check
+  // TODO: Replace with actual permission check
   return {
     canManageGames: true, // Will check user role
     canEditGames: true,

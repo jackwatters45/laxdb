@@ -95,7 +95,7 @@ function Users() {
                             >
                               <SelectTrigger className="h-8 w-32">
                                 <SelectValue>
-                                  {(value) => value || "Select"}
+                                  {(value) => value ?? "Select"}
                                 </SelectValue>{" "}
                               </SelectTrigger>
                               <SelectContent align="end">
@@ -126,7 +126,7 @@ function Users() {
                       >
                         <SelectTrigger className="h-8 w-32">
                           <SelectValue>
-                            {(value) => value || "Select"}
+                            {(value) => value ?? "Select"}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent align="end">
@@ -206,7 +206,7 @@ function Users() {
                     <Select defaultValue={user.role}>
                       <SelectTrigger className="h-8 w-32">
                         <SelectValue>
-                          {(value) => value || "Select"}
+                          {(value) => value ?? "Select"}
                         </SelectValue>{" "}
                       </SelectTrigger>
                       <SelectContent align="end">

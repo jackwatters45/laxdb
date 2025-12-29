@@ -52,7 +52,7 @@ const getTeamPlayers = createServerFn({ method: "GET" })
     ),
   );
 
-// FIX: more of a replace than an update - make sure updates add user options + exclude ids or something...
+// TODO: more of a replace than an update - make sure updates add user options + exclude ids or something...
 export const Route = createFileRoute(
   "/_protected/$organizationSlug/$teamId/players/",
 )({

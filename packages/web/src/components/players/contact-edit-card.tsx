@@ -12,7 +12,7 @@ import {
 } from "@laxdb/ui/components/social-icons";
 
 type ContactEditCardContextValue = {
-  control: Control<FieldValues>;
+  control: Control;
   name: string;
   label: string;
   prefix: string | undefined;
@@ -39,10 +39,8 @@ type ContactEditCardProps<T extends FieldValues> = {
   prefix?: string;
 };
 
-function eraseControlType<T extends FieldValues>(
-  control: Control<T>,
-): Control<FieldValues> {
-  return control as unknown as Control<FieldValues>;
+function eraseControlType<T extends FieldValues>(control: Control<T>): Control {
+  return control as unknown as Control;
 }
 
 function ContactEditCard<T extends FieldValues>({
