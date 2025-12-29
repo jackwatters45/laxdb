@@ -1,1 +1,6 @@
-export { default } from "@workspace/ui/postcss.config";
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};

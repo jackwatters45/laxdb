@@ -1,11 +1,12 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["**/*.ts", "**/*.tsx", "../../types/**/*.d.ts"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
+    "types": ["@cloudflare/workers-types"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]
     }
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../../types/**/*.ts"],
-  "exclude": ["node_modules"]
+  }
 }
