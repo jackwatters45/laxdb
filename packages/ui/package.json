@@ -16,7 +16,7 @@
     },
     "./hooks/*": {
       "types": "./dist/hooks/*.d.ts",
-      "default": "./src/hooks/*.tsx"
+      "default": "./src/hooks/*.ts"
     }
   },
   "scripts": {

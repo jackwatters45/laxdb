@@ -32,6 +32,8 @@
 - [ ] get dev working
 - [ ] deployment (vite)
 
+- [ ] indeterminate checkboxes
+
 ## Pressing things to eventually do..
 
 - fix http api
