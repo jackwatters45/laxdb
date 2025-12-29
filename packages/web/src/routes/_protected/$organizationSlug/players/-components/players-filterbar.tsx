@@ -10,20 +10,15 @@ import {
   FilterGroup,
   FilterSearch,
 } from "@laxdb/ui/components/data-table/data-table-filterbar";
-import { useDataTable } from "../../../../../../../../ui/dist/components/data-table/use-data-table";
+import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
 import { Button } from "@laxdb/ui/components/ui/button";
-import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
 import { AddPlayerCommand } from "./add-player-command";
 
 export function PlayersFilterBar({
   organizationId,
-  teamId,
-  excludePlayerIds,
 }: {
   organizationId: string;
-  teamId: string;
-  excludePlayerIds: string[];
 }) {
   const { table } = useDataTable();
 
@@ -44,24 +39,14 @@ export function PlayersFilterBar({
           <FilterClear />
         </FilterGroup>
         <FilterActions>
-          <ButtonGroup>
-            <FilterBarDisplayTypeToggle />
-          </ButtonGroup>
-          <ButtonGroup>
-            <FilterBarViewOptions />
-          </ButtonGroup>
-          <ButtonGroup>
-            <AddPlayerCommand
-              excludePlayerIds={excludePlayerIds}
-              organizationId={organizationId}
-              teamId={teamId}
-            >
-              <Button size="sm">
-                <Plus className="size-4" />
-                <span className="hidden lg:block">Add Player</span>
-              </Button>
-            </AddPlayerCommand>
-          </ButtonGroup>
+          <FilterBarDisplayTypeToggle />
+          <FilterBarViewOptions />
+          <AddPlayerCommand organizationId={organizationId}>
+            <Button size="sm">
+              <Plus className="size-4" />
+              <span className="hidden lg:block">Add Player</span>
+            </Button>
+          </AddPlayerCommand>
         </FilterActions>
       </FilterBar>
     </FilterBarProvider>

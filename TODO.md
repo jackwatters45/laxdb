@@ -27,10 +27,12 @@
 - [x] imports
 - [x] update agents file
 - [x] errs
-- [x] get dev working
 - [x] fix up types / build shit
 - [ ] rest of routes
+- [ ] get dev working
 - [ ] deployment (vite)
+
+- [ ] indeterminate checkboxes
 
 ## Pressing things to eventually do..
 

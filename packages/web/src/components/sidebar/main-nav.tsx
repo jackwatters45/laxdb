@@ -13,19 +13,19 @@ export function MainNav() {
   const routeMatch = useMatchRoute();
 
   // UGLY
-  // const isSettings =
-  //   routeMatch({ to: "/$organizationSlug/settings/general" }) ||
-  //   routeMatch({ to: "/$organizationSlug/settings/users" }) ||
-  //   routeMatch({ to: "/$organizationSlug/settings/billing" });
+  const isSettings =
+    routeMatch({ to: "/$organizationSlug/settings/general" }) ||
+    routeMatch({ to: "/$organizationSlug/settings/users" }) ||
+    routeMatch({ to: "/$organizationSlug/settings/billing" });
 
   const isNotTeams =
-    // routeMatch({ to: "/$organizationSlug/players", fuzzy: true }) ||
-    // routeMatch({ to: "/$organizationSlug/games", fuzzy: true }) ||
+    routeMatch({ to: "/$organizationSlug/players", fuzzy: true }) ||
+    routeMatch({ to: "/$organizationSlug/games", fuzzy: true }) ||
     // routeMatch({ to: "/$organizationSlug/feedback", fuzzy: true }) ||
     // routeMatch({ to: "/$organizationSlug/plan", fuzzy: true }) ||
     routeMatch({ to: "/$organizationSlug/organization/join" }) ||
-    routeMatch({ to: "/$organizationSlug/organization/create" });
-  // ||isSettings;
+    routeMatch({ to: "/$organizationSlug/organization/create" }) ||
+    isSettings;
 
   const isTeams =
     (routeMatch({ to: "/$organizationSlug" }) ||
@@ -129,7 +129,7 @@ export function MainNav() {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>*/}
-        {/*<SidebarMenuItem>
+        <SidebarMenuItem>
           <SidebarMenuButton
             render={
               <Link
@@ -143,7 +143,7 @@ export function MainNav() {
             <Settings />
             <span>Settings</span>
           </SidebarMenuButton>
-        </SidebarMenuItem>*/}
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );

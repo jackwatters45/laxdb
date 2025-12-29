@@ -8,12 +8,11 @@ import {
   BulkEditToolbarActions,
   BulkEditToolbarCopyAction,
   BulkEditToolbarDeleteAction,
-  BulkEditToolbarRemoveAction,
   BulkEditToolbarSelection,
   BulkEditToolbarSeparator,
 } from "@laxdb/ui/components/data-table/data-table-bulk-edit-toolbar";
-import { useDataTable } from "../../../../../../../../ui/dist/components/data-table/use-data-table";
-import { usePlayerMutations } from "../-mutations";
+import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
+import { useBulkDeletePlayers } from "../-mutations";
 
 const Route = createFileRoute(
   "/_protected/$organizationSlug/$teamId/players/",
@@ -25,16 +24,11 @@ const getPlayerIds = (table: Table<TeamPlayerWithInfo>) => {
 };
 
 export function PlayersToolbar() {
-  const { teamId } = Route.useParams();
   const { activeOrganization } = Route.useRouteContext();
-
   const { table } = useDataTable<TeamPlayerWithInfo>();
   const rowSelection = table.getState().rowSelection;
 
-  const { bulkDelete, bulkRemove } = usePlayerMutations(
-    activeOrganization.id,
-    teamId,
-  );
+  const bulkDelete = useBulkDeletePlayers(activeOrganization.id);
 
   const onDelete = () => {
     const playerIds = getPlayerIds(table);
@@ -42,15 +36,9 @@ export function PlayersToolbar() {
     table.resetRowSelection();
   };
 
-  const onRemove = () => {
-    const playerIds = getPlayerIds(table);
-    bulkRemove.mutate({ playerIds, teamId });
-    table.resetRowSelection();
-  };
-
   return (
     <BulkEditProvider
-      actions={{ onDelete, onRemove }}
+      actions={{ onDelete }}
       rowSelection={rowSelection}
       table={table}
     >
@@ -64,7 +52,6 @@ export function PlayersToolbar() {
             tooltipContent="Copy Emails"
           />
           <BulkEditToolbarSeparator />
-          <BulkEditToolbarRemoveAction tooltipContent="Remove From Team" />
           <BulkEditToolbarDeleteAction />
         </BulkEditToolbarActions>
       </BulkEditToolbar>
