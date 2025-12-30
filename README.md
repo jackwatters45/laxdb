@@ -9,7 +9,7 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 - Infrastructure: Cloudflare Workers via Alchemy (TypeScript IaC)
 - Database: PlanetScale (PostgreSQL) with Drizzle ORM
 - Authentication: better-auth with organization and team support
-- Frontend: TanStack Start (Web App), Next.js (Marketing Site)
+- Frontend: TanStack Start (Web App, Marketing Site)
 - Monorepo Management: Bun Workspaces and Turborepo
 
 ## Project Structure
@@ -17,7 +17,7 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 - `packages/api`: Effect-based HTTP API with RPC support
 - `packages/core`: Shared business logic, database schemas, and core services
 - `packages/web`: Main web application built with TanStack Start, deployed on Cloudflare Workers
-- `packages/marketing`: Marketing website built with Next.js
+- `packages/marketing`: Marketing website built with TanStack Start
 - `packages/effect-cloudflare`: Effect-TS bindings for Cloudflare primitives (KV, R2, D1, etc.)
 - `packages/scripts`: Internal utility and maintenance scripts
 

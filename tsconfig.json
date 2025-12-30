@@ -35,8 +35,12 @@
     "sourceMap": true,
     "plugins": [
       {
-        "name": "@effect/language-service"
-      }
-    ]
-  }
+        "name": "@effect/language-service",
+        "importAliases": {
+          "Array": "Arr",
+          "Function": "Fn",
+        },
+      },
+    ],
+  },
 }

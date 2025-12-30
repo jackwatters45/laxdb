@@ -40,7 +40,6 @@
           "@effect/ai-anthropic",
           "@effect/ai-openai",
           "@effect/cli",
-          "@effect/cluster",
           "@effect/experimental",
           "@effect/opentelemetry",
           "@effect/platform",
