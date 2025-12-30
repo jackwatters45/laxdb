@@ -2,9 +2,10 @@
 
 ## Setting back up
 
-- [ ] indeterminate checkboxes
-- [ ] add marketing
 - [ ] add blog
+  - [ ] deployment
+  - [ ] improve functionality (mdx, styling)
+- [ ] update marketing
 
 - [ ] get dev working
 - [ ] deployment (vite)
@@ -15,7 +16,6 @@
 
 ## Pressing things to eventually do..
 
-- add marketing page to deployment
 - how to handle teamId + org in core repo
 - Permissions!!
 - Polar
