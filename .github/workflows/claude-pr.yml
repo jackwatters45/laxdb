@@ -1,21 +1,22 @@
-name: Claude PR Description
+name: Claude PR Assistant
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'PR number to generate description for'
+        description: 'PR number'
         required: true
         type: number
 
 concurrency:
-  group: claude-${{ github.event.pull_request.number || inputs.pr_number }}
+  group: claude-pr-${{ github.event.pull_request.number || inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
   generate-description:
+    if: github.event.action == 'opened' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -120,3 +121,41 @@ jobs:
             - Reference the repository's CLAUDE.md for style conventions if available
 
           claude_args: '--allowed-tools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*)"'
+
+  code-review:
+    needs: [generate-description]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+
+            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
