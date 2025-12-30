@@ -1,17 +1,15 @@
-// content-collections.ts
 import { defineCollection, defineConfig } from "@content-collections/core";
+import { compileMDX } from "@content-collections/mdx";
 import { z } from "zod";
-import matter from "gray-matter";
-
-function extractFrontMatter(content: string) {
-  const { data, content: body, excerpt } = matter(content, { excerpt: true });
-  return { data, body, excerpt: excerpt ?? "" };
-}
+import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
 
 const posts = defineCollection({
   name: "posts",
   directory: "./src/content",
-  include: "*.md",
+  include: "**/*.mdx",
   schema: z.object({
     title: z.string(),
     published: z.iso.date(),
@@ -19,20 +17,32 @@ const posts = defineCollection({
     authors: z.array(z.string()),
     content: z.string(),
   }),
-  transform: (post) => {
-    const frontMatter = extractFrontMatter(post.content);
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document, {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypeAutolinkHeadings, { behavior: "wrap" }],
+        [rehypePrettyCode, { theme: "github-dark" }],
+      ],
+    });
 
-    // Extract header image (first image in the document)
-    const headerImageMatch = post.content.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+    const headerImageMatch = document.content.match(/!\[([^\]]*)\]\(([^)]+)\)/);
     const headerImage = headerImageMatch ? headerImageMatch[2] : undefined;
 
+    const excerpt =
+      document.content
+        .replace(/^---[\s\S]*?---\s*/, "")
+        .replace(/^!\[[^\]]*]\([^)]+\)\s*/, "")
+        .split("\n\n")[0]
+        ?.trim() ?? undefined;
+
     return {
-      ...post,
-      slug: post._meta.path,
-      excerpt: frontMatter.excerpt,
-      description: frontMatter.data.description,
+      ...document,
+      slug: document._meta.path,
+      excerpt,
       headerImage,
-      content: frontMatter.body,
+      mdx,
     };
   },
 });

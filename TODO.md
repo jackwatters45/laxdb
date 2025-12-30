@@ -2,9 +2,10 @@
 
 ## Setting back up
 
-- [ ] add blog
-  - [ ] deployment
-  - [ ] improve functionality (mdx, styling)
+- [x] add blog
+  - [x] deployment
+  - [x] mdx
+  - [ ] styling
 - [ ] write
   - [ ] missing tools
   - [ ] overall plans
