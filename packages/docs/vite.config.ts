@@ -26,13 +26,19 @@ export default defineConfig({
         prerender: {
           outputPath: "index.html",
           enabled: true,
-          crawlLinks: true,
+          // Disabled crawlLinks because fumadocs server functions don't work
+          // in TanStack Start's prerender environment (returns 500 error).
+          // TODO: Investigate how to properly static render /docs/* pages
+          // with fumadocs + TanStack Start. May need custom prerender logic
+          // or fumadocs SSG mode.
+          crawlLinks: false,
         },
       },
       pages: [
-        {
-          path: "/docs",
-        },
+        // TODO: Investigate how to properly static render /docs/* pages
+        // {
+        //   path: "/docs",
+        // },
         {
           path: "/api/search",
         },
