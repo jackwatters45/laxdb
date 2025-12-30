@@ -1,12 +1,5 @@
 # TODO
 
-- [ ] renamed actions not working :))
-  - [ ] pr description?
-
----
-
-## Use existing branch
-
 - [ ] get dev working
   - [ ] build web
   - [ ] deployment to main
