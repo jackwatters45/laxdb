@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { allPosts, type Post } from "content-collections";
-import { Markdown } from "@/components/markdown";
+import { MDXContent } from "@/components/mdx-content";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }: { params: { slug: string } }): Post => {
@@ -34,10 +34,7 @@ function BlogPost() {
             })}
           </p>
         </header>
-        <Markdown
-          content={post.content}
-          className="prose prose-gray max-w-none"
-        />
+        <MDXContent code={post.mdx} className="prose prose-gray max-w-none" />
       </article>
     </main>
   );
