@@ -1,6 +1,5 @@
 {
   "name": "laxdb",
-  "version": "0.0.0",
   "description": "Lax DB is a suite of tools made with lacrosse in mind",
   "workspaces": [
     "packages/*"
