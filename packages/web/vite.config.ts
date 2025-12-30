@@ -3,6 +3,8 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import alchemy from "alchemy/cloudflare/tanstack-start";
+import { devtools } from "@tanstack/devtools-vite";
+import tailwindcss from "@tailwindcss/vite";
 
 const config = defineConfig({
   build: {
@@ -12,8 +14,10 @@ const config = defineConfig({
     },
   },
   plugins: [
+    devtools(),
     viteTsConfigPaths({ projects: ["./tsconfig.json"] }),
     alchemy(),
+    tailwindcss(),
     tanstackStart(),
     viteReact(),
   ],

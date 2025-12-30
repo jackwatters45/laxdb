@@ -1,2 +1,3 @@
-better-auth-cloudflare
-laxtalk
+*
+!package.json
+!tsconfig.json

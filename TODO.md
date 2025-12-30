@@ -1,8 +1,11 @@
 # TODO
 
-- [ ] get dev working
-  - [ ] build web
+- [x] migrate to tailwind v4?
+- [x] get dev working
+  - [x] build web
   - [ ] deployment to main
+
+- [ ] add build script to turbo
 
 - [ ] figure out staging branching for pg
 
@@ -18,7 +21,6 @@
 - [ ] contributing docs site
 
 - [ ] consolidate ui components
-- [ ] migrate to tailwind v4?
 
 - [ ] ts-aware - web package + current fixes
 - [ ] fix http api
