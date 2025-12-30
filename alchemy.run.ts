@@ -34,12 +34,15 @@ export const secrets = {
 // Domain
 const PRODUCTION = "laxdb.io";
 const DEV = "dev.laxdb.io";
-export const domain =
-  stage === prodStage
-    ? PRODUCTION
-    : stage === devStage
-      ? DEV
-      : `${stage}.${DEV}`;
+
+const getDomain = (subdomain?: string) => {
+  const prefix = subdomain ? `${subdomain}.` : "";
+  if (stage === prodStage) return `${prefix}${PRODUCTION}`;
+  if (stage === devStage) return `${prefix}${DEV}`;
+  return `${prefix}${stage}.${DEV}`;
+};
+
+export const domain = getDomain();
 
 // DB
 const database = await Database("Database", {
@@ -144,29 +147,23 @@ export const storage = await R2Bucket("storage", {});
 //   },
 // });
 
-// export const web = await TanStackStart("web", {
-//   bindings: {
-//     DB: db,
-//     KV: kv,
-//     STORAGE: storage,
-//     DATABASE_URL: dbRole.connectionUrl,
-//     // API_URL: worker.url!,
-//     ...secrets,
-//   },
-//   cwd: "./packages/web",
-//   domains: [domain],
-// });
+ export const marketing = await TanStackStart('marketing', {
+   bindings: {},
+   cwd: './packages/marketing',
+   domains: [domain],
+ });
 
-export const marketing = await TanStackStart('marketing', {
+export const docs = await TanStackStart('docs', {
   bindings: {},
-  cwd: './packages/marketing',
-  domains: [domain],
+  cwd: './packages/docs',
+  domains: [getDomain('docs')],
 });
 
 console.log({
   domain,
-  // web: web.url,
-  marketing: marketing.url,
+   // web: web.url,
+   marketing: marketing.url,
+   docs: docs.url,
   // api: api.url,
   db: database.id,
   kv: kv.namespaceId,
@@ -184,7 +181,7 @@ if (process.env.PULL_REQUEST) {
 
      Your changes have been deployed to a preview environment:
 
-     **🌐 Docs:** ${"docs.url"}
+     **🌐 Docs:** ${docs.url}
      **🌐 Marketing:** ${marketing.url}
      **🌐 Website:** ${"web.url"}
 

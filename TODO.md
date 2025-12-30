@@ -14,6 +14,7 @@
   - [ ] tool plans
 - [ ] add changesets
 - [ ] contributing docs site
+- [ ] consolidate ui components
 
 - [ ] build web
 - [ ] migrate to tailwind v4
