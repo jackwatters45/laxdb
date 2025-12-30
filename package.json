@@ -1,7 +1,6 @@
 {
   "name": "laxdb",
   "version": "0.0.0",
-  "private": true,
   "description": "Lax DB is a suite of tools made with lacrosse in mind",
   "workspaces": [
     "packages/*"
@@ -16,6 +15,9 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "fix": "turbo fix",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish",
     "prepare": "effect-language-service patch",
     "postinstall": "vibe-rules install codex"
   },
@@ -24,6 +26,8 @@
     "effect": "^3.19.13"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
     "@cloudflare/vitest-pool-workers": "^0.8.71",
     "@cloudflare/workers-types": "^4.20251230.0",
     "@effect/language-service": "^0.62.5",
