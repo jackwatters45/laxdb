@@ -4,36 +4,80 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+permissions:
+  contents: write
 
 jobs:
   release:
-    name: Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Create Release Pull Request
-        uses: changesets/action@v1
-        with:
-          version: bun run version
-          commit: "chore: version packages"
-          title: "chore: version packages"
-          createGithubReleases: true
+      - name: Determine version bump
+        id: bump
+        if: github.ref == 'refs/heads/main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BUMP="patch"
+          
+          PR_NUMBER=$(gh pr list --search "${{ github.sha }}" --state merged --json number -q '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$PR_NUMBER" ]; then
+            LABELS=$(gh pr view "$PR_NUMBER" --json labels -q '.labels[].name' 2>/dev/null || echo "")
+            if echo "$LABELS" | grep -q "release:major"; then
+              BUMP="major"
+            elif echo "$LABELS" | grep -q "release:minor"; then
+              BUMP="minor"
+            fi
+          fi
+          
+          echo "type=$BUMP" >> $GITHUB_OUTPUT
+          echo "Version bump: $BUMP"
+
+      - name: Get next version
+        id: version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          LATEST=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+          BUMP="${{ steps.bump.outputs.type }}"
+          
+          if [ -z "$LATEST" ]; then
+            case "$BUMP" in
+              major) NEXT="v1.0.0" ;;
+              minor) NEXT="v0.1.0" ;;
+              *)     NEXT="v0.0.1" ;;
+            esac
+          else
+            MAJOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f1)
+            MINOR=$(echo "$LATEST" | sed 's/v//' | cut -d. -f2)
+            PATCH=$(echo "$LATEST" | sed 's/v//' | cut -d. -f3)
+            
+            case "$BUMP" in
+              major) NEXT="v$((MAJOR+1)).0.0" ;;
+              minor) NEXT="v${MAJOR}.$((MINOR+1)).0" ;;
+              *)     NEXT="v${MAJOR}.${MINOR}.$((PATCH+1))" ;;
+            esac
+          fi
+          
+          echo "tag=$NEXT" >> $GITHUB_OUTPUT
+          echo "Next version: $NEXT"
+
+      - name: Create tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || steps.version.outputs.tag }}
+          generate_release_notes: true
