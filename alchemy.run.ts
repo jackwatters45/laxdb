@@ -147,6 +147,18 @@ export const storage = await R2Bucket("storage", {});
 //   },
 // });
 
+export const web = await TanStackStart("web", {
+  cwd: './packages/web',
+  domains: [domain],
+  bindings: {
+    DB: db,
+    KV: kv,
+    STORAGE: storage,
+    DATABASE_URL: dbRole.connectionUrl,
+    ...secrets,
+  },
+});
+
  export const marketing = await TanStackStart('marketing', {
    bindings: {},
    cwd: './packages/marketing',
