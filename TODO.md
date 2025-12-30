@@ -2,8 +2,11 @@
 
 ## Setting back up
 
-- [x] add changesets
-- [ ] claude description not consistently working
+- [ ] get dev working
+  - [ ] build web
+
+- [ ] figure out staging branching for pg
+- [ ] deployment to main
 
 - [ ] write
   - [ ] missing tools
@@ -11,20 +14,15 @@
   - [ ] wikipedia like lacrosse repo
 - [ ] update marketing page
   - [ ] blog
+    - [ ] styling
   - [ ] tool plans
-  - [ ] blog styling
+
 - [ ] contributing docs site
 
 - [ ] consolidate ui components
-
-- [ ] build web
 - [ ] migrate to tailwind v4?
 
-- [ ] figure out staging branching for pg
-- [ ] get dev working
-- [ ] deployment (vite)
-
-- [ ] ts-aware - web package
+- [ ] ts-aware - web package + current fixes
 - [ ] fix http api
 
 ## Pressing things to eventually do..
