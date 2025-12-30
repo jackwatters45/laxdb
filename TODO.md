@@ -1,7 +1,5 @@
 # TODO
 
-## Setting back up
-
 - [ ] get dev working
   - [ ] build web
 
