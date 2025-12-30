@@ -4,7 +4,7 @@ import {
   RiTwitterXFill,
   RiYoutubeFill,
 } from "@remixicon/react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { SolarLogo } from "../../../public/solar-logo";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -66,9 +66,7 @@ const Footer = () => {
         className="relative mx-auto flex max-w-6xl flex-wrap pt-4"
         id="footer"
       >
-        {/* Vertical Lines */}
         <div className="pointer-events-none inset-0">
-          {/* Left */}
           <div
             className="absolute inset-y-0 my-[-5rem] w-px"
             style={{
@@ -92,7 +90,6 @@ const Footer = () => {
             </svg>
           </div>
 
-          {/* Right */}
           <div
             className="absolute inset-y-0 right-0 my-[-5rem] w-px"
             style={{
@@ -119,10 +116,6 @@ const Footer = () => {
         <svg
           aria-hidden="true"
           className="mb-10 h-20 w-full border-y border-dashed border-gray-300 stroke-gray-300"
-          // style={{
-          //   maskImage:
-          //     "linear-gradient(transparent, white 10rem, white calc(100% - 10rem), transparent)",
-          // }}
         >
           <defs>
             <pattern
@@ -154,7 +147,7 @@ const Footer = () => {
         <div className="mr-auto flex w-full justify-between lg:w-fit lg:flex-col">
           <Link
             className="flex items-center font-medium text-gray-700 select-none sm:text-sm"
-            href="/"
+            to="/"
           >
             <SolarLogo className="ml-2 w-20" />
 
@@ -163,39 +156,38 @@ const Footer = () => {
 
           <div>
             <div className="mt-4 flex items-center">
-              {/* Social Icons */}
-              <Link
+              <a
                 className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
                 href="#"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <RiTwitterXFill className="size-5" />
-              </Link>
-              <Link
+              </a>
+              <a
                 className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
                 href="#"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <RiYoutubeFill className="size-5" />
-              </Link>
-              <Link
+              </a>
+              <a
                 className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
                 href="#"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <RiGithubFill className="size-5" />
-              </Link>
-              <Link
+              </a>
+              <a
                 className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
                 href="#"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <RiSlackFill className="size-5" />
-              </Link>
+              </a>
             </div>
             <div className="ml-2 hidden text-sm text-gray-700 lg:inline">
               &copy; {CURRENT_YEAR} Solar Technologies, Inc.
@@ -203,7 +195,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Sections */}
         {Object.entries(sections).map(([key, section]) => (
           <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0" key={key}>
             <h3 className="mb-4 font-medium text-gray-900 sm:text-sm">
@@ -212,12 +203,12 @@ const Footer = () => {
             <ul className="space-y-4">
               {section.items.map((item) => (
                 <li className="text-sm" key={item.label}>
-                  <Link
+                  <a
                     className="text-gray-600 transition-colors duration-200 hover:text-gray-900"
                     href={item.href}
                   >
                     {item.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

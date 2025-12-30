@@ -1,23 +1,42 @@
 {
-  "extends": "@tsconfig/bun",
+  "$schema": "https://www.schemastore.org/tsconfig",
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
+    // @tsconfig/bun - Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // @tsconfig/bun - Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // @tsconfig/bun - Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // @tsconfig/bun - Stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Project-specific
+    "forceConsistentCasingInFileNames": true,
     "strictNullChecks": true,
     "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
     "incremental": true,
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
     "sourceMap": true,
-    "skipLibCheck": true,
-    "module": "preserve",
-    "moduleResolution": "bundler",
-    "noEmit": true,
     "plugins": [
       {
-        "name": "@effect/language-service",
-      },
-    ],
-  },
+        "name": "@effect/language-service"
+      }
+    ]
+  }
 }

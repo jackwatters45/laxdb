@@ -4,6 +4,9 @@ node_modules
 # ts build
 *.tsbuildinfo
 
+# content collections
+.content-collections
+
 # wrangler
 .wrangler
 

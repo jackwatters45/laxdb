@@ -1,3 +1,4 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { CallToAction } from "@/components/ui/call-to-action";
 import FeatureDivider from "@/components/ui/feature-divider";
 import Features from "@/components/ui/features";
@@ -6,7 +7,11 @@ import { MapComponent } from "@/components/ui/map/map";
 import { SolarAnalytics } from "@/components/ui/solar-analytics";
 import Testimonial from "@/components/ui/testimonial";
 
-export default function Home() {
+export const Route = createFileRoute("/")({
+  component: Home,
+});
+
+function Home() {
   return (
     <main className="relative mx-auto flex flex-col">
       <div className="pt-56">

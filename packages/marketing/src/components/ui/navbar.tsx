@@ -1,9 +1,9 @@
 "use client";
 
 import { RiCloseFill, RiMenuFill } from "@remixicon/react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import React from "react";
-import { siteConfig } from "@/app/site-config";
+import { siteConfig } from "@/site";
 import useScroll from "@/lib/use-scroll";
 import { cn } from "@/lib/utils";
 import { SolarLogo } from "../../../public/solar-logo";
@@ -24,21 +24,21 @@ export function NavBar() {
     >
       <div className="w-full md:my-auto">
         <div className="relative flex items-center justify-between">
-          <Link aria-label="Home" href={siteConfig.baseLinks.home}>
+          <Link aria-label="Home" to={siteConfig.baseLinks.home}>
             <span className="sr-only">Solar Tech Logo</span>
             <SolarLogo className="w-22" />
           </Link>
           <nav className="hidden sm:block md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:transform">
             <div className="flex items-center gap-10 font-medium">
-              <Link className="px-2 py-1 text-gray-900" href="#solutions">
+              <a className="px-2 py-1 text-gray-900" href="#solutions">
                 Solutions
-              </Link>
-              <Link className="px-2 py-1 text-gray-900" href="#farm-management">
+              </a>
+              <a className="px-2 py-1 text-gray-900" href="#farm-management">
                 Farm Management
-              </Link>
-              <Link className="px-2 py-1 text-gray-900" href="#solar-analytics">
+              </a>
+              <a className="px-2 py-1 text-gray-900" href="#solar-analytics">
                 Analytics
-              </Link>
+              </a>
             </div>
           </nav>
           <Button
@@ -85,7 +85,7 @@ export function NavBar() {
                 }
               }}
             >
-              <Link href="#solutions">Solutions</Link>
+              <a href="#solutions">Solutions</a>
             </li>
             <li
               onClick={() => {
@@ -97,7 +97,7 @@ export function NavBar() {
                 }
               }}
             >
-              <Link href="#farm-management">Farm Management</Link>
+              <a href="#farm-management">Farm Management</a>
             </li>
             <li
               onClick={() => {
@@ -109,7 +109,7 @@ export function NavBar() {
                 }
               }}
             >
-              <Link href="#solar-analytics">Analytics</Link>
+              <a href="#solar-analytics">Analytics</a>
             </li>
           </ul>
           <Button className="text-lg" variant="secondary">
