@@ -5,8 +5,8 @@ on:
     types: [labeled]
 
 concurrency:
-  group: ai-changeset-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: claude-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   generate-changeset:

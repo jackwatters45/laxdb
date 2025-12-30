@@ -10,6 +10,10 @@ on:
     #   - "src/**/*.js"
     #   - "src/**/*.jsx"
 
+concurrency:
+  group: claude-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   claude-review:
     # Optional: Filter by PR author
