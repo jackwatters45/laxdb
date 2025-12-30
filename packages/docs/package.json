@@ -1,5 +1,6 @@
 {
   "name": "@laxdb/docs",
+  "private": true,
   "type": "module",
   "sideEffects": false,
   "scripts": {

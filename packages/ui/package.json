@@ -1,6 +1,7 @@
 {
   "name": "@laxdb/ui",
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "exports": {
     "./globals.css": "./src/styles/globals.css",
