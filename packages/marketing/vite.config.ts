@@ -13,8 +13,8 @@ export default defineConfig({
     },
   },
   plugins: [
-    viteTsConfigPaths({ projects: ["./tsconfig.json"] }),
     contentCollections(),
+    viteTsConfigPaths({ projects: ["./tsconfig.json"] }),
     alchemy(),
     tanstackStart(),
     viteReact(),

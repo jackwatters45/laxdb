@@ -1,12 +1,9 @@
-## <!-- src/blog/hello-world.md -->
-
+---
 title: Hello World
 published: 2024-01-15
 authors:
-
-- Jane Doe
-  description: My first blog post
-
+  - Jane Doe
+description: My first blog post
 ---
 
 ![Hero Image](/images/hero.jpg)

@@ -17,6 +17,7 @@ const posts = defineCollection({
     published: z.iso.date(),
     description: z.string().optional(),
     authors: z.array(z.string()),
+    content: z.string(),
   }),
   transform: (post) => {
     const frontMatter = extractFrontMatter(post.content);

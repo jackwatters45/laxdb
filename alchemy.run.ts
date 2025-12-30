@@ -75,8 +75,7 @@ const personalBranch = await Branch("personal-branch", {
 const currentBranch =
   stage === prodStage
     ? database.defaultBranch
-    : stage === devStage
-      ? devBranch
+    : stage === devStage || stage.startsWith("pr-")      ? devBranch
       : personalBranch;
 
 // Admin role for current branch
@@ -89,6 +88,7 @@ const dbRole = await Role(`db-role-${stage}`, {
 // Hyperdrive connection pooling
 const db = await Hyperdrive("hyperdrive", {
   origin: dbRole.connectionUrl,
+  adopt: true
 });
 
 // Generate Drizzle migrations
@@ -184,6 +184,8 @@ if (process.env.PULL_REQUEST) {
 
      Your changes have been deployed to a preview environment:
 
+     **🌐 Docs:** ${"docs.url"}
+     **🌐 Marketing:** ${marketing.url}
      **🌐 Website:** ${"web.url"}
 
      Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}

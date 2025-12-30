@@ -49,5 +49,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Generate content-collections
+        run: bun run gen:content-collections
+        working-directory: packages/marketing
+
       - name: Typecheck
         run: bun run typecheck

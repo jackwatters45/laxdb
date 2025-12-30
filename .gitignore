@@ -4,13 +4,11 @@ node_modules
 # ts build
 *.tsbuildinfo
 
+# content collections
+.content-collections
+
 # wrangler
 .wrangler
-wrangler.jsonc
-wrangler.json
-
-#content collections
-.content-collections
 
 # alchemy
 .alchemy

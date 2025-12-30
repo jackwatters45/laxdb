@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite dev --port 3002",
     "build": "vite build",
+    "gen:content-collections": "content-collections build",
     "start": "node .output/server/index.mjs",
     "serve": "vite preview",
     "typecheck": "tsgo --noEmit",
@@ -46,8 +47,10 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@content-collections/cli": "^0.1.8",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "4.0.0-beta.3",
+    "@tsconfig/bun": "^1.0.10",
     "@types/hast": "^3.0.4",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
