@@ -478,3 +478,171 @@ Located at `packages/web`. TanStack Router + React app.
 - better-auth
 - tanstack query
 - tanstack table
+
+---
+
+# PROJECT KNOWLEDGE BASE
+
+**Generated:** 2025-12-31
+**Commit:** 7dd20db
+
+## OVERVIEW
+
+Lacrosse team/club management platform. Effect-TS backend, TanStack Start frontend, Cloudflare Workers deployment via Alchemy IaC. PlanetScale PostgreSQL with Drizzle ORM.
+
+## STRUCTURE
+
+```
+laxdb/
+├── packages/
+│   ├── core/           # Effect services, Drizzle schemas, domain logic
+│   ├── api/            # Effect RPC + HTTP API (Cloudflare Worker)
+│   ├── web/            # TanStack Start app (main frontend)
+│   ├── ui/             # shadcn/Base UI components (NOT Radix)
+│   ├── marketing/      # Marketing site (TanStack Start)
+│   ├── docs/           # Fumadocs documentation site
+│   └── effect-cloudflare/  # Effect bindings for CF primitives (experimental)
+├── alchemy.run.ts      # Infrastructure as Code (entry point for deploy)
+├── types/              # Global TypeScript declarations
+└── llms/               # Reference docs for libraries
+```
+
+## WHERE TO LOOK
+
+| Task | Location | Pattern |
+|------|----------|---------|
+| Add domain entity | `packages/core/src/{entity}/` | Create: schema → sql → repo → service → contract |
+| Add API endpoint | `packages/api/src/{entity}/` | Create: rpc.ts (handlers) → api.ts (HTTP) → client.ts |
+| Add frontend route | `packages/web/src/routes/` | File-based routing, use `-components/` for route-specific components |
+| Add UI component | `packages/ui/src/components/ui/` | `bunx --bun shadcn@latest add <component>` |
+| Add data table | `packages/ui/src/components/data-table/` | Uses @tanstack/react-table |
+| Modify DB schema | `packages/core/src/schema.ts` | Run `bun run db:generate` then `bun run db:migrate` |
+| Change infrastructure | `alchemy.run.ts` | Run `bun run deploy` to apply |
+| Add auth logic | `packages/core/src/auth/` | Uses better-auth with org/team support |
+
+## CODE MAP
+
+### Domain Modules (packages/core/src/)
+
+| Module | Files | Purpose |
+|--------|-------|---------|
+| auth/ | 5 | better-auth integration, permissions |
+| organization/ | 6 | Multi-tenant org management |
+| team/ | 6 | Teams within organizations |
+| player/ | 5 + contact-info/ (5) | Player profiles, contact info |
+| game/ | 5 | Game scheduling, stats |
+| season/ | 5 | Season management |
+| feedback/ | 4 | User feedback system |
+| email/ | 3 | AWS SES email service |
+| user/ | 4 | User profiles |
+
+### Per-Module File Pattern
+
+```
+{module}/
+├── {module}.schema.ts    # Effect Schema classes (inputs, outputs)
+├── {module}.sql.ts       # Drizzle table definitions
+├── {module}.repo.ts      # Database operations (Effect)
+├── {module}.service.ts   # Business logic (Effect.Service)
+├── {module}.contract.ts  # RPC contract definitions
+└── {module}.error.ts     # Domain-specific errors (optional)
+```
+
+### API Layer (packages/api/src/)
+
+```
+{module}/
+├── {module}.rpc.ts       # RpcGroup + handlers
+├── {module}.api.ts       # HttpApi routes (OpenAPI)
+└── {module}.client.ts    # Type-safe client exports
+```
+
+## CONVENTIONS
+
+### Effect Patterns (CRITICAL)
+
+```typescript
+// Service definition - ALWAYS use this pattern
+export class MyService extends Effect.Service<MyService>()("MyService", {
+  effect: Effect.gen(function* () {
+    const dep = yield* SomeDependency;
+    return { /* methods */ };
+  }),
+  dependencies: [SomeDependency.Default],
+}) {}
+
+// Error handling - use catchTag, not catchAll
+Effect.catchTag("SqlError", (e) => Effect.fail(parsePostgresError(e)))
+
+// Input validation - always decode first
+const decoded = yield* decodeArguments(InputSchema, input);
+```
+
+### Linting/Formatting
+
+- **oxlint** (not ESLint) - run `bun run lint`
+- **oxfmt** (not Prettier) - run `bun run format`
+- Combined: `bun run fix`
+- Type checking: `bun run typecheck` (uses tsgo)
+
+### TypeScript Rules
+
+- `typescript/consistent-type-imports`: REQUIRED (`import type`)
+- `typescript/consistent-type-exports`: REQUIRED
+- `import/no-cycle`: ERROR (circular imports forbidden)
+- `typescript/no-explicit-any`: OFF (allowed in this project)
+
+### Frontend (packages/web)
+
+- Routes use TanStack Router file-based routing
+- Route-specific components: `-components/` directory (dash prefix)
+- Use `@/` path alias for imports from src/
+- Forms: react-hook-form with Field components from @laxdb/ui
+
+### UI Components (packages/ui)
+
+- Built on **Base UI** (NOT Radix) - APIs differ
+- See package AGENTS.md for Base UI specifics
+
+## ANTI-PATTERNS
+
+| Pattern | Why Bad | Do Instead |
+|---------|---------|------------|
+| `Effect.catchAll` | Swallows typed errors | Use `Effect.catchTag` |
+| `as any` / `@ts-ignore` | Defeats type safety | Fix the types properly |
+| Import from `effect/internal` | Unstable APIs | Use public effect exports |
+| Direct DB queries in routes | Bypasses service layer | Use service → repo pattern |
+| Inline styles in components | Inconsistent styling | Use Tailwind classes |
+| `useState` for server data | Missing cache/sync | Use TanStack Query |
+
+## COMMANDS
+
+```bash
+# Development
+bun run dev                    # Start all packages (via Alchemy)
+infisical run --env=dev -- bun run dev  # With secrets
+
+# Database
+cd packages/core
+bun run db:generate            # Generate migrations from schema
+bun run db:migrate             # Apply migrations
+bun run db:studio              # Open Drizzle Studio
+
+# Quality
+bun run typecheck              # TypeScript check all packages
+bun run fix                    # Lint + format all packages
+bun run test                   # Run tests (per-package)
+
+# Deployment
+bun run deploy                 # Deploy via Alchemy
+bun run destroy                # Tear down infrastructure
+```
+
+## NOTES
+
+- **Infisical for secrets**: Use `infisical run --env=dev --` prefix for local dev
+- **DB branching**: PlanetScale uses main→development→personal branches; stage determines branch
+- **PR previews**: Alchemy auto-creates preview deployments with GitHub comments
+- **No CI workflows**: Deployment is via Alchemy commands, not GitHub Actions
+- **Many TODOs**: Web routes have placeholder API calls marked `// TODO: Replace with actual API`
+- **effect-cloudflare**: Experimental package, not production-ready
