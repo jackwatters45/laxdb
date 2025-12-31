@@ -82,7 +82,7 @@ const currentBranch =
       : personalBranch;
 
 // Admin role for current branch
-const dbRole = await Role(`db-role-${stage}`, {
+const dbRole = await Role(`db-role-${stage}-v2`, {
   database,
   branch: currentBranch,
   inheritedRoles: ["postgres"],
