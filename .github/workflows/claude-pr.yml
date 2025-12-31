@@ -35,16 +35,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           echo "========== Checking PR State =========="
-          
           PR_DATA=$(gh pr view "$PR_NUMBER" --json title,body)
           TITLE=$(echo "$PR_DATA" | jq -r '.title')
           BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
           BODY_LENGTH=${#BODY}
-          
           echo "Current title: $TITLE"
           echo "Body length: $BODY_LENGTH chars"
-          
-          # Check conventional commit prefix
           if echo "$TITLE" | grep -qE "^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\(.+\))?:"; then
             echo "✅ Title has conventional commit prefix"
             echo "needs_title=false" >> $GITHUB_OUTPUT
@@ -52,8 +48,6 @@ jobs:
             echo "❌ Title needs conventional commit prefix"
             echo "needs_title=true" >> $GITHUB_OUTPUT
           fi
-          
-          # Check body structure
           HAS_SUMMARY=$(echo "$BODY" | grep -c "## Summary" || true)
           if [ "$BODY_LENGTH" -gt 100 ] && [ "$HAS_SUMMARY" -gt 0 ]; then
             echo "✅ Body has description"
@@ -111,6 +105,8 @@ jobs:
             - Single line, conventional commit format
             - Format: type(scope): description (max 72 chars)
             - Types: feat, fix, chore, docs, style, refactor, perf, test, build, ci, revert
+            - IMPORTANT: Title must be all lowercase, EXCEPT for file names which keep exact case
+            - Examples: "fix: resolve null pointer in auth.ts", "feat(api): add user endpoint"
             
             If needs new body, write to /tmp/new-body.txt:
             - Use this exact format:
@@ -150,7 +146,6 @@ jobs:
         run: |
           echo "========== Applying PR Updates =========="
           
-          # Check if Claude generated title
           if [ -f /tmp/new-title.txt ]; then
             NEW_TITLE=$(cat /tmp/new-title.txt | head -1 | tr -d '\n')
             echo "Claude generated title: $NEW_TITLE"
@@ -167,42 +162,20 @@ jobs:
             else
               PREFIX="chore"
             fi
-            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's|^[^/]*/||' | tr '-' ' ' | tr '_' ' ')
+            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's|^[^/]*/||' | tr '-' ' ' | tr '_' ' ' | tr '[:upper:]' '[:lower:]')
             NEW_TITLE="${PREFIX}: ${CLEAN_BRANCH}"
             echo "Fallback title: $NEW_TITLE"
           fi
           
-          # Check if Claude generated body
           if [ -f /tmp/new-body.txt ]; then
             echo "Claude generated body ($(wc -c < /tmp/new-body.txt) bytes)"
             BODY_FILE="/tmp/new-body.txt"
           elif [ "${{ steps.check-pr.outputs.needs_body }}" = "true" ]; then
             echo "Claude didn't generate body, using fallback..."
-            cat > /tmp/fallback-body.txt << 'EOF'
-          ## Summary
-          Automated PR description.
-
-          ## Changes
-          See files changed in this PR.
-
-          ## Type
-          - [ ] Bug fix
-          - [ ] New feature
-          - [ ] Refactor
-          - [ ] Documentation
-          - [ ] Tests
-          - [x] Other
-
-          ## Notes
-          Please review and update this description.
-
-          ---
-          *Auto-generated fallback.*
-          EOF
+            printf '%s\n' "## Summary" "Automated PR description." "" "## Changes" "See files changed in this PR." "" "## Type" "- [ ] Bug fix" "- [ ] New feature" "- [ ] Refactor" "- [ ] Documentation" "- [ ] Tests" "- [x] Other" "" "## Notes" "Please review and update this description." "" "---" "*Auto-generated fallback.*" > /tmp/fallback-body.txt
             BODY_FILE="/tmp/fallback-body.txt"
           fi
           
-          # Apply updates
           if [ "${{ steps.check-pr.outputs.needs_title }}" = "true" ] && [ -n "$NEW_TITLE" ]; then
             if [ "${{ steps.check-pr.outputs.needs_body }}" = "true" ] && [ -n "$BODY_FILE" ]; then
               echo "Updating title and body..."
@@ -246,7 +219,6 @@ jobs:
           gh pr diff "$PR_NUMBER" > /tmp/pr-diff-review.txt 2>&1 || echo "No diff" > /tmp/pr-diff-review.txt
           head -c 80000 /tmp/pr-diff-review.txt > /tmp/pr-diff-truncated.txt
           gh pr view "$PR_NUMBER" --json title,body,files > /tmp/pr-meta.json
-          
           TITLE=$(gh pr view "$PR_NUMBER" --json title -q '.title')
           echo "title=$TITLE" >> $GITHUB_OUTPUT
           echo "PR Title: $TITLE"
@@ -273,22 +245,21 @@ jobs:
                - Performance considerations
                - Security concerns
                - Test coverage
-               - Whether title follows conventional commit format (feat:, fix:, chore:, etc.)
+               - Whether title follows conventional commit format (all lowercase except file names)
             
             3. Write your review to /tmp/review-comment.txt in this format:
             
-            ## 🤖 Code Review
+            ## Code Review
 
             ### Summary
             Brief summary of what this PR does.
 
             ### Title Convention
-            ✅ or ⚠️ note about conventional commit format
+            Note if title follows format (type: lowercase description, file names keep case)
 
             ### Feedback
             - Point 1
             - Point 2
-            - Point 3
 
             ### Suggestions
             - Suggestion 1 (if any)
@@ -315,41 +286,18 @@ jobs:
             REVIEW_FILE="/tmp/review-comment.txt"
           else
             echo "Claude didn't generate review, using fallback..."
-            
             PR_STATS=$(gh pr view "$PR_NUMBER" --json files,additions,deletions,title)
             FILES_CHANGED=$(echo "$PR_STATS" | jq '.files | length')
             ADDITIONS=$(echo "$PR_STATS" | jq '.additions')
             DELETIONS=$(echo "$PR_STATS" | jq '.deletions')
             TITLE=$(echo "$PR_STATS" | jq -r '.title')
             
-            TITLE_CHECK="⚠️ Title should use conventional commit format (feat:, fix:, chore:, etc.)"
+            TITLE_CHECK="Title should use conventional commit format (type: lowercase description)"
             if echo "$TITLE" | grep -qE "^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\(.+\))?:"; then
-              TITLE_CHECK="✅ Title follows conventional commit format"
+              TITLE_CHECK="Title follows conventional commit format"
             fi
             
-            cat > /tmp/fallback-review.txt << EOF
-          ## 🤖 Code Review
-
-          *Automated review - Claude was unable to generate detailed feedback.*
-
-          ### Stats
-          - **Files changed:** $FILES_CHANGED
-          - **Lines added:** +$ADDITIONS
-          - **Lines deleted:** -$DELETIONS
-
-          ### Title Convention
-          $TITLE_CHECK
-
-          ### Checklist
-          Please manually verify:
-          - [ ] Code follows project conventions
-          - [ ] No obvious bugs
-          - [ ] Tests added if needed
-          - [ ] No security concerns
-
-          ---
-          *Fallback review*
-          EOF
+            printf '%s\n' "## Code Review" "" "*Automated review - Claude was unable to generate detailed feedback.*" "" "### Stats" "- **Files changed:** $FILES_CHANGED" "- **Lines added:** +$ADDITIONS" "- **Lines deleted:** -$DELETIONS" "" "### Title Convention" "$TITLE_CHECK" "" "### Checklist" "- [ ] Code follows project conventions" "- [ ] No obvious bugs" "- [ ] Tests added if needed" "" "---" "*Fallback review*" > /tmp/fallback-review.txt
             REVIEW_FILE="/tmp/fallback-review.txt"
           fi
           
@@ -358,4 +306,4 @@ jobs:
           echo "--- End review ---"
           
           gh pr comment "$PR_NUMBER" --body-file "$REVIEW_FILE"
-          echo "✅ Review posted"
+          echo "Review posted"
