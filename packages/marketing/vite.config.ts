@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import contentCollections from "@content-collections/vite";
 import alchemy from "alchemy/cloudflare/tanstack-start";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   build: {
@@ -16,6 +17,7 @@ export default defineConfig({
     contentCollections(),
     viteTsConfigPaths({ projects: ["./tsconfig.json"] }),
     alchemy(),
+    tailwindcss(),
     tanstackStart(),
     viteReact(),
   ],

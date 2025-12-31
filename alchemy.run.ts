@@ -149,7 +149,7 @@ export const storage = await R2Bucket("storage", {});
 
 export const web = await TanStackStart("web", {
   cwd: './packages/web',
-  domains: [domain],
+  domains: [getDomain('app')],
   bindings: {
     DB: db,
     KV: kv,
@@ -195,7 +195,7 @@ if (process.env.PULL_REQUEST) {
 
      **🌐 Docs:** ${docs.url}
      **🌐 Marketing:** ${marketing.url}
-     **🌐 Website:** ${"web.url"}
+     **🌐 Website:** ${web.url}
 
      Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
 

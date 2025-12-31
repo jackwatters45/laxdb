@@ -14,6 +14,8 @@ import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
 import { Toaster } from "@laxdb/ui/components/ui/sonner";
 import globalsCss from "@/globals.css?url";
 import { seo } from "@/lib/seo";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -84,6 +86,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="antialiased">
         {children}
+        <TanStackDevtools
+          config={{
+            position: "bottom-right",
+          }}
+          plugins={[
+            {
+              name: "Tanstack Router",
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+          ]}
+        />
         <Scripts />
       </body>
     </html>
