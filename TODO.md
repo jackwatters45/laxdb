@@ -1,10 +1,5 @@
 # TODO
 
-- [x] migrate to tailwind v4?
-- [x] get dev working
-  - [x] build web
-  - [ ] deployment to main
-
 - [ ] add build script to turbo
 
 - [ ] figure out staging branching for pg
