@@ -1,6 +1,9 @@
 # TODO
 
+- [ ] pr descriptions still not quite working
+- [ ] deploying to main
 - [ ] build script to turbo not really working
+- [ ] ts-aware - web package + current fixes
 
 - [ ] write
   - [ ] missing tools
@@ -15,7 +18,6 @@
 
 - [ ] consolidate ui components
 
-- [ ] ts-aware - web package + current fixes
 - [ ] fix http api
 
 ## Pressing things to eventually do..
