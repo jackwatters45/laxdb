@@ -2,6 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env", ".env.*", "tsconfig.json"],
   "globalEnv": ["NODE_ENV", "CI"],
+  "globalPassThroughEnv": [
+    "CLOUDFLARE_ACCOUNT_ID",
+    "CLOUDFLARE_API_TOKEN",
+    "DATABASE_URL",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL"
+  ],
   "tasks": {
     "typecheck": {
       "dependsOn": ["^typecheck"],
@@ -15,17 +22,8 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "public/**",
-        "tsconfig.json",
-        "package.json",
-        "vite.config.ts",
-        "next.config.ts"
-      ],
-      "outputs": ["dist/**", ".next/**", ".output/**", "!.next/cache/**"],
-      "env": ["VITE_*", "NEXT_PUBLIC_*"]
+      "outputs": ["dist/**", ".output/**"],
+      "env": ["VITE_*"]
     },
     "test": {
       "dependsOn": ["^build"],

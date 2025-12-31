@@ -34,15 +34,13 @@ export default defineConfig({
           crawlLinks: false,
         },
       },
-      pages: [
-        // TODO: Investigate how to properly static render /docs/* pages
-        // {
-        //   path: "/docs",
-        // },
-        {
-          path: "/api/search",
-        },
-      ],
+      // TODO: Investigate prerendering /docs/* and /api/search
+      // fumadocs server functions don't work reliably in TanStack Start's
+      // prerender environment (returns 500 error during turbo parallel builds).
+      // pages: [
+      //   { path: "/docs" },
+      // { path: "/api/search" },
+      // ],
     }),
     react(),
   ],
