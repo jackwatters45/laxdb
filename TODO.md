@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] pr descriptions still not quite working
+- [x] pr descriptions still not quite working
 - [ ] deploying to main
 - [ ] build script to turbo not really working
 - [ ] ts-aware - web package + current fixes
