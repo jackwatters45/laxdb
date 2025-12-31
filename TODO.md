@@ -1,8 +1,6 @@
 # TODO
 
-- [ ] add build script to turbo
-
-- [ ] figure out staging branching for pg
+- [ ] build script to turbo not really working
 
 - [ ] write
   - [ ] missing tools
@@ -30,7 +28,3 @@
 
 - Blog some of the specific/unique technical challenges
   - http + rpc
-
-```
-
-```

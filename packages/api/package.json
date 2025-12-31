@@ -6,8 +6,6 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
