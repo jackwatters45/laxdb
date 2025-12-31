@@ -27,7 +27,6 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 
 - Bun runtime
 - Cloudflare account with Wrangler CLI configured
-- PlanetScale database instance
 
 ### Environment Setup
 
