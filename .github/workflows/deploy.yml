@@ -4,8 +4,12 @@ on:
     branches:
       - main
     paths-ignore:
-      - "*.md"
+      - "llms/**"
       - "docs/**"
+      - "scratchpad/**"
+      - "README.md"
+      - "AGENTS.md"
+      - "TODO.md"
   pull_request:
     types:
       - opened

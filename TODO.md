@@ -1,7 +1,11 @@
 # TODO
 
-- [x] pr descriptions still not quite working
-- [ ] deploying to main
+- [ ] pr descriptions still not quite working
+  - [ ] generate title if no fix/feat/chore: (ie feat: something ) etc in title
+
+- [x] need to remove md from deploy thing because of content
+- [x] deploying to main
+
 - [ ] build script to turbo not really working
 - [ ] ts-aware - web package + current fixes
 
