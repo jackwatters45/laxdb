@@ -61,7 +61,7 @@ export function ModalAddUser({ children }: ModalAddUserProps) {
                   name="role-new-user"
                 >
                   <SelectValue>
-                    {(value) => value ?? "Select role..."}
+                    {(value: string | null) => value ?? "Select role..."}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent align="end">

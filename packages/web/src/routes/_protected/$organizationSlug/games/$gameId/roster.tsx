@@ -85,9 +85,9 @@ function RosterManagementPage() {
     mutationKey: ["updateRoster", gameId],
     mutationFn: (newRoster: RosterPlayer[]) =>
       updateGameRoster({ data: { gameId, roster: newRoster } }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Roster updated successfully!");
-      router.invalidate();
+      await router.invalidate();
     },
     onError: () => {
       toast.error("Failed to update roster. Please try again.");

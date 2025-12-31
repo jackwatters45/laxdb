@@ -111,8 +111,8 @@ function NavUserContent() {
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem
-        onClick={() => {
-          authClient.signOut({
+        onClick={async () => {
+          await authClient.signOut({
             fetchOptions: {
               onSuccess: () => {
                 window.location.href = "/login";

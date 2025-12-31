@@ -130,14 +130,14 @@ export function SearchCommand() {
   ];
 
   // Set up hotkeys for navigation
-  useHotkeys("meta+shift+t", () => {
+  useHotkeys("meta+shift+t", async () => {
     if (activeOrganization) {
-      navigate({
+      await navigate({
         to: "/$organizationSlug",
         params: { organizationSlug: activeOrganization.slug },
       });
     } else {
-      navigate({ to: "/" });
+      await navigate({ to: "/" });
     }
   });
 
@@ -168,8 +168,8 @@ export function SearchCommand() {
   //   }
   // });
 
-  useHotkeys("meta+shift+e", () => {
-    navigate({
+  useHotkeys("meta+shift+e", async () => {
+    await navigate({
       to: "/$organizationSlug/feedback",
       params: { organizationSlug: activeOrganization.slug },
     });

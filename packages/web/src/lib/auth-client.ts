@@ -7,7 +7,6 @@ import {
   player,
 } from "@laxdb/core/auth/auth.permissions";
 import { polarClient } from "@polar-sh/better-auth";
-import type { AccessControl } from "better-auth/plugins/access";
 import {
   adminClient,
   lastLoginMethodClient,
@@ -19,7 +18,7 @@ export const authClient = createAuthClient({
   plugins: [
     polarClient(),
     organizationClient({
-      ac: ac as unknown as AccessControl,
+      ac,
       roles: {
         headCoach,
         coach,

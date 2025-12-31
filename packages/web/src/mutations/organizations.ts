@@ -48,8 +48,8 @@ export const useSwitchOrganization = ({ setOpen, router }: SwitchOrgMutation) =>
     onError: (_error) => {
       toast.error("Failed to switch organization");
     },
-    onSuccess: (data, _variables, _result, context) => {
-      context.client.invalidateQueries();
+    onSuccess: async (data, _variables, _result, context) => {
+      await context.client.invalidateQueries();
 
       // router.navigate({ to: `/${newOrg.slug}` });
 
@@ -57,7 +57,7 @@ export const useSwitchOrganization = ({ setOpen, router }: SwitchOrgMutation) =>
       if (setOpen) {
         setOpen(false);
       }
-      router.navigate({ to: `/${data.organizationSlug}` });
+      await router.navigate({ to: `/${data.organizationSlug}` });
     },
   });
 

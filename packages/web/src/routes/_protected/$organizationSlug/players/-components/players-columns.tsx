@@ -5,7 +5,11 @@ import {
   PlayerNameSchema,
 } from "@laxdb/core/schema";
 import { Link } from "@tanstack/react-router";
-import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import {
+  type ColumnDef,
+  createColumnHelper,
+  type Row,
+} from "@tanstack/react-table";
 import { Schema } from "effect";
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
@@ -45,7 +49,7 @@ function PlayerActionsCell({
   player: TeamPlayerWithInfo;
   organizationId: string;
   organizationSlug: string;
-  row: any;
+  row: Row<TeamPlayerWithInfo>;
 }) {
   const mutations = usePlayerMutations(organizationId);
 
@@ -218,7 +222,9 @@ export function createEditablePlayerColumns({
             value={player.position ?? ""}
           >
             <SelectTrigger variant="data">
-              <SelectValue>{(value) => value ?? "Select position"}</SelectValue>
+              <SelectValue>
+                {(value: string | null) => value ?? "Select position"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {POSITION_SELECT_FIELDS.map((position) => (

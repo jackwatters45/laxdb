@@ -88,6 +88,14 @@ const formatDateTimeForInput = () => {
   return nextSaturday.toISOString().slice(0, 16);
 };
 
+const gameTypeLabels: Record<string, string> = {
+  regular: "Regular Season",
+  playoff: "Playoff",
+  tournament: "Tournament",
+  friendly: "Friendly",
+  practice: "Practice",
+};
+
 export const Route = createFileRoute(
   "/_protected/$organizationSlug/games/create",
 )({
@@ -113,12 +121,12 @@ function CreateGamePage() {
   const createGameMutation = useMutation({
     mutationKey: ["createGame"],
     mutationFn: (data: CreateGameInput) => createGame({ data }),
-    onSuccess: (game) => {
+    onSuccess: async (game) => {
       toast.success(
         `Game against ${game.opponentName} scheduled successfully!`,
       );
-      router.invalidate();
-      router.navigate({
+      await router.invalidate();
+      await router.navigate({
         to: "/$organizationSlug/games",
         params: { organizationSlug },
       });
@@ -153,10 +161,7 @@ function CreateGamePage() {
           <CardTitle>Game Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="opponentName"
@@ -268,17 +273,8 @@ function CreateGamePage() {
                         aria-invalid={fieldState.invalid}
                       >
                         <SelectValue>
-                          {(value) => {
-                            const labels: Record<string, string> = {
-                              regular: "Regular Season",
-                              playoff: "Playoff",
-                              tournament: "Tournament",
-                              friendly: "Friendly",
-                              practice: "Practice",
-                            };
-                            return (
-                              labels[value as string] ?? "Select game type"
-                            );
+                          {(value: keyof typeof gameTypeLabels) => {
+                            return gameTypeLabels[value] ?? "Select game type";
                           }}
                         </SelectValue>
                       </SelectTrigger>

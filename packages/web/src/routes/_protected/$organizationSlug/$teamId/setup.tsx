@@ -96,10 +96,10 @@ function SetupTeamPage() {
   const updateTeamMutation = useMutation({
     mutationKey: ["updateTeam", teamId],
     mutationFn: (data: FormData) => updateTeam({ data: { teamId, ...data } }),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       toast.success(`Team "${variables.name}" created successfully!`);
-      router.invalidate();
-      router.navigate({
+      await router.invalidate();
+      await router.navigate({
         to: "/$organizationSlug",
         params: {
           organizationSlug,
@@ -178,10 +178,7 @@ function SetupTeamPage() {
             <CardTitle>Team Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <form
-              className="space-y-6"
-              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-            >
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
               <Controller
                 control={form.control}
                 name="name"

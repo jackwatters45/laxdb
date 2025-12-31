@@ -150,8 +150,8 @@ export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
       }
       toast.error("Failed to delete players");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey });
     },
   });
 }
@@ -195,8 +195,8 @@ export function useDeletePlayerBase(queryKey: readonly string[]) {
       }
       toast.error("Failed to delete player");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey });
     },
   });
 }

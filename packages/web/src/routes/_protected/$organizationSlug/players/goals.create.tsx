@@ -83,8 +83,8 @@ export const Route = createFileRoute(
   "/_protected/$organizationSlug/players/goals/create",
 )({
   component: CreateGoalPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    playerId: search.playerId as string,
+  validateSearch: (search: { playerId: string }) => ({
+    playerId: search.playerId,
   }),
   loaderDeps: ({ search }) => ({ playerId: search.playerId }),
   loader: async ({ deps }) => {
@@ -126,7 +126,7 @@ function CreateGoalPage() {
       });
 
       // Navigate back to player page
-      router.navigate({
+      await router.navigate({
         to: "/$organizationSlug/players/$playerId",
         params: { organizationSlug, playerId },
       });
@@ -175,10 +175,7 @@ function CreateGoalPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               {/* Title */}
               <Controller

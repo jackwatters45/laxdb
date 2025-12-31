@@ -126,7 +126,9 @@ function PositionCell({ organizationId, teamId, player }: CellProps) {
       value={player.position ?? ""}
     >
       <SelectTrigger variant="data">
-        <SelectValue>{(value) => value ?? "Select position"}</SelectValue>
+        <SelectValue>
+          {(value: string | null) => value ?? "Select position"}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {POSITION_SELECT_FIELDS.map((position) => (
@@ -189,13 +191,12 @@ function ActionsCell({
       row={row}
     >
       <RowActionsDropdown>
-        {/*TODO: uncomment */}
-        {/*<Link
+        <Link
           params={{ organizationSlug, teamId, playerId: player.publicId }}
           to="/$organizationSlug/$teamId/players/$playerId"
         >
           <RowActionItem icon={User2}>View</RowActionItem>
-        </Link>*/}
+        </Link>
         <RowActionSeparator />
         <RowActionRemoveItem
           alertDescription="Are you sure you want to remove this player from the team?"

@@ -156,9 +156,11 @@ function TeamOverviewCard({
       });
 
       toast.success(`Team "${team.name}" deleted successfully.`);
-      router.invalidate(); // Refresh the route data
+      await router.invalidate(); // Refresh the route data
     } catch (error) {
-      toast.error(`Failed to delete team. Please try again. ${error}`);
+      toast.error(
+        `Failed to delete team. Please try again. ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
