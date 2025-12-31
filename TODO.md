@@ -1,8 +1,5 @@
 # TODO
 
-- [ ] pr descriptions still not quite working
-  - [x] generate title if no fix/feat/chore: (ie feat: something ) etc in title
-
 - [ ] build script to turbo not really working
 - [ ] ts-aware - web package + current fixes
 
