@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
@@ -12,7 +11,5 @@
   "dependencies": {
     "@laxdb/core": "*"
   },
-  "devDependencies": {
-    "@vitest/ui": "^3.2.4"
-  }
+  "devDependencies": {}
 }

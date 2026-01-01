@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] pipeline
+
 - [ ] write
   - [ ] missing tools
   - [ ] overall plans
