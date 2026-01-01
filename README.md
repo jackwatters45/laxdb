@@ -16,10 +16,12 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 
 - `packages/api`: Effect-based HTTP API with RPC support
 - `packages/core`: Shared business logic, database schemas, and core services
+- `packages/docs`: Documentation site built with Fumadocs
 - `packages/web`: Main web application built with TanStack Start, deployed on Cloudflare Workers
 - `packages/marketing`: Marketing website built with TanStack Start
 - `packages/effect-cloudflare`: Effect-TS bindings for Cloudflare primitives (KV, R2, D1, etc.)
 - `packages/scripts`: Internal utility and maintenance scripts
+- `packages/ui`: Shared UI component library built with shadcn/ui (Base UI)
 
 ## Getting Started
 
