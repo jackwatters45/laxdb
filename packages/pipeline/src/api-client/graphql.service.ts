@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Duration, Effect, Schema } from "effect";
 import {
   ApiError,
   type ApiClientError,
@@ -48,13 +48,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
   ): Effect.Effect<A, ApiClientError | GraphQLError> =>
     Effect.gen(function* () {
       const timeout = timeoutMs ?? defaultTimeout;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        controller.abort();
-      }, timeout);
 
       const response = yield* Effect.tryPromise({
-        try: () =>
+        try: (signal) =>
           fetch(config.endpoint, {
             method: "POST",
             headers: buildHeaders(),
@@ -63,10 +59,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
               variables: request.variables,
               operationName: request.operationName,
             }),
-            signal: controller.signal,
+            signal,
           }),
         catch: (error) => {
-          clearTimeout(timeoutId);
           if (error instanceof Error && error.name === "AbortError") {
             return new ApiTimeoutError({
               message: `Request timed out after ${timeout}ms`,
@@ -80,9 +75,18 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
             cause: error,
           });
         },
-      });
-
-      clearTimeout(timeoutId);
+      }).pipe(
+        Effect.timeout(Duration.millis(timeout)),
+        Effect.catchTag("TimeoutException", () =>
+          Effect.fail(
+            new ApiTimeoutError({
+              message: `Request timed out after ${timeout}ms`,
+              endpoint: config.endpoint,
+              timeoutMs: timeout,
+            }),
+          ),
+        ),
+      );
 
       if (!response.ok) {
         return yield* Effect.fail(

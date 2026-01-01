@@ -156,7 +156,10 @@ describe("getGames", () => {
 
 ## Commands
 
+Commands require Infisical for API credentials:
+
 ```bash
-bun run test              # Run tests
-npx tsc --noEmit          # Type check
+infisical run --env=dev -- bun run test   # Run tests
+bun run typecheck                         # Type check
+bun run fix                               # Lint and format
 ```

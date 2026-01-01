@@ -1,9 +1,7 @@
 import { Effect, type ParseResult, Schema } from "effect";
-import {
-  ApiSchemaError,
-  makeApiClient,
-  makeGraphQLClient,
-} from "../api-client";
+import { ApiSchemaError } from "../api-client/api-client.error";
+import { makeApiClient } from "../api-client/api-client.service";
+import { makeGraphQLClient } from "../api-client/graphql.service";
 import { PLLConfig } from "../config";
 import {
   PLAYERS_QUERY,

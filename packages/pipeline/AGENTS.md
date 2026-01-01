@@ -199,7 +199,8 @@ To add an entirely new API source (e.g., NLL):
 
 ```typescript
 import { Effect } from "effect";
-import { makeApiClient, makeGraphQLClient } from "../api-client";
+import { makeApiClient } from "../api-client/api-client.service";
+import { makeGraphQLClient } from "../api-client/graphql.service";
 
 const nllRestClient = makeApiClient({
   baseUrl: "https://api.nll.com/v1",
@@ -222,8 +223,6 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 ```
 
 5. Create `nll.test.ts` with integration tests
-6. Create `index.ts` exporting public API
-7. Add to `src/index.ts`
 
 ## COMMON SCHEMA PATTERNS
 
@@ -250,26 +249,26 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 
 ## COMMANDS
 
+Commands require Infisical for API credentials:
+
 ```bash
-bun src/example-pll.ts   # Run PLL example
-bun run typecheck        # Type check
-bun run test             # Run tests (16 integration tests)
-bun run fix              # Lint + format
+infisical run --env=dev -- bun src/example-pll.ts   # Run PLL example
+infisical run --env=dev -- bun run test             # Run tests
+bun run typecheck                                    # Type check
+bun run fix                                          # Lint + format
 ```
 
 ## PLL API REFERENCE
 
+### Environment Variables
+
+Required (stored in Infisical):
+- `PLL_REST_TOKEN` - REST API bearer token
+- `PLL_GRAPHQL_TOKEN` - GraphQL API bearer token
+
 ### REST API
 
 Base URL: `https://api.stats.premierlacrosseleague.com/api/v4`
-
-Headers:
-```
-authorization: Bearer jJ9|)b1*<wh86u~
-authsource: web
-origin: https://premierlacrosseleague.com
-referer: https://premierlacrosseleague.com/
-```
 
 Endpoints:
 - `GET /standings?year={year}&champSeries={bool}` - Team standings
@@ -277,13 +276,6 @@ Endpoints:
 ### GraphQL API
 
 Endpoint: `https://api.stats.premierlacrosseleague.com/graphql`
-
-Headers:
-```
-authorization: Bearer N)eIKy1rZ%/%fm1WhM7tuVcrR*UIsc
-origin: https://stats.premierlacrosseleague.com
-referer: https://stats.premierlacrosseleague.com/
-```
 
 Queries:
 - `standings(season, champSeries)` - Team standings with nested team object

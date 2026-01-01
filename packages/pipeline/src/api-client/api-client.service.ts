@@ -47,21 +47,15 @@ export const makeApiClient = (config: ApiClientConfig) => {
       const url = `${config.baseUrl}${endpoint}`;
       const timeoutMs = options?.timeoutMs ?? defaultTimeout;
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        controller.abort();
-      }, timeoutMs);
-
       const response = yield* Effect.tryPromise({
-        try: () =>
+        try: (signal) =>
           fetch(url, {
             method,
             headers: buildHeaders(options),
             body: body ? JSON.stringify(body) : undefined,
-            signal: controller.signal,
+            signal,
           }),
         catch: (error) => {
-          clearTimeout(timeoutId);
           if (error instanceof Error && error.name === "AbortError") {
             return new ApiTimeoutError({
               message: `Request timed out after ${timeoutMs}ms`,
@@ -75,9 +69,18 @@ export const makeApiClient = (config: ApiClientConfig) => {
             cause: error,
           });
         },
-      });
-
-      clearTimeout(timeoutId);
+      }).pipe(
+        Effect.timeout(Duration.millis(timeoutMs)),
+        Effect.catchTag("TimeoutException", () =>
+          Effect.fail(
+            new ApiTimeoutError({
+              message: `Request timed out after ${timeoutMs}ms`,
+              endpoint,
+              timeoutMs,
+            }),
+          ),
+        ),
+      );
 
       if (response.status === 429) {
         const retryAfter = response.headers.get("retry-after");
