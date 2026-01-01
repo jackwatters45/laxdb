@@ -8,7 +8,6 @@
     "start": "node .output/server/index.mjs",
     "build": "vite build",
     "serve": "vite preview",
-    "test": "vitest run",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
