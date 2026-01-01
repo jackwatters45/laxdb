@@ -1,8 +1,5 @@
 # TODO
 
-- [ ] update tanstack table
-- [ ] build script to turbo not really working
-
 - [ ] write
   - [ ] missing tools
   - [ ] overall plans
@@ -17,6 +14,7 @@
 - [ ] consolidate ui components
 
 - [ ] fix http api
+- [ ] build script to turbo not really working
 
 ## Pressing things to eventually do..
 
