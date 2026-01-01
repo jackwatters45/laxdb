@@ -10,6 +10,7 @@ import {
   RemoveTeamMemberInput,
   UpdateTeamInput,
 } from "./team.schema";
+import type { Headers } from "../type";
 
 // Teams Service
 export class TeamService extends Effect.Service<TeamService>()("TeamService", {

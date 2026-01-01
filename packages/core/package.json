@@ -42,6 +42,7 @@
     "@types/pg": "^8.16.0",
     "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.8",
+    "fetchdts": "^0.1.7",
     "tsx": "^4.21.0"
   },
   "effect": {

@@ -37,6 +37,7 @@ import {
 } from "./organization/organization.sql";
 import { teamMemberTable, teamTable } from "./team/team.sql";
 import { userTable } from "./user/user.sql";
+import type { Headers } from "./type";
 
 const polarClient = new Polar({
   // accessToken: Resource.PolarAccessToken.value,

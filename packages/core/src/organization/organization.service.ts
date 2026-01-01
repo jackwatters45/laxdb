@@ -9,6 +9,7 @@ import {
   CreateOrganizationInput,
   type DashboardData,
 } from "./organization.schema";
+import type { Headers } from "../type";
 
 export class OrganizationService extends Effect.Service<OrganizationService>()(
   "OrganizationService",
