@@ -10,7 +10,7 @@
     "serve": "vite preview",
     "test": "vitest run",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --fix",
+    "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"
   },

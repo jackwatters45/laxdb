@@ -1,7 +1,7 @@
 # TODO
 
+- [ ] update tanstack table
 - [ ] build script to turbo not really working
-- [ ] ts-aware - web package + current fixes
 
 - [ ] write
   - [ ] missing tools

@@ -72,7 +72,9 @@ export function OrganizationSwitcher() {
                 <DropdownMenuItem
                   className="flex w-full items-center justify-between gap-2 p-2"
                   key={org.id}
-                  onClick={() => !isActive && switchOrg.mutate(org.id)}
+                  onClick={() => {
+                    if (!isActive) switchOrg.mutate(org.id);
+                  }}
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex size-6 items-center justify-center rounded-sm border bg-background">

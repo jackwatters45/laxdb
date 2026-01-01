@@ -38,7 +38,8 @@
     "max-lines": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
     "unicorn/no-empty-file": "warn",
-    "@typescript-eslint/no-floating-promises" : "warn"
+    // TODO: disable when fixing
+    "no-warning-comments": "off",
   },
   "ignorePatterns": [
     "node_modules/**",

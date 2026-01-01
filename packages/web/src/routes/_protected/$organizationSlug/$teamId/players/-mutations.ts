@@ -166,8 +166,8 @@ export function useRemovePlayerFromTeam(
       }
       toast.error("Failed to remove player from team");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
         queryKey: getTeamPlayersQK(organizationId, teamId),
       });
     },
@@ -220,8 +220,8 @@ export function useBulkRemovePlayersFromTeam(
       }
       toast.error("Failed to remove players from team");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
         queryKey: getTeamPlayersQK(organizationId, teamId),
       });
     },
@@ -340,8 +340,8 @@ export function useLinkPlayer(organizationId: string, teamId: string) {
       }
       toast.error("Failed to link player");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
         queryKey: getTeamPlayersQK(organizationId, teamId),
       });
     },
@@ -375,8 +375,8 @@ export function useAddExistingPlayerToTeam(
     onError: () => {
       toast.error("Failed to add existing player to team");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
         queryKey: getTeamPlayersQK(organizationId, teamId),
       });
     },

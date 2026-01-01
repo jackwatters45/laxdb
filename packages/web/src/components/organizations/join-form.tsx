@@ -43,8 +43,12 @@ const acceptInvitation = createServerFn({ method: "POST" })
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const organizationService = yield* OrganizationService;
+
+        // TODO: figure out why getRequestHeaders is causing issues
+        // oxlint-disable-next-line typescript-eslint/no-unsafe-assignment -- type mismatch
         const headers = getRequestHeaders();
 
+        // oxlint-disable-next-line typescript-eslint/no-unsafe-argument -- type mismatch
         return yield* organizationService.acceptInvitation(data, headers);
       }),
     ),
@@ -105,10 +109,7 @@ export function JoinOrganizationForm({
           </p>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="invitationId"

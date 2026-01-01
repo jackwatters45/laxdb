@@ -72,7 +72,7 @@ export function CreateOrganizationForm({
     mutationFn: (data: FormData) => createOrganization({ data }),
     onSuccess: async (result, variables) => {
       await router.invalidate();
-      router.navigate({
+      await router.navigate({
         to: "/$organizationSlug/$teamId/setup",
         params: { organizationSlug: variables.slug, teamId: result.teamId },
       });
@@ -111,10 +111,7 @@ export function CreateOrganizationForm({
           <CardTitle>Organization Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="name"

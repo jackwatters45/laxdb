@@ -7,5 +7,9 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  return <div>Hello "/_protected/$organizationSlug/players/notes/create"!</div>;
+  return (
+    <div>
+      Hello &quot;/_protected/$organizationSlug/players/notes/create&quot;!
+    </div>
+  );
 }

@@ -95,8 +95,8 @@ function Users() {
                             >
                               <SelectTrigger className="h-8 w-32">
                                 <SelectValue>
-                                  {(value) => value ?? "Select"}
-                                </SelectValue>{" "}
+                                  {(value: string | null) => value ?? "Select"}
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent align="end">
                                 {roles.map((role) => (
@@ -126,7 +126,7 @@ function Users() {
                       >
                         <SelectTrigger className="h-8 w-32">
                           <SelectValue>
-                            {(value) => value ?? "Select"}
+                            {(value: string | null) => value ?? "Select"}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent align="end">
@@ -206,8 +206,8 @@ function Users() {
                     <Select defaultValue={user.role}>
                       <SelectTrigger className="h-8 w-32">
                         <SelectValue>
-                          {(value) => value ?? "Select"}
-                        </SelectValue>{" "}
+                          {(value: string | null) => value ?? "Select"}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent align="end">
                         {roles.map((role) => (

@@ -21,8 +21,7 @@ export function MainNav() {
   const isNotTeams =
     routeMatch({ to: "/$organizationSlug/players", fuzzy: true }) ||
     routeMatch({ to: "/$organizationSlug/games", fuzzy: true }) ||
-    // routeMatch({ to: "/$organizationSlug/feedback", fuzzy: true }) ||
-    // routeMatch({ to: "/$organizationSlug/plan", fuzzy: true }) ||
+    routeMatch({ to: "/$organizationSlug/feedback", fuzzy: true }) ||
     routeMatch({ to: "/$organizationSlug/organization/join" }) ||
     routeMatch({ to: "/$organizationSlug/organization/create" }) ||
     isSettings;
@@ -55,7 +54,7 @@ export function MainNav() {
             <span>Teams</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {/*<SidebarMenuItem>
+        <SidebarMenuItem>
           <SidebarMenuButton
             render={
               <Link
@@ -69,8 +68,8 @@ export function MainNav() {
             <User />
             <span>Players</span>
           </SidebarMenuButton>
-        </SidebarMenuItem>*/}
-        {/*<SidebarMenuItem>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
           <SidebarMenuButton
             render={
               <Link
@@ -84,7 +83,7 @@ export function MainNav() {
             <Trophy />
             <span>Games</span>
           </SidebarMenuButton>
-        </SidebarMenuItem>*/}
+        </SidebarMenuItem>
         {/*<SidebarMenuItem>
           <SidebarMenuButton asChild tooltip={'Playbook'}>
             <Link

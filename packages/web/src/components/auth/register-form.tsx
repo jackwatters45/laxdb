@@ -122,10 +122,7 @@ export function RegisterForm({
         </div>
       )}
 
-      <form
-        className="space-y-4"
-        onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-      >
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
           <Controller
             name="name"

@@ -98,10 +98,7 @@ function JoinOrganizationPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="invitationId"

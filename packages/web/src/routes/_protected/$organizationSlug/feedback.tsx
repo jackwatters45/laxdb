@@ -84,9 +84,9 @@ function FeedbackPage() {
 
   const submitFeedbackMutation = useMutation({
     mutationFn: (data: FeedbackFormValues) => submitFeedback({ data }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Thank you for your feedback! We appreciate your input.");
-      router.navigate({ href: "/teams" });
+      await router.navigate({ href: "/teams" });
     },
     onError: () => {
       toast.error(
@@ -121,7 +121,7 @@ function FeedbackPage() {
             <CardContent>
               <form
                 className="space-y-6"
-                onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+                onSubmit={form.handleSubmit(onSubmit)}
               >
                 <FieldGroup>
                   <Controller
@@ -139,7 +139,9 @@ function FeedbackPage() {
                             aria-invalid={fieldState.invalid}
                           >
                             <SelectValue>
-                              {(value) => value ?? "Select a topic"}
+                              {(value: string | null) =>
+                                value ?? "Select a topic"
+                              }
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>

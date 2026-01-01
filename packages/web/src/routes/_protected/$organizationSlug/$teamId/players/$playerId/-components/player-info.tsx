@@ -3,6 +3,7 @@ import { Edit } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import type { PlayerInfoType } from "../-data-2";
+import React from "react";
 
 type PlayerInfoProps = {
   organizationSlug: string;
@@ -25,33 +26,50 @@ export function PlayerInfo({
             <h1 className="font-semibold text-xl">{playerInfo.name}</h1>
             <div className="flex items-center gap-2 text-muted-foreground">
               {[
-                playerInfo.primaryPosition && (
-                  <span className="capitalize" key="position">
-                    {playerInfo.primaryPosition}
-                  </span>
-                ),
-                playerInfo.gradeLevel && (
-                  <span className="capitalize" key="grade">
-                    {playerInfo.gradeLevel}
-                  </span>
-                ),
-                playerInfo.heightFeet && playerInfo.heightInches && (
-                  <span key="height">
-                    {playerInfo.heightFeet}&apos;{playerInfo.heightInches}&quot;
-                  </span>
-                ),
-                playerInfo.weightPounds && (
-                  <span key="weight">{playerInfo.weightPounds} lbs</span>
-                ),
+                playerInfo.primaryPosition
+                  ? {
+                      key: "position",
+                      content: (
+                        <span className="capitalize">
+                          {playerInfo.primaryPosition}
+                        </span>
+                      ),
+                    }
+                  : null,
+                playerInfo.gradeLevel
+                  ? {
+                      key: "grade",
+                      content: (
+                        <span className="capitalize">
+                          {playerInfo.gradeLevel}
+                        </span>
+                      ),
+                    }
+                  : null,
+                playerInfo.heightFeet && playerInfo.heightInches
+                  ? {
+                      key: "height",
+                      content: (
+                        <span>
+                          {playerInfo.heightFeet}&apos;
+                          {playerInfo.heightInches}&quot;
+                        </span>
+                      ),
+                    }
+                  : null,
+                playerInfo.weightPounds
+                  ? {
+                      key: "weight",
+                      content: <span>{playerInfo.weightPounds} lbs</span>,
+                    }
+                  : null,
               ]
-                .filter(Boolean)
-                .map((item, index, array) => (
-                  <>
-                    {item}
-                    {index < array.length - 1 && (
-                      <span key={item?.toString()}>{"•"}</span>
-                    )}
-                  </>
+                .filter((item) => item !== null)
+                .map((item, index, arr) => (
+                  <React.Fragment key={item.key}>
+                    {item.content}
+                    {index < arr.length - 1 && <span>•</span>}
+                  </React.Fragment>
                 ))}
             </div>
           </div>

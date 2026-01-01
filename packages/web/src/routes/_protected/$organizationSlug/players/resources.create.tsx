@@ -79,8 +79,8 @@ export const Route = createFileRoute(
   "/_protected/$organizationSlug/players/resources/create",
 )({
   component: CreateResourcePage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    playerId: search.playerId as string,
+  validateSearch: (search: { playerId: string }) => ({
+    playerId: search.playerId,
   }),
   loaderDeps: ({ search }) => ({ playerId: search.playerId }),
   loader: async ({ deps }) => {
@@ -120,7 +120,7 @@ function CreateResourcePage() {
       });
 
       // Navigate back to player page
-      router.navigate({
+      await router.navigate({
         to: "/$organizationSlug/players/$playerId",
         params: {
           organizationSlug,
@@ -195,10 +195,7 @@ function CreateResourcePage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               {/* Title */}
               <Controller

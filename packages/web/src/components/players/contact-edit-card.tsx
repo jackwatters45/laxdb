@@ -40,6 +40,7 @@ type ContactEditCardProps<T extends FieldValues> = {
 };
 
 function eraseControlType<T extends FieldValues>(control: Control<T>): Control {
+  // oxlint-disable-next-line no-unsafe-type-assertion - needed to erase type information
   return control as unknown as Control;
 }
 

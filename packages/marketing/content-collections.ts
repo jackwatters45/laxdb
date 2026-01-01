@@ -4,7 +4,7 @@ import { z } from "zod";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypePrettyCode from "rehype-pretty-code";
+import { rehypePrettyCode } from "rehype-pretty-code";
 
 const posts = defineCollection({
   name: "posts",

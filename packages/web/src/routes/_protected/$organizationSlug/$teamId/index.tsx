@@ -37,6 +37,10 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { authMiddleware } from "@/lib/middleware";
 import { TeamHeader } from "./-components/team-header";
+import type { Player } from "@laxdb/core/player/player.schema";
+import type { User } from "better-auth";
+
+type PopulatedMember = Player & { user?: User };
 
 const GetTeamDataSchema = Schema.Struct({
   ...TeamIdSchema,
@@ -86,7 +90,7 @@ const getTeamData = createServerFn({ method: "GET" })
           { concurrency: "unbounded" },
         );
 
-        const members = membersResult || [];
+        const members = (membersResult || []) as unknown as PopulatedMember[];
         const activeMember = activeMemberResult ?? null;
         const canManageTeam =
           activeMember?.role === "coach" || activeMember?.role === "headCoach";
@@ -123,7 +127,7 @@ function TeamManagementPage() {
 
   useEffect(() => {
     const loadTeamDetails = async () => {
-      const teamsResult = await (authClient.organization as any)
+      const teamsResult = await authClient.organization
         .listTeams()
         .catch(() => ({ data: null }));
 
@@ -134,7 +138,7 @@ function TeamManagementPage() {
       setLoading(false);
     };
 
-    loadTeamDetails();
+    void loadTeamDetails();
   }, [teamId]);
 
   if (loading) {
@@ -229,7 +233,7 @@ function TeamManagementPage() {
                   {members.map((member) => (
                     <TeamMemberCard
                       canManage={canManageTeam}
-                      key={member.id}
+                      key={member.publicId}
                       member={member}
                       teamId={teamId}
                     />
@@ -276,19 +280,27 @@ function TeamMemberCard({
   canManage,
   teamId: _teamId,
 }: {
-  member: any;
+  member: PopulatedMember;
   canManage: boolean;
   teamId: string;
 }) {
-  const [userDetails, setUserDetails] = useState<any>(null);
+  const [userDetails, setUserDetails] = useState<{
+    name: string;
+    email: string;
+    image: string | null;
+  }>({
+    name: member.user?.name ?? "Unknown Player",
+    email: member.user?.email ?? "",
+    image: member.user?.image ?? null,
+  });
 
   useEffect(() => {
-    // In a real app, you'd have an API to get user details by ID
+    // TODO: In a real app, you'd have an API to get user details by ID
     // For now, we'll use what's available in the member object
     setUserDetails({
       name: member.user?.name ?? "Unknown Player",
       email: member.user?.email ?? "",
-      image: member.user?.image,
+      image: member.user?.image ?? null,
     });
   }, [member]);
 
@@ -299,10 +311,13 @@ function TeamMemberCard({
       return;
     }
 
+    if (!member.userId) {
+      toast.error("Cannot remove member: missing user ID");
+      return;
+    }
+
     const { error } = await authClient.organization
-      .removeMember({
-        memberIdOrEmail: member.userId,
-      })
+      .removeMember({ memberIdOrEmail: member.userId })
       .catch(() => ({ error: { message: "Network error" } }));
 
     if (error) {
