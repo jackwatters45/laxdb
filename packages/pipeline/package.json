@@ -1,16 +1,11 @@
 {
-  "name": "@laxdb/core",
+  "name": "@laxdb/pipeline",
   "private": true,
   "type": "module",
   "exports": {
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "db": "drizzle-kit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "better-auth:gen": "npx @better-auth/cli@latest generate",
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
@@ -18,22 +13,9 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.958.0",
-    "@effect/experimental": "^0.58.0",
     "@effect/platform": "^0.94.0",
-    "@effect/platform-bun": "^0.87.0",
-    "@effect/rpc": "^0.73.0",
-    "@effect/sql": "^0.49.0",
-    "@effect/sql-drizzle": "^0.48.0",
-    "@effect/sql-pg": "^0.50.0",
-    "@polar-sh/better-auth": "^1.6.3",
-    "@polar-sh/sdk": "^0.42.1",
-    "better-auth": "^1.4.9",
-    "drizzle-orm": "^0.44.7",
-    "effect": "^3.19.13",
-    "nanoid": "^5.1.6",
-    "pg": "^8.16.3",
-    "zod": "^4.2.1"
+    "cheerio": "^1.1.2",
+    "effect": "^3.19.13"
   },
   "devDependencies": {
     "@effect/build-utils": "^0.7.9",
