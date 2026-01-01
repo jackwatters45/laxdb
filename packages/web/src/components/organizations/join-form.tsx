@@ -44,11 +44,8 @@ const acceptInvitation = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const organizationService = yield* OrganizationService;
 
-        // TODO: figure out why getRequestHeaders is causing issues
-        // oxlint-disable-next-line typescript-eslint/no-unsafe-assignment -- type mismatch
         const headers = getRequestHeaders();
 
-        // oxlint-disable-next-line typescript-eslint/no-unsafe-argument -- type mismatch
         return yield* organizationService.acceptInvitation(data, headers);
       }),
     ),

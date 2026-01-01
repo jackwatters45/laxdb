@@ -7,6 +7,7 @@ import {
   OrganizationSlugError,
 } from "./organization.error";
 import type { CreateOrganizationInput } from "./organization.schema";
+import type { Headers } from "../type";
 
 export class OrganizationRepo extends Effect.Service<OrganizationRepo>()(
   "OrganizationRepo",
