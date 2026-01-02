@@ -7,21 +7,22 @@ import {
   RateLimitError,
   TimeoutError,
 } from "../error";
+import { DEFAULT_PIPELINE_CONFIG } from "../config";
 import type {
   RestClientConfig,
   RestRequestOptions,
   HttpMethod,
 } from "./rest-client.schema";
 
-const DEFAULT_TIMEOUT_MS = 30000;
-const DEFAULT_MAX_RETRIES = 3;
-const DEFAULT_RETRY_DELAY_MS = 1000;
-
 const isTransientError = (error: PipelineError): boolean =>
   error._tag === "NetworkError" || error._tag === "TimeoutError";
 
 export const makeRestClient = (config: RestClientConfig) => {
-  const defaultTimeout = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const defaultTimeout =
+    config.timeoutMs ?? DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs;
+  const maxRetries = config.maxRetries ?? DEFAULT_PIPELINE_CONFIG.maxRetries;
+  const retryDelayMs =
+    config.retryDelayMs ?? DEFAULT_PIPELINE_CONFIG.retryDelayMs;
 
   const buildHeaders = (
     options?: RestRequestOptions,
@@ -137,9 +138,9 @@ export const makeRestClient = (config: RestClientConfig) => {
     });
 
   const transientRetrySchedule = Schedule.exponential(
-    Duration.millis(DEFAULT_RETRY_DELAY_MS),
+    Duration.millis(retryDelayMs),
   ).pipe(
-    Schedule.compose(Schedule.recurs(DEFAULT_MAX_RETRIES)),
+    Schedule.compose(Schedule.recurs(maxRetries)),
     Schedule.whileInput(isTransientError),
   );
 
@@ -153,7 +154,7 @@ export const makeRestClient = (config: RestClientConfig) => {
     request(method, endpoint, schema, body, options).pipe(
       Effect.retry(transientRetrySchedule),
       Effect.catchTag("RateLimitError", (error) =>
-        Effect.sleep(Duration.millis(error.retryAfterMs ?? 1000)).pipe(
+        Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
           Effect.andThen(request(method, endpoint, schema, body, options)),
         ),
       ),
@@ -204,14 +205,3 @@ export const makeRestClient = (config: RestClientConfig) => {
 };
 
 export type RestClient = ReturnType<typeof makeRestClient>;
-
-export class RestClientFactory extends Context.Tag("RestClientFactory")<
-  RestClientFactory,
-  {
-    readonly create: (config: RestClientConfig) => RestClient;
-  }
->() {
-  static readonly Default = Layer.succeed(RestClientFactory, {
-    create: makeRestClient,
-  });
-}

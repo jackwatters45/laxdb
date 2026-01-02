@@ -1,15 +1,15 @@
-import { Duration, Effect, Schema } from "effect";
+import { Duration, Effect, Schedule, Schema } from "effect";
 import {
   HttpError,
   NetworkError,
   ParseError,
   type PipelineError,
+  RateLimitError,
   TimeoutError,
 } from "../error";
+import { DEFAULT_PIPELINE_CONFIG } from "../config";
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
-
-const DEFAULT_TIMEOUT_MS = 30000;
 
 export class GraphQLError extends Schema.TaggedError<GraphQLError>(
   "GraphQLError",
@@ -25,8 +25,15 @@ export class GraphQLError extends Schema.TaggedError<GraphQLError>(
   ),
 }) {}
 
+const isTransientError = (error: PipelineError | GraphQLError): boolean =>
+  error._tag === "NetworkError" || error._tag === "TimeoutError";
+
 export const makeGraphQLClient = (config: GraphQLClientConfig) => {
-  const defaultTimeout = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const defaultTimeout =
+    config.timeoutMs ?? DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs;
+  const maxRetries = config.maxRetries ?? DEFAULT_PIPELINE_CONFIG.maxRetries;
+  const retryDelayMs =
+    config.retryDelayMs ?? DEFAULT_PIPELINE_CONFIG.retryDelayMs;
 
   const buildHeaders = (): Record<string, string> => {
     const headers: Record<string, string> = {
@@ -147,22 +154,49 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       return decoded.data;
     });
 
+  const transientRetrySchedule = Schedule.exponential(
+    Duration.millis(retryDelayMs),
+  ).pipe(
+    Schedule.compose(Schedule.recurs(maxRetries)),
+    Schedule.whileInput(isTransientError),
+  );
+
+  const executeWithRetry = <A, I>(
+    request: GraphQLRequest,
+    dataSchema: Schema.Schema<A, I>,
+    timeoutMs?: number,
+  ): Effect.Effect<A, PipelineError | GraphQLError> =>
+    execute(request, dataSchema, timeoutMs).pipe(
+      Effect.retry(transientRetrySchedule),
+      Effect.catchTag("RateLimitError", (error) =>
+        Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
+          Effect.andThen(execute(request, dataSchema, timeoutMs)),
+        ),
+      ),
+    );
+
   return {
     query: <A, I>(
       query: string,
       dataSchema: Schema.Schema<A, I>,
       variables?: Record<string, unknown>,
       operationName?: string,
-    ) => execute({ query, variables, operationName }, dataSchema),
+    ) => executeWithRetry({ query, variables, operationName }, dataSchema),
 
     mutation: <A, I>(
       mutation: string,
       dataSchema: Schema.Schema<A, I>,
       variables?: Record<string, unknown>,
       operationName?: string,
-    ) => execute({ query: mutation, variables, operationName }, dataSchema),
+    ) =>
+      executeWithRetry(
+        { query: mutation, variables, operationName },
+        dataSchema,
+      ),
 
-    execute,
+    execute: executeWithRetry,
+
+    executeOnce: execute,
   } as const;
 };
 

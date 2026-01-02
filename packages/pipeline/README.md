@@ -4,7 +4,29 @@ Effect-TS based data pipeline for web scraping, API consumption, and HTML parsin
 
 ## Overview
 
-This package provides two main capabilities:
+This package wraps external APIs and web scraping sources to create a unified data ingestion layer for laxdb. Rather than scattering fetch calls throughout the codebase, we centralize all external data access here with:
+
+- **Schema validation** - Every API response is validated against Effect Schema definitions, catching API changes early
+- **Error handling** - Typed errors (`HttpError`, `NetworkError`, `RateLimitError`, etc.) with automatic retry logic
+- **Rate limiting** - Built-in backoff and retry strategies to respect external API limits
+- **Testability** - Clients can be mocked for testing without hitting real APIs
+
+### Architecture
+
+```
+External Sources          Pipeline Package              Core Database
+┌─────────────────┐      ┌─────────────────────┐      ┌─────────────────┐
+│  PLL API        │─────▶│  PLLClient          │      │                 │
+│  (GraphQL/REST) │      │  - Schema validation│      │  players table  │
+└─────────────────┘      │  - Error handling   │─────▶│  games table    │
+                         │  - Retry logic      │      │  teams table    │
+┌─────────────────┐      └─────────────────────┘      │                 │
+│  NLL Website    │─────▶│  ScraperService     │      └─────────────────┘
+│  (HTML scraping)│      │  ParserService      │─────▶│  (future)       │
+└─────────────────┘      └─────────────────────┘      └─────────────────┘
+```
+
+### Capabilities
 
 1. **API Client** - Generic HTTP client for consuming external JSON APIs (PLL, etc.)
 2. **Web Scraping** - HTML fetching and parsing with Cheerio

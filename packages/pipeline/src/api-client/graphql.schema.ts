@@ -9,6 +9,8 @@ export class GraphQLClientConfig extends Schema.Class<GraphQLClientConfig>(
   ),
   authHeader: Schema.optional(Schema.String),
   timeoutMs: Schema.optional(Schema.Number),
+  maxRetries: Schema.optional(Schema.Number),
+  retryDelayMs: Schema.optional(Schema.Number),
 }) {}
 
 export class GraphQLRequest extends Schema.Class<GraphQLRequest>(

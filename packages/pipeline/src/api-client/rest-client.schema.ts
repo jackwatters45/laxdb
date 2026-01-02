@@ -9,6 +9,8 @@ export class RestClientConfig extends Schema.Class<RestClientConfig>(
   ),
   authHeader: Schema.optional(Schema.String),
   timeoutMs: Schema.optional(Schema.Number),
+  maxRetries: Schema.optional(Schema.Number),
+  retryDelayMs: Schema.optional(Schema.Number),
 }) {}
 
 export class RestRequestOptions extends Schema.Class<RestRequestOptions>(
