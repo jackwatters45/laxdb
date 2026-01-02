@@ -37,8 +37,10 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
           catch: (e) => new Error(`Failed to read manifest: ${String(e)}`),
         });
 
-        const parsed = JSON.parse(content);
-        return yield* Schema.decode(ExtractionManifestSchema)(parsed).pipe(
+        const parsed: unknown = JSON.parse(content);
+        return yield* Schema.decodeUnknown(ExtractionManifestSchema)(
+          parsed,
+        ).pipe(
           Effect.catchAll(() => Effect.succeed(createEmptyManifest("pll"))),
         );
       });

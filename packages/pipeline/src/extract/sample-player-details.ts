@@ -21,8 +21,8 @@ const args = process.argv.slice(2);
 const yearArg = args.find((a) => a.startsWith("--year="));
 const countArg = args.find((a) => a.startsWith("--count="));
 
-const YEAR = yearArg ? parseInt(yearArg.split("=")[1]!, 10) : 2024;
-const SAMPLE_COUNT = countArg ? parseInt(countArg.split("=")[1]!, 10) : 5;
+const YEAR = yearArg ? parseInt(yearArg.split("=")[1] ?? "", 10) : 2024;
+const SAMPLE_COUNT = countArg ? parseInt(countArg.split("=")[1] ?? "", 10) : 5;
 
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
@@ -48,7 +48,7 @@ const program = Effect.gen(function* () {
     catch: (e) => new Error(`Failed to read players file: ${String(e)}`),
   });
 
-  const allPlayers = JSON.parse(playersData) as PLLPlayer[];
+  const allPlayers = JSON.parse(playersData) as unknown as PLLPlayer[];
   yield* Effect.log(`Found ${allPlayers.length} players\n`);
 
   // Filter players with slugs and sample
@@ -142,10 +142,15 @@ const program = Effect.gen(function* () {
     return;
   }
 
-  const firstDetail = successfulDetails[0]!.detail!;
+  const firstSuccess = successfulDetails[0];
+  if (!firstSuccess?.detail) {
+    yield* Effect.log("No successful detail fetches with data.");
+    return;
+  }
+  const firstDetail = firstSuccess.detail;
 
   yield* Effect.log(
-    `Sample player: ${successfulDetails[0]!.player.firstName} ${successfulDetails[0]!.player.lastName}\n`,
+    `Sample player: ${firstSuccess.player.firstName} ${firstSuccess.player.lastName}\n`,
   );
 
   // careerStats
@@ -161,8 +166,9 @@ const program = Effect.gen(function* () {
   yield* Effect.log(
     `\nallSeasonStats: ${firstDetail.allSeasonStats.length} entries`,
   );
-  if (firstDetail.allSeasonStats.length > 0) {
-    const entry = firstDetail.allSeasonStats[0]!;
+  const firstSeasonStat = firstDetail.allSeasonStats[0];
+  if (firstSeasonStat) {
+    const entry = firstSeasonStat;
     yield* Effect.log(
       `  Sample entry: year=${entry.year}, segment=${entry.seasonSegment}, teamId=${entry.teamId}`,
     );

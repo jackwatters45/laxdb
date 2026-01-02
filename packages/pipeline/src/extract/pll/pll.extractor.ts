@@ -402,7 +402,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(teamsPath, "utf-8"),
               catch: () => "[]",
             });
-            const teams = JSON.parse(teamsData) as PLLTeam[];
+            const teams = JSON.parse(teamsData) as unknown as PLLTeam[];
             if (teams.length > 0) {
               const result = yield* extractTeamDetails(year, teams);
               manifest = manifestService.markComplete(
@@ -454,7 +454,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(playersPath, "utf-8"),
               catch: () => "[]",
             });
-            const players = JSON.parse(playersData) as PLLPlayer[];
+            const players = JSON.parse(playersData) as unknown as PLLPlayer[];
             if (players.length > 0) {
               const result = yield* extractPlayerDetails(year, players);
               manifest = manifestService.markComplete(
@@ -492,7 +492,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(eventsPath, "utf-8"),
               catch: () => "[]",
             });
-            const events = JSON.parse(eventsData) as PLLEvent[];
+            const events = JSON.parse(eventsData) as unknown as PLLEvent[];
             if (events.length > 0) {
               const result = yield* extractEventDetails(year, events);
               manifest = manifestService.markComplete(

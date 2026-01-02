@@ -71,7 +71,7 @@ const loadPlayerDetails = (outputDir: string) =>
         path.join(outputDir, "pll", "player-details.json"),
         "utf-8",
       );
-      const parsed = JSON.parse(data) as PlayerDetailRef[];
+      const parsed = JSON.parse(data) as unknown as PlayerDetailRef[];
       return new Set(parsed.map((p) => p.slug).filter(Boolean));
     },
     catch: (e) => new Error(`Failed to read player-details: ${String(e)}`),

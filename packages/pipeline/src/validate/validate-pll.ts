@@ -72,7 +72,7 @@ const readJsonFile = <T>(filePath: string) =>
   Effect.tryPromise({
     try: async () => {
       const content = await fs.readFile(filePath, "utf-8");
-      return JSON.parse(content) as T;
+      return JSON.parse(content) as unknown as T;
     },
     catch: (e) => new Error(`Failed to read ${filePath}: ${String(e)}`),
   });
