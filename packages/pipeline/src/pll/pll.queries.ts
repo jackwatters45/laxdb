@@ -447,7 +447,7 @@ query($stat: String, $limit: Int) {
 `;
 
 const FULL_PLAYER_STATS_FRAGMENT = `
-fragment FullPlayerStatsFragment on PlayerStatsType {
+fragment FullPlayerStatsFragment on PlayerStats {
   gamesPlayed
   goals
   twoPointGoals
@@ -535,8 +535,8 @@ fragment FullPlayerAdvancedStatsFragment on AdvancedSeasonStats {
 `;
 
 export const PLAYER_DETAIL_QUERY = `
-query($id: ID!, $year: Int, $statsYear: Int) {
-  player(id: $id, forYear: $year) {
+query($slug: ID!, $year: Int, $statsYear: Int) {
+  player(slug: $slug, forYear: $year) {
     officialId
     stats(year: $statsYear, segment: regular) {
       ...FullPlayerStatsFragment
@@ -639,21 +639,6 @@ query($id: ID!, $year: Int, $statsYear: Int, $eventsYear: Int, $includeChampSeri
       broadcaster
       eventStatus
     }
-    roster(year: $year) {
-      officialId
-      slug
-      firstName
-      lastName
-      lastNameSuffix
-      jerseyNum
-      position
-      positionName
-      handedness
-      profileUrl
-      injuryStatus
-      injuryDescription
-      isCaptain
-    }
     stats(year: $statsYear, segment: regular) {
       ...FullTeamStatsFragment
     }
@@ -674,12 +659,47 @@ ${TEAM_STATS_FRAGMENT}
 `;
 
 export const TEAM_STATS_ONLY_QUERY = `
-query($id: ID, $year: Int, $segment: StatSegment!) {
-  team(id: $id, forYear: $year) {
-    stats(segment: $segment) {
+query($id: ID, $year:Int, $segment: StatSegment!) {
+  team(id: $id, forYear:$year) {
+    stats(segment:$segment){
       ...FullTeamStatsFragment
     }
   }
 }
 ${TEAM_STATS_FRAGMENT}
+`;
+
+export const EVENT_DETAIL_QUERY = `
+query($slug: ID!) {
+  event(slug: $slug) {
+    id
+    homeTeam {
+      officialId
+      fullName
+      location
+      locationCode
+      urlLogo
+    }
+    awayTeam {
+      officialId
+      fullName
+      location
+      locationCode
+      urlLogo
+    }
+    homeScore
+    visitorScore
+    eventStatus
+    period
+    playLogs {
+      id
+      period
+      minutes
+      seconds
+      teamId
+      gbPlayerName
+      description
+    }
+  }
+}
 `;

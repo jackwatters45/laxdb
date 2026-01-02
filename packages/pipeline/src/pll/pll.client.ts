@@ -6,6 +6,7 @@ import { PLLConfig } from "../config";
 import {
   ADVANCED_PLAYERS_QUERY,
   CAREER_STATS_QUERY,
+  EVENT_DETAIL_QUERY,
   PLAYER_DETAIL_QUERY,
   PLAYERS_QUERY,
   STANDINGS_QUERY,
@@ -19,6 +20,8 @@ import {
   PLLAdvancedPlayersResponse,
   PLLCareerStatsRequest,
   PLLCareerStatsResponse,
+  PLLEventDetailRequest,
+  PLLEventDetailResponse,
   PLLEventsRequest,
   PLLEventsResponse,
   PLLGraphQLStandingsResponse,
@@ -225,7 +228,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
             PLAYER_DETAIL_QUERY,
             PLLPlayerDetailResponse,
             {
-              id: request.id,
+              slug: request.slug,
               year: request.year,
               statsYear: request.statsYear,
             },
@@ -233,7 +236,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
           return response.player;
         }).pipe(
           Effect.tap((player) =>
-            Effect.log(`Fetched player detail for id=${input.id}`),
+            Effect.log(`Fetched player detail for slug=${input.slug}`),
           ),
         ),
 
@@ -294,6 +297,27 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
         }).pipe(
           Effect.tap((events) =>
             Effect.log(`Fetched ${events.length} events for ${input.year}`),
+          ),
+        ),
+
+      getEventDetail: (input: typeof PLLEventDetailRequest.Encoded) =>
+        Effect.gen(function* () {
+          const request = yield* Schema.decode(PLLEventDetailRequest)(
+            input,
+          ).pipe(Effect.mapError(mapParseError));
+          const response = yield* graphqlClient.query(
+            EVENT_DETAIL_QUERY,
+            PLLEventDetailResponse,
+            {
+              slug: request.slug,
+            },
+          );
+          return response.event;
+        }).pipe(
+          Effect.tap((event) =>
+            Effect.log(
+              `Fetched event detail for slug=${input.slug}${event ? ` (${event.homeTeam?.locationCode ?? "?"} vs ${event.awayTeam?.locationCode ?? "?"})` : ""}`,
+            ),
           ),
         ),
     };

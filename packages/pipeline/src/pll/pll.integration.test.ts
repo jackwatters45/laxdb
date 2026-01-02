@@ -607,10 +607,8 @@ describe("PLLClient", () => {
     });
   });
 
-  // TODO: These tests fail with HTTP 400 - need to investigate query structure
-  // The API might have changed or the queries might need adjustment
-  describe.skip("getPlayerDetail", () => {
-    it("fetches player detail by id", async () => {
+  describe("getPlayerDetail", () => {
+    it("fetches player detail by slug", async () => {
       const program = Effect.gen(function* () {
         const pll = yield* PLLClient;
         const players = yield* pll.getPlayers({
@@ -618,9 +616,12 @@ describe("PLLClient", () => {
           includeReg: true,
           limit: 1,
         });
-        const playerId = players[0]?.officialId;
-        if (!playerId) return null;
-        return yield* pll.getPlayerDetail({ id: playerId, statsYear: 2024 });
+        const playerSlug = players[0]?.slug;
+        if (!playerSlug) return null;
+        return yield* pll.getPlayerDetail({
+          slug: playerSlug,
+          statsYear: 2024,
+        });
       });
 
       const player = await Effect.runPromise(
@@ -642,11 +643,11 @@ describe("PLLClient", () => {
           limit: 10,
         });
         const playerWithGames = players.find(
-          (p) => p.stats && p.stats.gamesPlayed > 0,
+          (p) => p.stats && p.stats.gamesPlayed > 0 && p.slug,
         );
-        if (!playerWithGames) return null;
+        if (!playerWithGames?.slug) return null;
         return yield* pll.getPlayerDetail({
-          id: playerWithGames.officialId,
+          slug: playerWithGames.slug,
           statsYear: 2024,
         });
       });
@@ -662,8 +663,7 @@ describe("PLLClient", () => {
     });
   });
 
-  // TODO: HTTP 400 - needs query investigation (same issue as getPlayerDetail)
-  describe.skip("getTeamDetail", () => {
+  describe("getTeamDetail", () => {
     it("fetches team detail by id", async () => {
       const program = Effect.gen(function* () {
         const pll = yield* PLLClient;
@@ -684,12 +684,11 @@ describe("PLLClient", () => {
 
       expect(team).toBeDefined();
       expect(team).toHaveProperty("officialId");
-      expect(team).toHaveProperty("roster");
       expect(team).toHaveProperty("events");
       expect(team).toHaveProperty("coaches");
     });
 
-    it("returns team with roster players", async () => {
+    it("returns team with events and coaches", async () => {
       const program = Effect.gen(function* () {
         const pll = yield* PLLClient;
         const teams = yield* pll.getTeams({ year: 2024 });
@@ -708,10 +707,11 @@ describe("PLLClient", () => {
       );
 
       expect(team).toBeDefined();
-      expect(team?.roster.length).toBeGreaterThan(0);
-      expect(team?.roster[0]).toHaveProperty("officialId");
-      expect(team?.roster[0]).toHaveProperty("firstName");
-      expect(team?.roster[0]).toHaveProperty("lastName");
+      expect(team?.events.length).toBeGreaterThan(0);
+      expect(team?.events[0]).toHaveProperty("id");
+      expect(team?.events[0]).toHaveProperty("slugname");
+      expect(team?.coaches.length).toBeGreaterThan(0);
+      expect(team?.coaches[0]).toHaveProperty("firstName");
     });
   });
 
@@ -825,6 +825,107 @@ describe("PLLClient", () => {
       expect(eventWithTeams?.homeTeam).toHaveProperty("fullName");
       expect(eventWithTeams?.awayTeam).toHaveProperty("officialId");
       expect(eventWithTeams?.awayTeam).toHaveProperty("fullName");
+    });
+  });
+
+  describe("getEventDetail", () => {
+    it("fetches event detail with play-by-play", async () => {
+      const program = Effect.gen(function* () {
+        const pll = yield* PLLClient;
+        return yield* pll.getEventDetail({ slug: "2024_game_1" });
+      });
+
+      const event = await Effect.runPromise(
+        program.pipe(Effect.provide(PLLClient.Default)),
+      );
+
+      expect(event).toBeDefined();
+      expect(event).toHaveProperty("id");
+      expect(event).toHaveProperty("homeTeam");
+      expect(event).toHaveProperty("awayTeam");
+      expect(event).toHaveProperty("homeScore");
+      expect(event).toHaveProperty("visitorScore");
+      expect(event).toHaveProperty("playLogs");
+    });
+
+    it("returns event with team info", async () => {
+      const program = Effect.gen(function* () {
+        const pll = yield* PLLClient;
+        return yield* pll.getEventDetail({ slug: "2024_game_1" });
+      });
+
+      const event = await Effect.runPromise(
+        program.pipe(Effect.provide(PLLClient.Default)),
+      );
+
+      expect(event?.homeTeam).toBeDefined();
+      expect(event?.homeTeam?.officialId).toBeTypeOf("string");
+      expect(event?.homeTeam?.fullName).toBeTypeOf("string");
+      expect(event?.homeTeam?.locationCode).toBeTypeOf("string");
+      expect(event?.awayTeam?.officialId).toBeTypeOf("string");
+      expect(event?.awayTeam?.fullName).toBeTypeOf("string");
+    });
+
+    it("returns event with play logs", async () => {
+      const program = Effect.gen(function* () {
+        const pll = yield* PLLClient;
+        return yield* pll.getEventDetail({ slug: "2024_game_1" });
+      });
+
+      const event = await Effect.runPromise(
+        program.pipe(Effect.provide(PLLClient.Default)),
+      );
+
+      expect(event?.playLogs).toBeDefined();
+      expect(event?.playLogs?.length).toBeGreaterThan(0);
+
+      const playLog = event?.playLogs?.[0];
+      expect(playLog).toHaveProperty("id");
+      expect(playLog).toHaveProperty("period");
+      expect(playLog).toHaveProperty("minutes");
+      expect(playLog).toHaveProperty("seconds");
+      expect(playLog).toHaveProperty("teamId");
+      expect(playLog).toHaveProperty("description");
+    });
+
+    it("returns play logs with expected types", async () => {
+      const program = Effect.gen(function* () {
+        const pll = yield* PLLClient;
+        return yield* pll.getEventDetail({ slug: "2024_game_1" });
+      });
+
+      const event = await Effect.runPromise(
+        program.pipe(Effect.provide(PLLClient.Default)),
+      );
+
+      const playLog = event?.playLogs?.[0];
+      expect(playLog?.id).toBeTypeOf("number");
+      expect(playLog?.period).toBeTypeOf("number");
+      expect(playLog?.minutes).toBeTypeOf("number");
+      expect(playLog?.seconds).toBeTypeOf("number");
+      expect(playLog?.teamId).toBeTypeOf("string");
+      expect(playLog?.description).toBeTypeOf("string");
+    });
+
+    it("fetches event using slug from getEvents", async () => {
+      const program = Effect.gen(function* () {
+        const pll = yield* PLLClient;
+        const events = yield* pll.getEvents({ year: 2024 });
+        const completedEvent = events.find(
+          (e) => e.eventStatus === 3 && e.slugname,
+        );
+        if (!completedEvent?.slugname) return null;
+        return yield* pll.getEventDetail({ slug: completedEvent.slugname });
+      });
+
+      const event = await Effect.runPromise(
+        program.pipe(Effect.provide(PLLClient.Default)),
+      );
+
+      expect(event).toBeDefined();
+      expect(event?.homeScore).toBeTypeOf("number");
+      expect(event?.visitorScore).toBeTypeOf("number");
+      expect(event?.eventStatus).toBe(3); // Completed
     });
   });
 });

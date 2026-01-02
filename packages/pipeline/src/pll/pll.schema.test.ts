@@ -181,15 +181,15 @@ describe("PLLCareerStatsRequest", () => {
 
 describe("PLLPlayerDetailRequest", () => {
   it("decodes valid request", async () => {
-    const input = { id: "000365", statsYear: 2024 };
+    const input = { slug: "liam-byrnes", statsYear: 2024 };
     const result = await Effect.runPromise(
       Schema.decode(PLLPlayerDetailRequest)(input),
     );
-    expect(result.id).toBe("000365");
+    expect(result.slug).toBe("liam-byrnes");
     expect(result.statsYear).toBe(2024);
   });
 
-  it("requires id", async () => {
+  it("requires slug", async () => {
     const input = { statsYear: 2024 };
     await expect(
       Effect.runPromise(Schema.decode(PLLPlayerDetailRequest)(input as any)),

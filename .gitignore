@@ -14,6 +14,9 @@ node_modules
 .coverage
 coverage
 
+# opencode
+.sisyphus
+
 # wrangler
 .wrangler
 wrangler.jsonc

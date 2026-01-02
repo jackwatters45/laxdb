@@ -284,9 +284,24 @@ Queries:
 
 ### PLLClient Methods
 
-| Method | Type | Description |
-|--------|------|-------------|
-| `getStandings` | REST | Team standings |
-| `getStandingsGraphQL` | GraphQL | Standings with nested team |
-| `getPlayers` | GraphQL | Players with reg/post/champSeries stats |
-| `getStatLeaders` | GraphQL | Stat leaders by category |
+| Method | Type | Status | Description |
+|--------|------|--------|-------------|
+| `getStandings` | REST | ✅ | Team standings |
+| `getStandingsGraphQL` | GraphQL | ✅ | Standings with nested team |
+| `getPlayers` | GraphQL | ✅ | Players with reg/post/champSeries stats |
+| `getAdvancedPlayers` | GraphQL | ✅ | Players with advanced stats (rate, handedness) |
+| `getStatLeaders` | GraphQL | ✅ | Stat leaders by category |
+| `getTeams` | GraphQL | ✅ | Teams with stats |
+| `getCareerStats` | GraphQL | ✅ | Career stat leaders |
+| `getPlayerDetail` | GraphQL | ✅ | Player detail with stats, career, accolades |
+| `getTeamDetail` | GraphQL | ✅ | Team detail with events, coaches |
+| `getTeamStats` | GraphQL | ✅ | Team stats by segment |
+| `getEvents` | REST | ✅ | Game events |
+| `getEventDetail` | GraphQL | ✅ | Event with play-by-play logs |
+
+### Development Scripts
+
+| Script | Usage | Description |
+|--------|-------|-------------|
+| `introspect.ts` | `infisical run --env=dev -- bun src/pll/introspect.ts [slug]` | Probe event detail queries |
+| `extract-queries.ts` | `bun src/pll/extract-queries.ts` | Extract GraphQL queries from client |

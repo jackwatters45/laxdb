@@ -590,22 +590,22 @@ export class PLLPlayerDetailResponse extends Schema.Class<PLLPlayerDetailRespons
 export class PLLPlayerDetailRequest extends Schema.Class<PLLPlayerDetailRequest>(
   "PLLPlayerDetailRequest",
 )({
-  id: Schema.String,
+  slug: Schema.String,
   year: Schema.optional(PLLYear),
   statsYear: Schema.optional(PLLYear),
 }) {}
 
 export class PLLTeamEvent extends Schema.Class<PLLTeamEvent>("PLLTeamEvent")({
-  id: Schema.String,
+  id: Schema.Number,
   slugname: Schema.NullOr(Schema.String),
   externalId: Schema.NullOr(Schema.String),
-  startTime: Schema.NullOr(Schema.String),
-  week: Schema.NullOr(Schema.Number),
+  startTime: Schema.NullOr(Schema.Number),
+  week: Schema.NullOr(Schema.String),
   venue: Schema.NullOr(Schema.String),
   description: Schema.NullOr(Schema.String),
   location: Schema.NullOr(Schema.String),
-  broadcaster: Schema.NullOr(Schema.String),
-  eventStatus: Schema.NullOr(Schema.String),
+  broadcaster: Schema.NullOr(Schema.Array(Schema.String)),
+  eventStatus: Schema.NullOr(Schema.Number),
 }) {}
 
 export class PLLTeamCoach extends Schema.Class<PLLTeamCoach>("PLLTeamCoach")({
@@ -651,7 +651,6 @@ export class PLLTeamDetail extends Schema.Class<PLLTeamDetail>("PLLTeamDetail")(
     allYears: Schema.Array(Schema.Number),
     coaches: Schema.Array(PLLTeamCoach),
     events: Schema.Array(PLLTeamEvent),
-    roster: Schema.Array(PLLTeamRosterPlayer),
     stats: Schema.NullOr(PLLTeamStats),
     postStats: Schema.NullOr(PLLTeamStats),
     champSeries: Schema.optional(PLLTeamChampSeries),
@@ -775,4 +774,49 @@ export class PLLEventsRequest extends Schema.Class<PLLEventsRequest>(
   year: PLLYear,
   includeCS: Schema.optionalWith(Schema.Boolean, { default: () => true }),
   includeWLL: Schema.optionalWith(Schema.Boolean, { default: () => true }),
+}) {}
+
+export class PLLPlayLog extends Schema.Class<PLLPlayLog>("PLLPlayLog")({
+  id: Schema.Number,
+  period: Schema.Number,
+  minutes: Schema.Number,
+  seconds: Schema.Number,
+  teamId: Schema.NullOr(Schema.String),
+  gbPlayerName: Schema.NullOr(Schema.String),
+  description: Schema.NullOr(Schema.String),
+}) {}
+
+export class PLLEventTeamInfo extends Schema.Class<PLLEventTeamInfo>(
+  "PLLEventTeamInfo",
+)({
+  officialId: Schema.String,
+  fullName: Schema.String,
+  location: Schema.NullOr(Schema.String),
+  locationCode: Schema.NullOr(Schema.String),
+  urlLogo: Schema.NullOr(Schema.String),
+}) {}
+
+export class PLLEventDetail extends Schema.Class<PLLEventDetail>(
+  "PLLEventDetail",
+)({
+  id: Schema.Number,
+  homeTeam: Schema.NullOr(PLLEventTeamInfo),
+  awayTeam: Schema.NullOr(PLLEventTeamInfo),
+  homeScore: Schema.NullOr(Schema.Number),
+  visitorScore: Schema.NullOr(Schema.Number),
+  eventStatus: Schema.NullOr(Schema.Number),
+  period: Schema.NullOr(Schema.Number),
+  playLogs: Schema.NullOr(Schema.Array(PLLPlayLog)),
+}) {}
+
+export class PLLEventDetailResponse extends Schema.Class<PLLEventDetailResponse>(
+  "PLLEventDetailResponse",
+)({
+  event: Schema.NullOr(PLLEventDetail),
+}) {}
+
+export class PLLEventDetailRequest extends Schema.Class<PLLEventDetailRequest>(
+  "PLLEventDetailRequest",
+)({
+  slug: Schema.String,
 }) {}
