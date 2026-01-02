@@ -4,7 +4,6 @@ import {
   NetworkError,
   ParseError,
   type PipelineError,
-  RateLimitError,
   TimeoutError,
 } from "../error";
 import { DEFAULT_PIPELINE_CONFIG } from "../config";

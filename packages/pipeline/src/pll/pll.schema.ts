@@ -167,7 +167,7 @@ export class PLLPlayer extends Schema.Class<PLLPlayer>("PLLPlayer")({
   allTeams: Schema.Array(PLLPlayerTeam),
   stats: Schema.optional(PLLPlayerStats),
   postStats: Schema.optional(PLLPlayerStats),
-  champSeries: Schema.optional(PLLChampSeries),
+  champSeries: Schema.NullishOr(PLLChampSeries),
 }) {}
 
 export class PLLPlayersResponse extends Schema.Class<PLLPlayersResponse>(

@@ -1,4 +1,4 @@
-import { Context, Duration, Effect, Layer, Schedule, Schema } from "effect";
+import { Duration, Effect, Schedule, Schema } from "effect";
 import {
   HttpError,
   NetworkError,
