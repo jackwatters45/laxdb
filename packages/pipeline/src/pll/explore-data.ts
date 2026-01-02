@@ -256,7 +256,11 @@ const exploreDetailEndpoints = (year: number) =>
       return;
     }
 
-    const sampleTeam = teams[0]!;
+    const sampleTeam = teams[0];
+    if (!sampleTeam) {
+      yield* Effect.log("No teams found, skipping team detail exploration");
+      return;
+    }
     yield* Effect.log(`\n🏟️ Team Detail (${sampleTeam.fullName}):`);
     const teamDetailStart = Date.now();
     const teamDetail = yield* pll
@@ -286,8 +290,8 @@ const exploreDetailEndpoints = (year: number) =>
       .getPlayers({ season: year, limit: 10 })
       .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLPlayer[])));
 
-    if (players.length > 0) {
-      const samplePlayer = players[0]!;
+    const samplePlayer = players[0];
+    if (samplePlayer) {
       const slug = samplePlayer.slug;
       if (slug) {
         yield* Effect.log(
@@ -364,7 +368,7 @@ const main = Effect.gen(function* () {
   const summaries: YearSummary[] = [];
 
   if (yearArg) {
-    const year = parseInt(yearArg.split("=")[1]!, 10);
+    const year = parseInt(yearArg.split("=")[1] ?? "", 10);
     if (year < 2019 || year > 2030) {
       yield* Effect.log(`Invalid year: ${year}. Must be 2019-2030.`);
       return;

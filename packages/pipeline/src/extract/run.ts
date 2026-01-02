@@ -25,7 +25,7 @@ const parseArgs = (): CliArgs => {
   const args = process.argv.slice(2);
 
   const yearArg = args.find((a) => a.startsWith("--year="));
-  const year = yearArg ? parseInt(yearArg.split("=")[1]!, 10) : null;
+  const year = yearArg ? parseInt(yearArg.split("=")[1] ?? "", 10) : null;
 
   return {
     all: args.includes("--all"),

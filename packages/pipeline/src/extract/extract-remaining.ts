@@ -45,7 +45,7 @@ const loadJson = <T>(filePath: string) =>
   Effect.tryPromise({
     try: async () => {
       const data = await fs.readFile(filePath, "utf-8");
-      return JSON.parse(data) as T;
+      return JSON.parse(data) as unknown as T;
     },
     catch: () => null as T | null,
   }).pipe(Effect.orElse(() => Effect.succeed(null as T | null)));
@@ -90,7 +90,7 @@ const program = Effect.gen(function* () {
     const existingSlugs = new Set(existingDetails.map((d) => d.slug));
 
     const eventsToExtract = allEvents.filter(
-      (e) => !existingSlugs.has(e.event.slugname!),
+      (e) => e.event.slugname && !existingSlugs.has(e.event.slugname),
     );
     yield* Effect.log(`Already extracted: ${existingSlugs.size}`);
     yield* Effect.log(`Remaining: ${eventsToExtract.length}`);
@@ -110,20 +110,26 @@ const program = Effect.gen(function* () {
         year: number;
         detail: PLLEventDetail | null;
         error: string | null;
-      }> = existingDetails.map((d) => ({
-        ...d,
-        year: 0,
-        detail: d as unknown as PLLEventDetail,
-        error: null,
-      }));
+      }> = existingDetails.map((d) => {
+        const existing = d as { slug: string; detail?: PLLEventDetail };
+        return {
+          slug: existing.slug,
+          year: 0,
+          detail: existing.detail ?? null,
+          error: null,
+        };
+      });
 
       let extracted = 0;
       let failed = 0;
       const startTime = Date.now();
 
       for (let i = 0; i < eventsToExtract.length; i++) {
-        const { event, year } = eventsToExtract[i]!;
-        const slug = event.slugname!;
+        const entry = eventsToExtract[i];
+        if (!entry) continue;
+        const { event, year } = entry;
+        const slug = event.slugname;
+        if (!slug) continue;
 
         const result = yield* pll.getEventDetail({ slug }).pipe(
           Effect.map((detail) => ({
@@ -218,18 +224,28 @@ const program = Effect.gen(function* () {
         year: number;
         detail: PLLTeamDetail | null;
         error: string | null;
-      }> = existingDetails.map((d) => ({
-        ...d,
-        detail: d as unknown as PLLTeamDetail,
-        error: null,
-      }));
+      }> = existingDetails.map((d) => {
+        const existing = d as {
+          teamId: string;
+          year: number;
+          detail?: PLLTeamDetail;
+        };
+        return {
+          teamId: existing.teamId,
+          year: existing.year,
+          detail: existing.detail ?? null,
+          error: null,
+        };
+      });
 
       let extracted = 0;
       let failed = 0;
       const startTime = Date.now();
 
       for (let i = 0; i < teamsToExtract.length; i++) {
-        const { team, year } = teamsToExtract[i]!;
+        const entry = teamsToExtract[i];
+        if (!entry) continue;
+        const { team, year } = entry;
         const teamId = team.officialId;
 
         const result = yield* pll

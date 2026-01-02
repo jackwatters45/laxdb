@@ -116,7 +116,7 @@ beforeAll(async () => {
       path.join(OUTPUT_DIR, "player-details.json"),
       "utf-8",
     );
-    playerDetails = JSON.parse(pdContent);
+    playerDetails = JSON.parse(pdContent) as typeof playerDetails;
   } catch {
     playerDetails = [];
   }
@@ -126,7 +126,7 @@ beforeAll(async () => {
       path.join(OUTPUT_DIR, "career-stats.json"),
       "utf-8",
     );
-    careerStats = JSON.parse(csContent);
+    careerStats = JSON.parse(csContent) as typeof careerStats;
   } catch {
     careerStats = [];
   }
@@ -138,7 +138,7 @@ beforeAll(async () => {
           path.join(OUTPUT_DIR, year, "players.json"),
           "utf-8",
         );
-        yearPlayers[year] = JSON.parse(content);
+        yearPlayers[year] = JSON.parse(content) as YearPlayer[];
       } catch {
         yearPlayers[year] = [];
       }
@@ -148,7 +148,7 @@ beforeAll(async () => {
           path.join(OUTPUT_DIR, year, "teams.json"),
           "utf-8",
         );
-        yearTeams[year] = JSON.parse(content);
+        yearTeams[year] = JSON.parse(content) as YearTeam[];
       } catch {
         yearTeams[year] = [];
       }
@@ -375,7 +375,7 @@ describe("Data Anomaly Detection", () => {
           if (!playerIdsBySlug.has(player.slug)) {
             playerIdsBySlug.set(player.slug, new Set());
           }
-          playerIdsBySlug.get(player.slug)!.add(player.officialId);
+          playerIdsBySlug.get(player.slug)?.add(player.officialId);
         }
       }
 

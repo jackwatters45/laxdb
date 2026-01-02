@@ -188,9 +188,9 @@ describe("PLLPlayerDetailRequest", () => {
   });
 
   it("requires slug", async () => {
-    const input = { statsYear: 2024 };
+    const input = { statsYear: 2024 } as unknown;
     await expect(
-      Effect.runPromise(Schema.decode(PLLPlayerDetailRequest)(input as any)),
+      Effect.runPromise(Schema.decodeUnknown(PLLPlayerDetailRequest)(input)),
     ).rejects.toThrow();
   });
 });
