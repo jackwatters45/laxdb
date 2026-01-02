@@ -175,9 +175,10 @@ const program = Effect.gen(function* () {
     yield* Effect.log(`  All entries: ${yearSegments.join(", ")}`);
   }
 
-  // accolades
-  yield* Effect.log(`\naccolades: ${firstDetail.accolades.length} entries`);
-  if (firstDetail.accolades.length > 0) {
+  yield* Effect.log(
+    `\naccolades: ${firstDetail.accolades?.length ?? 0} entries`,
+  );
+  if (firstDetail.accolades && firstDetail.accolades.length > 0) {
     for (const acc of firstDetail.accolades) {
       yield* Effect.log(`  - ${acc.awardName}: ${acc.years.join(", ")}`);
     }
@@ -233,7 +234,7 @@ const program = Effect.gen(function* () {
   yield* Effect.log(``);
 });
 
-Effect.runPromise(
+await Effect.runPromise(
   program.pipe(
     Effect.provide(PLLClient.Default),
     Effect.provide(ExtractConfigService.Default),

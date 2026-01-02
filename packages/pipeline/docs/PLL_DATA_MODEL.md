@@ -13,12 +13,12 @@
 | `getEvents(year)` | REST | Event[] (games) with teams, scores | Yes |
 | `getStandings(year)` | REST | Standing[] with win/loss records | Yes |
 | `getStandingsGraphQL(year)` | GraphQL | Standing[] with embedded team | Yes |
-| `getPlayerDetail(slug)` | GraphQL | careerStats, allSeasonStats, accolades | No |
-| `getTeamDetail(id, year)` | GraphQL | events, coach details, allYears | No |
-| `getEventDetail(slug)` | GraphQL | playLogs (play-by-play) | No |
-| `getAdvancedPlayers(year)` | GraphQL | Rate stats, shooting hand breakdowns | No |
-| `getStatLeaders(year, stats)` | GraphQL | Leaderboards by stat | No |
-| `getCareerStats(stat)` | GraphQL | Career leaderboards | No |
+| `getPlayerDetail(slug)` | GraphQL | careerStats, allSeasonStats, accolades | Yes (502 players) |
+| `getTeamDetail(id, year)` | GraphQL | events, coach details, allYears | Yes (53 team-years) |
+| `getEventDetail(slug)` | GraphQL | playLogs (play-by-play) | Yes (269 events, 58K plays) |
+| `getAdvancedPlayers(year)` | GraphQL | Rate stats, shooting hand breakdowns | Yes (all years) |
+| `getStatLeaders(year, stats)` | GraphQL | Leaderboards by stat | Yes (7 years × 9 categories) |
+| `getCareerStats(stat)` | GraphQL | Career leaderboards | No (covered by player details) |
 
 ---
 
@@ -426,12 +426,12 @@ Stats exist at multiple levels:
 ### Phase 2: Enhanced Data (DONE)
 - [x] Advanced players per year (rate stats) - extracted for all years
 - [x] Player details sample - analyzed data structure
-- [ ] Team details per year (coach IDs, proper events) - optional
+- [x] Player details (full extraction) - 502 unique players, accolades + career stats
+- [x] Team details per year (coach IDs, events) - 53 team-year combos
 
-### Phase 3: Detail Data (DECIDE)
-- [ ] Player details (full extraction) - ~200 players, gets accolades + career stats
-- [ ] Event details (play-by-play) - ~330 events
-- [ ] Stat leaders per year - 7 calls
+### Phase 3: Detail Data (DONE)
+- [x] Event details (play-by-play) - 269 events, 58,652 total plays
+- [x] Stat leaders per year - 7 years × 9 stat categories
 
 ---
 
@@ -460,18 +460,29 @@ Sampled 5 top players (Jeff Teat, Tre Leclaire, Zed Williams, Connor Fields, Mar
 ]
 ```
 
-### Decision: Full Player Detail Extraction
+### Full Player Detail Extraction (COMPLETED)
 
-**Recommendation**: Extract player details for ALL unique players (not per-year).
+Extracted player details for ALL 502 unique players across all years.
 
-Why:
-- Accolades are UNIQUE and valuable (awards, honors)
-- `careerStats` gives lifetime totals without recalculation
-- `allSeasonStats` provides historical data in one call
-- One call per player (not per year) - ~200-250 unique players total
+**Results:**
+- 502 players extracted, 0 failures
+- 290 players have accolades (awards)
+- Duration: ~3.5 minutes (502 API calls)
+- Output: `output/pll/player-details.json` (3.4MB)
 
-Cost: ~250 API calls (one-time)
-Value: High (enables awards display, career leaderboards)
+**Award counts extracted:**
+| Award | Count |
+|-------|-------|
+| All-Star | 561 |
+| Champion | 275 |
+| 1st Team All-Pro | 89 |
+| 2nd Team All-Pro | 67 |
+| Championship Series Champion | 36 |
+| DPOY | 21 |
+| MVP | 16 |
+| GOY | 16 |
+| ROY | 16 |
+| OPOY | 9 |
 
 ---
 
@@ -571,3 +582,42 @@ Value: High (enables awards display, career leaderboards)
 | `Q` | Questionable |
 | `O` | Out |
 | `IR` | Injured Reserve |
+
+---
+
+## Complete Extraction Summary
+
+**Last Updated**: 2026-01-02
+
+All PLL data has been extracted and is ready for database design.
+
+### Output Files
+
+| File | Size | Contents |
+|------|------|----------|
+| `output/pll/{year}/teams.json` | ~100KB ea | 8 teams per year with stats |
+| `output/pll/{year}/players.json` | ~2MB ea | All players with season stats |
+| `output/pll/{year}/advanced-players.json` | ~2MB ea | Advanced rate stats |
+| `output/pll/{year}/events.json` | ~200KB ea | All games per year |
+| `output/pll/{year}/standings.json` | ~10KB ea | Season standings |
+| `output/pll/player-details.json` | 3.4MB | 502 players - career stats + accolades |
+| `output/pll/team-details.json` | 580KB | 53 team-years - coaches, events |
+| `output/pll/event-details.json` | 14MB | 269 events - play-by-play logs |
+| `output/pll/stat-leaders.json` | 364KB | 7 years × 9 stat categories |
+
+### Data Totals
+
+| Entity | Count | Years |
+|--------|-------|-------|
+| Teams | 8 per year | 2019-2025 |
+| Players | 502 unique | All-time |
+| Events/Games | 269 | 2021-2025 (play-by-play) |
+| Play-by-Play Logs | 58,652 | 2021-2025 |
+| Coach Records | 159 | All years |
+| Player Accolades | 290 players | All-time |
+
+### Next Steps
+
+1. Design database schema based on extracted data
+2. Build sync service to import data
+3. Create deduplication logic for player matching
