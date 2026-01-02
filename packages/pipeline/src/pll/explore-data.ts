@@ -308,7 +308,9 @@ const exploreDetailEndpoints = (year: number) =>
           yield* Effect.log(
             `   All season stats: ${playerDetail.allSeasonStats.length}`,
           );
-          yield* Effect.log(`   Accolades: ${playerDetail.accolades.length}`);
+          yield* Effect.log(
+            `   Accolades: ${playerDetail.accolades?.length ?? 0}`,
+          );
           yield* Effect.log(
             `   Has career stats: ${playerDetail.careerStats !== null}`,
           );

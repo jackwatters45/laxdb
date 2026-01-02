@@ -576,7 +576,7 @@ export class PLLPlayerDetail extends Schema.Class<PLLPlayerDetail>(
   postStats: Schema.NullOr(PLLPlayerStats),
   careerStats: Schema.NullOr(PLLPlayerCareerStats),
   allSeasonStats: Schema.Array(PLLPlayerSeasonStats),
-  accolades: Schema.Array(PLLPlayerAccolade),
+  accolades: Schema.NullOr(Schema.Array(PLLPlayerAccolade)),
   champSeries: Schema.NullOr(PLLChampSeries),
   advancedSeasonStats: Schema.NullOr(PLLAdvancedSeasonStats),
 }) {}

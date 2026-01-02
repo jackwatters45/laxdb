@@ -1,7 +1,8 @@
 # TODO
 
 - [ ] pipeline
-
+  - [ ] historical vs real time
+  - [ ] game events -> structured data
 - [ ] write
   - [ ] missing tools
   - [ ] overall plans

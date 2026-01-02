@@ -15,10 +15,10 @@ import type {
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { PLLManifestService } from "./pll.manifest";
-import type { ExtractionManifest, SeasonManifest } from "../extract.schema";
+import type { SeasonManifest } from "../extract.schema";
 
 const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
-type PLLYear = (typeof PLL_YEARS)[number];
+type _PLLYear = (typeof PLL_YEARS)[number];
 
 interface ExtractResult<T> {
   data: T;

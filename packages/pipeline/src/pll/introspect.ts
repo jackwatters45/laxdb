@@ -57,4 +57,4 @@ const program = Effect.gen(function* () {
   console.log(JSON.stringify(result, null, 2));
 });
 
-Effect.runPromise(program).catch(console.error);
+await Effect.runPromise(program).catch(console.error);
