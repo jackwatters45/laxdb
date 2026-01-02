@@ -7,11 +7,11 @@
  *   infisical run --env=dev -- bun src/extract/extract-all-player-details.ts --limit=10
  */
 
-import { Effect, Duration } from "effect";
+import { Effect, Duration, Schema } from "effect";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { PLLClient } from "../pll/pll.client";
-import type { PLLPlayer, PLLPlayerDetail } from "../pll/pll.schema";
+import { PLLPlayer, PLLPlayerDetail } from "../pll/pll.schema";
 import { ExtractConfigService } from "./extract.config";
 
 const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
@@ -19,17 +19,18 @@ const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const limitArg = args.find((a) => a.startsWith("--limit="));
-const LIMIT = limitArg ? parseInt(limitArg.split("=")[1]!, 10) : null;
+const LIMIT = limitArg ? parseInt(limitArg.split("=")[1] ?? "", 10) : null;
 
-interface PlayerDetailResult {
-  slug: string;
-  officialId: string;
-  firstName: string;
-  lastName: string;
-  detail: PLLPlayerDetail | null;
-  error: string | null;
-  fetchedAt: string;
-}
+const PlayerDetailResult = Schema.Struct({
+  slug: Schema.String,
+  officialId: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+  detail: Schema.NullOr(PLLPlayerDetail),
+  error: Schema.NullOr(Schema.String),
+  fetchedAt: Schema.String,
+});
+type PlayerDetailResult = typeof PlayerDetailResult.Type;
 
 interface ExtractionSummary {
   totalUniquePlayers: number;
@@ -40,14 +41,17 @@ interface ExtractionSummary {
   timestamp: string;
 }
 
+const PlayerDetailResultArray = Schema.Array(PlayerDetailResult);
+
 const loadExistingResults = (outputPath: string) =>
-  Effect.tryPromise({
-    try: async () => {
-      const data = await fs.readFile(outputPath, "utf-8");
-      return JSON.parse(data) as PlayerDetailResult[];
-    },
-    catch: (e) => new Error(`Failed to read existing results: ${String(e)}`),
-  }).pipe(Effect.orElse(() => Effect.succeed([] as PlayerDetailResult[])));
+  Effect.gen(function* () {
+    const data = yield* Effect.tryPromise({
+      try: () => fs.readFile(outputPath, "utf-8"),
+      catch: (e) => new Error(`Failed to read existing results: ${String(e)}`),
+    });
+    const parsed: unknown = JSON.parse(data);
+    return yield* Schema.decodeUnknown(PlayerDetailResultArray)(parsed);
+  }).pipe(Effect.orElse(() => Effect.succeed([])));
 
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
@@ -64,9 +68,11 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log(`Loading players from all years...`);
 
+  const PLLPlayerArray = Schema.Array(PLLPlayer);
+
   const allPlayersMap = new Map<
     string,
-    { player: PLLPlayer; years: number[] }
+    { player: Schema.Schema.Type<typeof PLLPlayer>; years: number[] }
   >();
 
   for (const year of PLL_YEARS) {
@@ -82,7 +88,10 @@ const program = Effect.gen(function* () {
       catch: () => "[]",
     });
 
-    const players = JSON.parse(playersData) as PLLPlayer[];
+    const parsed: unknown = JSON.parse(playersData);
+    const players = yield* Schema.decodeUnknown(PLLPlayerArray)(parsed).pipe(
+      Effect.orElse(() => Effect.succeed([])),
+    );
 
     for (const player of players) {
       if (!player.slug) continue;
@@ -128,7 +137,7 @@ const program = Effect.gen(function* () {
   }
 
   const playersToExtract = uniquePlayers.filter(
-    (p) => !existingSlugs.has(p.player.slug!),
+    (p) => p.player.slug && !existingSlugs.has(p.player.slug),
   );
 
   if (LIMIT) {
@@ -165,8 +174,11 @@ const program = Effect.gen(function* () {
   let failed = 0;
 
   for (let i = 0; i < playersToExtract.length; i++) {
-    const { player, years } = playersToExtract[i]!;
-    const slug = player.slug!;
+    const entry = playersToExtract[i];
+    if (!entry) continue;
+    const { player, years } = entry;
+    const slug = player.slug;
+    if (!slug) continue;
     const queryYear = Math.max(...years);
 
     const result = yield* pll
@@ -254,7 +266,7 @@ const program = Effect.gen(function* () {
 
   const successfulResults = results.filter((r) => r.detail !== null);
   const playersWithAccolades = successfulResults.filter(
-    (r) => r.detail!.accolades && r.detail!.accolades.length > 0,
+    (r) => r.detail?.accolades && r.detail.accolades.length > 0,
   );
 
   yield* Effect.log(`\nAccolades summary:`);
@@ -262,7 +274,7 @@ const program = Effect.gen(function* () {
 
   const awardCounts = new Map<string, number>();
   for (const r of playersWithAccolades) {
-    for (const acc of r.detail!.accolades ?? []) {
+    for (const acc of r.detail?.accolades ?? []) {
       const current = awardCounts.get(acc.awardName) ?? 0;
       awardCounts.set(acc.awardName, current + acc.years.length);
     }

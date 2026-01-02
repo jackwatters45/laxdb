@@ -1,17 +1,17 @@
-import { Effect, Duration } from "effect";
+import { Effect, Duration, Schema } from "effect";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { PLLClient } from "../../pll/pll.client";
-import type {
+import {
   PLLTeam,
   PLLPlayer,
   PLLEvent,
-  PLLTeamDetail,
-  PLLPlayerDetail,
-  PLLEventDetail,
-  PLLTeamStanding,
-  PLLGraphQLStanding,
-  PLLAdvancedPlayer,
+  type PLLTeamDetail,
+  type PLLPlayerDetail,
+  type PLLEventDetail,
+  type PLLTeamStanding,
+  type PLLGraphQLStanding,
+  type PLLAdvancedPlayer,
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { PLLManifestService } from "./pll.manifest";
@@ -402,7 +402,10 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(teamsPath, "utf-8"),
               catch: () => "[]",
             });
-            const teams = JSON.parse(teamsData) as PLLTeam[];
+            const parsedTeams: unknown = JSON.parse(teamsData);
+            const teams = yield* Schema.decodeUnknown(Schema.Array(PLLTeam))(
+              parsedTeams,
+            ).pipe(Effect.orElse(() => Effect.succeed([])));
             if (teams.length > 0) {
               const result = yield* extractTeamDetails(year, teams);
               manifest = manifestService.markComplete(
@@ -454,7 +457,10 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(playersPath, "utf-8"),
               catch: () => "[]",
             });
-            const players = JSON.parse(playersData) as PLLPlayer[];
+            const parsedPlayers: unknown = JSON.parse(playersData);
+            const players = yield* Schema.decodeUnknown(
+              Schema.Array(PLLPlayer),
+            )(parsedPlayers).pipe(Effect.orElse(() => Effect.succeed([])));
             if (players.length > 0) {
               const result = yield* extractPlayerDetails(year, players);
               manifest = manifestService.markComplete(
@@ -492,7 +498,10 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               try: () => fs.readFile(eventsPath, "utf-8"),
               catch: () => "[]",
             });
-            const events = JSON.parse(eventsData) as PLLEvent[];
+            const parsedEvents: unknown = JSON.parse(eventsData);
+            const events = yield* Schema.decodeUnknown(Schema.Array(PLLEvent))(
+              parsedEvents,
+            ).pipe(Effect.orElse(() => Effect.succeed([])));
             if (events.length > 0) {
               const result = yield* extractEventDetails(year, events);
               manifest = manifestService.markComplete(

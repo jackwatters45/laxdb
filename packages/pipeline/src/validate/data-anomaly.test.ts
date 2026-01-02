@@ -1,86 +1,101 @@
 import { describe, expect, it, beforeAll } from "vitest";
+import { Schema } from "effect";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 const OUTPUT_DIR = path.join(__dirname, "../../output/pll");
 
-interface PlayerDetail {
-  slug: string;
-  officialId: string;
-  firstName: string;
-  lastName: string;
-  careerStats: {
-    gamesPlayed: number;
-    goals: number;
-    assists: number;
-    points: number;
-    shots: number;
-    shotPct: number;
-    saves: number;
-    savePct: number;
-    faceoffsWon: number;
-    faceoffs: number;
-    faceoffPct: number;
-  } | null;
-  allSeasonStats: Array<{
-    year: number;
-    seasonSegment: string;
-    gamesPlayed: number;
-    goals: number;
-    assists: number;
-    points: number;
-    shots: number;
-  }>;
-}
+const PlayerDetailSchema = Schema.Struct({
+  slug: Schema.String,
+  officialId: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+  careerStats: Schema.NullOr(
+    Schema.Struct({
+      gamesPlayed: Schema.Number,
+      goals: Schema.Number,
+      assists: Schema.Number,
+      points: Schema.Number,
+      shots: Schema.Number,
+      shotPct: Schema.Number,
+      saves: Schema.Number,
+      savePct: Schema.Number,
+      faceoffsWon: Schema.Number,
+      faceoffs: Schema.Number,
+      faceoffPct: Schema.Number,
+    }),
+  ),
+  allSeasonStats: Schema.Array(
+    Schema.Struct({
+      year: Schema.Number,
+      seasonSegment: Schema.String,
+      gamesPlayed: Schema.Number,
+      goals: Schema.Number,
+      assists: Schema.Number,
+      points: Schema.Number,
+      shots: Schema.Number,
+    }),
+  ),
+});
+type PlayerDetail = Schema.Schema.Type<typeof PlayerDetailSchema>;
 
-interface CareerStatsPlayer {
-  slug: string | null;
-  name: string;
-  experience: number | null;
-  allYears: number[] | null;
-  stats: {
-    gamesPlayed: number;
-    points: number;
-    goals: number;
-    assists: number;
-    groundBalls: number;
-    saves: number;
-    faceoffsWon: number;
-  };
-  inPlayerDetails: boolean;
-  likelySource: "pll" | "mll_or_retired";
-}
+const CareerStatsPlayerSchema = Schema.Struct({
+  slug: Schema.NullOr(Schema.String),
+  name: Schema.String,
+  experience: Schema.NullOr(Schema.Number),
+  allYears: Schema.NullOr(Schema.Array(Schema.Number)),
+  stats: Schema.Struct({
+    gamesPlayed: Schema.Number,
+    points: Schema.Number,
+    goals: Schema.Number,
+    assists: Schema.Number,
+    groundBalls: Schema.Number,
+    saves: Schema.Number,
+    faceoffsWon: Schema.Number,
+  }),
+  inPlayerDetails: Schema.Boolean,
+  likelySource: Schema.Literal("pll", "mll_or_retired"),
+});
+type CareerStatsPlayer = Schema.Schema.Type<typeof CareerStatsPlayerSchema>;
 
-interface YearPlayer {
-  officialId: string;
-  firstName: string;
-  lastName: string;
-  slug: string | null;
-  allTeams: Array<{
-    officialId: string;
-    year: number;
-    position: string | null;
-  }>;
-  stats?: {
-    gamesPlayed: number;
-    goals: number;
-    assists: number;
-    points: number;
-    shots: number;
-  };
-}
+const YearPlayerSchema = Schema.Struct({
+  officialId: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+  slug: Schema.NullOr(Schema.String),
+  allTeams: Schema.Array(
+    Schema.Struct({
+      officialId: Schema.String,
+      year: Schema.Number,
+      position: Schema.NullOr(Schema.String),
+    }),
+  ),
+  stats: Schema.optional(
+    Schema.Struct({
+      gamesPlayed: Schema.Number,
+      goals: Schema.Number,
+      assists: Schema.Number,
+      points: Schema.Number,
+      shots: Schema.Number,
+    }),
+  ),
+});
+type YearPlayer = Schema.Schema.Type<typeof YearPlayerSchema>;
 
-interface YearTeam {
-  officialId: string;
-  fullName: string;
-  teamWins: number;
-  teamLosses: number;
-  stats: {
-    gamesPlayed: number;
-    goals: number;
-    shots: number;
-  } | null;
-}
+const YearTeamSchema = Schema.Struct({
+  officialId: Schema.String,
+  fullName: Schema.String,
+  teamWins: Schema.Number,
+  teamLosses: Schema.Number,
+  stats: Schema.NullOr(
+    Schema.Struct({
+      gamesPlayed: Schema.Number,
+      goals: Schema.Number,
+      shots: Schema.Number,
+    }),
+  ),
+});
+type YearTeam = Schema.Schema.Type<typeof YearTeamSchema>;
 
 let playerDetails: PlayerDetail[] = [];
 let careerStats: CareerStatsPlayer[] = [];
@@ -110,13 +125,26 @@ const VALID_POSITIONS = new Set([
   null,
 ]);
 
+const parseJsonArray = <A, I>(
+  content: string,
+  schema: Schema.Schema<A, I>,
+): A[] => {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    const decoded = Schema.decodeUnknownSync(Schema.Array(schema))(parsed);
+    return [...decoded];
+  } catch {
+    return [];
+  }
+};
+
 beforeAll(async () => {
   try {
     const pdContent = await fs.readFile(
       path.join(OUTPUT_DIR, "player-details.json"),
       "utf-8",
     );
-    playerDetails = JSON.parse(pdContent);
+    playerDetails = parseJsonArray(pdContent, PlayerDetailSchema);
   } catch {
     playerDetails = [];
   }
@@ -126,7 +154,7 @@ beforeAll(async () => {
       path.join(OUTPUT_DIR, "career-stats.json"),
       "utf-8",
     );
-    careerStats = JSON.parse(csContent);
+    careerStats = parseJsonArray(csContent, CareerStatsPlayerSchema);
   } catch {
     careerStats = [];
   }
@@ -138,7 +166,7 @@ beforeAll(async () => {
           path.join(OUTPUT_DIR, year, "players.json"),
           "utf-8",
         );
-        yearPlayers[year] = JSON.parse(content);
+        yearPlayers[year] = parseJsonArray(content, YearPlayerSchema);
       } catch {
         yearPlayers[year] = [];
       }
@@ -148,7 +176,7 @@ beforeAll(async () => {
           path.join(OUTPUT_DIR, year, "teams.json"),
           "utf-8",
         );
-        yearTeams[year] = JSON.parse(content);
+        yearTeams[year] = parseJsonArray(content, YearTeamSchema);
       } catch {
         yearTeams[year] = [];
       }
@@ -375,7 +403,7 @@ describe("Data Anomaly Detection", () => {
           if (!playerIdsBySlug.has(player.slug)) {
             playerIdsBySlug.set(player.slug, new Set());
           }
-          playerIdsBySlug.get(player.slug)!.add(player.officialId);
+          playerIdsBySlug.get(player.slug)?.add(player.officialId);
         }
       }
 

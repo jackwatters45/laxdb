@@ -12,11 +12,13 @@ import {
   infoIssue,
 } from "./validate.schema";
 
-const readJsonFile = <T>(filePath: string) =>
+const readJsonFile = <T>(filePath: string): Effect.Effect<T, Error> =>
   Effect.tryPromise({
     try: async () => {
       const content = await fs.readFile(filePath, "utf-8");
-      return JSON.parse(content) as T;
+      const parsed: unknown = JSON.parse(content);
+      // oxlint-disable-next-line typescript-eslint/no-unsafe-type-assertion -- Generic validation utility
+      return parsed as T;
     },
     catch: (e) => new Error(`Failed to read ${filePath}: ${String(e)}`),
   });
