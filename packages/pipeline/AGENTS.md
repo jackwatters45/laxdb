@@ -276,6 +276,52 @@ infisical run --env=dev -- bun src/example-pll.ts   # Run PLL example
 infisical run --env=dev -- bun run test             # Run tests
 bun run typecheck                                    # Type check
 bun run fix                                          # Lint + format
+
+# Data extraction
+infisical run --env=dev -- bun src/extract/extract-all-player-details.ts
+infisical run --env=dev -- bun src/extract/extract-remaining.ts
+infisical run --env=dev -- bun src/extract/extract-career-stats.ts
+
+# Data validation
+infisical run --env=dev -- bun src/validate/validate-pll.ts
+```
+
+## VALIDATION
+
+The `src/validate/` module provides reusable validators for extracted data.
+
+### Running Validation
+
+```bash
+infisical run --env=dev -- bun src/validate/validate-pll.ts
+```
+
+### Validation Checks
+
+| Check | Description |
+|-------|-------------|
+| `file_exists` | Verifies file exists and captures size |
+| `json_parse` | Validates JSON structure and record count |
+| `required_fields` | Checks for null/undefined required fields |
+| `unique_field` | Detects duplicate values in ID fields |
+| `cross_reference` | Validates foreign key relationships between datasets |
+
+### Validation Report
+
+Outputs a JSON report to `output/pll/validation-report.json` with:
+- File-level checks and issues
+- Cross-reference match rates
+- Summary statistics (errors, warnings, info)
+- Overall validity status
+
+### Adding New Validators
+
+```typescript
+import { validateJsonArray, validateRequiredFields, crossReference } from "./validate.service";
+
+const { result, data } = yield* validateJsonArray<MyType>(filePath, minRecords);
+const fieldCheck = yield* validateRequiredFields(data, ["id", "name"]);
+const xref = yield* crossReference(sourceData, targetData, "foreignKey", "id", "source.json", "target.json");
 ```
 
 ## PLL API REFERENCE

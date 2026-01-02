@@ -18,7 +18,7 @@
 | `getEventDetail(slug)` | GraphQL | playLogs (play-by-play) | Yes (269 events, 58K plays) |
 | `getAdvancedPlayers(year)` | GraphQL | Rate stats, shooting hand breakdowns | Yes (all years) |
 | `getStatLeaders(year, stats)` | GraphQL | Leaderboards by stat | Yes (7 years × 9 categories) |
-| `getCareerStats(stat)` | GraphQL | Career leaderboards | No (covered by player details) |
+| `getCareerStats(stat)` | GraphQL | Career leaderboards | Yes (1,170 players including MLL) |
 
 ---
 
@@ -604,20 +604,93 @@ All PLL data has been extracted and is ready for database design.
 | `output/pll/team-details.json` | 580KB | 53 team-years - coaches, events |
 | `output/pll/event-details.json` | 14MB | 269 events - play-by-play logs |
 | `output/pll/stat-leaders.json` | 364KB | 7 years × 9 stat categories |
+| `output/pll/career-stats.json` | 685KB | 1,170 players - career leaderboards (incl. MLL) |
 
 ### Data Totals
 
 | Entity | Count | Years |
 |--------|-------|-------|
 | Teams | 8 per year | 2019-2025 |
-| Players | 502 unique | All-time |
+| Players (PLL) | 502 unique | 2019-2025 (full profiles) |
+| Players (MLL) | 801 unique | 2001-2018 (career stats only) |
+| Players (Total) | 1,170 unique | 2001-2025 (via career stats) |
 | Events/Games | 269 | 2021-2025 (play-by-play) |
 | Play-by-Play Logs | 58,652 | 2021-2025 |
 | Coach Records | 159 | All years |
 | Player Accolades | 290 players | All-time |
+
+---
+
+## MLL (Major League Lacrosse) Data
+
+The PLL API contains career stats for players from the defunct **Major League Lacrosse (MLL)**, which operated from 2001-2020 before merging with PLL.
+
+### Discovery
+
+The `getCareerStats` endpoint returns career leaderboards that include players who never played in PLL (2019+). Cross-referencing with our `player-details.json` (which only has PLL players) revealed:
+
+- **369 players** appear in both career stats AND player details (PLL players)
+- **801 players** appear ONLY in career stats (MLL-era players)
+
+### Data Structure for MLL Players
+
+MLL players have career stats but NO individual profile pages:
+
+```json
+{
+  "slug": "casey-powell",
+  "name": "Casey Powell",
+  "experience": null,
+  "allYears": [2001, 2002, 2003, ..., 2016],
+  "stats": {
+    "gamesPlayed": 130,
+    "points": 523,
+    "goals": 262,
+    "assists": 256,
+    "groundBalls": 257,
+    "saves": 0,
+    "faceoffsWon": 1
+  },
+  "appearedInStats": ["points", "goals", "assists", "groundBalls"],
+  "inPlayerDetails": false,
+  "likelySource": "mll_or_retired"
+}
+```
+
+### MLL vs PLL Player Detection
+
+| Field | PLL Player | MLL Player |
+|-------|------------|------------|
+| `inPlayerDetails` | `true` | `false` |
+| `likelySource` | `"pll"` | `"mll_or_retired"` |
+| `experience` | Number (1-8+) | `null` |
+| `allYears` | Includes 2019+ | Ends before 2019 |
+| Profile available | Yes | No |
+| Career stats | Yes | Yes |
+| Season-by-season | Yes | No |
+| Accolades | Yes | No |
+
+### Database Implications
+
+When designing the database schema:
+
+1. **PLL players (502)**: Full profile data - name, position, college, handedness, jersey history, career stats, season stats, accolades
+2. **MLL players (801)**: Career stats only - name, slug, years active, aggregate stats
+3. **Bridge players** (played in both leagues): Will have MLL career stats merged with PLL profile
+
+### Notable MLL Players in Dataset
+
+Top career scorers who never played PLL:
+- Casey Powell (523 points, 2001-2016)
+- Mark Millon (411 points, 2001-2010)
+- Josh Sims (344 points, 2008-2018)
+- John Grant (340 points, 2001-2014)
+
+---
 
 ### Next Steps
 
 1. Design database schema based on extracted data
 2. Build sync service to import data
 3. Create deduplication logic for player matching
+4. Handle MLL-only players (career stats without profiles)
