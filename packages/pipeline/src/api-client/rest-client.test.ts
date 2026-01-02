@@ -283,4 +283,83 @@ describe("makeRestClient", () => {
       );
     });
   });
+
+  describe("config overrides", () => {
+    it("respects custom maxRetries", async () => {
+      mockFetch.mockRejectedValue(new Error("Network failed"));
+
+      const client = makeRestClient({
+        baseUrl: "https://api.example.com",
+        maxRetries: 1,
+      });
+
+      const result = await Effect.runPromiseExit(
+        client.get("/users/1", TestResponse),
+      );
+
+      expect(result._tag).toBe("Failure");
+      // 1 initial + 1 retry = 2 calls
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("respects maxRetries of 0 (no retries)", async () => {
+      mockFetch.mockRejectedValue(new Error("Network failed"));
+
+      const client = makeRestClient({
+        baseUrl: "https://api.example.com",
+        maxRetries: 0,
+      });
+
+      const result = await Effect.runPromiseExit(
+        client.get("/users/1", TestResponse),
+      );
+
+      expect(result._tag).toBe("Failure");
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("retries with backoff on persistent rate limit", async () => {
+      mockFetch.mockResolvedValue(
+        new Response("Too Many Requests", { status: 429 }),
+      );
+
+      const client = makeRestClient({
+        baseUrl: "https://api.example.com",
+        maxRetries: 2,
+        retryDelayMs: 10,
+      });
+
+      const result = await Effect.runPromiseExit(
+        client.get("/users/1", TestResponse),
+      );
+
+      expect(result._tag).toBe("Failure");
+      // 1 initial + 1 after sleep + 2 retries = 4 calls
+      expect(mockFetch).toHaveBeenCalledTimes(4);
+    });
+
+    it("succeeds on retry after rate limit clears", async () => {
+      mockFetch
+        .mockResolvedValueOnce(
+          new Response("Too Many Requests", { status: 429 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ id: 1, name: "Success" }), {
+            status: 200,
+          }),
+        );
+
+      const client = makeRestClient({
+        baseUrl: "https://api.example.com",
+        retryDelayMs: 10,
+      });
+
+      const result = await Effect.runPromise(
+        client.get("/users/1", TestResponse),
+      );
+
+      expect(result).toEqual({ id: 1, name: "Success" });
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+  });
 });

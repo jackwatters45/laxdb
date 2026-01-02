@@ -1,34 +1,54 @@
 import { Config, Duration, Effect, Redacted } from "effect";
 
+export interface PipelineConfigValues {
+  readonly userAgent: string;
+  readonly defaultTimeoutMs: number;
+  readonly maxRetries: number;
+  readonly retryDelayMs: number;
+  readonly rateLimitDelayMs: number;
+  readonly maxConcurrency: number;
+  readonly retryDelay: Duration.Duration;
+  readonly defaultTimeout: Duration.Duration;
+}
+
+export const DEFAULT_PIPELINE_CONFIG: PipelineConfigValues = {
+  userAgent: "Mozilla/5.0 (compatible; LaxDBBot/1.0; +https://laxdb.io/bot)",
+  defaultTimeoutMs: 30000,
+  maxRetries: 3,
+  retryDelayMs: 1000,
+  rateLimitDelayMs: 100,
+  maxConcurrency: 5,
+  retryDelay: Duration.millis(1000),
+  defaultTimeout: Duration.millis(30000),
+};
+
 export class PipelineConfig extends Effect.Service<PipelineConfig>()(
   "PipelineConfig",
   {
     effect: Effect.gen(function* () {
       const userAgent = yield* Config.string("PIPELINE_USER_AGENT").pipe(
-        Config.withDefault(
-          "Mozilla/5.0 (compatible; LaxDBBot/1.0; +https://laxdb.io/bot)",
-        ),
+        Config.withDefault(DEFAULT_PIPELINE_CONFIG.userAgent),
       );
 
       const defaultTimeoutMs = yield* Config.number(
         "PIPELINE_DEFAULT_TIMEOUT_MS",
-      ).pipe(Config.withDefault(30000));
+      ).pipe(Config.withDefault(DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs));
 
       const maxRetries = yield* Config.number("PIPELINE_MAX_RETRIES").pipe(
-        Config.withDefault(3),
+        Config.withDefault(DEFAULT_PIPELINE_CONFIG.maxRetries),
       );
 
       const retryDelayMs = yield* Config.number("PIPELINE_RETRY_DELAY_MS").pipe(
-        Config.withDefault(1000),
+        Config.withDefault(DEFAULT_PIPELINE_CONFIG.retryDelayMs),
       );
 
       const rateLimitDelayMs = yield* Config.number(
         "PIPELINE_RATE_LIMIT_DELAY_MS",
-      ).pipe(Config.withDefault(100));
+      ).pipe(Config.withDefault(DEFAULT_PIPELINE_CONFIG.rateLimitDelayMs));
 
       const maxConcurrency = yield* Config.number(
         "PIPELINE_MAX_CONCURRENCY",
-      ).pipe(Config.withDefault(5));
+      ).pipe(Config.withDefault(DEFAULT_PIPELINE_CONFIG.maxConcurrency));
 
       return {
         userAgent,
@@ -39,7 +59,7 @@ export class PipelineConfig extends Effect.Service<PipelineConfig>()(
         maxConcurrency,
         retryDelay: Duration.millis(retryDelayMs),
         defaultTimeout: Duration.millis(defaultTimeoutMs),
-      } as const;
+      } satisfies PipelineConfigValues;
     }),
   },
 ) {}

@@ -4,7 +4,29 @@ Effect-TS based data pipeline for web scraping, API consumption, and HTML parsin
 
 ## Overview
 
-This package provides two main capabilities:
+This package wraps external APIs and web scraping sources to create a unified data ingestion layer for laxdb. Rather than scattering fetch calls throughout the codebase, we centralize all external data access here with:
+
+- **Schema validation** - Every API response is validated against Effect Schema definitions, catching API changes early
+- **Error handling** - Typed errors (`HttpError`, `NetworkError`, `RateLimitError`, etc.) with automatic retry logic
+- **Rate limiting** - Built-in backoff and retry strategies to respect external API limits
+- **Testability** - Clients can be mocked for testing without hitting real APIs
+
+### Architecture
+
+```
+External Sources          Pipeline Package              Core Database
+┌─────────────────┐      ┌─────────────────────┐      ┌─────────────────┐
+│  PLL API        │─────▶│  PLLClient          │      │                 │
+│  (GraphQL/REST) │      │  - Schema validation│      │  players table  │
+└─────────────────┘      │  - Error handling   │─────▶│  games table    │
+                         │  - Retry logic      │      │  teams table    │
+┌─────────────────┐      └─────────────────────┘      │                 │
+│  NLL Website    │─────▶│  ScraperService     │      └─────────────────┘
+│  (HTML scraping)│      │  ParserService      │─────▶│  (future)       │
+└─────────────────┘      └─────────────────────┘      └─────────────────┘
+```
+
+### Capabilities
 
 1. **API Client** - Generic HTTP client for consuming external JSON APIs (PLL, etc.)
 2. **Web Scraping** - HTML fetching and parsing with Cheerio
@@ -125,15 +147,28 @@ const program = Effect.gen(function* () {
 
 ## API Reference
 
-### ApiClient
+### RestClient
 
-Generic HTTP client for JSON APIs with schema validation.
+REST client with automatic retry for transient errors and rate limits.
 
 ```typescript
-interface ApiClient {
-  get<T>(endpoint: string, schema: Schema<T>): Effect<T, ApiError>;
-  post<T>(endpoint: string, body: unknown, schema: Schema<T>): Effect<T, ApiError>;
-}
+const client = makeRestClient({ baseUrl: "https://api.example.com" });
+
+client.get("/users", UserSchema);      // With retries
+client.post("/users", body, UserSchema);
+client.requestOnce("GET", "/health", HealthSchema);  // No retries
+```
+
+### GraphQLClient
+
+GraphQL client with automatic retry for transient errors and rate limits.
+
+```typescript
+const client = makeGraphQLClient({ endpoint: "https://api.example.com/graphql" });
+
+client.query(QUERY, DataSchema, variables);     // With retries
+client.mutation(MUTATION, DataSchema, variables);
+client.executeOnce(request, DataSchema);        // No retries
 ```
 
 ### ScraperService
@@ -172,6 +207,25 @@ Environment variables (all optional):
 | `PIPELINE_MAX_RETRIES` | `3` | Retry attempts |
 | `PIPELINE_RETRY_DELAY_MS` | `1000` | Base retry delay |
 | `PIPELINE_MAX_CONCURRENCY` | `5` | Batch concurrency limit |
+
+### Per-Client Configuration
+
+Override defaults for specific clients:
+
+```typescript
+// Uses global defaults
+const client = makeRestClient({ baseUrl: "https://api.example.com" });
+
+// Override retry settings per-client
+const client = makeRestClient({
+  baseUrl: "https://slow-api.example.com",
+  timeoutMs: 60000,    // 60s timeout (default: 30s)
+  maxRetries: 5,       // 5 retries (default: 3)
+  retryDelayMs: 2000,  // 2s base delay (default: 1s)
+});
+```
+
+The same options work for `makeGraphQLClient`.
 
 ## Development
 
