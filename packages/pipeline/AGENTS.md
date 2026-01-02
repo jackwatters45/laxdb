@@ -6,10 +6,10 @@ Effect-TS based data pipeline for consuming external APIs and web scraping.
 
 ```
 src/
-├── api-client/              # Generic API client for JSON APIs
-│   ├── api-client.schema.ts    # Request/response schemas
-│   ├── api-client.error.ts     # API client errors
-│   ├── api-client.service.ts   # makeApiClient (REST)
+├── api-client/              # REST and GraphQL clients
+│   ├── rest-client.schema.ts   # REST client config/options schemas
+│   ├── rest-client.service.ts  # makeRestClient (REST)
+│   ├── api-client.error.ts     # Shared API errors (REST + GraphQL)
 │   ├── graphql.schema.ts       # GraphQL schemas
 │   └── graphql.service.ts      # makeGraphQLClient
 ├── scraper/                 # Web scraping module
@@ -199,10 +199,10 @@ To add an entirely new API source (e.g., NLL):
 
 ```typescript
 import { Effect } from "effect";
-import { makeApiClient } from "../api-client/api-client.service";
+import { makeRestClient } from "../api-client/rest-client.service";
 import { makeGraphQLClient } from "../api-client/graphql.service";
 
-const nllRestClient = makeApiClient({
+const nllRestClient = makeRestClient({
   baseUrl: "https://api.nll.com/v1",
   authHeader: "Bearer TOKEN",
   defaultHeaders: {
@@ -242,7 +242,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 
 - **Hardcoded credentials**: Use config service or environment variables
 - **Skip schema validation**: Always decode API responses with Effect Schema
-- **Direct fetch calls**: Use `makeApiClient` for REST, `makeGraphQLClient` for GraphQL
+- **Direct fetch calls**: Use `makeRestClient` for REST, `makeGraphQLClient` for GraphQL
 - **Ignore rate limits**: Implement backoff in client services
 - **Effect.catchAll**: Use `Effect.catchTag` to preserve error types
 - **Guessing schema types**: Always verify against actual API responses

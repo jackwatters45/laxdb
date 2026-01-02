@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
-export class ApiClientConfig extends Schema.Class<ApiClientConfig>(
-  "ApiClientConfig",
+export class RestClientConfig extends Schema.Class<RestClientConfig>(
+  "RestClientConfig",
 )({
   baseUrl: Schema.String,
   defaultHeaders: Schema.optional(
@@ -11,8 +11,8 @@ export class ApiClientConfig extends Schema.Class<ApiClientConfig>(
   timeoutMs: Schema.optional(Schema.Number),
 }) {}
 
-export class ApiRequestOptions extends Schema.Class<ApiRequestOptions>(
-  "ApiRequestOptions",
+export class RestRequestOptions extends Schema.Class<RestRequestOptions>(
+  "RestRequestOptions",
 )({
   headers: Schema.optional(
     Schema.Record({ key: Schema.String, value: Schema.String }),

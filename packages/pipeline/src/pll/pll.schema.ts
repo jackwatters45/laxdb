@@ -264,3 +264,515 @@ export class PLLGraphQLStandingsResponse extends Schema.Class<PLLGraphQLStanding
 )({
   standings: Schema.Array(PLLGraphQLStanding),
 }) {}
+
+export class PLLCurrentTeam extends Schema.Class<PLLCurrentTeam>(
+  "PLLCurrentTeam",
+)({
+  officialId: Schema.String,
+  jerseyNum: Schema.NullOr(Schema.Number),
+  position: Schema.NullOr(Schema.String),
+  locationCode: Schema.NullOr(Schema.String),
+  location: Schema.NullOr(Schema.String),
+  fullName: Schema.String,
+  urlLogo: Schema.NullOr(Schema.String),
+}) {}
+
+export class PLLAdvancedPlayerStats extends Schema.Class<PLLAdvancedPlayerStats>(
+  "PLLAdvancedPlayerStats",
+)({
+  gamesPlayed: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  shots: Schema.Number,
+  touches: Schema.NullOr(Schema.Number),
+  totalPasses: Schema.NullOr(Schema.Number),
+  turnovers: Schema.Number,
+  passRate: Schema.NullOr(Schema.Number),
+  shotRate: Schema.NullOr(Schema.Number),
+  goalRate: Schema.NullOr(Schema.Number),
+  assistRate: Schema.NullOr(Schema.Number),
+  turnoverRate: Schema.NullOr(Schema.Number),
+}) {}
+
+export class PLLAdvancedSeasonStats extends Schema.Class<PLLAdvancedSeasonStats>(
+  "PLLAdvancedSeasonStats",
+)({
+  unassistedGoals: Schema.NullOr(Schema.Number),
+  assistedGoals: Schema.NullOr(Schema.Number),
+  settledGoals: Schema.NullOr(Schema.Number),
+  fastbreakGoals: Schema.NullOr(Schema.Number),
+  substitutionGoals: Schema.NullOr(Schema.Number),
+  doorstepGoals: Schema.NullOr(Schema.Number),
+  powerPlayGoals: Schema.NullOr(Schema.Number),
+
+  assistOpportunities: Schema.NullOr(Schema.Number),
+  settledAssists: Schema.NullOr(Schema.Number),
+  powerPlayAssists: Schema.NullOr(Schema.Number),
+  fastbreakAssists: Schema.NullOr(Schema.Number),
+  dodgeAssists: Schema.NullOr(Schema.Number),
+  pnrAssists: Schema.NullOr(Schema.Number),
+
+  unassistedShots: Schema.NullOr(Schema.Number),
+  unassistedShotPct: Schema.NullOr(Schema.Number),
+  assistedShots: Schema.NullOr(Schema.Number),
+  assistedShotPct: Schema.NullOr(Schema.Number),
+  pipeShots: Schema.NullOr(Schema.Number),
+
+  lhShots: Schema.NullOr(Schema.Number),
+  lhGoals: Schema.NullOr(Schema.Number),
+  lhShotPct: Schema.NullOr(Schema.Number),
+  rhShots: Schema.NullOr(Schema.Number),
+  rhGoals: Schema.NullOr(Schema.Number),
+  rhShotPct: Schema.NullOr(Schema.Number),
+}) {}
+
+export class PLLAdvancedPlayer extends Schema.Class<PLLAdvancedPlayer>(
+  "PLLAdvancedPlayer",
+)({
+  officialId: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+  slug: Schema.NullOr(Schema.String),
+  currentTeam: Schema.NullOr(PLLCurrentTeam),
+  stats: Schema.NullOr(PLLAdvancedPlayerStats),
+  advancedSeasonStats: Schema.NullOr(PLLAdvancedSeasonStats),
+}) {}
+
+export class PLLAdvancedPlayersResponse extends Schema.Class<PLLAdvancedPlayersResponse>(
+  "PLLAdvancedPlayersResponse",
+)({
+  allPlayers: Schema.Array(PLLAdvancedPlayer),
+}) {}
+
+export class PLLAdvancedPlayersRequest extends Schema.Class<PLLAdvancedPlayersRequest>(
+  "PLLAdvancedPlayersRequest",
+)({
+  year: PLLYear,
+  limit: Schema.optionalWith(PositiveLimit, { default: () => 250 }),
+  league: Schema.optionalWith(Schema.String, { default: () => "PLL" }),
+}) {}
+
+// Team stats (shared between regular, post, and champSeries)
+export class PLLTeamStats extends Schema.Class<PLLTeamStats>("PLLTeamStats")({
+  gamesPlayed: Schema.Number,
+  scores: Schema.Number,
+  scoresAgainst: Schema.Number,
+  goals: Schema.Number,
+  twoPointGoals: Schema.Number,
+  onePointGoals: Schema.NullOr(Schema.Number),
+  assists: Schema.Number,
+  groundBalls: Schema.Number,
+  turnovers: Schema.Number,
+  causedTurnovers: Schema.Number,
+  faceoffsWon: Schema.Number,
+  faceoffsLost: Schema.Number,
+  faceoffs: Schema.Number,
+  faceoffPct: Schema.Number,
+  shots: Schema.Number,
+  shotPct: Schema.Number,
+  twoPointShots: Schema.Number,
+  twoPointShotPct: Schema.Number,
+  twoPointShotsOnGoal: Schema.Number,
+  twoPointShotsOnGoalPct: Schema.Number,
+  shotsOnGoal: Schema.Number,
+  shotsOnGoalPct: Schema.Number,
+  goalsAgainst: Schema.Number,
+  twoPointGoalsAgainst: Schema.Number,
+  numPenalties: Schema.Number,
+  pim: Schema.Number,
+  clears: Schema.Number,
+  clearAttempts: Schema.Number,
+  clearPct: Schema.Number,
+  rides: Schema.Number,
+  rideAttempts: Schema.Number,
+  ridesPct: Schema.Number,
+  saves: Schema.Number,
+  savePct: Schema.Number,
+  saa: Schema.NullOr(Schema.Number),
+  offsides: Schema.Number,
+  shotClockExpirations: Schema.Number,
+  powerPlayGoals: Schema.Number,
+  powerPlayShots: Schema.Number,
+  powerPlayPct: Schema.Number,
+  powerPlayGoalsAgainst: Schema.Number,
+  powerPlayShotsAgainst: Schema.Number,
+  powerPlayGoalsAgainstPct: Schema.Number,
+  shortHandedGoals: Schema.Number,
+  shortHandedShots: Schema.Number,
+  shortHandedPct: Schema.Number,
+  shortHandedShotsAgainst: Schema.Number,
+  shortHandedGoalsAgainst: Schema.Number,
+  shortHandedGoalsAgainstPct: Schema.Number,
+  manDownPct: Schema.Number,
+  timesManUp: Schema.Number,
+  timesShortHanded: Schema.Number,
+  scoresPG: Schema.NullOr(Schema.Number),
+  shotsPG: Schema.NullOr(Schema.Number),
+  totalPasses: Schema.NullOr(Schema.Number),
+  touches: Schema.NullOr(Schema.Number),
+}) {}
+
+export class PLLCoach extends Schema.Class<PLLCoach>("PLLCoach")({
+  name: Schema.String,
+  coachType: Schema.String,
+}) {}
+
+export class PLLTeamChampSeries extends Schema.Class<PLLTeamChampSeries>(
+  "PLLTeamChampSeries",
+)({
+  teamWins: Schema.Number,
+  teamLosses: Schema.Number,
+  teamTies: Schema.Number,
+  stats: Schema.NullOr(PLLTeamStats),
+}) {}
+
+export class PLLTeam extends Schema.Class<PLLTeam>("PLLTeam")({
+  officialId: Schema.String,
+  locationCode: Schema.NullOr(Schema.String),
+  location: Schema.NullOr(Schema.String),
+  fullName: Schema.String,
+  urlLogo: Schema.NullOr(Schema.String),
+  slogan: Schema.NullOr(Schema.String),
+  teamWins: Schema.Number,
+  teamLosses: Schema.Number,
+  teamTies: Schema.Number,
+  teamWinsPost: Schema.NullOr(Schema.Number),
+  teamLossesPost: Schema.NullOr(Schema.Number),
+  teamTiesPost: Schema.NullOr(Schema.Number),
+  league: Schema.NullOr(Schema.String),
+  coaches: Schema.Array(PLLCoach),
+  stats: Schema.NullOr(PLLTeamStats),
+  postStats: Schema.NullOr(PLLTeamStats),
+  champSeries: Schema.optional(PLLTeamChampSeries),
+}) {}
+
+export class PLLTeamsResponse extends Schema.Class<PLLTeamsResponse>(
+  "PLLTeamsResponse",
+)({
+  allTeams: Schema.Array(PLLTeam),
+}) {}
+
+export class PLLTeamsRequest extends Schema.Class<PLLTeamsRequest>(
+  "PLLTeamsRequest",
+)({
+  year: PLLYear,
+  sortBy: Schema.optionalWith(Schema.String, { default: () => "points" }),
+  includeChampSeries: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }),
+}) {}
+
+export class PLLCareerStatsPlayer extends Schema.Class<PLLCareerStatsPlayer>(
+  "PLLCareerStatsPlayer",
+)({
+  name: Schema.String,
+  experience: Schema.NullOr(Schema.Number),
+  allYears: Schema.NullOr(Schema.Array(Schema.Number)),
+  slug: Schema.NullOr(Schema.String),
+}) {}
+
+export class PLLCareerStat extends Schema.Class<PLLCareerStat>("PLLCareerStat")(
+  {
+    player: PLLCareerStatsPlayer,
+    gamesPlayed: Schema.Number,
+    points: Schema.Number,
+    goals: Schema.Number,
+    onePointGoals: Schema.NullOr(Schema.Number),
+    twoPointGoals: Schema.Number,
+    assists: Schema.Number,
+    groundBalls: Schema.Number,
+    saves: Schema.Number,
+    faceoffsWon: Schema.Number,
+  },
+) {}
+
+export class PLLCareerStatsResponse extends Schema.Class<PLLCareerStatsResponse>(
+  "PLLCareerStatsResponse",
+)({
+  careerStats: Schema.Array(PLLCareerStat),
+}) {}
+
+export class PLLCareerStatsRequest extends Schema.Class<PLLCareerStatsRequest>(
+  "PLLCareerStatsRequest",
+)({
+  stat: Schema.optional(Schema.String),
+  limit: Schema.optional(PositiveLimit),
+}) {}
+
+export class PLLPlayerCareerStats extends Schema.Class<PLLPlayerCareerStats>(
+  "PLLPlayerCareerStats",
+)({
+  gamesPlayed: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  turnovers: Schema.Number,
+  shots: Schema.Number,
+  shotPct: Schema.Number,
+  shotsOnGoal: Schema.Number,
+  shotsOnGoalPct: Schema.Number,
+  gamesStarted: Schema.NullOr(Schema.Number),
+  onePointGoals: Schema.NullOr(Schema.Number),
+  twoPointGoals: Schema.Number,
+  saves: Schema.Number,
+  savePct: Schema.Number,
+  scoresAgainst: Schema.NullOr(Schema.Number),
+  foRecord: Schema.NullOr(Schema.String),
+  faceoffs: Schema.Number,
+  faceoffsWon: Schema.Number,
+  faceoffPct: Schema.Number,
+  causedTurnovers: Schema.Number,
+  groundBalls: Schema.Number,
+  powerPlayGoals: Schema.NullOr(Schema.Number),
+  pimValue: Schema.NullOr(Schema.Number),
+  numPenalties: Schema.NullOr(Schema.Number),
+  twoPointGoalsAgainst: Schema.NullOr(Schema.Number),
+}) {}
+
+export class PLLPlayerAccolade extends Schema.Class<PLLPlayerAccolade>(
+  "PLLPlayerAccolade",
+)({
+  awardName: Schema.String,
+  years: Schema.Array(Schema.Number),
+}) {}
+
+export class PLLPlayerSeasonStats extends Schema.Class<PLLPlayerSeasonStats>(
+  "PLLPlayerSeasonStats",
+)({
+  year: Schema.Number,
+  seasonSegment: Schema.String,
+  teamId: Schema.NullOr(Schema.String),
+  gamesPlayed: Schema.Number,
+  goals: Schema.Number,
+  twoPointGoals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  scoringPoints: Schema.Number,
+  shots: Schema.Number,
+  shotPct: Schema.Number,
+  shotsOnGoal: Schema.Number,
+  shotsOnGoalPct: Schema.Number,
+  twoPointShots: Schema.Number,
+  twoPointShotPct: Schema.Number,
+  groundBalls: Schema.Number,
+  turnovers: Schema.Number,
+  causedTurnovers: Schema.Number,
+  faceoffsWon: Schema.Number,
+  faceoffsLost: Schema.Number,
+  faceoffs: Schema.Number,
+  faceoffPct: Schema.Number,
+  saves: Schema.Number,
+  savePct: Schema.Number,
+  goalsAgainst: Schema.Number,
+  GAA: Schema.Number,
+  plusMinus: Schema.Number,
+}) {}
+
+export class PLLPlayerDetail extends Schema.Class<PLLPlayerDetail>(
+  "PLLPlayerDetail",
+)({
+  officialId: Schema.String,
+  stats: Schema.NullOr(PLLPlayerStats),
+  postStats: Schema.NullOr(PLLPlayerStats),
+  careerStats: Schema.NullOr(PLLPlayerCareerStats),
+  allSeasonStats: Schema.Array(PLLPlayerSeasonStats),
+  accolades: Schema.Array(PLLPlayerAccolade),
+  champSeries: Schema.NullOr(PLLChampSeries),
+  advancedSeasonStats: Schema.NullOr(PLLAdvancedSeasonStats),
+}) {}
+
+export class PLLPlayerDetailResponse extends Schema.Class<PLLPlayerDetailResponse>(
+  "PLLPlayerDetailResponse",
+)({
+  player: Schema.NullOr(PLLPlayerDetail),
+}) {}
+
+export class PLLPlayerDetailRequest extends Schema.Class<PLLPlayerDetailRequest>(
+  "PLLPlayerDetailRequest",
+)({
+  id: Schema.String,
+  year: Schema.optional(PLLYear),
+  statsYear: Schema.optional(PLLYear),
+}) {}
+
+export class PLLTeamEvent extends Schema.Class<PLLTeamEvent>("PLLTeamEvent")({
+  id: Schema.String,
+  slugname: Schema.NullOr(Schema.String),
+  externalId: Schema.NullOr(Schema.String),
+  startTime: Schema.NullOr(Schema.String),
+  week: Schema.NullOr(Schema.Number),
+  venue: Schema.NullOr(Schema.String),
+  description: Schema.NullOr(Schema.String),
+  location: Schema.NullOr(Schema.String),
+  broadcaster: Schema.NullOr(Schema.String),
+  eventStatus: Schema.NullOr(Schema.String),
+}) {}
+
+export class PLLTeamCoach extends Schema.Class<PLLTeamCoach>("PLLTeamCoach")({
+  officialId: Schema.String,
+  coachType: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+}) {}
+
+export class PLLTeamRosterPlayer extends Schema.Class<PLLTeamRosterPlayer>(
+  "PLLTeamRosterPlayer",
+)({
+  officialId: Schema.String,
+  slug: Schema.NullOr(Schema.String),
+  firstName: Schema.String,
+  lastName: Schema.String,
+  lastNameSuffix: Schema.NullOr(Schema.String),
+  jerseyNum: Schema.NullOr(Schema.Number),
+  position: Schema.NullOr(Schema.String),
+  positionName: Schema.NullOr(Schema.String),
+  handedness: Schema.NullOr(Schema.String),
+  profileUrl: Schema.NullOr(Schema.String),
+  injuryStatus: Schema.NullOr(Schema.String),
+  injuryDescription: Schema.NullOr(Schema.String),
+  isCaptain: Schema.NullOr(Schema.Boolean),
+}) {}
+
+export class PLLTeamDetail extends Schema.Class<PLLTeamDetail>("PLLTeamDetail")(
+  {
+    officialId: Schema.String,
+    urlLogo: Schema.NullOr(Schema.String),
+    location: Schema.NullOr(Schema.String),
+    locationCode: Schema.NullOr(Schema.String),
+    fullName: Schema.String,
+    league: Schema.NullOr(Schema.String),
+    slogan: Schema.NullOr(Schema.String),
+    teamWins: Schema.Number,
+    teamLosses: Schema.Number,
+    teamTies: Schema.Number,
+    teamWinsPost: Schema.NullOr(Schema.Number),
+    teamLossesPost: Schema.NullOr(Schema.Number),
+    teamTiesPost: Schema.NullOr(Schema.Number),
+    allYears: Schema.Array(Schema.Number),
+    coaches: Schema.Array(PLLTeamCoach),
+    events: Schema.Array(PLLTeamEvent),
+    roster: Schema.Array(PLLTeamRosterPlayer),
+    stats: Schema.NullOr(PLLTeamStats),
+    postStats: Schema.NullOr(PLLTeamStats),
+    champSeries: Schema.optional(PLLTeamChampSeries),
+  },
+) {}
+
+export class PLLTeamDetailResponse extends Schema.Class<PLLTeamDetailResponse>(
+  "PLLTeamDetailResponse",
+)({
+  team: Schema.NullOr(PLLTeamDetail),
+}) {}
+
+export class PLLTeamDetailRequest extends Schema.Class<PLLTeamDetailRequest>(
+  "PLLTeamDetailRequest",
+)({
+  id: Schema.String,
+  year: Schema.optional(PLLYear),
+  statsYear: Schema.optional(PLLYear),
+  eventsYear: Schema.optional(PLLYear),
+  includeChampSeries: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }),
+}) {}
+
+export class PLLTeamStatsOnly extends Schema.Class<PLLTeamStatsOnly>(
+  "PLLTeamStatsOnly",
+)({
+  stats: Schema.NullOr(PLLTeamStats),
+}) {}
+
+export class PLLTeamStatsResponse extends Schema.Class<PLLTeamStatsResponse>(
+  "PLLTeamStatsResponse",
+)({
+  team: Schema.NullOr(PLLTeamStatsOnly),
+}) {}
+
+export class PLLTeamStatsRequest extends Schema.Class<PLLTeamStatsRequest>(
+  "PLLTeamStatsRequest",
+)({
+  id: Schema.String,
+  year: Schema.optional(PLLYear),
+  segment: Schema.Literal("regular", "post"),
+}) {}
+
+export class PLLEventTeam extends Schema.Class<PLLEventTeam>("PLLEventTeam")({
+  officialId: Schema.String,
+  year: Schema.Number,
+  urlLogo: Schema.NullOr(Schema.String),
+  fullName: Schema.String,
+  location: Schema.NullOr(Schema.String),
+  locationCode: Schema.NullOr(Schema.String),
+  league: Schema.NullOr(Schema.String),
+  conference: Schema.NullOr(Schema.String),
+  slogan: Schema.NullOr(Schema.String),
+  teamWins: Schema.Number,
+  teamLosses: Schema.Number,
+  teamTies: Schema.Number,
+  teamTiesPost: Schema.NullOr(Schema.Number),
+  teamLossesPost: Schema.NullOr(Schema.Number),
+  teamWinsPost: Schema.NullOr(Schema.Number),
+  seed: Schema.NullOr(Schema.Number),
+  shopImg: Schema.NullOr(Schema.String),
+  teamColor: Schema.NullOr(Schema.String),
+  backgroundColor: Schema.NullOr(Schema.String),
+  spotifyId: Schema.NullOr(Schema.String),
+  twTag: Schema.NullOr(Schema.String),
+  igTag: Schema.NullOr(Schema.String),
+  team_id: Schema.String,
+}) {}
+
+export class PLLEvent extends Schema.Class<PLLEvent>("PLLEvent")({
+  id: Schema.Number,
+  slugname: Schema.NullOr(Schema.String),
+  eventId: Schema.NullOr(Schema.String),
+  externalId: Schema.NullOr(Schema.String),
+  league: Schema.NullOr(Schema.String),
+  seasonSegment: Schema.NullOr(Schema.String),
+  startTime: Schema.NullOr(Schema.String),
+  week: Schema.NullOr(Schema.String),
+  year: Schema.Number,
+  gameNumber: Schema.NullOr(Schema.Number),
+  location: Schema.NullOr(Schema.String),
+  venue: Schema.NullOr(Schema.String),
+  venueLocation: Schema.NullOr(Schema.String),
+  urlStreaming: Schema.NullOr(Schema.String),
+  urlTicket: Schema.NullOr(Schema.String),
+  urlPreview: Schema.NullOr(Schema.String),
+  broadcaster: Schema.NullOr(Schema.Array(Schema.String)),
+  addToCalendarId: Schema.NullOr(Schema.String),
+  description: Schema.NullOr(Schema.String),
+  weekendTicketId: Schema.NullOr(Schema.String),
+  suiteId: Schema.NullOr(Schema.String),
+  waitlistUrl: Schema.NullOr(Schema.String),
+  waitlist: Schema.NullOr(Schema.Boolean),
+  eventStatus: Schema.NullOr(Schema.Number),
+  period: Schema.NullOr(Schema.Number),
+  clockMinutes: Schema.NullOr(Schema.Number),
+  clockSeconds: Schema.NullOr(Schema.Number),
+  clockTenths: Schema.NullOr(Schema.Number),
+  gameStatus: Schema.NullOr(Schema.String),
+  externalEventId: Schema.NullOr(Schema.String),
+  visitorScore: Schema.NullOr(Schema.Number),
+  homeScore: Schema.NullOr(Schema.Number),
+  homeTeam: Schema.NullOr(PLLEventTeam),
+  awayTeam: Schema.NullOr(PLLEventTeam),
+  ticketId: Schema.NullOr(Schema.String),
+  snl: Schema.NullOr(Schema.Boolean),
+}) {}
+
+export class PLLEventsResponse extends Schema.Class<PLLEventsResponse>(
+  "PLLEventsResponse",
+)({
+  data: Schema.Struct({
+    items: Schema.Array(PLLEvent),
+  }),
+}) {}
+
+export class PLLEventsRequest extends Schema.Class<PLLEventsRequest>(
+  "PLLEventsRequest",
+)({
+  year: PLLYear,
+  includeCS: Schema.optionalWith(Schema.Boolean, { default: () => true }),
+  includeWLL: Schema.optionalWith(Schema.Boolean, { default: () => true }),
+}) {}

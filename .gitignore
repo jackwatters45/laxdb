@@ -10,6 +10,10 @@ node_modules
 # fumadocs
 .source
 
+# coverage
+.coverage
+coverage
+
 # wrangler
 .wrangler
 wrangler.jsonc

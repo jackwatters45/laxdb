@@ -1,11 +1,11 @@
 import { Duration, Effect, Schema } from "effect";
 import {
-  ApiError,
-  type ApiClientError,
-  ApiNetworkError,
-  ApiSchemaError,
-  ApiTimeoutError,
-} from "./api-client.error";
+  HttpError,
+  NetworkError,
+  ParseError,
+  type PipelineError,
+  TimeoutError,
+} from "../error";
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
 
@@ -45,13 +45,14 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     request: GraphQLRequest,
     dataSchema: Schema.Schema<A, I>,
     timeoutMs?: number,
-  ): Effect.Effect<A, ApiClientError | GraphQLError> =>
+  ): Effect.Effect<A, PipelineError | GraphQLError> =>
     Effect.gen(function* () {
       const timeout = timeoutMs ?? defaultTimeout;
+      const url = config.endpoint;
 
       const response = yield* Effect.tryPromise({
         try: (signal) =>
-          fetch(config.endpoint, {
+          fetch(url, {
             method: "POST",
             headers: buildHeaders(),
             body: JSON.stringify({
@@ -63,15 +64,15 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
           }),
         catch: (error) => {
           if (error instanceof Error && error.name === "AbortError") {
-            return new ApiTimeoutError({
+            return new TimeoutError({
               message: `Request timed out after ${timeout}ms`,
-              endpoint: config.endpoint,
+              url,
               timeoutMs: timeout,
             });
           }
-          return new ApiNetworkError({
+          return new NetworkError({
             message: `Network error: ${String(error)}`,
-            endpoint: config.endpoint,
+            url,
             cause: error,
           });
         },
@@ -79,9 +80,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         Effect.timeout(Duration.millis(timeout)),
         Effect.catchTag("TimeoutException", () =>
           Effect.fail(
-            new ApiTimeoutError({
+            new TimeoutError({
               message: `Request timed out after ${timeout}ms`,
-              endpoint: config.endpoint,
+              url,
               timeoutMs: timeout,
             }),
           ),
@@ -90,9 +91,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
 
       if (!response.ok) {
         return yield* Effect.fail(
-          new ApiError({
+          new HttpError({
             message: `HTTP ${response.status}: ${response.statusText}`,
-            endpoint: config.endpoint,
+            url,
             method: "POST",
             statusCode: response.status,
           }),
@@ -102,9 +103,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       const json = yield* Effect.tryPromise({
         try: () => response.json(),
         catch: (error) =>
-          new ApiError({
+          new HttpError({
             message: `Failed to parse JSON: ${String(error)}`,
-            endpoint: config.endpoint,
+            url,
             method: "POST",
             cause: error,
           }),
@@ -114,9 +115,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       const decoded = yield* Schema.decodeUnknown(responseSchema)(json).pipe(
         Effect.mapError(
           (error) =>
-            new ApiSchemaError({
+            new ParseError({
               message: `Schema validation failed: ${String(error)}`,
-              endpoint: config.endpoint,
+              url,
               cause: error,
             }),
         ),
