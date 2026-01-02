@@ -1,4 +1,5 @@
 import { type Config, defineConfig } from "drizzle-kit";
+import { Env } from "./src/config";
 
 export default defineConfig({
   dialect: "postgresql",
@@ -6,7 +7,7 @@ export default defineConfig({
   out: "./migrations",
   dbCredentials: {
     ssl: "require",
-    url: process.env.DATABASE_URL!,
+    url: Env.DATABASE_URL(),
   },
   migrations: {
     schema: "public",

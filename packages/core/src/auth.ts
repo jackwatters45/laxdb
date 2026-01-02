@@ -17,8 +17,9 @@ import {
 } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { desc, eq } from "drizzle-orm";
-import { Array as Arr, Effect, ManagedRuntime } from "effect";
+import { Array as Arr, Effect, ManagedRuntime, Redacted } from "effect";
 import { OrganizationMembershipError } from "./auth/auth.error";
+import { AppConfig } from "./config";
 import {
   ac,
   assistantCoach,
@@ -49,10 +50,16 @@ const runtime = ManagedRuntime.make(DatabaseLive);
 export class AuthService extends Effect.Service<AuthService>()("AuthService", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
+    const {
+      betterAuthSecret,
+      googleClientId,
+      googleClientSecret,
+      polarWebhookSecret,
+    } = yield* AppConfig;
 
     const auth = betterAuth({
       appName: "Goalbound",
-      secret: process.env.BETTER_AUTH_SECRET!,
+      secret: Redacted.value(betterAuthSecret),
       database: drizzleAdapter(db, {
         provider: "pg",
         schema: {
@@ -73,8 +80,8 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
       },
       socialProviders: {
         google: {
-          clientId: process.env.GOOGLE_CLIENT_ID!,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+          clientId: googleClientId,
+          clientSecret: Redacted.value(googleClientSecret),
         },
       },
       // FIX: Wire up KVService for rate limiting and session caching
@@ -188,7 +195,7 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
             portal(),
             usage(),
             webhooks({
-              secret: process.env.POLAR_WEBHOOK_SECRET!,
+              secret: Redacted.value(polarWebhookSecret),
               // onCustomerStateChanged: (payload) => // Triggered when anything regarding a customer changes
               // onOrderPaid: (payload) => // Triggered when an order was paid (purchase, subscription renewal, etc.)
               // ...  // Over 25 granular webhook handlers

@@ -3,7 +3,7 @@ import { PgClient } from "@effect/sql-pg";
 import { Cause, Console, Effect, Layer, Redacted } from "effect";
 
 const fromHyperdrive = Effect.try(() => {
-  // oxlint-disable-next-line @typescript-eslint/no-require-imports
+  // oxlint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-type-assertion
   const { env } = require("cloudflare:workers") as {
     env: { DB?: { connectionString: string } };
   };

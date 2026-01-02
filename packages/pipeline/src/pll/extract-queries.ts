@@ -26,10 +26,7 @@ async function extractQueries() {
 
   const seen = new Set<string>();
   for (const match of matches) {
-    const clean = match
-      .replaceAll(/^"|"$/g, "")
-      .replaceAll(/\\n/g, "\n")
-      .trim();
+    const clean = match.replaceAll(/^"|"$/g, "").replaceAll("\\n", "\n").trim();
 
     const opMatch = clean.match(/\{\s*(\w+)/);
     const opName = opMatch?.[1] ?? "unknown";

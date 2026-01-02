@@ -12,8 +12,7 @@ export class EmailService extends Effect.Service<EmailService>()(
         sendEmail: (input: SendEmailInput) =>
           Effect.gen(function* () {
             const validated = yield* Schema.decode(SendEmailInput)(input);
-            const awsRegion = yield* AppConfig.awsRegion;
-            const emailSender = yield* AppConfig.emailSender;
+            const { awsRegion, emailSender } = yield* AppConfig;
 
             const sesClient = new SESv2Client({
               region: awsRegion,
