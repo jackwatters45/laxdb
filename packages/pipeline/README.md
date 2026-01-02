@@ -147,15 +147,28 @@ const program = Effect.gen(function* () {
 
 ## API Reference
 
-### ApiClient
+### RestClient
 
-Generic HTTP client for JSON APIs with schema validation.
+REST client with automatic retry for transient errors and rate limits.
 
 ```typescript
-interface ApiClient {
-  get<T>(endpoint: string, schema: Schema<T>): Effect<T, ApiError>;
-  post<T>(endpoint: string, body: unknown, schema: Schema<T>): Effect<T, ApiError>;
-}
+const client = makeRestClient({ baseUrl: "https://api.example.com" });
+
+client.get("/users", UserSchema);      // With retries
+client.post("/users", body, UserSchema);
+client.requestOnce("GET", "/health", HealthSchema);  // No retries
+```
+
+### GraphQLClient
+
+GraphQL client with automatic retry for transient errors and rate limits.
+
+```typescript
+const client = makeGraphQLClient({ endpoint: "https://api.example.com/graphql" });
+
+client.query(QUERY, DataSchema, variables);     // With retries
+client.mutation(MUTATION, DataSchema, variables);
+client.executeOnce(request, DataSchema);        // No retries
 ```
 
 ### ScraperService
@@ -194,6 +207,25 @@ Environment variables (all optional):
 | `PIPELINE_MAX_RETRIES` | `3` | Retry attempts |
 | `PIPELINE_RETRY_DELAY_MS` | `1000` | Base retry delay |
 | `PIPELINE_MAX_CONCURRENCY` | `5` | Batch concurrency limit |
+
+### Per-Client Configuration
+
+Override defaults for specific clients:
+
+```typescript
+// Uses global defaults
+const client = makeRestClient({ baseUrl: "https://api.example.com" });
+
+// Override retry settings per-client
+const client = makeRestClient({
+  baseUrl: "https://slow-api.example.com",
+  timeoutMs: 60000,    // 60s timeout (default: 30s)
+  maxRetries: 5,       // 5 retries (default: 3)
+  retryDelayMs: 2000,  // 2s base delay (default: 1s)
+});
+```
+
+The same options work for `makeGraphQLClient`.
 
 ## Development
 

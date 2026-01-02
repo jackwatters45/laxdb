@@ -14,6 +14,7 @@ import type {
   HttpMethod,
 } from "./rest-client.schema";
 
+// RateLimitError handled separately - server provides retry-after delay
 const isTransientError = (error: PipelineError): boolean =>
   error._tag === "NetworkError" || error._tag === "TimeoutError";
 
@@ -144,6 +145,10 @@ export const makeRestClient = (config: RestClientConfig) => {
     Schedule.whileInput(isTransientError),
   );
 
+  const rateLimitRetrySchedule = Schedule.exponential(
+    Duration.millis(retryDelayMs),
+  ).pipe(Schedule.compose(Schedule.recurs(maxRetries)));
+
   const requestWithRetry = <T>(
     method: HttpMethod,
     endpoint: string,
@@ -155,7 +160,11 @@ export const makeRestClient = (config: RestClientConfig) => {
       Effect.retry(transientRetrySchedule),
       Effect.catchTag("RateLimitError", (error) =>
         Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
-          Effect.andThen(request(method, endpoint, schema, body, options)),
+          Effect.andThen(
+            request(method, endpoint, schema, body, options).pipe(
+              Effect.retry(rateLimitRetrySchedule),
+            ),
+          ),
         ),
       ),
     );

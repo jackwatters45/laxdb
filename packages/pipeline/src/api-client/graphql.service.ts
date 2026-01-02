@@ -25,6 +25,7 @@ export class GraphQLError extends Schema.TaggedError<GraphQLError>(
   ),
 }) {}
 
+// RateLimitError handled separately - server provides retry-after delay
 const isTransientError = (error: PipelineError | GraphQLError): boolean =>
   error._tag === "NetworkError" || error._tag === "TimeoutError";
 
@@ -161,6 +162,10 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     Schedule.whileInput(isTransientError),
   );
 
+  const rateLimitRetrySchedule = Schedule.exponential(
+    Duration.millis(retryDelayMs),
+  ).pipe(Schedule.compose(Schedule.recurs(maxRetries)));
+
   const executeWithRetry = <A, I>(
     request: GraphQLRequest,
     dataSchema: Schema.Schema<A, I>,
@@ -170,7 +175,11 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       Effect.retry(transientRetrySchedule),
       Effect.catchTag("RateLimitError", (error) =>
         Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
-          Effect.andThen(execute(request, dataSchema, timeoutMs)),
+          Effect.andThen(
+            execute(request, dataSchema, timeoutMs).pipe(
+              Effect.retry(rateLimitRetrySchedule),
+            ),
+          ),
         ),
       ),
     );
