@@ -17,6 +17,9 @@ const DEFAULT_TIMEOUT_MS = 30000;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 
+const isTransientError = (error: PipelineError): boolean =>
+  error._tag === "NetworkError" || error._tag === "TimeoutError";
+
 export const makeRestClient = (config: RestClientConfig) => {
   const defaultTimeout = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
@@ -133,6 +136,13 @@ export const makeRestClient = (config: RestClientConfig) => {
       return decoded;
     });
 
+  const transientRetrySchedule = Schedule.exponential(
+    Duration.millis(DEFAULT_RETRY_DELAY_MS),
+  ).pipe(
+    Schedule.compose(Schedule.recurs(DEFAULT_MAX_RETRIES)),
+    Schedule.whileInput(isTransientError),
+  );
+
   const requestWithRetry = <T>(
     method: HttpMethod,
     endpoint: string,
@@ -141,13 +151,10 @@ export const makeRestClient = (config: RestClientConfig) => {
     options?: RestRequestOptions,
   ): Effect.Effect<T, PipelineError> =>
     request(method, endpoint, schema, body, options).pipe(
-      Effect.retry(
-        Schedule.exponential(Duration.millis(DEFAULT_RETRY_DELAY_MS)).pipe(
-          Schedule.compose(Schedule.recurs(DEFAULT_MAX_RETRIES)),
-          Schedule.whileInput(
-            (error: PipelineError) =>
-              error._tag === "NetworkError" || error._tag === "TimeoutError",
-          ),
+      Effect.retry(transientRetrySchedule),
+      Effect.catchTag("RateLimitError", (error) =>
+        Effect.sleep(Duration.millis(error.retryAfterMs ?? 1000)).pipe(
+          Effect.andThen(request(method, endpoint, schema, body, options)),
         ),
       ),
     );

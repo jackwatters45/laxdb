@@ -235,7 +235,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
           );
           return response.player;
         }).pipe(
-          Effect.tap((player) =>
+          Effect.tap(() =>
             Effect.log(`Fetched player detail for slug=${input.slug}`),
           ),
         ),
@@ -258,7 +258,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
           );
           return response.team;
         }).pipe(
-          Effect.tap((team) =>
+          Effect.tap(() =>
             Effect.log(`Fetched team detail for id=${input.id}`),
           ),
         ),

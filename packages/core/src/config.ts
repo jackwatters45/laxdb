@@ -37,27 +37,20 @@ const requireEnv = (name: string): string => {
   return value;
 };
 
+/**
+ * Synchronous environment access for non-sensitive values only.
+ *
+ * WHY THIS EXISTS:
+ * Effect Config (AppConfig) requires being inside an Effect context to access values.
+ * However, some patterns like AtomHttpApi.Tag and AtomRpc.Tag need configuration at
+ * module definition time (outside Effect context). This helper provides synchronous
+ * access for those specific cases.
+ *
+ * SECURITY:
+ * - Only non-sensitive values (public URLs) should be exposed here
+ * - Secrets MUST use AppConfig with Config.redacted() for proper redaction in logs
+ * - If you need a secret synchronously, refactor to defer the access into Effect context
+ */
 export const Env = {
-  DATABASE_URL: () => requireEnv("DATABASE_URL"),
   API_URL: () => requireEnv("API_URL"),
-
-  BETTER_AUTH_SECRET: () => requireEnv("BETTER_AUTH_SECRET"),
-  GOOGLE_CLIENT_ID: () => requireEnv("GOOGLE_CLIENT_ID"),
-  GOOGLE_CLIENT_SECRET: () => requireEnv("GOOGLE_CLIENT_SECRET"),
-  POLAR_WEBHOOK_SECRET: () => requireEnv("POLAR_WEBHOOK_SECRET"),
-
-  ALCHEMY_PASSWORD: () => requireEnv("ALCHEMY_PASSWORD"),
-  ALCHEMY_STATE_TOKEN: () => requireEnv("ALCHEMY_STATE_TOKEN"),
-
-  CLOUDFLARE_ACCOUNT_ID: () => requireEnv("CLOUDFLARE_ACCOUNT_ID"),
-  CLOUDFLARE_API_TOKEN: () => requireEnv("CLOUDFLARE_API_TOKEN"),
-  CLOUDFLARE_EMAIL: () => requireEnv("CLOUDFLARE_EMAIL"),
-
-  PLANETSCALE_ORGANIZATION: () => requireEnv("PLANETSCALE_ORGANIZATION"),
-  PLANETSCALE_SERVICE_TOKEN: () => requireEnv("PLANETSCALE_SERVICE_TOKEN"),
-  PLANETSCALE_SERVICE_TOKEN_ID: () =>
-    requireEnv("PLANETSCALE_SERVICE_TOKEN_ID"),
-
-  PLL_GRAPHQL_TOKEN: () => requireEnv("PLL_GRAPHQL_TOKEN"),
-  PLL_REST_TOKEN: () => requireEnv("PLL_REST_TOKEN"),
 } as const;

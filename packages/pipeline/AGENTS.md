@@ -238,12 +238,32 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 | Union types | `Schema.Union(TypeA, TypeB)` |
 | Literal values | `Schema.Literal("regular", "post")` |
 
+## ERROR TYPES
+
+All errors are Effect Schema TaggedErrors from `src/error.ts`:
+
+| Error | Required Fields | Optional Fields | When Used |
+|-------|-----------------|-----------------|-----------|
+| `HttpError` | `message`, `url` | `method`, `statusCode`, `cause` | Non-2xx HTTP response |
+| `NetworkError` | `message`, `url` | `cause` | Connection/DNS failures |
+| `TimeoutError` | `message`, `url` | `timeoutMs` | Request timeout |
+| `RateLimitError` | `message`, `url` | `retryAfterMs` | HTTP 429 response |
+| `ParseError` | `message` | `url`, `cause` | Schema validation failure |
+
+**Note**: `url` is required for all network errors since they occur after a request is initiated. `ParseError` has optional `url` because it's also used for input validation (before any request).
+
+### Retry Behavior
+
+The REST client (`makeRestClient`) handles retries automatically:
+- **Transient errors** (`NetworkError`, `TimeoutError`): Exponential backoff, max 3 retries
+- **Rate limiting** (`RateLimitError`): Respects server's `retry-after` header, single retry
+
 ## ANTI-PATTERNS
 
 - **Hardcoded credentials**: Use config service or environment variables
 - **Skip schema validation**: Always decode API responses with Effect Schema
 - **Direct fetch calls**: Use `makeRestClient` for REST, `makeGraphQLClient` for GraphQL
-- **Ignore rate limits**: Implement backoff in client services
+- **Ignore rate limits**: Retry logic is built-in, but respect API limits
 - **Effect.catchAll**: Use `Effect.catchTag` to preserve error types
 - **Guessing schema types**: Always verify against actual API responses
 
