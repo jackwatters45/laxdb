@@ -1,14 +1,21 @@
-import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
+import { defineConfig } from "vitest/config";
 
-export default defineWorkersConfig({
+export default defineConfig({
   test: {
     globals: true,
     testTimeout: 30000,
-    poolOptions: {
-      miniflare: {},
-      workers: {
-        wrangler: { configPath: "./wrangler.toml" },
-      },
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json"],
+      reportsDirectory: "./.coverage",
+      include: ["src/**/*.ts"],
+      exclude: [
+        "src/**/*.test.ts",
+        "src/**/*.schema.ts",
+        "src/**/index.ts",
+        "src/example-*.ts",
+        "src/pll/pll.queries.ts",
+      ],
     },
   },
 });

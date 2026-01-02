@@ -1,27 +1,30 @@
 import { Context, Duration, Effect, Layer, Schedule, Schema } from "effect";
 import {
-  ApiError,
-  type ApiClientError,
-  ApiNetworkError,
-  ApiRateLimitError,
-  ApiSchemaError,
-  ApiTimeoutError,
-} from "./api-client.error";
+  HttpError,
+  NetworkError,
+  ParseError,
+  type PipelineError,
+  RateLimitError,
+  TimeoutError,
+} from "../error";
 import type {
-  ApiClientConfig,
-  ApiRequestOptions,
+  RestClientConfig,
+  RestRequestOptions,
   HttpMethod,
-} from "./api-client.schema";
+} from "./rest-client.schema";
 
 const DEFAULT_TIMEOUT_MS = 30000;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 
-export const makeApiClient = (config: ApiClientConfig) => {
+const isTransientError = (error: PipelineError): boolean =>
+  error._tag === "NetworkError" || error._tag === "TimeoutError";
+
+export const makeRestClient = (config: RestClientConfig) => {
   const defaultTimeout = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
   const buildHeaders = (
-    options?: ApiRequestOptions,
+    options?: RestRequestOptions,
   ): Record<string, string> => {
     const headers: Record<string, string> = {
       "content-type": "application/json",
@@ -41,8 +44,8 @@ export const makeApiClient = (config: ApiClientConfig) => {
     endpoint: string,
     schema: Schema.Schema<T>,
     body?: unknown,
-    options?: ApiRequestOptions,
-  ): Effect.Effect<T, ApiClientError> =>
+    options?: RestRequestOptions,
+  ): Effect.Effect<T, PipelineError> =>
     Effect.gen(function* () {
       const url = `${config.baseUrl}${endpoint}`;
       const timeoutMs = options?.timeoutMs ?? defaultTimeout;
@@ -57,15 +60,15 @@ export const makeApiClient = (config: ApiClientConfig) => {
           }),
         catch: (error) => {
           if (error instanceof Error && error.name === "AbortError") {
-            return new ApiTimeoutError({
+            return new TimeoutError({
               message: `Request timed out after ${timeoutMs}ms`,
-              endpoint,
+              url,
               timeoutMs,
             });
           }
-          return new ApiNetworkError({
+          return new NetworkError({
             message: `Network error: ${String(error)}`,
-            endpoint,
+            url,
             cause: error,
           });
         },
@@ -73,9 +76,9 @@ export const makeApiClient = (config: ApiClientConfig) => {
         Effect.timeout(Duration.millis(timeoutMs)),
         Effect.catchTag("TimeoutException", () =>
           Effect.fail(
-            new ApiTimeoutError({
+            new TimeoutError({
               message: `Request timed out after ${timeoutMs}ms`,
-              endpoint,
+              url,
               timeoutMs,
             }),
           ),
@@ -89,9 +92,9 @@ export const makeApiClient = (config: ApiClientConfig) => {
           : undefined;
 
         return yield* Effect.fail(
-          new ApiRateLimitError({
+          new RateLimitError({
             message: "Rate limited by server",
-            endpoint,
+            url,
             retryAfterMs,
           }),
         );
@@ -99,9 +102,9 @@ export const makeApiClient = (config: ApiClientConfig) => {
 
       if (!response.ok) {
         return yield* Effect.fail(
-          new ApiError({
+          new HttpError({
             message: `HTTP ${response.status}: ${response.statusText}`,
-            endpoint,
+            url,
             method,
             statusCode: response.status,
           }),
@@ -111,9 +114,9 @@ export const makeApiClient = (config: ApiClientConfig) => {
       const json = yield* Effect.tryPromise({
         try: () => response.json(),
         catch: (error) =>
-          new ApiError({
+          new HttpError({
             message: `Failed to parse JSON: ${String(error)}`,
-            endpoint,
+            url,
             method,
             cause: error,
           }),
@@ -122,9 +125,9 @@ export const makeApiClient = (config: ApiClientConfig) => {
       const decoded = yield* Schema.decodeUnknown(schema)(json).pipe(
         Effect.mapError(
           (error) =>
-            new ApiSchemaError({
+            new ParseError({
               message: `Schema validation failed: ${String(error)}`,
-              endpoint,
+              url,
               cause: error,
             }),
         ),
@@ -133,22 +136,25 @@ export const makeApiClient = (config: ApiClientConfig) => {
       return decoded;
     });
 
+  const transientRetrySchedule = Schedule.exponential(
+    Duration.millis(DEFAULT_RETRY_DELAY_MS),
+  ).pipe(
+    Schedule.compose(Schedule.recurs(DEFAULT_MAX_RETRIES)),
+    Schedule.whileInput(isTransientError),
+  );
+
   const requestWithRetry = <T>(
     method: HttpMethod,
     endpoint: string,
     schema: Schema.Schema<T>,
     body?: unknown,
-    options?: ApiRequestOptions,
-  ): Effect.Effect<T, ApiClientError> =>
+    options?: RestRequestOptions,
+  ): Effect.Effect<T, PipelineError> =>
     request(method, endpoint, schema, body, options).pipe(
-      Effect.retry(
-        Schedule.exponential(Duration.millis(DEFAULT_RETRY_DELAY_MS)).pipe(
-          Schedule.compose(Schedule.recurs(DEFAULT_MAX_RETRIES)),
-          Schedule.whileInput(
-            (error: ApiClientError) =>
-              error._tag === "ApiNetworkError" ||
-              error._tag === "ApiTimeoutError",
-          ),
+      Effect.retry(transientRetrySchedule),
+      Effect.catchTag("RateLimitError", (error) =>
+        Effect.sleep(Duration.millis(error.retryAfterMs ?? 1000)).pipe(
+          Effect.andThen(request(method, endpoint, schema, body, options)),
         ),
       ),
     );
@@ -157,34 +163,34 @@ export const makeApiClient = (config: ApiClientConfig) => {
     get: <T>(
       endpoint: string,
       schema: Schema.Schema<T>,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => requestWithRetry("GET", endpoint, schema, undefined, options),
 
     post: <T>(
       endpoint: string,
       body: unknown,
       schema: Schema.Schema<T>,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => requestWithRetry("POST", endpoint, schema, body, options),
 
     put: <T>(
       endpoint: string,
       body: unknown,
       schema: Schema.Schema<T>,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => requestWithRetry("PUT", endpoint, schema, body, options),
 
     patch: <T>(
       endpoint: string,
       body: unknown,
       schema: Schema.Schema<T>,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => requestWithRetry("PATCH", endpoint, schema, body, options),
 
     delete: <T>(
       endpoint: string,
       schema: Schema.Schema<T>,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => requestWithRetry("DELETE", endpoint, schema, undefined, options),
 
     requestOnce: <T>(
@@ -192,20 +198,20 @@ export const makeApiClient = (config: ApiClientConfig) => {
       endpoint: string,
       schema: Schema.Schema<T>,
       body?: unknown,
-      options?: ApiRequestOptions,
+      options?: RestRequestOptions,
     ) => request(method, endpoint, schema, body, options),
   } as const;
 };
 
-export type ApiClient = ReturnType<typeof makeApiClient>;
+export type RestClient = ReturnType<typeof makeRestClient>;
 
-export class ApiClientFactory extends Context.Tag("ApiClientFactory")<
-  ApiClientFactory,
+export class RestClientFactory extends Context.Tag("RestClientFactory")<
+  RestClientFactory,
   {
-    readonly create: (config: ApiClientConfig) => ApiClient;
+    readonly create: (config: RestClientConfig) => RestClient;
   }
 >() {
-  static readonly Default = Layer.succeed(ApiClientFactory, {
-    create: makeApiClient,
+  static readonly Default = Layer.succeed(RestClientFactory, {
+    create: makeRestClient,
   });
 }

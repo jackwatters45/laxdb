@@ -1,6 +1,7 @@
 import { FetchHttpClient } from "@effect/platform";
 import { RpcClient } from "@effect/rpc";
 import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
+import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
 import { RpcProtocolLive } from "../protocol";
 import { OrganizationsApi } from "./organization.api";
@@ -27,6 +28,6 @@ export class HttpOrganizationClientAtom extends AtomHttpApi.Tag<HttpOrganization
   {
     api: OrganizationsApi,
     httpClient: FetchHttpClient.layer,
-    baseUrl: process.env.API_URL!,
+    baseUrl: Env.API_URL(),
   },
 ) {}

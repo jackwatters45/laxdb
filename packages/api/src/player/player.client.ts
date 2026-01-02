@@ -1,6 +1,7 @@
 import { FetchHttpClient } from "@effect/platform";
 import { RpcClient } from "@effect/rpc";
 import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
+import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
 import { RpcProtocolLive } from "../protocol";
 import { PlayersApi } from "./player.api";
@@ -27,6 +28,6 @@ export class HttpPlayerClientAtom extends AtomHttpApi.Tag<HttpPlayerClientAtom>(
   {
     api: PlayersApi,
     httpClient: FetchHttpClient.layer,
-    baseUrl: process.env.API_URL!,
+    baseUrl: Env.API_URL(),
   },
 ) {}

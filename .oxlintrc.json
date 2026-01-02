@@ -43,6 +43,5 @@
     "**/*.gen.ts",
     "**/migrations/**",
     "bun.lock",
-    "**/tests/**",
   ]
 }

@@ -6,10 +6,10 @@ Effect-TS based data pipeline for consuming external APIs and web scraping.
 
 ```
 src/
-├── api-client/              # Generic API client for JSON APIs
-│   ├── api-client.schema.ts    # Request/response schemas
-│   ├── api-client.error.ts     # API client errors
-│   ├── api-client.service.ts   # makeApiClient (REST)
+├── api-client/              # REST and GraphQL clients
+│   ├── rest-client.schema.ts   # REST client config/options schemas
+│   ├── rest-client.service.ts  # makeRestClient (REST)
+│   ├── api-client.error.ts     # Shared API errors (REST + GraphQL)
 │   ├── graphql.schema.ts       # GraphQL schemas
 │   └── graphql.service.ts      # makeGraphQLClient
 ├── scraper/                 # Web scraping module
@@ -199,10 +199,10 @@ To add an entirely new API source (e.g., NLL):
 
 ```typescript
 import { Effect } from "effect";
-import { makeApiClient } from "../api-client/api-client.service";
+import { makeRestClient } from "../api-client/rest-client.service";
 import { makeGraphQLClient } from "../api-client/graphql.service";
 
-const nllRestClient = makeApiClient({
+const nllRestClient = makeRestClient({
   baseUrl: "https://api.nll.com/v1",
   authHeader: "Bearer TOKEN",
   defaultHeaders: {
@@ -238,12 +238,32 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 | Union types | `Schema.Union(TypeA, TypeB)` |
 | Literal values | `Schema.Literal("regular", "post")` |
 
+## ERROR TYPES
+
+All errors are Effect Schema TaggedErrors from `src/error.ts`:
+
+| Error | Required Fields | Optional Fields | When Used |
+|-------|-----------------|-----------------|-----------|
+| `HttpError` | `message`, `url` | `method`, `statusCode`, `cause` | Non-2xx HTTP response |
+| `NetworkError` | `message`, `url` | `cause` | Connection/DNS failures |
+| `TimeoutError` | `message`, `url` | `timeoutMs` | Request timeout |
+| `RateLimitError` | `message`, `url` | `retryAfterMs` | HTTP 429 response |
+| `ParseError` | `message` | `url`, `cause` | Schema validation failure |
+
+**Note**: `url` is required for all network errors since they occur after a request is initiated. `ParseError` has optional `url` because it's also used for input validation (before any request).
+
+### Retry Behavior
+
+The REST client (`makeRestClient`) handles retries automatically:
+- **Transient errors** (`NetworkError`, `TimeoutError`): Exponential backoff, max 3 retries
+- **Rate limiting** (`RateLimitError`): Respects server's `retry-after` header, single retry
+
 ## ANTI-PATTERNS
 
 - **Hardcoded credentials**: Use config service or environment variables
 - **Skip schema validation**: Always decode API responses with Effect Schema
-- **Direct fetch calls**: Use `makeApiClient` for REST, `makeGraphQLClient` for GraphQL
-- **Ignore rate limits**: Implement backoff in client services
+- **Direct fetch calls**: Use `makeRestClient` for REST, `makeGraphQLClient` for GraphQL
+- **Ignore rate limits**: Retry logic is built-in, but respect API limits
 - **Effect.catchAll**: Use `Effect.catchTag` to preserve error types
 - **Guessing schema types**: Always verify against actual API responses
 
@@ -284,9 +304,24 @@ Queries:
 
 ### PLLClient Methods
 
-| Method | Type | Description |
-|--------|------|-------------|
-| `getStandings` | REST | Team standings |
-| `getStandingsGraphQL` | GraphQL | Standings with nested team |
-| `getPlayers` | GraphQL | Players with reg/post/champSeries stats |
-| `getStatLeaders` | GraphQL | Stat leaders by category |
+| Method | Type | Status | Description |
+|--------|------|--------|-------------|
+| `getStandings` | REST | ✅ | Team standings |
+| `getStandingsGraphQL` | GraphQL | ✅ | Standings with nested team |
+| `getPlayers` | GraphQL | ✅ | Players with reg/post/champSeries stats |
+| `getAdvancedPlayers` | GraphQL | ✅ | Players with advanced stats (rate, handedness) |
+| `getStatLeaders` | GraphQL | ✅ | Stat leaders by category |
+| `getTeams` | GraphQL | ✅ | Teams with stats |
+| `getCareerStats` | GraphQL | ✅ | Career stat leaders |
+| `getPlayerDetail` | GraphQL | ✅ | Player detail with stats, career, accolades |
+| `getTeamDetail` | GraphQL | ✅ | Team detail with events, coaches |
+| `getTeamStats` | GraphQL | ✅ | Team stats by segment |
+| `getEvents` | REST | ✅ | Game events |
+| `getEventDetail` | GraphQL | ✅ | Event with play-by-play logs |
+
+### Development Scripts
+
+| Script | Usage | Description |
+|--------|-------|-------------|
+| `introspect.ts` | `infisical run --env=dev -- bun src/pll/introspect.ts [slug]` | Probe event detail queries |
+| `extract-queries.ts` | `bun src/pll/extract-queries.ts` | Extract GraphQL queries from client |

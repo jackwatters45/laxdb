@@ -6,6 +6,7 @@ export default defineConfig({
   out: "./migrations",
   dbCredentials: {
     ssl: "require",
+    // oxlint-disable-next-line no-non-null-assertion - derived from alchemy
     url: process.env.DATABASE_URL!,
   },
   migrations: {
