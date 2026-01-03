@@ -9,9 +9,9 @@
  *   infisical run --env=dev -- bun src/extract/extract-remaining.ts --dry-run
  */
 
-import { Effect, Duration, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Duration, Layer, Schema } from "effect";
 import { PLLClient } from "../pll/pll.client";
 import {
   PLLStatLeader,
@@ -51,31 +51,36 @@ const leadersOnly = args.has("--leaders-only");
 const extractAll = !eventsOnly && !teamsOnly && !leadersOnly;
 
 const saveJson = <T>(filePath: string, data: T) =>
-  Effect.tryPromise({
-    try: async () => {
-      const dir = path.dirname(filePath);
-      await fs.mkdir(dir, { recursive: true });
-      await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    },
-    catch: (e) => new Error(`Failed to save ${filePath}: ${String(e)}`),
-  });
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const dir = path.dirname(filePath);
+    yield* fs.makeDirectory(dir, { recursive: true });
+    yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
+  }).pipe(
+    Effect.catchAll((e) =>
+      Effect.fail(new Error(`Failed to save ${filePath}: ${String(e)}`)),
+    ),
+  );
 
 const loadJsonWithSchema = <A, I>(
   filePath: string,
   schema: Schema.Schema<A, I>,
 ) =>
   Effect.gen(function* () {
-    const data = yield* Effect.tryPromise({
-      try: () => fs.readFile(filePath, "utf-8"),
-      catch: () => new Error("File not found"),
+    const fs = yield* FileSystem.FileSystem;
+    const data = yield* fs.readFileString(filePath, "utf-8");
+    const parsed = yield* Effect.try({
+      try: () => JSON.parse(data) as unknown,
+      catch: (e) =>
+        new Error(`Failed to parse JSON from ${filePath}: ${String(e)}`),
     });
-    const parsed: unknown = JSON.parse(data);
     return yield* Schema.decodeUnknown(schema)(parsed);
   }).pipe(
     Effect.tap(() => Effect.log(`Successfully decoded data from ${filePath}`)),
     Effect.catchAll((error) =>
       Effect.zipRight(
-        Effect.logError(`Failed to decode data from ${filePath}: ${error}`),
+        Effect.logError(`Failed to decode data from ${filePath}`, error),
         Effect.succeed(null),
       ),
     ),
@@ -84,6 +89,8 @@ const loadJsonWithSchema = <A, I>(
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
   const config = yield* ExtractConfigService;
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
 
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`PLL Remaining Data Extraction`);
@@ -366,17 +373,25 @@ const program = Effect.gen(function* () {
 
     const existingPath = path.join(outputDir, "stat-leaders.json");
     const existingLeaders: StatLeadersData = yield* Effect.gen(function* () {
-      const data = yield* Effect.tryPromise({
-        try: () => fs.readFile(existingPath, "utf-8"),
-        catch: () => new Error("File not found"),
+      const data = yield* fs.readFileString(existingPath, "utf-8");
+      const parsed = yield* Effect.try({
+        try: () => JSON.parse(data) as unknown,
+        catch: (e) =>
+          new Error(
+            `Failed to parse stat leaders JSON from ${existingPath}: ${String(e)}`,
+          ),
       });
-      const parsed: unknown = JSON.parse(data);
       return yield* Schema.decodeUnknown(StatLeadersDataSchema)(parsed);
     }).pipe(
-      Effect.tap(() => Effect.log(`Successfully decoded stat leaders from ${existingPath}`)),
+      Effect.tap(() =>
+        Effect.log(`Successfully decoded stat leaders from ${existingPath}`),
+      ),
       Effect.catchAll((error) =>
         Effect.zipRight(
-          Effect.logError(`Failed to decode stat leaders from ${existingPath}: ${error}`),
+          Effect.logError(
+            `Failed to decode stat leaders from ${existingPath}`,
+            error,
+          ),
           Effect.succeed<StatLeadersData>({}),
         ),
       ),
@@ -438,9 +453,10 @@ const program = Effect.gen(function* () {
   yield* Effect.log("=".repeat(60));
 });
 
-await Effect.runPromise(
-  program.pipe(
-    Effect.provide(PLLClient.Default),
-    Effect.provide(ExtractConfigService.Default),
-  ),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  PLLClient.Default,
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

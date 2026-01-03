@@ -1,6 +1,6 @@
-import { Effect, Duration, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
+import { Effect, Duration, Layer, Schema } from "effect";
 import { PLLClient } from "../../pll/pll.client";
 import {
   PLLTeam,
@@ -26,19 +26,6 @@ interface ExtractResult<T> {
   durationMs: number;
 }
 
-const saveJson = <T>(filePath: string, data: T) =>
-  Effect.gen(function* () {
-    const dir = path.dirname(filePath);
-    yield* Effect.tryPromise({
-      try: () => fs.mkdir(dir, { recursive: true }),
-      catch: (e) => new Error(`Failed to create directory: ${String(e)}`),
-    });
-    yield* Effect.tryPromise({
-      try: () => fs.writeFile(filePath, JSON.stringify(data, null, 2)),
-      catch: (e) => new Error(`Failed to write file: ${String(e)}`),
-    });
-  });
-
 const withTiming = <T, E, R>(
   effect: Effect.Effect<T, E, R>,
 ): Effect.Effect<ExtractResult<T>, E, R> =>
@@ -57,10 +44,38 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
       const pll = yield* PLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* PLLManifestService;
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "pll", String(year), `${entity}.json`);
+
+      const saveJson = <T>(filePath: string, data: T) =>
+        Effect.gen(function* () {
+          const dir = path.dirname(filePath);
+          yield* fs.makeDirectory(dir, { recursive: true });
+          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
+        }).pipe(
+          Effect.catchAll((e) =>
+            Effect.fail(new Error(`Failed to write file: ${String(e)}`)),
+          ),
+        );
+
+      const readJsonFile = (filePath: string) =>
+        fs
+          .readFileString(filePath, "utf-8")
+          .pipe(
+            Effect.catchAll((error) =>
+              Effect.zipRight(
+                Effect.logWarning(
+                  `Could not read file at ${filePath}, using empty array`,
+                  error,
+                ),
+                Effect.succeed("[]"),
+              ),
+            ),
+          );
 
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
@@ -398,18 +413,23 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
           if (includeDetails && shouldExtract("teamDetails")) {
             const teamsPath = getOutputPath(year, "teams");
-            const teamsData = yield* Effect.tryPromise({
-              try: () => fs.readFile(teamsPath, "utf-8"),
-              catch: () => "[]",
-            });
-            const parsedTeams: unknown = JSON.parse(teamsData);
-            const teams = yield* Schema.decodeUnknown(Schema.Array(PLLTeam))(
-              parsedTeams,
-            ).pipe(
-              Effect.tap(() => Effect.log(`Successfully decoded teams for ${year}`)),
+            const teamsData = yield* readJsonFile(teamsPath);
+            const teams = yield* Effect.try({
+              try: () => JSON.parse(teamsData) as unknown,
+              catch: (e) =>
+                new Error(
+                  `Failed to parse teams JSON for ${year}: ${String(e)}`,
+                ),
+            }).pipe(
+              Effect.flatMap((parsed) =>
+                Schema.decodeUnknown(Schema.Array(PLLTeam))(parsed),
+              ),
+              Effect.tap(() =>
+                Effect.log(`Successfully decoded teams for ${year}`),
+              ),
               Effect.catchAll((error) =>
                 Effect.zipRight(
-                  Effect.logError(`Failed to decode teams for ${year}: ${error}`),
+                  Effect.logError(`Failed to decode teams for ${year}`, error),
                   Effect.succeed([]),
                 ),
               ),
@@ -461,18 +481,26 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
           if (includeDetails && shouldExtract("playerDetails")) {
             const playersPath = getOutputPath(year, "players");
-            const playersData = yield* Effect.tryPromise({
-              try: () => fs.readFile(playersPath, "utf-8"),
-              catch: () => "[]",
-            });
-            const parsedPlayers: unknown = JSON.parse(playersData);
-            const players = yield* Schema.decodeUnknown(
-              Schema.Array(PLLPlayer),
-            )(parsedPlayers).pipe(
-              Effect.tap(() => Effect.log(`Successfully decoded players for ${year}`)),
+            const playersData = yield* readJsonFile(playersPath);
+            const players = yield* Effect.try({
+              try: () => JSON.parse(playersData) as unknown,
+              catch: (e) =>
+                new Error(
+                  `Failed to parse players JSON for ${year}: ${String(e)}`,
+                ),
+            }).pipe(
+              Effect.flatMap((parsed) =>
+                Schema.decodeUnknown(Schema.Array(PLLPlayer))(parsed),
+              ),
+              Effect.tap(() =>
+                Effect.log(`Successfully decoded players for ${year}`),
+              ),
               Effect.catchAll((error) =>
                 Effect.zipRight(
-                  Effect.logError(`Failed to decode players for ${year}: ${error}`),
+                  Effect.logError(
+                    `Failed to decode players for ${year}`,
+                    error,
+                  ),
                   Effect.succeed([]),
                 ),
               ),
@@ -510,18 +538,23 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
           if (includeDetails && shouldExtract("eventDetails")) {
             const eventsPath = getOutputPath(year, "events");
-            const eventsData = yield* Effect.tryPromise({
-              try: () => fs.readFile(eventsPath, "utf-8"),
-              catch: () => "[]",
-            });
-            const parsedEvents: unknown = JSON.parse(eventsData);
-            const events = yield* Schema.decodeUnknown(Schema.Array(PLLEvent))(
-              parsedEvents,
-            ).pipe(
-              Effect.tap(() => Effect.log(`Successfully decoded events for ${year}`)),
+            const eventsData = yield* readJsonFile(eventsPath);
+            const events = yield* Effect.try({
+              try: () => JSON.parse(eventsData) as unknown,
+              catch: (e) =>
+                new Error(
+                  `Failed to parse events JSON for ${year}: ${String(e)}`,
+                ),
+            }).pipe(
+              Effect.flatMap((parsed) =>
+                Schema.decodeUnknown(Schema.Array(PLLEvent))(parsed),
+              ),
+              Effect.tap(() =>
+                Effect.log(`Successfully decoded events for ${year}`),
+              ),
               Effect.catchAll((error) =>
                 Effect.zipRight(
-                  Effect.logError(`Failed to decode events for ${year}: ${error}`),
+                  Effect.logError(`Failed to decode events for ${year}`, error),
                   Effect.succeed([]),
                 ),
               ),
@@ -610,9 +643,12 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
       };
     }),
     dependencies: [
-      PLLClient.Default,
-      ExtractConfigService.Default,
-      PLLManifestService.Default,
+      Layer.mergeAll(
+        PLLClient.Default,
+        ExtractConfigService.Default,
+        PLLManifestService.Default,
+        BunContext.layer,
+      ),
     ],
   },
 ) {}

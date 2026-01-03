@@ -1,9 +1,7 @@
+import { FileSystem, Path } from "@effect/platform";
 import { Effect, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import {
   type ValidationIssue,
-  type ValidationCheckResult,
   type FileValidationResult,
   type CrossReferenceResult,
   type ValidationReport,
@@ -11,28 +9,18 @@ import {
   warningIssue,
   infoIssue,
 } from "./validate.schema";
-
-const readJsonFile = <T>(filePath: string): Effect.Effect<T, Error> =>
-  Effect.tryPromise({
-    try: async () => {
-      const content = await fs.readFile(filePath, "utf-8");
-      const parsed: unknown = JSON.parse(content);
-      // oxlint-disable-next-line typescript-eslint/no-unsafe-type-assertion -- Generic validation utility
-      return parsed as T;
-    },
-    catch: (e) => new Error(`Failed to read ${filePath}: ${String(e)}`),
-  });
+import { readJsonFile } from "@laxdb/core/util";
 
 const getFileStats = (filePath: string) =>
-  Effect.tryPromise({
-    try: () => fs.stat(filePath),
-    catch: () => new Error("File not found"),
-  });
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    return yield* fs.stat(filePath);
+  }).pipe(Effect.catchAll(() => Effect.fail(new Error("File not found"))));
 
-const runCheck = (
+const runCheck = <R>(
   checkName: string,
-  checkFn: () => Effect.Effect<(typeof ValidationIssue.Type)[], Error>,
-): Effect.Effect<typeof ValidationCheckResult.Type> =>
+  checkFn: () => Effect.Effect<(typeof ValidationIssue.Type)[], Error, R>,
+) =>
   Effect.gen(function* () {
     const start = Date.now();
     const result = yield* checkFn().pipe(
@@ -51,9 +39,7 @@ const runCheck = (
     };
   });
 
-export const validateFileExists = (
-  filePath: string,
-): Effect.Effect<typeof FileValidationResult.Type> =>
+export const validateFileExists = (filePath: string) =>
   Effect.gen(function* () {
     const statsResult = yield* getFileStats(filePath).pipe(
       Effect.map((s) => ({ success: true as const, stats: s })),
@@ -78,13 +64,13 @@ export const validateFileExists = (
             durationMs: 0,
           },
         ],
-      };
+      } satisfies typeof FileValidationResult.Type;
     }
 
     return {
       filePath,
       exists: true,
-      sizeBytes: statsResult.stats.size,
+      sizeBytes: Number(statsResult.stats.size),
       recordCount: undefined,
       checks: [
         {
@@ -94,18 +80,15 @@ export const validateFileExists = (
           durationMs: 0,
         },
       ],
-    };
+    } satisfies typeof FileValidationResult.Type;
   });
 
-export const validateJsonArray = <T>(
-  filePath: string,
-  minRecords = 0,
-): Effect.Effect<{ result: typeof FileValidationResult.Type; data: T[] }> =>
+export const validateJsonArray = <T>(filePath: string, minRecords = 0) =>
   Effect.gen(function* () {
     const fileResult = yield* validateFileExists(filePath);
 
     if (!fileResult.exists) {
-      return { result: fileResult, data: [] };
+      return { result: fileResult, data: [] as T[] };
     }
 
     const parseCheck = yield* runCheck("json_parse", () =>
@@ -145,7 +128,7 @@ export const validateJsonArray = <T>(
         sizeBytes,
         recordCount: Array.isArray(data) ? data.length : 0,
         checks: [...checks, parseCheck],
-      },
+      } satisfies typeof FileValidationResult.Type,
       data,
     };
   });
@@ -154,7 +137,7 @@ export const validateSchema = <T, I>(
   data: unknown[],
   schema: Schema.Schema<T, I>,
   sampleSize = 10,
-): Effect.Effect<typeof ValidationCheckResult.Type> =>
+) =>
   runCheck("schema_validation", () =>
     Effect.gen(function* () {
       const issues: (typeof ValidationIssue.Type)[] = [];
@@ -202,7 +185,7 @@ export const validateSchema = <T, I>(
 export const validateRequiredFields = <T extends object>(
   data: T[],
   requiredFields: (keyof T)[],
-): Effect.Effect<typeof ValidationCheckResult.Type> =>
+) =>
   runCheck("required_fields", () =>
     Effect.succeed(
       (() => {
@@ -253,7 +236,7 @@ export const validateRequiredFields = <T extends object>(
 export const validateUniqueField = <T extends object>(
   data: T[],
   field: keyof T,
-): Effect.Effect<typeof ValidationCheckResult.Type> =>
+) =>
   runCheck(`unique_${String(field)}`, () =>
     Effect.succeed(
       (() => {
@@ -302,7 +285,7 @@ export const crossReference = <S extends object, T extends object>(
   targetField: keyof T,
   sourceFile: string,
   targetFile: string,
-): Effect.Effect<typeof CrossReferenceResult.Type> =>
+) =>
   Effect.succeed(
     (() => {
       const targetValues = new Set<unknown>();
@@ -336,7 +319,7 @@ export const crossReference = <S extends object, T extends object>(
         matchedRecords: matched,
         unmatchedRecords: sourceData.length - matched,
         unmatchedSamples: unmatched.length > 0 ? unmatched : undefined,
-      };
+      } satisfies typeof CrossReferenceResult.Type;
     })(),
   );
 
@@ -385,6 +368,7 @@ export const buildReport = (
 
 export const printReport = (report: typeof ValidationReport.Type) =>
   Effect.gen(function* () {
+    const path = yield* Path.Path;
     yield* Effect.log(`\n${"=".repeat(70)}`);
     yield* Effect.log(`VALIDATION REPORT: ${report.source}`);
     yield* Effect.log("=".repeat(70));

@@ -7,9 +7,9 @@
  *   infisical run --env=dev -- bun src/extract/extract-all-player-details.ts --limit=10
  */
 
-import { Effect, Duration, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Duration, Layer, Schema } from "effect";
 import { PLLClient } from "../pll/pll.client";
 import { PLLPlayer, PLLPlayerDetail } from "../pll/pll.schema";
 import { ExtractConfigService } from "./extract.config";
@@ -43,19 +43,26 @@ interface ExtractionSummary {
 
 const PlayerDetailResultArray = Schema.Array(PlayerDetailResult);
 
-const loadExistingResults = (outputPath: string) =>
+const loadExistingResults = (fs: FileSystem.FileSystem, outputPath: string) =>
   Effect.gen(function* () {
-    const data = yield* Effect.tryPromise({
-      try: () => fs.readFile(outputPath, "utf-8"),
-      catch: (e) => new Error(`Failed to read player details from ${outputPath}: ${String(e)}`),
+    const data = yield* fs.readFileString(outputPath);
+    const parsed = yield* Effect.try({
+      try: () => JSON.parse(data) as unknown,
+      catch: (e) =>
+        new Error(`Failed to parse JSON from ${outputPath}: ${String(e)}`),
     });
-    const parsed: unknown = JSON.parse(data);
     return yield* Schema.decodeUnknown(PlayerDetailResultArray)(parsed);
   }).pipe(
-    Effect.tap(() => Effect.log(`Successfully decoded existing player details from ${outputPath}`)),
-    Effect.catchAll((error) =>
+    Effect.tap(() =>
+      Effect.log(
+        `Successfully decoded existing player details from ${outputPath}`,
+      ),
+    ),
+    Effect.catchAllCause((cause) =>
       Effect.zipRight(
-        Effect.logError(`Failed to decode existing player details from ${outputPath}: ${error}`),
+        Effect.logWarning(
+          `Failed to load existing player details from ${outputPath}, starting fresh. Cause: ${String(cause)}`,
+        ),
         Effect.succeed([]),
       ),
     ),
@@ -64,6 +71,8 @@ const loadExistingResults = (outputPath: string) =>
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
   const config = yield* ExtractConfigService;
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
 
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`Full Player Details Extraction`);
@@ -91,17 +100,32 @@ const program = Effect.gen(function* () {
       "players.json",
     );
 
-    const playersData = yield* Effect.tryPromise({
-      try: () => fs.readFile(playersPath, "utf-8"),
-      catch: () => "[]",
-    });
+    const playersData = yield* fs
+      .readFileString(playersPath, "utf-8")
+      .pipe(
+        Effect.catchAll((error) =>
+          Effect.zipRight(
+            Effect.logWarning(
+              `Could not read players file at ${playersPath}, using empty array`,
+              error,
+            ),
+            Effect.succeed("[]"),
+          ),
+        ),
+      );
 
-    const parsed: unknown = JSON.parse(playersData);
-    const players = yield* Schema.decodeUnknown(PLLPlayerArray)(parsed).pipe(
-      Effect.tap(() => Effect.log(`Successfully decoded players for year ${year}`)),
+    const players = yield* Effect.try({
+      try: () => JSON.parse(playersData) as unknown,
+      catch: (e) =>
+        new Error(`Failed to parse players JSON for ${year}: ${String(e)}`),
+    }).pipe(
+      Effect.flatMap((parsed) => Schema.decodeUnknown(PLLPlayerArray)(parsed)),
+      Effect.tap(() =>
+        Effect.log(`Successfully decoded players for year ${year}`),
+      ),
       Effect.catchAll((error) =>
         Effect.zipRight(
-          Effect.logError(`Failed to decode players for year ${year}: ${error}`),
+          Effect.logError(`Failed to decode players for year ${year}`, error),
           Effect.succeed([]),
         ),
       ),
@@ -137,7 +161,7 @@ const program = Effect.gen(function* () {
     "player-details-summary.json",
   );
 
-  const existingResults = yield* loadExistingResults(outputPath);
+  const existingResults = yield* loadExistingResults(fs, outputPath);
   const existingSlugs = new Set<string>();
 
   for (const r of existingResults) {
@@ -249,10 +273,7 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log(`\nSaving results...`);
 
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(outputPath, JSON.stringify(results, null, 2)),
-    catch: (e) => new Error(`Failed to write results: ${String(e)}`),
-  });
+  yield* fs.writeFileString(outputPath, JSON.stringify(results, null, 2));
 
   const summary: ExtractionSummary = {
     totalUniquePlayers: uniquePlayers.length,
@@ -263,10 +284,7 @@ const program = Effect.gen(function* () {
     timestamp: new Date().toISOString(),
   };
 
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(summaryPath, JSON.stringify(summary, null, 2)),
-    catch: (e) => new Error(`Failed to write summary: ${String(e)}`),
-  });
+  yield* fs.writeFileString(summaryPath, JSON.stringify(summary, null, 2));
 
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`EXTRACTION COMPLETE`);
@@ -303,9 +321,10 @@ const program = Effect.gen(function* () {
   }
 });
 
-await Effect.runPromise(
-  program.pipe(
-    Effect.provide(PLLClient.Default),
-    Effect.provide(ExtractConfigService.Default),
-  ),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  PLLClient.Default,
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

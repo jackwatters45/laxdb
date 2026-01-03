@@ -1,6 +1,6 @@
-import { Effect, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
+import { Effect, Layer, Schema } from "effect";
 import {
   type ExtractionManifest,
   type SeasonManifest,
@@ -16,28 +16,30 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
   {
     effect: Effect.gen(function* () {
       const config = yield* ExtractConfigService;
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
       const manifestPath = path.join(config.outputDir, "pll", "manifest.json");
 
       const load = Effect.gen(function* () {
-        const exists = yield* Effect.tryPromise({
-          try: () =>
-            fs
-              .access(manifestPath)
-              .then(() => true)
-              .catch(() => false),
-          catch: () => new Error("Unexpected error checking file existence"),
-        });
+        const exists = yield* fs.exists(manifestPath);
 
         if (!exists) {
           return createEmptyManifest("pll");
         }
 
-        const content = yield* Effect.tryPromise({
-          try: () => fs.readFile(manifestPath, "utf-8"),
-          catch: (e) => new Error(`Failed to read manifest: ${String(e)}`),
-        });
+        const content = yield* fs
+          .readFileString(manifestPath, "utf-8")
+          .pipe(
+            Effect.catchAll((e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            ),
+          );
 
-        const parsed: unknown = JSON.parse(content);
+        const parsed = yield* Effect.try({
+          try: () => JSON.parse(content) as unknown,
+          catch: (e) =>
+            new Error(`Failed to parse manifest JSON: ${String(e)}`),
+        });
         return yield* Schema.decodeUnknown(ExtractionManifestSchema)(
           parsed,
         ).pipe(
@@ -48,17 +50,14 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
       const save = (manifest: ExtractionManifest) =>
         Effect.gen(function* () {
           const dir = path.dirname(manifestPath);
-          yield* Effect.tryPromise({
-            try: () => fs.mkdir(dir, { recursive: true }),
-            catch: (e) => new Error(`Failed to create directory: ${String(e)}`),
-          });
-
+          yield* fs.makeDirectory(dir, { recursive: true });
           const content = JSON.stringify(manifest, null, 2);
-          yield* Effect.tryPromise({
-            try: () => fs.writeFile(manifestPath, content),
-            catch: (e) => new Error(`Failed to write manifest: ${String(e)}`),
-          });
-        });
+          yield* fs.writeFileString(manifestPath, content);
+        }).pipe(
+          Effect.catchAll((e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          ),
+        );
 
       const getSeasonManifest = (
         manifest: ExtractionManifest,
@@ -122,6 +121,6 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         isExtracted,
       };
     }),
-    dependencies: [ExtractConfigService.Default],
+    dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],
   },
 ) {}

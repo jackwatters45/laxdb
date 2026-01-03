@@ -6,9 +6,9 @@
  *   infisical run --env=dev -- bun src/extract/extract-career-stats.ts --dry-run
  */
 
-import { Effect, Duration, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Duration, Layer, Schema } from "effect";
 import { PLLClient } from "../pll/pll.client";
 import type { PLLCareerStat } from "../pll/pll.schema";
 import { ExtractConfigService } from "./extract.config";
@@ -66,17 +66,21 @@ interface ExtractionSummary {
 
 const PlayerDetailRefArray = Schema.Array(PlayerDetailRef);
 
-const loadPlayerDetails = (outputDir: string) =>
+const loadPlayerDetails = (
+  fs: FileSystem.FileSystem,
+  path: Path.Path,
+  outputDir: string,
+) =>
   Effect.gen(function* () {
-    const data = yield* Effect.tryPromise({
-      try: () =>
-        fs.readFile(
-          path.join(outputDir, "pll", "player-details.json"),
-          "utf-8",
+    const filePath = path.join(outputDir, "pll", "player-details.json");
+    const data = yield* fs.readFileString(filePath, "utf-8");
+    const parsed = yield* Effect.try({
+      try: () => JSON.parse(data) as unknown,
+      catch: (e) =>
+        new Error(
+          `Failed to parse player details JSON from ${filePath}: ${String(e)}`,
         ),
-      catch: (e) => new Error(`Failed to read player-details: ${String(e)}`),
     });
-    const parsed: unknown = JSON.parse(data);
     const players = yield* Schema.decodeUnknown(PlayerDetailRefArray)(parsed);
     return new Set(players.map((p) => p.slug).filter(Boolean));
   });
@@ -84,6 +88,8 @@ const loadPlayerDetails = (outputDir: string) =>
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
   const config = yield* ExtractConfigService;
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
 
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`Career Stats Extraction`);
@@ -93,7 +99,7 @@ const program = Effect.gen(function* () {
   const startTime = Date.now();
 
   yield* Effect.log(`Loading existing player-details for cross-reference...`);
-  const existingSlugs = yield* loadPlayerDetails(config.outputDir);
+  const existingSlugs = yield* loadPlayerDetails(fs, path, config.outputDir);
   yield* Effect.log(
     `Found ${existingSlugs.size} players in player-details.json\n`,
   );
@@ -210,10 +216,7 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log(`\nWriting results...`);
 
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(outputPath, JSON.stringify(results, null, 2)),
-    catch: (e) => new Error(`Failed to write results: ${String(e)}`),
-  });
+  yield* fs.writeFileString(outputPath, JSON.stringify(results, null, 2));
 
   const summary: ExtractionSummary = {
     totalUniquePlayers: results.length,
@@ -224,10 +227,7 @@ const program = Effect.gen(function* () {
     timestamp: new Date().toISOString(),
   };
 
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(summaryPath, JSON.stringify(summary, null, 2)),
-    catch: (e) => new Error(`Failed to write summary: ${String(e)}`),
-  });
+  yield* fs.writeFileString(summaryPath, JSON.stringify(summary, null, 2));
 
   yield* Effect.log(`\nOutput written to:`);
   yield* Effect.log(`  - ${outputPath}`);
@@ -235,9 +235,10 @@ const program = Effect.gen(function* () {
   yield* Effect.log(`\nDuration: ${Math.round(summary.durationMs / 1000)}s`);
 });
 
-await Effect.runPromise(
-  program.pipe(
-    Effect.provide(PLLClient.Default),
-    Effect.provide(ExtractConfigService.Default),
-  ),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  PLLClient.Default,
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

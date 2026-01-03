@@ -1,5 +1,6 @@
+import { Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
 import { Effect, Config } from "effect";
-import * as path from "node:path";
 
 export interface ExtractConfig {
   readonly outputDir: string;
@@ -8,14 +9,14 @@ export interface ExtractConfig {
   readonly delayBetweenBatchesMs: number;
 }
 
-const DEFAULT_OUTPUT_DIR = path.join(process.cwd(), "output");
-
 export class ExtractConfigService extends Effect.Service<ExtractConfigService>()(
   "ExtractConfigService",
   {
     effect: Effect.gen(function* () {
+      const path = yield* Path.Path;
+      const defaultOutputDir = path.join(process.cwd(), "output");
       const outputDir = yield* Config.string("EXTRACT_OUTPUT_DIR").pipe(
-        Config.withDefault(DEFAULT_OUTPUT_DIR),
+        Config.withDefault(defaultOutputDir),
       );
       const concurrency = yield* Config.number("EXTRACT_CONCURRENCY").pipe(
         Config.withDefault(5),
@@ -34,5 +35,6 @@ export class ExtractConfigService extends Effect.Service<ExtractConfigService>()
         delayBetweenBatchesMs,
       } satisfies ExtractConfig;
     }),
+    dependencies: [BunContext.layer],
   },
 ) {}

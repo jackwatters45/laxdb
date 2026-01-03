@@ -3,8 +3,11 @@
 ## Next
 
 - [ ] clean up current 
-  - [ ] Node usages should be effect.
+  - [x] Node fs usages should be effect.
+  - [ ] shared utils move to core.
+  - [ ] Same thing with path?
   - [ ] Before all - remove try catches
+  - [ ] Fix change provide calls
 - [ ] Add other endpoints from PLL
 - [ ] Game events -> structured data
 - [ ] Integration test issue

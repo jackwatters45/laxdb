@@ -5,6 +5,19 @@ import {
   DatabaseError,
   ValidationError,
 } from "./error";
+import { FileSystem } from "@effect/platform";
+
+export const readJsonFile = <T>(filePath: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const content = yield* fs.readFileString(filePath, "utf-8");
+    const parsed: unknown = JSON.parse(content);
+    return parsed as T;
+  }).pipe(
+    Effect.catchAll((e) =>
+      Effect.fail(new Error(`Failed to read ${filePath}: ${String(e)}`)),
+    ),
+  );
 
 export const decodeArguments = <A, I, R>(
   schema: Schema.Schema<A, I, R>,

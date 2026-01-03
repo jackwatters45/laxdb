@@ -11,6 +11,7 @@
   - [ ] blog
     - [ ] styling
   - [ ] tool plans
+- [ ] Tests
 
 - [ ] contributing docs site
 
