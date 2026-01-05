@@ -1,648 +1,104 @@
-<!-- vibe-rules Integration -->
+# laxdb - Lacrosse Team/Club Management Platform
 
-<alchemy_cloudflare>
-Always Apply: true - This rule should ALWAYS be applied by the AI
-Always apply this rule in these files: *.ts
+Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via Alchemy IaC, PlanetScale PostgreSQL.
 
-# Alchemy - TypeScript-native Infrastructure as Code
+## MUST KNOW
 
-Alchemy is a TypeScript-native Infrastructure-as-Code framework that allows you to define cloud resources using familiar TypeScript patterns. This guide focuses on Cloudflare integration.
+- **Type safety is non-negotiable**: No `any`, no `!`, no `as Type`
+- **Effect patterns are strict**: See `packages/core/AGENTS.md` for mandatory patterns
+- **Base UI not Radix**: UI components use Base UI - APIs differ significantly
+- **Infisical for secrets**: `infisical run --env=dev --` prefix for local dev
 
-## Core Concepts
-
-**Resources**: Async functions that manage cloud infrastructure lifecycle (create, update, delete)
-**Bindings**: Type-safe connections between resources (workers, KV stores, databases)
-**State Management**: Tracks resource state for consistent deployments
-**Finalization**: Always call `app.finalize()` to clean up orphaned resources
-
-## Basic Setup
-
-### Project Structure
-```typescript
-// alchemy.run.ts - Your infrastructure definition
-import alchemy from "alchemy";
-import { Worker, KVNamespace } from "alchemy/cloudflare";
-
-const app = await alchemy("my-app");
-
-export const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  bindings: {
-    CACHE: await KVNamespace("cache", { title: "cache-store" })
-  }
-});
-
-console.log({ url: worker.url });
-await app.finalize(); // ⚠️ ALWAYS call finalize()
-```
-
-### Environment Setup
-```bash
-# .env - Required for secret encryption
-ALCHEMY_PASSWORD=your-secure-password
-
-# Optional: Use Cloudflare state store in production
-ALCHEMY_STATE_STORE=cloudflare
-```
-
-### Commands
-```bash
-bun alchemy deploy            # Deploy
-bun alchemy dev               # Local development
-bun alchemy destroy           # Destroy all resources
-```
-
-## Workers
-
-### Basic Worker
-```typescript
-const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  url: true, // Get public URL
-});
-```
-
-### Worker with Bindings
-```typescript
-const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  bindings: {
-    // Resource bindings
-    CACHE: kvNamespace,
-    STORAGE: r2Bucket,
-    COUNTER: durableObjectNamespace,
-    QUEUE: queue,
-    API: otherWorker,
-    
-    // Environment variables
-    API_KEY: alchemy.secret(process.env.API_KEY),
-    DEBUG: "true"
-  }
-});
-```
-
-### Worker Implementation
-```typescript
-// src/worker.ts
-import type { worker } from "../alchemy.run";
-
-export default {
-  async fetch(request: Request, env: typeof worker.Env): Promise<Response> {
-    // Type-safe access to all bindings
-    const cached = await env.CACHE.get("key");
-    const apiKey = env.API_KEY;
-    
-    return new Response("Hello World");
-  }
-};
-```
-
-### Type Safety Setup
-```typescript
-// types/env.d.ts
-import type { worker } from "../alchemy.run";
-
-declare module "cloudflare:workers" {
-  namespace Cloudflare {
-    export interface Env extends typeof worker.Env {}
-  }
-}
-```
-
-## Durable Objects
-
-### Creating Durable Object Namespace
-```typescript
-// Use 'new' instead of 'await' for DurableObjectNamespace
-const counter = DurableObjectNamespace("counter", {
-  className: "Counter",
-  sqlite: true, // Enable SQLite storage
-});
-
-const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  bindings: {
-    COUNTER: counter, // Bind to worker
-  }
-});
-```
-
-### Durable Object Implementation
-```typescript
-// src/counter.ts
-import { DurableObject } from "cloudflare:workers";
-
-export class Counter extends DurableObject {
-  async increment(): Promise<number> {
-    let count = (await this.ctx.storage.get("count")) || 0;
-    count++;
-    await this.ctx.storage.put("count", count);
-    return count;
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const count = await this.increment();
-    return new Response(JSON.stringify({ count }));
-  }
-}
-```
-
-### Using Durable Objects in Worker
-```typescript
-// src/worker.ts
-export default {
-  async fetch(request: Request, env: typeof worker.Env) {
-    // Get a Durable Object instance
-    const id = env.COUNTER.idFromName("global-counter");
-    const obj = env.COUNTER.get(id);
-    
-    // Call the Durable Object
-    return obj.fetch(request);
-  }
-};
-```
-
-### Cross-Script Durable Objects
-```typescript
-// Method 1: Re-export from provider worker
-const sharedCounter = host.bindings.SHARED_COUNTER;
-
-// Method 2: Reference by worker script name
-const counter = DurableObjectNamespace("counter", {
-  className: "Counter",
-  scriptName: "provider-worker"
-});
-```
-
-## Key Resources
-
-### KV Namespace
-```typescript
-const cache = await KVNamespace("cache", {
-  title: "my-cache-store"
-});
-
-// Usage in worker
-const value = await env.CACHE.get("key");
-await env.CACHE.put("key", "value", { expirationTtl: 3600 });
-```
-
-### R2 Bucket
-```typescript
-const storage = await R2Bucket("storage", {
-  allowPublicAccess: false
-});
-
-// Usage in worker
-const object = await env.STORAGE.get("file.txt");
-await env.STORAGE.put("file.txt", "content");
-```
-
-### Queue
-```typescript
-// Typed queue
-const queue = await Queue<{ name: string; email: string }>("notifications");
-
-// Producer worker
-const producer = await Worker("producer", {
-  bindings: { QUEUE: queue },
-  // Queue sending code
-});
-
-// Consumer worker
-const consumer = await Worker("consumer", {
-  eventSources: [queue], // Register as consumer
-  // Queue processing code
-});
-
-// Worker implementation for queue processing
-export default {
-  async queue(batch: typeof queue.Batch, env: Env) {
-    for (const message of batch.messages) {
-      console.log("Processing:", message.body);
-      message.ack(); // Acknowledge message
-    }
-  }
-};
-```
-
-### Custom Domains
-```typescript
-const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  routes: [
-    { pattern: "api.example.com/*", zone: "example.com" },
-    { pattern: "example.com/api/*", zone: "example.com" }
-  ]
-});
-```
-
-## Converting Existing Cloudflare Projects
-
-### 1. Migrate wrangler.toml Configuration
-```toml
-# Old wrangler.toml
-name = "my-worker"
-main = "src/index.js"
-
-[env.production]
-kv_namespaces = [
-  { binding = "CACHE", id = "abc123" }
-]
-
-[[env.production.r2_buckets]]
-binding = "STORAGE"
-bucket_name = "my-bucket"
-```
-
-```typescript
-// New alchemy.run.ts
-const worker = await Worker("my-worker", {
-  entrypoint: "./src/index.js",
-  bindings: {
-    CACHE: await KVNamespace("cache", { 
-      title: "cache-store",
-      adopt: true // Use existing KV namespace
-    }),
-    STORAGE: await R2Bucket("storage", {
-      name: "my-bucket",
-      adopt: true // Use existing bucket
-    })
-  }
-});
-```
-
-### 2. Enable Development Compatibility
-```typescript
-// Generate wrangler.json for local development
-await WranglerJson({
-  worker,
-});
-```
-
-### 3. Adopt Existing Resources
-```typescript
-// Use adopt: true to use existing resources instead of failing
-const bucket = await R2Bucket("storage", {
-  name: "existing-bucket-name",
-  adopt: true // Won't fail if bucket already exists
-});
-```
-
-### 4. State Store Migration
-```typescript
-// Local development (default)
-const app = await alchemy("my-app");
-
-// Production with Cloudflare state store
-const app = await alchemy("my-app", {
-  stateStore: process.env.NODE_ENV === "production" 
-    ? (scope) => new DOStateStore(scope)
-    : undefined
-});
-```
-
-## Advanced Patterns
-
-### Framework Integration (Vite/React/etc.)
-```typescript
-const website = await Vite("website", {
-  entrypoint: "./src/worker.ts",
-  command: "bun run build", // Build command
-  bindings: {
-    API: await Worker("api", { entrypoint: "./api/worker.ts" }),
-    STORAGE: await R2Bucket("assets")
-  }
-});
-```
-
-### Resource Scoping
-```typescript
-// Organize resources into logical groups
-await alchemy.run("backend", async () => {
-  await Worker("api", { entrypoint: "./api.ts" });
-  await KVNamespace("cache", { title: "api-cache" });
-});
-
-await alchemy.run("frontend", async () => {
-  await Vite("website", { entrypoint: "./src/worker.ts" });
-});
-```
-
-### Testing Pattern
-```typescript
-import { alchemy } from "../../src/alchemy";
-const test = alchemy.test(import.meta, { prefix: "test" });
-
-describe("Worker Tests", () => {
-  test("creates worker", async (scope) => {
-    const worker = await Worker("test-worker", {
-      entrypoint: "./src/worker.ts"
-    });
-    
-    expect(worker.url).toBeTruthy();
-    // Resources auto-cleaned after test
-  });
-});
-```
-
-## Best Practices
-
-1. **Always call finalize()**: `await app.finalize()` at the end of your script
-2. **Use adoption for migrations**: `adopt: true` when converting existing projects  
-3. **Type-safe bindings**: Set up env.d.ts for full type safety
-4. **Resource naming**: Use consistent, descriptive names for resources
-5. **State store**: Use DOStateStore for production deployments
-6. **Secrets**: Use `alchemy.secret()` for sensitive values
-7. **Scoping**: Organize related resources using `alchemy.run()`
-8. **Testing**: Use `alchemy.test()` for integration tests
-
-## Common Issues
-
-- **Missing finalize()**: Resources won't be cleaned up properly
-- **Wrong DurableObject syntax**: Use `DurableObjectNamespace()` not `await`
-- **Type errors**: Set up env.d.ts file for binding types
-- **State conflicts**: Use different stages/prefixes for different environments
-- **Resource adoption**: Use `adopt: true` when migrating existing resources
-
-## Development Workflow
-
-```bash
-# Create new project
-bunx alchemy create my-app --template=vite
-cd my-app
-
-# Set up authentication (one-time)
-bun wrangler login
-
-# Deploy infrastructure
-bun run deploy
-
-# Local development
-bun run dev
-
-# Clean up
-bun run destroy
-```
-</alchemy_cloudflare>
-
-<!-- /vibe-rules Integration -->
-
-<!-- effect-solutions:start -->
-
-## Effect Best Practices
-
-**Before implementing Effect features**, run `effect-solutions list` and read the relevant guide.
-
-Topics include: services and layers, data modeling, error handling, configuration, testing, HTTP clients, CLIs, observability, and project structure.
-
-**Effect Source Reference:** `~/.local/share/effect-solutions/effect`
-Search here for real implementations when docs aren't enough.
-
-<!-- effect-solutions:end -->
-
-<!-- Monorepo Packages -->
-
-## Monorepo Structure
-
-This is a Bun monorepo with packages in `packages/*`.
-
-### @laxdb/ui - Shared UI Components
-
-Located at `packages/ui`. Contains shadcn/ui components built on Base UI (not Radix).
-
-**Adding shadcn components:**
-```bash
-cd packages/ui && bunx --bun shadcn@latest add <component>
-```
-
-**Importing in apps:**
-```tsx
-import { Button } from "@laxdb/ui/components/ui/button";
-import { cn } from "@laxdb/ui/lib/utils";
-```
-
-**Key differences from Radix-based shadcn:**
-
-1. **Select placeholder** - No `placeholder` prop on SelectValue. Use render function:
-   ```tsx
-   <SelectValue>{(value) => value ?? "Select..."}</SelectValue>
-   ```
-
-2. **Forms** - Use `Field` components with `Controller` from react-hook-form:
-   ```tsx
-   import { Controller } from "react-hook-form";
-   import { Field, FieldLabel, FieldError, FieldGroup } from "@laxdb/ui/components/ui/field";
-   
-   <Controller
-     name="email"
-     control={form.control}
-     render={({ field, fieldState }) => (
-       <Field data-invalid={fieldState.invalid}>
-         <FieldLabel htmlFor="email">Email</FieldLabel>
-         <Input {...field} id="email" aria-invalid={fieldState.invalid} />
-         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-       </Field>
-     )}
-   />
-   ```
-
-3. **Resizable** - Uses `Group`/`Separator` instead of `PanelGroup`/`PanelResizeHandle`
-
-**Package exports:**
-- `@laxdb/ui/components/ui/*` - UI components
-- `@laxdb/ui/components/*` - Non-UI components (social-icons, etc.)
-- `@laxdb/ui/lib/*` - Utilities (cn, utils)
-- `@laxdb/ui/hooks/*` - React hooks
-- `@laxdb/ui/globals.css` - Global styles
-
-### @laxdb/core - Business Logic & Database
-
-Located at `packages/core`. Contains Effect-based services, Drizzle schemas, and domain logic.
-
-### @laxdb/api - API Layer
-
-Located at `packages/api`. Effect RPC handlers and middleware.
-
-### @laxdb/web - Frontend App
-
-Located at `packages/web`. TanStack Router + React app.
-
-<!-- Common Libs -->
-
-**Common libs can be found in the `~/.local/share` directory**
-
-- alchemy
-- drizzle-orm
-- tanstack router (start)
-- better-auth
-- tanstack query
-- tanstack table
-
----
-
-# PROJECT KNOWLEDGE BASE
-
-**Generated:** 2025-12-31
-**Commit:** 7dd20db
-
-## OVERVIEW
-
-Lacrosse team/club management platform. Effect-TS backend, TanStack Start frontend, Cloudflare Workers deployment via Alchemy IaC. PlanetScale PostgreSQL with Drizzle ORM.
-
-## STRUCTURE
+## ARCHITECTURE OVERVIEW
 
 ```
-laxdb/
-├── packages/
-│   ├── core/           # Effect services, Drizzle schemas, domain logic
-│   ├── api/            # Effect RPC + HTTP API (Cloudflare Worker)
-│   ├── web/            # TanStack Start app (main frontend)
-│   ├── ui/             # shadcn/Base UI components (NOT Radix)
-│   ├── marketing/      # Marketing site (TanStack Start)
-│   ├── docs/           # Fumadocs documentation site
-│   └── effect-cloudflare/  # Effect bindings for CF primitives (experimental)
-├── alchemy.run.ts      # Infrastructure as Code (entry point for deploy)
-├── types/              # Global TypeScript declarations
-└── llms/               # Reference docs for libraries
+User Request → TanStack Start (web) → Effect RPC (api) → Effect Services (core) → Drizzle → PlanetScale
+                     ↓
+              Cloudflare Workers (all apps deployed here)
 ```
 
-## WHERE TO LOOK
+**Data flow**: Frontend queries hit `packages/api` which calls `packages/core` services. Services use repos for DB access. All Effect-based with typed errors.
 
-| Task | Location | Pattern |
-|------|----------|---------|
-| Add domain entity | `packages/core/src/{entity}/` | Create: schema → sql → repo → service → contract |
-| Add API endpoint | `packages/api/src/{entity}/` | Create: rpc.ts (handlers) → api.ts (HTTP) → client.ts |
-| Add frontend route | `packages/web/src/routes/` | File-based routing, use `-components/` for route-specific components |
-| Add UI component | `packages/ui/src/components/ui/` | `bunx --bun shadcn@latest add <component>` |
-| Add data table | `packages/ui/src/components/data-table/` | Uses @tanstack/react-table |
-| Modify DB schema | `packages/core/src/schema.ts` | Run `bun run db:generate` then `bun run db:migrate` |
-| Change infrastructure | `alchemy.run.ts` | Run `bun run deploy` to apply |
-| Add auth logic | `packages/core/src/auth/` | Uses better-auth with org/team support |
+## PACKAGE MAP
 
-## CODE MAP
+| Package              | Purpose                                     | Key Files                    |
+| -------------------- | ------------------------------------------- | ---------------------------- |
+| `packages/core`      | Business logic, DB schemas, domain services | `AGENTS.md` has full details |
+| `packages/api`       | Effect RPC + REST API (CF Worker)           | `AGENTS.md` has patterns     |
+| `packages/web`       | TanStack Start app (main frontend)          | `AGENTS.md` has routing      |
+| `packages/ui`        | shadcn/Base UI components                   | `AGENTS.md` has API diffs    |
+| `packages/marketing` | Marketing site                              | `AGENTS.md`                  |
+| `packages/docs`      | Fumadocs documentation                      | `AGENTS.md`                  |
+| `packages/pipeline`  | Data ingestion (PLL API, scraping)          | `AGENTS.md` has API guide    |
 
-### Domain Modules (packages/core/src/)
+## COMMON TASKS
 
-| Module | Files | Purpose |
-|--------|-------|---------|
-| auth/ | 5 | better-auth integration, permissions |
-| organization/ | 6 | Multi-tenant org management |
-| team/ | 6 | Teams within organizations |
-| player/ | 5 + contact-info/ (5) | Player profiles, contact info |
-| game/ | 5 | Game scheduling, stats |
-| season/ | 5 | Season management |
-| feedback/ | 4 | User feedback system |
-| email/ | 3 | AWS SES email service |
-| user/ | 4 | User profiles |
+| Task                  | Package | Pattern                                                    |
+| --------------------- | ------- | ---------------------------------------------------------- |
+| Add domain entity     | `core`  | schema.ts → {domain}.sql.ts → repo → service → contract    |
+| Add API endpoint      | `api`   | {domain}.rpc.ts → {domain}.api.ts → {domain}.client.ts     |
+| Add frontend route    | `web`   | `src/routes/_protected/...` (file-based)                   |
+| Add UI component      | `ui`    | `bunx --bun shadcn@latest add <component>`                 |
+| Modify DB schema      | `core`  | Edit sql.ts → `bun run db:generate` → `bun run db:migrate` |
+| Deploy infrastructure | root    | `bun run deploy` (runs alchemy.run.ts)                     |
 
-### Per-Module File Pattern
+## ANTI-PATTERNS (BLOCKING)
 
-```
-{module}/
-├── {module}.schema.ts    # Effect Schema classes (inputs, outputs)
-├── {module}.sql.ts       # Drizzle table definitions
-├── {module}.repo.ts      # Database operations (Effect)
-├── {module}.service.ts   # Business logic (Effect.Service)
-├── {module}.contract.ts  # RPC contract definitions
-└── {module}.error.ts     # Domain-specific errors (optional)
-```
-
-### API Layer (packages/api/src/)
-
-```
-{module}/
-├── {module}.rpc.ts       # RpcGroup + handlers
-├── {module}.api.ts       # HttpApi routes (OpenAPI)
-└── {module}.client.ts    # Type-safe client exports
-```
-
-## CONVENTIONS
-
-### Effect Patterns (CRITICAL)
-
-```typescript
-// Service definition - ALWAYS use this pattern
-export class MyService extends Effect.Service<MyService>()("MyService", {
-  effect: Effect.gen(function* () {
-    const dep = yield* SomeDependency;
-    return { /* methods */ };
-  }),
-  dependencies: [SomeDependency.Default],
-}) {}
-
-// Error handling - use catchTag, not catchAll
-Effect.catchTag("SqlError", (e) => Effect.fail(parsePostgresError(e)))
-
-// Input validation - always decode first
-const decoded = yield* decodeArguments(InputSchema, input);
-```
-
-### Linting/Formatting
-
-- **oxlint** (not ESLint) - run `bun run lint`
-- **oxfmt** (not Prettier) - run `bun run format`
-- Combined: `bun run fix`
-- Type checking: `bun run typecheck` (uses tsgo)
-
-### TypeScript Rules
-
-- `typescript/consistent-type-imports`: REQUIRED (`import type`)
-- `typescript/consistent-type-exports`: REQUIRED
-- `import/no-cycle`: ERROR (circular imports forbidden)
-- `typescript/no-explicit-any`: OFF (allowed in this project)
-
-### Frontend (packages/web)
-
-- Routes use TanStack Router file-based routing
-- Route-specific components: `-components/` directory (dash prefix)
-- Use `@/` path alias for imports from src/
-- Forms: react-hook-form with Field components from @laxdb/ui
-
-### UI Components (packages/ui)
-
-- Built on **Base UI** (NOT Radix) - APIs differ
-- See package AGENTS.md for Base UI specifics
-
-## ANTI-PATTERNS
-
-| Pattern | Why Bad | Do Instead |
-|---------|---------|------------|
-| `Effect.catchAll` | Swallows typed errors | Use `Effect.catchTag` |
-| `as any` / `@ts-ignore` | Defeats type safety | Fix the types properly |
-| Import from `effect/internal` | Unstable APIs | Use public effect exports |
-| Direct DB queries in routes | Bypasses service layer | Use service → repo pattern |
-| Inline styles in components | Inconsistent styling | Use Tailwind classes |
-| `useState` for server data | Missing cache/sync | Use TanStack Query |
+| Pattern                    | Why Bad                | Do Instead             |
+| -------------------------- | ---------------------- | ---------------------- |
+| `Effect.catchAll`          | Swallows typed errors  | `Effect.catchTag`      |
+| `as any` / `@ts-ignore`    | Defeats type safety    | Fix the types          |
+| Direct DB in routes        | Bypasses service layer | service → repo         |
+| `useState` for server data | Missing cache/sync     | TanStack Query         |
+| Radix API patterns         | We use Base UI         | Check component source |
 
 ## COMMANDS
 
 ```bash
 # Development
-bun run dev                    # Start all packages (via Alchemy)
+bun run dev                     # All packages via Alchemy
 infisical run --env=dev -- bun run dev  # With secrets
 
-# Database
-cd packages/core
-bun run db:generate            # Generate migrations from schema
-bun run db:migrate             # Apply migrations
-bun run db:studio              # Open Drizzle Studio
+# Database (in packages/core)
+bun run db:generate             # Generate migrations
+bun run db:migrate              # Apply migrations
+bun run db:studio               # Drizzle Studio
 
 # Quality
-bun run typecheck              # TypeScript check all packages
-bun run fix                    # Lint + format all packages
-bun run test                   # Run tests (per-package)
+bun run typecheck               # TypeScript check (tsgo --build)
+bun run lint                    # Lint only (oxlint)
+bun run format                  # Format only (oxfmt)
+bun run fix                     # Lint + format combined
 
 # Deployment
-bun run deploy                 # Deploy via Alchemy
-bun run destroy                # Tear down infrastructure
+bun run deploy                  # Deploy via Alchemy
+bun run destroy                 # Tear down
 ```
 
-## NOTES
+## INFRASTRUCTURE
 
-- **Infisical for secrets**: Use `infisical run --env=dev --` prefix for local dev
-- **DB branching**: PlanetScale uses main→development→personal branches; stage determines branch
-- **PR previews**: Alchemy auto-creates preview deployments with GitHub comments
-- **No CI workflows**: Deployment is via Alchemy commands, not GitHub Actions
-- **Many TODOs**: Web routes have placeholder API calls marked `// TODO: Replace with actual API`
-- **effect-cloudflare**: Experimental package, not production-ready
+Managed via `alchemy.run.ts`:
+
+- **Compute**: Cloudflare Workers (web, marketing, docs)
+- **Database**: PlanetScale PostgreSQL via Hyperdrive connection pooling
+- **Storage**: R2 buckets
+- **Cache**: KV namespaces
+- **Stages**: prod (laxdb.io), dev (dev.laxdb.io), PR previews
+
+## REFERENCE DOCS
+
+External documentation in `llms/`:
+
+- `llms/effect-ts/` - Effect patterns
+- `llms/better-auth.txt` - Auth patterns
+- `llms/tanstack-router.txt` - Router docs
+
+For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alchemy`.
+
+## CHILD INTENT NODES
+
+- `packages/core/AGENTS.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
+- `packages/api/AGENTS.md` - RPC/HTTP API patterns
+- `packages/web/AGENTS.md` - Frontend routing, components
+- `packages/ui/AGENTS.md` - Base UI component APIs
+- `packages/pipeline/AGENTS.md` - Data ingestion, external APIs

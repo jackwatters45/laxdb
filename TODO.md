@@ -27,5 +27,6 @@
 
 ## Rando
 
+- Take a closer look at AGENTS.md files
 - Blog some of the specific/unique technical challenges
   - http + rpc

@@ -13,10 +13,10 @@ src/
 │       ├── index.tsx     # Blog listing
 │       └── $slug.tsx     # Individual posts
 ├── components/
-│   ├── ui/               # Marketing UI components (hero, features, etc.)
-│   └── *.tsx             # Shared components (button, icons, etc.)
+│   ├── ui/               # Marketing UI (hero, features, pricing)
+│   └── *.tsx             # Shared (button, icons, nav)
 ├── content/              # MDX blog posts
-├── lib/                  # Utilities (utils.ts, use-scroll.ts)
+├── lib/                  # Utilities
 ├── site.ts               # Site config (name, url, description)
 └── globals.css           # Tailwind styles
 ```
@@ -31,18 +31,10 @@ src/
 | Add marketing section | `src/components/ui/` |
 | Change site metadata | `src/site.ts` |
 
-## CONVENTIONS
+## BLOG POSTS
 
-### Content Collections (Blog)
+Blog uses `@content-collections/core` with MDX:
 
-Blog posts use `@content-collections/core` with MDX:
-
-```
-src/content/
-└── my-post.mdx
-```
-
-**Frontmatter schema:**
 ```yaml
 ---
 title: "Post Title"
@@ -52,27 +44,26 @@ authors: ["Author Name"]
 ---
 ```
 
-Run `bun run gen:content-collections` after adding posts.
+**After adding/modifying posts**: `bun run gen:content-collections`
 
-### Tailwind v4 Beta
+## TAILWIND V4 BETA
 
 Uses Tailwind CSS v4 beta with `@tailwindcss/postcss`. Syntax differs from v3:
 - CSS-first configuration
 - New color system
 
-### Motion Animations
-
-Uses `motion` (framer-motion) for animations. See existing components for patterns.
-
 ## ANTI-PATTERNS
 
-- **Edit routeTree.gen.ts**: Auto-generated, don't modify
-- **Skip content-collections build**: Run after MDX changes
+| Pattern | Why Bad | Do Instead |
+|---------|---------|------------|
+| Edit routeTree.gen.ts | Auto-generated | Let router generate it |
+| Skip content-collections | MDX won't compile | Run after changes |
+| Use @laxdb/ui | Separate design system | Use local components |
 
 ## COMMANDS
 
 ```bash
-bun run dev                       # Dev server on port 3002
+bun run dev                       # Dev server (port 3002)
 bun run gen:content-collections   # Rebuild blog content
 bun run build                     # Production build
 ```
@@ -82,4 +73,5 @@ bun run build                     # Production build
 - **Template origin**: Based on Tremor Solar template
 - **Domain**: Deployed to root domain (laxdb.io in prod)
 - **Icons**: Uses @remixicon/react
+- **Motion**: Uses motion (framer-motion) for animations
 - **No shared UI**: Has own components, doesn't use @laxdb/ui

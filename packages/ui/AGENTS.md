@@ -2,6 +2,16 @@
 
 shadcn/ui components built on **Base UI** (NOT Radix). Shared across web, marketing, docs.
 
+## CRITICAL: Base UI vs Radix
+
+This package uses **Base UI**, not Radix. APIs differ significantly. Check component source when unsure.
+
+| Pattern | Radix | Base UI (This Project) |
+|---------|-------|------------------------|
+| Select placeholder | `<SelectValue placeholder="...">` | `<SelectValue>{(v) => v ?? "..."}</SelectValue>` |
+| Dialog trigger | Implicit via context | Often explicit `open` prop |
+| Checkbox state | `checked={bool}` | `checked={bool}` (same) |
+
 ## STRUCTURE
 
 ```
@@ -18,25 +28,13 @@ src/
 
 | Task | Location |
 |------|----------|
-| Add shadcn component | Run: `bunx --bun shadcn@latest add <name>` |
+| Add shadcn component | `bunx --bun shadcn@latest add <name>` |
 | Modify component | `src/components/ui/{component}.tsx` |
 | Add data table feature | `src/components/data-table/` |
 | Add hook | `src/hooks/` |
 | Modify styles | `src/styles/globals.css` |
 
-## CONVENTIONS
-
-### Base UI vs Radix (CRITICAL)
-
-This package uses **Base UI**, not Radix. APIs differ significantly:
-
-| Pattern | Radix | Base UI (This Project) |
-|---------|-------|------------------------|
-| Select placeholder | `<SelectValue placeholder="...">` | `<SelectValue>{(v) => v ?? "..."}</SelectValue>` |
-| Checkbox state | `checked={bool}` | `checked={bool}` (same) |
-| Dialog trigger | Implicit via context | Often explicit `open` prop |
-
-### Import Pattern
+## IMPORT PATTERN
 
 ```tsx
 // From apps (web, marketing, docs)
@@ -45,7 +43,7 @@ import { cn } from "@laxdb/ui/lib/utils";
 import { useToast } from "@laxdb/ui/hooks/use-toast";
 ```
 
-### Package Exports
+## PACKAGE EXPORTS
 
 - `@laxdb/ui/components/ui/*` - UI components
 - `@laxdb/ui/components/*` - Other components (data-table, etc.)
@@ -53,7 +51,7 @@ import { useToast } from "@laxdb/ui/hooks/use-toast";
 - `@laxdb/ui/hooks/*` - React hooks
 - `@laxdb/ui/globals.css` - Global styles
 
-### Forms with Field Components
+## FORMS PATTERN
 
 ```tsx
 import { Field, FieldLabel, FieldError } from "@laxdb/ui/components/ui/field";
@@ -74,21 +72,32 @@ import { Controller } from "react-hook-form";
 
 ## ANTI-PATTERNS
 
-- **Radix patterns**: Base UI APIs differ - check component source
-- **Direct Tailwind in apps**: Use cn() utility, extend components here
-- **Modify generated components blindly**: shadcn generates, but you own the code
+| Pattern | Why Bad | Do Instead |
+|---------|---------|------------|
+| Radix API patterns | APIs differ | Check component source |
+| Direct Tailwind in apps | Inconsistent | Use cn() utility, extend components |
+| Copy-paste components | Loses updates | Import from @laxdb/ui |
 
 ## COMMANDS
 
 ```bash
 bunx --bun shadcn@latest add <component>  # Add new component
-bun run typecheck                          # Type check (tsgo --build)
+bun run typecheck                          # Type check
 bun run fix                                # Lint + format
 ```
 
+## KEY COMPONENTS
+
+| Component | Notes |
+|-----------|-------|
+| `theme-provider.tsx` | ThemeProvider for dark/light mode |
+| `sonner.tsx` | Toast notifications |
+| `data-table/` | Full TanStack Table integration |
+| `field.tsx` | Form field wrapper components |
+| `sidebar.tsx` | App sidebar layout |
+
 ## NOTES
 
-- **ThemeProvider**: In `components/theme-provider.tsx`
-- **Sonner toasts**: Use `components/ui/sonner.tsx`
-- **Data tables**: Full TanStack Table integration in `components/data-table/`
 - **motion**: Uses motion (framer-motion) for animations
+- **shadcn ownership**: Components are generated but you own them - modify freely
+- **Tailwind v4**: Some packages use v4 beta with different syntax

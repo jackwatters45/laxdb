@@ -24,10 +24,19 @@ src/
 | Add REST endpoint | `src/{domain}/{domain}.api.ts` |
 | Export client | `src/{domain}/{domain}.client.ts` |
 | Modify CORS/middleware | `src/index.ts` |
+| Register new domain | Add to `AllRpcs` and `AllApis` in `src/index.ts` |
 
-## CONVENTIONS
+## ADDING NEW DOMAIN (Checklist)
 
-### RPC Handler Pattern
+1. Create contract in `@laxdb/core` first (`{domain}.contract.ts`)
+2. Create `{domain}.rpc.ts` with RpcGroup + handlers
+3. Create `{domain}.api.ts` with HttpApi group
+4. Create `{domain}.client.ts` for exports
+5. **Register in `src/index.ts`**:
+   - Add to `AllRpcs`: `RpcServer.layer(MyRpcs).pipe(Layer.provide(MyHandlers))`
+   - Add to `AllApis`: `MyApiLive`
+
+## RPC HANDLER PATTERN
 
 ```typescript
 export class MyRpcs extends RpcGroup.make(
@@ -48,7 +57,7 @@ export const MyHandlers = MyRpcs.toLayer(
 ).pipe(Layer.provide(MyService.Default));
 ```
 
-### HTTP API Pattern
+## HTTP API PATTERN
 
 ```typescript
 export const MyApiLive = HttpApiBuilder.group(MyApi, "my", (handlers) =>
@@ -58,24 +67,25 @@ export const MyApiLive = HttpApiBuilder.group(MyApi, "my", (handlers) =>
 );
 ```
 
-### Adding New Domain
-
-1. Create contract in `@laxdb/core` first
-2. Create `{domain}.rpc.ts` with RpcGroup
-3. Create `{domain}.api.ts` with HttpApi handlers
-4. Create `{domain}.client.ts` for exports
-5. Add to `AllRpcs` and `AllApis` in `index.ts`
-
 ## ANTI-PATTERNS
 
-- **Business logic in handlers**: Keep in @laxdb/core services
-- **Skip Layer.provide**: Handlers must provide service dependencies
-- **Direct DB access**: Always go through @laxdb/core repos
+| Pattern | Why Bad | Do Instead |
+|---------|---------|------------|
+| Business logic in handlers | Duplicates/diverges from core | Keep in @laxdb/core services |
+| Skip `Layer.provide` | Handlers won't get dependencies | Always provide service deps |
+| Direct DB access | Bypasses service layer | Go through @laxdb/core repos |
+| Forget to register | Endpoint won't work | Add to AllRpcs/AllApis |
+
+## ENDPOINTS
+
+| Path | Method | Description |
+|------|--------|-------------|
+| `/rpc` | POST | Effect RPC (NDJSON serialization) |
+| `/docs` | GET | Scalar OpenAPI UI |
+| `/health` | GET | Health check |
 
 ## NOTES
 
 - **Entry point**: `src/index.ts` exports `{ fetch: handler }`
-- **RPC endpoint**: `/rpc` (NDJSON serialization)
-- **OpenAPI docs**: `/docs` (Scalar UI)
-- **Health check**: `/health`
-- **CORS**: Currently `allowedOrigins: ["*"]`
+- **CORS**: Currently `allowedOrigins: ["*"]` (open)
+- **All domain handlers follow same pattern** - consistency is key
