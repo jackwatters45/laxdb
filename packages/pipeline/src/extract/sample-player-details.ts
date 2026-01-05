@@ -10,9 +10,9 @@
  *   infisical run --env=dev -- bun src/extract/sample-player-details.ts --year=2024 --count=5
  */
 
-import { Effect, Duration, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Duration, Layer, Schema } from "effect";
 import { PLLClient } from "../pll/pll.client";
 import { PLLPlayer, type PLLPlayerDetail } from "../pll/pll.schema";
 import { ExtractConfigService } from "./extract.config";
@@ -27,13 +27,14 @@ const SAMPLE_COUNT = countArg ? parseInt(countArg.split("=")[1] ?? "", 10) : 5;
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
   const config = yield* ExtractConfigService;
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
 
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`Player Detail Sample Extraction`);
   yield* Effect.log(`Year: ${YEAR}, Sample size: ${SAMPLE_COUNT}`);
   yield* Effect.log("=".repeat(60) + "\n");
 
-  // Load existing players
   const playersPath = path.join(
     config.outputDir,
     "pll",
@@ -43,27 +44,28 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log(`Loading players from ${playersPath}...`);
 
-  const playersData = yield* Effect.tryPromise({
-    try: () => fs.readFile(playersPath, "utf-8"),
-    catch: (e) => new Error(`Failed to read players file: ${String(e)}`),
-  });
+  const playersData = yield* fs.readFileString(playersPath, "utf-8");
 
-  const parsed: unknown = JSON.parse(playersData);
+  const parsed = yield* Effect.try({
+    try: () => JSON.parse(playersData) as unknown,
+    catch: (e) =>
+      new Error(
+        `Failed to parse players JSON from ${playersPath}: ${String(e)}`,
+      ),
+  });
   const allPlayers = yield* Schema.decodeUnknown(Schema.Array(PLLPlayer))(
     parsed,
   );
   yield* Effect.log(`Found ${allPlayers.length} players\n`);
 
-  // Filter players with slugs and sample
   const playersWithSlug = allPlayers.filter((p) => p.slug !== null);
 
-  // Get a diverse sample: high performers, different positions
   const samplePlayers = playersWithSlug
-    .filter((p) => (p.stats?.gamesPlayed ?? 0) >= 5) // Players with actual playing time
-    .toSorted((a, b) => (b.stats?.goals ?? 0) - (a.stats?.goals ?? 0)) // Sort by goals
-    .slice(0, Math.min(SAMPLE_COUNT * 3, playersWithSlug.length)) // Take top performers pool
-    .toSorted(() => Math.random() - 0.5) // Shuffle
-    .slice(0, SAMPLE_COUNT); // Take sample
+    .filter((p) => (p.stats?.gamesPlayed ?? 0) >= 5)
+    .toSorted((a, b) => (b.stats?.goals ?? 0) - (a.stats?.goals ?? 0))
+    .slice(0, Math.min(SAMPLE_COUNT * 3, playersWithSlug.length))
+    .toSorted(() => Math.random() - 0.5)
+    .slice(0, SAMPLE_COUNT);
 
   yield* Effect.log(`Selected ${samplePlayers.length} players for sampling:\n`);
   for (const p of samplePlayers) {
@@ -73,7 +75,6 @@ const program = Effect.gen(function* () {
   }
   yield* Effect.log("");
 
-  // Extract details for each
   const details: Array<{
     player: PLLPlayer;
     detail: PLLPlayerDetail | null;
@@ -112,7 +113,6 @@ const program = Effect.gen(function* () {
     details.push(result);
   }
 
-  // Save sample output
   const outputPath = path.join(
     config.outputDir,
     "pll",
@@ -121,19 +121,11 @@ const program = Effect.gen(function* () {
   );
 
   const outputDir = path.dirname(outputPath);
-  yield* Effect.tryPromise({
-    try: () => fs.mkdir(outputDir, { recursive: true }),
-    catch: (e) => new Error(`Failed to create directory: ${String(e)}`),
-  });
-
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(outputPath, JSON.stringify(details, null, 2)),
-    catch: (e) => new Error(`Failed to write file: ${String(e)}`),
-  });
+  yield* fs.makeDirectory(outputDir, { recursive: true });
+  yield* fs.writeFileString(outputPath, JSON.stringify(details, null, 2));
 
   yield* Effect.log(`\nSaved sample to ${outputPath}\n`);
 
-  // Analyze the data structure
   yield* Effect.log("=".repeat(60));
   yield* Effect.log(`DATA STRUCTURE ANALYSIS`);
   yield* Effect.log("=".repeat(60) + "\n");
@@ -156,7 +148,6 @@ const program = Effect.gen(function* () {
     `Sample player: ${firstSuccess.player.firstName} ${firstSuccess.player.lastName}\n`,
   );
 
-  // careerStats
   if (firstDetail.careerStats) {
     yield* Effect.log(`careerStats: PRESENT`);
     const fields = Object.keys(firstDetail.careerStats);
@@ -165,7 +156,6 @@ const program = Effect.gen(function* () {
     yield* Effect.log(`careerStats: NULL`);
   }
 
-  // allSeasonStats
   yield* Effect.log(
     `\nallSeasonStats: ${firstDetail.allSeasonStats.length} entries`,
   );
@@ -177,7 +167,6 @@ const program = Effect.gen(function* () {
     );
     yield* Effect.log(`  Fields: ${Object.keys(entry).join(", ")}`);
 
-    // Show all years/segments
     const yearSegments = firstDetail.allSeasonStats.map(
       (s) => `${s.year}-${s.seasonSegment}`,
     );
@@ -193,7 +182,6 @@ const program = Effect.gen(function* () {
     }
   }
 
-  // advancedSeasonStats
   if (firstDetail.advancedSeasonStats) {
     yield* Effect.log(`\nadvancedSeasonStats: PRESENT`);
     const fields = Object.keys(firstDetail.advancedSeasonStats);
@@ -202,7 +190,6 @@ const program = Effect.gen(function* () {
     yield* Effect.log(`\nadvancedSeasonStats: NULL`);
   }
 
-  // champSeries
   if (firstDetail.champSeries) {
     yield* Effect.log(`\nchampSeries: PRESENT`);
     yield* Effect.log(`  position: ${firstDetail.champSeries.position}`);
@@ -216,7 +203,6 @@ const program = Effect.gen(function* () {
     yield* Effect.log(`\nchampSeries: NULL`);
   }
 
-  // Summary
   yield* Effect.log(`\n${"=".repeat(60)}`);
   yield* Effect.log(`SUMMARY`);
   yield* Effect.log("=".repeat(60));
@@ -226,7 +212,6 @@ const program = Effect.gen(function* () {
   yield* Effect.log(`Output: ${outputPath}`);
   yield* Effect.log(``);
 
-  // Value assessment
   yield* Effect.log(`VALUE ASSESSMENT:`);
   yield* Effect.log(
     `  - careerStats: Lifetime totals (useful for career leaderboards)`,
@@ -243,9 +228,10 @@ const program = Effect.gen(function* () {
   yield* Effect.log(``);
 });
 
-await Effect.runPromise(
-  program.pipe(
-    Effect.provide(PLLClient.Default),
-    Effect.provide(ExtractConfigService.Default),
-  ),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  PLLClient.Default,
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

@@ -8,6 +8,7 @@
  *   infisical run --env=dev -- bun src/extract/run.ts --year=2024 --force
  */
 
+import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 import { PLLExtractorService, PLLManifestService } from "./pll";
 import { ExtractConfigService } from "./extract.config";
@@ -86,28 +87,15 @@ const MainLive = Layer.mergeAll(
   Layer.provideMerge(PLLExtractorService.Default),
 );
 
-const main = async () => {
-  const args = parseArgs();
+const args = parseArgs();
 
-  if (args.help) {
-    printHelp();
-    return;
-  }
-
-  if (!args.all && !args.year) {
-    console.error("Error: Must specify --all or --year=YYYY");
-    printHelp();
-    process.exit(1);
-  }
-
-  const program = runExtraction(args).pipe(Effect.provide(MainLive));
-
-  try {
-    await Effect.runPromise(program);
-  } catch (error) {
-    console.error("Extraction failed:", error);
-    process.exit(1);
-  }
-};
-
-await main();
+if (args.help) {
+  printHelp();
+} else if (!args.all && !args.year) {
+  console.error("Error: Must specify --all or --year=YYYY");
+  printHelp();
+  process.exit(1);
+} else {
+  const MainLayer = Layer.merge(MainLive, BunContext.layer);
+  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
+}

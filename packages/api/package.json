@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@effect-atom/atom-react": "^0.4.4",
-    "@effect/platform": "^0.94.0",
+    "@effect/platform": "0.94.1",
     "@effect/rpc": "^0.73.0",
     "@laxdb/core": "workspace:*"
   },

@@ -14,6 +14,8 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
+    "@effect/platform": "^0.94.1",
+    "@effect/platform-bun": "^0.87.0",
     "@laxdb/core": "*",
     "cheerio": "^1.1.2"
   },

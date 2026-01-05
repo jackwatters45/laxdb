@@ -1,6 +1,6 @@
-import { Effect } from "effect";
-import * as path from "node:path";
-import * as fs from "node:fs/promises";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Layer } from "effect";
 import { ExtractConfigService } from "../extract/extract.config";
 import {
   validateJsonArray,
@@ -17,6 +17,7 @@ import type {
   ValidationCheckResult,
 } from "./validate.schema";
 import { errorIssue, infoIssue } from "./validate.schema";
+import { readJsonFile } from "@laxdb/core/util";
 
 interface PlayerDetail {
   slug: string;
@@ -68,19 +69,10 @@ type StatLeadersData = Record<string, Record<string, unknown[]>>;
 
 const YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
-const readJsonFile = <T>(filePath: string): Effect.Effect<T, Error> =>
-  Effect.tryPromise({
-    try: async () => {
-      const content = await fs.readFile(filePath, "utf-8");
-      const parsed: unknown = JSON.parse(content);
-      // oxlint-disable-next-line typescript-eslint/no-unsafe-type-assertion -- Generic validation utility
-      return parsed as T;
-    },
-    catch: (e) => new Error(`Failed to read ${filePath}: ${String(e)}`),
-  });
-
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
   const pllDir = path.join(config.outputDir, "pll");
   const startTime = Date.now();
 
@@ -323,15 +315,15 @@ const program = Effect.gen(function* () {
   yield* printReport(report);
 
   const reportPath = path.join(pllDir, "validation-report.json");
-  yield* Effect.tryPromise({
-    try: () => fs.writeFile(reportPath, JSON.stringify(report, null, 2)),
-    catch: (e) => new Error(`Failed to write report: ${String(e)}`),
-  });
+  yield* fs.writeFileString(reportPath, JSON.stringify(report, null, 2));
   yield* Effect.log(`Report saved to: ${reportPath}`);
 
   return report;
 });
 
-await Effect.runPromise(
-  program.pipe(Effect.provide(ExtractConfigService.Default)),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));
