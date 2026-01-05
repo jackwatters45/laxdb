@@ -7,24 +7,17 @@
   },
   "scripts": {
     "test": "vitest",
-    "test:unit": "vitest run --exclude='**/*.integration.test.ts'",
-    "test:coverage": "vitest run --coverage --exclude='**/*.integration.test.ts'",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@effect/platform": "^0.94.0",
+    "@laxdb/core": "*",
     "cheerio": "^1.1.2"
   },
-  "devDependencies": {
-    "@types/pg": "^8.16.0",
-    "@types/ws": "^8.18.1",
-    "drizzle-kit": "^0.31.8",
-    "fetchdts": "^0.1.7",
-    "tsx": "^4.21.0"
-  },
+  "devDependencies": {},
   "effect": {
     "generateExports": {
       "include": [

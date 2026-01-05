@@ -4,62 +4,47 @@ Effect-TS based data pipeline for web scraping, API consumption, and HTML parsin
 
 ## Overview
 
-This package wraps external APIs and web scraping sources to create a unified data ingestion layer for laxdb. Rather than scattering fetch calls throughout the codebase, we centralize all external data access here with:
+This package wraps external APIs and web scraping sources to create a unified data ingestion layer for laxdb. All external data access is centralized here with:
 
-- **Schema validation** - Every API response is validated against Effect Schema definitions, catching API changes early
-- **Error handling** - Typed errors (`HttpError`, `NetworkError`, `RateLimitError`, etc.) with automatic retry logic
-- **Rate limiting** - Built-in backoff and retry strategies to respect external API limits
-- **Testability** - Clients can be mocked for testing without hitting real APIs
+- **Schema validation** - Every API response is validated against Effect Schema definitions
+- **Error handling** - Typed errors (`HttpError`, `NetworkError`, `RateLimitError`, etc.) with automatic retry
+- **Rate limiting** - Built-in backoff and retry strategies
+- **Testability** - Comprehensive integration tests for all endpoints
 
-### Architecture
+## Current Status
 
-```
-External Sources          Pipeline Package              Core Database
-┌─────────────────┐      ┌─────────────────────┐      ┌─────────────────┐
-│  PLL API        │─────▶│  PLLClient          │      │                 │
-│  (GraphQL/REST) │      │  - Schema validation│      │  players table  │
-└─────────────────┘      │  - Error handling   │─────▶│  games table    │
-                         │  - Retry logic      │      │  teams table    │
-┌─────────────────┐      └─────────────────────┘      │                 │
-│  NLL Website    │─────▶│  ScraperService     │      └─────────────────┘
-│  (HTML scraping)│      │  ParserService      │─────▶│  (future)       │
-└─────────────────┘      └─────────────────────┘      └─────────────────┘
-```
+### PLL (Premier Lacrosse League) - Complete
 
-### Capabilities
+All PLL data has been extracted and validated:
 
-1. **API Client** - Generic HTTP client for consuming external JSON APIs (PLL, etc.)
-2. **Web Scraping** - HTML fetching and parsing with Cheerio
+| Data | Records | Description |
+|------|---------|-------------|
+| Players | 502 | Full profiles with career stats, accolades |
+| Teams | 53 | Team-year combinations (9 franchises) |
+| Events | 269 | Games with play-by-play (58,652 plays) |
+| Career Stats | 1,170 | Includes 801 MLL legacy players |
+| Stat Leaders | 63 | 7 years × 9 categories |
 
-## Installation
+### PLLClient Methods
 
-```bash
-bun add @laxdb/pipeline
-```
+| Method | Type | Description |
+|--------|------|-------------|
+| `getStandings` | REST | Team standings |
+| `getStandingsGraphQL` | GraphQL | Standings with nested team |
+| `getPlayers` | GraphQL | Players with reg/post/champSeries stats |
+| `getAdvancedPlayers` | GraphQL | Advanced stats (rate, handedness) |
+| `getStatLeaders` | GraphQL | Stat leaders by category |
+| `getTeams` | GraphQL | Teams with coaches, stats |
+| `getCareerStats` | GraphQL | Career stat leaders |
+| `getPlayerDetail` | GraphQL | Player detail with career, accolades |
+| `getTeamDetail` | GraphQL | Team detail with events, coaches |
+| `getTeamStats` | GraphQL | Team stats by segment |
+| `getEvents` | REST | Game events |
+| `getEventDetail` | GraphQL | Event with play-by-play logs |
 
 ## Quick Start
 
-### API Client (JSON APIs)
-
-```typescript
-import { ApiClient } from "@laxdb/pipeline";
-import { Effect, Schema } from "effect";
-
-// Define your response schema
-class UserResponse extends Schema.Class<UserResponse>("UserResponse")({
-  id: Schema.Number,
-  name: Schema.String,
-}) {}
-
-const program = Effect.gen(function* () {
-  const client = yield* ApiClient;
-  
-  const user = yield* client.get("/users/1", UserResponse);
-  console.log(user.name);
-});
-```
-
-### PLL API (Premier Lacrosse League)
+### PLL API
 
 ```typescript
 import { PLLClient } from "@laxdb/pipeline";
@@ -68,11 +53,24 @@ import { Effect } from "effect";
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
   
+  // Get standings
   const standings = yield* pll.getStandings({ year: 2024, champSeries: false });
-  console.log(`${standings.length} teams`);
+  
+  // Get players with stats
+  const players = yield* pll.getPlayers({ 
+    season: 2024, 
+    includeReg: true,
+    limit: 50 
+  });
+  
+  // Get player detail
+  const player = yield* pll.getPlayerDetail({ 
+    slug: "jeff-teat",
+    statsYear: 2024 
+  });
 });
 
-Effect.runPromise(program.pipe(Effect.provide(PLLClient.Default)));
+await Effect.runPromise(program.pipe(Effect.provide(PLLClient.Default)));
 ```
 
 ### Web Scraping
@@ -92,153 +90,66 @@ const program = Effect.gen(function* () {
 });
 ```
 
-## Data Sources
+## Project Structure
 
-### Currently Implemented
-
-| Source | Module | Status |
-|--------|--------|--------|
-| PLL (Premier Lacrosse League) | `src/pll/` | Standings |
-
-### Planned
-
-| Source | Data Types | Priority |
-|--------|------------|----------|
-| PLL | Players, Games, Stats, Rosters | High |
-| NLL (National Lacrosse League) | Standings, Players, Games | Medium |
-| NCAA Lacrosse | Teams, Schedules, Rankings | Medium |
-| USL (US Lacrosse) | Club directories, Events | Low |
-
-## Next Steps
-
-### Phase 1: Expand PLL API (Current)
-
-- [ ] Extract generic `ApiClient` service from `PLLClient`
-- [ ] Add PLL endpoints: `/players`, `/games`, `/teams`, `/rosters`
-- [ ] Add response schemas for each endpoint
-- [ ] Add tests with mocked responses
-
-### Phase 2: Data Integration
-
-- [ ] Create schemas in `@laxdb/core` for external data (players, games, etc.)
-- [ ] Build sync service to import PLL data into database
-- [ ] Add deduplication logic (match external players to internal records)
-- [ ] Track data freshness and sync timestamps
-
-### Phase 3: Additional Data Sources
-
-- [ ] Research NLL API (if available) or scraping requirements
-- [ ] Research NCAA data sources
-- [ ] Add source-specific clients following PLL pattern
-
-### Phase 4: Automation
-
-- [ ] Create CLI for manual data sync (`bun pipeline sync pll`)
-- [ ] Add Cloudflare Workers cron trigger for scheduled syncs
-- [ ] Add webhook support for real-time updates (if available)
-- [ ] Implement rate limiting and backoff strategies
-
-### Phase 5: Data Quality
-
-- [ ] Add data validation and anomaly detection
-- [ ] Create admin dashboard for sync status
-- [ ] Add alerts for sync failures
-- [ ] Implement data versioning/history
-
-## API Reference
-
-### RestClient
-
-REST client with automatic retry for transient errors and rate limits.
-
-```typescript
-const client = makeRestClient({ baseUrl: "https://api.example.com" });
-
-client.get("/users", UserSchema);      // With retries
-client.post("/users", body, UserSchema);
-client.requestOnce("GET", "/health", HealthSchema);  // No retries
+```
+src/
+├── api-client/           # REST and GraphQL clients
+├── extract/              # Data extraction scripts
+│   ├── pll/              # PLL-specific extractors
+│   └── run.ts            # CLI entry point
+├── validate/             # Data validation system
+├── pll/                  # PLL API client
+├── scraper/              # Web scraping
+├── parser/               # HTML parsing (Cheerio)
+└── config.ts             # Configuration
 ```
 
-### GraphQLClient
-
-GraphQL client with automatic retry for transient errors and rate limits.
-
-```typescript
-const client = makeGraphQLClient({ endpoint: "https://api.example.com/graphql" });
-
-client.query(QUERY, DataSchema, variables);     // With retries
-client.mutation(MUTATION, DataSchema, variables);
-client.executeOnce(request, DataSchema);        // No retries
-```
-
-### ScraperService
-
-Web page fetching with retry logic.
-
-```typescript
-interface ScraperService {
-  scrape(request: ScrapeRequest): Effect<ScrapeResponse, ScraperError>;
-  scrapeBatch(request: BatchScrapeRequest): Effect<ScrapeResponse[], ScraperError>;
-  ping(url: string): Effect<boolean, ScraperError>;
-}
-```
-
-### ParserService
-
-HTML parsing with Cheerio.
-
-```typescript
-interface ParserService {
-  parse(request: ParseRequest): Effect<ParsedHtml, ParserError>;
-  querySelector(html: string, selector: string): Effect<Element[], ParserError>;
-  extractText(html: string): Effect<string, ParserError>;
-  extractLinks(html: string, baseUrl?: string): Effect<ExtractedLink[], ParserError>;
-}
-```
-
-## Configuration
-
-Environment variables (all optional):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PIPELINE_USER_AGENT` | `laxdb-pipeline/1.0` | HTTP User-Agent header |
-| `PIPELINE_DEFAULT_TIMEOUT_MS` | `30000` | Request timeout |
-| `PIPELINE_MAX_RETRIES` | `3` | Retry attempts |
-| `PIPELINE_RETRY_DELAY_MS` | `1000` | Base retry delay |
-| `PIPELINE_MAX_CONCURRENCY` | `5` | Batch concurrency limit |
-
-### Per-Client Configuration
-
-Override defaults for specific clients:
-
-```typescript
-// Uses global defaults
-const client = makeRestClient({ baseUrl: "https://api.example.com" });
-
-// Override retry settings per-client
-const client = makeRestClient({
-  baseUrl: "https://slow-api.example.com",
-  timeoutMs: 60000,    // 60s timeout (default: 30s)
-  maxRetries: 5,       // 5 retries (default: 3)
-  retryDelayMs: 2000,  // 2s base delay (default: 1s)
-});
-```
-
-The same options work for `makeGraphQLClient`.
-
-## Development
+## Commands
 
 ```bash
-# Run example
-bun src/example-pll.ts
+# Run tests
+infisical run --env=dev -- bun run test
 
 # Type check
 bun run typecheck
 
-# Run tests
-bun run test
-
 # Lint + format
 bun run fix
+
+# Data extraction
+infisical run --env=dev -- bun src/extract/run.ts
+
+# Data validation
+infisical run --env=dev -- bun src/validate/validate-pll.ts
 ```
+
+## Environment Variables
+
+Required (stored in Infisical):
+- `PLL_REST_TOKEN` - PLL REST API bearer token
+- `PLL_GRAPHQL_TOKEN` - PLL GraphQL API bearer token
+
+## Output Files
+
+Extracted data is stored in `data/pll/`:
+
+```
+data/pll/
+├── {year}/
+│   ├── teams.json
+│   ├── players.json
+│   ├── advanced-players.json
+│   ├── events.json
+│   └── standings.json
+├── player-details.json      # 502 players with career stats
+├── team-details.json        # 53 team-years with coaches
+├── event-details.json       # 269 events with play-by-play
+├── career-stats.json        # 1,170 career stat leaders
+├── stat-leaders.json        # Historical stat leaders
+└── validation-report.json   # Validation results
+```
+
+## Next Steps
+
+See `TODO.md` for current work items and `docs/PLL_DATA_MODEL.md` for complete data documentation.

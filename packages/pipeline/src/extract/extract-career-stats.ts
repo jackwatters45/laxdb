@@ -6,7 +6,7 @@
  *   infisical run --env=dev -- bun src/extract/extract-career-stats.ts --dry-run
  */
 
-import { Effect, Duration } from "effect";
+import { Effect, Duration, Schema } from "effect";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { PLLClient } from "../pll/pll.client";
@@ -26,12 +26,12 @@ const STAT_TYPES = [
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 
-interface PlayerDetailRef {
-  slug: string;
-  officialId: string;
-  firstName: string;
-  lastName: string;
-}
+const PlayerDetailRef = Schema.Struct({
+  slug: Schema.String,
+  officialId: Schema.String,
+  firstName: Schema.String,
+  lastName: Schema.String,
+});
 
 interface CareerStatsResult {
   slug: string | null;
@@ -64,17 +64,21 @@ interface ExtractionSummary {
   timestamp: string;
 }
 
+const PlayerDetailRefArray = Schema.Array(PlayerDetailRef);
+
 const loadPlayerDetails = (outputDir: string) =>
-  Effect.tryPromise({
-    try: async () => {
-      const data = await fs.readFile(
-        path.join(outputDir, "pll", "player-details.json"),
-        "utf-8",
-      );
-      const parsed = JSON.parse(data) as PlayerDetailRef[];
-      return new Set(parsed.map((p) => p.slug).filter(Boolean));
-    },
-    catch: (e) => new Error(`Failed to read player-details: ${String(e)}`),
+  Effect.gen(function* () {
+    const data = yield* Effect.tryPromise({
+      try: () =>
+        fs.readFile(
+          path.join(outputDir, "pll", "player-details.json"),
+          "utf-8",
+        ),
+      catch: (e) => new Error(`Failed to read player-details: ${String(e)}`),
+    });
+    const parsed: unknown = JSON.parse(data);
+    const players = yield* Schema.decodeUnknown(PlayerDetailRefArray)(parsed);
+    return new Set(players.map((p) => p.slug).filter(Boolean));
   });
 
 const program = Effect.gen(function* () {
