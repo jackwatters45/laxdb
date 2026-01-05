@@ -51,7 +51,15 @@ const loadExistingResults = (outputPath: string) =>
     });
     const parsed: unknown = JSON.parse(data);
     return yield* Schema.decodeUnknown(PlayerDetailResultArray)(parsed);
-  }).pipe(Effect.orElse(() => Effect.succeed([])));
+  }).pipe(
+    Effect.tap(() => Effect.log(`Successfully decoded existing player details from ${outputPath}`)),
+    Effect.catchAll((error) =>
+      Effect.zipRight(
+        Effect.logError(`Failed to decode existing player details from ${outputPath}: ${error}`),
+        Effect.succeed([]),
+      ),
+    ),
+  );
 
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
@@ -90,7 +98,13 @@ const program = Effect.gen(function* () {
 
     const parsed: unknown = JSON.parse(playersData);
     const players = yield* Schema.decodeUnknown(PLLPlayerArray)(parsed).pipe(
-      Effect.orElse(() => Effect.succeed([])),
+      Effect.tap(() => Effect.log(`Successfully decoded players for year ${year}`)),
+      Effect.catchAll((error) =>
+        Effect.zipRight(
+          Effect.logError(`Failed to decode players for year ${year}: ${error}`),
+          Effect.succeed([]),
+        ),
+      ),
     );
 
     for (const player of players) {

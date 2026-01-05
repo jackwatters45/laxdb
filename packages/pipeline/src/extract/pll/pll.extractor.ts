@@ -405,7 +405,15 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             const parsedTeams: unknown = JSON.parse(teamsData);
             const teams = yield* Schema.decodeUnknown(Schema.Array(PLLTeam))(
               parsedTeams,
-            ).pipe(Effect.orElse(() => Effect.succeed([])));
+            ).pipe(
+              Effect.tap(() => Effect.log(`Successfully decoded teams for ${year}`)),
+              Effect.catchAll((error) =>
+                Effect.zipRight(
+                  Effect.logError(`Failed to decode teams for ${year}: ${error}`),
+                  Effect.succeed([]),
+                ),
+              ),
+            );
             if (teams.length > 0) {
               const result = yield* extractTeamDetails(year, teams);
               manifest = manifestService.markComplete(
@@ -460,7 +468,15 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             const parsedPlayers: unknown = JSON.parse(playersData);
             const players = yield* Schema.decodeUnknown(
               Schema.Array(PLLPlayer),
-            )(parsedPlayers).pipe(Effect.orElse(() => Effect.succeed([])));
+            )(parsedPlayers).pipe(
+              Effect.tap(() => Effect.log(`Successfully decoded players for ${year}`)),
+              Effect.catchAll((error) =>
+                Effect.zipRight(
+                  Effect.logError(`Failed to decode players for ${year}: ${error}`),
+                  Effect.succeed([]),
+                ),
+              ),
+            );
             if (players.length > 0) {
               const result = yield* extractPlayerDetails(year, players);
               manifest = manifestService.markComplete(
@@ -501,7 +517,15 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             const parsedEvents: unknown = JSON.parse(eventsData);
             const events = yield* Schema.decodeUnknown(Schema.Array(PLLEvent))(
               parsedEvents,
-            ).pipe(Effect.orElse(() => Effect.succeed([])));
+            ).pipe(
+              Effect.tap(() => Effect.log(`Successfully decoded events for ${year}`)),
+              Effect.catchAll((error) =>
+                Effect.zipRight(
+                  Effect.logError(`Failed to decode events for ${year}: ${error}`),
+                  Effect.succeed([]),
+                ),
+              ),
+            );
             if (events.length > 0) {
               const result = yield* extractEventDetails(year, events);
               manifest = manifestService.markComplete(

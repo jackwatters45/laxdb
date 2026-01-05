@@ -71,7 +71,15 @@ const loadJsonWithSchema = <A, I>(
     });
     const parsed: unknown = JSON.parse(data);
     return yield* Schema.decodeUnknown(schema)(parsed);
-  }).pipe(Effect.orElse(() => Effect.succeed(null)));
+  }).pipe(
+    Effect.tap(() => Effect.log(`Successfully decoded data from ${filePath}`)),
+    Effect.catchAll((error) =>
+      Effect.zipRight(
+        Effect.logError(`Failed to decode data from ${filePath}: ${error}`),
+        Effect.succeed(null),
+      ),
+    ),
+  );
 
 const program = Effect.gen(function* () {
   const pll = yield* PLLClient;
@@ -364,7 +372,15 @@ const program = Effect.gen(function* () {
       });
       const parsed: unknown = JSON.parse(data);
       return yield* Schema.decodeUnknown(StatLeadersDataSchema)(parsed);
-    }).pipe(Effect.orElse(() => Effect.succeed<StatLeadersData>({})));
+    }).pipe(
+      Effect.tap(() => Effect.log(`Successfully decoded stat leaders from ${existingPath}`)),
+      Effect.catchAll((error) =>
+        Effect.zipRight(
+          Effect.logError(`Failed to decode stat leaders from ${existingPath}: ${error}`),
+          Effect.succeed<StatLeadersData>({}),
+        ),
+      ),
+    );
 
     const yearsToExtract = PLL_YEARS.filter(
       (year) => !existingLeaders[String(year)],
