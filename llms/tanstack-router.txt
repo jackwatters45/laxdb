@@ -1,4 +1,3 @@
-<!-- vibe-rules Integration -->
 
 <@tanstack/react-router_api>
 Always Apply: false - This rule should only be applied when relevant files are open
@@ -13384,5 +13383,3 @@ function PathlessLayoutRouteComponent() {
 
 
 </@tanstack/react-router_setup-and-architecture>
-
-<!-- /vibe-rules Integration -->

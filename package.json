@@ -15,8 +15,7 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "fix": "turbo fix",
-    "prepare": "effect-language-service patch",
-    "postinstall": "vibe-rules install codex"
+    "prepare": "effect-language-service patch"
   },
   "dependencies": {
     "alchemy": "^0.82.2",
@@ -39,7 +38,6 @@
     "oxlint-tsgolint": "^0.10.0",
     "turbo": "^2.7.2",
     "typescript": "^5.9.3",
-    "vibe-rules": "^0.3.91",
     "vitest": "^4.0.16"
   },
   "overrides": {
