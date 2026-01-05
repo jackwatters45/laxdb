@@ -47,7 +47,7 @@ const loadExistingResults = (outputPath: string) =>
   Effect.gen(function* () {
     const data = yield* Effect.tryPromise({
       try: () => fs.readFile(outputPath, "utf-8"),
-      catch: (e) => new Error(`Failed to read existing results: ${String(e)}`),
+      catch: (e) => new Error(`Failed to read player details from ${outputPath}: ${String(e)}`),
     });
     const parsed: unknown = JSON.parse(data);
     return yield* Schema.decodeUnknown(PlayerDetailResultArray)(parsed);

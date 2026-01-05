@@ -49,7 +49,7 @@ infisical run --env=dev -- bun src/validate/validate-pll.ts
 
 ## ADDING A NEW ENDPOINT
 
-See `docs/ADDING_ENDPOINTS.md` for detailed guide.
+See `docs/ADDING_DATA_SOURCE.md` for detailed guide.
 
 Quick summary:
 1. Capture request from browser DevTools
