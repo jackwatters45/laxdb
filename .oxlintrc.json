@@ -34,14 +34,13 @@
     "max-lines": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
     "unicorn/no-empty-file": "warn",
-    // TODO: disable when fixing
-    "no-warning-comments": "off",
+    "no-warning-comments": "off"
   },
   "ignorePatterns": [
     "node_modules/**",
     "**/dist/**",
     "**/*.gen.ts",
     "**/migrations/**",
-    "bun.lock",
+    "bun.lock"
   ]
 }

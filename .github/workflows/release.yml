@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           BUMP="patch"
-          
+
           PR_NUMBER=$(gh pr list --search "${{ github.sha }}" --state merged --json number -q '.[0].number' 2>/dev/null || echo "")
           if [ -n "$PR_NUMBER" ]; then
             LABELS=$(gh pr view "$PR_NUMBER" --json labels -q '.labels[].name' 2>/dev/null || echo "")
@@ -36,7 +36,7 @@ jobs:
               BUMP="minor"
             fi
           fi
-          
+
           echo "type=$BUMP" >> $GITHUB_OUTPUT
           echo "Version bump: $BUMP"
 
@@ -46,7 +46,7 @@ jobs:
         run: |
           LATEST=$(git tag -l 'v*' --sort=-v:refname | head -n1)
           BUMP="${{ steps.bump.outputs.type }}"
-          
+
           if [ -z "$LATEST" ]; then
             case "$BUMP" in
               major) NEXT="v1.0.0" ;;
@@ -64,7 +64,7 @@ jobs:
               *)     NEXT="v${MAJOR}.${MINOR}.$((PATCH+1))" ;;
             esac
           fi
-          
+
           echo "tag=$NEXT" >> $GITHUB_OUTPUT
           echo "Next version: $NEXT"
 

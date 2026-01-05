@@ -38,9 +38,9 @@
         "name": "@effect/language-service",
         "importAliases": {
           "Array": "Arr",
-          "Function": "Fn",
-        },
-      },
-    ],
-  },
+          "Function": "Fn"
+        }
+      }
+    ]
+  }
 }

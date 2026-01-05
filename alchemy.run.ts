@@ -61,7 +61,7 @@ const devBranch = await Branch("dev-branch", {
   database,
   parentBranch: "main",
   isProduction: false,
-  adopt: true
+  adopt: true,
 });
 
 // Personal dev branch
@@ -71,14 +71,15 @@ const personalBranch = await Branch("personal-branch", {
   database,
   parentBranch: "development",
   isProduction: false,
-  adopt: true
+  adopt: true,
 });
 
 // Branch selection based on stage
 const currentBranch =
   stage === prodStage
     ? database.defaultBranch
-    : stage === devStage || stage.startsWith("pr-")      ? devBranch
+    : stage === devStage || stage.startsWith("pr-")
+      ? devBranch
       : personalBranch;
 
 // Admin role for current branch
@@ -91,7 +92,7 @@ const dbRole = await Role(`db-role-${stage}-v2`, {
 // Hyperdrive connection pooling
 const db = await Hyperdrive("hyperdrive", {
   origin: dbRole.connectionUrl,
-  adopt: true
+  adopt: true,
 });
 
 // Generate Drizzle migrations
@@ -148,8 +149,8 @@ export const storage = await R2Bucket("storage", {});
 // });
 
 export const web = await TanStackStart("web", {
-  cwd: './packages/web',
-  domains: [getDomain('app')],
+  cwd: "./packages/web",
+  domains: [getDomain("app")],
   bindings: {
     DB: db,
     KV: kv,
@@ -159,23 +160,23 @@ export const web = await TanStackStart("web", {
   },
 });
 
- export const marketing = await TanStackStart('marketing', {
-   bindings: {},
-   cwd: './packages/marketing',
-   domains: [domain],
- });
-
-export const docs = await TanStackStart('docs', {
+export const marketing = await TanStackStart("marketing", {
   bindings: {},
-  cwd: './packages/docs',
-  domains: [getDomain('docs')],
+  cwd: "./packages/marketing",
+  domains: [domain],
+});
+
+export const docs = await TanStackStart("docs", {
+  bindings: {},
+  cwd: "./packages/docs",
+  domains: [getDomain("docs")],
 });
 
 console.log({
   domain,
-   // web: web.url,
-   marketing: marketing.url,
-   docs: docs.url,
+  // web: web.url,
+  marketing: marketing.url,
+  docs: docs.url,
   // api: api.url,
   db: database.id,
   kv: kv.namespaceId,

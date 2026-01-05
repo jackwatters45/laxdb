@@ -6,19 +6,21 @@ Effect-TS services, Drizzle ORM schemas, domain logic for lacrosse management.
 
 ```
 src/
-├── {domain}/           # Domain modules (auth, player, team, etc.)
-│   ├── {domain}.schema.ts    # Effect Schema classes (inputs, outputs)
-│   ├── {domain}.sql.ts       # Drizzle table definitions
-│   ├── {domain}.repo.ts      # DB operations (Effect)
-│   ├── {domain}.service.ts   # Business logic (Effect.Service)
-│   ├── {domain}.contract.ts  # RPC contract definitions
-│   └── {domain}.error.ts     # Domain errors (optional)
-├── drizzle/            # Drizzle service + types
-├── schema.ts           # ALL table exports (single source of truth)
+├── auth/               # Auth subsystem (→ src/auth/AGENTS.md)
+├── organization/       # Multi-tenant org management
+├── team/               # Teams within organizations  
+├── player/             # Player profiles + contact-info/
+├── game/               # Game scheduling, stats
+├── season/             # Season management
+├── feedback/           # User feedback system
+├── email/              # AWS SES email service
+├── user/               # User profiles
+├── drizzle/            # Drizzle service + types (→ src/drizzle/AGENTS.md)
+├── schema.ts           # Shared validation schemas (see SHARED SCHEMAS)
+├── error.ts            # Shared error types (see ERROR HANDLING)
 ├── runtime.server.ts   # ManagedRuntime with all services
-├── auth.ts             # better-auth instance export
-├── config.ts           # Config service
-├── error.ts            # Shared error types
+├── auth.ts             # AuthService + exported `auth` instance
+├── config.ts           # AppConfig (Effect Config for env vars)
 ├── util.ts             # decodeArguments, parsePostgresError
 └── kv.ts               # KV service
 ```
@@ -31,11 +33,22 @@ src/
 | Add DB table | `src/schema.ts` (exports) + `src/{domain}/{domain}.sql.ts` |
 | Add service method | `src/{domain}/{domain}.service.ts` |
 | Add RPC endpoint | `src/{domain}/{domain}.contract.ts` |
-| Modify auth | `src/auth/` + `src/auth.ts` |
+| Modify auth/roles | `src/auth/` (→ `src/auth/AGENTS.md`) |
+| DB connection issues | `src/drizzle/` (→ `src/drizzle/AGENTS.md`) |
 
-## CONVENTIONS
+## PER-DOMAIN FILE PATTERN
 
-### Service Pattern (MANDATORY)
+```
+{domain}/
+├── {domain}.schema.ts    # Effect Schema classes (inputs, outputs)
+├── {domain}.sql.ts       # Drizzle table definitions
+├── {domain}.repo.ts      # Database operations (Effect)
+├── {domain}.service.ts   # Business logic (Effect.Service)
+├── {domain}.contract.ts  # RPC contract definitions
+└── {domain}.error.ts     # Domain-specific errors (optional)
+```
+
+## SERVICE PATTERN (MANDATORY)
 
 ```typescript
 export class MyService extends Effect.Service<MyService>()("MyService", {
@@ -57,51 +70,41 @@ export class MyService extends Effect.Service<MyService>()("MyService", {
 }) {}
 ```
 
-### Error Handling
+## SHARED SCHEMAS (schema.ts)
 
-- `Effect.catchTag("SqlError", ...)` - Parse Postgres errors
-- `Effect.catchTag("NoSuchElementException", ...)` - Not found
-- Custom errors extend `Schema.TaggedError`
+Common validation schemas used across domains:
 
-### Repo Pattern
+| Schema | Purpose |
+|--------|---------|
+| `NanoidSchema` | 12-char nanoid validation |
+| `PublicIdSchema` | `{ publicId: NanoidSchema }` |
+| `Base64IdSchema` | 32-char better-auth ID format |
+| `TeamIdSchema` | Team ID validation |
+| `OrganizationIdSchema` | Org ID validation |
+| `TimestampsSchema` | `{ createdAt, updatedAt, deletedAt }` |
 
-```typescript
-export class MyRepo extends Effect.Service<MyRepo>()("MyRepo", {
-  effect: Effect.gen(function* () {
-    const db = yield* DrizzleService;
-    return {
-      list: (input) => db.pipe(Effect.flatMap((d) => ...)),
-    };
-  }),
-  dependencies: [DrizzleService.Default],
-}) {}
-```
+## ERROR HANDLING
 
-## ANTI-PATTERNS
+### Shared Errors (error.ts)
 
-- **Direct Effect.catchAll**: Loses error type info, use catchTag
-- **Skip decodeArguments**: Always validate inputs first
-- **Import from drizzle-kit**: Only import from drizzle-orm
-- **Modify schema.ts structure**: Keep flat exports, add tables via domain files
+| Error | HTTP | Use For |
+|-------|------|---------|
+| `NotFoundError` | 404 | Entity not found |
+| `ValidationError` | 400 | Input validation failure |
+| `DatabaseError` | 500 | DB operation failure |
+| `ConstraintViolationError` | 400 | Unique/FK constraint |
+| `AuthenticationError` | 401 | Not logged in |
+| `AuthorizationError` | 403 | No permission |
 
-## COMMANDS
+### Error Handling Patterns
 
-```bash
-bun run db:generate    # Generate migrations from schema changes
-bun run db:migrate     # Apply migrations (exit 9 = no changes, OK)
-bun run db:studio      # Open Drizzle Studio
-bun run test           # Run vitest
-```
+| Pattern | Use For |
+|---------|---------|
+| `Effect.catchTag("SqlError", ...)` | Parse Postgres errors via `parsePostgresError` |
+| `Effect.catchTag("NoSuchElementException", ...)` | Not found scenarios |
+| `Schema.TaggedError` | Custom domain errors |
 
-## NOTES
-
-- **Effect Schema**: Uses `Schema.Class<T>("Name")({...})` pattern, NOT Zod
-- **schema.ts**: Single export point for all tables - import from here
-- **runtime.server.ts**: Composes all services - add new services here
-- **better-auth**: Uses organization + team plugins, see auth/ directory
-- **PlanetScale**: PostgreSQL mode, not MySQL - use pg syntax
-
-### Effect Schema Pattern
+## SCHEMA PATTERNS
 
 ```typescript
 // Input/output schemas use Schema.Class
@@ -118,3 +121,36 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
   { domain: Schema.String, id: Schema.String },
 ) {}
 ```
+
+## ANTI-PATTERNS
+
+| Pattern | Why Bad | Do Instead |
+|---------|---------|------------|
+| `Effect.catchAll` | Loses error type info | `Effect.catchTag` |
+| Skip `decodeArguments` | Input not validated | Always validate first |
+| Import from `drizzle-kit` | Wrong package | Use `drizzle-orm` |
+| Direct pool access | Bypasses layer | Use DrizzleService |
+| Import from `effect/internal` | Unstable APIs | Use public exports |
+
+## COMMANDS
+
+```bash
+bun run db:generate    # Generate migrations from schema changes
+bun run db:migrate     # Apply migrations (exit 9 = no changes, OK)
+bun run db:studio      # Open Drizzle Studio
+bun run test           # Run vitest
+```
+
+## CRITICAL NOTES
+
+- **Effect Schema**: Uses `Schema.Class<T>("Name")({...})` pattern, NOT Zod
+- **PlanetScale**: PostgreSQL mode, not MySQL - use pg syntax
+- **runtime.server.ts**: Composes all services - add new services here
+- **Config**: Use `AppConfig` for env vars, secrets use `Config.redacted()`
+
+## CHILD INTENT NODES
+
+Only complex subsystems have dedicated Intent Nodes. Other domains (organization, team, player, game, season, feedback, email, user) follow the standard per-domain file pattern above and don't need separate documentation.
+
+- `src/auth/AGENTS.md` - Authentication, roles, permissions (better-auth integration is non-trivial)
+- `src/drizzle/AGENTS.md` - Database connection, Hyperdrive/PlanetScale specifics
