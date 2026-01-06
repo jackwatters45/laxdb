@@ -24,7 +24,6 @@
 
 - how to handle teamId + org in core repo
 - Permissions!!
-- Polar
 
 ## Rando
 
