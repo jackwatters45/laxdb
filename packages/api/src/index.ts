@@ -8,25 +8,20 @@ import {
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
 
-import { AuthHandlersLive } from "./auth/auth.handlers";
 import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
-import { GamesHandlersLive } from "./game/game.handlers";
+import { LaxdbApi } from "./definition";
 import { GameHandlers, GameRpcs } from "./game/game.rpc";
-import { OrganizationsHandlersLive } from "./organization/organization.handlers";
+import { HttpGroupsLive } from "./groups";
 import {
   OrganizationHandlers,
   OrganizationRpcs,
 } from "./organization/organization.rpc";
-import { ContactInfoHandlersLive } from "./player/contact-info/contact-info.handlers";
 import {
   ContactInfoHandlers,
   ContactInfoRpcs,
 } from "./player/contact-info/contact-info.rpc";
-import { PlayersHandlersLive } from "./player/player.handlers";
 import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
-import { SeasonsHandlersLive } from "./season/season.handlers";
 import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
-import { TeamsHandlersLive } from "./team/team.handlers";
 import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
 
 const AllRpcs = Layer.mergeAll(
@@ -39,16 +34,6 @@ const AllRpcs = Layer.mergeAll(
   RpcServer.layer(AuthRpcs).pipe(Layer.provide(AuthHandlers)),
 );
 
-const AllApis = Layer.mergeAll(
-  SeasonsHandlersLive,
-  GamesHandlersLive,
-  PlayersHandlersLive,
-  ContactInfoHandlersLive,
-  AuthHandlersLive,
-  OrganizationsHandlersLive,
-  TeamsHandlersLive,
-);
-
 const RpcProtocol = RpcServer.layerProtocolHttp({
   path: "/rpc",
   routerTag: HttpApiBuilder.Router,
@@ -58,19 +43,22 @@ const HealthCheckRoute = HttpApiBuilder.Router.use((router) =>
   router.get("/health", HttpServerResponse.text("OK")),
 );
 
-const ApiLive = Layer.mergeAll(
-  HttpServer.layerContext,
-  HttpApiScalar.layer({ path: "/docs" }),
-  HttpApiBuilder.middlewareCors({ allowedOrigins: ["*"] }),
-  HttpApiBuilder.middlewareOpenApi(),
-  AllApis,
-  AllRpcs,
-  RpcProtocol,
-  HealthCheckRoute,
-  DateTime.layerCurrentZoneLocal,
+const ApiLive = HttpApiBuilder.api(LaxdbApi).pipe(
+  Layer.provide(HttpGroupsLive),
+  Layer.provideMerge(
+    Layer.mergeAll(
+      HttpServer.layerContext,
+      HttpApiScalar.layer({ path: "/docs" }),
+      HttpApiBuilder.middlewareCors({ allowedOrigins: ["*"] }),
+      HttpApiBuilder.middlewareOpenApi(),
+      AllRpcs,
+      RpcProtocol,
+      HealthCheckRoute,
+      DateTime.layerCurrentZoneLocal,
+    ),
+  ),
 );
 
-// @ts-expect-error - we will fix this later
 const { handler } = HttpApiBuilder.toWebHandler(ApiLive, {
   middleware: HttpMiddleware.logger,
 });
