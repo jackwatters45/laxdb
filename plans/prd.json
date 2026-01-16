@@ -37,7 +37,7 @@
     "id": "api-004",
     "category": "infrastructure",
     "description": "Extract PlayersGroup from player.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor player.api.ts to export HttpApiGroup only (PlayersGroup)",
       "Create PlayersGroupLive using HttpApiBuilder.group(LaxdbApi, 'Players', ...)",

@@ -22,7 +22,7 @@ import {
   ContactInfoHandlers,
   ContactInfoRpcs,
 } from "./player/contact-info/contact-info.rpc";
-import { PlayersApiLive } from "./player/player.api";
+import { PlayersApiLive } from "./player/player.handlers";
 import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
 import { SeasonsApiLive } from "./season/season.handlers";
 import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
