@@ -12,7 +12,7 @@ import { AuthApiLive } from "./auth/auth.api";
 import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
 import { GamesApiLive } from "./game/game.handlers";
 import { GameHandlers, GameRpcs } from "./game/game.rpc";
-import { OrganizationsApiLive } from "./organization/organization.api";
+import { OrganizationsApiLive } from "./organization/organization.handlers";
 import {
   OrganizationHandlers,
   OrganizationRpcs,

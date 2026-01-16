@@ -70,7 +70,7 @@
     "id": "api-007",
     "category": "infrastructure",
     "description": "Extract OrganizationsGroup from organization.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor organization.api.ts to export HttpApiGroup only (OrganizationsGroup)",
       "Create OrganizationsGroupLive using HttpApiBuilder.group(LaxdbApi, 'Organizations', ...)",
