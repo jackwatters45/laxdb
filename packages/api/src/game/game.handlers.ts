@@ -4,7 +4,7 @@ import { Effect, Layer } from "effect";
 import { LaxdbApi } from "../definition";
 
 // Handler implementation using LaxdbApi
-export const GamesGroupLive = HttpApiBuilder.group(
+export const GamesHandlersLive = HttpApiBuilder.group(
   LaxdbApi,
   "Games",
   (handlers) =>
@@ -21,4 +21,4 @@ export const GamesGroupLive = HttpApiBuilder.group(
 ).pipe(Layer.provide(GameService.Default));
 
 // Legacy alias
-export const GamesApiLive = GamesGroupLive;
+export const GamesApiLive = GamesHandlersLive;

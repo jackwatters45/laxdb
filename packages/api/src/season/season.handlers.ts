@@ -4,7 +4,7 @@ import { Effect, Layer } from "effect";
 import { LaxdbApi } from "../definition";
 
 // Handler implementation using LaxdbApi
-export const SeasonsGroupLive = HttpApiBuilder.group(
+export const SeasonsHandlersLive = HttpApiBuilder.group(
   LaxdbApi,
   "Seasons",
   (handlers) =>
@@ -21,4 +21,4 @@ export const SeasonsGroupLive = HttpApiBuilder.group(
 ).pipe(Layer.provide(SeasonService.Default));
 
 // Legacy alias for backward compatibility
-export const SeasonsApiLive = SeasonsGroupLive;
+export const SeasonsApiLive = SeasonsHandlersLive;
