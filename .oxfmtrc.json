@@ -7,8 +7,24 @@
   "printWidth": 80,
   "endOfLine": "lf",
   "ternaries": true,
-  "experimental_sort_imports": {
-    "order": "asc"
+  "experimentalSortImports": {
+      "groups": [
+        ["side-effect"],
+        ["builtin"],
+        ["external", "external-type"],
+        ["internal", "internal-type"],
+        ["parent", "parent-type"],
+        ["sibling", "sibling-type"],
+        ["index", "index-type"]
+      ]
+  },
+  "experimentalTailwindcss": {
+    "config": "./tailwind.config.js",
+    "stylesheet": "./path/to/stylesheet.css",
+    "attributes": ["class", "className"],
+    "functions": ["clsx", "cn"],
+    "preserveDuplicates": false,
+    "preserveWhitespace": false
   },
   "ignorePatterns": [
     "**/*.md",
