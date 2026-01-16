@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -103,5 +103,3 @@ export const PlayersGroup = HttpApiGroup.make("Players")
       .setPayload(PlayerContract.bulkRemovePlayersFromTeam.payload),
   );
 
-// Legacy: Standalone API for client type inference
-export const PlayersApi = HttpApi.make("PlayersApi").add(PlayersGroup);

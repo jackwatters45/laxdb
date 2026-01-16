@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -55,5 +55,3 @@ export const GamesGroup = HttpApiGroup.make("Games")
       .setPayload(GameContract.delete.payload),
   );
 
-// Legacy: Standalone API for client type inference
-export const GamesApi = HttpApi.make("GamesApi").add(GamesGroup);

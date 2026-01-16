@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -55,5 +55,3 @@ export const SeasonsGroup = HttpApiGroup.make("Seasons")
       .setPayload(SeasonContract.delete.payload),
   );
 
-// Legacy: Standalone API for client type inference (deprecated, use LaxdbApi)
-export const SeasonsApi = HttpApi.make("SeasonsApi").add(SeasonsGroup);

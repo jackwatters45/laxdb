@@ -1,12 +1,9 @@
-import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
-import { FetchHttpClient } from "@effect/platform";
+import { AtomRpc } from "@effect-atom/atom-react";
 import { RpcClient } from "@effect/rpc";
-import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
 
 import { RpcProtocolLive } from "../protocol";
 
-import { TeamsApi } from "./team.api";
 import { TeamRpcs } from "./team.rpc";
 
 export class RpcTeamClient extends Effect.Service<RpcTeamClient>()(
@@ -22,14 +19,5 @@ export class RpcTeamClientAtom extends AtomRpc.Tag<RpcTeamClientAtom>()(
   {
     group: TeamRpcs,
     protocol: RpcProtocolLive,
-  },
-) {}
-
-export class HttpTeamClientAtom extends AtomHttpApi.Tag<HttpTeamClientAtom>()(
-  "HttpTeamClientAtom",
-  {
-    api: TeamsApi,
-    httpClient: FetchHttpClient.layer,
-    baseUrl: Env.API_URL(),
   },
 ) {}

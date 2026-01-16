@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { OrganizationContract } from "@laxdb/core/organization/organization.contract";
 
 // Group definition - no LaxdbApi import
@@ -25,7 +25,3 @@ export const OrganizationsGroup = HttpApiGroup.make("Organizations")
       .setPayload(OrganizationContract.getUserOrganizationContext.payload),
   );
 
-// Legacy: Standalone API for client type inference
-export const OrganizationsApi = HttpApi.make("OrganizationsApi").add(
-  OrganizationsGroup,
-);

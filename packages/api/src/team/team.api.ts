@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { TeamContract } from "@laxdb/core/team/team.contract";
 
 // Group definition - no LaxdbApi import
@@ -40,5 +40,3 @@ export const TeamsGroup = HttpApiGroup.make("Teams")
       .setPayload(TeamContract.removeMember.payload),
   );
 
-// Legacy: Standalone API for client type inference
-export const TeamsApi = HttpApi.make("TeamsApi").add(TeamsGroup);

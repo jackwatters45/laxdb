@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -18,5 +18,3 @@ export const ContactInfoGroup = HttpApiGroup.make("ContactInfo").add(
     .setPayload(ContactInfoContract.getPlayerWithContactInfo.payload),
 );
 
-// Legacy: Standalone API for client type inference
-export const ContactInfoApi = HttpApi.make("ContactInfoApi").add(ContactInfoGroup);
