@@ -1,7 +1,10 @@
 import type { Member } from "better-auth/plugins/organization";
 import { Array as Arr, Effect, Option, Schema } from "effect";
+
 import { AuthService } from "../auth";
 import { NotFoundError } from "../error";
+import type { Headers } from "../type";
+
 import { OrganizationNotFoundError } from "./organization.error";
 import { OrganizationRepo } from "./organization.repo";
 import {
@@ -9,7 +12,6 @@ import {
   CreateOrganizationInput,
   type DashboardData,
 } from "./organization.schema";
-import type { Headers } from "../type";
 
 export class OrganizationService extends Effect.Service<OrganizationService>()(
   "OrganizationService",

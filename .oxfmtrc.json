@@ -19,8 +19,7 @@
       ]
   },
   "experimentalTailwindcss": {
-    "config": "./tailwind.config.js",
-    "stylesheet": "./path/to/stylesheet.css",
+    "stylesheet": "./src/globals.css",
     "attributes": ["class", "className"],
     "functions": ["clsx", "cn"],
     "preserveDuplicates": false,

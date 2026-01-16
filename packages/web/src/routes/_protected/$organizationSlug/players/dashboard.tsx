@@ -1,3 +1,15 @@
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@laxdb/ui/components/ui/breadcrumb";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
@@ -12,19 +24,9 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+
 import { PageBody, PageContainer } from "@/components/layout/page-content";
-import { Badge } from "@laxdb/ui/components/ui/badge";
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
-import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+
 import { PlayersHeader } from "./-components/players-header";
 
 // Mock data for players
@@ -254,7 +256,7 @@ function PlayersPage() {
         <PageContainer>
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="font-bold text-3xl">Player Development</h1>
+              <h1 className="text-3xl font-bold">Player Development</h1>
               <p className="text-muted-foreground">
                 Track individual player progress and development
               </p>
@@ -295,16 +297,16 @@ function PlayersPage() {
           <div className="mb-8 grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   Total Players
                 </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {teamStats.totalPlayers}
                 </div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Active roster members
                 </p>
               </CardContent>
@@ -312,14 +314,14 @@ function PlayersPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="font-medium text-sm">Team GPA</CardTitle>
+                <CardTitle className="text-sm font-medium">Team GPA</CardTitle>
                 <GraduationCap className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {teamStats.averageGPA.toFixed(2)}
                 </div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Average academic performance
                 </p>
               </CardContent>
@@ -327,16 +329,16 @@ function PlayersPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   Need Attention
                 </CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {teamStats.needingAttention}
                 </div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Players requiring focus
                 </p>
               </CardContent>
@@ -344,16 +346,16 @@ function PlayersPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   High Potential
                 </CardTitle>
                 <Star className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {teamStats.highPotential}
                 </div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Players with 8+ potential
                 </p>
               </CardContent>
@@ -365,9 +367,9 @@ function PlayersPage() {
             <CardContent className="pt-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
-                  <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
-                    className="w-full rounded-md border border-input py-2 pr-3 pl-10 focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-md border border-input py-2 pr-3 pl-10 focus:ring-2 focus:ring-ring focus:outline-none"
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
                     }}
@@ -379,7 +381,7 @@ function PlayersPage() {
 
                 <div className="flex gap-2">
                   <select
-                    className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="rounded-md border border-input px-3 py-2 focus:ring-2 focus:ring-ring focus:outline-none"
                     onChange={(e) => {
                       setSelectedPosition(e.target.value);
                     }}
@@ -394,7 +396,7 @@ function PlayersPage() {
                   </select>
 
                   <select
-                    className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="rounded-md border border-input px-3 py-2 focus:ring-2 focus:ring-ring focus:outline-none"
                     onChange={(e) => {
                       setSelectedGrade(e.target.value);
                     }}
@@ -409,7 +411,7 @@ function PlayersPage() {
                   </select>
 
                   <select
-                    className="rounded-md border border-input px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="rounded-md border border-input px-3 py-2 focus:ring-2 focus:ring-ring focus:outline-none"
                     onChange={(e) => {
                       setSelectedTrend(e.target.value);
                     }}
@@ -439,7 +441,7 @@ function PlayersPage() {
           ) : (
             <div className="py-12 text-center">
               <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-              <h2 className="mb-2 font-semibold text-xl">No players found</h2>
+              <h2 className="mb-2 text-xl font-semibold">No players found</h2>
               <p className="mb-6 text-muted-foreground">
                 {searchTerm ||
                 selectedPosition !== "all" ||
@@ -533,7 +535,7 @@ function PlayerCard({
             </div>
             <div>
               <CardTitle className="text-lg">{player.name}</CardTitle>
-              <div className="flex items-center gap-1 text-muted-foreground text-sm">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 {getPositionIcon(player.primaryPosition)}
                 <span>
                   {player.primaryPosition.charAt(0).toUpperCase() +
@@ -562,18 +564,18 @@ function PlayerCard({
         {/* Player Stats Summary */}
         <div className="grid grid-cols-3 gap-3 rounded bg-muted p-3 text-center">
           <div>
-            <div className="font-bold text-lg">{player.overallRating}/10</div>
-            <div className="text-muted-foreground text-xs">Current</div>
+            <div className="text-lg font-bold">{player.overallRating}/10</div>
+            <div className="text-xs text-muted-foreground">Current</div>
           </div>
           <div>
-            <div className="font-bold text-lg">{player.potentialRating}/10</div>
-            <div className="text-muted-foreground text-xs">Potential</div>
+            <div className="text-lg font-bold">{player.potentialRating}/10</div>
+            <div className="text-xs text-muted-foreground">Potential</div>
           </div>
           <div>
-            <div className="font-bold text-lg">
+            <div className="text-lg font-bold">
               {player.gpa?.toFixed(1) || "N/A"}
             </div>
-            <div className="text-muted-foreground text-xs">GPA</div>
+            <div className="text-xs text-muted-foreground">GPA</div>
           </div>
         </div>
 
@@ -596,7 +598,7 @@ function PlayerCard({
         {/* Key Areas */}
         <div className="space-y-2">
           <div>
-            <div className="mb-1 font-medium text-green-700 text-sm">
+            <div className="mb-1 text-sm font-medium text-green-700">
               Strengths
             </div>
             <div className="text-xs">
@@ -604,7 +606,7 @@ function PlayerCard({
             </div>
           </div>
           <div>
-            <div className="mb-1 font-medium text-red-700 text-sm">
+            <div className="mb-1 text-sm font-medium text-red-700">
               Focus Areas
             </div>
             <div className="text-xs">

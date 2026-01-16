@@ -1,13 +1,6 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
-import { Effect, Schema } from "effect";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -23,6 +16,14 @@ import {
   FieldLabel,
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
+import { Effect, Schema } from "effect";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { PageContainer } from "../layout/page-content";
 
 const AcceptInvitationSchema = Schema.Struct({
@@ -91,7 +92,7 @@ export function JoinOrganizationForm({
   return (
     <PageContainer className="space-y-4">
       <div>
-        <h1 className="font-bold text-xl">Join Athletic Club</h1>
+        <h1 className="text-xl font-bold">Join Athletic Club</h1>
         <p className="text-muted-foreground">
           Enter the invitation code you received to join an existing club
         </p>
@@ -100,7 +101,7 @@ export function JoinOrganizationForm({
       <Card>
         <CardHeader>
           <CardTitle>Join Organization</CardTitle>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             You should have received an invitation code via email from your club
             administrator
           </p>

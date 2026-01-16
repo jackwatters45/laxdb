@@ -1,6 +1,9 @@
 import { Effect, Schema } from "effect";
+
 import { AuthService } from "../auth";
 import { OrganizationRepo } from "../organization/organization.repo";
+import type { Headers } from "../type";
+
 import { TeamRepo } from "./team.repo";
 import {
   CreateTeamInput,
@@ -10,7 +13,6 @@ import {
   RemoveTeamMemberInput,
   UpdateTeamInput,
 } from "./team.schema";
-import type { Headers } from "../type";
 
 // Teams Service
 export class TeamService extends Effect.Service<TeamService>()("TeamService", {

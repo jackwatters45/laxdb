@@ -2,6 +2,7 @@ import { AuthService } from "@laxdb/core/auth";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
+
 import { authMiddleware } from "@/lib/middleware";
 
 export const getSession = createServerFn({ method: "GET" })

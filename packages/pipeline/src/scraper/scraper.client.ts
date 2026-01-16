@@ -1,5 +1,7 @@
 import { Effect, Schedule } from "effect";
+
 import { PipelineConfig } from "../config";
+
 import {
   ScraperHttpError,
   ScraperNetworkError,

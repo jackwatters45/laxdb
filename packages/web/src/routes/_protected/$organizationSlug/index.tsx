@@ -2,18 +2,6 @@ import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { TeamIdSchema } from "@laxdb/core/schema";
 import { TeamService } from "@laxdb/core/team/team.service";
 import {
-  createFileRoute,
-  Link,
-  useRouteContext,
-  useRouter,
-} from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import type { Team, TeamMember } from "better-auth/plugins";
-import { Effect, Schema } from "effect";
-import { ArrowRight, Plus, Trash2, Users } from "lucide-react";
-import { toast } from "sonner";
-import { DashboardHeader } from "@/components/sidebar/dashboard-header";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -36,6 +24,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import {
+  createFileRoute,
+  Link,
+  useRouteContext,
+  useRouter,
+} from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import type { Team, TeamMember } from "better-auth/plugins";
+import { Effect, Schema } from "effect";
+import { ArrowRight, Plus, Trash2, Users } from "lucide-react";
+import { toast } from "sonner";
+
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import { authMiddleware } from "@/lib/middleware";
 import { getUserOrganizationContext } from "@/query/organizations";
 
@@ -86,7 +87,7 @@ function TeamsOverviewPage() {
       <div className="container mx-auto py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl">Teams</h1>
+            <h1 className="text-3xl font-bold">Teams</h1>
             <p className="text-muted-foreground">
               Manage teams for {activeOrganization.name}
             </p>
@@ -120,7 +121,7 @@ function TeamsOverviewPage() {
         ) : (
           <div className="py-12 text-center">
             <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-            <h2 className="mb-2 font-semibold text-xl">No teams yet</h2>
+            <h2 className="mb-2 text-xl font-semibold">No teams yet</h2>
             <p className="mb-6 text-muted-foreground">
               Get started by creating your first team
             </p>
@@ -211,7 +212,7 @@ function TeamOverviewCard({
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground text-sm">
+            <span className="text-sm text-muted-foreground">
               {memberCount} members
             </span>
           </div>

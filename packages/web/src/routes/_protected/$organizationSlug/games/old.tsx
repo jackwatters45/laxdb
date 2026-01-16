@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Calendar, MapPin, Plus, Trophy, Users } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import {
   BreadcrumbItem,
@@ -13,6 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Calendar, MapPin, Plus, Trophy, Users } from "lucide-react";
+
 import { GamesHeader } from "./-components/games-header";
 
 // Mock data for now - will replace with actual API calls
@@ -118,7 +119,7 @@ function GamesPage() {
       <div className="container mx-auto py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl">Games</h1>
+            <h1 className="text-3xl font-bold">Games</h1>
             <p className="text-muted-foreground">
               Manage your team&apos;s games and track performance
             </p>
@@ -161,7 +162,7 @@ function GamesPage() {
         {/* Upcoming Games */}
         {upcomingGames.length > 0 && (
           <div className="mb-8">
-            <h2 className="mb-4 font-semibold text-xl">Upcoming Games</h2>
+            <h2 className="mb-4 text-xl font-semibold">Upcoming Games</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {upcomingGames.map((game) => (
                 <GameCard game={game} key={game.id} permissions={permissions} />
@@ -173,7 +174,7 @@ function GamesPage() {
         {/* Recent Games */}
         {completedGames.length > 0 && (
           <div>
-            <h2 className="mb-4 font-semibold text-xl">Recent Games</h2>
+            <h2 className="mb-4 text-xl font-semibold">Recent Games</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {completedGames
                 .toSorted(
@@ -196,7 +197,7 @@ function GamesPage() {
         {games.length === 0 && (
           <div className="py-12 text-center">
             <Trophy className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-            <h2 className="mb-2 font-semibold text-xl">No games scheduled</h2>
+            <h2 className="mb-2 text-xl font-semibold">No games scheduled</h2>
             <p className="mb-6 text-muted-foreground">
               Get started by scheduling your first game
             </p>

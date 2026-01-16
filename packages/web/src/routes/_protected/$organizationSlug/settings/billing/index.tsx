@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import React from "react";
-import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -14,8 +11,13 @@ import { Progress } from "@laxdb/ui/components/ui/progress";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Switch } from "@laxdb/ui/components/ui/switch";
 import { cn } from "@laxdb/ui/lib/utils";
-import { SettingsHeader } from "../-components/settings-header";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { LinkIcon } from "lucide-react";
+import React from "react";
+
+import { PageBody } from "@/components/layout/page-content";
+
+import { SettingsHeader } from "../-components/settings-header";
 
 const data: {
   name: string;
@@ -71,10 +73,10 @@ function Billing() {
       <PageBody>
         <div className="container space-y-10 py-8">
           <div className="rounded-lg bg-muted p-6 ring-1 ring-border ring-inset dark:bg-muted/50 dark:ring-border">
-            <h4 className="font-semibold text-foreground text-sm">
+            <h4 className="text-sm font-semibold text-foreground">
               This workspace is currently on free plan
             </h4>
-            <p className="mt-1 max-w-2xl text-muted-foreground text-sm leading-6">
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
               Boost your analytics and unlock advanced features with our premium
               plans.{" "}
               <a
@@ -96,13 +98,13 @@ function Billing() {
                   >
                     Billing
                   </h2>
-                  <p className="mt-1 text-muted-foreground text-sm leading-6">
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Overview of current billing cycle based on fixed and
                     on-demand charges.
                   </p>
                 </div>
                 <div className="md:col-span-2">
-                  <ul className="w-full divide-y divide-border border-border border-b">
+                  <ul className="w-full divide-y divide-border border-b border-border">
                     {data.map((item) => (
                       <li className="px-2 py-4 text-sm md:p-4" key={item.name}>
                         <div className="w-full">
@@ -121,7 +123,7 @@ function Billing() {
                                 value={item.percentageValue}
                               />
                             )}
-                            <p className="mt-1 flex items-center justify-between text-muted-foreground text-xs">
+                            <p className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                               <span>{item.description}</span>
                               <span>{item.capacity}</span>
                             </p>
@@ -131,7 +133,7 @@ function Billing() {
                     ))}
                   </ul>
                   <div className="px-2 py-4 md:p-4">
-                    <p className="flex items-center justify-between font-medium text-foreground text-sm">
+                    <p className="flex items-center justify-between text-sm font-medium text-foreground">
                       <span>Total for May 24</span>
                       <span className="font-semibold">$280</span>
                     </p>
@@ -150,7 +152,7 @@ function Billing() {
                     >
                       Cost spend control
                     </h2>
-                    <p className="mt-1 text-muted-foreground text-sm leading-6">
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       Set hard caps for on-demand charges.
                     </p>
                   </div>
@@ -166,7 +168,7 @@ function Billing() {
                         <div>
                           {isSpendMgmtEnabled ? (
                             <>
-                              <p className="font-medium text-foreground text-sm">
+                              <p className="text-sm font-medium text-foreground">
                                 &#36;280 / 350 (62.2&#37;)
                               </p>
                               <Label
@@ -178,7 +180,7 @@ function Billing() {
                             </>
                           ) : (
                             <>
-                              <p className="font-medium text-foreground text-sm">
+                              <p className="text-sm font-medium text-foreground">
                                 &#36;0 / 0 (0&#37;)
                               </p>
                               <Label
@@ -268,33 +270,33 @@ function Billing() {
                     >
                       Add-Ons
                     </h2>
-                    <p className="mt-1 text-muted-foreground text-sm leading-6">
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       Additional services to boost your services.
                     </p>
                   </div>
                   <div className="space-y-6 md:col-span-2">
                     <Card className="overflow-hidden p-0">
                       <div className="px-4 pt-4 pb-6">
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-sm text-muted-foreground">
                           $25/month
                         </span>
-                        <h4 className="mt-4 font-semibold text-foreground text-sm">
+                        <h4 className="mt-4 text-sm font-semibold text-foreground">
                           Advanced bot protection
                         </h4>
-                        <p className="mt-2 max-w-xl text-muted-foreground text-sm leading-6">
+                        <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                           Safeguard your assets with our cutting-edge bot
                           protection. Our AI solution identifies and mitigates
                           automated traffic to protect your workspace from bad
                           bots.
                         </p>
                       </div>
-                      <div className="flex items-center justify-between border-border border-t bg-muted p-4">
+                      <div className="flex items-center justify-between border-t border-border bg-muted p-4">
                         <div className="flex items-center gap-3">
                           <Switch id="bot-protection" name="bot-protection" />
                           <Label htmlFor="bot-protection">Activate</Label>
                         </div>
                         <a
-                          className="inline-flex items-center gap-1 text-indigo-600 text-sm dark:text-indigo-500"
+                          className="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-500"
                           href="#"
                         >
                           Learn more
@@ -307,25 +309,25 @@ function Billing() {
                     </Card>
                     <Card className="overflow-hidden p-0">
                       <div className="px-4 pt-4 pb-6">
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-sm text-muted-foreground">
                           $50/month
                         </span>
-                        <h4 className="mt-4 font-semibold text-foreground text-sm">
+                        <h4 className="mt-4 text-sm font-semibold text-foreground">
                           Workspace insights
                         </h4>
-                        <p className="mt-2 max-w-xl text-muted-foreground text-sm leading-6">
+                        <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                           Real-time analysis of your workspace&#39;s usage,
                           enabling you to make well-informed decisions for
                           optimization.
                         </p>
                       </div>
-                      <div className="flex items-center justify-between border-border border-t bg-muted p-4">
+                      <div className="flex items-center justify-between border-t border-border bg-muted p-4">
                         <div className="flex items-center gap-3">
                           <Switch id="insights" name="insights" />
                           <Label htmlFor="insights">Activate</Label>
                         </div>
                         <a
-                          className="inline-flex items-center gap-1 text-indigo-600 text-sm dark:text-indigo-500"
+                          className="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-500"
                           href="#"
                         >
                           Learn more

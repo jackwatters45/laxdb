@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-import { FileText, Plus } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -8,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Link } from "@tanstack/react-router";
+import { FileText, Plus } from "lucide-react";
+
 import type { PlayerDetails } from "../-utils";
 import { formatDate, getPriorityColor } from "../-utils";
 
@@ -54,8 +55,8 @@ export function RecentNotes({
                 key={note.id}
               >
                 <div className="flex-1">
-                  <div className="font-medium text-sm">{note.title}</div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-sm font-medium">{note.title}</div>
+                  <div className="text-xs text-muted-foreground">
                     by {note.coach} • {formatDate(note.date)}
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { OrganizationService } from "@laxdb/core/organization/organization.servi
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
+
 import { authMiddleware } from "@/lib/middleware";
 
 export const getUserOrganizationContext = createServerFn()

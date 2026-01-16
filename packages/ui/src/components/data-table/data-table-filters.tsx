@@ -1,8 +1,5 @@
 "use client";
 
-import type { Column } from "@tanstack/react-table";
-import { ChevronDown, CornerDownRight, Plus } from "lucide-react";
-import React from "react";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -21,6 +18,10 @@ import {
 } from "@laxdb/ui/components/ui/select";
 import { focusRing } from "@laxdb/ui/lib/tw";
 import { cn } from "@laxdb/ui/lib/utils";
+import type { Column } from "@tanstack/react-table";
+import { ChevronDown, CornerDownRight, Plus } from "lucide-react";
+import React from "react";
+
 import { useFilterBar } from "./use-filterbar";
 
 export type ConditionFilter = {
@@ -169,7 +170,7 @@ function FilterSelect<TData, TValue>({
         render={
           <button
             className={cn(
-              "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
+              "flex w-full items-center gap-x-1.5 rounded-md border border-border px-2 py-1.5 font-medium whitespace-nowrap hover:bg-muted sm:w-fit sm:text-xs",
               selectedValues
                 ? "text-foreground"
                 : "border-dashed text-muted-foreground",
@@ -216,7 +217,7 @@ function FilterSelect<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
+        className="max-w-[calc(var(--radix-popover-trigger-width))] min-w-[calc(var(--radix-popover-trigger-width))] sm:max-w-56 sm:min-w-56"
         sideOffset={7}
       >
         <form
@@ -228,7 +229,7 @@ function FilterSelect<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="font-medium text-base sm:text-sm">
+              <Label className="text-base font-medium sm:text-sm">
                 Filter by {title}
               </Label>
               <Select
@@ -308,7 +309,7 @@ function FilterCheckbox<TData, TValue>({
         render={
           <button
             className={cn(
-              "flex h-7 w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium text-sm hover:bg-muted sm:w-fit",
+              "flex h-7 w-full items-center gap-x-1.5 rounded-md border border-border px-2 py-1.5 text-sm font-medium whitespace-nowrap hover:bg-muted sm:w-fit",
               selectedValues && selectedValues.length > 0
                 ? "text-foreground"
                 : "border-dashed text-muted-foreground",
@@ -357,7 +358,7 @@ function FilterCheckbox<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
+        className="max-w-[calc(var(--radix-popover-trigger-width))] min-w-[calc(var(--radix-popover-trigger-width))] sm:max-w-56 sm:min-w-56"
         sideOffset={7}
       >
         <form
@@ -369,7 +370,7 @@ function FilterCheckbox<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="font-semibold text-base sm:text-sm">
+              <Label className="text-base font-semibold sm:text-sm">
                 Filter by {title}
               </Label>
               <div className="mt-2 space-y-2 overflow-y-auto sm:max-h-40">
@@ -480,7 +481,7 @@ function FilterNumber<TData, TValue>({
         render={
           <button
             className={cn(
-              "flex w-full items-center gap-x-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1.5 font-medium hover:bg-muted sm:w-fit sm:text-xs",
+              "flex w-full items-center gap-x-1.5 rounded-md border border-border px-2 py-1.5 font-medium whitespace-nowrap hover:bg-muted sm:w-fit sm:text-xs",
               selectedValues && selectedValues.condition !== ""
                 ? "text-foreground"
                 : "border-dashed text-muted-foreground",
@@ -529,7 +530,7 @@ function FilterNumber<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="min-w-[calc(var(--radix-popover-trigger-width))] max-w-[calc(var(--radix-popover-trigger-width))] sm:min-w-56 sm:max-w-56"
+        className="max-w-[calc(var(--radix-popover-trigger-width))] min-w-[calc(var(--radix-popover-trigger-width))] sm:max-w-56 sm:min-w-56"
         sideOffset={7}
       >
         <form
@@ -541,7 +542,7 @@ function FilterNumber<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="font-medium text-base sm:text-sm">
+              <Label className="text-base font-medium sm:text-sm">
                 Filter by {title}
               </Label>
               <div className="space-y-2">
@@ -592,7 +593,7 @@ function FilterNumber<TData, TValue>({
                   />
                   {selectedValues?.condition === "is-between" && (
                     <>
-                      <span className="font-medium text-muted-foreground text-xs">
+                      <span className="text-xs font-medium text-muted-foreground">
                         and
                       </span>
                       <Input

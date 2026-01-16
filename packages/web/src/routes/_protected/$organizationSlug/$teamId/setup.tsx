@@ -1,14 +1,6 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { TeamService } from "@laxdb/core/team/team.service";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import type { Team } from "better-auth/plugins";
-import { Effect, Schema } from "effect";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -24,6 +16,15 @@ import {
 import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import type { Team } from "better-auth/plugins";
+import { Effect, Schema } from "effect";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import { authMiddleware } from "@/lib/middleware";
 import { getUserOrganizationContext } from "@/query/organizations";
 
@@ -167,7 +168,7 @@ function SetupTeamPage() {
       </DashboardHeader>
       <div className="container mx-auto max-w-2xl py-8">
         <div className="mb-8">
-          <h1 className="font-bold text-3xl">Create Your First Team</h1>
+          <h1 className="text-3xl font-bold">Create Your First Team</h1>
           <p className="text-muted-foreground">
             Give your team a unique name that reflects its identity
           </p>

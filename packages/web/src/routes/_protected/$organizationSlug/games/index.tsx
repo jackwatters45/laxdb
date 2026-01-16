@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@laxdb/ui/components/ui/breadcrumb";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+
+import { PageBody } from "@/components/layout/page-content";
+
 import { GamesHeader } from "./-components/games-header";
 
 // Mock data for now - will replace with actual API calls

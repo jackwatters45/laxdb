@@ -1,7 +1,8 @@
 import * as Effect from "effect/Effect";
-import * as Option from "effect/Option";
-import * as Worker from "./internal/worker";
 import * as Layer from "effect/Layer";
+import * as Option from "effect/Option";
+
+import * as Worker from "./internal/worker";
 
 export default Worker.makeFetchEntryPoint(
   Effect.fn(function* (_req, env, ctx) {

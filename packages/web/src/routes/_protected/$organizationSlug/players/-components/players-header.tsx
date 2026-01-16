@@ -1,5 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import { Navbar, NavbarItem } from "@laxdb/ui/components/sub-nav";
+import { Link } from "@tanstack/react-router";
+
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 
 type PlayersHeaderProps = {

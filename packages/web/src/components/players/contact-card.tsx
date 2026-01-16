@@ -1,13 +1,9 @@
-import { Copy, ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
-import { createContext, useContext } from "react";
-import { toast } from "sonner";
-import { Button } from "@laxdb/ui/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@laxdb/ui/components/ui/tooltip";
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+} from "@laxdb/ui/components/social-icons";
+import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Item,
   ItemActions,
@@ -17,10 +13,14 @@ import {
   ItemTitle,
 } from "@laxdb/ui/components/ui/item";
 import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkedInIcon,
-} from "@laxdb/ui/components/social-icons";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@laxdb/ui/components/ui/tooltip";
+import { Copy, ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
+import { createContext, useContext } from "react";
+import { toast } from "sonner";
 
 type ContactCardContextType = {
   label: string;
@@ -97,20 +97,20 @@ function ContactCardData() {
 function ContactCardLabel() {
   const { label } = useContactCard();
   return (
-    <ItemTitle className="text-muted-foreground text-xs">{label}</ItemTitle>
+    <ItemTitle className="text-xs text-muted-foreground">{label}</ItemTitle>
   );
 }
 
 function ContactCardValue() {
   const { href, value } = useContactCard();
   if (!href) {
-    return <span className="break-all font-medium text-sm">{value}</span>;
+    return <span className="text-sm font-medium break-all">{value}</span>;
   }
 
   const isExternal = href.startsWith("http");
   return (
     <a
-      className="break-all font-medium text-blue-600 text-sm hover:underline"
+      className="text-sm font-medium break-all text-blue-600 hover:underline"
       href={href}
       {...(isExternal && { rel: "noreferrer", target: "_blank" })}
     >

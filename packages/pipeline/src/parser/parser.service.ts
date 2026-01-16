@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { Effect, Schema } from "effect";
+
 import { ParserError, SelectorError } from "./parser.error";
 import {
   type ExtractedImage,

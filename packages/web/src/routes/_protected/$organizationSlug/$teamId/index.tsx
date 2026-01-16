@@ -1,21 +1,9 @@
 import { AuthService } from "@laxdb/core/auth";
+import type { Player } from "@laxdb/core/player/player.schema";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { TeamIdSchema } from "@laxdb/core/schema";
 import { TeamOperationError } from "@laxdb/core/team/team.error";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Effect, Schema } from "effect";
-import { Mail, Plus, Settings, UserMinus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { PageBody } from "@/components/layout/page-content";
 import { Badge } from "@laxdb/ui/components/ui/badge";
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "@laxdb/ui/components/ui/field";
-import { Input } from "@laxdb/ui/components/ui/input";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -34,11 +22,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import type { User } from "better-auth";
+import { Effect, Schema } from "effect";
+import { Mail, Plus, Settings, UserMinus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+import { PageBody } from "@/components/layout/page-content";
 import { authClient } from "@/lib/auth-client";
 import { authMiddleware } from "@/lib/middleware";
+
 import { TeamHeader } from "./-components/team-header";
-import type { Player } from "@laxdb/core/player/player.schema";
-import type { User } from "better-auth";
 
 type PopulatedMember = Player & { user?: User };
 
@@ -159,7 +161,7 @@ function TeamManagementPage() {
           {/* Header */}
           <div className="mb-8 flex items-center gap-4">
             <div className="flex-1">
-              <h1 className="font-bold text-3xl">{teamName}</h1>
+              <h1 className="text-3xl font-bold">{teamName}</h1>
               <p className="text-muted-foreground">
                 Manage players and team settings
               </p>
@@ -187,24 +189,24 @@ function TeamManagementPage() {
           <div className="mb-8 grid gap-6 md:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   Total Players
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">{members.length}</div>
+                <div className="text-2xl font-bold">{members.length}</div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   Active Players
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">{members.length}</div>
-                <p className="text-muted-foreground text-xs">
+                <div className="text-2xl font-bold">{members.length}</div>
+                <p className="text-xs text-muted-foreground">
                   All players active
                 </p>
               </CardContent>
@@ -212,7 +214,7 @@ function TeamManagementPage() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="font-medium text-sm">
+                <CardTitle className="text-sm font-medium">
                   Team Status
                 </CardTitle>
               </CardHeader>
@@ -352,7 +354,7 @@ function TeamMemberCard({
 
         <div>
           <div className="font-medium">{userDetails.name}</div>
-          <div className="text-muted-foreground text-sm">
+          <div className="text-sm text-muted-foreground">
             {userDetails.email}
           </div>
         </div>
@@ -427,7 +429,7 @@ function InvitePlayerDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-lg bg-background p-6">
-        <h2 className="mb-4 font-semibold text-xl">Invite Player to Team</h2>
+        <h2 className="mb-4 text-xl font-semibold">Invite Player to Team</h2>
 
         <form className="space-y-4" onSubmit={handleInvitePlayer}>
           <Field>

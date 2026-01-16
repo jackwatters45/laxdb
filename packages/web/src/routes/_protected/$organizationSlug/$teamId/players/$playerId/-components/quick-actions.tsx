@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-import { BookOpen, FileText, Target, TrendingUp, Trophy } from "lucide-react";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -7,6 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Link } from "@tanstack/react-router";
+import { BookOpen, FileText, Target, TrendingUp, Trophy } from "lucide-react";
 
 type QuickActionsProps = {
   playerId: string;

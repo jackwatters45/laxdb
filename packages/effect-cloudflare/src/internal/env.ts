@@ -1,6 +1,7 @@
+import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import { dual } from "effect/Function";
-import * as Context from "effect/Context";
+
 import type { KVNamespace as EffectKVNamespace } from "./kv-namespace";
 import { make as makeKVNamespace } from "./kv-namespace";
 import type { R2Bucket as EffectR2Bucket } from "./r2-bucket";

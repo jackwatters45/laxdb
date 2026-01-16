@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+
 import { SolarMark } from "../../../public/solar-mark";
 
 const createVariants = ({

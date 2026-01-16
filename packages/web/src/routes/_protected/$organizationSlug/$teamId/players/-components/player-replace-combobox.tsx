@@ -1,7 +1,4 @@
 import type { Player } from "@laxdb/core/player/player.sql";
-import { useQuery } from "@tanstack/react-query";
-import { Edit } from "lucide-react";
-import { useMemo } from "react";
 import {
   SearchComboboxAction,
   SearchComboboxContent,
@@ -17,6 +14,10 @@ import {
   SearchComboboxTrigger,
   useSearchCombobox,
 } from "@laxdb/ui/components/ui/search-combobox";
+import { useQuery } from "@tanstack/react-query";
+import { Edit } from "lucide-react";
+import { useMemo } from "react";
+
 import { getOrgPlayersQK } from "@/mutations/players";
 import { getOrganizationPlayers } from "@/query/players";
 
@@ -109,7 +110,7 @@ function FilteredPlayerItemsWithGroup() {
             <div className="flex flex-col">
               <span>{player.name ?? "Unnamed"}</span>
               {(player.email ?? player.phone) && (
-                <span className="text-muted-foreground text-xs">
+                <span className="text-xs text-muted-foreground">
                   {player.email ?? player.phone}
                 </span>
               )}

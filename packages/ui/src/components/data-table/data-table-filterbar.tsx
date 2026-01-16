@@ -1,7 +1,5 @@
-import type { Table } from "@tanstack/react-table";
-import { Grid2X2, List, SlidersHorizontal } from "lucide-react";
-import React from "react";
 import { Button } from "@laxdb/ui/components/ui/button";
+import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Label } from "@laxdb/ui/components/ui/label";
 import {
@@ -9,9 +7,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@laxdb/ui/components/ui/popover";
-import { cn } from "@laxdb/ui/lib/utils";
-import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { TabsList, TabsTrigger } from "@laxdb/ui/components/ui/tabs";
+import { cn } from "@laxdb/ui/lib/utils";
+import type { Table } from "@tanstack/react-table";
+import { Grid2X2, List, SlidersHorizontal } from "lucide-react";
+import React from "react";
+
 import {
   type FilterBarActions,
   FilterBarContext,
@@ -134,7 +135,7 @@ function FilterBarViewOptions() {
                   }}
                 />
                 <Label
-                  className="cursor-pointer font-normal text-sm"
+                  className="cursor-pointer text-sm font-normal"
                   htmlFor={column.id}
                 >
                   {label}

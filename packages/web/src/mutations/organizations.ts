@@ -6,6 +6,7 @@ import type { useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { toast } from "sonner";
+
 import { authMiddleware } from "@/lib/middleware";
 
 // Mutation to switch organization

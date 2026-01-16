@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { toast } from "sonner";
+
 import { authMiddleware } from "@/lib/middleware";
 
 export const getTeamPlayersQK = (organizationId: string, teamId: string) =>

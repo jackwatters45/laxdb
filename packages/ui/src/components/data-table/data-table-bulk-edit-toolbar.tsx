@@ -1,8 +1,3 @@
-import type { RowSelectionState, Table } from "@tanstack/react-table";
-import type { LucideIcon } from "lucide-react";
-import { Copy, Edit, Trash2, UserMinus, X } from "lucide-react";
-import * as React from "react";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +19,11 @@ import {
   TooltipTrigger,
 } from "@laxdb/ui/components/ui/tooltip";
 import { cn } from "@laxdb/ui/lib/utils";
+import type { RowSelectionState, Table } from "@tanstack/react-table";
+import type { LucideIcon } from "lucide-react";
+import { Copy, Edit, Trash2, UserMinus, X } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
 
 type BulkEditActions = {
   onRemove?: () => void;
@@ -115,7 +115,7 @@ function BulkEditToolbar({ children, className }: BulkEditToolbarProps) {
 
   return (
     <TooltipProvider>
-      <div className="slide-in-from-bottom-4 fixed right-0 bottom-4 left-0 z-50 flex animate-in justify-center duration-300">
+      <div className="fixed right-0 bottom-4 left-0 z-50 flex animate-in justify-center duration-300 slide-in-from-bottom-4">
         <div
           className={cn(
             "max-w-2xl rounded-3xl border border-border bg-card/95 px-3 py-2 shadow-lg backdrop-blur-sm",
@@ -137,7 +137,7 @@ function BulkEditToolbarCount({ className }: BulkEditToolbarCountProps) {
   return (
     <Badge
       className={cn(
-        "border-accent bg-accent px-2 py-0.5 text-foreground text-xs",
+        "border-accent bg-accent px-2 py-0.5 text-xs text-foreground",
         className,
       )}
       variant="outline"

@@ -1,4 +1,5 @@
 import { type Effect, Schema } from "effect";
+
 import {
   JerseyNumberSchema as BaseJerseyNumberSchema,
   EmailSchema,
@@ -10,6 +11,7 @@ import {
   TeamIdSchema,
   TimestampsSchema,
 } from "../schema";
+
 import type { PlayerService } from "./player.service";
 
 export const JerseyNumberSchema = Schema.NullOr(BaseJerseyNumberSchema);

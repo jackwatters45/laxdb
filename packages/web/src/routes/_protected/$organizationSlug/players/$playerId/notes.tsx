@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Calendar, FileText, Plus, User } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -9,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, FileText, Plus, User } from "lucide-react";
 
 // Mock data for player notes
 const mockPlayerNotes = [
@@ -141,7 +141,7 @@ function PlayerNotesPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl">Development Notes</h1>
+            <h1 className="text-3xl font-bold">Development Notes</h1>
             <p className="text-muted-foreground">
               Track progress and observations for {playerName}
             </p>
@@ -174,7 +174,7 @@ function PlayerNotesPage() {
                     {getTypeIcon(note.type)}
                     <div>
                       <CardTitle className="text-lg">{note.title}</CardTitle>
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>by {note.coach}</span>
                         <span>•</span>
                         <span>{formatDate(note.date)}</span>
@@ -209,7 +209,7 @@ function PlayerNotesPage() {
       ) : (
         <div className="py-12 text-center">
           <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h2 className="mb-2 font-semibold text-xl">No notes yet</h2>
+          <h2 className="mb-2 text-xl font-semibold">No notes yet</h2>
           <p className="mb-6 text-muted-foreground">
             Development notes will appear here when added
           </p>

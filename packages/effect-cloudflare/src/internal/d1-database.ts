@@ -1,18 +1,18 @@
 /**
  * @since 1.0.0
- */
-import * as Effect from "effect/Effect";
-import * as Option from "effect/Option";
-import * as Predicate from "effect/Predicate";
-import * as Schema from "effect/Schema";
-import * as Context from "effect/Context";
-import * as Layer from "effect/Layer";
-import { dual } from "effect/Function";
 import {
   type D1Database as NativeD1Database,
   type D1PreparedStatement as NativeD1PreparedStatement,
   type D1DatabaseSession as NativeD1DatabaseSession,
 } from "@cloudflare/workers-types";
+import * as Context from "effect/Context";
+ */
+import * as Effect from "effect/Effect";
+import { dual } from "effect/Function";
+import * as Layer from "effect/Layer";
+import * as Option from "effect/Option";
+import * as Predicate from "effect/Predicate";
+import * as Schema from "effect/Schema";
 
 /**
  * @since 1.0.0

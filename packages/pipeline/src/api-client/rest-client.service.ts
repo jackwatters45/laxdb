@@ -1,4 +1,6 @@
 import { Duration, Effect, Schedule, Schema } from "effect";
+
+import { DEFAULT_PIPELINE_CONFIG } from "../config";
 import {
   HttpError,
   NetworkError,
@@ -7,7 +9,7 @@ import {
   RateLimitError,
   TimeoutError,
 } from "../error";
-import { DEFAULT_PIPELINE_CONFIG } from "../config";
+
 import type {
   RestClientConfig,
   RestRequestOptions,

@@ -7,6 +7,7 @@ import {
 } from "@effect/platform";
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
+
 import { AuthApiLive } from "./auth/auth.api";
 import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
 import { GamesApiLive } from "./game/game.api";

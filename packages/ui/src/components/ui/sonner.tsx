@@ -1,5 +1,4 @@
 import { useTheme } from "@laxdb/ui/components/theme-provider";
-import { Toaster as Sonner } from "sonner";
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -7,6 +6,7 @@ import {
   OctagonXIcon,
   Loader2Icon,
 } from "lucide-react";
+import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 

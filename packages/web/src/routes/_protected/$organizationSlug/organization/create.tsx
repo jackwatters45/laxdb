@@ -1,11 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageBody } from "@/components/layout/page-content";
-import { CreateOrganizationForm } from "@/components/organizations/create-form";
-import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@laxdb/ui/components/ui/breadcrumb";
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { PageBody } from "@/components/layout/page-content";
+import { CreateOrganizationForm } from "@/components/organizations/create-form";
+import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 
 export const Route = createFileRoute(
   "/_protected/$organizationSlug/organization/create",

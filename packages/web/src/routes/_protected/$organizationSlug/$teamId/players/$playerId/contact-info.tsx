@@ -1,12 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Pencil } from "lucide-react";
-import { useState } from "react";
-import { PageBody, PageContainer } from "@/components/layout/page-content";
-import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
-import {
-  ContactInfoEdit,
-  ContactInfoView,
-} from "@/components/players/contact-info";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -19,6 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
+
+import { PageBody, PageContainer } from "@/components/layout/page-content";
+import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
+import {
+  ContactInfoEdit,
+  ContactInfoView,
+} from "@/components/players/contact-info";
+
 import { PlayerHeader } from "./-components/player-header";
 import { contactInfo } from "./-data-2";
 

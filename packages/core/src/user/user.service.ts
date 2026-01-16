@@ -1,6 +1,8 @@
 import { Effect, Schema } from "effect";
+
 import { NotFoundError } from "../error";
 import { parsePostgresError } from "../util";
+
 import { UserRepo } from "./user.repo";
 import { GetUserFromEmailInput } from "./user.schema";
 

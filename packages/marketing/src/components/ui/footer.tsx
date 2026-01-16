@@ -5,6 +5,7 @@ import {
   RiYoutubeFill,
 } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
+
 import { SolarLogo } from "../../../public/solar-logo";
 
 const CURRENT_YEAR = new Date().getFullYear();

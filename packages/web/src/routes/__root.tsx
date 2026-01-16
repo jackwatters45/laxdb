@@ -1,5 +1,8 @@
 /// <reference types="vite/client" />
 
+import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
+import { Toaster } from "@laxdb/ui/components/ui/sonner";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
@@ -7,15 +10,13 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type * as React from "react";
+
 import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
 import { NotFound } from "@/components/not-found";
-import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
-import { Toaster } from "@laxdb/ui/components/ui/sonner";
 import globalsCss from "@/globals.css?url";
 import { seo } from "@/lib/seo";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;

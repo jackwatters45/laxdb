@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+
 import type { PlayerDetails } from "../-utils";
 
 type PlayerOverviewProps = {
@@ -19,12 +20,12 @@ export function PlayerOverview({ player }: PlayerOverviewProps) {
       <CardContent className="space-y-3">
         <div className="grid grid-cols-2 gap-4 text-center">
           <div>
-            <div className="font-bold text-lg">{player.overallRating}/10</div>
-            <div className="text-muted-foreground text-xs">Current Rating</div>
+            <div className="text-lg font-bold">{player.overallRating}/10</div>
+            <div className="text-xs text-muted-foreground">Current Rating</div>
           </div>
           <div>
-            <div className="font-bold text-lg">{player.potentialRating}/10</div>
-            <div className="text-muted-foreground text-xs">Potential</div>
+            <div className="text-lg font-bold">{player.potentialRating}/10</div>
+            <div className="text-xs text-muted-foreground">Potential</div>
           </div>
         </div>
 

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./globals.css": "./src/styles/globals.css",
+    "./globals.css": "./src/globals.css",
     "./types": {
       "types": "./dist/types.d.ts",
       "default": "./src/types.ts"

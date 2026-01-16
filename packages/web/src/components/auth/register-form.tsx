@@ -1,7 +1,4 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import { Schema } from "effect";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -11,8 +8,12 @@ import {
   FieldLabel,
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@laxdb/ui/lib/utils";
+import { Schema } from "effect";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+
+import { authClient } from "@/lib/auth-client";
 
 const registerSchema = Schema.Struct({
   name: Schema.String.pipe(
@@ -104,20 +105,20 @@ export function RegisterForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="font-bold text-2xl">Create your account</h1>
-        <p className="text-balance text-muted-foreground text-sm">
+        <h1 className="text-2xl font-bold">Create your account</h1>
+        <p className="text-sm text-balance text-muted-foreground">
           Enter your details below to create your account
         </p>
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-red-800 text-sm">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-green-800 text-sm">
+        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800">
           {success}
         </div>
       )}
@@ -223,7 +224,7 @@ export function RegisterForm({
         </Button>
       </form>
 
-      <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
+      <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
         <span className="relative z-10 bg-background px-2 text-muted-foreground">
           Or continue with
         </span>

@@ -4,6 +4,7 @@
 import type * as Context from "effect/Context";
 import type * as Effect from "effect/Effect";
 import type * as Layer from "effect/Layer";
+
 import * as internal from "./internal/d1-database";
 
 // Re-export all types and errors

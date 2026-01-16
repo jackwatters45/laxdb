@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Calendar, TrendingUp, Trophy } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -9,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, TrendingUp, Trophy } from "lucide-react";
 
 // Mock detailed stats data
 const mockPlayerStats = {
@@ -113,7 +113,7 @@ function PlayerStatsPage() {
         </Link>
 
         <div>
-          <h1 className="font-bold text-3xl">Detailed Statistics</h1>
+          <h1 className="text-3xl font-bold">Detailed Statistics</h1>
           <p className="text-muted-foreground">
             Complete season performance for {stats.playerName}
           </p>
@@ -130,7 +130,7 @@ function PlayerStatsPage() {
             <CardContent>
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-sm">Scoring</h4>
+                  <h4 className="text-sm font-medium">Scoring</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Goals:</span>
@@ -152,7 +152,7 @@ function PlayerStatsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-medium text-sm">Shooting</h4>
+                  <h4 className="text-sm font-medium">Shooting</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Shots:</span>
@@ -174,7 +174,7 @@ function PlayerStatsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-medium text-sm">Other</h4>
+                  <h4 className="text-sm font-medium">Other</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Ground Balls:</span>
@@ -214,10 +214,10 @@ function PlayerStatsPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-center">
-                        <div className="font-medium text-sm">
+                        <div className="text-sm font-medium">
                           {formatDate(game.date)}
                         </div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-xs text-muted-foreground">
                           vs {game.opponent}
                         </div>
                       </div>
@@ -234,19 +234,19 @@ function PlayerStatsPage() {
                     <div className="flex gap-6 text-sm">
                       <div className="text-center">
                         <div className="font-medium">{game.goals}</div>
-                        <div className="text-muted-foreground text-xs">G</div>
+                        <div className="text-xs text-muted-foreground">G</div>
                       </div>
                       <div className="text-center">
                         <div className="font-medium">{game.assists}</div>
-                        <div className="text-muted-foreground text-xs">A</div>
+                        <div className="text-xs text-muted-foreground">A</div>
                       </div>
                       <div className="text-center">
                         <div className="font-medium">{game.shots}</div>
-                        <div className="text-muted-foreground text-xs">SOG</div>
+                        <div className="text-xs text-muted-foreground">SOG</div>
                       </div>
                       <div className="text-center">
                         <div className="font-medium">{game.minutes}</div>
-                        <div className="text-muted-foreground text-xs">MIN</div>
+                        <div className="text-xs text-muted-foreground">MIN</div>
                       </div>
                     </div>
                   </div>

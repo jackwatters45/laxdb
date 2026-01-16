@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-import type { Team } from "better-auth/plugins";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -10,6 +8,8 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@laxdb/ui/components/ui/breadcrumb";
+import { Link } from "@tanstack/react-router";
+import type { Team } from "better-auth/plugins";
 
 type TeamBasic = Pick<Team, "id" | "name">;
 

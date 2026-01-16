@@ -1,12 +1,11 @@
-import * as React from "react";
-
-import { cn } from "@laxdb/ui/lib/utils";
 import { Button } from "@laxdb/ui/components/ui/button";
+import { cn } from "@laxdb/ui/lib/utils";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   MoreHorizontalIcon,
 } from "lucide-react";
+import * as React from "react";
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -27,7 +26,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("gap-0.5 flex items-center", className)}
+      className={cn("flex items-center gap-0.5", className)}
       {...props}
     />
   );
@@ -109,7 +108,7 @@ function PaginationEllipsis({
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        "size-7 items-center justify-center [&_svg:not([class*='size-'])]:size-3.5 flex",
+        "flex size-7 items-center justify-center [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...props}

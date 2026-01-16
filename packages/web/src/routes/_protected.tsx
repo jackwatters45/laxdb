@@ -4,6 +4,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { Organization } from "better-auth/plugins";
 import { Array as Arr, Effect } from "effect";
+
 import { authMiddleware } from "@/lib/middleware";
 
 const getSessionAndOrg = createServerFn({ method: "GET" })

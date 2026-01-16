@@ -4,6 +4,7 @@ import { TeamOperationError } from "@laxdb/core/team/team.error";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
+
 import { authMiddleware } from "@/lib/middleware";
 
 const getTeamDashboardData = createServerFn({ method: "GET" })

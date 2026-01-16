@@ -1,6 +1,8 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
+
+import { ExtractConfigService } from "../extract.config";
 import {
   type ExtractionManifest,
   type SeasonManifest,
@@ -9,7 +11,6 @@ import {
   createEmptyManifest,
   createEmptySeasonManifest,
 } from "../extract.schema";
-import { ExtractConfigService } from "../extract.config";
 
 export class PLLManifestService extends Effect.Service<PLLManifestService>()(
   "PLLManifestService",

@@ -1,10 +1,11 @@
-import { Calendar, TrendingUp } from "lucide-react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Calendar, TrendingUp } from "lucide-react";
+
 import type { PlayerDetails } from "../-utils";
 import { formatDate } from "../-utils";
 

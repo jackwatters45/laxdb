@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { TimestampsSchema } from "../schema";
 
 export const TOPIC_ENUM = [

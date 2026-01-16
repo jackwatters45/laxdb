@@ -1,11 +1,6 @@
 import { PlayerService } from "@laxdb/core/player/player.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { TeamIdSchema } from "@laxdb/core/schema";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Effect, Schema } from "effect";
-import { useMemo } from "react";
 import {
   DataTableBody,
   DataTableContent,
@@ -13,7 +8,6 @@ import {
   DataTableProvider,
   DataTableRoot,
 } from "@laxdb/ui/components/data-table/data-table";
-import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbDropdown,
   BreadcrumbDropdownContent,
@@ -26,9 +20,18 @@ import {
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Tabs, TabsContent } from "@laxdb/ui/components/ui/tabs";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { useMemo } from "react";
+
+import { PageBody } from "@/components/layout/page-content";
 import { authMiddleware } from "@/lib/middleware";
 import { getTeamPlayersQK } from "@/mutations/players";
+
 import { TeamHeader } from "../-components/team-header";
+
 import { PlayerCards } from "./-components/players-cards";
 import { createEditablePlayerColumns } from "./-components/players-columns";
 import { PlayersFilterBar } from "./-components/players-filterbar";

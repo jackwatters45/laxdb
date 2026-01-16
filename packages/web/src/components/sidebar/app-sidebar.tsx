@@ -1,5 +1,3 @@
-import type * as React from "react";
-import { NavUserSidebar } from "@/components/nav/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -7,8 +5,12 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@laxdb/ui/components/ui/sidebar";
+import type * as React from "react";
+
+import { NavUserSidebar } from "@/components/nav/nav-user";
 import { OrganizationSwitcher } from "@/components/nav/organization-switcher";
 import { SearchCommand } from "@/components/nav/search-command";
+
 import { MainNav } from "./main-nav";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

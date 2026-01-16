@@ -1,9 +1,4 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Schema } from "effect";
-import { ArrowLeft, Calendar, Target } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -21,6 +16,11 @@ import {
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Schema } from "effect";
+import { ArrowLeft, Calendar, Target } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 
 // Form schema
 const goalFormSchema = Schema.Struct({
@@ -160,7 +160,7 @@ function CreateGoalPage() {
         </Link>
 
         <div>
-          <h1 className="font-bold text-3xl">Set New Goal</h1>
+          <h1 className="text-3xl font-bold">Set New Goal</h1>
           <p className="text-muted-foreground">
             Create a development goal for {player.name}
           </p>
@@ -245,7 +245,7 @@ function CreateGoalPage() {
                           type="button"
                         >
                           <span className="text-lg">{category.icon}</span>
-                          <span className="font-medium text-sm">
+                          <span className="text-sm font-medium">
                             {category.label}
                           </span>
                         </button>
@@ -310,7 +310,7 @@ function CreateGoalPage() {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="goal-due-date">Due Date</FieldLabel>
                     <div className="relative">
-                      <Calendar className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+                      <Calendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         {...field}
                         id="goal-due-date"

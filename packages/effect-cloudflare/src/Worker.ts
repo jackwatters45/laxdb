@@ -3,8 +3,9 @@
  */
 import type * as Effect from "effect/Effect";
 import type * as Layer from "effect/Layer";
-import type { CloudflareEnv } from "./internal/env";
+
 import type { CloudflareExecutionContext } from "./internal/context";
+import type { CloudflareEnv } from "./internal/env";
 import * as internal from "./internal/worker";
 
 /**

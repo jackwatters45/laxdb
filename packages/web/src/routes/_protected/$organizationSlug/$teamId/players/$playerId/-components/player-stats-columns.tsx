@@ -1,6 +1,6 @@
 import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
-import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 const columnHelper = createColumnHelper<TeamPlayerWithInfo>();
 

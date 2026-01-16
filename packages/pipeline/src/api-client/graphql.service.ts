@@ -1,4 +1,6 @@
 import { Duration, Effect, Schedule, Schema } from "effect";
+
+import { DEFAULT_PIPELINE_CONFIG } from "../config";
 import {
   HttpError,
   NetworkError,
@@ -6,7 +8,7 @@ import {
   type PipelineError,
   TimeoutError,
 } from "../error";
-import { DEFAULT_PIPELINE_CONFIG } from "../config";
+
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
 

@@ -29,7 +29,7 @@ function NavbarItem({
     props: mergeProps<"div">(
       {
         className: cn(
-          "relative inline-block select-none border-transparent border-b-2 px-3 py-4 font-normal text-muted-foreground text-sm leading-[0.875rem] transition-colors duration-200 ease-out hover:bg-accent",
+          "relative inline-block border-b-2 border-transparent px-3 py-4 text-sm leading-[0.875rem] font-normal text-muted-foreground transition-colors duration-200 ease-out select-none hover:bg-accent",
           "[&.active]:border-foreground [&.active]:text-foreground [&.active]:no-underline",
           className,
         ),

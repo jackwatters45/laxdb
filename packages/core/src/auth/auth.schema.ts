@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { TimestampsSchema } from "../schema";
 
 export class Session extends Schema.Class<Session>("Session")({

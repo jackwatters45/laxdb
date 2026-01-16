@@ -1,5 +1,7 @@
 import { FileSystem, Path } from "@effect/platform";
+import { readJsonFile } from "@laxdb/core/util";
 import { Effect, Schema } from "effect";
+
 import {
   type ValidationIssue,
   type FileValidationResult,
@@ -9,7 +11,6 @@ import {
   warningIssue,
   infoIssue,
 } from "./validate.schema";
-import { readJsonFile } from "@laxdb/core/util";
 
 const getFileStats = (filePath: string) =>
   Effect.gen(function* () {

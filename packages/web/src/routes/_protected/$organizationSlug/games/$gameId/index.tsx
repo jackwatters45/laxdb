@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Calendar, Edit, MapPin, Trophy, Users } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -9,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Calendar, Edit, MapPin, Trophy, Users } from "lucide-react";
 
 // Mock data - will replace with actual API calls
 const mockGameDetails = {
@@ -153,7 +153,7 @@ function GameDetailsPage() {
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-bold text-3xl">{game.opponentName}</h1>
+            <h1 className="text-3xl font-bold">{game.opponentName}</h1>
             <p className="text-muted-foreground">
               {getGameDetailsTypeLabel(game.gameType)} Game
             </p>
@@ -211,7 +211,7 @@ function GameDetailsPage() {
                 <div className="rounded-md bg-muted p-4">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Final Score</span>
-                    <span className="font-bold text-lg">
+                    <span className="text-lg font-bold">
                       {game.isHomeGame
                         ? `${game.homeScore} - ${game.awayScore}`
                         : `${game.awayScore} - ${game.homeScore}`}
@@ -223,7 +223,7 @@ function GameDetailsPage() {
               {game.coachNotes && (
                 <div>
                   <h4 className="mb-2 font-medium">Coach Notes</h4>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     {game.coachNotes}
                   </p>
                 </div>
@@ -265,12 +265,12 @@ function GameDetailsPage() {
                       key={player.id}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground text-sm">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                           {player.jerseyNumber}
                         </div>
                         <div>
                           <div className="font-medium">{player.name}</div>
-                          <div className="text-muted-foreground text-sm">
+                          <div className="text-sm text-muted-foreground">
                             {player.position}
                           </div>
                         </div>

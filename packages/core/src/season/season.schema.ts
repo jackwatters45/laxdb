@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import {
   NullableTeamIdSchema,
   OrganizationIdSchema,
@@ -6,6 +7,7 @@ import {
   TeamIdSchema,
   TimestampsSchema,
 } from "../schema";
+
 import { seasonStatusEnum } from "./season.sql";
 
 export class Season extends Schema.Class<Season>("Season")({

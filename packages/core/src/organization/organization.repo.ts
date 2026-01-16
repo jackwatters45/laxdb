@@ -1,13 +1,15 @@
 import type { TeamMember } from "better-auth/plugins";
 import { Effect } from "effect";
+
 import { AuthService } from "../auth";
+import type { Headers } from "../type";
+
 import {
   InvitationOperationError,
   OrganizationOperationError,
   OrganizationSlugError,
 } from "./organization.error";
 import type { CreateOrganizationInput } from "./organization.schema";
-import type { Headers } from "../type";
 
 export class OrganizationRepo extends Effect.Service<OrganizationRepo>()(
   "OrganizationRepo",

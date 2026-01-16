@@ -1,5 +1,8 @@
-import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@laxdb/ui/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,17 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@laxdb/ui/components/ui/dropdown-menu";
-import { useSwitchOrganization } from "@/mutations/organizations";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@laxdb/ui/components/ui/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@laxdb/ui/components/ui/sidebar";
+import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
+import { ChevronsUpDown, Plus } from "lucide-react";
+
+import { useSwitchOrganization } from "@/mutations/organizations";
 
 export function OrganizationSwitcher() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export function OrganizationSwitcher() {
             side="right"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
               Switch Organization
             </DropdownMenuLabel>
             {organizations.map((org) => {
@@ -78,7 +79,7 @@ export function OrganizationSwitcher() {
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex size-6 items-center justify-center rounded-sm border bg-background">
-                      <span className="font-medium text-xs">
+                      <span className="text-xs font-medium">
                         {org.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
