@@ -26,7 +26,7 @@ import { PlayersApiLive } from "./player/player.handlers";
 import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
 import { SeasonsApiLive } from "./season/season.handlers";
 import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
-import { TeamsApiLive } from "./team/team.api";
+import { TeamsApiLive } from "./team/team.handlers";
 import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
 
 const AllRpcs = Layer.mergeAll(

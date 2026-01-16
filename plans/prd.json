@@ -59,7 +59,7 @@
     "id": "api-006",
     "category": "infrastructure",
     "description": "Extract TeamsGroup from team.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor team.api.ts to export HttpApiGroup only (TeamsGroup)",
       "Create TeamsGroupLive using HttpApiBuilder.group(LaxdbApi, 'Teams', ...)",
