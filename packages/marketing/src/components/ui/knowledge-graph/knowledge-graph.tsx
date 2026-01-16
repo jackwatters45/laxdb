@@ -1,14 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { Post } from "content-collections"
 import type { GraphLink, GraphNode } from "./graph-types"
 import { useGraphData } from "./use-graph-data"
 
-// Dynamically import ForceGraph2D to avoid SSR issues
-const ForceGraph2D = typeof window !== "undefined"
-  ? require("react-force-graph-2d").default
-  : () => null
+const ForceGraph2D = lazy(() => import("react-force-graph-2d"))
 
 interface KnowledgeGraphProps {
   readonly posts: readonly Post[]
@@ -57,11 +54,11 @@ export function KnowledgeGraph({
     return connected
   }, [hoveredNode, graphData.links])
 
-  // Convert to mutable format for force-graph
-  const mutableGraphData = {
+  // Convert to mutable format for force-graph (memoized to prevent simulation reset on hover)
+  const mutableGraphData = useMemo(() => ({
     nodes: graphData.nodes.map((n) => ({ ...n })),
     links: graphData.links.map((l) => ({ ...l })),
-  }
+  }), [graphData])
 
   // Handle responsive sizing
   useEffect(() => {
@@ -196,29 +193,31 @@ export function KnowledgeGraph({
 
   return (
     <div ref={containerRef} className="w-full bg-gray-900/50 rounded-lg overflow-hidden">
-      <ForceGraph2D
-        graphData={mutableGraphData}
-        width={dimensions.width}
-        height={dimensions.height}
-        nodeCanvasObject={nodeCanvasObject}
-        nodePointerAreaPaint={(node: GraphNode & { x?: number; y?: number }, color: string, ctx: CanvasRenderingContext2D) => {
-          const x = node.x ?? 0
-          const y = node.y ?? 0
-          const size = (node.size ?? 1) * 4
-          ctx.beginPath()
-          ctx.arc(x, y, size + 5, 0, 2 * Math.PI)
-          ctx.fillStyle = color
-          ctx.fill()
-        }}
-        onNodeClick={handleNodeClick}
-        onNodeHover={handleNodeHover}
-        linkColor={getLinkColor}
-        linkWidth={getLinkWidth}
-        backgroundColor="transparent"
-        cooldownTicks={100}
-        d3AlphaDecay={0.02}
-        d3VelocityDecay={0.3}
-      />
+      <Suspense fallback={<div className="flex items-center justify-center" style={{ height: dimensions.height }}><span className="text-gray-400">Loading graph...</span></div>}>
+        <ForceGraph2D
+          graphData={mutableGraphData}
+          width={dimensions.width}
+          height={dimensions.height}
+          nodeCanvasObject={nodeCanvasObject}
+          nodePointerAreaPaint={(node: GraphNode & { x?: number; y?: number }, color: string, ctx: CanvasRenderingContext2D) => {
+            const x = node.x ?? 0
+            const y = node.y ?? 0
+            const size = (node.size ?? 1) * 4
+            ctx.beginPath()
+            ctx.arc(x, y, size + 5, 0, 2 * Math.PI)
+            ctx.fillStyle = color
+            ctx.fill()
+          }}
+          onNodeClick={handleNodeClick}
+          onNodeHover={handleNodeHover}
+          linkColor={getLinkColor}
+          linkWidth={getLinkWidth}
+          backgroundColor="transparent"
+          cooldownTicks={100}
+          d3AlphaDecay={0.02}
+          d3VelocityDecay={0.3}
+        />
+      </Suspense>
     </div>
   )
 }
