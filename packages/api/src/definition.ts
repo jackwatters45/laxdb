@@ -1,5 +1,5 @@
 import { HttpApi } from "@effect/platform";
+import { SeasonsGroup } from "./season/season.api";
 
-// Unified API definition - groups will be added in subsequent tasks
-// Following pattern from scratchpad/effect-api-example
-export class LaxdbApi extends HttpApi.make("LaxdbApi") {}
+// Unified API definition - groups added as they are migrated
+export class LaxdbApi extends HttpApi.make("LaxdbApi").add(SeasonsGroup) {}

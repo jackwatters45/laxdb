@@ -14,7 +14,7 @@
     "id": "api-002",
     "category": "infrastructure",
     "description": "Extract SeasonsGroup from season.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor season.api.ts to export HttpApiGroup only (SeasonsGroup)",
       "Remove HttpApi.make wrapper, keep endpoint definitions",

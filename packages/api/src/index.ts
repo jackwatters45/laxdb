@@ -24,7 +24,7 @@ import {
 } from "./player/contact-info/contact-info.rpc";
 import { PlayersApiLive } from "./player/player.api";
 import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
-import { SeasonsApiLive } from "./season/season.api";
+import { SeasonsApiLive } from "./season/season.handlers";
 import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
 import { TeamsApiLive } from "./team/team.api";
 import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
