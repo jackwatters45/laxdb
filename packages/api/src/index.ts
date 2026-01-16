@@ -17,7 +17,7 @@ import {
   OrganizationHandlers,
   OrganizationRpcs,
 } from "./organization/organization.rpc";
-import { ContactInfoApiLive } from "./player/contact-info/contact-info.api";
+import { ContactInfoApiLive } from "./player/contact-info/contact-info.handlers";
 import {
   ContactInfoHandlers,
   ContactInfoRpcs,

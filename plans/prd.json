@@ -48,7 +48,7 @@
     "id": "api-005",
     "category": "infrastructure",
     "description": "Extract ContactInfoGroup from contact-info.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor contact-info.api.ts to export HttpApiGroup only (ContactInfoGroup)",
       "Create ContactInfoGroupLive using HttpApiBuilder.group(LaxdbApi, 'ContactInfo', ...)",
