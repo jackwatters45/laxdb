@@ -19,7 +19,11 @@ const config = defineConfig({
     alchemy(),
     tailwindcss(),
     tanstackStart(),
-    viteReact(),
+    viteReact({
+      babel: {
+             plugins: ['babel-plugin-react-compiler'],
+           },
+    }),
   ],
   css: {
     modules: {
