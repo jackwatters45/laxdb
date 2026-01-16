@@ -13,7 +13,7 @@ function BlogIndex() {
   );
 
   const handleNodeClick = (slug: string) => {
-    navigate({ to: "/blog/$slug", params: { slug } });
+    void navigate({ to: "/blog/$slug", params: { slug } });
   };
 
   return (
