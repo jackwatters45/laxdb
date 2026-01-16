@@ -1,12 +1,9 @@
-import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
-import { FetchHttpClient } from "@effect/platform";
+import { AtomRpc } from "@effect-atom/atom-react";
 import { RpcClient } from "@effect/rpc";
-import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
 
 import { RpcProtocolLive } from "../protocol";
 
-import { SeasonsApi } from "./season.api";
 import { SeasonRpcs } from "./season.rpc";
 
 export class RpcSeasonClient extends Effect.Service<RpcSeasonClient>()(
@@ -22,14 +19,5 @@ export class RpcSeasonClientAtom extends AtomRpc.Tag<RpcSeasonClientAtom>()(
   {
     group: SeasonRpcs,
     protocol: RpcProtocolLive,
-  },
-) {}
-
-export class HttpSeasonClientAtom extends AtomHttpApi.Tag<HttpSeasonClientAtom>()(
-  "HttpSeasonClientAtom",
-  {
-    api: SeasonsApi,
-    httpClient: FetchHttpClient.layer,
-    baseUrl: Env.API_URL(),
   },
 ) {}

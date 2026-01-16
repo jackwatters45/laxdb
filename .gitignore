@@ -10,6 +10,9 @@ node_modules
 # fumadocs
 .source
 
+# claude
+.claude
+
 # coverage
 .coverage
 coverage

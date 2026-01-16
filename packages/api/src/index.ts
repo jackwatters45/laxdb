@@ -1,77 +1,60 @@
 import {
-  HttpApiBuilder,
   HttpApiScalar,
+  HttpLayerRouter,
   HttpMiddleware,
   HttpServer,
   HttpServerResponse,
+  OpenApi,
 } from "@effect/platform";
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
 
-import { AuthApiLive } from "./auth/auth.api";
-import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
-import { GamesApiLive } from "./game/game.api";
-import { GameHandlers, GameRpcs } from "./game/game.rpc";
-import { OrganizationsApiLive } from "./organization/organization.api";
-import {
-  OrganizationHandlers,
-  OrganizationRpcs,
-} from "./organization/organization.rpc";
-import { ContactInfoApiLive } from "./player/contact-info/contact-info.api";
-import {
-  ContactInfoHandlers,
-  ContactInfoRpcs,
-} from "./player/contact-info/contact-info.rpc";
-import { PlayersApiLive } from "./player/player.api";
-import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
-import { SeasonsApiLive } from "./season/season.api";
-import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
-import { TeamsApiLive } from "./team/team.api";
-import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
+import { LaxdbApi } from "./definition";
+import { HttpGroupsLive } from "./groups";
+import { LaxdbRpc } from "./rpc-group";
+import { LaxdbRpcHandlers } from "./rpc-handlers";
 
-const AllRpcs = Layer.mergeAll(
-  RpcServer.layer(SeasonRpcs).pipe(Layer.provide(SeasonHandlers)),
-  RpcServer.layer(GameRpcs).pipe(Layer.provide(GameHandlers)),
-  RpcServer.layer(PlayerRpcs).pipe(Layer.provide(PlayerHandlers)),
-  RpcServer.layer(ContactInfoRpcs).pipe(Layer.provide(ContactInfoHandlers)),
-  RpcServer.layer(TeamRpcs).pipe(Layer.provide(TeamHandlers)),
-  RpcServer.layer(OrganizationRpcs).pipe(Layer.provide(OrganizationHandlers)),
-  RpcServer.layer(AuthRpcs).pipe(Layer.provide(AuthHandlers)),
-);
+const DocsRoute = HttpApiScalar.layerHttpLayerRouter({
+  api: LaxdbApi,
+  path: "/docs",
+});
 
-const AllApis = Layer.mergeAll(
-  SeasonsApiLive,
-  GamesApiLive,
-  PlayersApiLive,
-  ContactInfoApiLive,
-  AuthApiLive,
-  OrganizationsApiLive,
-  TeamsApiLive,
-);
+const OpenApiJsonRoute = HttpLayerRouter.add(
+  "GET",
+  "/docs/openapi.json",
+  HttpServerResponse.json(OpenApi.fromApi(LaxdbApi)),
+).pipe(Layer.provide(HttpLayerRouter.layer));
 
-const RpcProtocol = RpcServer.layerProtocolHttp({
+const RpcRouter = RpcServer.layerHttpRouter({
+  group: LaxdbRpc,
   path: "/rpc",
-  routerTag: HttpApiBuilder.Router,
-}).pipe(Layer.provide(RpcSerialization.layerNdjson));
-
-const HealthCheckRoute = HttpApiBuilder.Router.use((router) =>
-  router.get("/health", HttpServerResponse.text("OK")),
+  protocol: "http",
+  spanPrefix: "rpc",
+}).pipe(
+  Layer.provide(LaxdbRpcHandlers),
+  Layer.provide(RpcSerialization.layerNdjson),
 );
 
-const ApiLive = Layer.mergeAll(
-  HttpServer.layerContext,
-  HttpApiScalar.layer({ path: "/docs" }),
-  HttpApiBuilder.middlewareCors({ allowedOrigins: ["*"] }),
-  HttpApiBuilder.middlewareOpenApi(),
-  AllApis,
-  AllRpcs,
-  RpcProtocol,
+const HttpApiRouter = HttpLayerRouter.addHttpApi(LaxdbApi).pipe(
+  Layer.provide(HttpGroupsLive),
+  Layer.provide(HttpServer.layerContext),
+);
+
+// oxlint-disable-next-line react-hooks/rules-of-hooks -- Not a React hook
+const HealthCheckRoute = HttpLayerRouter.use((router) =>
+  router.add("GET", "/health", HttpServerResponse.text("OK")),
+);
+
+const AllRoutes = Layer.mergeAll(
+  RpcRouter,
+  HttpApiRouter,
+  DocsRoute,
+  OpenApiJsonRoute,
   HealthCheckRoute,
-  DateTime.layerCurrentZoneLocal,
-);
+  HttpLayerRouter.cors(),
+).pipe(Layer.provide(DateTime.layerCurrentZoneLocal));
 
-// @ts-expect-error - we will fix this later
-const { handler } = HttpApiBuilder.toWebHandler(ApiLive, {
+const { handler } = HttpLayerRouter.toWebHandler(AllRoutes, {
   middleware: HttpMiddleware.logger,
 });
 

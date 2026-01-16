@@ -1,12 +1,9 @@
-import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
-import { FetchHttpClient } from "@effect/platform";
+import { AtomRpc } from "@effect-atom/atom-react";
 import { RpcClient } from "@effect/rpc";
-import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
 
 import { RpcProtocolLive } from "../../protocol";
 
-import { ContactInfoApi } from "./contact-info.api";
 import { ContactInfoRpcs } from "./contact-info.rpc";
 
 export class RpcContactInfoClient extends Effect.Service<RpcContactInfoClient>()(
@@ -22,14 +19,5 @@ export class RpcContactInfoClientAtom extends AtomRpc.Tag<RpcContactInfoClientAt
   {
     group: ContactInfoRpcs,
     protocol: RpcProtocolLive,
-  },
-) {}
-
-export class HttpContactInfoClientAtom extends AtomHttpApi.Tag<HttpContactInfoClientAtom>()(
-  "HttpContactInfoClientAtom",
-  {
-    api: ContactInfoApi,
-    httpClient: FetchHttpClient.layer,
-    baseUrl: Env.API_URL(),
   },
 ) {}

@@ -1,0 +1,19 @@
+import { HttpApi } from "@effect/platform";
+
+import { AuthGroup } from "./auth/auth.api";
+import { GamesGroup } from "./game/game.api";
+import { OrganizationsGroup } from "./organization/organization.api";
+import { ContactInfoGroup } from "./player/contact-info/contact-info.api";
+import { PlayersGroup } from "./player/player.api";
+import { SeasonsGroup } from "./season/season.api";
+import { TeamsGroup } from "./team/team.api";
+
+// Unified API definition - all groups added
+export class LaxdbApi extends HttpApi.make("LaxdbApi")
+  .add(SeasonsGroup)
+  .add(GamesGroup)
+  .add(PlayersGroup)
+  .add(ContactInfoGroup)
+  .add(TeamsGroup)
+  .add(OrganizationsGroup)
+  .add(AuthGroup) {}
