@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { CreateOrganizationForm } from "@/components/organizations/create-form";
 
 export const Route = createFileRoute("/_protected/organization/create")({

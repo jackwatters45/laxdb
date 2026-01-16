@@ -1,7 +1,6 @@
+import { cn } from "@laxdb/ui/lib/utils";
 import type { Column } from "@tanstack/react-table";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
-import { cn } from "@laxdb/ui/lib/utils";
 
 type DataTableColumnHeaderProps<TData, TValue> =
   React.HTMLAttributes<HTMLButtonElement> & {
@@ -34,7 +33,7 @@ export function DataTableColumnHeader<TData, TValue>({
       aria-label={`Sort by ${title}`}
       className={cn(
         column.columnDef.enableSorting === true
-          ? "-mx-2 inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+          ? "-mx-2 inline-flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 select-none hover:bg-muted focus:ring-2 focus:ring-ring focus:outline-none"
           : "inline-flex items-center gap-2",
         className,
       )}

@@ -4,7 +4,9 @@ import {
   RiSignalTowerFill,
   RiTruckFill,
 } from "@remixicon/react";
+
 import { Icons } from "@/components/icons";
+
 import { SVGMap } from "./svg-map";
 
 export const MapComponent = () => (

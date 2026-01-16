@@ -1,9 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { Edit } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import type { PlayerInfoType } from "../-data-2";
+import { Link } from "@tanstack/react-router";
+import { Edit } from "lucide-react";
 import React from "react";
+
+import type { PlayerInfoType } from "../-data-2";
 
 type PlayerInfoProps = {
   organizationSlug: string;
@@ -23,7 +24,7 @@ export function PlayerInfo({
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="font-semibold text-xl">{playerInfo.name}</h1>
+            <h1 className="text-xl font-semibold">{playerInfo.name}</h1>
             <div className="flex items-center gap-2 text-muted-foreground">
               {[
                 playerInfo.primaryPosition

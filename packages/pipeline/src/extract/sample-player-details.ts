@@ -13,8 +13,10 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Duration, Layer, Schema } from "effect";
+
 import { PLLClient } from "../pll/pll.client";
 import { PLLPlayer, type PLLPlayerDetail } from "../pll/pll.schema";
+
 import { ExtractConfigService } from "./extract.config";
 
 const args = process.argv.slice(2);

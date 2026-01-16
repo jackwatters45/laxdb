@@ -1,13 +1,6 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { AuthService } from "@laxdb/core/auth";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
-import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Effect, Schema } from "effect";
-import { AlertTriangle, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -18,6 +11,14 @@ import {
 } from "@laxdb/ui/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
+import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { authMiddleware } from "@/lib/middleware";
 
 // Server function to delete organization and set new active org
@@ -179,7 +180,7 @@ function SettingsPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <h1 className="font-bold text-3xl">Settings</h1>
+        <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground">
           Manage your organization settings and preferences
         </p>
@@ -236,16 +237,16 @@ function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-medium text-sm">Delete Organization</h3>
-              <p className="mb-3 text-muted-foreground text-sm">
+              <h3 className="text-sm font-medium">Delete Organization</h3>
+              <p className="mb-3 text-sm text-muted-foreground">
                 Permanently delete this organization and all associated data.
                 This action cannot be undone.
               </p>
               {!canDeleteOrganization && (
-                <div className="mb-3 flex items-start gap-2 rounded-md border-yellow-500 border-l-4 bg-yellow-50 p-3">
+                <div className="mb-3 flex items-start gap-2 rounded-md border-l-4 border-yellow-500 bg-yellow-50 p-3">
                   <AlertTriangle className="mt-0.5 h-4 w-4 text-yellow-600" />
                   <div>
-                    <p className="font-medium text-sm text-yellow-800">
+                    <p className="text-sm font-medium text-yellow-800">
                       Cannot Delete Last Organization
                     </p>
                     <p className="text-xs text-yellow-700">
@@ -326,7 +327,7 @@ function ConfirmDeleteDialog({
       <div className="w-full max-w-md rounded-lg bg-background p-6">
         <div className="mb-4 flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-destructive" />
-          <h2 className="font-semibold text-lg">Delete Organization</h2>
+          <h2 className="text-lg font-semibold">Delete Organization</h2>
         </div>
 
         <div className="mb-4 space-y-2">

@@ -1,4 +1,5 @@
 import { Layer } from "effect";
+
 import { RpcAuthClient } from "./auth/auth.client";
 import { RpcGameClient } from "./game/game.client";
 import { RpcOrganizationClient } from "./organization/organization.client";

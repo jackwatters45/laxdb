@@ -1,5 +1,7 @@
 import { RiArrowRightUpLine } from "@remixicon/react";
+
 import { FadeContainer, FadeDiv, FadeSpan } from "../fade";
+
 import GameOfLife from "./hero-background";
 
 export function Hero() {
@@ -12,7 +14,7 @@ export function Hero() {
             className="mx-auto w-full"
             type="button"
           >
-            <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-white/5 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-gray-900 ring-1 shadow-lg shadow-orange-400/20 ring-black/10 filter backdrop-blur-[1px] transition-colors hover:bg-orange-500/[2.5%] focus:outline-hidden sm:text-sm">
+            <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-white/5 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-gray-900 shadow-lg ring-1 shadow-orange-400/20 ring-black/10 filter backdrop-blur-[1px] transition-colors hover:bg-orange-500/[2.5%] focus:outline-hidden sm:text-sm">
               <span className="shrink-0 truncate rounded-full border bg-gray-50 px-2.5 py-1 text-sm text-gray-600 sm:text-xs">
                 News
               </span>

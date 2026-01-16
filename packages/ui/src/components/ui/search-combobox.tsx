@@ -1,5 +1,3 @@
-import { Check, ChevronsUpDown } from "lucide-react";
-import * as React from "react";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Command,
@@ -16,6 +14,8 @@ import {
   PopoverTrigger,
 } from "@laxdb/ui/components/ui/popover";
 import { cn } from "@laxdb/ui/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import * as React from "react";
 
 type SearchComboboxContextValue<TItem> = {
   items: TItem[];

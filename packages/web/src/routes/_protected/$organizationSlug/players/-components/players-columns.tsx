@@ -4,15 +4,6 @@ import {
   JerseyNumberSchema,
   PlayerNameSchema,
 } from "@laxdb/core/schema";
-import { Link } from "@tanstack/react-router";
-import {
-  type ColumnDef,
-  createColumnHelper,
-  type Row,
-} from "@tanstack/react-table";
-import { Schema } from "effect";
-import { User2 } from "lucide-react";
-import { toast } from "sonner";
 import { DataTableColumnHeader } from "@laxdb/ui/components/data-table/data-table-column-header";
 import {
   RowActionDeleteItem,
@@ -30,7 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
+import { Link } from "@tanstack/react-router";
+import {
+  type ColumnDef,
+  createColumnHelper,
+  type Row,
+} from "@tanstack/react-table";
+import { Schema } from "effect";
+import { User2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
+
 import { usePlayerMutations } from "../-mutations";
 
 const columnHelper = createColumnHelper<TeamPlayerWithInfo>();

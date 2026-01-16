@@ -1,4 +1,14 @@
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@laxdb/ui/components/ui/table";
+import { cn } from "@laxdb/ui/lib/utils";
+import type { ClassNameChildrenProp, ClassNameProp } from "@laxdb/ui/types";
+import {
   type ColumnDef,
   type ColumnFiltersState,
   flexRender,
@@ -13,16 +23,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@laxdb/ui/components/ui/table";
-import { cn } from "@laxdb/ui/lib/utils";
-import type { ClassNameChildrenProp, ClassNameProp } from "@laxdb/ui/types";
+
 import {
   DataTableContext,
   type DataTableContextValue,
@@ -117,7 +118,7 @@ function DataTableHeader({ className }: DataTableHeaderProps) {
   return (
     <TableHeader className={className}>
       {table.getHeaderGroups().map((headerGroup) => (
-        <TableRow className="border-border border-y" key={headerGroup.id}>
+        <TableRow className="border-y border-border" key={headerGroup.id}>
           {headerGroup.headers.map((header, i) => (
             <TableHead
               className={cn(
@@ -169,7 +170,7 @@ function DataTableRow({ row, className }: DataTableRowProps) {
         <TableCell
           className={cn(
             row.getIsSelected() ? "bg-muted/50" : "",
-            "relative whitespace-nowrap py-1 text-foreground first:w-8",
+            "relative py-1 whitespace-nowrap text-foreground first:w-8",
             index === 0 ? "" : "border-l",
             index === 0 ? "pl-2" : "",
             index === row.getVisibleCells().length - 1 ? "pr-2" : "",

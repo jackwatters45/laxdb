@@ -1,6 +1,8 @@
 import { Effect, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { HttpError, NetworkError, ParseError } from "../error";
+
 import { GraphQLError, makeGraphQLClient } from "./graphql.service";
 
 const TestDataSchema = Schema.Struct({

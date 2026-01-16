@@ -1,5 +1,8 @@
 import { Effect } from "effect";
+
 import { AuthService } from "../auth";
+import type { Headers } from "../type";
+
 import {
   TeamMemberError,
   TeamNotFoundError,
@@ -12,7 +15,6 @@ import type {
   RemoveTeamMemberInput,
   UpdateTeamInput,
 } from "./team.schema";
-import type { Headers } from "../type";
 
 export class TeamRepo extends Effect.Service<TeamRepo>()("TeamRepo", {
   effect: Effect.gen(function* () {

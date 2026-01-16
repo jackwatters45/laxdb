@@ -1,6 +1,3 @@
-import { MoreVertical, Plus } from "lucide-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -26,8 +23,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@laxdb/ui/components/ui/tooltip";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { MoreVertical, Plus } from "lucide-react";
+
+import { PageBody } from "@/components/layout/page-content";
+
 import { SettingsHeader } from "../-components/settings-header";
 import { invitedUsers, roles, users } from "../-data";
+
 import { ModalAddUser } from "./-modal-add-user";
 
 export const Route = createFileRoute(
@@ -51,7 +54,7 @@ function Users() {
                 >
                   Users
                 </h3>
-                <p className="text-muted-foreground text-sm leading-6">
+                <p className="text-sm leading-6 text-muted-foreground">
                   Workspace administrators can add, manage, and remove users.
                 </p>
               </div>
@@ -71,15 +74,15 @@ function Users() {
                   <div className="flex items-center gap-x-4 truncate">
                     <span
                       aria-hidden="true"
-                      className="hidden size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground text-xs sm:flex"
+                      className="hidden size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs text-muted-foreground sm:flex"
                     >
                       {user.initials}
                     </span>
                     <div className="truncate">
-                      <p className="truncate font-medium text-foreground text-sm">
+                      <p className="truncate text-sm font-medium text-foreground">
                         {user.name}
                       </p>
-                      <p className="truncate text-muted-foreground text-xs">
+                      <p className="truncate text-xs text-muted-foreground">
                         {user.email}
                       </p>
                     </div>
@@ -189,15 +192,15 @@ function Users() {
                   <div className="flex items-center gap-x-4">
                     <span
                       aria-hidden="true"
-                      className="hidden size-9 shrink-0 items-center justify-center rounded-full border border-border border-dashed bg-background text-muted-foreground text-xs sm:flex"
+                      className="hidden size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-border bg-background text-xs text-muted-foreground sm:flex"
                     >
                       {user.initials}
                     </span>
                     <div>
-                      <p className="font-medium text-foreground text-sm">
+                      <p className="text-sm font-medium text-foreground">
                         {user.email}
                       </p>
-                      <p className="text-muted-foreground text-xs">
+                      <p className="text-xs text-muted-foreground">
                         Expires in {user.expires} days
                       </p>
                     </div>

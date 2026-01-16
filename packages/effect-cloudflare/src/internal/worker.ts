@@ -5,12 +5,13 @@ import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import type * as Layer from "effect/Layer";
 import * as ManagedRuntime from "effect/ManagedRuntime";
-import { makeEnv, Env, type CloudflareEnv } from "./env";
+
 import {
   makeExecutionContext,
   ExecutionContext,
   type CloudflareExecutionContext,
 } from "./context";
+import { makeEnv, Env, type CloudflareEnv } from "./env";
 
 /**
  * @since 1.0.0

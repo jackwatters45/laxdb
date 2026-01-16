@@ -1,9 +1,11 @@
+import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
 import { FetchHttpClient } from "@effect/platform";
 import { RpcClient } from "@effect/rpc";
-import { AtomHttpApi, AtomRpc } from "@effect-atom/atom-react";
 import { Env } from "@laxdb/core/config";
 import { Effect } from "effect";
+
 import { RpcProtocolLive } from "../protocol";
+
 import { GamesApi } from "./game.api";
 import { GameRpcs } from "./game.rpc";
 

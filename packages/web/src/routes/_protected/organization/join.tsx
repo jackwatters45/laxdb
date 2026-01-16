@@ -1,13 +1,6 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { Effect, Schema } from "effect";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -23,6 +16,13 @@ import {
   FieldLabel,
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { Effect, Schema } from "effect";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const AcceptInvitationSchema = Schema.Struct({
   invitationId: Schema.String.pipe(
@@ -83,7 +83,7 @@ function JoinOrganizationPage() {
   return (
     <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-8">
-        <h1 className="font-bold text-3xl">Join Athletic Club</h1>
+        <h1 className="text-3xl font-bold">Join Athletic Club</h1>
         <p className="text-muted-foreground">
           Enter the invitation code you received to join an existing club
         </p>
@@ -92,7 +92,7 @@ function JoinOrganizationPage() {
       <Card>
         <CardHeader>
           <CardTitle>Join Organization</CardTitle>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             You should have received an invitation code via email from your club
             administrator
           </p>

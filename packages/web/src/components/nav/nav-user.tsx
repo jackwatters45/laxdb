@@ -1,5 +1,4 @@
-import { useRouteContext } from "@tanstack/react-router";
-import { ChevronsUpDown, LogOut, SunMoon } from "lucide-react";
+import { useTheme } from "@laxdb/ui/components/theme-provider";
 import {
   Avatar,
   AvatarFallback,
@@ -20,8 +19,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@laxdb/ui/components/ui/sidebar";
+import { useRouteContext } from "@tanstack/react-router";
+import { ChevronsUpDown, LogOut, SunMoon } from "lucide-react";
+
 import { authClient } from "@/lib/auth-client";
-import { useTheme } from "@laxdb/ui/components/theme-provider";
 
 export function NavUserSidebar() {
   const { user } = useRouteContext({ from: "/_protected" });

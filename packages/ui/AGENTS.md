@@ -21,7 +21,7 @@ src/
 │   └── data-table/   # TanStack Table components (9 files)
 ├── hooks/            # React hooks (use-mobile, use-toast, etc.)
 ├── lib/              # Utilities (cn, utils)
-└── styles/           # globals.css
+└── globals.css       # Tailwind styles
 ```
 
 ## WHERE TO LOOK
@@ -32,7 +32,7 @@ src/
 | Modify component | `src/components/ui/{component}.tsx` |
 | Add data table feature | `src/components/data-table/` |
 | Add hook | `src/hooks/` |
-| Modify styles | `src/styles/globals.css` |
+| Modify styles | `src/globals.css` |
 
 ## IMPORT PATTERN
 

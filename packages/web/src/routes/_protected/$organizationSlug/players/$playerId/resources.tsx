@@ -1,6 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeft, BookOpen, Calendar, Plus } from "lucide-react";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -9,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, BookOpen, Calendar, Plus } from "lucide-react";
 
 // Mock resources data
 const mockPlayerResources = [
@@ -171,7 +171,7 @@ function PlayerResourcesPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl">Assigned Resources</h1>
+            <h1 className="text-3xl font-bold">Assigned Resources</h1>
             <p className="text-muted-foreground">
               Learning materials and development resources for {playerName}
             </p>
@@ -197,7 +197,7 @@ function PlayerResourcesPage() {
       {/* Active Resources */}
       {groupedResources.active.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-4 font-semibold text-xl">Active Resources</h2>
+          <h2 className="mb-4 text-xl font-semibold">Active Resources</h2>
           <div className="space-y-4">
             {groupedResources.active.map((resource) => (
               <Card key={resource.id}>
@@ -211,7 +211,7 @@ function PlayerResourcesPage() {
                         <CardTitle className="text-lg">
                           {resource.title}
                         </CardTitle>
-                        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span>Assigned by {resource.assignedBy}</span>
                           <span>•</span>
                           <span>{formatDate(resource.assignedDate)}</span>
@@ -229,7 +229,7 @@ function PlayerResourcesPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-4 text-muted-foreground text-sm">
+                  <p className="mb-4 text-sm text-muted-foreground">
                     {resource.description}
                   </p>
 
@@ -252,7 +252,7 @@ function PlayerResourcesPage() {
                       <span>Due: {formatDate(resource.dueDate)}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-xs uppercase tracking-wide">
+                      <span className="text-xs font-medium tracking-wide uppercase">
                         {resource.type}
                       </span>
                     </div>
@@ -267,7 +267,7 @@ function PlayerResourcesPage() {
       {/* Completed Resources */}
       {groupedResources.completed.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-4 font-semibold text-xl">Completed Resources</h2>
+          <h2 className="mb-4 text-xl font-semibold">Completed Resources</h2>
           <div className="space-y-3">
             {groupedResources.completed.map((resource) => (
               <Card className="opacity-75" key={resource.id}>
@@ -279,7 +279,7 @@ function PlayerResourcesPage() {
                       </span>
                       <div>
                         <div className="font-medium">{resource.title}</div>
-                        <div className="text-muted-foreground text-sm">
+                        <div className="text-sm text-muted-foreground">
                           Completed{" "}
                           {resource.completedDate &&
                             formatDate(resource.completedDate)}
@@ -299,7 +299,7 @@ function PlayerResourcesPage() {
       {resources.length === 0 && (
         <div className="py-12 text-center">
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h2 className="mb-2 font-semibold text-xl">No resources assigned</h2>
+          <h2 className="mb-2 text-xl font-semibold">No resources assigned</h2>
           <p className="mb-6 text-muted-foreground">
             Learning resources will appear here when assigned
           </p>

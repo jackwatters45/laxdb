@@ -1,4 +1,5 @@
 import { index, integer, pgTable, text } from "drizzle-orm/pg-core";
+
 import { ids, timestamps } from "../drizzle/drizzle.type";
 import { organizationTable } from "../organization/organization.sql";
 import { teamTable } from "../team/team.sql";

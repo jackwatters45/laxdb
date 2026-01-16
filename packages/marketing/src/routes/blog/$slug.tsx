@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { allPosts, type Post } from "content-collections";
+
 import { MDXContent } from "@/components/mdx-content";
 
 export const Route = createFileRoute("/blog/$slug")({

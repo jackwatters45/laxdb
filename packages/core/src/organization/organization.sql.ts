@@ -1,4 +1,5 @@
 import { index, pgTable, text } from "drizzle-orm/pg-core";
+
 import { timestamp } from "../drizzle/drizzle.type";
 import { userTable } from "../user/user.sql";
 

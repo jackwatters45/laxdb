@@ -1,13 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { PageBody, PageContainer } from "@/components/layout/page-content";
-import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+
+import { PageBody, PageContainer } from "@/components/layout/page-content";
+import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
+
 import { PlayerHeader } from "./-components/player-header";
 import { PlayerInfo } from "./-components/player-info";
 import { playerInfo } from "./-data-2";

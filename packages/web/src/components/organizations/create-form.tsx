@@ -2,13 +2,6 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { CreateOrganizationInput } from "@laxdb/core/organization/organization.schema";
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Effect, Schema } from "effect";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { PageContainer } from "@/components/layout/page-content";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -24,6 +17,14 @@ import {
   FieldLabel,
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect, Schema } from "effect";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { PageContainer } from "@/components/layout/page-content";
 import { authMiddleware } from "@/lib/middleware";
 
 const createOrganization = createServerFn({ method: "POST" })
@@ -100,7 +101,7 @@ export function CreateOrganizationForm({
   return (
     <PageContainer className="space-y-4">
       <div>
-        <h1 className="font-bold text-xl">Create Your Athletic Club</h1>
+        <h1 className="text-xl font-bold">Create Your Athletic Club</h1>
         <p className="text-muted-foreground">
           Set up your organization to start managing teams and players
         </p>

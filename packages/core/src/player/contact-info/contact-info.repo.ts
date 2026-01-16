@@ -1,15 +1,17 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
+import type { SqlError } from "@effect/sql/SqlError";
 import { eq, getTableColumns } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
+import type { NoSuchElementException } from "effect/Cause";
+
 import { DatabaseLive } from "../../drizzle/drizzle.service";
 import { playerTable } from "../player.sql";
+
 import type {
   GetPlayerContactInfoInput,
   PlayerWithContactInfo,
 } from "./contact-info.schema";
 import { playerContactInfoTable } from "./contact-info.sql";
-import type { SqlError } from "@effect/sql/SqlError";
-import type { NoSuchElementException } from "effect/Cause";
 
 export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
   "ContactInfoRepo",

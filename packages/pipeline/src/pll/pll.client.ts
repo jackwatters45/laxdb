@@ -1,8 +1,10 @@
 import { Effect, type ParseResult, Schema } from "effect";
-import { ParseError } from "../error";
-import { makeRestClient } from "../api-client/rest-client.service";
+
 import { makeGraphQLClient } from "../api-client/graphql.service";
+import { makeRestClient } from "../api-client/rest-client.service";
 import { PLLConfig } from "../config";
+import { ParseError } from "../error";
+
 import {
   ADVANCED_PLAYERS_QUERY,
   CAREER_STATS_QUERY,

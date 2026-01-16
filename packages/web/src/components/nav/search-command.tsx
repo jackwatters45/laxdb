@@ -1,3 +1,14 @@
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@laxdb/ui/components/ui/command";
 import {
   Link,
   useNavigate,
@@ -21,17 +32,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@laxdb/ui/components/ui/command";
+
 import { useSwitchOrganization } from "@/mutations/organizations";
 
 export function SearchCommand() {
@@ -242,7 +243,7 @@ export function SearchCommand() {
   return (
     <>
       <Button
-        className="h-8 w-full cursor-text justify-between pr-1 pl-2 font-normal text-foreground focus:border-ring focus:ring-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2"
+        className="h-8 w-full cursor-text justify-between pr-1 pl-2 font-normal text-foreground group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 focus:border-ring focus:ring-0"
         onClick={(e) => {
           e.preventDefault();
           setOpen(true);
@@ -253,7 +254,7 @@ export function SearchCommand() {
           <Search className="size-3 transform text-muted-foreground" />
           <span className="group-data-[collapsible=icon]:hidden">Search</span>
         </div>
-        <kbd className="rounded-md border bg-muted px-1 py-0.5 font-semibold text-muted-foreground text-xs group-data-[collapsible=icon]:hidden">
+        <kbd className="rounded-md border bg-muted px-1 py-0.5 text-xs font-semibold text-muted-foreground group-data-[collapsible=icon]:hidden">
           ⌘K
         </kbd>
       </Button>

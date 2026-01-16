@@ -1,10 +1,3 @@
-import type { Table } from "@tanstack/react-table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Select,
@@ -14,6 +7,13 @@ import {
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
 import { cn } from "@laxdb/ui/lib/utils";
+import type { Table } from "@tanstack/react-table";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>;
@@ -24,7 +24,7 @@ function PaginationSelectedCount<TData>({ table }: { table: Table<TData> }) {
   const selectedRows = table.getFilteredSelectedRowModel().rows.length;
 
   return (
-    <div className="text-muted-foreground text-sm tabular-nums">
+    <div className="text-sm text-muted-foreground tabular-nums">
       {selectedRows} of {totalRows} row(s) selected.
     </div>
   );
@@ -33,7 +33,7 @@ function PaginationSelectedCount<TData>({ table }: { table: Table<TData> }) {
 function PaginationPageSizeSelect<TData>({ table }: { table: Table<TData> }) {
   return (
     <div className="flex items-center space-x-2">
-      <p className="font-medium text-muted-foreground text-sm">Rows per page</p>
+      <p className="text-sm font-medium text-muted-foreground">Rows per page</p>
       <Select
         onValueChange={(value) => {
           table.setPageSize(Number(value));
@@ -63,7 +63,7 @@ function PaginationInfo<TData>({ table }: { table: Table<TData> }) {
   const lastRowIndex = Math.min(totalRows, firstRowIndex + pageSize - 1);
 
   return (
-    <p className="hidden text-muted-foreground text-sm tabular-nums sm:block">
+    <p className="hidden text-sm text-muted-foreground tabular-nums sm:block">
       Showing{" "}
       <span className="font-medium text-foreground">
         {firstRowIndex}-{lastRowIndex}

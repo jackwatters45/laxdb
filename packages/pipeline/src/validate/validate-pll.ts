@@ -1,7 +1,16 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { readJsonFile } from "@laxdb/core/util";
 import { Effect, Layer } from "effect";
+
 import { ExtractConfigService } from "../extract/extract.config";
+
+import type {
+  FileValidationResult,
+  CrossReferenceResult,
+  ValidationCheckResult,
+} from "./validate.schema";
+import { errorIssue, infoIssue } from "./validate.schema";
 import {
   validateJsonArray,
   validateRequiredFields,
@@ -11,13 +20,6 @@ import {
   printReport,
   validateFileExists,
 } from "./validate.service";
-import type {
-  FileValidationResult,
-  CrossReferenceResult,
-  ValidationCheckResult,
-} from "./validate.schema";
-import { errorIssue, infoIssue } from "./validate.schema";
-import { readJsonFile } from "@laxdb/core/util";
 
 interface PlayerDetail {
   slug: string;

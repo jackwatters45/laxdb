@@ -1,13 +1,13 @@
 /**
  * @since 1.0.0
+import * as Context from "effect/Context";
  */
 import * as Effect from "effect/Effect";
+import { dual } from "effect/Function";
+import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Predicate from "effect/Predicate";
 import * as Schema from "effect/Schema";
-import * as Context from "effect/Context";
-import * as Layer from "effect/Layer";
-import { dual } from "effect/Function";
 
 /**
  * @since 1.0.0

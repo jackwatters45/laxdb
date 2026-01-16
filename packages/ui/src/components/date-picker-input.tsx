@@ -1,8 +1,5 @@
 "use client";
 
-import { CalendarIcon } from "lucide-react";
-import * as React from "react";
-
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Calendar } from "@laxdb/ui/components/ui/calendar";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -12,6 +9,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@laxdb/ui/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import * as React from "react";
 
 function formatDate(date: Date | undefined) {
   if (!date) {
@@ -70,7 +69,7 @@ export default function Calendar28() {
           <PopoverTrigger
             render={
               <Button
-                className="-translate-y-1/2 absolute top-1/2 right-2 h-6 w-6"
+                className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2"
                 id="date-picker"
                 size="icon"
                 variant="ghost"

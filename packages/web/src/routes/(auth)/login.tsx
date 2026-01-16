@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Schema } from "effect";
 import { GalleryVerticalEnd } from "lucide-react";
+
 import { LoginForm } from "@/components/auth/login-form";
 
 const loginSearchSchema = Schema.standardSchemaV1(

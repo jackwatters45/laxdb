@@ -3,9 +3,11 @@
 import { RiCloseFill, RiMenuFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
-import { siteConfig } from "@/site";
+
 import useScroll from "@/lib/use-scroll";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/site";
+
 import { SolarLogo } from "../../../public/solar-logo";
 import { Button } from "../button";
 

@@ -1,7 +1,4 @@
 import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
-import { createFileRoute } from "@tanstack/react-router";
-import type { Table } from "@tanstack/react-table";
-import { Mail } from "lucide-react";
 import {
   BulkEditProvider,
   BulkEditToolbar,
@@ -13,6 +10,10 @@ import {
   BulkEditToolbarSeparator,
 } from "@laxdb/ui/components/data-table/data-table-bulk-edit-toolbar";
 import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
+import { createFileRoute } from "@tanstack/react-router";
+import type { Table } from "@tanstack/react-table";
+import { Mail } from "lucide-react";
+
 import { usePlayerMutations } from "../-mutations";
 
 const Route = createFileRoute(

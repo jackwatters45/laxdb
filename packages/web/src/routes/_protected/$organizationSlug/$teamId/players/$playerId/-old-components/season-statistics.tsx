@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+
 import type { PlayerDetails } from "../-utils";
 
 type SeasonStatisticsProps = {
@@ -19,18 +20,18 @@ export function SeasonStatistics({ player }: SeasonStatisticsProps) {
       <CardContent>
         <div className="mb-4 grid grid-cols-3 gap-4">
           <div className="text-center">
-            <div className="font-bold text-2xl">{player.goals}</div>
-            <div className="text-muted-foreground text-sm">Goals</div>
+            <div className="text-2xl font-bold">{player.goals}</div>
+            <div className="text-sm text-muted-foreground">Goals</div>
           </div>
           <div className="text-center">
-            <div className="font-bold text-2xl">{player.assists}</div>
-            <div className="text-muted-foreground text-sm">Assists</div>
+            <div className="text-2xl font-bold">{player.assists}</div>
+            <div className="text-sm text-muted-foreground">Assists</div>
           </div>
           <div className="text-center">
-            <div className="font-bold text-2xl">
+            <div className="text-2xl font-bold">
               {player.shotAccuracy.toFixed(1)}%
             </div>
-            <div className="text-muted-foreground text-sm">Shot Accuracy</div>
+            <div className="text-sm text-muted-foreground">Shot Accuracy</div>
           </div>
         </div>
 

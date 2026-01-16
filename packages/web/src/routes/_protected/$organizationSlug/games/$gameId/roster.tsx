@@ -1,9 +1,3 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Plus, Save, Trash2, Users } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -12,6 +6,12 @@ import {
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Plus, Save, Trash2, Users } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 // Mock data
 const mockTeamPlayers = [
@@ -157,7 +157,7 @@ function RosterManagementPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl">Manage Game Roster</h1>
+            <h1 className="text-3xl font-bold">Manage Game Roster</h1>
             <p className="text-muted-foreground">
               Add players and set starting lineup
             </p>
@@ -196,7 +196,7 @@ function RosterManagementPage() {
                       </div>
                       <div>
                         <div className="font-medium">{player.name}</div>
-                        <div className="text-muted-foreground text-sm">
+                        <div className="text-sm text-muted-foreground">
                           {player.position}
                         </div>
                       </div>
@@ -274,12 +274,12 @@ function RosterManagementPage() {
                     key={player.id}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-bold text-sm">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-bold">
                         {player.jerseyNumber}
                       </div>
                       <div>
-                        <div className="font-medium text-sm">{player.name}</div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-sm font-medium">{player.name}</div>
+                        <div className="text-xs text-muted-foreground">
                           {player.position}
                         </div>
                       </div>
@@ -316,28 +316,28 @@ function RosterManagementPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="text-center">
-                <div className="font-bold text-2xl">{roster.length}</div>
-                <div className="text-muted-foreground text-sm">
+                <div className="text-2xl font-bold">{roster.length}</div>
+                <div className="text-sm text-muted-foreground">
                   Total Players
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {roster.filter((r) => r.isStarter).length}
                 </div>
-                <div className="text-muted-foreground text-sm">Starters</div>
+                <div className="text-sm text-muted-foreground">Starters</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {roster.filter((r) => r.isCaptain).length}
                 </div>
-                <div className="text-muted-foreground text-sm">Captains</div>
+                <div className="text-sm text-muted-foreground">Captains</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-2xl">
+                <div className="text-2xl font-bold">
                   {roster.length - roster.filter((r) => r.isStarter).length}
                 </div>
-                <div className="text-muted-foreground text-sm">
+                <div className="text-sm text-muted-foreground">
                   Bench Players
                 </div>
               </div>

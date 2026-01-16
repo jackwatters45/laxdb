@@ -1,7 +1,9 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import { and, eq, getTableColumns, inArray, isNull } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
+
 import { DatabaseLive } from "../drizzle/drizzle.service";
+
 import type {
   AddPlayerToTeamInput,
   BulkDeletePlayersInput,

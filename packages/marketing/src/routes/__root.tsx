@@ -6,10 +6,11 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+
 import Footer from "@/components/ui/footer";
 import { NavBar } from "@/components/ui/navbar";
-import { siteConfig } from "@/site";
 import globalsCss from "@/globals.css?url";
+import { siteConfig } from "@/site";
 
 export const Route = createRootRoute({
   head: () => ({

@@ -1,6 +1,3 @@
-import { ExternalLink } from "lucide-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageBody } from "@/components/layout/page-content";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -19,6 +16,11 @@ import {
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ExternalLink } from "lucide-react";
+
+import { PageBody } from "@/components/layout/page-content";
+
 import { SettingsHeader } from "../-components/settings-header";
 import { roles } from "../-data";
 
@@ -44,7 +46,7 @@ function General() {
                   >
                     Personal information
                   </h2>
-                  <p className="mt-1 text-muted-foreground text-sm leading-6">
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Manage your personal information and role.
                   </p>
                 </div>
@@ -126,7 +128,7 @@ function General() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="mt-2 text-muted-foreground text-xs">
+                      <p className="mt-2 text-xs text-muted-foreground">
                         Roles can only be changed by system admin.
                       </p>
                     </div>
@@ -149,16 +151,16 @@ function General() {
                   >
                     Notification settings
                   </h2>
-                  <p className="mt-1 text-muted-foreground text-sm leading-6">
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Configure the types of notifications you want to receive.
                   </p>
                 </div>
                 <div className="md:col-span-2">
                   <fieldset>
-                    <legend className="font-medium text-foreground text-sm">
+                    <legend className="text-sm font-medium text-foreground">
                       Team
                     </legend>
-                    <p className="mt-1 text-muted-foreground text-sm leading-6">
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       Configure the types of team alerts you want to receive.
                     </p>
                     <ul className="mt-4 divide-y divide-border">
@@ -181,10 +183,10 @@ function General() {
                     </ul>
                   </fieldset>
                   <fieldset className="mt-6">
-                    <legend className="font-medium text-foreground text-sm">
+                    <legend className="text-sm font-medium text-foreground">
                       Usage
                     </legend>
-                    <p className="mt-1 text-muted-foreground text-sm leading-6">
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       Configure the types of usage alerts you want to receive.
                     </p>
                     <ul className="mt-4 divide-y divide-border">
@@ -235,7 +237,7 @@ function General() {
                   >
                     Danger zone
                   </h2>
-                  <p className="mt-1 text-muted-foreground text-sm leading-6">
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Manage general workspace. Contact system admin for more
                     information.{" "}
                     <a
@@ -254,10 +256,10 @@ function General() {
                   <Card className="p-4">
                     <div className="flex items-start justify-between gap-10">
                       <div>
-                        <h4 className="font-medium text-foreground text-sm">
+                        <h4 className="text-sm font-medium text-foreground">
                           Leave workspace
                         </h4>
-                        <p className="mt-2 text-muted-foreground text-sm leading-6">
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
                           Revoke your access to this team. Other people you have
                           added to the workspace will remain.
                         </p>
@@ -273,10 +275,10 @@ function General() {
                   <Card className="overflow-hidden p-0">
                     <div className="flex items-start justify-between gap-10 p-4">
                       <div>
-                        <h4 className="font-medium text-muted-foreground text-sm">
+                        <h4 className="text-sm font-medium text-muted-foreground">
                           Delete workspace
                         </h4>
-                        <p className="mt-2 text-muted-foreground text-sm leading-6">
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
                           Revoke your access to this team. Other people you have
                           added to the workspace will remain.
                         </p>
@@ -289,8 +291,8 @@ function General() {
                         Delete workspace
                       </Button>
                     </div>
-                    <div className="border-border border-t bg-muted p-4">
-                      <p className="text-muted-foreground text-sm">
+                    <div className="border-t border-border bg-muted p-4">
+                      <p className="text-sm text-muted-foreground">
                         You cannot delete the workspace because you are not the
                         system admin.
                       </p>

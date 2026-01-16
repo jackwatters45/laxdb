@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-import { Plus, Target } from "lucide-react";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -7,6 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Link } from "@tanstack/react-router";
+import { Plus, Target } from "lucide-react";
+
 import type { PlayerDetails } from "../-utils";
 import { formatDate, getGoalCategoryIcon } from "../-utils";
 
@@ -54,7 +55,7 @@ export function ActiveGoals({
                     {getGoalCategoryIcon(goal.category)}
                     <span className="font-medium">{goal.title}</span>
                   </div>
-                  <span className="font-bold text-sm">{goal.progress}%</span>
+                  <span className="text-sm font-bold">{goal.progress}%</span>
                 </div>
                 <div className="mb-2 h-2 rounded-full bg-muted">
                   <div

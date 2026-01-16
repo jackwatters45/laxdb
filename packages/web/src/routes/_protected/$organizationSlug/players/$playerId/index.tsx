@@ -1,3 +1,11 @@
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
@@ -14,14 +22,6 @@ import {
   TrendingUp,
   Trophy,
 } from "lucide-react";
-import { Badge } from "@laxdb/ui/components/ui/badge";
-import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
 
 // Mock data for player details
 const mockPlayerDetails = {
@@ -322,11 +322,11 @@ function PlayerDetailsPage() {
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground text-xl">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground">
               {player.jerseyNumber}
             </div>
             <div>
-              <h1 className="font-bold text-3xl">{player.name}</h1>
+              <h1 className="text-3xl font-bold">{player.name}</h1>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <span>
                   {player.primaryPosition.charAt(0).toUpperCase() +
@@ -382,18 +382,18 @@ function PlayerDetailsPage() {
             <CardContent>
               <div className="mb-4 grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="font-bold text-2xl">{player.goals}</div>
-                  <div className="text-muted-foreground text-sm">Goals</div>
+                  <div className="text-2xl font-bold">{player.goals}</div>
+                  <div className="text-sm text-muted-foreground">Goals</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-bold text-2xl">{player.assists}</div>
-                  <div className="text-muted-foreground text-sm">Assists</div>
+                  <div className="text-2xl font-bold">{player.assists}</div>
+                  <div className="text-sm text-muted-foreground">Assists</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-bold text-2xl">
+                  <div className="text-2xl font-bold">
                     {player.shotAccuracy.toFixed(1)}%
                   </div>
-                  <div className="text-muted-foreground text-sm">
+                  <div className="text-sm text-muted-foreground">
                     Shot Accuracy
                   </div>
                 </div>
@@ -455,7 +455,7 @@ function PlayerDetailsPage() {
                           {getGoalCategoryIcon(goal.category)}
                           <span className="font-medium">{goal.title}</span>
                         </div>
-                        <span className="font-bold text-sm">
+                        <span className="text-sm font-bold">
                           {goal.progress}%
                         </span>
                       </div>
@@ -517,8 +517,8 @@ function PlayerDetailsPage() {
                       key={note.id}
                     >
                       <div className="flex-1">
-                        <div className="font-medium text-sm">{note.title}</div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-sm font-medium">{note.title}</div>
+                        <div className="text-xs text-muted-foreground">
                           by {note.coach} • {formatDate(note.date)}
                         </div>
                       </div>
@@ -565,18 +565,18 @@ function PlayerDetailsPage() {
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="font-bold text-lg">
+                  <div className="text-lg font-bold">
                     {player.overallRating}/10
                   </div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-xs text-muted-foreground">
                     Current Rating
                   </div>
                 </div>
                 <div>
-                  <div className="font-bold text-lg">
+                  <div className="text-lg font-bold">
                     {player.potentialRating}/10
                   </div>
-                  <div className="text-muted-foreground text-xs">Potential</div>
+                  <div className="text-xs text-muted-foreground">Potential</div>
                 </div>
               </div>
 
@@ -709,7 +709,7 @@ function PlayerDetailsPage() {
                     >
                       <div className="flex-1">
                         <div className="font-medium">{resource.title}</div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-xs text-muted-foreground">
                           Due: {formatDate(resource.dueDate)}
                         </div>
                       </div>
@@ -738,7 +738,7 @@ function PlayerDetailsPage() {
                   )}
                 </div>
               ) : (
-                <p className="text-center text-muted-foreground text-sm">
+                <p className="text-center text-sm text-muted-foreground">
                   No resources assigned
                 </p>
               )}

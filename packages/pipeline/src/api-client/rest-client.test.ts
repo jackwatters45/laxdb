@@ -1,6 +1,8 @@
 import { Effect, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { HttpError, NetworkError, ParseError, RateLimitError } from "../error";
+
 import { makeRestClient } from "./rest-client.service";
 
 const TestResponse = Schema.Struct({

@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import {
   FilterActions,
   FilterBar,
@@ -12,7 +11,10 @@ import {
 } from "@laxdb/ui/components/data-table/data-table-filterbar";
 import { useDataTable } from "@laxdb/ui/components/data-table/use-data-table";
 import { Button } from "@laxdb/ui/components/ui/button";
+import { Plus } from "lucide-react";
+
 import { POSITION_SELECT_FIELDS } from "@/lib/constants";
+
 import { AddPlayerCommand } from "./add-player-command";
 
 export function PlayersFilterBar({

@@ -18,8 +18,8 @@ import {
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { desc, eq } from "drizzle-orm";
 import { Array as Arr, Effect, ManagedRuntime, Redacted } from "effect";
+
 import { OrganizationMembershipError } from "./auth/auth.error";
-import { AppConfig } from "./config";
 import {
   ac,
   assistantCoach,
@@ -29,6 +29,7 @@ import {
   player,
 } from "./auth/auth.permissions";
 import * as authSchema from "./auth/auth.sql";
+import { AppConfig } from "./config";
 import { DatabaseLive } from "./drizzle/drizzle.service";
 import { AuthenticationError, DatabaseError } from "./error";
 import {
@@ -37,8 +38,8 @@ import {
   organizationTable,
 } from "./organization/organization.sql";
 import { teamMemberTable, teamTable } from "./team/team.sql";
-import { userTable } from "./user/user.sql";
 import type { Headers } from "./type";
+import { userTable } from "./user/user.sql";
 
 const polarClient = new Polar({
   // accessToken: Resource.PolarAccessToken.value,

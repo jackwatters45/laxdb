@@ -1,7 +1,3 @@
-import type { Row } from "@tanstack/react-table";
-import type { LucideIcon } from "lucide-react";
-import { MoreHorizontal, Pencil, Trash2, UserMinus } from "lucide-react";
-import * as React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +19,10 @@ import {
 } from "@laxdb/ui/components/ui/dropdown-menu";
 import { cn } from "@laxdb/ui/lib/utils";
 import type { ClassNameChildrenProp } from "@laxdb/ui/types";
+import type { Row } from "@tanstack/react-table";
+import type { LucideIcon } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, UserMinus } from "lucide-react";
+import * as React from "react";
 
 type RowActions<TData = unknown> = {
   onEdit?: (row: Row<TData>) => void;

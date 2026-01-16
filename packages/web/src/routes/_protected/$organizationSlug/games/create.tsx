@@ -1,11 +1,4 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Schema } from "effect";
-import { ArrowLeft, Calendar, MapPin } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
@@ -32,6 +25,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Schema } from "effect";
+import { ArrowLeft, Calendar, MapPin } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 // Mock server function for creating games
 const createGame = createServerFn({ method: "POST" })
@@ -150,7 +150,7 @@ function CreateGamePage() {
           </Button>
         </Link>
 
-        <h1 className="font-bold text-3xl">Schedule New Game</h1>
+        <h1 className="text-3xl font-bold">Schedule New Game</h1>
         <p className="text-muted-foreground">
           Add a new game to your team&apos;s schedule
         </p>

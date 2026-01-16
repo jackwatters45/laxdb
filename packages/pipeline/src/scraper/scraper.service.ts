@@ -1,5 +1,7 @@
 import { Effect, Schema, Array as Arr } from "effect";
+
 import { PipelineConfig } from "../config";
+
 import { ScraperClient } from "./scraper.client";
 import {
   BatchScrapeRequest,

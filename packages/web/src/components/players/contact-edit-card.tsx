@@ -1,15 +1,15 @@
-import { Mail, MessageCircle, Phone } from "lucide-react";
-import { createContext, useContext, useMemo } from "react";
-import type { Control, FieldValues, UseFormReturn } from "react-hook-form";
-import { Controller } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
-import { Input } from "@laxdb/ui/components/ui/input";
 import {
   FacebookIcon,
   InstagramIcon,
   LinkedInIcon,
   SOCIAL_PLATFORM_CONFIG,
 } from "@laxdb/ui/components/social-icons";
+import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Mail, MessageCircle, Phone } from "lucide-react";
+import { createContext, useContext, useMemo } from "react";
+import type { Control, FieldValues, UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 type ContactEditCardContextValue = {
   control: Control;
@@ -79,7 +79,7 @@ function ContactEditCardField() {
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel
             htmlFor={`contact-${name}`}
-            className="font-medium text-muted-foreground text-xs"
+            className="text-xs font-medium text-muted-foreground"
           >
             {label}
           </FieldLabel>
@@ -102,7 +102,7 @@ function ContactEditCardLabel() {
   return (
     <FieldLabel
       htmlFor={`contact-${String(name)}`}
-      className="font-medium text-muted-foreground text-xs"
+      className="text-xs font-medium text-muted-foreground"
     >
       {label}
     </FieldLabel>
@@ -135,7 +135,7 @@ function ContactEditCardInput({
       {icon}
       {prefix ? (
         <div className="flex flex-1 items-center rounded-md border">
-          <span className="flex h-8 items-center border-r bg-muted px-3 text-muted-foreground text-sm">
+          <span className="flex h-8 items-center border-r bg-muted px-3 text-sm text-muted-foreground">
             {prefix}
           </span>
           <Input
@@ -172,7 +172,7 @@ function ContactEditCardIcon({ children }: ContactEditCardIconProps) {
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel
             htmlFor={`contact-${name}`}
-            className="font-medium text-muted-foreground text-xs"
+            className="text-xs font-medium text-muted-foreground"
           >
             {label}
           </FieldLabel>

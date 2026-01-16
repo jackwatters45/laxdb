@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { EmailSchema } from "../schema";
 
 export class Email extends Schema.Class<Email>("Email")({

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
-import * as Wrangler from "wrangler";
-import { Env, makeEnv } from "../internal/env";
 import * as Option from "effect/Option";
+import * as Wrangler from "wrangler";
+
+import { Env, makeEnv } from "../internal/env";
 
 const platformProxyLayer = Layer.scoped(
   Env,

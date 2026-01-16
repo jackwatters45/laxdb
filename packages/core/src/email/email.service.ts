@@ -1,6 +1,8 @@
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import { Effect, Schema } from "effect";
+
 import { AppConfig } from "../config";
+
 import { EmailSendError } from "./email.error";
 import { SendEmailInput, SendFeedbackEmailInput } from "./email.schema";
 

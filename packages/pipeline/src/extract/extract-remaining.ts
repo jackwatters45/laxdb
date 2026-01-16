@@ -12,6 +12,7 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Duration, Layer, Schema } from "effect";
+
 import { PLLClient } from "../pll/pll.client";
 import {
   PLLStatLeader,
@@ -20,6 +21,7 @@ import {
   type PLLEventDetail,
   type PLLTeamDetail,
 } from "../pll/pll.schema";
+
 import { ExtractConfigService } from "./extract.config";
 
 const EventSlugRef = Schema.Struct({ slug: Schema.String });

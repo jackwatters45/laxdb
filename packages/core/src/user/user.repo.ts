@@ -1,7 +1,9 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import { eq } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
+
 import { DatabaseLive } from "../drizzle/drizzle.service";
+
 import type { GetUserFromEmailInput } from "./user.schema";
 import { type UserSelect, userTable } from "./user.sql";
 

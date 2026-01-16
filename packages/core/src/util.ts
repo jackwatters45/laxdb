@@ -1,11 +1,12 @@
+import { FileSystem } from "@effect/platform";
 import type { SqlError } from "@effect/sql/SqlError";
 import { Effect, Schema } from "effect";
+
 import {
   ConstraintViolationError,
   DatabaseError,
   ValidationError,
 } from "./error";
-import { FileSystem } from "@effect/platform";
 
 export const readJsonFile = <T>(filePath: string) =>
   Effect.gen(function* () {

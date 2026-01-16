@@ -1,7 +1,4 @@
 import type { Player } from "@laxdb/core/player/player.sql";
-import { useQuery } from "@tanstack/react-query";
-import { UserPlus } from "lucide-react";
-import { useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -18,8 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@laxdb/ui/components/ui/dialog";
+import { useQuery } from "@tanstack/react-query";
+import { UserPlus } from "lucide-react";
+import { useState } from "react";
+
 import { getOrgPlayersQK } from "@/mutations/players";
 import { getOrganizationPlayers } from "@/query/players";
+
 import { usePlayerMutations } from "../-mutations";
 
 export function AddPlayerCommand({
@@ -133,7 +135,7 @@ export function AddPlayerCommand({
                           <div className="flex flex-col">
                             <span>{player.name ?? "Unnamed"}</span>
                             {(player.email ?? player.phone) && (
-                              <span className="text-muted-foreground text-xs">
+                              <span className="text-xs text-muted-foreground">
                                 {player.email ?? player.phone}
                               </span>
                             )}

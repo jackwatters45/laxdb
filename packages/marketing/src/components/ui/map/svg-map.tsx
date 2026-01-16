@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "motion/react";
-
 import type { SVGProps } from "react";
 
 export const SVGMap = (props: SVGProps<SVGSVGElement>) => {

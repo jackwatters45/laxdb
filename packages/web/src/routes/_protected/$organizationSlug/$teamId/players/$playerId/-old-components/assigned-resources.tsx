@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
@@ -7,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Link } from "@tanstack/react-router";
+
 import type { PlayerDetails } from "../-utils";
 import { formatDate, getStatusColor } from "../-utils";
 
@@ -34,7 +35,7 @@ export function AssignedResources({
               >
                 <div className="flex-1">
                   <div className="font-medium">{resource.title}</div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-xs text-muted-foreground">
                     Due: {formatDate(resource.dueDate)}
                   </div>
                 </div>
@@ -63,7 +64,7 @@ export function AssignedResources({
             )}
           </div>
         ) : (
-          <p className="text-center text-muted-foreground text-sm">
+          <p className="text-center text-sm text-muted-foreground">
             No resources assigned
           </p>
         )}

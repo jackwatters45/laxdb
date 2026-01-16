@@ -2,12 +2,13 @@ import { AuthService } from "@laxdb/core/auth";
 import { OrganizationOperationError } from "@laxdb/core/organization/organization.error";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { OrganizationSlugSchema } from "@laxdb/core/schema";
+import { SidebarInset, SidebarProvider } from "@laxdb/ui/components/ui/sidebar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { Effect, Schema } from "effect";
+
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@laxdb/ui/components/ui/sidebar";
 import { authMiddleware } from "@/lib/middleware";
 
 const GetDashboardDataSchema = Schema.Struct({
