@@ -81,7 +81,7 @@
     "id": "api-008",
     "category": "infrastructure",
     "description": "Extract AuthGroup from auth.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor auth.api.ts to export HttpApiGroup only (AuthGroup)",
       "Create AuthGroupLive using HttpApiBuilder.group(LaxdbApi, 'Auth', ...)",
