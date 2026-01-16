@@ -1,18 +1,29 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { allPosts } from "content-collections";
+import { KnowledgeGraph } from "../../components/ui/knowledge-graph";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
 });
 
 function BlogIndex() {
+  const navigate = useNavigate();
   const sortedPosts = [...allPosts].toSorted(
     (a, b) => new Date(b.published).getTime() - new Date(a.published).getTime(),
   );
 
+  const handleNodeClick = (slug: string) => {
+    navigate({ to: "/blog/$slug", params: { slug } });
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-32">
       <h1 className="mb-8 text-4xl font-bold text-gray-900">Blog</h1>
+
+      <section className="mb-12">
+        <h2 className="mb-4 text-xl font-semibold text-gray-700">Knowledge Graph</h2>
+        <KnowledgeGraph posts={allPosts} onNodeClick={handleNodeClick} />
+      </section>
       <ul className="space-y-8">
         {sortedPosts.map((post) => (
           <li key={post.slug}>

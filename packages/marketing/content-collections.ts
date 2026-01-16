@@ -15,6 +15,7 @@ const posts = defineCollection({
     published: z.iso.date(),
     description: z.string().optional(),
     authors: z.array(z.string()),
+    tags: z.array(z.string()).optional(),
     content: z.string(),
   }),
   transform: async (document, context) => {
