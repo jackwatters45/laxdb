@@ -32,6 +32,3 @@ export const TeamsHandlersLive = HttpApiBuilder.group(
         );
     }),
 ).pipe(Layer.provide(TeamService.Default));
-
-// Legacy alias
-export const TeamsApiLive = TeamsHandlersLive;

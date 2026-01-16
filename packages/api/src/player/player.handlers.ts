@@ -36,6 +36,3 @@ export const PlayersHandlersLive = HttpApiBuilder.group(
         );
     }),
 ).pipe(Layer.provide(PlayerService.Default));
-
-// Legacy alias
-export const PlayersApiLive = PlayersHandlersLive;

@@ -19,6 +19,3 @@ export const SeasonsHandlersLive = HttpApiBuilder.group(
         .handle("deleteSeason", ({ payload }) => service.delete(payload));
     }),
 ).pipe(Layer.provide(SeasonService.Default));
-
-// Legacy alias for backward compatibility
-export const SeasonsApiLive = SeasonsHandlersLive;

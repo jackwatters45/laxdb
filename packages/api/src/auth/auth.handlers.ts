@@ -18,6 +18,3 @@ export const AuthHandlersLive = HttpApiBuilder.group(
         );
     }),
 ).pipe(Layer.provide(AuthService.Default));
-
-// Legacy alias
-export const AuthApiLive = AuthHandlersLive;

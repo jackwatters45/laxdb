@@ -8,25 +8,25 @@ import {
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
 
-import { AuthApiLive } from "./auth/auth.handlers";
+import { AuthHandlersLive } from "./auth/auth.handlers";
 import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
-import { GamesApiLive } from "./game/game.handlers";
+import { GamesHandlersLive } from "./game/game.handlers";
 import { GameHandlers, GameRpcs } from "./game/game.rpc";
-import { OrganizationsApiLive } from "./organization/organization.handlers";
+import { OrganizationsHandlersLive } from "./organization/organization.handlers";
 import {
   OrganizationHandlers,
   OrganizationRpcs,
 } from "./organization/organization.rpc";
-import { ContactInfoApiLive } from "./player/contact-info/contact-info.handlers";
+import { ContactInfoHandlersLive } from "./player/contact-info/contact-info.handlers";
 import {
   ContactInfoHandlers,
   ContactInfoRpcs,
 } from "./player/contact-info/contact-info.rpc";
-import { PlayersApiLive } from "./player/player.handlers";
+import { PlayersHandlersLive } from "./player/player.handlers";
 import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
-import { SeasonsApiLive } from "./season/season.handlers";
+import { SeasonsHandlersLive } from "./season/season.handlers";
 import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
-import { TeamsApiLive } from "./team/team.handlers";
+import { TeamsHandlersLive } from "./team/team.handlers";
 import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
 
 const AllRpcs = Layer.mergeAll(
@@ -40,13 +40,13 @@ const AllRpcs = Layer.mergeAll(
 );
 
 const AllApis = Layer.mergeAll(
-  SeasonsApiLive,
-  GamesApiLive,
-  PlayersApiLive,
-  ContactInfoApiLive,
-  AuthApiLive,
-  OrganizationsApiLive,
-  TeamsApiLive,
+  SeasonsHandlersLive,
+  GamesHandlersLive,
+  PlayersHandlersLive,
+  ContactInfoHandlersLive,
+  AuthHandlersLive,
+  OrganizationsHandlersLive,
+  TeamsHandlersLive,
 );
 
 const RpcProtocol = RpcServer.layerProtocolHttp({

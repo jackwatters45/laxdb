@@ -23,6 +23,3 @@ export const OrganizationsHandlersLive = HttpApiBuilder.group(
         );
     }),
 ).pipe(Layer.provide(OrganizationService.Default));
-
-// Legacy alias
-export const OrganizationsApiLive = OrganizationsHandlersLive;

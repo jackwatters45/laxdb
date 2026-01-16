@@ -19,6 +19,3 @@ export const GamesHandlersLive = HttpApiBuilder.group(
         .handle("deleteGame", ({ payload }) => service.delete(payload));
     }),
 ).pipe(Layer.provide(GameService.Default));
-
-// Legacy alias
-export const GamesApiLive = GamesHandlersLive;

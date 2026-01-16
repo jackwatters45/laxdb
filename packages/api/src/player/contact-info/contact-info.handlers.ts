@@ -16,6 +16,3 @@ export const ContactInfoHandlersLive = HttpApiBuilder.group(
       );
     }),
 ).pipe(Layer.provide(PlayerContactInfoService.Default));
-
-// Legacy alias
-export const ContactInfoApiLive = ContactInfoHandlersLive;
