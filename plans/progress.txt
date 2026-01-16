@@ -1,0 +1,21 @@
+# PRD Progress Log
+
+## Session: 2026-01-16
+
+### PRD Created
+- api-001: Fix API package (HttpLayerRouter migration)
+- research-001: Effect-form comparison analysis
+- feature-001: Graph component for blog (client-side)
+- infra-001: Effect Cloudflare Hyperdrive wrapper
+
+### Notes
+- Graph component does NOT need SSR - client-side only with dynamic import
+- Cloudflare scope reduced to Hyperdrive only (not full coverage)
+- OpenCode plugin task dropped (using Claude Code instead)
+
+---
+
+## api-001 COMPLETE
+Summary: Created packages/api/src/definition.ts with LaxdbApi class extending HttpApi.make('LaxdbApi')
+Files: packages/api/src/definition.ts
+Gotchas: Pre-existing pipeline test failures unrelated to API changes

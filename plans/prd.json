@@ -1,0 +1,300 @@
+[
+  {
+    "id": "api-001",
+    "category": "infrastructure",
+    "description": "Create unified LaxdbApi definition",
+    "passes": true,
+    "steps": [
+      "Create packages/api/src/definition.ts",
+      "Define LaxdbApi class extending HttpApi.make('LaxdbApi')",
+      "Export placeholder for groups (will add in subsequent tasks)"
+    ]
+  },
+  {
+    "id": "api-002",
+    "category": "infrastructure",
+    "description": "Extract SeasonsGroup from season.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor season.api.ts to export HttpApiGroup only (SeasonsGroup)",
+      "Remove HttpApi.make wrapper, keep endpoint definitions",
+      "Create SeasonsGroupLive using HttpApiBuilder.group(LaxdbApi, 'Seasons', ...)",
+      "Add SeasonsGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-003",
+    "category": "infrastructure",
+    "description": "Extract GamesGroup from game.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor game.api.ts to export HttpApiGroup only (GamesGroup)",
+      "Create GamesGroupLive using HttpApiBuilder.group(LaxdbApi, 'Games', ...)",
+      "Add GamesGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-004",
+    "category": "infrastructure",
+    "description": "Extract PlayersGroup from player.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor player.api.ts to export HttpApiGroup only (PlayersGroup)",
+      "Create PlayersGroupLive using HttpApiBuilder.group(LaxdbApi, 'Players', ...)",
+      "Add PlayersGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-005",
+    "category": "infrastructure",
+    "description": "Extract ContactInfoGroup from contact-info.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor contact-info.api.ts to export HttpApiGroup only (ContactInfoGroup)",
+      "Create ContactInfoGroupLive using HttpApiBuilder.group(LaxdbApi, 'ContactInfo', ...)",
+      "Add ContactInfoGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-006",
+    "category": "infrastructure",
+    "description": "Extract TeamsGroup from team.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor team.api.ts to export HttpApiGroup only (TeamsGroup)",
+      "Create TeamsGroupLive using HttpApiBuilder.group(LaxdbApi, 'Teams', ...)",
+      "Add TeamsGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-007",
+    "category": "infrastructure",
+    "description": "Extract OrganizationsGroup from organization.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor organization.api.ts to export HttpApiGroup only (OrganizationsGroup)",
+      "Create OrganizationsGroupLive using HttpApiBuilder.group(LaxdbApi, 'Organizations', ...)",
+      "Add OrganizationsGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-008",
+    "category": "infrastructure",
+    "description": "Extract AuthGroup from auth.api.ts",
+    "passes": false,
+    "steps": [
+      "Refactor auth.api.ts to export HttpApiGroup only (AuthGroup)",
+      "Create AuthGroupLive using HttpApiBuilder.group(LaxdbApi, 'Auth', ...)",
+      "Add AuthGroup to LaxdbApi in definition.ts"
+    ]
+  },
+  {
+    "id": "api-009",
+    "category": "infrastructure",
+    "description": "Create groups layer index",
+    "passes": false,
+    "steps": [
+      "Create packages/api/src/groups/index.ts",
+      "Merge all *GroupLive layers with Layer.mergeAll",
+      "Export as HttpGroupsLive"
+    ]
+  },
+  {
+    "id": "api-010",
+    "category": "infrastructure",
+    "description": "Rewrite index.ts with HttpLayerRouter",
+    "passes": false,
+    "steps": [
+      "Import HttpLayerRouter from @effect/platform",
+      "Use HttpLayerRouter.addHttpApi(LaxdbApi) for API routes",
+      "Add HttpApiScalar.layerHttpLayerRouter for /docs",
+      "Add health check via HttpLayerRouter.add('GET', '/health', ...)",
+      "Integrate RPC protocol (HttpLayerRouter.addRoute or similar)",
+      "Export handler, remove @ts-expect-error"
+    ]
+  },
+  {
+    "id": "api-011",
+    "category": "infrastructure",
+    "description": "Verify API package works end-to-end",
+    "passes": false,
+    "steps": [
+      "Run bun run typecheck - must pass with no errors",
+      "Test GET /health returns OK",
+      "Test GET /docs shows Scalar documentation",
+      "Test POST /rpc endpoints work",
+      "Test REST endpoints for all domains"
+    ]
+  },
+  {
+    "id": "research-001",
+    "category": "research",
+    "description": "Read and understand effect-form codebase",
+    "passes": false,
+    "steps": [
+      "Read FormBuilder.ts - understand builder API and fluent interface",
+      "Read Field.ts - understand scalar vs array field types",
+      "Read FormAtoms.ts - understand @effect-atom state management",
+      "Read Validation.ts - understand error handling patterns",
+      "Read Mode.ts - understand onChange/onBlur/onSubmit modes"
+    ]
+  },
+  {
+    "id": "research-002",
+    "category": "research",
+    "description": "Review effect-form examples",
+    "passes": false,
+    "steps": [
+      "Review 01-basic-form.tsx - basic usage pattern",
+      "Review 02-validation-modes.tsx - mode configuration",
+      "Review 03-array-fields.tsx - dynamic lists",
+      "Review 04-cross-field-validation.tsx - refine() usage",
+      "Review 05-async-validation.tsx - refineEffect() usage",
+      "Review 06-auto-submit.tsx - auto submission",
+      "Review 07-multi-step-wizard.tsx - wizard pattern",
+      "Review 08-revert-changes.tsx - dirty tracking"
+    ]
+  },
+  {
+    "id": "research-003",
+    "category": "research",
+    "description": "Research react-hook-form API",
+    "passes": false,
+    "steps": [
+      "Document useForm hook API and options",
+      "Document register, handleSubmit, formState patterns",
+      "Document watch, setValue, getValues methods",
+      "Document useFieldArray for dynamic fields",
+      "Document resolver pattern for schema validation",
+      "Document async validation approach"
+    ]
+  },
+  {
+    "id": "research-004",
+    "category": "research",
+    "description": "Research ts-form/tanstack-form API",
+    "passes": false,
+    "steps": [
+      "Document createFormFactory pattern",
+      "Document field validation approach",
+      "Document type inference capabilities",
+      "Document async validation support"
+    ]
+  },
+  {
+    "id": "research-005",
+    "category": "research",
+    "description": "Create comparison document and gap analysis",
+    "passes": false,
+    "steps": [
+      "Create scratchpad/effect-form/COMPARISON.md",
+      "Write comparison matrix: type safety, validation, async, errors",
+      "Write comparison matrix: state mgmt, cross-field, arrays, SSR",
+      "Document effect-form gaps: focus management, form reset, field-level async",
+      "Document SSR/hydration behavior with @effect-atom",
+      "List action items for production readiness"
+    ]
+  },
+  {
+    "id": "graph-001",
+    "category": "feature",
+    "description": "Add tags to blog post schema",
+    "passes": false,
+    "steps": [
+      "Edit packages/marketing/content-collections.ts",
+      "Add tags field as optional string array to post schema",
+      "Add some sample tags to existing blog posts for testing"
+    ]
+  },
+  {
+    "id": "graph-002",
+    "category": "feature",
+    "description": "Create graph data utilities",
+    "passes": false,
+    "steps": [
+      "Create packages/marketing/src/components/ui/knowledge-graph/ directory",
+      "Create graph-types.ts with GraphNode and GraphLink interfaces",
+      "Create graph-utils.ts: extractTags(posts) function",
+      "Create graph-utils.ts: parseInternalLinks(content) function",
+      "Create graph-utils.ts: buildGraphData(posts) returning nodes and links"
+    ]
+  },
+  {
+    "id": "graph-003",
+    "category": "feature",
+    "description": "Create knowledge graph React component",
+    "passes": false,
+    "steps": [
+      "Install react-force-graph-2d dependency",
+      "Create use-graph-data.ts hook wrapping buildGraphData",
+      "Create knowledge-graph.tsx with ForceGraph2D",
+      "Use dynamic import (client-side only, no SSR)",
+      "Pass nodes and links to graph component"
+    ]
+  },
+  {
+    "id": "graph-004",
+    "category": "feature",
+    "description": "Style and add interactions to graph",
+    "passes": false,
+    "steps": [
+      "Style nodes: dark theme, Obsidian-like minimal aesthetic",
+      "Color-code nodes by category/tag if applicable",
+      "Implement hover: highlight node and connected edges",
+      "Implement click: navigate to post slug",
+      "Add responsive sizing for mobile"
+    ]
+  },
+  {
+    "id": "graph-005",
+    "category": "feature",
+    "description": "Integrate graph into blog",
+    "passes": false,
+    "steps": [
+      "Add graph to blog page or create /graph route",
+      "Test with real blog posts",
+      "Test navigation on click works",
+      "Test performance with current post count"
+    ]
+  },
+  {
+    "id": "cf-001",
+    "category": "infrastructure",
+    "description": "Create Hyperdrive internal implementation",
+    "passes": false,
+    "steps": [
+      "Review KVNamespace pattern in packages/effect-cloudflare/src/internal/kv-namespace.ts",
+      "Check @cloudflare/workers-types for Hyperdrive types",
+      "Create packages/effect-cloudflare/src/internal/hyperdrive.ts",
+      "Define HyperdriveError with Schema.TaggedError",
+      "Define error variants: ConnectionError, TimeoutError",
+      "Implement core wrapper around globalThis.Hyperdrive"
+    ]
+  },
+  {
+    "id": "cf-002",
+    "category": "infrastructure",
+    "description": "Create Hyperdrive public API",
+    "passes": false,
+    "steps": [
+      "Create packages/effect-cloudflare/src/Hyperdrive.ts",
+      "Export Context.Tag for DI",
+      "Export make() factory function",
+      "Export layer() for Effect layer creation",
+      "Export withHyperdrive() helper",
+      "Export all error types"
+    ]
+  },
+  {
+    "id": "cf-003",
+    "category": "infrastructure",
+    "description": "Finalize Hyperdrive package",
+    "passes": false,
+    "steps": [
+      "Add Hyperdrive to packages/effect-cloudflare/src/index.ts exports",
+      "Update INTEGRATION.md with Hyperdrive usage examples",
+      "Write unit tests with mocked Hyperdrive binding",
+      "Run bun run typecheck - must pass"
+    ]
+  }
+]
