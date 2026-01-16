@@ -92,7 +92,7 @@
     "id": "api-009",
     "category": "infrastructure",
     "description": "Create groups layer index",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/api/src/groups/index.ts",
       "Merge all *GroupLive layers with Layer.mergeAll",
