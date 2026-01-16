@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { FileText, Plus } from "lucide-react";
 
@@ -18,11 +13,7 @@ type RecentNotesProps = {
   canCreateNotes: boolean;
 };
 
-export function RecentNotes({
-  player,
-  organizationSlug,
-  canCreateNotes,
-}: RecentNotesProps) {
+export function RecentNotes({ player, organizationSlug, canCreateNotes }: RecentNotesProps) {
   return (
     <Card>
       <CardHeader>
@@ -50,10 +41,7 @@ export function RecentNotes({
         {player.recentNotes.length > 0 ? (
           <div className="space-y-3">
             {player.recentNotes.map((note) => (
-              <div
-                className="flex items-center justify-between rounded border p-3"
-                key={note.id}
-              >
+              <div className="flex items-center justify-between rounded border p-3" key={note.id}>
                 <div className="flex-1">
                   <div className="text-sm font-medium">{note.title}</div>
                   <div className="text-xs text-muted-foreground">
@@ -61,9 +49,7 @@ export function RecentNotes({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={getPriorityColor(note.priority)}>
-                    {note.priority}
-                  </Badge>
+                  <Badge variant={getPriorityColor(note.priority)}>{note.priority}</Badge>
                   <Button
                     size="sm"
                     variant="ghost"

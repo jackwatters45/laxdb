@@ -7,18 +7,8 @@ import {
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@laxdb/ui/components/ui/field";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
@@ -38,9 +28,7 @@ const CreateTeamSchema = Schema.Struct({
 
 const createTeam = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator((data: typeof CreateTeamSchema.Type) =>
-    Schema.decodeSync(CreateTeamSchema)(data),
-  )
+  .inputValidator((data: typeof CreateTeamSchema.Type) => Schema.decodeSync(CreateTeamSchema)(data))
   .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -71,9 +59,7 @@ const formSchema = Schema.Struct({
 
 type FormData = typeof formSchema.Type;
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/teams/create",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/teams/create")({
   component: CreateTeamPage,
 });
 
@@ -118,9 +104,7 @@ function CreateTeamPage() {
         <BreadcrumbItem>
           <BreadcrumbLink
             title="Teams"
-            render={
-              <Link params={{ organizationSlug }} to="/$organizationSlug" />
-            }
+            render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
           >
             Teams
           </BreadcrumbLink>
@@ -129,12 +113,7 @@ function CreateTeamPage() {
         <BreadcrumbItem>
           <BreadcrumbLink
             title="Create"
-            render={
-              <Link
-                params={{ organizationSlug }}
-                to="/$organizationSlug/teams/create"
-              />
-            }
+            render={<Link params={{ organizationSlug }} to="/$organizationSlug/teams/create" />}
           >
             Create
           </BreadcrumbLink>
@@ -143,9 +122,7 @@ function CreateTeamPage() {
       <div className="container mx-auto max-w-2xl py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Create New Team</h1>
-          <p className="text-muted-foreground">
-            Add a new team to your organization
-          </p>
+          <p className="text-muted-foreground">Add a new team to your organization</p>
         </div>
 
         <Card>
@@ -167,9 +144,7 @@ function CreateTeamPage() {
                         placeholder="e.g., U18s, Senior Men's A, Women's Team"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
                 />
@@ -179,9 +154,7 @@ function CreateTeamPage() {
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="team-description">
-                        Description (Optional)
-                      </FieldLabel>
+                      <FieldLabel htmlFor="team-description">Description (Optional)</FieldLabel>
                       <Textarea
                         {...field}
                         id="team-description"
@@ -189,9 +162,7 @@ function CreateTeamPage() {
                         rows={3}
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
                 />
@@ -202,20 +173,11 @@ function CreateTeamPage() {
                   className="flex-1"
                   type="button"
                   variant="outline"
-                  render={
-                    <Link
-                      params={{ organizationSlug }}
-                      to="/$organizationSlug"
-                    />
-                  }
+                  render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  disabled={createTeamMutation.isPending}
-                  type="submit"
-                >
+                <Button className="flex-1" disabled={createTeamMutation.isPending} type="submit">
                   {createTeamMutation.isPending ? "Creating..." : "Create Team"}
                 </Button>
               </div>

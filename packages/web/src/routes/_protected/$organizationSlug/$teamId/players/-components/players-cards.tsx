@@ -11,11 +11,9 @@ import {
 export function PlayerCards({ players }: { players: TeamPlayerWithInfo[] }) {
   return (
     <div className="xl:gris-cols-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {[...players, ...players, ...players, ...players, ...players].map(
-        (player, i) => (
-          <PlayerCard key={`${player.publicId}-${i}`} player={player} />
-        ),
-      )}
+      {[...players, ...players, ...players, ...players, ...players].map((player, i) => (
+        <PlayerCard key={`${player.publicId}-${i}`} player={player} />
+      ))}
     </div>
   );
 }

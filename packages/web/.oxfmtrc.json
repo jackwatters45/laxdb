@@ -1,0 +1,9 @@
+{
+  "experimentalTailwindcss": {
+    "stylesheet": "./src/globals.css",
+    "attributes": ["class", "className"],
+    "functions": ["clsx", "cn"],
+    "preserveDuplicates": false,
+    "preserveWhitespace": false
+  }
+}

@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Calendar, Edit, MapPin, Trophy, Users } from "lucide-react";
@@ -18,12 +13,7 @@ const mockGameDetails = {
   venue: "Memorial Stadium",
   isHomeGame: true,
   gameType: "regular" as const,
-  status: "scheduled" as
-    | "scheduled"
-    | "in_progress"
-    | "completed"
-    | "cancelled"
-    | "postponed",
+  status: "scheduled" as "scheduled" | "in_progress" | "completed" | "cancelled" | "postponed",
   homeScore: 0,
   awayScore: 0,
   weatherConditions: "",
@@ -123,9 +113,7 @@ const getGameDetailsTypeLabel = (type: string) => {
   }
 };
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/games/$gameId/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/games/$gameId/")({
   component: GameDetailsPage,
   loader: async ({ params }) => {
     const [game, permissions] = await Promise.all([
@@ -154,9 +142,7 @@ function GameDetailsPage() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold">{game.opponentName}</h1>
-            <p className="text-muted-foreground">
-              {getGameDetailsTypeLabel(game.gameType)} Game
-            </p>
+            <p className="text-muted-foreground">{getGameDetailsTypeLabel(game.gameType)} Game</p>
           </div>
 
           <div className="flex gap-2">
@@ -223,9 +209,7 @@ function GameDetailsPage() {
               {game.coachNotes && (
                 <div>
                   <h4 className="mb-2 font-medium">Coach Notes</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {game.coachNotes}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{game.coachNotes}</p>
                 </div>
               )}
             </CardContent>
@@ -270,14 +254,10 @@ function GameDetailsPage() {
                         </div>
                         <div>
                           <div className="font-medium">{player.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {player.position}
-                          </div>
+                          <div className="text-sm text-muted-foreground">{player.position}</div>
                         </div>
                       </div>
-                      {player.isStarter && (
-                        <Badge variant="secondary">Starter</Badge>
-                      )}
+                      {player.isStarter && <Badge variant="secondary">Starter</Badge>}
                     </div>
                   ))}
                 </div>
@@ -391,16 +371,12 @@ function GameDetailsPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Type</span>
-                  <span className="text-sm">
-                    {getGameDetailsTypeLabel(game.gameType)}
-                  </span>
+                  <span className="text-sm">{getGameDetailsTypeLabel(game.gameType)}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Location</span>
-                  <span className="text-sm">
-                    {game.isHomeGame ? "Home" : "Away"}
-                  </span>
+                  <span className="text-sm">{game.isHomeGame ? "Home" : "Away"}</span>
                 </div>
 
                 <div className="flex items-center justify-between">

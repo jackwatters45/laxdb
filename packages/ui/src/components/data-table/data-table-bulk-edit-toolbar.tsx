@@ -122,9 +122,7 @@ function BulkEditToolbar({ children, className }: BulkEditToolbarProps) {
             className,
           )}
         >
-          <div className="flex items-center justify-between gap-2">
-            {children}
-          </div>
+          <div className="flex items-center justify-between gap-2">{children}</div>
         </div>
       </div>
     </TooltipProvider>
@@ -136,10 +134,7 @@ function BulkEditToolbarCount({ className }: BulkEditToolbarCountProps) {
 
   return (
     <Badge
-      className={cn(
-        "border-accent bg-accent px-2 py-0.5 text-xs text-foreground",
-        className,
-      )}
+      className={cn("border-accent bg-accent px-2 py-0.5 text-xs text-foreground", className)}
       variant="outline"
     >
       {selectedCount}
@@ -155,10 +150,7 @@ function BulkEditToolbarClear({ className }: BulkEditToolbarClearProps) {
       <TooltipTrigger
         render={
           <Button
-            className={cn(
-              "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
-              className,
-            )}
+            className={cn("h-6 w-6 p-0 text-muted-foreground hover:text-foreground", className)}
             onClick={() => {
               table.resetRowSelection();
             }}
@@ -183,13 +175,8 @@ function BulkEditToolbarSelection({ className }: { className?: string }) {
   );
 }
 
-function BulkEditToolbarActions({
-  children,
-  className,
-}: BulkEditToolbarActionsProps) {
-  return (
-    <div className={cn("flex items-center gap-1", className)}>{children}</div>
-  );
+function BulkEditToolbarActions({ children, className }: BulkEditToolbarActionsProps) {
+  return <div className={cn("flex items-center gap-1", className)}>{children}</div>;
 }
 
 function BulkEditToolbarAction({
@@ -206,8 +193,7 @@ function BulkEditToolbarAction({
           <Button
             className={cn(
               "h-7 w-7 p-0",
-              variant === "destructive" &&
-                "text-destructive hover:text-destructive",
+              variant === "destructive" && "text-destructive hover:text-destructive",
               className,
             )}
             onClick={onClick}
@@ -261,13 +247,7 @@ function BulkEditToolbarDeleteAction({ className }: { className?: string }) {
         <TooltipTrigger
           render={
             <AlertDialogTrigger
-              render={
-                <Button
-                  className={cn("h-7 w-7 p-0", className)}
-                  size="sm"
-                  variant="ghost"
-                />
-              }
+              render={<Button className={cn("h-7 w-7 p-0", className)} size="sm" variant="ghost" />}
             />
           }
         >
@@ -279,17 +259,14 @@ function BulkEditToolbarDeleteAction({ className }: { className?: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete {selectedCount}{" "}
-            {selectedCount === 1 ? "item" : "items"}. This action cannot be
-            undone.
+            This will permanently delete {selectedCount} {selectedCount === 1 ? "item" : "items"}.
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className={cn(
-              "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-            )}
+            className={cn("bg-destructive text-destructive-foreground hover:bg-destructive/90")}
             onClick={actions.onDelete}
           >
             Delete
@@ -325,13 +302,7 @@ function BulkEditToolbarRemoveAction({
         <TooltipTrigger
           render={
             <AlertDialogTrigger
-              render={
-                <Button
-                  className={cn("h-7 w-7 p-0", className)}
-                  size="sm"
-                  variant="ghost"
-                />
-              }
+              render={<Button className={cn("h-7 w-7 p-0", className)} size="sm" variant="ghost" />}
             />
           }
         >
@@ -343,17 +314,14 @@ function BulkEditToolbarRemoveAction({
         <AlertDialogHeader>
           <AlertDialogTitle>Remove from team?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will remove {selectedCount}{" "}
-            {selectedCount === 1 ? "player" : "players"} from this team. The
-            player records will not be deleted.
+            This will remove {selectedCount} {selectedCount === 1 ? "player" : "players"} from this
+            team. The player records will not be deleted.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className={cn(
-              "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-            )}
+            className={cn("bg-destructive text-destructive-foreground hover:bg-destructive/90")}
             onClick={actions.onRemove}
           >
             Remove
@@ -394,9 +362,7 @@ function BulkEditToolbarCopyAction({
 
     const text = values.join(", ");
     await navigator.clipboard.writeText(text);
-    toast.success(
-      `Copied ${values.length} ${values.length === 1 ? "value" : "values"}`,
-    );
+    toast.success(`Copied ${values.length} ${values.length === 1 ? "value" : "values"}`);
   };
 
   return (

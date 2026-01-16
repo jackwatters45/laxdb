@@ -122,11 +122,7 @@ function FilteredPlayerItemsWithGroup() {
   );
 }
 
-function RenamePlayerOption({
-  onRename,
-}: {
-  onRename: (newName: string) => void;
-}) {
+function RenamePlayerOption({ onRename }: { onRename: (newName: string) => void }) {
   const { searchQuery } = useSearchCombobox();
 
   if (!searchQuery.trim()) {

@@ -15,9 +15,7 @@ import { Mail } from "lucide-react";
 
 import { useBulkDeletePlayers } from "../-mutations";
 
-const Route = createFileRoute(
-  "/_protected/$organizationSlug/$teamId/players/",
-)();
+const Route = createFileRoute("/_protected/$organizationSlug/$teamId/players/")();
 
 const getPlayerIds = (table: Table<TeamPlayerWithInfo>) => {
   const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -38,20 +36,12 @@ export function PlayersToolbar() {
   };
 
   return (
-    <BulkEditProvider
-      actions={{ onDelete }}
-      rowSelection={rowSelection}
-      table={table}
-    >
+    <BulkEditProvider actions={{ onDelete }} rowSelection={rowSelection} table={table}>
       <BulkEditToolbar>
         <BulkEditToolbarSelection />
         <BulkEditToolbarSeparator />
         <BulkEditToolbarActions>
-          <BulkEditToolbarCopyAction
-            columnId="email"
-            icon={Mail}
-            tooltipContent="Copy Emails"
-          />
+          <BulkEditToolbarCopyAction columnId="email" icon={Mail} tooltipContent="Copy Emails" />
           <BulkEditToolbarSeparator />
           <BulkEditToolbarDeleteAction />
         </BulkEditToolbarActions>

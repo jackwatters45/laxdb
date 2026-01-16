@@ -4,22 +4,14 @@ import {
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 
 import { PageBody, PageContainer } from "@/components/layout/page-content";
 import { TeamBreadcrumbSwitcher } from "@/components/nav/team-breadcrumb-switcher";
-import {
-  ContactInfoEdit,
-  ContactInfoView,
-} from "@/components/players/contact-info";
+import { ContactInfoEdit, ContactInfoView } from "@/components/players/contact-info";
 
 import { PlayerHeader } from "./-components/player-header";
 import { contactInfo } from "./-data-2";
@@ -60,15 +52,9 @@ function ContactInfo() {
             </CardHeader>
             <CardContent>
               {isEditing ? (
-                <ContactInfoEdit
-                  contactInfo={contactInfo}
-                  setIsEditing={setIsEditing}
-                />
+                <ContactInfoEdit contactInfo={contactInfo} setIsEditing={setIsEditing} />
               ) : (
-                <ContactInfoView
-                  contactInfo={contactInfo}
-                  setIsEditing={setIsEditing}
-                />
+                <ContactInfoView contactInfo={contactInfo} setIsEditing={setIsEditing} />
               )}
             </CardContent>
           </Card>
@@ -93,9 +79,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Teams"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
         >
           Teams
         </BreadcrumbLink>

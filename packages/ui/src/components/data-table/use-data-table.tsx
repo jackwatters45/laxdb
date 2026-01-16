@@ -6,9 +6,7 @@ type DataTableContextValue<TData = unknown> = {
   columns: ColumnDef<TData>[];
 };
 
-const DataTableContext = React.createContext<DataTableContextValue | null>(
-  null,
-);
+const DataTableContext = React.createContext<DataTableContextValue | null>(null);
 
 function useDataTable<TData = unknown>(): DataTableContextValue<TData> {
   const context = React.use(DataTableContext);

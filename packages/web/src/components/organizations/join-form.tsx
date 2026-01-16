@@ -2,12 +2,7 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -52,11 +47,7 @@ const acceptInvitation = createServerFn({ method: "POST" })
     ),
   );
 
-export function JoinOrganizationForm({
-  organizationSlug,
-}: {
-  organizationSlug?: string;
-}) {
+export function JoinOrganizationForm({ organizationSlug }: { organizationSlug?: string }) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
@@ -79,9 +70,7 @@ export function JoinOrganizationForm({
       // });
     },
     onError: (_error) => {
-      toast.error(
-        "Failed to join organization. Please check your invitation code.",
-      );
+      toast.error("Failed to join organization. Please check your invitation code.");
     },
   });
 
@@ -102,8 +91,7 @@ export function JoinOrganizationForm({
         <CardHeader>
           <CardTitle>Join Organization</CardTitle>
           <p className="text-sm text-muted-foreground">
-            You should have received an invitation code via email from your club
-            administrator
+            You should have received an invitation code via email from your club administrator
           </p>
         </CardHeader>
         <CardContent>
@@ -114,9 +102,7 @@ export function JoinOrganizationForm({
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="invitation-code">
-                      Invitation Code
-                    </FieldLabel>
+                    <FieldLabel htmlFor="invitation-code">Invitation Code</FieldLabel>
                     <Input
                       {...field}
                       id="invitation-code"
@@ -126,9 +112,7 @@ export function JoinOrganizationForm({
                     <FieldDescription>
                       This is usually a long string of letters and numbers
                     </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />

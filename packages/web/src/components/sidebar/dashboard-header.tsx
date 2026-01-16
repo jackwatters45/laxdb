@@ -77,11 +77,7 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
             {props.breadcrumbItems.map((item, i) => (
               <Fragment key={item.label}>
                 <BreadcrumbItem
-                  className={
-                    i === props.breadcrumbItems.length - 1
-                      ? "min-w-0 flex-1"
-                      : ""
-                  }
+                  className={i === props.breadcrumbItems.length - 1 ? "min-w-0 flex-1" : ""}
                 >
                   {item.href ? (
                     <BreadcrumbLink
@@ -100,9 +96,7 @@ export function DashboardHeaderOld(props: DashboardHeaderProps) {
                     </BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
-                {i !== props.breadcrumbItems.length - 1 && (
-                  <BreadcrumbSeparator />
-                )}
+                {i !== props.breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
               </Fragment>
             ))}
           </BreadcrumbList>

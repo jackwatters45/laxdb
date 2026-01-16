@@ -32,42 +32,22 @@ const item = {
   },
 };
 
-function FadeContainer({
-  children,
-  className,
-}: React.HTMLProps<HTMLDivElement>) {
+function FadeContainer({ children, className }: React.HTMLProps<HTMLDivElement>) {
   return (
-    <motion.div
-      animate="show"
-      className={className}
-      initial="hidden"
-      variants={container}
-    >
+    <motion.div animate="show" className={className} initial="hidden" variants={container}>
       {children}
     </motion.div>
   );
 }
 
-function FadeDiv({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function FadeDiv({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <motion.div className={className} variants={item}>
       {children}
     </motion.div>
   );
 }
-function FadeSpan({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function FadeSpan({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <motion.span className={className} variants={item}>
       {children}

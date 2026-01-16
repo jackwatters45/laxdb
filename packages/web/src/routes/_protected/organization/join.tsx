@@ -2,12 +2,7 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -43,10 +38,7 @@ const acceptInvitation = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const organiationService = yield* OrganizationService;
         const request = getRequest();
-        return yield* organiationService.acceptInvitation(
-          data,
-          request.headers,
-        );
+        return yield* organiationService.acceptInvitation(data, request.headers);
       }),
     ),
   );
@@ -70,9 +62,7 @@ function JoinOrganizationPage() {
       toast.success("Successfully joined the organization!");
     },
     onError: () => {
-      toast.error(
-        "Failed to join organization. Please check your invitation code.",
-      );
+      toast.error("Failed to join organization. Please check your invitation code.");
     },
   });
 
@@ -93,8 +83,7 @@ function JoinOrganizationPage() {
         <CardHeader>
           <CardTitle>Join Organization</CardTitle>
           <p className="text-sm text-muted-foreground">
-            You should have received an invitation code via email from your club
-            administrator
+            You should have received an invitation code via email from your club administrator
           </p>
         </CardHeader>
         <CardContent>
@@ -105,9 +94,7 @@ function JoinOrganizationPage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="invitation-code">
-                      Invitation Code
-                    </FieldLabel>
+                    <FieldLabel htmlFor="invitation-code">Invitation Code</FieldLabel>
                     <Input
                       {...field}
                       id="invitation-code"
@@ -117,20 +104,14 @@ function JoinOrganizationPage() {
                     <FieldDescription>
                       This is usually a long string of letters and numbers
                     </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
             </FieldGroup>
 
             <div className="flex gap-4 pt-4">
-              <Button
-                className="flex-1"
-                disabled={joinOrgMutation.isPending}
-                type="submit"
-              >
+              <Button className="flex-1" disabled={joinOrgMutation.isPending} type="submit">
                 {joinOrgMutation.isPending ? "Joining..." : "Join Club"}
               </Button>
             </div>

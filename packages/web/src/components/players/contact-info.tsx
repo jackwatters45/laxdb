@@ -64,8 +64,8 @@ function EmptyContactInfo({ setIsEditing }: EmptyContactInfoProps) {
         </EmptyMedia>
         <EmptyTitle>No ContactInfo Yet</EmptyTitle>
         <EmptyDescription>
-          You haven&apos;t added any contact information yet. Get started by
-          adding user contact info.
+          You haven&apos;t added any contact information yet. Get started by adding user contact
+          info.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
@@ -98,31 +98,18 @@ function ContactInfoView({ contactInfo, setIsEditing }: ContactInfoViewProps) {
     <ContactInfoCardWrapper>
       {contactInfo.email && <EmailContactCard email={contactInfo.email} />}
       {contactInfo.phone && <PhoneContactCard phone={contactInfo.phone} />}
-      {contactInfo.facebook && (
-        <FacebookContactCard username={contactInfo.facebook} />
-      )}
-      {contactInfo.instagram && (
-        <InstagramContactCard username={contactInfo.instagram} />
-      )}
-      {contactInfo.whatsapp && (
-        <WhatsAppContactCard phone={contactInfo.whatsapp} />
-      )}
-      {contactInfo.linkedin && (
-        <LinkedInContactCard username={contactInfo.linkedin} />
-      )}
-      {contactInfo.groupme && (
-        <GroupMeContactCard username={contactInfo.groupme} />
-      )}
-      {contactInfo.emergencyContactName &&
-        contactInfo.emergencyContactPhone && (
-          <>
-            <EmergencyContactNameCard name={contactInfo.emergencyContactName} />
+      {contactInfo.facebook && <FacebookContactCard username={contactInfo.facebook} />}
+      {contactInfo.instagram && <InstagramContactCard username={contactInfo.instagram} />}
+      {contactInfo.whatsapp && <WhatsAppContactCard phone={contactInfo.whatsapp} />}
+      {contactInfo.linkedin && <LinkedInContactCard username={contactInfo.linkedin} />}
+      {contactInfo.groupme && <GroupMeContactCard username={contactInfo.groupme} />}
+      {contactInfo.emergencyContactName && contactInfo.emergencyContactPhone && (
+        <>
+          <EmergencyContactNameCard name={contactInfo.emergencyContactName} />
 
-            <EmergencyContactPhoneCard
-              phone={contactInfo.emergencyContactPhone}
-            />
-          </>
-        )}
+          <EmergencyContactPhoneCard phone={contactInfo.emergencyContactPhone} />
+        </>
+      )}
     </ContactInfoCardWrapper>
   );
 }
@@ -176,9 +163,4 @@ function ContactInfoEdit({ contactInfo, setIsEditing }: ContactInfoEditProps) {
   );
 }
 
-export {
-  ContactInfoCardWrapper,
-  ContactInfoEdit,
-  ContactInfoView,
-  EmptyContactInfo,
-};
+export { ContactInfoCardWrapper, ContactInfoEdit, ContactInfoView, EmptyContactInfo };

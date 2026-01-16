@@ -7,12 +7,7 @@ import {
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
@@ -36,9 +31,7 @@ const UpdateTeamSchema = Schema.Struct({
 
 const updateTeam = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator((data: typeof UpdateTeamSchema.Type) =>
-    Schema.decodeSync(UpdateTeamSchema)(data),
-  )
+  .inputValidator((data: typeof UpdateTeamSchema.Type) => Schema.decodeSync(UpdateTeamSchema)(data))
   .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -69,9 +62,7 @@ const formSchema = Schema.Struct({
 
 type FormData = typeof formSchema.Type;
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/$teamId/setup",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/$teamId/setup")({
   component: SetupTeamPage,
   loader: async () => {
     const { teams } = await getUserOrganizationContext();
@@ -130,9 +121,7 @@ function SetupTeamPage() {
         <BreadcrumbItem>
           <BreadcrumbLink
             title="Teams"
-            render={
-              <Link params={{ organizationSlug }} to="/$organizationSlug" />
-            }
+            render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
           >
             Teams
           </BreadcrumbLink>
@@ -141,12 +130,7 @@ function SetupTeamPage() {
         <BreadcrumbItem>
           <BreadcrumbLink
             title={team.name}
-            render={
-              <Link
-                params={{ organizationSlug, teamId }}
-                to="/$organizationSlug/$teamId"
-              />
-            }
+            render={<Link params={{ organizationSlug, teamId }} to="/$organizationSlug/$teamId" />}
           >
             {team.name}
           </BreadcrumbLink>
@@ -156,10 +140,7 @@ function SetupTeamPage() {
           <BreadcrumbLink
             title="Setup"
             render={
-              <Link
-                params={{ organizationSlug, teamId }}
-                to="/$organizationSlug/$teamId/setup"
-              />
+              <Link params={{ organizationSlug, teamId }} to="/$organizationSlug/$teamId/setup" />
             }
           >
             Setup
@@ -192,9 +173,7 @@ function SetupTeamPage() {
                       placeholder="e.g., U18s, Senior Men's A, Women's Team"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -204,9 +183,7 @@ function SetupTeamPage() {
                 name="description"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="description">
-                      Description (Optional)
-                    </FieldLabel>
+                    <FieldLabel htmlFor="description">Description (Optional)</FieldLabel>
                     <Textarea
                       {...field}
                       id="description"
@@ -214,9 +191,7 @@ function SetupTeamPage() {
                       rows={3}
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -226,20 +201,11 @@ function SetupTeamPage() {
                   className="flex-1"
                   type="button"
                   variant="outline"
-                  render={
-                    <Link
-                      params={{ organizationSlug }}
-                      to="/$organizationSlug"
-                    />
-                  }
+                  render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
                 >
                   Skip
                 </Button>
-                <Button
-                  className="flex-1"
-                  disabled={updateTeamMutation.isPending}
-                  type="submit"
-                >
+                <Button className="flex-1" disabled={updateTeamMutation.isPending} type="submit">
                   {updateTeamMutation.isPending ? "Creating..." : "Create Team"}
                 </Button>
               </div>

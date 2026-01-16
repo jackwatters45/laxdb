@@ -1,10 +1,5 @@
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
@@ -61,9 +56,7 @@ type RosterPlayer = {
   isCaptain: boolean;
 };
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/games/$gameId/roster",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/games/$gameId/roster")({
   component: RosterManagementPage,
   loader: async ({ params }) => {
     const [roster, players] = await Promise.all([
@@ -94,11 +87,9 @@ function RosterManagementPage() {
     },
   });
 
-  const isPlayerInRoster = (playerId: string) =>
-    roster.some((r) => r.playerId === playerId);
+  const isPlayerInRoster = (playerId: string) => roster.some((r) => r.playerId === playerId);
 
-  const _getPlayerRosterInfo = (playerId: string) =>
-    roster.find((r) => r.playerId === playerId);
+  const _getPlayerRosterInfo = (playerId: string) => roster.find((r) => r.playerId === playerId);
 
   const addPlayerToRoster = (playerId: string) => {
     if (!isPlayerInRoster(playerId)) {
@@ -117,13 +108,8 @@ function RosterManagementPage() {
     setRoster((prev) => prev.filter((r) => r.playerId !== playerId));
   };
 
-  const updatePlayerRosterInfo = (
-    playerId: string,
-    updates: Partial<RosterPlayer>,
-  ) => {
-    setRoster((prev) =>
-      prev.map((r) => (r.playerId === playerId ? { ...r, ...updates } : r)),
-    );
+  const updatePlayerRosterInfo = (playerId: string, updates: Partial<RosterPlayer>) => {
+    setRoster((prev) => prev.map((r) => (r.playerId === playerId ? { ...r, ...updates } : r)));
   };
 
   const handleSave = () => {
@@ -158,15 +144,10 @@ function RosterManagementPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Manage Game Roster</h1>
-            <p className="text-muted-foreground">
-              Add players and set starting lineup
-            </p>
+            <p className="text-muted-foreground">Add players and set starting lineup</p>
           </div>
 
-          <Button
-            disabled={updateRosterMutation.isPending}
-            onClick={handleSave}
-          >
+          <Button disabled={updateRosterMutation.isPending} onClick={handleSave}>
             <Save className="mr-2 h-4 w-4" />
             {updateRosterMutation.isPending ? "Saving..." : "Save Roster"}
           </Button>
@@ -196,9 +177,7 @@ function RosterManagementPage() {
                       </div>
                       <div>
                         <div className="font-medium">{player.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {player.position}
-                        </div>
+                        <div className="text-sm text-muted-foreground">{player.position}</div>
                       </div>
                     </div>
 
@@ -214,9 +193,7 @@ function RosterManagementPage() {
                               });
                             }}
                           />
-                          <label htmlFor={`starter-${player.id}`}>
-                            Starter
-                          </label>
+                          <label htmlFor={`starter-${player.id}`}>Starter</label>
                         </div>
                         <div className="flex items-center gap-1 text-xs">
                           <Checkbox
@@ -228,9 +205,7 @@ function RosterManagementPage() {
                               });
                             }}
                           />
-                          <label htmlFor={`captain-${player.id}`}>
-                            Captain
-                          </label>
+                          <label htmlFor={`captain-${player.id}`}>Captain</label>
                         </div>
                       </div>
 
@@ -279,9 +254,7 @@ function RosterManagementPage() {
                       </div>
                       <div>
                         <div className="text-sm font-medium">{player.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {player.position}
-                        </div>
+                        <div className="text-xs text-muted-foreground">{player.position}</div>
                       </div>
                     </div>
 
@@ -317,29 +290,21 @@ function RosterManagementPage() {
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="text-center">
                 <div className="text-2xl font-bold">{roster.length}</div>
-                <div className="text-sm text-muted-foreground">
-                  Total Players
-                </div>
+                <div className="text-sm text-muted-foreground">Total Players</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">
-                  {roster.filter((r) => r.isStarter).length}
-                </div>
+                <div className="text-2xl font-bold">{roster.filter((r) => r.isStarter).length}</div>
                 <div className="text-sm text-muted-foreground">Starters</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">
-                  {roster.filter((r) => r.isCaptain).length}
-                </div>
+                <div className="text-2xl font-bold">{roster.filter((r) => r.isCaptain).length}</div>
                 <div className="text-sm text-muted-foreground">Captains</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
                   {roster.length - roster.filter((r) => r.isStarter).length}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Bench Players
-                </div>
+                <div className="text-sm text-muted-foreground">Bench Players</div>
               </div>
             </div>
           </CardContent>

@@ -1,7 +1,4 @@
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
@@ -70,10 +67,7 @@ export const Route = createFileRoute("/_protected/$organizationSlug/games/")({
   component: GamesPage,
   loader: async () => {
     try {
-      const [games, permissions] = await Promise.all([
-        getTeamGames(),
-        getUserPermissions(),
-      ]);
+      const [games, permissions] = await Promise.all([getTeamGames(), getUserPermissions()]);
 
       return { games, permissions };
     } catch {
@@ -110,9 +104,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Games"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug/games" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/games" />}
         >
           Games
         </BreadcrumbLink>

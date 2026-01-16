@@ -1,9 +1,5 @@
 import type { TeamPlayerWithInfo } from "@laxdb/core/player/player.schema";
-import {
-  EmailSchema,
-  JerseyNumberSchema,
-  PlayerNameSchema,
-} from "@laxdb/core/schema";
+import { EmailSchema, JerseyNumberSchema, PlayerNameSchema } from "@laxdb/core/schema";
 import { DataTableColumnHeader } from "@laxdb/ui/components/data-table/data-table-column-header";
 import {
   RowActionDeleteItem,
@@ -22,11 +18,7 @@ import {
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
 import { Link } from "@tanstack/react-router";
-import {
-  type ColumnDef,
-  createColumnHelper,
-  type Row,
-} from "@tanstack/react-table";
+import { type ColumnDef, createColumnHelper, type Row } from "@tanstack/react-table";
 import { Schema } from "effect";
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
@@ -97,9 +89,7 @@ export function createEditablePlayerColumns({
         <Checkbox
           aria-label="Select all"
           checked={table.getIsAllPageRowsSelected()}
-          indeterminate={
-            table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()
-          }
+          indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()}
           className="translate-y-0.5"
           onCheckedChange={() => {
             table.toggleAllPageRowsSelected();
@@ -123,9 +113,7 @@ export function createEditablePlayerColumns({
       },
     }),
     columnHelper.accessor("jerseyNumber", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="#" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
       enableSorting: true,
       meta: {
         className: "w-16",
@@ -142,8 +130,7 @@ export function createEditablePlayerColumns({
               const numValue = newValue ? Number(newValue) : null;
 
               if (numValue !== null) {
-                const result =
-                  Schema.decodeUnknownEither(JerseyNumberSchema)(numValue);
+                const result = Schema.decodeUnknownEither(JerseyNumberSchema)(numValue);
                 if (result._tag === "Left") {
                   toast.error("Jersey number must be between 0 and 1000");
                 }
@@ -160,9 +147,7 @@ export function createEditablePlayerColumns({
       },
     }),
     columnHelper.accessor("name", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Name" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
       enableSorting: true,
       enableHiding: false,
       enableColumnFilter: true,
@@ -180,13 +165,10 @@ export function createEditablePlayerColumns({
               const nameValue = newName ?? null;
 
               if (nameValue) {
-                const result =
-                  Schema.decodeUnknownEither(PlayerNameSchema)(nameValue);
+                const result = Schema.decodeUnknownEither(PlayerNameSchema)(nameValue);
 
                 if (result._tag === "Left") {
-                  toast.error(
-                    "Player name must be between 1 and 100 characters",
-                  );
+                  toast.error("Player name must be between 1 and 100 characters");
                 }
               }
 
@@ -201,9 +183,7 @@ export function createEditablePlayerColumns({
       },
     }),
     columnHelper.accessor("position", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Position" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Position" />,
       enableSorting: true,
       enableColumnFilter: true,
       meta: {
@@ -224,9 +204,7 @@ export function createEditablePlayerColumns({
             value={player.position ?? ""}
           >
             <SelectTrigger variant="data">
-              <SelectValue>
-                {(value: string | null) => value ?? "Select position"}
-              </SelectValue>
+              <SelectValue>{(value: string | null) => value ?? "Select position"}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {POSITION_SELECT_FIELDS.map((position) => (
@@ -240,9 +218,7 @@ export function createEditablePlayerColumns({
       },
     }),
     columnHelper.accessor("email", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Email" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
       enableSorting: true,
       enableColumnFilter: true,
       meta: {
@@ -260,8 +236,7 @@ export function createEditablePlayerColumns({
               const emailValue = newValue ?? null;
 
               if (emailValue) {
-                const result =
-                  Schema.decodeUnknownEither(EmailSchema)(emailValue);
+                const result = Schema.decodeUnknownEither(EmailSchema)(emailValue);
                 if (result._tag === "Left") {
                   toast.error("Please enter a valid email address");
                 }

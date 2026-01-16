@@ -11,9 +11,7 @@ export const getUserOrganizationContext = createServerFn()
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const organizationService = yield* OrganizationService;
-        return yield* organizationService.getUserOrganizationContext(
-          context.headers,
-        );
+        return yield* organizationService.getUserOrganizationContext(context.headers);
       }),
     ),
   );

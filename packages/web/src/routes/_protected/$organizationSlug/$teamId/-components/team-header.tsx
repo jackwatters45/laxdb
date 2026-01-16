@@ -9,11 +9,7 @@ type TeamHeaderProps = {
   children: React.ReactNode;
 };
 
-export function TeamHeader({
-  organizationSlug,
-  teamId,
-  children,
-}: TeamHeaderProps) {
+export function TeamHeader({ organizationSlug, teamId, children }: TeamHeaderProps) {
   return (
     <div>
       <DashboardHeader>{children}</DashboardHeader>
@@ -43,10 +39,7 @@ export function TeamSubNav({ organizationSlug, teamId }: TeamSubNavProps) {
       </NavbarItem>
       <NavbarItem
         render={
-          <Link
-            params={{ organizationSlug, teamId }}
-            to="/$organizationSlug/$teamId/players"
-          />
+          <Link params={{ organizationSlug, teamId }} to="/$organizationSlug/$teamId/players" />
         }
       >
         Players

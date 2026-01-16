@@ -8,10 +8,7 @@ import {
   DataTableProvider,
   DataTableRoot,
 } from "@laxdb/ui/components/data-table/data-table";
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { Tabs, TabsContent } from "@laxdb/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -34,9 +31,7 @@ const GetPlayers = Schema.Struct({
 
 const getPlayers = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator((data: typeof GetPlayers.Type) =>
-    Schema.decodeSync(GetPlayers)(data),
-  )
+  .inputValidator((data: typeof GetPlayers.Type) => Schema.decodeSync(GetPlayers)(data))
   .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -78,8 +73,7 @@ function PlayersDataTable() {
 
   const { data: players = [] } = useQuery({
     queryKey: getOrgPlayersQK(activeOrganization.id),
-    queryFn: () =>
-      getPlayers({ data: { organizationId: activeOrganization.id } }),
+    queryFn: () => getPlayers({ data: { organizationId: activeOrganization.id } }),
   });
 
   const columns = useMemo(
@@ -120,12 +114,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Players"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/players"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/players" />}
         >
           Players
         </BreadcrumbLink>

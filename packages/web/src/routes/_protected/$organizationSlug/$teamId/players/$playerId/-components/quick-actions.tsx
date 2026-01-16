@@ -1,10 +1,5 @@
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { BookOpen, FileText, Target, TrendingUp, Trophy } from "lucide-react";
 
@@ -19,11 +14,7 @@ type QuickActionsProps = {
   };
 };
 
-export function QuickActions({
-  playerId,
-  organizationSlug,
-  permissions,
-}: QuickActionsProps) {
+export function QuickActions({ playerId, organizationSlug, permissions }: QuickActionsProps) {
   return (
     <Card>
       <CardHeader>

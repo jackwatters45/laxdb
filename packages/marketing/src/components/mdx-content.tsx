@@ -22,14 +22,7 @@ function Anchor({ href, children, ...props }: AnchorProps) {
 type ImgProps = ComponentPropsWithoutRef<"img">;
 
 function Image({ alt, ...props }: ImgProps) {
-  return (
-    <img
-      alt={alt ?? ""}
-      loading="lazy"
-      className="rounded-lg shadow-md"
-      {...props}
-    />
-  );
+  return <img alt={alt ?? ""} loading="lazy" className="rounded-lg shadow-md" {...props} />;
 }
 
 const components = {

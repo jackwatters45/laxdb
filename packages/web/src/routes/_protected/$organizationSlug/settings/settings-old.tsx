@@ -40,8 +40,7 @@ const deleteOrganization = createServerFn({ method: "POST" })
         if (organizationsResult.length <= 1) {
           return {
             success: false as const,
-            error:
-              "Cannot delete your last organization. You must have at least one organization.",
+            error: "Cannot delete your last organization. You must have at least one organization.",
           };
         }
 
@@ -54,9 +53,7 @@ const deleteOrganization = createServerFn({ method: "POST" })
         );
 
         // Find remaining organizations (excluding the one we just deleted)
-        const remainingOrgs = organizationsResult.filter(
-          (org) => org.id !== data.organizationId,
-        );
+        const remainingOrgs = organizationsResult.filter((org) => org.id !== data.organizationId);
 
         // Set the first remaining organization as active
         if (remainingOrgs && remainingOrgs.length > 0) {
@@ -73,10 +70,7 @@ const deleteOrganization = createServerFn({ method: "POST" })
         Effect.catchAll((error) =>
           Effect.succeed({
             success: false as const,
-            error:
-              error instanceof Error
-                ? error.message
-                : "Failed to delete organization",
+            error: error instanceof Error ? error.message : "Failed to delete organization",
           }),
         ),
       ),
@@ -92,12 +86,8 @@ const getDashboardData = createServerFn()
         const auth = yield* AuthService;
 
         const [organization, organizations] = yield* Effect.all([
-          Effect.tryPromise(() =>
-            auth.auth.api.getFullOrganization({ headers: context.headers }),
-          ),
-          Effect.tryPromise(() =>
-            auth.auth.api.listOrganizations({ headers: context.headers }),
-          ),
+          Effect.tryPromise(() => auth.auth.api.getFullOrganization({ headers: context.headers })),
+          Effect.tryPromise(() => auth.auth.api.listOrganizations({ headers: context.headers })),
         ]);
 
         return {
@@ -117,9 +107,7 @@ const getDashboardData = createServerFn()
     ),
   );
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/settings/settings-old",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/settings/settings-old")({
   component: SettingsPage,
   loader: () => getDashboardData(),
 });
@@ -136,8 +124,7 @@ const confirmDeleteSchema = Schema.Struct({
 type ConfirmDeleteForm = typeof confirmDeleteSchema.Type;
 
 function SettingsPage() {
-  const { organization, canDeleteOrganization, organizationCount } =
-    Route.useLoaderData();
+  const { organization, canDeleteOrganization, organizationCount } = Route.useLoaderData();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -181,9 +168,7 @@ function SettingsPage() {
     <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your organization settings and preferences
-        </p>
+        <p className="text-muted-foreground">Manage your organization settings and preferences</p>
       </div>
 
       <div className="max-w-2xl space-y-6">
@@ -191,9 +176,7 @@ function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Organization</CardTitle>
-            <CardDescription>
-              Current organization: {organization.name}
-            </CardDescription>
+            <CardDescription>Current organization: {organization.name}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
@@ -209,15 +192,11 @@ function SettingsPage() {
               </div>
               <div>
                 <span className="font-medium">Total Organizations:</span>{" "}
-                <span
-                  className={organizationCount === 1 ? "text-yellow-600" : ""}
-                >
+                <span className={organizationCount === 1 ? "text-yellow-600" : ""}>
                   {organizationCount}
                 </span>
                 {organizationCount === 1 && (
-                  <span className="ml-1 text-xs text-yellow-600">
-                    (minimum required)
-                  </span>
+                  <span className="ml-1 text-xs text-yellow-600">(minimum required)</span>
                 )}
               </div>
             </div>
@@ -231,16 +210,14 @@ function SettingsPage() {
               <AlertTriangle className="h-5 w-5" />
               Danger Zone
             </CardTitle>
-            <CardDescription>
-              Irreversible and destructive actions
-            </CardDescription>
+            <CardDescription>Irreversible and destructive actions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <h3 className="text-sm font-medium">Delete Organization</h3>
               <p className="mb-3 text-sm text-muted-foreground">
-                Permanently delete this organization and all associated data.
-                This action cannot be undone.
+                Permanently delete this organization and all associated data. This action cannot be
+                undone.
               </p>
               {!canDeleteOrganization && (
                 <div className="mb-3 flex items-start gap-2 rounded-md border-l-4 border-yellow-500 bg-yellow-50 p-3">
@@ -250,8 +227,8 @@ function SettingsPage() {
                       Cannot Delete Last Organization
                     </p>
                     <p className="text-xs text-yellow-700">
-                      You must have at least one organization. Create another
-                      organization before deleting this one.
+                      You must have at least one organization. Create another organization before
+                      deleting this one.
                     </p>
                   </div>
                 </div>
@@ -336,15 +313,11 @@ function ConfirmDeleteDialog({
             <strong>{organization.name}</strong> and all associated data.
           </p>
           <p className="text-sm">
-            This includes all teams, games, players, and other data. This action
-            cannot be undone.
+            This includes all teams, games, players, and other data. This action cannot be undone.
           </p>
         </div>
 
-        <form
-          className="space-y-6"
-          onSubmit={(e) => void form.handleSubmit(handleSubmit)(e)}
-        >
+        <form className="space-y-6" onSubmit={(e) => void form.handleSubmit(handleSubmit)(e)}>
           <Controller
             name="confirmText"
             control={form.control}
@@ -361,9 +334,7 @@ function ConfirmDeleteDialog({
                   placeholder={organization.name}
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />

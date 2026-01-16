@@ -26,9 +26,8 @@ export default function Testimonial() {
                 Solar transformed our environmental monitoring capabilities.
               </strong>{" "}
               <span className="text-gray-900/70">
-                Their autonomous network provides real-time data on forest
-                health, wildlife patterns, and ecosystem changes with
-                unprecedented precision and efficiency.
+                Their autonomous network provides real-time data on forest health, wildlife
+                patterns, and ecosystem changes with unprecedented precision and efficiency.
               </span>
             </p>
           </blockquote>
@@ -44,12 +43,8 @@ export default function Testimonial() {
             />
           </div>
           <div>
-            <div className="text-base font-medium text-gray-900">
-              Dr. Sarah Miller
-            </div>
-            <div className="text-sm text-[#C33621]/80">
-              Director of Conservation Technologies
-            </div>
+            <div className="text-base font-medium text-gray-900">Dr. Sarah Miller</div>
+            <div className="text-sm text-[#C33621]/80">Director of Conservation Technologies</div>
           </div>
         </div>
       </div>

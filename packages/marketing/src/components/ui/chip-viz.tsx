@@ -4,13 +4,7 @@ import { motion } from "motion/react";
 
 import { SolarMark } from "../../../public/solar-mark";
 
-const createVariants = ({
-  scale,
-  delay,
-}: {
-  scale: number;
-  delay: number;
-}) => ({
+const createVariants = ({ scale, delay }: { scale: number; delay: number }) => ({
   initial: { scale: 1 },
   animate: {
     scale: [1, scale, 1],

@@ -44,9 +44,7 @@ const getPlayerPermissions = createServerFn().handler(() => ({
   canViewSensitive: true,
 }));
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/$teamId/players/$playerId/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/$teamId/players/$playerId/")({
   component: RouteComponent,
   loader: async ({ params }) => {
     const [player, permissions] = await Promise.all([
@@ -100,10 +98,7 @@ function RouteComponent() {
               organizationSlug={organizationSlug}
               player={player}
             />
-            <AssignedResources
-              organizationSlug={organizationSlug}
-              player={player}
-            />
+            <AssignedResources organizationSlug={organizationSlug} player={player} />
 
             <UpcomingEvents player={player} />
           </div>
@@ -119,18 +114,12 @@ function Header() {
   const { player } = Route.useLoaderData();
 
   return (
-    <PlayerHeader
-      organizationSlug={organizationSlug}
-      playerId={player.id}
-      teamId={activeTeam.id}
-    >
+    <PlayerHeader organizationSlug={organizationSlug} playerId={player.id} teamId={activeTeam.id}>
       <BreadcrumbItem>
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Teams"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
         >
           Teams
         </BreadcrumbLink>

@@ -25,17 +25,18 @@ source.config.ts       # Fumadocs MDX config
 
 ## WHERE TO LOOK
 
-| Task | Location |
-|------|----------|
-| Add docs page | `content/docs/{path}.mdx` |
-| Modify docs layout | `src/lib/layout.shared.tsx` |
-| Configure navigation | `content/docs/meta.json` |
-| Add search | `src/routes/api/search.ts` (Orama) |
-| Change source config | `source.config.ts` |
+| Task                 | Location                           |
+| -------------------- | ---------------------------------- |
+| Add docs page        | `content/docs/{path}.mdx`          |
+| Modify docs layout   | `src/lib/layout.shared.tsx`        |
+| Configure navigation | `content/docs/meta.json`           |
+| Add search           | `src/routes/api/search.ts` (Orama) |
+| Change source config | `source.config.ts`                 |
 
 ## ADDING DOCS
 
 **Page structure:**
+
 ```mdx
 ---
 title: Page Title
@@ -46,6 +47,7 @@ description: Page description
 ```
 
 **Navigation via meta.json:**
+
 ```json
 {
   "pages": ["index", "getting-started", "..."]
@@ -55,6 +57,7 @@ description: Page description
 ## BUILD PROCESS
 
 `fumadocs-mdx` runs at:
+
 - `postinstall` (auto)
 - `typecheck` (before tsgo)
 
@@ -62,11 +65,11 @@ Generates type-safe imports from MDX content.
 
 ## ANTI-PATTERNS
 
-| Pattern | Why Bad | Do Instead |
-|---------|---------|------------|
-| Edit `.source/` | Auto-generated | Let fumadocs generate |
-| Skip fumadocs-mdx | MDX imports break | Run before typecheck |
-| Edit routeTree.gen.ts | Auto-generated | Let router generate |
+| Pattern               | Why Bad           | Do Instead            |
+| --------------------- | ----------------- | --------------------- |
+| Edit `.source/`       | Auto-generated    | Let fumadocs generate |
+| Skip fumadocs-mdx     | MDX imports break | Run before typecheck  |
+| Edit routeTree.gen.ts | Auto-generated    | Let router generate   |
 
 ## COMMANDS
 

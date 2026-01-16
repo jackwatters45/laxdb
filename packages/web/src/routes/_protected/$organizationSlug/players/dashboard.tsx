@@ -1,15 +1,7 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
@@ -194,15 +186,10 @@ const getPlayerPermissions = createServerFn().handler(() => ({
   canSetGoals: true,
 }));
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/dashboard",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/dashboard")({
   component: PlayersPage,
   loader: async () => {
-    const [players, permissions] = await Promise.all([
-      getTeamPlayers(),
-      getPlayerPermissions(),
-    ]);
+    const [players, permissions] = await Promise.all([getTeamPlayers(), getPlayerPermissions()]);
 
     return { players, permissions };
   },
@@ -229,10 +216,8 @@ function PlayersPage() {
 
     const matchesPosition =
       selectedPosition === "all" || player.primaryPosition === selectedPosition;
-    const matchesGrade =
-      selectedGrade === "all" || player.gradeLevel === selectedGrade;
-    const matchesTrend =
-      selectedTrend === "all" || player.developmentTrend === selectedTrend;
+    const matchesGrade = selectedGrade === "all" || player.gradeLevel === selectedGrade;
+    const matchesTrend = selectedTrend === "all" || player.developmentTrend === selectedTrend;
 
     return matchesSearch && matchesPosition && matchesGrade && matchesTrend;
   });
@@ -240,11 +225,8 @@ function PlayersPage() {
   // Calculate team statistics
   const teamStats = {
     totalPlayers: players.length,
-    averageGPA:
-      players.reduce((sum, p) => sum + (p.gpa || 0), 0) / players.length,
-    needingAttention: players.filter(
-      (p) => p.developmentTrend === "needs_attention",
-    ).length,
+    averageGPA: players.reduce((sum, p) => sum + (p.gpa || 0), 0) / players.length,
+    needingAttention: players.filter((p) => p.developmentTrend === "needs_attention").length,
     highPotential: players.filter((p) => p.potentialRating >= 8).length,
   };
 
@@ -297,18 +279,12 @@ function PlayersPage() {
           <div className="mb-8 grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Players
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Total Players</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {teamStats.totalPlayers}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Active roster members
-                </p>
+                <div className="text-2xl font-bold">{teamStats.totalPlayers}</div>
+                <p className="text-xs text-muted-foreground">Active roster members</p>
               </CardContent>
             </Card>
 
@@ -318,46 +294,30 @@ function PlayersPage() {
                 <GraduationCap className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {teamStats.averageGPA.toFixed(2)}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Average academic performance
-                </p>
+                <div className="text-2xl font-bold">{teamStats.averageGPA.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground">Average academic performance</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Need Attention
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Need Attention</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {teamStats.needingAttention}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Players requiring focus
-                </p>
+                <div className="text-2xl font-bold">{teamStats.needingAttention}</div>
+                <p className="text-xs text-muted-foreground">Players requiring focus</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  High Potential
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">High Potential</CardTitle>
                 <Star className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {teamStats.highPotential}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Players with 8+ potential
-                </p>
+                <div className="text-2xl font-bold">{teamStats.highPotential}</div>
+                <p className="text-xs text-muted-foreground">Players with 8+ potential</p>
               </CardContent>
             </Card>
           </div>
@@ -431,11 +391,7 @@ function PlayersPage() {
           {filteredPlayers.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredPlayers.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  permissions={permissions}
-                  player={player}
-                />
+                <PlayerCard key={player.id} permissions={permissions} player={player} />
               ))}
             </div>
           ) : (
@@ -516,13 +472,7 @@ const getPositionIcon = (_position: string) => {
   return <Users className="h-4 w-4" />;
 };
 
-function PlayerCard({
-  player,
-  permissions,
-}: {
-  player: Player;
-  permissions: Permissions;
-}) {
+function PlayerCard({ player, permissions }: { player: Player; permissions: Permissions }) {
   const { organizationSlug } = Route.useParams();
 
   return (
@@ -538,13 +488,11 @@ function PlayerCard({
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 {getPositionIcon(player.primaryPosition)}
                 <span>
-                  {player.primaryPosition.charAt(0).toUpperCase() +
-                    player.primaryPosition.slice(1)}
+                  {player.primaryPosition.charAt(0).toUpperCase() + player.primaryPosition.slice(1)}
                 </span>
                 <span>•</span>
                 <span>
-                  {player.gradeLevel.charAt(0).toUpperCase() +
-                    player.gradeLevel.slice(1)}
+                  {player.gradeLevel.charAt(0).toUpperCase() + player.gradeLevel.slice(1)}
                 </span>
               </div>
             </div>
@@ -572,9 +520,7 @@ function PlayerCard({
             <div className="text-xs text-muted-foreground">Potential</div>
           </div>
           <div>
-            <div className="text-lg font-bold">
-              {player.gpa?.toFixed(1) || "N/A"}
-            </div>
+            <div className="text-lg font-bold">{player.gpa?.toFixed(1) || "N/A"}</div>
             <div className="text-xs text-muted-foreground">GPA</div>
           </div>
         </div>
@@ -598,20 +544,12 @@ function PlayerCard({
         {/* Key Areas */}
         <div className="space-y-2">
           <div>
-            <div className="mb-1 text-sm font-medium text-green-700">
-              Strengths
-            </div>
-            <div className="text-xs">
-              {player.strengths.slice(0, 2).join(", ")}
-            </div>
+            <div className="mb-1 text-sm font-medium text-green-700">Strengths</div>
+            <div className="text-xs">{player.strengths.slice(0, 2).join(", ")}</div>
           </div>
           <div>
-            <div className="mb-1 text-sm font-medium text-red-700">
-              Focus Areas
-            </div>
-            <div className="text-xs">
-              {player.improvementAreas.slice(0, 2).join(", ")}
-            </div>
+            <div className="mb-1 text-sm font-medium text-red-700">Focus Areas</div>
+            <div className="text-xs">{player.improvementAreas.slice(0, 2).join(", ")}</div>
           </div>
         </div>
 
@@ -619,9 +557,7 @@ function PlayerCard({
         {player.nextMeetingDate && (
           <div className="flex items-center gap-2 rounded bg-blue-50 p-2 text-sm">
             <Calendar className="h-4 w-4 text-blue-600" />
-            <span>
-              Next meeting: {formatPlayerDate(player.nextMeetingDate)}
-            </span>
+            <span>Next meeting: {formatPlayerDate(player.nextMeetingDate)}</span>
           </div>
         )}
 
@@ -692,12 +628,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Players"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/players"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/players" />}
         >
           Teams
         </BreadcrumbLink>

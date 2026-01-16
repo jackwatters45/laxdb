@@ -4,17 +4,11 @@ import { cn } from "@laxdb/ui/lib/utils";
 import * as React from "react";
 import { Group, Panel, Separator } from "react-resizable-panels";
 
-function ResizablePanelGroup({
-  className,
-  ...props
-}: React.ComponentProps<typeof Group>) {
+function ResizablePanelGroup({ className, ...props }: React.ComponentProps<typeof Group>) {
   return (
     <Group
       data-slot="resizable-panel-group"
-      className={cn(
-        "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
-        className,
-      )}
+      className={cn("flex h-full w-full data-[panel-group-direction=vertical]:flex-col", className)}
       {...props}
     />
   );
@@ -40,9 +34,7 @@ function ResizableHandle({
       )}
       {...props}
     >
-      {withHandle && (
-        <div className="z-10 flex h-6 w-1 shrink-0 rounded-lg bg-border" />
-      )}
+      {withHandle && <div className="z-10 flex h-6 w-1 shrink-0 rounded-lg bg-border" />}
     </Separator>
   );
 }

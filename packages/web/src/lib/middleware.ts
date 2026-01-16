@@ -15,9 +15,7 @@ export const authMiddleware = createMiddleware({
       const request = getRequest();
       const { headers } = request;
 
-      const session = yield* Effect.promise(() =>
-        auth.auth.api.getSession({ headers }),
-      );
+      const session = yield* Effect.promise(() => auth.auth.api.getSession({ headers }));
 
       if (!session) {
         const url = new URL(request.url);
@@ -58,8 +56,7 @@ const preLogMiddleware = createMiddleware({ type: "function" })
     return ctx.next({
       sendContext: {
         serverTime,
-        durationToServer:
-          serverTime.getTime() - ctx.context.clientTime.getTime(),
+        durationToServer: serverTime.getTime() - ctx.context.clientTime.getTime(),
       },
     });
   });

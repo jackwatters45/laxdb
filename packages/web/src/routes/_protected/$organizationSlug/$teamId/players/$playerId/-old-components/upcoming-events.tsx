@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Calendar, TrendingUp } from "lucide-react";
 
 import type { PlayerDetails } from "../-utils";
@@ -31,9 +26,7 @@ export function UpcomingEvents({ player }: UpcomingEventsProps) {
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <div>
               <div className="font-medium">Next Meeting</div>
-              <div className="text-muted-foreground">
-                {formatDate(player.nextMeetingDate)}
-              </div>
+              <div className="text-muted-foreground">{formatDate(player.nextMeetingDate)}</div>
             </div>
           </div>
         )}
@@ -42,9 +35,7 @@ export function UpcomingEvents({ player }: UpcomingEventsProps) {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
             <div>
               <div className="font-medium">Next Assessment</div>
-              <div className="text-muted-foreground">
-                {formatDate(player.nextAssessmentDate)}
-              </div>
+              <div className="text-muted-foreground">{formatDate(player.nextAssessmentDate)}</div>
             </div>
           </div>
         )}

@@ -2,11 +2,7 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@laxdb/ui/lib/utils";
 
-function NavbarRoot({
-  className,
-  render,
-  ...props
-}: useRender.ComponentProps<"div">) {
+function NavbarRoot({ className, render, ...props }: useRender.ComponentProps<"div">) {
   return useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(
@@ -19,11 +15,7 @@ function NavbarRoot({
   });
 }
 
-function NavbarItem({
-  className,
-  render,
-  ...props
-}: useRender.ComponentProps<"div">) {
+function NavbarItem({ className, render, ...props }: useRender.ComponentProps<"div">) {
   return useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(

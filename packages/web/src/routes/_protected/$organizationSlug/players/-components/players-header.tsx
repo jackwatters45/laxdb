@@ -8,10 +8,7 @@ type PlayersHeaderProps = {
   children: React.ReactNode;
 };
 
-export function PlayersHeader({
-  organizationSlug,
-  children,
-}: PlayersHeaderProps) {
+export function PlayersHeader({ organizationSlug, children }: PlayersHeaderProps) {
   return (
     <div>
       <DashboardHeader>{children}</DashboardHeader>

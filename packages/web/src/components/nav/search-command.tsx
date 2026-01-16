@@ -9,12 +9,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@laxdb/ui/components/ui/command";
-import {
-  Link,
-  useNavigate,
-  useRouteContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { Link, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import {
   BookOpen,
   Building2,
@@ -283,9 +278,7 @@ export function SearchCommand() {
                       <Building2 className="mr-2 h-4 w-4" />
                       <span>{org.name}</span>
                     </div>
-                    {isActive && (
-                      <div className="mr-2 ml-auto h-2 w-2 rounded-full bg-green-500" />
-                    )}
+                    {isActive && <div className="mr-2 ml-auto h-2 w-2 rounded-full bg-green-500" />}
                     {shortcut && <CommandShortcut>{shortcut}</CommandShortcut>}
                   </CommandItem>
                 );
@@ -335,9 +328,7 @@ export function SearchCommand() {
                 <Link to={item.href}>
                   <item.icon className="mr-2 h-4 w-4" />
                   <span>{item.label}</span>
-                  {item.shortcut && (
-                    <CommandShortcut>{item.shortcut}</CommandShortcut>
-                  )}
+                  {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                 </Link>
               </CommandItem>
             ))}
@@ -358,9 +349,7 @@ export function SearchCommand() {
                     <Link to={item.href}>
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.label}</span>
-                      {item.shortcut && (
-                        <CommandShortcut>{item.shortcut}</CommandShortcut>
-                      )}
+                      {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                     </Link>
                   </CommandItem>
                 ))}
@@ -383,9 +372,7 @@ export function SearchCommand() {
                     <Link to={item.href}>
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.label}</span>
-                      {item.shortcut && (
-                        <CommandShortcut>{item.shortcut}</CommandShortcut>
-                      )}
+                      {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                     </Link>
                   </CommandItem>
                 ))}

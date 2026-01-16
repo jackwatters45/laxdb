@@ -7,19 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@laxdb/ui/components/ui/dialog";
-import {
-  InputGroup,
-  InputGroupAddon,
-} from "@laxdb/ui/components/ui/input-group";
+import { InputGroup, InputGroupAddon } from "@laxdb/ui/components/ui/input-group";
 import { cn } from "@laxdb/ui/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { SearchIcon, CheckIcon } from "lucide-react";
 import * as React from "react";
 
-function Command({
-  className,
-  ...props
-}: React.ComponentProps<typeof CommandPrimitive>) {
+function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
     <CommandPrimitive
       data-slot="command"
@@ -85,10 +79,7 @@ function CommandInput({
   );
 }
 
-function CommandList({
-  className,
-  ...props
-}: React.ComponentProps<typeof CommandPrimitive.List>) {
+function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
   return (
     <CommandPrimitive.List
       data-slot="command-list"
@@ -163,10 +154,7 @@ function CommandItem({
   );
 }
 
-function CommandShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function CommandShortcut({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="command-shortcut"

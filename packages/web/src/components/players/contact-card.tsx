@@ -1,8 +1,4 @@
-import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkedInIcon,
-} from "@laxdb/ui/components/social-icons";
+import { FacebookIcon, InstagramIcon, LinkedInIcon } from "@laxdb/ui/components/social-icons";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Item,
@@ -46,13 +42,7 @@ type ContactCardProps = {
   href?: string;
 };
 
-function ContactCard({
-  children,
-  className,
-  label,
-  value,
-  href,
-}: ContactCardProps) {
+function ContactCard({ children, className, label, value, href }: ContactCardProps) {
   return (
     <ContactCardContext.Provider value={{ label, value, href }}>
       <Item
@@ -70,11 +60,7 @@ type ContactCardContentProps = {
 };
 
 function ContactCardContent({ children }: ContactCardContentProps) {
-  return (
-    <ItemContent className="flex-row items-center gap-2">
-      {children}
-    </ItemContent>
-  );
+  return <ItemContent className="flex-row items-center gap-2">{children}</ItemContent>;
 }
 
 type ContactCardIconProps = {
@@ -96,9 +82,7 @@ function ContactCardData() {
 
 function ContactCardLabel() {
   const { label } = useContactCard();
-  return (
-    <ItemTitle className="text-xs text-muted-foreground">{label}</ItemTitle>
-  );
+  return <ItemTitle className="text-xs text-muted-foreground">{label}</ItemTitle>;
 }
 
 function ContactCardValue() {
@@ -133,12 +117,7 @@ function ContactCardActions() {
         <Tooltip>
           <TooltipTrigger
             render={
-              <Button
-                className="h-6 w-6 p-0"
-                onClick={handleCopy}
-                size="sm"
-                variant="ghost"
-              />
+              <Button className="h-6 w-6 p-0" onClick={handleCopy} size="sm" variant="ghost" />
             }
           >
             <Copy className="h-3 w-3" />
@@ -221,11 +200,7 @@ type FacebookContactCardProps = {
 
 function FacebookContactCard({ username }: FacebookContactCardProps) {
   return (
-    <ContactCard
-      href={`https://facebook.com/${username}`}
-      label="Facebook"
-      value={username}
-    >
+    <ContactCard href={`https://facebook.com/${username}`} label="Facebook" value={username}>
       <ContactCardContent>
         <ContactCardIcon>
           <FacebookIcon className="h-4 w-4 text-muted-foreground" />
@@ -283,11 +258,7 @@ type GroupMeContactCardProps = {
 
 function GroupMeContactCard({ username }: GroupMeContactCardProps) {
   return (
-    <ContactCard
-      href={`https://groupme.com/contact/${username}`}
-      label="GroupMe"
-      value={username}
-    >
+    <ContactCard href={`https://groupme.com/contact/${username}`} label="GroupMe" value={username}>
       <ContactCardContent>
         <ContactCardIcon>
           <MessageCircle className="h-4 w-4 text-muted-foreground" />
@@ -305,11 +276,7 @@ type LinkedInContactCardProps = {
 
 function LinkedInContactCard({ username }: LinkedInContactCardProps) {
   return (
-    <ContactCard
-      href={`https://linkedin.com/in/${username}`}
-      label="LinkedIn"
-      value={username}
-    >
+    <ContactCard href={`https://linkedin.com/in/${username}`} label="LinkedIn" value={username}>
       <ContactCardContent>
         <ContactCardIcon>
           <LinkedInIcon className="h-4 w-4 text-muted-foreground" />
@@ -345,11 +312,7 @@ type EmergencyContactPhoneCardProps = {
 
 function EmergencyContactPhoneCard({ phone }: EmergencyContactPhoneCardProps) {
   return (
-    <ContactCard
-      href={`tel:${phone}`}
-      label="Emergency Contact Phone"
-      value={phone}
-    >
+    <ContactCard href={`tel:${phone}`} label="Emergency Contact Phone" value={phone}>
       <ContactCardContent>
         <ContactCardIcon>
           <Phone className="h-4 w-4 text-muted-foreground" />

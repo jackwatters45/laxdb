@@ -6,11 +6,11 @@ shadcn/ui components built on **Base UI** (NOT Radix). Shared across web, market
 
 This package uses **Base UI**, not Radix. APIs differ significantly. Check component source when unsure.
 
-| Pattern | Radix | Base UI (This Project) |
-|---------|-------|------------------------|
+| Pattern            | Radix                             | Base UI (This Project)                           |
+| ------------------ | --------------------------------- | ------------------------------------------------ |
 | Select placeholder | `<SelectValue placeholder="...">` | `<SelectValue>{(v) => v ?? "..."}</SelectValue>` |
-| Dialog trigger | Implicit via context | Often explicit `open` prop |
-| Checkbox state | `checked={bool}` | `checked={bool}` (same) |
+| Dialog trigger     | Implicit via context              | Often explicit `open` prop                       |
+| Checkbox state     | `checked={bool}`                  | `checked={bool}` (same)                          |
 
 ## STRUCTURE
 
@@ -26,13 +26,13 @@ src/
 
 ## WHERE TO LOOK
 
-| Task | Location |
-|------|----------|
-| Add shadcn component | `bunx --bun shadcn@latest add <name>` |
-| Modify component | `src/components/ui/{component}.tsx` |
-| Add data table feature | `src/components/data-table/` |
-| Add hook | `src/hooks/` |
-| Modify styles | `src/globals.css` |
+| Task                   | Location                              |
+| ---------------------- | ------------------------------------- |
+| Add shadcn component   | `bunx --bun shadcn@latest add <name>` |
+| Modify component       | `src/components/ui/{component}.tsx`   |
+| Add data table feature | `src/components/data-table/`          |
+| Add hook               | `src/hooks/`                          |
+| Modify styles          | `src/globals.css`                     |
 
 ## IMPORT PATTERN
 
@@ -67,16 +67,16 @@ import { Controller } from "react-hook-form";
       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
     </Field>
   )}
-/>
+/>;
 ```
 
 ## ANTI-PATTERNS
 
-| Pattern | Why Bad | Do Instead |
-|---------|---------|------------|
-| Radix API patterns | APIs differ | Check component source |
-| Direct Tailwind in apps | Inconsistent | Use cn() utility, extend components |
-| Copy-paste components | Loses updates | Import from @laxdb/ui |
+| Pattern                 | Why Bad       | Do Instead                          |
+| ----------------------- | ------------- | ----------------------------------- |
+| Radix API patterns      | APIs differ   | Check component source              |
+| Direct Tailwind in apps | Inconsistent  | Use cn() utility, extend components |
+| Copy-paste components   | Loses updates | Import from @laxdb/ui               |
 
 ## COMMANDS
 
@@ -88,13 +88,13 @@ bun run fix                                # Lint + format
 
 ## KEY COMPONENTS
 
-| Component | Notes |
-|-----------|-------|
+| Component            | Notes                             |
+| -------------------- | --------------------------------- |
 | `theme-provider.tsx` | ThemeProvider for dark/light mode |
-| `sonner.tsx` | Toast notifications |
-| `data-table/` | Full TanStack Table integration |
-| `field.tsx` | Form field wrapper components |
-| `sidebar.tsx` | App sidebar layout |
+| `sonner.tsx`         | Toast notifications               |
+| `data-table/`        | Full TanStack Table integration   |
+| `field.tsx`          | Form field wrapper components     |
+| `sidebar.tsx`        | App sidebar layout                |
 
 ## NOTES
 

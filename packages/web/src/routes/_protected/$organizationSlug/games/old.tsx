@@ -1,15 +1,7 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Calendar, MapPin, Plus, Trophy, Users } from "lucide-react";
@@ -73,38 +65,32 @@ const getUserPermissions = createServerFn().handler(() => {
   };
 });
 
-export const Route = createFileRoute("/_protected/$organizationSlug/games/old")(
-  {
-    component: GamesPage,
-    loader: async () => {
-      try {
-        const [games, permissions] = await Promise.all([
-          getTeamGames(),
-          getUserPermissions(),
-        ]);
+export const Route = createFileRoute("/_protected/$organizationSlug/games/old")({
+  component: GamesPage,
+  loader: async () => {
+    try {
+      const [games, permissions] = await Promise.all([getTeamGames(), getUserPermissions()]);
 
-        return { games, permissions };
-      } catch {
-        return {
-          games: mockGames,
-          permissions: {
-            canManageGames: true,
-            canEditGames: true,
-            canViewStats: true,
-          },
-        };
-      }
-    },
+      return { games, permissions };
+    } catch {
+      return {
+        games: mockGames,
+        permissions: {
+          canManageGames: true,
+          canEditGames: true,
+          canViewStats: true,
+        },
+      };
+    }
   },
-);
+});
 
 function GamesPage() {
   const { organizationSlug } = Route.useParams();
   const { games, permissions } = Route.useLoaderData();
 
   const upcomingGames = games.filter(
-    (game) =>
-      game.status === "scheduled" && new Date(game.gameDate) > new Date(),
+    (game) => game.status === "scheduled" && new Date(game.gameDate) > new Date(),
   );
 
   const completedGames = games.filter((game) => game.status === "completed");
@@ -127,12 +113,7 @@ function GamesPage() {
 
           {permissions.canManageGames && (
             <Button
-              render={
-                <Link
-                  params={{ organizationSlug }}
-                  to="/$organizationSlug/games/create"
-                />
-              }
+              render={<Link params={{ organizationSlug }} to="/$organizationSlug/games/create" />}
             >
               <Plus className="mr-2 h-4 w-4" />
               Schedule Game
@@ -150,11 +131,7 @@ function GamesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <GameCard
-                game={nextGame}
-                isHighlighted
-                permissions={permissions}
-              />
+              <GameCard game={nextGame} isHighlighted permissions={permissions} />
             </CardContent>
           </Card>
         )}
@@ -177,18 +154,10 @@ function GamesPage() {
             <h2 className="mb-4 text-xl font-semibold">Recent Games</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {completedGames
-                .toSorted(
-                  (a, b) =>
-                    new Date(b.gameDate).getTime() -
-                    new Date(a.gameDate).getTime(),
-                )
+                .toSorted((a, b) => new Date(b.gameDate).getTime() - new Date(a.gameDate).getTime())
                 .slice(0, 6)
                 .map((game) => (
-                  <GameCard
-                    game={game}
-                    key={game.id}
-                    permissions={permissions}
-                  />
+                  <GameCard game={game} key={game.id} permissions={permissions} />
                 ))}
             </div>
           </div>
@@ -198,17 +167,10 @@ function GamesPage() {
           <div className="py-12 text-center">
             <Trophy className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
             <h2 className="mb-2 text-xl font-semibold">No games scheduled</h2>
-            <p className="mb-6 text-muted-foreground">
-              Get started by scheduling your first game
-            </p>
+            <p className="mb-6 text-muted-foreground">Get started by scheduling your first game</p>
             {permissions.canManageGames && (
               <Button
-                render={
-                  <Link
-                    params={{ organizationSlug }}
-                    to="/$organizationSlug/games/create"
-                  />
-                }
+                render={<Link params={{ organizationSlug }} to="/$organizationSlug/games/create" />}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Schedule Your First Game
@@ -409,9 +371,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Games"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug/games" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/games" />}
         >
           Games
         </BreadcrumbLink>

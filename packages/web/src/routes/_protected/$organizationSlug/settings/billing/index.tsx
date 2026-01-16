@@ -59,9 +59,7 @@ const data: {
   },
 ];
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/settings/billing/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/settings/billing/")({
   component: Billing,
 });
 
@@ -77,8 +75,7 @@ function Billing() {
               This workspace is currently on free plan
             </h4>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Boost your analytics and unlock advanced features with our premium
-              plans.{" "}
+              Boost your analytics and unlock advanced features with our premium plans.{" "}
               <a
                 className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-500"
                 href="#"
@@ -92,15 +89,11 @@ function Billing() {
             <section aria-labelledby="billing-overview">
               <div className="grid grid-cols-1 gap-x-14 gap-y-8 md:grid-cols-3">
                 <div>
-                  <h2
-                    className="scroll-mt-10 font-semibold text-foreground"
-                    id="billing-overview"
-                  >
+                  <h2 className="scroll-mt-10 font-semibold text-foreground" id="billing-overview">
                     Billing
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Overview of current billing cycle based on fixed and
-                    on-demand charges.
+                    Overview of current billing cycle based on fixed and on-demand charges.
                   </p>
                 </div>
                 <div className="md:col-span-2">
@@ -109,19 +102,12 @@ function Billing() {
                       <li className="px-2 py-4 text-sm md:p-4" key={item.name}>
                         <div className="w-full">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-foreground">
-                              {item.name}
-                            </p>
-                            <p className="font-medium text-muted-foreground">
-                              {item.value}
-                            </p>
+                            <p className="font-medium text-foreground">{item.name}</p>
+                            <p className="font-medium text-muted-foreground">{item.value}</p>
                           </div>
                           <div className="w-full md:w-2/3">
                             {item.percentageValue && (
-                              <Progress
-                                className="mt-2 h-1.5"
-                                value={item.percentageValue}
-                              />
+                              <Progress className="mt-2 h-1.5" value={item.percentageValue} />
                             )}
                             <p className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                               <span>{item.description}</span>
@@ -171,10 +157,7 @@ function Billing() {
                               <p className="text-sm font-medium text-foreground">
                                 &#36;280 / 350 (62.2&#37;)
                               </p>
-                              <Label
-                                className="text-muted-foreground"
-                                htmlFor="spend-mgmt"
-                              >
+                              <Label className="text-muted-foreground" htmlFor="spend-mgmt">
                                 Spend management enabled
                               </Label>
                             </>
@@ -183,10 +166,7 @@ function Billing() {
                               <p className="text-sm font-medium text-foreground">
                                 &#36;0 / 0 (0&#37;)
                               </p>
-                              <Label
-                                className="text-muted-foreground"
-                                htmlFor="spend-mgmt"
-                              >
+                              <Label className="text-muted-foreground" htmlFor="spend-mgmt">
                                 Spend management disabled
                               </Label>
                             </>
@@ -226,9 +206,7 @@ function Billing() {
                       >
                         <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
                           <div className="md:col-span-1">
-                            <Label className="font-medium">
-                              Set amount ($)
-                            </Label>
+                            <Label className="font-medium">Set amount ($)</Label>
                             <Input
                               className="mt-2"
                               defaultValue={350}
@@ -238,9 +216,7 @@ function Billing() {
                             />
                           </div>
                           <div className="md:col-span-2">
-                            <Label className="font-medium">
-                              Provide email for notifications
-                            </Label>
+                            <Label className="font-medium">Provide email for notifications</Label>
                             <Input
                               className="mt-2"
                               id="email"
@@ -264,10 +240,7 @@ function Billing() {
               <form>
                 <div className="grid grid-cols-1 gap-x-14 gap-y-8 md:grid-cols-3">
                   <div>
-                    <h2
-                      className="scroll-mt-10 font-semibold text-foreground"
-                      id="add-ons"
-                    >
+                    <h2 className="scroll-mt-10 font-semibold text-foreground" id="add-ons">
                       Add-Ons
                     </h2>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -277,17 +250,14 @@ function Billing() {
                   <div className="space-y-6 md:col-span-2">
                     <Card className="overflow-hidden p-0">
                       <div className="px-4 pt-4 pb-6">
-                        <span className="text-sm text-muted-foreground">
-                          $25/month
-                        </span>
+                        <span className="text-sm text-muted-foreground">$25/month</span>
                         <h4 className="mt-4 text-sm font-semibold text-foreground">
                           Advanced bot protection
                         </h4>
                         <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                          Safeguard your assets with our cutting-edge bot
-                          protection. Our AI solution identifies and mitigates
-                          automated traffic to protect your workspace from bad
-                          bots.
+                          Safeguard your assets with our cutting-edge bot protection. Our AI
+                          solution identifies and mitigates automated traffic to protect your
+                          workspace from bad bots.
                         </p>
                       </div>
                       <div className="flex items-center justify-between border-t border-border bg-muted p-4">
@@ -300,25 +270,19 @@ function Billing() {
                           href="#"
                         >
                           Learn more
-                          <LinkIcon
-                            aria-hidden="true"
-                            className="size-4 shrink-0"
-                          />
+                          <LinkIcon aria-hidden="true" className="size-4 shrink-0" />
                         </a>
                       </div>
                     </Card>
                     <Card className="overflow-hidden p-0">
                       <div className="px-4 pt-4 pb-6">
-                        <span className="text-sm text-muted-foreground">
-                          $50/month
-                        </span>
+                        <span className="text-sm text-muted-foreground">$50/month</span>
                         <h4 className="mt-4 text-sm font-semibold text-foreground">
                           Workspace insights
                         </h4>
                         <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                          Real-time analysis of your workspace&#39;s usage,
-                          enabling you to make well-informed decisions for
-                          optimization.
+                          Real-time analysis of your workspace&#39;s usage, enabling you to make
+                          well-informed decisions for optimization.
                         </p>
                       </div>
                       <div className="flex items-center justify-between border-t border-border bg-muted p-4">
@@ -331,10 +295,7 @@ function Billing() {
                           href="#"
                         >
                           Learn more
-                          <LinkIcon
-                            aria-hidden="true"
-                            className="size-4 shrink-0"
-                          />
+                          <LinkIcon aria-hidden="true" className="size-4 shrink-0" />
                         </a>
                       </div>
                     </Card>
@@ -357,12 +318,7 @@ function Header() {
       <BreadcrumbItem>
         <BreadcrumbLink
           title="Settings"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/settings/general"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/settings/general" />}
         >
           Settings
         </BreadcrumbLink>
@@ -371,12 +327,7 @@ function Header() {
       <BreadcrumbItem>
         <BreadcrumbLink
           title="Billing"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/settings/billing"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/settings/billing" />}
         >
           Billing
         </BreadcrumbLink>

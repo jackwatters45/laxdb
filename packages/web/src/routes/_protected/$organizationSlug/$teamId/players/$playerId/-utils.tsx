@@ -90,8 +90,7 @@ export const mockPlayerDetails = {
   // Personal Information
   emergencyContactName: "Sarah Johnson (Mother)",
   emergencyContactPhone: "(555) 123-4567",
-  seasonGoals:
-    "Score 25 goals, improve shot accuracy to 75%, become team captain",
+  seasonGoals: "Score 25 goals, improve shot accuracy to 75%, become team captain",
   collegeAspirations: "Division I lacrosse scholarship, study business",
   careerGoals: "Professional lacrosse player or sports management",
 

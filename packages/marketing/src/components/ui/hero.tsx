@@ -19,9 +19,7 @@ export function Hero() {
                 News
               </span>
               <span className="flex items-center gap-1 truncate">
-                <span className="w-full truncate">
-                  Smart Irrigation System Launch
-                </span>
+                <span className="w-full truncate">Smart Irrigation System Launch</span>
 
                 <RiArrowRightUpLine className="size-4 shrink-0 text-gray-700" />
               </span>

@@ -10,20 +10,11 @@ type PlayerHeaderProps = {
   children: React.ReactNode;
 };
 
-export function PlayerHeader({
-  organizationSlug,
-  teamId,
-  playerId,
-  children,
-}: PlayerHeaderProps) {
+export function PlayerHeader({ organizationSlug, teamId, playerId, children }: PlayerHeaderProps) {
   return (
     <div>
       <DashboardHeader>{children}</DashboardHeader>
-      <PlayerSubNav
-        organizationSlug={organizationSlug}
-        playerId={playerId}
-        teamId={teamId}
-      />
+      <PlayerSubNav organizationSlug={organizationSlug} playerId={playerId} teamId={teamId} />
     </div>
   );
 }
@@ -34,11 +25,7 @@ type PlayerSubNavProps = {
   playerId: string;
 };
 
-export function PlayerSubNav({
-  organizationSlug,
-  teamId,
-  playerId,
-}: PlayerSubNavProps) {
+export function PlayerSubNav({ organizationSlug, teamId, playerId }: PlayerSubNavProps) {
   return (
     <Navbar className="border-b">
       <NavbarItem

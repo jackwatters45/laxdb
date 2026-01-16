@@ -18,13 +18,6 @@
         ["index", "index-type"]
       ]
   },
-  "experimentalTailwindcss": {
-    "stylesheet": "./src/globals.css",
-    "attributes": ["class", "className"],
-    "functions": ["clsx", "cn"],
-    "preserveDuplicates": false,
-    "preserveWhitespace": false
-  },
   "ignorePatterns": [
     "**/*.md",
     "node_modules/**",
