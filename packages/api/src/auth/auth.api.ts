@@ -10,9 +10,11 @@ export const AuthGroup = HttpApiGroup.make("Auth")
       .setPayload(AuthContract.getSession.payload),
   )
   .add(
-    HttpApiEndpoint.post("getActiveOrganization", "/api/auth/active-organization")
+    HttpApiEndpoint.post(
+      "getActiveOrganization",
+      "/api/auth/active-organization",
+    )
       .addSuccess(AuthContract.getActiveOrganization.success)
       .addError(AuthContract.getActiveOrganization.error)
       .setPayload(AuthContract.getActiveOrganization.payload),
   );
-

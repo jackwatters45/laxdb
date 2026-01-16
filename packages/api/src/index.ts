@@ -1,6 +1,5 @@
 import {
-  HttpApiBuilder,
-  HttpApiScalar,
+  HttpLayerRouter,
   HttpMiddleware,
   HttpServer,
   HttpServerResponse,
@@ -8,58 +7,39 @@ import {
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
 
-import { AuthHandlers, AuthRpcs } from "./auth/auth.rpc";
 import { LaxdbApi } from "./definition";
-import { GameHandlers, GameRpcs } from "./game/game.rpc";
 import { HttpGroupsLive } from "./groups";
-import {
-  OrganizationHandlers,
-  OrganizationRpcs,
-} from "./organization/organization.rpc";
-import {
-  ContactInfoHandlers,
-  ContactInfoRpcs,
-} from "./player/contact-info/contact-info.rpc";
-import { PlayerHandlers, PlayerRpcs } from "./player/player.rpc";
-import { SeasonHandlers, SeasonRpcs } from "./season/season.rpc";
-import { TeamHandlers, TeamRpcs } from "./team/team.rpc";
+import { LaxdbRpc } from "./rpc-group";
+import { LaxdbRpcHandlers } from "./rpc-handlers";
 
-const AllRpcs = Layer.mergeAll(
-  RpcServer.layer(SeasonRpcs).pipe(Layer.provide(SeasonHandlers)),
-  RpcServer.layer(GameRpcs).pipe(Layer.provide(GameHandlers)),
-  RpcServer.layer(PlayerRpcs).pipe(Layer.provide(PlayerHandlers)),
-  RpcServer.layer(ContactInfoRpcs).pipe(Layer.provide(ContactInfoHandlers)),
-  RpcServer.layer(TeamRpcs).pipe(Layer.provide(TeamHandlers)),
-  RpcServer.layer(OrganizationRpcs).pipe(Layer.provide(OrganizationHandlers)),
-  RpcServer.layer(AuthRpcs).pipe(Layer.provide(AuthHandlers)),
-);
-
-const RpcProtocol = RpcServer.layerProtocolHttp({
+const RpcRouter = RpcServer.layerHttpRouter({
+  group: LaxdbRpc,
   path: "/rpc",
-  routerTag: HttpApiBuilder.Router,
-}).pipe(Layer.provide(RpcSerialization.layerNdjson));
-
-const HealthCheckRoute = HttpApiBuilder.Router.use((router) =>
-  router.get("/health", HttpServerResponse.text("OK")),
+  protocol: "http",
+  spanPrefix: "rpc",
+}).pipe(
+  Layer.provide(LaxdbRpcHandlers),
+  Layer.provide(RpcSerialization.layerNdjson),
 );
 
-const ApiLive = HttpApiBuilder.api(LaxdbApi).pipe(
+const HttpApiRouter = HttpLayerRouter.addHttpApi(LaxdbApi).pipe(
   Layer.provide(HttpGroupsLive),
-  Layer.provideMerge(
-    Layer.mergeAll(
-      HttpServer.layerContext,
-      HttpApiScalar.layer({ path: "/docs" }),
-      HttpApiBuilder.middlewareCors({ allowedOrigins: ["*"] }),
-      HttpApiBuilder.middlewareOpenApi(),
-      AllRpcs,
-      RpcProtocol,
-      HealthCheckRoute,
-      DateTime.layerCurrentZoneLocal,
-    ),
-  ),
+  Layer.provide(HttpServer.layerContext),
 );
 
-const { handler } = HttpApiBuilder.toWebHandler(ApiLive, {
+// oxlint-disable-next-line react-hooks/rules-of-hooks -- Not a React hook
+const HealthCheckRoute = HttpLayerRouter.use((router) =>
+  router.add("GET", "/health", HttpServerResponse.text("OK")),
+);
+
+const AllRoutes = Layer.mergeAll(
+  RpcRouter,
+  HttpApiRouter,
+  HealthCheckRoute,
+  HttpLayerRouter.cors(),
+).pipe(Layer.provide(DateTime.layerCurrentZoneLocal));
+
+const { handler } = HttpLayerRouter.toWebHandler(AllRoutes, {
   middleware: HttpMiddleware.logger,
 });
 

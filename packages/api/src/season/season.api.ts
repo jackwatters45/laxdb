@@ -54,4 +54,3 @@ export const SeasonsGroup = HttpApiGroup.make("Seasons")
       .addError(ConstraintViolationError)
       .setPayload(SeasonContract.delete.payload),
   );
-

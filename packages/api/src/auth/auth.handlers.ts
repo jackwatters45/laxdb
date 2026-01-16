@@ -1,6 +1,7 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { AuthService } from "@laxdb/core/auth";
 import { Effect, Layer } from "effect";
+
 import { LaxdbApi } from "../definition";
 
 // Handler implementation using LaxdbApi

@@ -17,4 +17,3 @@ export const ContactInfoGroup = HttpApiGroup.make("ContactInfo").add(
     .addError(ConstraintViolationError)
     .setPayload(ContactInfoContract.getPlayerWithContactInfo.payload),
 );
-

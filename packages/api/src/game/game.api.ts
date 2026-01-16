@@ -54,4 +54,3 @@ export const GamesGroup = HttpApiGroup.make("Games")
       .addError(ConstraintViolationError)
       .setPayload(GameContract.delete.payload),
   );
-

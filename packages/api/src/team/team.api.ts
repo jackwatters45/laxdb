@@ -39,4 +39,3 @@ export const TeamsGroup = HttpApiGroup.make("Teams")
       .addError(TeamContract.removeMember.error)
       .setPayload(TeamContract.removeMember.payload),
   );
-

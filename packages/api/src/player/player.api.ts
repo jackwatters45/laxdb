@@ -82,7 +82,10 @@ export const PlayersGroup = HttpApiGroup.make("Players")
       .setPayload(PlayerContract.updateTeamPlayer.payload),
   )
   .add(
-    HttpApiEndpoint.post("removePlayerFromTeam", "/api/players/remove-from-team")
+    HttpApiEndpoint.post(
+      "removePlayerFromTeam",
+      "/api/players/remove-from-team",
+    )
       .addSuccess(PlayerContract.removePlayerFromTeam.success)
       .addError(NotFoundError)
       .addError(ValidationError)
@@ -102,4 +105,3 @@ export const PlayersGroup = HttpApiGroup.make("Players")
       .addError(ConstraintViolationError)
       .setPayload(PlayerContract.bulkRemovePlayersFromTeam.payload),
   );
-

@@ -1,6 +1,7 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { TeamService } from "@laxdb/core/team/team.service";
 import { Effect, Layer } from "effect";
+
 import { LaxdbApi } from "../definition";
 
 // Handler implementation using LaxdbApi

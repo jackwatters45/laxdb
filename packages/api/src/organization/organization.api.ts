@@ -24,4 +24,3 @@ export const OrganizationsGroup = HttpApiGroup.make("Organizations")
       .addError(OrganizationContract.getUserOrganizationContext.error)
       .setPayload(OrganizationContract.getUserOrganizationContext.payload),
   );
-

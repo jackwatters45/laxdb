@@ -1,6 +1,7 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { SeasonService } from "@laxdb/core/season/season.service";
 import { Effect, Layer } from "effect";
+
 import { LaxdbApi } from "../definition";
 
 // Handler implementation using LaxdbApi

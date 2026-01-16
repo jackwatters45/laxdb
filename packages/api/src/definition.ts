@@ -1,4 +1,5 @@
 import { HttpApi } from "@effect/platform";
+
 import { AuthGroup } from "./auth/auth.api";
 import { GamesGroup } from "./game/game.api";
 import { OrganizationsGroup } from "./organization/organization.api";
