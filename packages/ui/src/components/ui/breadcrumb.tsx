@@ -9,21 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@laxdb/ui/components/ui/dropdown-menu";
 import { cn } from "@laxdb/ui/lib/utils";
-import {
-  ChevronRightIcon,
-  ChevronsUpDownIcon,
-  MoreHorizontalIcon,
-} from "lucide-react";
+import { ChevronRightIcon, ChevronsUpDownIcon, MoreHorizontalIcon } from "lucide-react";
 import * as React from "react";
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
-    <nav
-      aria-label="breadcrumb"
-      data-slot="breadcrumb"
-      className={cn(className)}
-      {...props}
-    />
+    <nav aria-label="breadcrumb" data-slot="breadcrumb" className={cn(className)} {...props} />
   );
 }
 
@@ -50,11 +41,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   );
 }
 
-function BreadcrumbLink({
-  className,
-  render,
-  ...props
-}: useRender.ComponentProps<"a">) {
+function BreadcrumbLink({ className, render, ...props }: useRender.ComponentProps<"a">) {
   return useRender({
     defaultTagName: "a",
     props: mergeProps<"a">(
@@ -83,11 +70,7 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   );
 }
 
-function BreadcrumbSeparator({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<"li">) {
+function BreadcrumbSeparator({ children, className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-separator"
@@ -101,19 +84,13 @@ function BreadcrumbSeparator({
   );
 }
 
-function BreadcrumbEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn(
-        "flex size-4 items-center justify-center [&>svg]:size-3.5",
-        className,
-      )}
+      className={cn("flex size-4 items-center justify-center [&>svg]:size-3.5", className)}
       {...props}
     >
       <MoreHorizontalIcon />
@@ -122,9 +99,7 @@ function BreadcrumbEllipsis({
   );
 }
 
-function BreadcrumbDropdown({
-  ...props
-}: React.ComponentProps<typeof DropdownMenu>) {
+function BreadcrumbDropdown({ ...props }: React.ComponentProps<typeof DropdownMenu>) {
   return <DropdownMenu {...props} />;
 }
 
@@ -146,21 +121,15 @@ function BreadcrumbDropdownTrigger({
   );
 }
 
-function BreadcrumbDropdownContent({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuContent>) {
+function BreadcrumbDropdownContent({ ...props }: React.ComponentProps<typeof DropdownMenuContent>) {
   return <DropdownMenuContent {...props} />;
 }
 
-function BreadcrumbDropdownItem({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuItem>) {
+function BreadcrumbDropdownItem({ ...props }: React.ComponentProps<typeof DropdownMenuItem>) {
   return <DropdownMenuItem {...props} />;
 }
 
-function BreadcrumbDropdownLabel({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuLabel>) {
+function BreadcrumbDropdownLabel({ ...props }: React.ComponentProps<typeof DropdownMenuLabel>) {
   return <DropdownMenuLabel {...props} />;
 }
 

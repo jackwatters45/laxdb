@@ -1,12 +1,7 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@laxdb/ui/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { cn } from "@laxdb/ui/lib/utils";
 import { Schema } from "effect";
@@ -16,9 +11,7 @@ import { Controller, useForm } from "react-hook-form";
 import { authClient } from "@/lib/auth-client";
 
 const registerSchema = Schema.Struct({
-  name: Schema.String.pipe(
-    Schema.minLength(1, { message: () => "Name is required" }),
-  ),
+  name: Schema.String.pipe(Schema.minLength(1, { message: () => "Name is required" })),
   email: Schema.String.pipe(
     Schema.minLength(1, { message: () => "Email is required" }),
     Schema.filter((email) => /\S+@\S+\.\S+/.test(email), {
@@ -41,10 +34,7 @@ const registerSchema = Schema.Struct({
 
 type RegisterFormValues = typeof registerSchema.Type;
 
-export function RegisterForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+export function RegisterForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -75,15 +65,11 @@ export function RegisterForm({
       if (result.error) {
         setError(result.error.message ?? "Registration failed");
       } else {
-        setSuccess(
-          "Account created successfully! Please check your email to verify your account.",
-        );
+        setSuccess("Account created successfully! Please check your email to verify your account.");
         form.reset();
       }
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unexpected error occurred",
-      );
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -96,9 +82,7 @@ export function RegisterForm({
         callbackURL: "/teams",
       });
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Google sign up failed",
-      );
+      setError(error instanceof Error ? error.message : "Google sign up failed");
     }
   };
 
@@ -137,9 +121,7 @@ export function RegisterForm({
                   placeholder="John Doe"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -157,9 +139,7 @@ export function RegisterForm({
                   placeholder="m@example.com"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -177,9 +157,7 @@ export function RegisterForm({
                   placeholder="Create a password"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -189,9 +167,7 @@ export function RegisterForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="register-confirm-password">
-                  Confirm Password
-                </FieldLabel>
+                <FieldLabel htmlFor="register-confirm-password">Confirm Password</FieldLabel>
                 <Input
                   {...field}
                   id="register-confirm-password"
@@ -199,9 +175,7 @@ export function RegisterForm({
                   placeholder="Confirm your password"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />

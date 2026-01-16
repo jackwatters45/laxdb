@@ -1,23 +1,10 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@laxdb/ui/components/ui/field";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@laxdb/ui/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@laxdb/ui/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -61,20 +48,10 @@ const createGameSchema = Schema.Struct({
   opponentName: Schema.String.pipe(
     Schema.minLength(1, { message: () => "Opponent name is required" }),
   ),
-  gameDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => "Date and time is required" }),
-  ),
-  venue: Schema.String.pipe(
-    Schema.minLength(1, { message: () => "Venue is required" }),
-  ),
+  gameDate: Schema.String.pipe(Schema.minLength(1, { message: () => "Date and time is required" })),
+  venue: Schema.String.pipe(Schema.minLength(1, { message: () => "Venue is required" })),
   isHomeGame: Schema.Boolean,
-  gameType: Schema.Literal(
-    "regular",
-    "playoff",
-    "tournament",
-    "friendly",
-    "practice",
-  ),
+  gameType: Schema.Literal("regular", "playoff", "tournament", "friendly", "practice"),
 });
 
 type CreateGameInput = typeof createGameSchema.Type;
@@ -96,9 +73,7 @@ const gameTypeLabels: Record<string, string> = {
   practice: "Practice",
 };
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/games/create",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/games/create")({
   component: CreateGamePage,
 });
 
@@ -122,9 +97,7 @@ function CreateGamePage() {
     mutationKey: ["createGame"],
     mutationFn: (data: CreateGameInput) => createGame({ data }),
     onSuccess: async (game) => {
-      toast.success(
-        `Game against ${game.opponentName} scheduled successfully!`,
-      );
+      toast.success(`Game against ${game.opponentName} scheduled successfully!`);
       await router.invalidate();
       await router.navigate({
         to: "/$organizationSlug/games",
@@ -151,9 +124,7 @@ function CreateGamePage() {
         </Link>
 
         <h1 className="text-3xl font-bold">Schedule New Game</h1>
-        <p className="text-muted-foreground">
-          Add a new game to your team&apos;s schedule
-        </p>
+        <p className="text-muted-foreground">Add a new game to your team&apos;s schedule</p>
       </div>
 
       <Card>
@@ -168,18 +139,14 @@ function CreateGamePage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="opponent-name">
-                      Opponent Team *
-                    </FieldLabel>
+                    <FieldLabel htmlFor="opponent-name">Opponent Team *</FieldLabel>
                     <Input
                       {...field}
                       id="opponent-name"
                       placeholder="e.g., Riverside Hawks, Central Valley Eagles"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -199,9 +166,7 @@ function CreateGamePage() {
                       type="datetime-local"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -221,9 +186,7 @@ function CreateGamePage() {
                       placeholder="e.g., Memorial Stadium, Lions Field"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -254,9 +217,7 @@ function CreateGamePage() {
                         </Label>
                       </div>
                     </RadioGroup>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -268,10 +229,7 @@ function CreateGamePage() {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="game-type">Game Type</FieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger
-                        id="game-type"
-                        aria-invalid={fieldState.invalid}
-                      >
+                      <SelectTrigger id="game-type" aria-invalid={fieldState.invalid}>
                         <SelectValue>
                           {(value: keyof typeof gameTypeLabels) => {
                             return gameTypeLabels[value] ?? "Select game type";
@@ -286,9 +244,7 @@ function CreateGamePage() {
                         <SelectItem value="practice">Practice</SelectItem>
                       </SelectContent>
                     </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -310,14 +266,10 @@ function CreateGamePage() {
               </Button>
               <Button
                 className="flex-1"
-                disabled={
-                  form.formState.isSubmitting || createGameMutation.isPending
-                }
+                disabled={form.formState.isSubmitting || createGameMutation.isPending}
                 type="submit"
               >
-                {createGameMutation.isPending
-                  ? "Scheduling..."
-                  : "Schedule Game"}
+                {createGameMutation.isPending ? "Scheduling..." : "Schedule Game"}
               </Button>
             </div>
           </form>

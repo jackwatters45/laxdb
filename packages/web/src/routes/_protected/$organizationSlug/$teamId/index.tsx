@@ -16,17 +16,8 @@ import {
   BreadcrumbSeparator,
 } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "@laxdb/ui/components/ui/field";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
+import { Field, FieldDescription, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -94,8 +85,7 @@ const getTeamData = createServerFn({ method: "GET" })
 
         const members = (membersResult || []) as unknown as PopulatedMember[];
         const activeMember = activeMemberResult ?? null;
-        const canManageTeam =
-          activeMember?.role === "coach" || activeMember?.role === "headCoach";
+        const canManageTeam = activeMember?.role === "coach" || activeMember?.role === "headCoach";
 
         return {
           teamId,
@@ -129,13 +119,9 @@ function TeamManagementPage() {
 
   useEffect(() => {
     const loadTeamDetails = async () => {
-      const teamsResult = await authClient.organization
-        .listTeams()
-        .catch(() => ({ data: null }));
+      const teamsResult = await authClient.organization.listTeams().catch(() => ({ data: null }));
 
-      const team = teamsResult.data?.find(
-        (t: { id: string; name: string }) => t.id === teamId,
-      );
+      const team = teamsResult.data?.find((t: { id: string; name: string }) => t.id === teamId);
       setTeamName(team?.name ?? "Unknown Team");
       setLoading(false);
     };
@@ -162,9 +148,7 @@ function TeamManagementPage() {
           <div className="mb-8 flex items-center gap-4">
             <div className="flex-1">
               <h1 className="text-3xl font-bold">{teamName}</h1>
-              <p className="text-muted-foreground">
-                Manage players and team settings
-              </p>
+              <p className="text-muted-foreground">Manage players and team settings</p>
             </div>
 
             {canManageTeam && (
@@ -189,9 +173,7 @@ function TeamManagementPage() {
           <div className="mb-8 grid gap-6 md:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Players
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Total Players</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{members.length}</div>
@@ -200,23 +182,17 @@ function TeamManagementPage() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Players
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Active Players</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{members.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  All players active
-                </p>
+                <p className="text-xs text-muted-foreground">All players active</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Team Status
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Team Status</CardTitle>
               </CardHeader>
               <CardContent>
                 <Badge variant="secondary">Active</Badge>
@@ -243,9 +219,7 @@ function TeamManagementPage() {
                 </div>
               ) : (
                 <div className="py-8 text-center">
-                  <div className="mb-4 text-muted-foreground">
-                    No players in this team yet
-                  </div>
+                  <div className="mb-4 text-muted-foreground">No players in this team yet</div>
                   {canManageTeam && (
                     <Button
                       onClick={() => {
@@ -307,9 +281,7 @@ function TeamMemberCard({
   }, [member]);
 
   const handleRemoveFromTeam = async () => {
-    if (
-      !confirm("Are you sure you want to remove this player from the team?")
-    ) {
+    if (!confirm("Are you sure you want to remove this player from the team?")) {
       return;
     }
 
@@ -330,9 +302,7 @@ function TeamMemberCard({
   };
 
   if (!userDetails) {
-    return (
-      <div className="rounded-lg border p-4">Loading player details...</div>
-    );
+    return <div className="rounded-lg border p-4">Loading player details...</div>;
   }
 
   return (
@@ -346,17 +316,13 @@ function TeamMemberCard({
               src={userDetails.image}
             />
           ) : (
-            <span className="font-semibold">
-              {userDetails.name.charAt(0).toUpperCase()}
-            </span>
+            <span className="font-semibold">{userDetails.name.charAt(0).toUpperCase()}</span>
           )}
         </div>
 
         <div>
           <div className="font-medium">{userDetails.name}</div>
-          <div className="text-sm text-muted-foreground">
-            {userDetails.email}
-          </div>
+          <div className="text-sm text-muted-foreground">{userDetails.email}</div>
         </div>
       </div>
 
@@ -450,19 +416,10 @@ function InvitePlayerDialog({
           </Field>
 
           <div className="flex gap-3 pt-4">
-            <Button
-              className="flex-1"
-              onClick={onClose}
-              type="button"
-              variant="outline"
-            >
+            <Button className="flex-1" onClick={onClose} type="button" variant="outline">
               Cancel
             </Button>
-            <Button
-              className="flex-1"
-              disabled={loading || !email.trim()}
-              type="submit"
-            >
+            <Button className="flex-1" disabled={loading || !email.trim()} type="submit">
               {loading ? "Sending..." : "Send Invitation"}
             </Button>
           </div>
@@ -482,9 +439,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Teams"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
         >
           Teams
         </BreadcrumbLink>

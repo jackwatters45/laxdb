@@ -8,12 +8,7 @@ import {
 } from "@laxdb/ui/components/ui/select";
 import { cn } from "@laxdb/ui/lib/utils";
 import type { Table } from "@tanstack/react-table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>;
@@ -135,9 +130,7 @@ function PaginationControls<TData>({ table }: { table: Table<TData> }) {
   );
 }
 
-export function DataTablePagination<TData>({
-  table,
-}: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between px-4 py-2">
       <PaginationSelectedCount table={table} />
@@ -152,9 +145,4 @@ export function DataTablePagination<TData>({
 }
 
 // Export individual components for advanced composition
-export {
-  PaginationSelectedCount,
-  PaginationPageSizeSelect,
-  PaginationInfo,
-  PaginationControls,
-};
+export { PaginationSelectedCount, PaginationPageSizeSelect, PaginationInfo, PaginationControls };

@@ -1,12 +1,7 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -36,9 +31,7 @@ const goalFormSchema = Schema.Struct({
   targetValue: Schema.String.pipe(
     Schema.minLength(1, { message: () => "Target value is required" }),
   ),
-  dueDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => "Due date is required" }),
-  ),
+  dueDate: Schema.String.pipe(Schema.minLength(1, { message: () => "Due date is required" })),
   priority: Schema.Literal("low", "medium", "high"),
 });
 
@@ -79,9 +72,7 @@ const getPlayerInfo = createServerFn({ method: "GET" })
     };
   });
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/goals/create",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/goals/create")({
   component: CreateGoalPage,
   validateSearch: (search: { playerId: string }) => ({
     playerId: search.playerId,
@@ -149,10 +140,7 @@ function CreateGoalPage() {
   return (
     <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-8">
-        <Link
-          params={{ organizationSlug, playerId }}
-          to="/$organizationSlug/players/$playerId"
-        >
+        <Link params={{ organizationSlug, playerId }} to="/$organizationSlug/players/$playerId">
           <Button className="mb-4" variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to {player.name}
@@ -161,9 +149,7 @@ function CreateGoalPage() {
 
         <div>
           <h1 className="text-3xl font-bold">Set New Goal</h1>
-          <p className="text-muted-foreground">
-            Create a development goal for {player.name}
-          </p>
+          <p className="text-muted-foreground">Create a development goal for {player.name}</p>
         </div>
       </div>
 
@@ -190,9 +176,7 @@ function CreateGoalPage() {
                       placeholder="e.g., Improve Shot Accuracy"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -203,9 +187,7 @@ function CreateGoalPage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="goal-description">
-                      Description
-                    </FieldLabel>
+                    <FieldLabel htmlFor="goal-description">Description</FieldLabel>
                     <Textarea
                       {...field}
                       id="goal-description"
@@ -216,9 +198,7 @@ function CreateGoalPage() {
                     <FieldDescription>
                       Optional: Provide more details about this goal
                     </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -245,15 +225,11 @@ function CreateGoalPage() {
                           type="button"
                         >
                           <span className="text-lg">{category.icon}</span>
-                          <span className="text-sm font-medium">
-                            {category.label}
-                          </span>
+                          <span className="text-sm font-medium">{category.label}</span>
                         </button>
                       ))}
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -265,18 +241,14 @@ function CreateGoalPage() {
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="current-value">
-                        Current Value
-                      </FieldLabel>
+                      <FieldLabel htmlFor="current-value">Current Value</FieldLabel>
                       <Input
                         {...field}
                         id="current-value"
                         placeholder="e.g., 60% accuracy"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
                 />
@@ -285,18 +257,14 @@ function CreateGoalPage() {
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="target-value">
-                        Target Value
-                      </FieldLabel>
+                      <FieldLabel htmlFor="target-value">Target Value</FieldLabel>
                       <Input
                         {...field}
                         id="target-value"
                         placeholder="e.g., 75% accuracy"
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
                 />
@@ -319,9 +287,7 @@ function CreateGoalPage() {
                         aria-invalid={fieldState.invalid}
                       />
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -353,9 +319,7 @@ function CreateGoalPage() {
                         </button>
                       ))}
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -376,11 +340,7 @@ function CreateGoalPage() {
               >
                 Cancel
               </Button>
-              <Button
-                className="flex-1"
-                disabled={form.formState.isSubmitting}
-                type="submit"
-              >
+              <Button className="flex-1" disabled={form.formState.isSubmitting} type="submit">
                 {form.formState.isSubmitting ? "Creating..." : "Create Goal"}
               </Button>
             </div>

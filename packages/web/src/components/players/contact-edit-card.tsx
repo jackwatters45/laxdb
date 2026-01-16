@@ -18,15 +18,12 @@ type ContactEditCardContextValue = {
   prefix: string | undefined;
 };
 
-const ContactEditCardContext =
-  createContext<ContactEditCardContextValue | null>(null);
+const ContactEditCardContext = createContext<ContactEditCardContextValue | null>(null);
 
 function useContactEditCard(): ContactEditCardContextValue {
   const context = useContext(ContactEditCardContext);
   if (!context) {
-    throw new Error(
-      "ContactEditCard components must be used within ContactEditCard",
-    );
+    throw new Error("ContactEditCard components must be used within ContactEditCard");
   }
   return context;
 }
@@ -62,9 +59,7 @@ function ContactEditCard<T extends FieldValues>({
   );
 
   return (
-    <ContactEditCardContext.Provider value={value}>
-      {children}
-    </ContactEditCardContext.Provider>
+    <ContactEditCardContext.Provider value={value}>{children}</ContactEditCardContext.Provider>
   );
 }
 
@@ -123,13 +118,7 @@ type ContactEditCardInputProps = {
   isInvalid?: boolean;
 };
 
-function ContactEditCardInput({
-  icon,
-  prefix,
-  field,
-  id,
-  isInvalid,
-}: ContactEditCardInputProps) {
+function ContactEditCardInput({ icon, prefix, field, id, isInvalid }: ContactEditCardInputProps) {
   return (
     <div className="flex items-center gap-2">
       {icon}
@@ -146,12 +135,7 @@ function ContactEditCardInput({
           />
         </div>
       ) : (
-        <Input
-          {...field}
-          id={id}
-          aria-invalid={isInvalid}
-          className="h-8 text-sm"
-        />
+        <Input {...field} id={id} aria-invalid={isInvalid} className="h-8 text-sm" />
       )}
     </div>
   );
@@ -194,9 +178,7 @@ type EmailEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function EmailEditCard<T extends FieldValues>({
-  form,
-}: EmailEditCardProps<T>) {
+export function EmailEditCard<T extends FieldValues>({ form }: EmailEditCardProps<T>) {
   return (
     <ContactEditCard form={form} label="Email" name="email">
       <ContactEditCardIcon>
@@ -210,9 +192,7 @@ type PhoneEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function PhoneEditCard<T extends FieldValues>({
-  form,
-}: PhoneEditCardProps<T>) {
+export function PhoneEditCard<T extends FieldValues>({ form }: PhoneEditCardProps<T>) {
   return (
     <ContactEditCard form={form} label="Phone" name="phone">
       <ContactEditCardIcon>
@@ -226,9 +206,7 @@ type FacebookEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function FacebookEditCard<T extends FieldValues>({
-  form,
-}: FacebookEditCardProps<T>) {
+export function FacebookEditCard<T extends FieldValues>({ form }: FacebookEditCardProps<T>) {
   return (
     <ContactEditCard
       form={form}
@@ -247,9 +225,7 @@ type InstagramEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function InstagramEditCard<T extends FieldValues>({
-  form,
-}: InstagramEditCardProps<T>) {
+export function InstagramEditCard<T extends FieldValues>({ form }: InstagramEditCardProps<T>) {
   return (
     <ContactEditCard
       form={form}
@@ -268,9 +244,7 @@ type WhatsAppEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function WhatsAppEditCard<T extends FieldValues>({
-  form,
-}: WhatsAppEditCardProps<T>) {
+export function WhatsAppEditCard<T extends FieldValues>({ form }: WhatsAppEditCardProps<T>) {
   return (
     <ContactEditCard
       form={form}
@@ -289,9 +263,7 @@ type GroupMeEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function GroupMeEditCard<T extends FieldValues>({
-  form,
-}: GroupMeEditCardProps<T>) {
+export function GroupMeEditCard<T extends FieldValues>({ form }: GroupMeEditCardProps<T>) {
   return (
     <ContactEditCard
       form={form}
@@ -310,9 +282,7 @@ type LinkedInEditCardProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
 };
 
-export function LinkedInEditCard<T extends FieldValues>({
-  form,
-}: LinkedInEditCardProps<T>) {
+export function LinkedInEditCard<T extends FieldValues>({ form }: LinkedInEditCardProps<T>) {
   return (
     <ContactEditCard
       form={form}
@@ -335,11 +305,7 @@ export function EmergencyContactNameEditCard<T extends FieldValues>({
   form,
 }: EmergencyContactNameEditCardProps<T>) {
   return (
-    <ContactEditCard
-      form={form}
-      label="Emergency Contact Name"
-      name={"emergencyContactName"}
-    >
+    <ContactEditCard form={form} label="Emergency Contact Name" name={"emergencyContactName"}>
       <ContactEditCardIcon>
         <Phone className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>
@@ -355,11 +321,7 @@ export function EmergencyContactPhoneEditCard<T extends FieldValues>({
   form,
 }: EmergencyContactPhoneEditCardProps<T>) {
   return (
-    <ContactEditCard
-      form={form}
-      label="Emergency Contact Phone"
-      name={"emergencyContactPhone"}
-    >
+    <ContactEditCard form={form} label="Emergency Contact Phone" name={"emergencyContactPhone"}>
       <ContactEditCardIcon>
         <Phone className="h-4 w-4 text-muted-foreground" />
       </ContactEditCardIcon>

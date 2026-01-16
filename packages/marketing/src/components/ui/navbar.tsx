@@ -43,10 +43,7 @@ export function NavBar() {
               </a>
             </div>
           </nav>
-          <Button
-            className="hidden h-10 font-semibold sm:block"
-            variant="secondary"
-          >
+          <Button className="hidden h-10 font-semibold sm:block" variant="secondary">
             Get a quote
           </Button>
           <Button
@@ -58,15 +55,9 @@ export function NavBar() {
             variant="secondary"
           >
             {open ? (
-              <RiCloseFill
-                aria-hidden
-                className="size-6 shrink-0 text-gray-900"
-              />
+              <RiCloseFill aria-hidden className="size-6 shrink-0 text-gray-900" />
             ) : (
-              <RiMenuFill
-                aria-hidden
-                className="size-6 shrink-0 text-gray-900"
-              />
+              <RiMenuFill aria-hidden className="size-6 shrink-0 text-gray-900" />
             )}
           </Button>
         </div>

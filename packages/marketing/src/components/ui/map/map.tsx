@@ -1,9 +1,4 @@
-import {
-  RiHome9Fill,
-  RiPlaneLine,
-  RiSignalTowerFill,
-  RiTruckFill,
-} from "@remixicon/react";
+import { RiHome9Fill, RiPlaneLine, RiSignalTowerFill, RiTruckFill } from "@remixicon/react";
 
 import { Icons } from "@/components/icons";
 
@@ -90,9 +85,8 @@ export const MapComponent = () => (
       Monitoring & Control for Precision Agriculture
     </h2>
     <p className="mt-4 max-w-2xl text-center text-base text-balance text-gray-400 sm:mt-8 sm:text-xl">
-      Complete oversight of your farming operations across fields, irrigation
-      systems, and aerial monitoring, delivering insights even in remote rural
-      locations.
+      Complete oversight of your farming operations across fields, irrigation systems, and aerial
+      monitoring, delivering insights even in remote rural locations.
     </p>
 
     <div className="relative mt-20 mb-10 ml-[17rem] scale-90 sm:mb-16 md:mt-24 md:ml-0 md:scale-100">

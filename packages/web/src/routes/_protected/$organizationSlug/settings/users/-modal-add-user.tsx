@@ -56,14 +56,8 @@ export function ModalAddUser({ children }: ModalAddUserProps) {
                 Select role
               </Label>
               <Select>
-                <SelectTrigger
-                  className="mt-2"
-                  id="role-new-user"
-                  name="role-new-user"
-                >
-                  <SelectValue>
-                    {(value: string | null) => value ?? "Select role..."}
-                  </SelectValue>
+                <SelectTrigger className="mt-2" id="role-new-user" name="role-new-user">
+                  <SelectValue>{(value: string | null) => value ?? "Select role..."}</SelectValue>
                 </SelectTrigger>
                 <SelectContent align="end">
                   {roles.map((role) => (
@@ -81,18 +75,11 @@ export function ModalAddUser({ children }: ModalAddUserProps) {
           </DialogHeader>
           <DialogFooter className="mt-6">
             <DialogClose
-              render={
-                <Button
-                  className="mt-2 w-full sm:mt-0 sm:w-fit"
-                  variant="secondary"
-                />
-              }
+              render={<Button className="mt-2 w-full sm:mt-0 sm:w-fit" variant="secondary" />}
             >
               Go back
             </DialogClose>
-            <DialogClose
-              render={<Button className="w-full sm:w-fit" type="submit" />}
-            >
+            <DialogClose render={<Button className="w-full sm:w-fit" type="submit" />}>
               Add user
             </DialogClose>
           </DialogFooter>

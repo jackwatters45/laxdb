@@ -66,13 +66,7 @@ const GameOfLife = () => {
           if (cell.opacity > 0) {
             ctx.fillStyle = `rgba(0, 0, 0, ${cell.opacity})`;
             ctx.beginPath();
-            ctx.arc(
-              j * cellSize + cellSize / 2,
-              i * cellSize + cellSize / 2,
-              1,
-              0,
-              Math.PI * 2,
-            );
+            ctx.arc(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2, 1, 0, Math.PI * 2);
             ctx.fill();
           }
         }
@@ -81,9 +75,7 @@ const GameOfLife = () => {
       const next = grid.map((row, i) =>
         row.map((cell, j) => {
           const neighbors = countNeighbors(grid, i, j);
-          const willBeAlive = cell.alive
-            ? neighbors >= 2 && neighbors <= 3
-            : neighbors === 3;
+          const willBeAlive = cell.alive ? neighbors >= 2 && neighbors <= 3 : neighbors === 3;
           return {
             alive: willBeAlive,
             opacity: cell.opacity,

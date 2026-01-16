@@ -1,8 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@laxdb/ui/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@laxdb/ui/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@laxdb/ui/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@laxdb/ui/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@laxdb/ui/components/ui/sidebar";
 import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import { ChevronsUpDown, Plus } from "lucide-react";
 
@@ -85,9 +77,7 @@ export function OrganizationSwitcher() {
                     </div>
                     <span>{org.name}</span>
                   </div>
-                  {isActive && (
-                    <div className="h-2 w-2 rounded-full bg-green-500" />
-                  )}
+                  {isActive && <div className="h-2 w-2 rounded-full bg-green-500" />}
                 </DropdownMenuItem>
               );
             })}
@@ -104,9 +94,7 @@ export function OrganizationSwitcher() {
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="h-4" />
               </div>
-              <div className="font-medium text-muted-foreground">
-                Create Organization
-              </div>
+              <div className="font-medium text-muted-foreground">Create Organization</div>
             </DropdownMenuItem>
             <DropdownMenuItem
               render={
@@ -120,9 +108,7 @@ export function OrganizationSwitcher() {
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="h-4" />
               </div>
-              <div className="font-medium text-muted-foreground">
-                Join Organization
-              </div>
+              <div className="font-medium text-muted-foreground">Join Organization</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

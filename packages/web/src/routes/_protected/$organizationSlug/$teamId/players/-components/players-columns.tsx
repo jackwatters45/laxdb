@@ -19,11 +19,7 @@ import {
   SelectValue,
 } from "@laxdb/ui/components/ui/select";
 import { Link } from "@tanstack/react-router";
-import {
-  type ColumnDef,
-  type Row,
-  createColumnHelper,
-} from "@tanstack/react-table";
+import { type ColumnDef, type Row, createColumnHelper } from "@tanstack/react-table";
 import { Schema } from "effect";
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
@@ -62,8 +58,7 @@ function JerseyNumberCell({ organizationId, teamId, player }: CellProps) {
         const numValue = newValue ? Number(newValue) : null;
 
         if (numValue !== null) {
-          const result =
-            Schema.decodeUnknownEither(JerseyNumberSchema)(numValue);
+          const result = Schema.decodeUnknownEither(JerseyNumberSchema)(numValue);
           if (result._tag === "Left") {
             toast.error("Jersey number must be between 0 and 1000");
             return;
@@ -80,12 +75,7 @@ function JerseyNumberCell({ organizationId, teamId, player }: CellProps) {
   );
 }
 
-function NameCell({
-  organizationId,
-  teamId,
-  player,
-  excludePlayerIds,
-}: NameCellProps) {
+function NameCell({ organizationId, teamId, player, excludePlayerIds }: NameCellProps) {
   const mutations = usePlayerMutations(organizationId, teamId);
   const handleUpdate = mutations.update.handleUpdate;
   const linkPlayer = mutations.link;
@@ -129,9 +119,7 @@ function PositionCell({ organizationId, teamId, player }: CellProps) {
       value={player.position ?? ""}
     >
       <SelectTrigger variant="data">
-        <SelectValue>
-          {(value: string | null) => value ?? "Select position"}
-        </SelectValue>
+        <SelectValue>{(value: string | null) => value ?? "Select position"}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         {POSITION_SELECT_FIELDS.map((position) => (
@@ -172,13 +160,7 @@ function EmailCell({ organizationId, teamId, player }: CellProps) {
   );
 }
 
-function ActionsCell({
-  organizationId,
-  organizationSlug,
-  teamId,
-  player,
-  row,
-}: ActionsCellProps) {
+function ActionsCell({ organizationId, organizationSlug, teamId, player, row }: ActionsCellProps) {
   const mutations = usePlayerMutations(organizationId, teamId);
 
   return (
@@ -236,9 +218,7 @@ export function createEditablePlayerColumns({
         <Checkbox
           aria-label="Select all"
           checked={table.getIsAllPageRowsSelected()}
-          indeterminate={
-            table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()
-          }
+          indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllPageRowsSelected()}
           className="translate-y-0.5"
           onCheckedChange={() => {
             table.toggleAllPageRowsSelected();
@@ -262,26 +242,18 @@ export function createEditablePlayerColumns({
       },
     }),
     columnHelper.accessor("jerseyNumber", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="#" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
       enableSorting: true,
       meta: {
         className: "w-16",
         displayName: "Jersey Number",
       },
       cell: ({ row: { original: player } }) => (
-        <JerseyNumberCell
-          organizationId={organizationId}
-          player={player}
-          teamId={teamId}
-        />
+        <JerseyNumberCell organizationId={organizationId} player={player} teamId={teamId} />
       ),
     }),
     columnHelper.accessor("name", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Name" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
       enableSorting: true,
       enableHiding: false,
       enableColumnFilter: true,
@@ -299,9 +271,7 @@ export function createEditablePlayerColumns({
       ),
     }),
     columnHelper.accessor("position", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Position" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Position" />,
       enableSorting: true,
       enableColumnFilter: true,
       meta: {
@@ -310,17 +280,11 @@ export function createEditablePlayerColumns({
       },
       filterFn: "arrIncludesSome",
       cell: ({ row }) => (
-        <PositionCell
-          organizationId={organizationId}
-          player={row.original}
-          teamId={teamId}
-        />
+        <PositionCell organizationId={organizationId} player={row.original} teamId={teamId} />
       ),
     }),
     columnHelper.accessor("email", {
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Email" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
       enableSorting: true,
       enableColumnFilter: true,
       meta: {
@@ -328,11 +292,7 @@ export function createEditablePlayerColumns({
         displayName: "Email",
       },
       cell: ({ row: { original: player } }) => (
-        <EmailCell
-          organizationId={organizationId}
-          player={player}
-          teamId={teamId}
-        />
+        <EmailCell organizationId={organizationId} player={player} teamId={teamId} />
       ),
     }),
     columnHelper.display({

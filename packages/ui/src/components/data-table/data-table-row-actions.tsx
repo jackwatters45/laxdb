@@ -35,9 +35,7 @@ type RowActionsContextValue<TData = unknown> = {
   actions?: RowActions<TData>;
 };
 
-const RowActionsContext = React.createContext<RowActionsContextValue | null>(
-  null,
-);
+const RowActionsContext = React.createContext<RowActionsContextValue | null>(null);
 
 function useRowActions<TData = unknown>(): RowActionsContextValue<TData> {
   const context = React.useContext(RowActionsContext);
@@ -53,11 +51,7 @@ type RowActionsProviderProps<TData> = {
   children: React.ReactNode;
 };
 
-function RowActionsProvider<TData>({
-  row,
-  actions,
-  children,
-}: RowActionsProviderProps<TData>) {
+function RowActionsProvider<TData>({ row, actions, children }: RowActionsProviderProps<TData>) {
   const value = React.useMemo(
     () => ({
       row,
@@ -144,11 +138,7 @@ function RowActionEditItem({ className, children }: ClassNameChildrenProp) {
   }
 
   return (
-    <RowActionItem
-      className={className}
-      icon={Pencil}
-      onClick={() => actions.onEdit?.(row)}
-    >
+    <RowActionItem className={className} icon={Pencil} onClick={() => actions.onEdit?.(row)}>
       {children}
     </RowActionItem>
   );

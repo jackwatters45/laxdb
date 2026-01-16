@@ -50,9 +50,7 @@ export default function FieldPerformance() {
     <div className="h-150 shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] perspective-[4000px] perspective-origin-center">
       <div className="-translate-y-10 -translate-z-10 rotate-x-10 rotate-y-20 -rotate-z-10 transform-3d">
         <h3 className="text-sm text-gray-500">Field Yield Performance</h3>
-        <p className="mt-1 text-3xl font-semibold text-gray-900">
-          32,227 bushels
-        </p>
+        <p className="mt-1 text-3xl font-semibold text-gray-900">32,227 bushels</p>
         <p className="mt-1 text-sm font-medium">
           <span className="text-emerald-700">+430 bushels (4.1%)</span>{" "}
           <span className="font-normal text-gray-500">Past growing season</span>
@@ -65,21 +63,11 @@ export default function FieldPerformance() {
               <TableRow>
                 <TableHeaderCell>Field</TableHeaderCell>
                 <TableHeaderCell className="text-right">Yield</TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Expected
-                </TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Water Used
-                </TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Yield Diff
-                </TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Efficiency
-                </TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Nutrients
-                </TableHeaderCell>
+                <TableHeaderCell className="text-right">Expected</TableHeaderCell>
+                <TableHeaderCell className="text-right">Water Used</TableHeaderCell>
+                <TableHeaderCell className="text-right">Yield Diff</TableHeaderCell>
+                <TableHeaderCell className="text-right">Efficiency</TableHeaderCell>
+                <TableHeaderCell className="text-right">Nutrients</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -87,10 +75,7 @@ export default function FieldPerformance() {
                 <TableRow key={item.name}>
                   <TableCell className="font-medium text-gray-900">
                     <div className="flex space-x-3">
-                      <span
-                        aria-hidden="true"
-                        className={`${item.bgColor} w-1 shrink-0 rounded`}
-                      />
+                      <span aria-hidden="true" className={`${item.bgColor} w-1 shrink-0 rounded`} />
                       <span>{item.name}</span>
                     </div>
                   </TableCell>
@@ -100,9 +85,7 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === "positive"
-                          ? "text-emerald-700"
-                          : "text-red-700"
+                        item.changeType === "positive" ? "text-emerald-700" : "text-red-700"
                       }
                     >
                       {item.yield}
@@ -111,9 +94,7 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === "positive"
-                          ? "text-emerald-700"
-                          : "text-red-700"
+                        item.changeType === "positive" ? "text-emerald-700" : "text-red-700"
                       }
                     >
                       {item.efficiency}
@@ -122,9 +103,7 @@ export default function FieldPerformance() {
                   <TableCell className="text-right">
                     <span
                       className={
-                        item.changeType === "positive"
-                          ? "text-emerald-700"
-                          : "text-red-700"
+                        item.changeType === "positive" ? "text-emerald-700" : "text-red-700"
                       }
                     >
                       {item.nutrients}

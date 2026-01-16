@@ -1,16 +1,11 @@
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { PageBody } from "@/components/layout/page-content";
 import { JoinOrganizationForm } from "@/components/organizations/join-form";
 import { DashboardHeader } from "@/components/sidebar/dashboard-header";
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/organization/join",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/organization/join")({
   component: CreateOrganizationPage,
 });
 
@@ -35,12 +30,7 @@ function Header() {
       <BreadcrumbItem>
         <BreadcrumbLink
           title="Join Organization"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/organization/join"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/organization/join" />}
         >
           Join Organization
         </BreadcrumbLink>

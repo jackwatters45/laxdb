@@ -17,11 +17,7 @@ import { POSITION_SELECT_FIELDS } from "@/lib/constants";
 
 import { AddPlayerCommand } from "./add-player-command";
 
-export function PlayersFilterBar({
-  organizationId,
-}: {
-  organizationId: string;
-}) {
+export function PlayersFilterBar({ organizationId }: { organizationId: string }) {
   const { table } = useDataTable();
 
   return (

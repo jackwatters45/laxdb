@@ -1,9 +1,4 @@
-import {
-  RiDropFill,
-  RiNavigationFill,
-  RiPieChartFill,
-  RiRobot3Fill,
-} from "@remixicon/react";
+import { RiDropFill, RiNavigationFill, RiPieChartFill, RiRobot3Fill } from "@remixicon/react";
 
 import { Divider } from "../divider";
 

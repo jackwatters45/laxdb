@@ -23,8 +23,7 @@ import { authMiddleware } from "@/lib/middleware";
 export const getTeamPlayersQK = (organizationId: string, teamId: string) =>
   [organizationId, teamId, "players"] as const;
 
-export const getOrgPlayersQK = (organizationId: string) =>
-  [organizationId, "players"] as const;
+export const getOrgPlayersQK = (organizationId: string) => [organizationId, "players"] as const;
 
 export class UpdatePlayerAndTeamInput extends Schema.Class<UpdatePlayerAndTeamInput>(
   "UpdatePlayerAndTeamInput",
@@ -77,12 +76,10 @@ export function useUpdatePlayerBase(queryKey: readonly string[]) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof UpdatePlayerAndTeamInput.Type) =>
-      updatePlayerFn({ data }),
+    mutationFn: (data: typeof UpdatePlayerAndTeamInput.Type) => updatePlayerFn({ data }),
     onMutate: async (variables, ctx) => {
       await ctx.client.cancelQueries({ queryKey });
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.map((player) => {
@@ -92,12 +89,9 @@ export function useUpdatePlayerBase(queryKey: readonly string[]) {
           if (variables.name !== undefined) updates.name = variables.name;
           if (variables.email !== undefined) updates.email = variables.email;
           if (variables.phone !== undefined) updates.phone = variables.phone;
-          if (variables.dateOfBirth !== undefined)
-            updates.dateOfBirth = variables.dateOfBirth;
-          if (variables.jerseyNumber !== undefined)
-            updates.jerseyNumber = variables.jerseyNumber;
-          if (variables.position !== undefined)
-            updates.position = variables.position;
+          if (variables.dateOfBirth !== undefined) updates.dateOfBirth = variables.dateOfBirth;
+          if (variables.jerseyNumber !== undefined) updates.jerseyNumber = variables.jerseyNumber;
+          if (variables.position !== undefined) updates.position = variables.position;
           return { ...player, ...updates };
         }),
       );
@@ -131,13 +125,11 @@ export function useBulkDeletePlayersBase(queryKey: readonly string[]) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof BulkDeletePlayersInput.Type) =>
-      bulkDeletePlayersFn({ data }),
+    mutationFn: (data: typeof BulkDeletePlayersInput.Type) => bulkDeletePlayersFn({ data }),
     onMutate: async (variables, ctx) => {
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.filter((p) => !variables.playerIds.includes(p.publicId)),
@@ -176,13 +168,11 @@ export function useDeletePlayerBase(queryKey: readonly string[]) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof DeletePlayerInput.Type) =>
-      deletePlayerFn({ data }),
+    mutationFn: (data: typeof DeletePlayerInput.Type) => deletePlayerFn({ data }),
     onMutate: async (variables, ctx) => {
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.filter((p) => p.publicId !== variables.playerId),

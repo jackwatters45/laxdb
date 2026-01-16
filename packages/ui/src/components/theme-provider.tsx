@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -61,19 +54,14 @@ const disableAnimation = () => {
   };
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(
-  undefined,
-);
+const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
 
 function ThemeScript({
   storageKey = "laxdb-ui-theme",
   defaultTheme = "system",
   attribute = "class",
   enableSystem = true,
-}: Pick<
-  ThemeProviderProps,
-  "storageKey" | "defaultTheme" | "attribute" | "enableSystem"
->) {
+}: Pick<ThemeProviderProps, "storageKey" | "defaultTheme" | "attribute" | "enableSystem">) {
   const themeScript = `
     (function() {
       function getSystemTheme() {
@@ -103,12 +91,7 @@ function ThemeScript({
     })()
   `;
 
-  return (
-    <script
-      dangerouslySetInnerHTML={{ __html: themeScript }}
-      suppressHydrationWarning
-    />
-  );
+  return <script dangerouslySetInnerHTML={{ __html: themeScript }} suppressHydrationWarning />;
 }
 
 export function ThemeProvider({
@@ -120,9 +103,7 @@ export function ThemeProvider({
   disableTransitionOnChange = false,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(
-    () => getTheme(storageKey, defaultTheme) as Theme,
-  );
+  const [theme, setThemeState] = useState<Theme>(() => getTheme(storageKey, defaultTheme) as Theme);
   const [resolvedTheme, setResolvedTheme] = useState<Theme>(() =>
     theme === "system" ? getSystemTheme() : theme,
   );

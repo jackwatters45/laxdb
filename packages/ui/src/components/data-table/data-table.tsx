@@ -24,11 +24,7 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 
-import {
-  DataTableContext,
-  type DataTableContextValue,
-  useDataTable,
-} from "./use-data-table";
+import { DataTableContext, type DataTableContextValue, useDataTable } from "./use-data-table";
 
 type DataTableProviderProps<TData> = {
   columns: ColumnDef<TData>[];
@@ -46,11 +42,8 @@ function DataTableProvider<TData>({
   children,
 }: DataTableProviderProps<TData>) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -145,9 +138,7 @@ function DataTableBody({ className }: DataTableBodyProps) {
   return (
     <TableBody className={className}>
       {table.getRowModel().rows?.length ? (
-        table
-          .getRowModel()
-          .rows.map((row) => <DataTableRow key={row.id} row={row} />)
+        table.getRowModel().rows.map((row) => <DataTableRow key={row.id} row={row} />)
       ) : (
         <TableRow>
           <TableCell className="h-24 text-center" colSpan={columns.length}>

@@ -638,12 +638,7 @@ export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
       />
 
       <defs>
-        <pattern
-          height="64"
-          id="irrigating-pattern"
-          patternUnits="userSpaceOnUse"
-          width="64"
-        >
+        <pattern height="64" id="irrigating-pattern" patternUnits="userSpaceOnUse" width="64">
           {Array.from({ length: 34 }, (_, i) => {
             const offset = i * 4;
             return (
@@ -656,12 +651,7 @@ export const SVGMap = (props: SVGProps<SVGSVGElement>) => {
             );
           })}
         </pattern>
-        <pattern
-          height="64"
-          id="dot-pattern"
-          patternUnits="userSpaceOnUse"
-          width="64"
-        >
+        <pattern height="64" id="dot-pattern" patternUnits="userSpaceOnUse" width="64">
           {Array.from({ length: 16 }, (_, i) =>
             Array.from({ length: 16 }, (_, j) => (
               <circle

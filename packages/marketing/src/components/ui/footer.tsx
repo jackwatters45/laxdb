@@ -1,9 +1,4 @@
-import {
-  RiGithubFill,
-  RiSlackFill,
-  RiTwitterXFill,
-  RiYoutubeFill,
-} from "@remixicon/react";
+import { RiGithubFill, RiSlackFill, RiTwitterXFill, RiYoutubeFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 
 import { SolarLogo } from "../../../public/solar-logo";
@@ -63,10 +58,7 @@ const Footer = () => {
 
   return (
     <div className="px-4 xl:px-0">
-      <footer
-        className="relative mx-auto flex max-w-6xl flex-wrap pt-4"
-        id="footer"
-      >
+      <footer className="relative mx-auto flex max-w-6xl flex-wrap pt-4" id="footer">
         <div className="pointer-events-none inset-0">
           <div
             className="absolute inset-y-0 my-[-5rem] w-px"
@@ -74,11 +66,7 @@ const Footer = () => {
               maskImage: "linear-gradient(transparent, white 5rem)",
             }}
           >
-            <svg
-              aria-hidden="true"
-              className="h-full w-full"
-              preserveAspectRatio="none"
-            >
+            <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
               <line
                 className="stroke-gray-300"
                 strokeDasharray="3 3"
@@ -97,11 +85,7 @@ const Footer = () => {
               maskImage: "linear-gradient(transparent, white 5rem)",
             }}
           >
-            <svg
-              aria-hidden="true"
-              className="h-full w-full"
-              preserveAspectRatio="none"
-            >
+            <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
               <line
                 className="stroke-gray-300"
                 strokeDasharray="3 3"
@@ -138,12 +122,7 @@ const Footer = () => {
               })}
             </pattern>
           </defs>
-          <rect
-            fill="url(#diagonal-footer-pattern)"
-            height="100%"
-            stroke="none"
-            width="100%"
-          />
+          <rect fill="url(#diagonal-footer-pattern)" height="100%" stroke="none" width="100%" />
         </svg>
         <div className="mr-auto flex w-full justify-between lg:w-fit lg:flex-col">
           <Link
@@ -198,9 +177,7 @@ const Footer = () => {
 
         {Object.entries(sections).map(([key, section]) => (
           <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0" key={key}>
-            <h3 className="mb-4 font-medium text-gray-900 sm:text-sm">
-              {section.title}
-            </h3>
+            <h3 className="mb-4 font-medium text-gray-900 sm:text-sm">{section.title}</h3>
             <ul className="space-y-4">
               {section.items.map((item) => (
                 <li className="text-sm" key={item.label}>

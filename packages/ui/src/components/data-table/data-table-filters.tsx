@@ -4,11 +4,7 @@ import { Button } from "@laxdb/ui/components/ui/button";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@laxdb/ui/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@laxdb/ui/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -43,10 +39,7 @@ type ColumnFilterLabelProps = {
   className?: string;
 };
 
-const ColumnFiltersLabel = ({
-  columnFilterLabels,
-  className,
-}: ColumnFilterLabelProps) => {
+const ColumnFiltersLabel = ({ columnFilterLabels, className }: ColumnFilterLabelProps) => {
   if (!columnFilterLabels) {
     return null;
   }
@@ -77,11 +70,7 @@ type FilterSearchProps = {
   className?: string;
 };
 
-function FilterSearch({
-  column,
-  placeholder = "Search...",
-  className,
-}: FilterSearchProps) {
+function FilterSearch({ column, placeholder = "Search...", className }: FilterSearchProps) {
   const { table } = useFilterBar();
 
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -133,15 +122,9 @@ function FilterClear({ className }: FilterClearProps) {
 // Individual filter components
 type FilterSelectProps<TData, TValue> = SharedFilterProps<TData, TValue>;
 
-function FilterSelect<TData, TValue>({
-  column,
-  title,
-  options,
-}: FilterSelectProps<TData, TValue>) {
+function FilterSelect<TData, TValue>({ column, title, options }: FilterSelectProps<TData, TValue>) {
   const columnFilters = column?.getFilterValue() as string;
-  const [selectedValues, setSelectedValues] = React.useState<string>(
-    columnFilters || "",
-  );
+  const [selectedValues, setSelectedValues] = React.useState<string>(columnFilters || "");
   const [open, setOpen] = React.useState(false);
 
   const columnFilterLabels = React.useMemo(() => {
@@ -171,9 +154,7 @@ function FilterSelect<TData, TValue>({
           <button
             className={cn(
               "flex w-full items-center gap-x-1.5 rounded-md border border-border px-2 py-1.5 font-medium whitespace-nowrap hover:bg-muted sm:w-fit sm:text-xs",
-              selectedValues
-                ? "text-foreground"
-                : "border-dashed text-muted-foreground",
+              selectedValues ? "text-foreground" : "border-dashed text-muted-foreground",
               focusRing,
             )}
             type="button"
@@ -229,9 +210,7 @@ function FilterSelect<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="text-base font-medium sm:text-sm">
-                Filter by {title}
-              </Label>
+              <Label className="text-base font-medium sm:text-sm">Filter by {title}</Label>
               <Select
                 onValueChange={(value) => {
                   setSelectedValues(value ?? "");
@@ -278,9 +257,7 @@ function FilterCheckbox<TData, TValue>({
   options,
 }: FilterCheckboxProps<TData, TValue>) {
   const columnFilters = column?.getFilterValue() as string[];
-  const [selectedValues, setSelectedValues] = React.useState<string[]>(
-    columnFilters || [],
-  );
+  const [selectedValues, setSelectedValues] = React.useState<string[]>(columnFilters || []);
   const [open, setOpen] = React.useState(false);
 
   const columnFilterLabels = React.useMemo(() => {
@@ -333,9 +310,7 @@ function FilterCheckbox<TData, TValue>({
             aria-hidden="true"
             className={cn(
               "-ml-px size-5 shrink-0 transition sm:size-4",
-              selectedValues &&
-                selectedValues.length > 0 &&
-                "rotate-45 hover:text-destructive",
+              selectedValues && selectedValues.length > 0 && "rotate-45 hover:text-destructive",
             )}
           />
         </span>
@@ -370,9 +345,7 @@ function FilterCheckbox<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="text-base font-semibold sm:text-sm">
-                Filter by {title}
-              </Label>
+              <Label className="text-base font-semibold sm:text-sm">Filter by {title}</Label>
               <div className="mt-2 space-y-2 overflow-y-auto sm:max-h-40">
                 {options.map((option) => (
                   <div className="flex items-center gap-2" key={option.label}>
@@ -382,18 +355,13 @@ function FilterCheckbox<TData, TValue>({
                       onCheckedChange={(checked) => {
                         setSelectedValues((prev) => {
                           if (checked) {
-                            return prev
-                              ? [...prev, option.value]
-                              : [option.value];
+                            return prev ? [...prev, option.value] : [option.value];
                           }
                           return prev.filter((value) => value !== option.value);
                         });
                       }}
                     />
-                    <Label
-                      className="text-base sm:text-sm"
-                      htmlFor={option.value}
-                    >
+                    <Label className="text-base sm:text-sm" htmlFor={option.value}>
                       {option.label}
                     </Label>
                   </div>
@@ -441,9 +409,7 @@ function FilterNumber<TData, TValue>({
       return;
     }
 
-    const condition = options.find(
-      (option) => option.value === selectedValues.condition,
-    )?.label;
+    const condition = options.find((option) => option.value === selectedValues.condition)?.label;
     if (!condition) {
       return;
     }
@@ -542,9 +508,7 @@ function FilterNumber<TData, TValue>({
         >
           <div className="space-y-2">
             <div>
-              <Label className="text-base font-medium sm:text-sm">
-                Filter by {title}
-              </Label>
+              <Label className="text-base font-medium sm:text-sm">Filter by {title}</Label>
               <div className="space-y-2">
                 <Select
                   onValueChange={(value) => {
@@ -557,9 +521,7 @@ function FilterNumber<TData, TValue>({
                   value={selectedValues?.condition}
                 >
                   <SelectTrigger className="mt-2 sm:py-1">
-                    <SelectValue>
-                      {(value) => value ?? "Select condition"}
-                    </SelectValue>
+                    <SelectValue>{(value) => value ?? "Select condition"}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {options.map((item) => (
@@ -581,10 +543,7 @@ function FilterNumber<TData, TValue>({
                     onChange={(e) => {
                       setSelectedValues((prev) => ({
                         condition: prev?.condition || "",
-                        value: [
-                          e.target.value,
-                          isBetween ? prev?.value?.[1] || "" : "",
-                        ],
+                        value: [e.target.value, isBetween ? prev?.value?.[1] || "" : ""],
                       }));
                     }}
                     placeholder="$0"
@@ -593,9 +552,7 @@ function FilterNumber<TData, TValue>({
                   />
                   {selectedValues?.condition === "is-between" && (
                     <>
-                      <span className="text-xs font-medium text-muted-foreground">
-                        and
-                      </span>
+                      <span className="text-xs font-medium text-muted-foreground">and</span>
                       <Input
                         className="sm:[&>input]:py-1"
                         disabled={!selectedValues?.condition}
@@ -634,10 +591,4 @@ function FilterNumber<TData, TValue>({
   );
 }
 
-export {
-  FilterCheckbox,
-  FilterClear,
-  FilterNumber,
-  FilterSearch,
-  FilterSelect,
-};
+export { FilterCheckbox, FilterClear, FilterNumber, FilterSearch, FilterSelect };

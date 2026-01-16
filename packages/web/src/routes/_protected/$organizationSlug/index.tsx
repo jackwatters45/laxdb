@@ -13,23 +13,10 @@ import {
   AlertDialogTrigger,
 } from "@laxdb/ui/components/ui/alert-dialog";
 import { Badge } from "@laxdb/ui/components/ui/badge";
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@laxdb/ui/components/ui/breadcrumb";
+import { BreadcrumbItem, BreadcrumbLink } from "@laxdb/ui/components/ui/breadcrumb";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
-import {
-  createFileRoute,
-  Link,
-  useRouteContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
+import { createFileRoute, Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { Team, TeamMember } from "better-auth/plugins";
 import { Effect, Schema } from "effect";
@@ -46,9 +33,7 @@ const DeleteTeamSchema = Schema.Struct({
 
 const deleteTeam = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator((data: typeof DeleteTeamSchema.Type) =>
-    Schema.decodeSync(DeleteTeamSchema)(data),
-  )
+  .inputValidator((data: typeof DeleteTeamSchema.Type) => Schema.decodeSync(DeleteTeamSchema)(data))
   .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -76,9 +61,7 @@ function TeamsOverviewPage() {
         <BreadcrumbItem>
           <BreadcrumbLink
             title="Teams"
-            render={
-              <Link params={{ organizationSlug }} to="/$organizationSlug" />
-            }
+            render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
           >
             Teams
           </BreadcrumbLink>
@@ -88,19 +71,12 @@ function TeamsOverviewPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Teams</h1>
-            <p className="text-muted-foreground">
-              Manage teams for {activeOrganization.name}
-            </p>
+            <p className="text-muted-foreground">Manage teams for {activeOrganization.name}</p>
           </div>
 
           {canManageTeams && (
             <Button
-              render={
-                <Link
-                  params={{ organizationSlug }}
-                  to="/$organizationSlug/teams/create"
-                />
-              }
+              render={<Link params={{ organizationSlug }} to="/$organizationSlug/teams/create" />}
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Team
@@ -111,20 +87,14 @@ function TeamsOverviewPage() {
         {teams && teams.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {teams.map((team) => (
-              <TeamOverviewCard
-                canManage={canManageTeams}
-                key={team.id}
-                team={team}
-              />
+              <TeamOverviewCard canManage={canManageTeams} key={team.id} team={team} />
             ))}
           </div>
         ) : (
           <div className="py-12 text-center">
             <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
             <h2 className="mb-2 text-xl font-semibold">No teams yet</h2>
-            <p className="mb-6 text-muted-foreground">
-              Get started by creating your first team
-            </p>
+            <p className="mb-6 text-muted-foreground">Get started by creating your first team</p>
             {canManageTeams && (
               <Button render={<Link to="/organization/create" />}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -188,8 +158,8 @@ function TeamOverviewCard({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Team</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete &quot;{team.name}&quot;?
-                      This action cannot be undone.
+                      Are you sure you want to delete &quot;{team.name}&quot;? This action cannot be
+                      undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -212,9 +182,7 @@ function TeamOverviewCard({
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              {memberCount} members
-            </span>
+            <span className="text-sm text-muted-foreground">{memberCount} members</span>
           </div>
 
           <Badge variant="secondary">Active</Badge>

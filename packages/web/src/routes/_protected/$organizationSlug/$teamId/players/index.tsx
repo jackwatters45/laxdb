@@ -43,9 +43,7 @@ const GetTeamPlayers = Schema.Struct({
 
 const getTeamPlayers = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator((data: typeof GetTeamPlayers.Type) =>
-    Schema.decodeSync(GetTeamPlayers)(data),
-  )
+  .inputValidator((data: typeof GetTeamPlayers.Type) => Schema.decodeSync(GetTeamPlayers)(data))
   .handler(({ data }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -56,9 +54,7 @@ const getTeamPlayers = createServerFn({ method: "GET" })
   );
 
 // TODO: more of a replace than an update - make sure updates add user options + exclude ids or something...
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/$teamId/players/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/$teamId/players/")({
   component: RouteComponent,
   loader: async ({ params, context }) => {
     await context.queryClient.prefetchQuery({
@@ -100,10 +96,7 @@ function PlayersDataTable() {
     [activeOrganization.id, organizationSlug, teamId],
   );
 
-  const excludePlayerIds = useMemo(
-    () => players.map((p) => p.publicId),
-    [players],
-  );
+  const excludePlayerIds = useMemo(() => players.map((p) => p.publicId), [players]);
 
   return (
     <DataTableProvider
@@ -143,9 +136,7 @@ function Header() {
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Teams"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
         >
           Teams
         </BreadcrumbLink>

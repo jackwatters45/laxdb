@@ -111,10 +111,7 @@ export const constructCategoryColors = (
   return categoryColors;
 };
 
-export const getColorClassName = (
-  color: AvailableChartColorsKeys,
-  type: ColorUtility,
-): string => {
+export const getColorClassName = (color: AvailableChartColorsKeys, type: ColorUtility): string => {
   const fallbackColor = {
     bg: "bg-gray-500",
     stroke: "stroke-gray-500",
@@ -138,10 +135,7 @@ export const getYAxisDomain = (
 
 // Tremor hasOnlyOneValueForKey [v0.1.0]
 
-export function hasOnlyOneValueForKey(
-  array: any[],
-  keyToCheck: string,
-): boolean {
+export function hasOnlyOneValueForKey(array: any[], keyToCheck: string): boolean {
   const val: any[] = [];
 
   for (const obj of array) {

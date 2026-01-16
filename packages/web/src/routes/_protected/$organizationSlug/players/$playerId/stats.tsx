@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Calendar, TrendingUp, Trophy } from "lucide-react";
@@ -77,9 +72,7 @@ const getPlayerDetailedStats = createServerFn({ method: "GET" })
     return mockPlayerStats;
   });
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/$playerId/stats",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/$playerId/stats")({
   component: PlayerStatsPage,
   loader: async ({ params }) => {
     const stats = await getPlayerDetailedStats({
@@ -102,10 +95,7 @@ function PlayerStatsPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <Link
-          params={{ organizationSlug, playerId }}
-          to="/$organizationSlug/players/$playerId"
-        >
+        <Link params={{ organizationSlug, playerId }} to="/$organizationSlug/players/$playerId">
           <Button className="mb-4" variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to {stats.playerName}
@@ -138,9 +128,7 @@ function PlayerStatsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Assists:</span>
-                      <span className="font-medium">
-                        {stats.season.assists}
-                      </span>
+                      <span className="font-medium">{stats.season.assists}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Points:</span>
@@ -160,15 +148,11 @@ function PlayerStatsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>On Goal:</span>
-                      <span className="font-medium">
-                        {stats.season.shotsOnGoal}
-                      </span>
+                      <span className="font-medium">{stats.season.shotsOnGoal}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Accuracy:</span>
-                      <span className="font-medium">
-                        {stats.season.shotAccuracy.toFixed(1)}%
-                      </span>
+                      <span className="font-medium">{stats.season.shotAccuracy.toFixed(1)}%</span>
                     </div>
                   </div>
                 </div>
@@ -178,21 +162,15 @@ function PlayerStatsPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Ground Balls:</span>
-                      <span className="font-medium">
-                        {stats.season.groundBalls}
-                      </span>
+                      <span className="font-medium">{stats.season.groundBalls}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Turnovers:</span>
-                      <span className="font-medium">
-                        {stats.season.turnovers}
-                      </span>
+                      <span className="font-medium">{stats.season.turnovers}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>+/-:</span>
-                      <span className="font-medium">
-                        +{stats.season.plusMinus}
-                      </span>
+                      <span className="font-medium">+{stats.season.plusMinus}</span>
                     </div>
                   </div>
                 </div>
@@ -214,20 +192,10 @@ function PlayerStatsPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-center">
-                        <div className="text-sm font-medium">
-                          {formatDate(game.date)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          vs {game.opponent}
-                        </div>
+                        <div className="text-sm font-medium">{formatDate(game.date)}</div>
+                        <div className="text-xs text-muted-foreground">vs {game.opponent}</div>
                       </div>
-                      <Badge
-                        variant={
-                          game.result.startsWith("W")
-                            ? "default"
-                            : "destructive"
-                        }
-                      >
+                      <Badge variant={game.result.startsWith("W") ? "default" : "destructive"}>
                         {game.result}
                       </Badge>
                     </div>
@@ -282,9 +250,7 @@ function PlayerStatsPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Minutes per Game:</span>
-                  <span className="font-medium">
-                    {stats.season.minutesPlayed.toFixed(1)}
-                  </span>
+                  <span className="font-medium">{stats.season.minutesPlayed.toFixed(1)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shots per Game:</span>

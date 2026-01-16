@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 
 import type { PlayerDetails } from "../-utils";
 
@@ -28,9 +23,7 @@ export function SeasonStatistics({ player }: SeasonStatisticsProps) {
             <div className="text-sm text-muted-foreground">Assists</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">
-              {player.shotAccuracy.toFixed(1)}%
-            </div>
+            <div className="text-2xl font-bold">{player.shotAccuracy.toFixed(1)}%</div>
             <div className="text-sm text-muted-foreground">Shot Accuracy</div>
           </div>
         </div>

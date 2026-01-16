@@ -10,9 +10,7 @@ type PageBodyProps = {
  * Use this to wrap the main content that should scroll.
  */
 export function PageBody({ children, className }: PageBodyProps) {
-  return (
-    <div className={cn("flex-1 overflow-auto", className)}>{children}</div>
-  );
+  return <div className={cn("flex-1 overflow-auto", className)}>{children}</div>;
 }
 
 /**
@@ -20,7 +18,5 @@ export function PageBody({ children, className }: PageBodyProps) {
  * Use this to wrap the content within the PageBody.
  */
 export function PageContainer({ children, className }: PageBodyProps) {
-  return (
-    <div className={cn("container mx-auto py-8", className)}>{children}</div>
-  );
+  return <div className={cn("container mx-auto py-8", className)}>{children}</div>;
 }

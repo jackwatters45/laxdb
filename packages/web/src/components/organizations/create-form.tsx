@@ -3,12 +3,7 @@ import { CreateOrganizationInput } from "@laxdb/core/organization/organization.s
 import { OrganizationService } from "@laxdb/core/organization/organization.service";
 import { RuntimeServer } from "@laxdb/core/runtime.server";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -36,10 +31,7 @@ const createOrganization = createServerFn({ method: "POST" })
     RuntimeServer.runPromise(
       Effect.gen(function* () {
         const organizationService = yield* OrganizationService;
-        return yield* organizationService.createOrganization(
-          data,
-          context.headers,
-        );
+        return yield* organizationService.createOrganization(data, context.headers);
       }),
     ),
   );
@@ -53,11 +45,7 @@ const generateSlug = (name: string) =>
     .replaceAll(/\s+/g, "-")
     .slice(0, 50);
 
-export function CreateOrganizationForm({
-  organizationSlug,
-}: {
-  organizationSlug?: string;
-}) {
+export function CreateOrganizationForm({ organizationSlug }: { organizationSlug?: string }) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
@@ -80,9 +68,7 @@ export function CreateOrganizationForm({
     },
     onError: (error, variables) => {
       if (error.message === "Slug is not available") {
-        toast.error(
-          `Slug "${variables.slug}" is not available. Please try a different slug.`,
-        );
+        toast.error(`Slug "${variables.slug}" is not available. Please try a different slug.`);
       } else {
         toast.error("Failed to create organization. Please try again.");
       }
@@ -130,9 +116,7 @@ export function CreateOrganizationForm({
                         handleNameChange(e.target.value);
                       }}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -149,12 +133,8 @@ export function CreateOrganizationForm({
                       placeholder="malvern-lacrosse-club"
                       aria-invalid={fieldState.invalid}
                     />
-                    <FieldDescription>
-                      This will be used in your club&apos;s URL
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    <FieldDescription>This will be used in your club&apos;s URL</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />

@@ -1,12 +1,7 @@
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -37,9 +32,7 @@ const resourceFormSchema = Schema.Struct({
     }),
   ),
   type: Schema.Literal("drill", "video", "article", "program"),
-  dueDate: Schema.String.pipe(
-    Schema.minLength(1, { message: () => "Due date is required" }),
-  ),
+  dueDate: Schema.String.pipe(Schema.minLength(1, { message: () => "Due date is required" })),
   priority: Schema.Literal("low", "medium", "high"),
 });
 
@@ -75,9 +68,7 @@ const getPlayerInfo = createServerFn({ method: "GET" })
     };
   });
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/resources/create",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/resources/create")({
   component: CreateResourcePage,
   validateSearch: (search: { playerId: string }) => ({
     playerId: search.playerId,
@@ -181,9 +172,7 @@ function CreateResourcePage() {
 
         <div>
           <h1 className="text-3xl font-bold">Assign Resource</h1>
-          <p className="text-muted-foreground">
-            Assign a learning resource to {player.name}
-          </p>
+          <p className="text-muted-foreground">Assign a learning resource to {player.name}</p>
         </div>
       </div>
 
@@ -203,18 +192,14 @@ function CreateResourcePage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="resource-title">
-                      Resource Title
-                    </FieldLabel>
+                    <FieldLabel htmlFor="resource-title">Resource Title</FieldLabel>
                     <Input
                       {...field}
                       id="resource-title"
                       placeholder="e.g., Advanced Shooting Drills"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -225,9 +210,7 @@ function CreateResourcePage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="resource-description">
-                      Description
-                    </FieldLabel>
+                    <FieldLabel htmlFor="resource-description">Description</FieldLabel>
                     <Textarea
                       {...field}
                       id="resource-description"
@@ -236,12 +219,9 @@ function CreateResourcePage() {
                       aria-invalid={fieldState.invalid}
                     />
                     <FieldDescription>
-                      Explain how this resource will help the player&apos;s
-                      development
+                      Explain how this resource will help the player&apos;s development
                     </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -269,19 +249,13 @@ function CreateResourcePage() {
                         >
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{type.icon}</span>
-                            <span className="text-sm font-medium">
-                              {type.label}
-                            </span>
+                            <span className="text-sm font-medium">{type.label}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {type.description}
-                          </span>
+                          <span className="text-xs text-muted-foreground">{type.description}</span>
                         </button>
                       ))}
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -292,9 +266,7 @@ function CreateResourcePage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="resource-due-date">
-                      Due Date
-                    </FieldLabel>
+                    <FieldLabel htmlFor="resource-due-date">Due Date</FieldLabel>
                     <div className="relative">
                       <Calendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -305,9 +277,7 @@ function CreateResourcePage() {
                         aria-invalid={fieldState.invalid}
                       />
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -339,9 +309,7 @@ function CreateResourcePage() {
                         </button>
                       ))}
                     </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -365,14 +333,8 @@ function CreateResourcePage() {
               >
                 Cancel
               </Button>
-              <Button
-                className="flex-1"
-                disabled={form.formState.isSubmitting}
-                type="submit"
-              >
-                {form.formState.isSubmitting
-                  ? "Assigning..."
-                  : "Assign Resource"}
+              <Button className="flex-1" disabled={form.formState.isSubmitting} type="submit">
+                {form.formState.isSubmitting ? "Assigning..." : "Assign Resource"}
               </Button>
             </div>
           </form>

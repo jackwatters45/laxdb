@@ -44,8 +44,7 @@ type SwitchOrgMutation = {
 
 export const useSwitchOrganization = ({ setOpen, router }: SwitchOrgMutation) =>
   useMutation({
-    mutationFn: (organizationId: string) =>
-      switchActiveOrganization({ data: { organizationId } }),
+    mutationFn: (organizationId: string) => switchActiveOrganization({ data: { organizationId } }),
     onError: (_error) => {
       toast.error("Failed to switch organization");
     },

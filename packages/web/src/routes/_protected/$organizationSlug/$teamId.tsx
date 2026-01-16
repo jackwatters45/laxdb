@@ -9,9 +9,7 @@ import { authMiddleware } from "@/lib/middleware";
 
 const getTeamDashboardData = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(
-    (data: { activeOrganizationId: string; teamId: string }) => data,
-  )
+  .inputValidator((data: { activeOrganizationId: string; teamId: string }) => data)
   .handler(({ data, context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -43,8 +41,7 @@ const getTeamDashboardData = createServerFn({ method: "GET" })
         );
 
         // Find the active team from the teamId parameter
-        const activeTeam =
-          teams?.find((team) => team.id === data.teamId) ?? null;
+        const activeTeam = teams?.find((team) => team.id === data.teamId) ?? null;
         if (!activeTeam) {
           throw redirect({
             to: "/$organizationSlug",

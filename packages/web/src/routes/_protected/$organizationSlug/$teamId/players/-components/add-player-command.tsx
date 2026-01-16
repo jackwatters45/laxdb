@@ -155,9 +155,7 @@ export function AddPlayerCommand({
                   </CommandGroup>
                 )}
                 {!searchQuery && filteredPlayers.length === 0 && (
-                  <CommandEmpty>
-                    Type a name to create a new player
-                  </CommandEmpty>
+                  <CommandEmpty>Type a name to create a new player</CommandEmpty>
                 )}
               </>
             )}

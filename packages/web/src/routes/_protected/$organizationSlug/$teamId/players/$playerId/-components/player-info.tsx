@@ -13,12 +13,7 @@ type PlayerInfoProps = {
   playerInfo: PlayerInfoType;
 };
 
-export function PlayerInfo({
-  organizationSlug,
-  teamId,
-  canEdit,
-  playerInfo,
-}: PlayerInfoProps) {
+export function PlayerInfo({ organizationSlug, teamId, canEdit, playerInfo }: PlayerInfoProps) {
   return (
     <div className="mb-8">
       <div className="flex items-start justify-between">
@@ -30,21 +25,13 @@ export function PlayerInfo({
                 playerInfo.primaryPosition
                   ? {
                       key: "position",
-                      content: (
-                        <span className="capitalize">
-                          {playerInfo.primaryPosition}
-                        </span>
-                      ),
+                      content: <span className="capitalize">{playerInfo.primaryPosition}</span>,
                     }
                   : null,
                 playerInfo.gradeLevel
                   ? {
                       key: "grade",
-                      content: (
-                        <span className="capitalize">
-                          {playerInfo.gradeLevel}
-                        </span>
-                      ),
+                      content: <span className="capitalize">{playerInfo.gradeLevel}</span>,
                     }
                   : null,
                 playerInfo.heightFeet && playerInfo.heightInches

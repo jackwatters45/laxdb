@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 
 import type { PlayerDetails } from "../-utils";
 
@@ -41,9 +36,7 @@ export function PlayerOverview({ player }: PlayerOverviewProps) {
           <div className="flex items-center justify-between">
             <span>Secondary Positions:</span>
             <span className="font-medium">
-              {player.secondaryPositions.length > 0
-                ? player.secondaryPositions.join(", ")
-                : "None"}
+              {player.secondaryPositions.length > 0 ? player.secondaryPositions.join(", ") : "None"}
             </span>
           </div>
         </div>

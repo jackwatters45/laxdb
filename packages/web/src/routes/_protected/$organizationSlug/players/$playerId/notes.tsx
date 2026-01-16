@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Calendar, FileText, Plus, User } from "lucide-react";
@@ -74,9 +69,7 @@ const getPlayerPermissions = createServerFn().handler(() => ({
   canDeleteNotes: true,
 }));
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/$playerId/notes",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/$playerId/notes")({
   component: PlayerNotesPage,
   loader: async ({ params }) => {
     const [playerData, permissions] = await Promise.all([
@@ -129,10 +122,7 @@ function PlayerNotesPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <Link
-          params={{ organizationSlug, playerId }}
-          to="/$organizationSlug/players/$playerId"
-        >
+        <Link params={{ organizationSlug, playerId }} to="/$organizationSlug/players/$playerId">
           <Button className="mb-4" variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to {playerName}
@@ -185,9 +175,7 @@ function PlayerNotesPage() {
                     <Badge variant={getPriorityColor(note.priority)}>
                       {note.priority.toUpperCase()}
                     </Badge>
-                    <Badge variant="outline">
-                      {note.type.replace("_", " ").toUpperCase()}
-                    </Badge>
+                    <Badge variant="outline">{note.type.replace("_", " ").toUpperCase()}</Badge>
                   </div>
                 </div>
               </CardHeader>

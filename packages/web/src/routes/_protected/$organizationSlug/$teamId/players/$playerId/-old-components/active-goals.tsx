@@ -1,10 +1,5 @@
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { Plus, Target } from "lucide-react";
 
@@ -17,11 +12,7 @@ type ActiveGoalsProps = {
   canSetGoals: boolean;
 };
 
-export function ActiveGoals({
-  player,
-  organizationSlug,
-  canSetGoals,
-}: ActiveGoalsProps) {
+export function ActiveGoals({ player, organizationSlug, canSetGoals }: ActiveGoalsProps) {
   return (
     <Card>
       <CardHeader>
@@ -67,9 +58,7 @@ export function ActiveGoals({
                   <span className="text-muted-foreground">
                     {goal.currentValue} → {goal.targetValue}
                   </span>
-                  <span className="text-muted-foreground">
-                    Due: {formatDate(goal.dueDate)}
-                  </span>
+                  <span className="text-muted-foreground">Due: {formatDate(goal.dueDate)}</span>
                 </div>
               </div>
             ))}

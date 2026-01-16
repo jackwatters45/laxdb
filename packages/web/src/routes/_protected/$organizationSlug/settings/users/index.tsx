@@ -33,9 +33,7 @@ import { invitedUsers, roles, users } from "../-data";
 
 import { ModalAddUser } from "./-modal-add-user";
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/settings/users/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/settings/users/")({
   component: Users,
 });
 
@@ -48,10 +46,7 @@ function Users() {
           <section aria-labelledby="existing-users">
             <div className="sm:flex sm:items-center sm:justify-between">
               <div>
-                <h3
-                  className="scroll-mt-10 font-semibold text-foreground"
-                  id="existing-users"
-                >
+                <h3 className="scroll-mt-10 font-semibold text-foreground" id="existing-users">
                   Users
                 </h3>
                 <p className="text-sm leading-6 text-muted-foreground">
@@ -67,10 +62,7 @@ function Users() {
             </div>
             <ul className="mt-6 divide-y divide-border">
               {users.map((user) => (
-                <li
-                  className="flex items-center justify-between gap-x-6 py-2.5"
-                  key={user.name}
-                >
+                <li className="flex items-center justify-between gap-x-6 py-2.5" key={user.name}>
                   <div className="flex items-center gap-x-4 truncate">
                     <span
                       aria-hidden="true"
@@ -79,12 +71,8 @@ function Users() {
                       {user.initials}
                     </span>
                     <div className="truncate">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {user.name}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {user.email}
-                      </p>
+                      <p className="truncate text-sm font-medium text-foreground">{user.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -92,10 +80,7 @@ function Users() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger render={<div />}>
-                            <Select
-                              defaultValue={user.role}
-                              disabled={user.role === "admin"}
-                            >
+                            <Select defaultValue={user.role} disabled={user.role === "admin"}>
                               <SelectTrigger className="h-8 w-32">
                                 <SelectValue>
                                   {(value: string | null) => value ?? "Select"}
@@ -114,23 +99,15 @@ function Users() {
                               </SelectContent>
                             </Select>
                           </TooltipTrigger>
-                          <TooltipContent
-                            className="max-w-44 text-xs"
-                            sideOffset={5}
-                          >
+                          <TooltipContent className="max-w-44 text-xs" sideOffset={5}>
                             A workspace must have at least one admin
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <Select
-                        defaultValue={user.role}
-                        disabled={user.role === "admin"}
-                      >
+                      <Select defaultValue={user.role} disabled={user.role === "admin"}>
                         <SelectTrigger className="h-8 w-32">
-                          <SelectValue>
-                            {(value: string | null) => value ?? "Select"}
-                          </SelectValue>
+                          <SelectValue>{(value: string | null) => value ?? "Select"}</SelectValue>
                         </SelectTrigger>
                         <SelectContent align="end">
                           {roles.map((role) => (
@@ -177,10 +154,7 @@ function Users() {
             </ul>
           </section>
           <section aria-labelledby="pending-invitations" className="mt-12">
-            <h2
-              className="scroll-mt-10 font-semibold text-foreground"
-              id="pending-invitations"
-            >
+            <h2 className="scroll-mt-10 font-semibold text-foreground" id="pending-invitations">
               Pending invitations
             </h2>
             <ul className="mt-6 divide-y divide-border">
@@ -197,9 +171,7 @@ function Users() {
                       {user.initials}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {user.email}
-                      </p>
+                      <p className="text-sm font-medium text-foreground">{user.email}</p>
                       <p className="text-xs text-muted-foreground">
                         Expires in {user.expires} days
                       </p>
@@ -208,9 +180,7 @@ function Users() {
                   <div className="flex items-center gap-2">
                     <Select defaultValue={user.role}>
                       <SelectTrigger className="h-8 w-32">
-                        <SelectValue>
-                          {(value: string | null) => value ?? "Select"}
-                        </SelectValue>
+                        <SelectValue>{(value: string | null) => value ?? "Select"}</SelectValue>
                       </SelectTrigger>
                       <SelectContent align="end">
                         {roles.map((role) => (
@@ -266,12 +236,7 @@ function Header() {
       <BreadcrumbItem>
         <BreadcrumbLink
           title="Settings"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/settings/general"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/settings/general" />}
         >
           Settings
         </BreadcrumbLink>
@@ -280,12 +245,7 @@ function Header() {
       <BreadcrumbItem>
         <BreadcrumbLink
           title="Users"
-          render={
-            <Link
-              params={{ organizationSlug }}
-              to="/$organizationSlug/settings/users"
-            />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug/settings/users" />}
         >
           Users
         </BreadcrumbLink>

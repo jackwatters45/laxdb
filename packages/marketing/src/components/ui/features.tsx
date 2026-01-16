@@ -34,11 +34,7 @@ export default function Features() {
               "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
-          <svg
-            aria-hidden="true"
-            className="h-full w-full"
-            preserveAspectRatio="none"
-          >
+          <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
             <line
               className="stroke-gray-300"
               strokeDasharray="3 3"
@@ -59,11 +55,7 @@ export default function Features() {
               "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
-          <svg
-            aria-hidden="true"
-            className="h-full w-full"
-            preserveAspectRatio="none"
-          >
+          <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
             <line
               className="stroke-gray-300"
               strokeDasharray="3 3"
@@ -83,11 +75,7 @@ export default function Features() {
               "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
-          <svg
-            aria-hidden="true"
-            className="h-full w-full"
-            preserveAspectRatio="none"
-          >
+          <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
             <line
               className="stroke-gray-300"
               strokeDasharray="3 3"
@@ -107,11 +95,7 @@ export default function Features() {
               "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
-          <svg
-            aria-hidden="true"
-            className="h-full w-full"
-            preserveAspectRatio="none"
-          >
+          <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
             <line
               className="stroke-gray-300"
               strokeDasharray="3 3"
@@ -131,11 +115,7 @@ export default function Features() {
               "linear-gradient(transparent, white 5rem, white calc(100% - 5rem), transparent)",
           }}
         >
-          <svg
-            aria-hidden="true"
-            className="h-full w-full"
-            preserveAspectRatio="none"
-          >
+          <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
             <line
               className="stroke-gray-300"
               strokeDasharray="3 3"
@@ -159,9 +139,8 @@ export default function Features() {
             A network of autonomous systems for complete farm monitoring
           </p>
           <p className="mt-4 text-balance text-gray-700">
-            Deploy intelligent monitoring and automated response systems across
-            your fields, irrigation networks, and aerial operations with our
-            integrated platform.
+            Deploy intelligent monitoring and automated response systems across your fields,
+            irrigation networks, and aerial operations with our integrated platform.
           </p>
         </div>
         <div className="relative col-span-2 flex items-center justify-center overflow-hidden">
@@ -193,11 +172,7 @@ export default function Features() {
                 })}
               </pattern>
             </defs>
-            <rect
-              fill="url(#diagonal-feature-pattern)"
-              height="100%"
-              width="100%"
-            />
+            <rect fill="url(#diagonal-feature-pattern)" height="100%" width="100%" />
           </svg>
           <div className="pointer-events-none h-[26rem] p-10 select-none">
             <div className="relative flex flex-col items-center justify-center">
@@ -205,10 +180,7 @@ export default function Features() {
                 durationSeconds={40}
                 keepUpright
                 orbitingObjects={[
-                  <div
-                    className="relative flex items-center justify-center"
-                    key="obj1"
-                  >
+                  <div className="relative flex items-center justify-center" key="obj1">
                     <RiTruckFill className="z-10 size-5 text-gray-900" />
                     <div className="absolute size-10 rounded-full bg-white/50 shadow-lg ring-1 ring-black/5" />
                     <div className="absolute -top-5 left-4">
@@ -229,10 +201,7 @@ export default function Features() {
                     />
                   </div>,
 
-                  <div
-                    className="relative flex items-center justify-center"
-                    key="obj2"
-                  >
+                  <div className="relative flex items-center justify-center" key="obj2">
                     <RiPlaneFill className="z-10 size-5 rotate-90 text-gray-900" />
                     <div className="absolute size-10 rounded-full bg-white/50 shadow-lg ring-1 ring-black/5" />
                     <div className="absolute -top-5 left-4">
@@ -253,10 +222,7 @@ export default function Features() {
                     />
                   </div>,
 
-                  <div
-                    className="relative flex items-center justify-center"
-                    key="obj3"
-                  >
+                  <div className="relative flex items-center justify-center" key="obj3">
                     <RiCarFill className="z-10 size-5 text-gray-900" />
                     <div className="absolute size-10 rounded-full bg-white/50 shadow-lg ring-1 ring-black/5" />
                     <div
@@ -266,10 +232,7 @@ export default function Features() {
                       }}
                     />
                   </div>,
-                  <div
-                    className="relative flex items-center justify-center"
-                    key="obj4"
-                  >
+                  <div className="relative flex items-center justify-center" key="obj4">
                     <Icons.QuadCopter className="z-10 size-5 rotate-90 text-gray-900" />
                     <div className="absolute size-10 rounded-full bg-white/50 shadow-lg ring-1 ring-black/5" />
                     <div className="absolute -top-5 left-4">
@@ -290,10 +253,7 @@ export default function Features() {
                       }}
                     />
                   </div>,
-                  <div
-                    className="relative flex items-center justify-center"
-                    key="obj5"
-                  >
+                  <div className="relative flex items-center justify-center" key="obj5">
                     <RiPlaneFill className="z-10 size-5 rotate-90 text-gray-900" />
                     <div className="absolute size-10 rounded-full bg-white/50 shadow-lg ring-1 ring-black/5" />
                     <div
@@ -328,10 +288,9 @@ export default function Features() {
             Turn every acre into a data-driven powerhouse
           </p>
           <p className="mt-4 text-balance text-gray-700">
-            Revolutionize your farming operation with edge-computing AI that
-            transforms raw field data into actionable insights in real-time.
-            Make informed decisions faster, reduce resource waste, and maximize
-            yields.
+            Revolutionize your farming operation with edge-computing AI that transforms raw field
+            data into actionable insights in real-time. Make informed decisions faster, reduce
+            resource waste, and maximize yields.
           </p>
         </div>
         <div className="relative col-span-2 flex items-center justify-center overflow-hidden">
@@ -356,11 +315,7 @@ export default function Features() {
                 })}
               </pattern>
             </defs>
-            <rect
-              fill="url(#diagonal-feature-pattern)"
-              height="100%"
-              width="100%"
-            />
+            <rect fill="url(#diagonal-feature-pattern)" height="100%" width="100%" />
           </svg>
           <div className="relative h-[432px] w-[432px]">
             <svg
@@ -386,9 +341,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      14°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">14°C</span>
                   </div>
                 </div>
               </div>
@@ -397,9 +350,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      18°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">18°C</span>
                   </div>
                 </div>
               </div>
@@ -408,9 +359,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      17°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">17°C</span>
                   </div>
                 </div>
               </div>
@@ -419,9 +368,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      14°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">14°C</span>
                   </div>
                 </div>
               </div>
@@ -430,9 +377,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      12°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">12°C</span>
                   </div>
                 </div>
               </div>
@@ -441,9 +386,7 @@ export default function Features() {
                 <div className="relative">
                   <div className="absolute inset-0 size-12 animate-pulse bg-orange-200 blur-[3px]" />
                   <div className="relative flex h-12 w-12 items-center justify-center bg-white shadow-sm ring-1 ring-black/15">
-                    <span className="text-sm font-medium text-gray-500">
-                      17°C
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">17°C</span>
                   </div>
                 </div>
               </div>
@@ -459,9 +402,8 @@ export default function Features() {
             Scale your smart farm with plug-and-play simplicity
           </p>
           <p className="mt-4 text-balance text-gray-700">
-            Add new sensors and capabilities to your farm network with zero
-            setup required. Our systems automatically connect and coordinate
-            with each other.
+            Add new sensors and capabilities to your farm network with zero setup required. Our
+            systems automatically connect and coordinate with each other.
           </p>
         </div>
         <div className="relative col-span-2 flex items-center justify-center overflow-hidden">
@@ -493,51 +435,35 @@ export default function Features() {
                 })}
               </pattern>
             </defs>
-            <rect
-              fill="url(#diagonal-feature-pattern)"
-              height="100%"
-              width="100%"
-            />
+            <rect fill="url(#diagonal-feature-pattern)" height="100%" width="100%" />
           </svg>
           <div className="pointer-events-none relative flex size-full h-[26rem] items-center justify-center p-10 select-none">
             <div className="relative">
               <div className="absolute top-[6rem] left-[6rem] z-20">
                 <div className="relative mx-auto w-fit rounded-full bg-gray-50 p-1 shadow-md ring-1 shadow-black/10 ring-black/10">
                   <div className="w-fit rounded-full bg-linear-to-b from-white to-gray-100 p-3 shadow-[inset_0px_-2px_6px_rgba(0,0,0,0.09),0_3px_5px_0_rgba(0,0,0,0.19)] ring-1 ring-white/50 ring-inset">
-                    <RiNotification2Line
-                      aria-hidden="true"
-                      className="size-5 text-gray-900"
-                    />
+                    <RiNotification2Line aria-hidden="true" className="size-5 text-gray-900" />
                   </div>
                 </div>
               </div>
               <div className="absolute top-[6rem] right-[6rem] z-20">
                 <div className="relative mx-auto w-fit rounded-full bg-gray-50 p-1 shadow-md ring-1 shadow-black/10 ring-black/10">
                   <div className="w-fit rounded-full bg-linear-to-b from-white to-gray-100 p-3 shadow-[inset_0px_-2px_6px_rgba(0,0,0,0.05),0_7px_10px_0_rgba(0,0,0,0.10)] ring-1 ring-white/50 ring-inset">
-                    <RiContrast2Line
-                      aria-hidden="true"
-                      className="size-5 text-gray-900"
-                    />
+                    <RiContrast2Line aria-hidden="true" className="size-5 text-gray-900" />
                   </div>
                 </div>
               </div>
               <div className="absolute right-[6rem] bottom-[6rem] z-20">
                 <div className="relative mx-auto w-fit rounded-full bg-gray-50 p-1 shadow-md ring-1 shadow-black/10 ring-black/10">
                   <div className="w-fit rounded-full bg-linear-to-b from-white to-gray-100 p-3 shadow-[inset_0px_-2px_6px_rgba(0,0,0,0.05),0_7px_10px_0_rgba(0,0,0,0.10)] ring-1 ring-white/50 ring-inset">
-                    <RiCodepenLine
-                      aria-hidden="true"
-                      className="size-5 text-gray-900"
-                    />
+                    <RiCodepenLine aria-hidden="true" className="size-5 text-gray-900" />
                   </div>
                 </div>
               </div>
               <div className="absolute bottom-[6rem] left-[6rem] z-20">
                 <div className="relative mx-auto w-fit rounded-full bg-gray-50 p-1 shadow-md ring-1 shadow-black/10 ring-black/10">
                   <div className="w-fit rounded-full bg-linear-to-b from-white to-gray-100 p-3 shadow-[inset_0px_-2px_6px_rgba(0,0,0,0.05),0_7px_10px_0_rgba(0,0,0,0.10)] ring-1 ring-white/50 ring-inset">
-                    <RiFullscreenFill
-                      aria-hidden="true"
-                      className="size-5 text-gray-900"
-                    />
+                    <RiFullscreenFill aria-hidden="true" className="size-5 text-gray-900" />
                   </div>
                 </div>
               </div>

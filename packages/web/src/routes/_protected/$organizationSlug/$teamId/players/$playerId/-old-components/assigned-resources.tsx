@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { Link } from "@tanstack/react-router";
 
 import type { PlayerDetails } from "../-utils";
@@ -16,10 +11,7 @@ type AssignedResourcesProps = {
   organizationSlug: string;
 };
 
-export function AssignedResources({
-  player,
-  organizationSlug,
-}: AssignedResourcesProps) {
+export function AssignedResources({ player, organizationSlug }: AssignedResourcesProps) {
   return (
     <Card>
       <CardHeader>
@@ -29,10 +21,7 @@ export function AssignedResources({
         {player.assignedResources.length > 0 ? (
           <div className="space-y-2">
             {player.assignedResources.slice(0, 3).map((resource) => (
-              <div
-                className="flex items-center justify-between text-sm"
-                key={resource.id}
-              >
+              <div className="flex items-center justify-between text-sm" key={resource.id}>
                 <div className="flex-1">
                   <div className="font-medium">{resource.title}</div>
                   <div className="text-xs text-muted-foreground">
@@ -64,9 +53,7 @@ export function AssignedResources({
             )}
           </div>
         ) : (
-          <p className="text-center text-sm text-muted-foreground">
-            No resources assigned
-          </p>
+          <p className="text-center text-sm text-muted-foreground">No resources assigned</p>
         )}
       </CardContent>
     </Card>

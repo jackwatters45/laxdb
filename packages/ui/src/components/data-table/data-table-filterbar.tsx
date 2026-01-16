@@ -2,11 +2,7 @@ import { Button } from "@laxdb/ui/components/ui/button";
 import { ButtonGroup } from "@laxdb/ui/components/ui/button-group";
 import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@laxdb/ui/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@laxdb/ui/components/ui/popover";
 import { TabsList, TabsTrigger } from "@laxdb/ui/components/ui/tabs";
 import { cn } from "@laxdb/ui/lib/utils";
 import type { Table } from "@tanstack/react-table";
@@ -26,11 +22,7 @@ type FilterBarProviderProps<TData = unknown> = {
   children?: React.ReactNode;
 };
 
-function FilterBarProvider<TData>({
-  table,
-  actions,
-  children,
-}: FilterBarProviderProps<TData>) {
+function FilterBarProvider<TData>({ table, actions, children }: FilterBarProviderProps<TData>) {
   const value = React.useMemo(
     () => ({
       table,
@@ -54,10 +46,7 @@ type FilterBarProps = {
 function FilterBar({ children, className }: FilterBarProps) {
   return (
     <div
-      className={cn(
-        "flex flex-wrap items-center justify-between gap-2 px-4 sm:gap-x-6",
-        className,
-      )}
+      className={cn("flex flex-wrap items-center justify-between gap-2 px-4 sm:gap-x-6", className)}
     >
       {children}
     </div>
@@ -72,10 +61,7 @@ type FilterGroupProps = {
 function FilterGroup({ children, className }: FilterGroupProps) {
   return (
     <div
-      className={cn(
-        "flex w-full flex-col gap-2 sm:w-fit sm:flex-row sm:items-center",
-        className,
-      )}
+      className={cn("flex w-full flex-col gap-2 sm:w-fit sm:flex-row sm:items-center", className)}
     >
       {children}
     </div>
@@ -83,11 +69,7 @@ function FilterGroup({ children, className }: FilterGroupProps) {
 }
 
 function FilterActions({ children, className }: FilterGroupProps) {
-  return (
-    <ButtonGroup className={cn("flex items-center gap-2", className)}>
-      {children}
-    </ButtonGroup>
-  );
+  return <ButtonGroup className={cn("flex items-center gap-2", className)}>{children}</ButtonGroup>;
 }
 
 function FilterBarViewOptions() {
@@ -108,19 +90,14 @@ function FilterBarViewOptions() {
         <SlidersHorizontal aria-hidden="true" className="size-4" />
         View
       </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="z-50 w-fit space-y-2"
-        sideOffset={7}
-      >
+      <PopoverContent align="end" className="z-50 w-fit space-y-2" sideOffset={7}>
         <Label className="font-semibold">Display Properties</Label>
         <div className="mt-2 flex flex-col space-y-2">
           {columns.map((column) => {
             if (!column.getCanHide()) {
               return null;
             }
-            const label =
-              (column.columnDef.meta?.displayName as string) || column.id;
+            const label = (column.columnDef.meta?.displayName as string) || column.id;
             return (
               <div
                 className="flex items-center gap-2 overflow-y-auto rounded-sm text-sm hover:bg-accent hover:text-accent-foreground"
@@ -134,10 +111,7 @@ function FilterBarViewOptions() {
                     column.toggleVisibility(!!value);
                   }}
                 />
-                <Label
-                  className="cursor-pointer text-sm font-normal"
-                  htmlFor={column.id}
-                >
+                <Label className="cursor-pointer text-sm font-normal" htmlFor={column.id}>
                   {label}
                 </Label>
               </div>

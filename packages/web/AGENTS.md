@@ -58,25 +58,25 @@ src/
 
 ## WHERE TO LOOK
 
-| Task | Location |
-|------|----------|
-| Add protected route | `src/routes/_protected/$organizationSlug/` |
-| Add team route | `src/routes/_protected/$organizationSlug/$teamId/` |
-| Route-specific component | `src/routes/.../-components/` (dash prefix) |
-| Shared component | `src/components/{category}/` |
-| Add query | `src/query/` |
-| Add mutation | `src/mutations/` |
-| Auth middleware | `src/lib/middleware.ts` |
+| Task                     | Location                                           |
+| ------------------------ | -------------------------------------------------- |
+| Add protected route      | `src/routes/_protected/$organizationSlug/`         |
+| Add team route           | `src/routes/_protected/$organizationSlug/$teamId/` |
+| Route-specific component | `src/routes/.../-components/` (dash prefix)        |
+| Shared component         | `src/components/{category}/`                       |
+| Add query                | `src/query/`                                       |
+| Add mutation             | `src/mutations/`                                   |
+| Auth middleware          | `src/lib/middleware.ts`                            |
 
 ## FILE-BASED ROUTING
 
-| Pattern | Meaning |
-|---------|---------|
-| `_protected.tsx` | Layout with auth guard |
-| `$param` | Dynamic route segment |
-| `(group)/` | Route group (no URL segment) |
-| `-components/` | Route-specific components (dash prefix) |
-| `index.tsx` | Index route for directory |
+| Pattern          | Meaning                                 |
+| ---------------- | --------------------------------------- |
+| `_protected.tsx` | Layout with auth guard                  |
+| `$param`         | Dynamic route segment                   |
+| `(group)/`       | Route group (no URL segment)            |
+| `-components/`   | Route-specific components (dash prefix) |
+| `index.tsx`      | Index route for directory               |
 
 ## ROUTE COMPONENT PATTERN
 
@@ -106,7 +106,7 @@ import { RuntimeServer } from "@laxdb/core/runtime.server";
 
 // Define server function with middleware
 const getData = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])  // ← Validates session, provides context
+  .middleware([authMiddleware]) // ← Validates session, provides context
   .handler(({ context }) =>
     RuntimeServer.runPromise(
       Effect.gen(function* () {
@@ -125,6 +125,7 @@ export const Route = createFileRoute("...")({
 ```
 
 **Middleware chain**:
+
 1. `authMiddleware` checks session via `AuthService.getSession()`
 2. If no session → redirects to `/login?redirectUrl=...`
 3. If valid → provides `{ session, headers }` in context
@@ -149,17 +150,17 @@ Use react-hook-form with @laxdb/ui Field components:
 
 ## ANTI-PATTERNS
 
-| Pattern | Why Bad | Do Instead |
-|---------|---------|------------|
-| `useState` for server data | Missing cache/sync | TanStack Query |
-| Inline fetch calls | No caching/retry | Define in query/ or mutations/ |
-| Components in route files | Hard to test | Extract to -components/ |
-| Skip route loader | Flash of empty state | Prefetch for better UX |
+| Pattern                    | Why Bad              | Do Instead                     |
+| -------------------------- | -------------------- | ------------------------------ |
+| `useState` for server data | Missing cache/sync   | TanStack Query                 |
+| Inline fetch calls         | No caching/retry     | Define in query/ or mutations/ |
+| Components in route files  | Hard to test         | Extract to -components/        |
+| Skip route loader          | Flash of empty state | Prefetch for better UX         |
 
 ## NOTES
 
 - **Many TODOs**: Routes have `// TODO: Replace with actual API` placeholders
 - **Auth client**: `lib/auth-client.ts` exports better-auth client
-- **Theme**: ThemeProvider in __root.tsx, storageKey "laxdb-ui-theme"
+- **Theme**: ThemeProvider in \_\_root.tsx, storageKey "laxdb-ui-theme"
 - **routeTree.gen.ts**: Auto-generated, don't edit
 - **Import alias**: `@/` maps to `src/`

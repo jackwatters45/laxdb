@@ -90,10 +90,7 @@ export function AddPlayerCommand({
                   <>
                     <CommandGroup heading="Existing Players">
                       {allPlayers.map((player) => (
-                        <CommandItem
-                          key={player.publicId}
-                          value={player.publicId}
-                        >
+                        <CommandItem key={player.publicId} value={player.publicId}>
                           <div className="flex flex-col">
                             <span>{player.name ?? "Unnamed"}</span>
                             {(player.email ?? player.phone) && (
@@ -116,11 +113,7 @@ export function AddPlayerCommand({
                     </CommandItem>
                   </CommandGroup>
                 )}
-                {!searchQuery && (
-                  <CommandEmpty>
-                    Type a name to create a new player
-                  </CommandEmpty>
-                )}
+                {!searchQuery && <CommandEmpty>Type a name to create a new player</CommandEmpty>}
               </>
             )}
           </CommandList>

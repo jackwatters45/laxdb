@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { ArrowLeft, BookOpen, Calendar, Plus } from "lucide-react";
@@ -83,9 +78,7 @@ const getPlayerPermissions = createServerFn().handler(() => ({
   canDeleteResources: true,
 }));
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/$playerId/resources",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/$playerId/resources")({
   component: PlayerResourcesPage,
   loader: async ({ params }) => {
     const [playerData, permissions] = await Promise.all([
@@ -150,19 +143,14 @@ function PlayerResourcesPage() {
   const { organizationSlug, playerId } = Route.useParams();
 
   const groupedResources = {
-    active: resources.filter(
-      (r) => r.status === "in_progress" || r.status === "not_started",
-    ),
+    active: resources.filter((r) => r.status === "in_progress" || r.status === "not_started"),
     completed: resources.filter((r) => r.status === "completed"),
   };
 
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <Link
-          params={{ organizationSlug, playerId }}
-          to="/$organizationSlug/players/$playerId"
-        >
+        <Link params={{ organizationSlug, playerId }} to="/$organizationSlug/players/$playerId">
           <Button className="mb-4" variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to {playerName}
@@ -204,13 +192,9 @@ function PlayerResourcesPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">
-                        {getTypeIcon(resource.type)}
-                      </span>
+                      <span className="text-2xl">{getTypeIcon(resource.type)}</span>
                       <div>
-                        <CardTitle className="text-lg">
-                          {resource.title}
-                        </CardTitle>
+                        <CardTitle className="text-lg">{resource.title}</CardTitle>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span>Assigned by {resource.assignedBy}</span>
                           <span>•</span>
@@ -229,9 +213,7 @@ function PlayerResourcesPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-4 text-sm text-muted-foreground">
-                    {resource.description}
-                  </p>
+                  <p className="mb-4 text-sm text-muted-foreground">{resource.description}</p>
 
                   <div className="mb-4">
                     <div className="mb-2 flex items-center justify-between text-sm">
@@ -274,15 +256,11 @@ function PlayerResourcesPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">
-                        {getTypeIcon(resource.type)}
-                      </span>
+                      <span className="text-xl">{getTypeIcon(resource.type)}</span>
                       <div>
                         <div className="font-medium">{resource.title}</div>
                         <div className="text-sm text-muted-foreground">
-                          Completed{" "}
-                          {resource.completedDate &&
-                            formatDate(resource.completedDate)}
+                          Completed {resource.completedDate && formatDate(resource.completedDate)}
                         </div>
                       </div>
                     </div>

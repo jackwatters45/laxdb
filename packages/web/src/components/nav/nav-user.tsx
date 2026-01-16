@@ -1,9 +1,5 @@
 import { useTheme } from "@laxdb/ui/components/theme-provider";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@laxdb/ui/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@laxdb/ui/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,9 +60,7 @@ export function NavUserHeader() {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar className="h-7 w-7 rounded-lg">
-          <AvatarFallback className="rounded-lg uppercase">
-            {user.name?.slice(0, 2)}
-          </AvatarFallback>
+          <AvatarFallback className="rounded-lg uppercase">{user.name?.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <NavUserContent />

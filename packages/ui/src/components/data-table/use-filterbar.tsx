@@ -10,9 +10,7 @@ type FilterBarContextValue<TData = unknown> = {
   actions?: FilterBarActions;
 };
 
-const FilterBarContext = React.createContext<FilterBarContextValue | null>(
-  null,
-);
+const FilterBarContext = React.createContext<FilterBarContextValue | null>(null);
 
 function useFilterBar<TData = unknown>(): FilterBarContextValue<TData> {
   const context = React.use(FilterBarContext);
@@ -22,9 +20,4 @@ function useFilterBar<TData = unknown>(): FilterBarContextValue<TData> {
   return context as FilterBarContextValue<TData>;
 }
 
-export {
-  type FilterBarActions,
-  type FilterBarContextValue,
-  FilterBarContext,
-  useFilterBar,
-};
+export { type FilterBarActions, type FilterBarContextValue, FilterBarContext, useFilterBar };

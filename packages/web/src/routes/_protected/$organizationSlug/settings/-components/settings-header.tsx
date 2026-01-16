@@ -7,10 +7,7 @@ type SettingsHeaderProps = {
   children: React.ReactNode;
 };
 
-export function SettingsHeader({
-  organizationSlug,
-  children,
-}: SettingsHeaderProps) {
+export function SettingsHeader({ organizationSlug, children }: SettingsHeaderProps) {
   return (
     <div>
       <DashboardHeader>{children}</DashboardHeader>

@@ -4,11 +4,7 @@ import { Button } from "@laxdb/ui/components/ui/button";
 import { Calendar } from "@laxdb/ui/components/ui/calendar";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@laxdb/ui/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@laxdb/ui/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 
@@ -33,9 +29,7 @@ function isValidDate(date: Date | undefined) {
 
 export default function Calendar28() {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(
-    new Date("2025-06-01"),
-  );
+  const [date, setDate] = React.useState<Date | undefined>(new Date("2025-06-01"));
   const [month, setMonth] = React.useState<Date | undefined>(date);
   const [value, setValue] = React.useState(formatDate(date));
 

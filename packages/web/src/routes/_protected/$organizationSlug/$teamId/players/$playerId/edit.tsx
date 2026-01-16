@@ -55,18 +55,12 @@ function Header() {
   const { player } = Route.useLoaderData();
 
   return (
-    <PlayerHeader
-      organizationSlug={organizationSlug}
-      playerId={player.id}
-      teamId={activeTeam.id}
-    >
+    <PlayerHeader organizationSlug={organizationSlug} playerId={player.id} teamId={activeTeam.id}>
       <BreadcrumbItem>
         <BreadcrumbLink
           className="max-w-full truncate"
           title="Teams"
-          render={
-            <Link params={{ organizationSlug }} to="/$organizationSlug" />
-          }
+          render={<Link params={{ organizationSlug }} to="/$organizationSlug" />}
         >
           Teams
         </BreadcrumbLink>

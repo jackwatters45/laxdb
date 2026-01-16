@@ -2,22 +2,15 @@
 
 @theme {
   --animate-hide: hide 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-down-and-fade: slideDownAndFade 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-left-and-fade: slideLeftAndFade 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-up-and-fade: slideUpAndFade 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-right-and-fade: slideRightAndFade 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-down-and-fade: slideDownAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-left-and-fade: slideLeftAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up-and-fade: slideUpAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-right-and-fade: slideRightAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --animate-accordion-open: accordionOpen 150ms cubic-bezier(0.87, 0, 0.13, 1);
   --animate-accordion-close: accordionClose 150ms cubic-bezier(0.87, 0, 0.13, 1);
-  --animate-dialog-overlay-show: dialogOverlayShow 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-dialog-content-show: dialogContentShow 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-drawer-slide-left-and-fade: drawerSlideLeftAndFade 150ms
-    cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dialog-overlay-show: dialogOverlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dialog-content-show: dialogContentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-drawer-slide-left-and-fade: drawerSlideLeftAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --animate-drawer-slide-right-and-fade: drawerSlideRightAndFade 150ms ease-in;
   --animate-dashes: dashes 0.8s linear infinite;
   --animate-dashes-reverse: dashes 0.8s linear infinite reverse;

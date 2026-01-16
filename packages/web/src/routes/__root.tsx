@@ -4,12 +4,7 @@ import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
 import { Toaster } from "@laxdb/ui/components/ui/sonner";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
-import {
-  createRootRouteWithContext,
-  HeadContent,
-  Outlet,
-  Scripts,
-} from "@tanstack/react-router";
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type * as React from "react";
 
@@ -32,8 +27,7 @@ export const Route = createRootRouteWithContext<{
       },
       ...seo({
         title: "LaxDB",
-        description:
-          "TanStack Start is a type-safe, client-first, full-stack React framework. ",
+        description: "TanStack Start is a type-safe, client-first, full-stack React framework. ",
       }),
     ],
     links: [

@@ -23,14 +23,9 @@ import {
 
 // Update player
 const useUpdatePlayer = (organizationId: string, teamId: string) => {
-  const mutation = useUpdatePlayerBase(
-    getTeamPlayersQK(organizationId, teamId),
-  );
+  const mutation = useUpdatePlayerBase(getTeamPlayersQK(organizationId, teamId));
 
-  const handleUpdate = (
-    publicPlayerId: string,
-    updates: Partial<TeamPlayerWithInfo>,
-  ) => {
+  const handleUpdate = (publicPlayerId: string, updates: Partial<TeamPlayerWithInfo>) => {
     const { jerseyNumber, ...rest } = updates;
 
     mutation.mutate({
@@ -48,10 +43,7 @@ const useUpdatePlayer = (organizationId: string, teamId: string) => {
 };
 
 // Add player to team
-export const AddNewPlayerWithTeamInput = Schema.extend(
-  CreatePlayerInput,
-  AddNewPlayerToTeamInput,
-);
+export const AddNewPlayerWithTeamInput = Schema.extend(CreatePlayerInput, AddNewPlayerToTeamInput);
 
 export const addNewPlayerToTeamFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -78,14 +70,12 @@ export function useAddNewPlayerToTeam(organizationId: string, teamId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof AddNewPlayerWithTeamInput.Type) =>
-      addNewPlayerToTeamFn({ data }),
+    mutationFn: (data: typeof AddNewPlayerWithTeamInput.Type) => addNewPlayerToTeamFn({ data }),
     onMutate: async (variables, ctx) => {
       const queryKey = getTeamPlayersQK(organizationId, teamId);
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
       const optimisticPlayer: TeamPlayerWithInfo = {
         publicId: `temp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         organizationId: variables.organizationId,
@@ -111,10 +101,7 @@ export function useAddNewPlayerToTeam(organizationId: string, teamId: string) {
     },
     onError: (_err, _variables, context) => {
       if (context?.previousPlayers) {
-        queryClient.setQueryData(
-          getTeamPlayersQK(organizationId, teamId),
-          context.previousPlayers,
-        );
+        queryClient.setQueryData(getTeamPlayersQK(organizationId, teamId), context.previousPlayers);
       }
       toast.error("Failed to add player to team");
     },
@@ -136,21 +123,16 @@ export const removePlayerFromTeamFn = createServerFn({ method: "POST" })
     ),
   );
 
-export function useRemovePlayerFromTeam(
-  organizationId: string,
-  teamId: string,
-) {
+export function useRemovePlayerFromTeam(organizationId: string, teamId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof RemovePlayerFromTeamInput.Type) =>
-      removePlayerFromTeamFn({ data }),
+    mutationFn: (data: typeof RemovePlayerFromTeamInput.Type) => removePlayerFromTeamFn({ data }),
     onMutate: async (variables, ctx) => {
       const queryKey = getTeamPlayersQK(organizationId, teamId);
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.filter((p) => p.publicId !== variables.playerId),
@@ -160,10 +142,7 @@ export function useRemovePlayerFromTeam(
     },
     onError: (_err, _variables, context) => {
       if (context?.previousPlayers) {
-        queryClient.setQueryData(
-          getTeamPlayersQK(organizationId, teamId),
-          context.previousPlayers,
-        );
+        queryClient.setQueryData(getTeamPlayersQK(organizationId, teamId), context.previousPlayers);
       }
       toast.error("Failed to remove player from team");
     },
@@ -190,10 +169,7 @@ export const bulkRemovePlayersFromTeamFn = createServerFn({ method: "POST" })
     ),
   );
 
-export function useBulkRemovePlayersFromTeam(
-  organizationId: string,
-  teamId: string,
-) {
+export function useBulkRemovePlayersFromTeam(organizationId: string, teamId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -203,8 +179,7 @@ export function useBulkRemovePlayersFromTeam(
       const queryKey = getTeamPlayersQK(organizationId, teamId);
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.filter((p) => !variables.playerIds.includes(p.publicId)),
@@ -214,10 +189,7 @@ export function useBulkRemovePlayersFromTeam(
     },
     onError: (_err, _variables, context) => {
       if (context?.previousPlayers) {
-        queryClient.setQueryData(
-          getTeamPlayersQK(organizationId, teamId),
-          context.previousPlayers,
-        );
+        queryClient.setQueryData(getTeamPlayersQK(organizationId, teamId), context.previousPlayers);
       }
       toast.error("Failed to remove players from team");
     },
@@ -311,8 +283,7 @@ export function useLinkPlayer(organizationId: string, teamId: string) {
       const queryKey = getTeamPlayersQK(organizationId, teamId);
       await ctx.client.cancelQueries({ queryKey });
 
-      const previousPlayers =
-        ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
+      const previousPlayers = ctx.client.getQueryData<TeamPlayerWithInfo[]>(queryKey);
 
       ctx.client.setQueryData<TeamPlayerWithInfo[]>(queryKey, (old = []) =>
         old.map((player) =>
@@ -334,10 +305,7 @@ export function useLinkPlayer(organizationId: string, teamId: string) {
     },
     onError: (_err, _variables, context) => {
       if (context?.previousPlayers) {
-        queryClient.setQueryData(
-          getTeamPlayersQK(organizationId, teamId),
-          context.previousPlayers,
-        );
+        queryClient.setQueryData(getTeamPlayersQK(organizationId, teamId), context.previousPlayers);
       }
       toast.error("Failed to link player");
     },
@@ -364,15 +332,11 @@ export const addExistingPlayerToTeamFn = createServerFn({ method: "POST" })
     ),
   );
 
-export function useAddExistingPlayerToTeam(
-  organizationId: string,
-  teamId: string,
-) {
+export function useAddExistingPlayerToTeam(organizationId: string, teamId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: typeof AddPlayerToTeamInput.Type) =>
-      addExistingPlayerToTeamFn({ data }),
+    mutationFn: (data: typeof AddPlayerToTeamInput.Type) => addExistingPlayerToTeamFn({ data }),
     onError: () => {
       toast.error("Failed to add existing player to team");
     },

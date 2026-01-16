@@ -1,9 +1,6 @@
 import { type RefObject, useCallback, useEffect } from "react";
 
-export function useScrollEnd(
-  callback: () => void,
-  target: RefObject<HTMLDivElement | null>,
-) {
+export function useScrollEnd(callback: () => void, target: RefObject<HTMLDivElement | null>) {
   const stableCallback = useCallback(callback, [callback]);
 
   useEffect(() => {

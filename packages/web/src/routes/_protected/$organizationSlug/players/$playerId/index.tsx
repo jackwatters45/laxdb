@@ -1,11 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@laxdb/ui/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@laxdb/ui/components/ui/card";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
@@ -41,8 +36,7 @@ const mockPlayerDetails = {
   // Personal Information
   emergencyContactName: "Sarah Johnson (Mother)",
   emergencyContactPhone: "(555) 123-4567",
-  seasonGoals:
-    "Score 25 goals, improve shot accuracy to 75%, become team captain",
+  seasonGoals: "Score 25 goals, improve shot accuracy to 75%, become team captain",
   collegeAspirations: "Division I lacrosse scholarship, study business",
   careerGoals: "Professional lacrosse player or sports management",
 
@@ -220,9 +214,7 @@ const getPlayerPermissions = createServerFn().handler(() => ({
   canViewSensitive: true,
 }));
 
-export const Route = createFileRoute(
-  "/_protected/$organizationSlug/players/$playerId/",
-)({
+export const Route = createFileRoute("/_protected/$organizationSlug/players/$playerId/")({
   component: PlayerDetailsPage,
   loader: async ({ params }) => {
     const [player, permissions] = await Promise.all([
@@ -329,13 +321,11 @@ function PlayerDetailsPage() {
               <h1 className="text-3xl font-bold">{player.name}</h1>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <span>
-                  {player.primaryPosition.charAt(0).toUpperCase() +
-                    player.primaryPosition.slice(1)}
+                  {player.primaryPosition.charAt(0).toUpperCase() + player.primaryPosition.slice(1)}
                 </span>
                 <span>•</span>
                 <span>
-                  {player.gradeLevel.charAt(0).toUpperCase() +
-                    player.gradeLevel.slice(1)}
+                  {player.gradeLevel.charAt(0).toUpperCase() + player.gradeLevel.slice(1)}
                 </span>
                 <span>•</span>
                 <span>
@@ -390,12 +380,8 @@ function PlayerDetailsPage() {
                   <div className="text-sm text-muted-foreground">Assists</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">
-                    {player.shotAccuracy.toFixed(1)}%
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Shot Accuracy
-                  </div>
+                  <div className="text-2xl font-bold">{player.shotAccuracy.toFixed(1)}%</div>
+                  <div className="text-sm text-muted-foreground">Shot Accuracy</div>
                 </div>
               </div>
 
@@ -413,9 +399,7 @@ function PlayerDetailsPage() {
                   <div className="text-muted-foreground">Caused TOs</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-medium">
-                    {player.minutesPlayed.toFixed(1)}
-                  </div>
+                  <div className="font-medium">{player.minutesPlayed.toFixed(1)}</div>
                   <div className="text-muted-foreground">Avg Minutes</div>
                 </div>
               </div>
@@ -455,9 +439,7 @@ function PlayerDetailsPage() {
                           {getGoalCategoryIcon(goal.category)}
                           <span className="font-medium">{goal.title}</span>
                         </div>
-                        <span className="text-sm font-bold">
-                          {goal.progress}%
-                        </span>
+                        <span className="text-sm font-bold">{goal.progress}%</span>
                       </div>
                       <div className="mb-2 h-2 rounded-full bg-muted">
                         <div
@@ -523,9 +505,7 @@ function PlayerDetailsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant={getPriorityColor(note.priority)}>
-                          {note.priority}
-                        </Badge>
+                        <Badge variant={getPriorityColor(note.priority)}>{note.priority}</Badge>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -565,17 +545,11 @@ function PlayerDetailsPage() {
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-lg font-bold">
-                    {player.overallRating}/10
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Current Rating
-                  </div>
+                  <div className="text-lg font-bold">{player.overallRating}/10</div>
+                  <div className="text-xs text-muted-foreground">Current Rating</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold">
-                    {player.potentialRating}/10
-                  </div>
+                  <div className="text-lg font-bold">{player.potentialRating}/10</div>
                   <div className="text-xs text-muted-foreground">Potential</div>
                 </div>
               </div>
@@ -703,10 +677,7 @@ function PlayerDetailsPage() {
               {player.assignedResources.length > 0 ? (
                 <div className="space-y-2">
                   {player.assignedResources.slice(0, 3).map((resource) => (
-                    <div
-                      className="flex items-center justify-between text-sm"
-                      key={resource.id}
-                    >
+                    <div className="flex items-center justify-between text-sm" key={resource.id}>
                       <div className="flex-1">
                         <div className="font-medium">{resource.title}</div>
                         <div className="text-xs text-muted-foreground">
@@ -738,9 +709,7 @@ function PlayerDetailsPage() {
                   )}
                 </div>
               ) : (
-                <p className="text-center text-sm text-muted-foreground">
-                  No resources assigned
-                </p>
+                <p className="text-center text-sm text-muted-foreground">No resources assigned</p>
               )}
             </CardContent>
           </Card>
@@ -755,9 +724,7 @@ function PlayerDetailsPage() {
                 {player.emergencyContactName && (
                   <div>
                     <div className="font-medium">Emergency Contact</div>
-                    <div className="text-muted-foreground">
-                      {player.emergencyContactName}
-                    </div>
+                    <div className="text-muted-foreground">{player.emergencyContactName}</div>
                   </div>
                 )}
                 {player.emergencyContactPhone && (
