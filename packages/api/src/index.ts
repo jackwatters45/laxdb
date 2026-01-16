@@ -1,8 +1,10 @@
 import {
+  HttpApiScalar,
   HttpLayerRouter,
   HttpMiddleware,
   HttpServer,
   HttpServerResponse,
+  OpenApi,
 } from "@effect/platform";
 import { RpcSerialization, RpcServer } from "@effect/rpc";
 import { DateTime, Layer } from "effect";
@@ -11,6 +13,17 @@ import { LaxdbApi } from "./definition";
 import { HttpGroupsLive } from "./groups";
 import { LaxdbRpc } from "./rpc-group";
 import { LaxdbRpcHandlers } from "./rpc-handlers";
+
+const DocsRoute = HttpApiScalar.layerHttpLayerRouter({
+  api: LaxdbApi,
+  path: "/docs",
+});
+
+const OpenApiJsonRoute = HttpLayerRouter.add(
+  "GET",
+  "/docs/openapi.json",
+  HttpServerResponse.json(OpenApi.fromApi(LaxdbApi)),
+).pipe(Layer.provide(HttpLayerRouter.layer));
 
 const RpcRouter = RpcServer.layerHttpRouter({
   group: LaxdbRpc,
@@ -35,6 +48,8 @@ const HealthCheckRoute = HttpLayerRouter.use((router) =>
 const AllRoutes = Layer.mergeAll(
   RpcRouter,
   HttpApiRouter,
+  DocsRoute,
+  OpenApiJsonRoute,
   HealthCheckRoute,
   HttpLayerRouter.cors(),
 ).pipe(Layer.provide(DateTime.layerCurrentZoneLocal));
