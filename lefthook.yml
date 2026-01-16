@@ -1,0 +1,17 @@
+pre-commit:
+  parallel: true
+  commands:
+    fix:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: bun run fix && git update-index --again
+    typecheck:
+      run: bun run typecheck
+
+pre-push:
+  parallel: true
+  commands:
+    fix:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: bun run fix
+    typecheck:
+      run: bun run typecheck

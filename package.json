@@ -33,6 +33,7 @@
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
     "babel-plugin-react-compiler": "^1.0.0",
+    "lefthook": "^2.0.15",
     "miniflare": "^4.20251217.0",
     "oxfmt": "^0.24.0",
     "oxlint": "^1.36.0",

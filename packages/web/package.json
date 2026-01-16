@@ -21,6 +21,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@laxdb/core": "*",
     "@laxdb/ui": "*",
+    "@lucas-barake/effect-form-react": "^0.14.0",
     "@polar-sh/better-auth": "^1.6.3",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.9.0",
