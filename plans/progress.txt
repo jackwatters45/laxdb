@@ -24,3 +24,7 @@ Gotchas: Pre-existing pipeline test failures unrelated to API changes
 Summary: Extracted SeasonsGroup from season.api.ts, created season.handlers.ts for LaxdbApi-based handlers
 Files: packages/api/src/season/season.api.ts, packages/api/src/season/season.handlers.ts, packages/api/src/definition.ts, packages/api/src/index.ts
 Gotchas: Circular dependency issue - group definitions must NOT import LaxdbApi. Handlers in separate file.
+
+## api-003 COMPLETE
+Summary: Extracted GamesGroup from game.api.ts, created game.handlers.ts
+Files: packages/api/src/game/game.api.ts, packages/api/src/game/game.handlers.ts, packages/api/src/definition.ts, packages/api/src/index.ts

@@ -26,7 +26,7 @@
     "id": "api-003",
     "category": "infrastructure",
     "description": "Extract GamesGroup from game.api.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Refactor game.api.ts to export HttpApiGroup only (GamesGroup)",
       "Create GamesGroupLive using HttpApiBuilder.group(LaxdbApi, 'Games', ...)",
