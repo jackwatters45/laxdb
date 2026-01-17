@@ -1,10 +1,10 @@
-# LLMs Documentation
+# References
 
-This directory contains documentation files to help LLMs understand and work with specific libraries and frameworks used in the Lax DB project.
+External documentation for libraries and frameworks used in laxdb.
 
 ## Purpose
 
-The `llms/` folder stores `.txt` files containing library-specific documentation, patterns, and examples that help AI assistants provide better code suggestions and follow project conventions.
+The `references/` folder stores documentation, patterns, and examples that help AI assistants provide better code suggestions and follow project conventions.
 
 ## Usage
 

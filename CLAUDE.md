@@ -1,5 +1,7 @@
 # laxdb - Lacrosse Team/Club Management Platform
 
+> **When to read:** First file for any laxdb task. Architecture overview, package routing, global constraints.
+
 Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via Alchemy IaC, PlanetScale PostgreSQL.
 
 ## MUST KNOW
@@ -87,13 +89,15 @@ Managed via `alchemy.run.ts`:
 
 ## REFERENCE DOCS
 
-External documentation in `llms/`:
+External documentation in `references/`:
 
-- `llms/effect-ts/` - Effect patterns
-- `llms/better-auth.txt` - Auth patterns
-- `llms/tanstack-router.txt` - Router docs
+- `references/effect-ts/` - Effect patterns
+- `references/better-auth.txt` - Auth patterns
+- `references/tanstack-router.txt` - Router docs
+- `references/ALCHEMY.md` - Alchemy IaC patterns
+- `references/infisical/` - Secrets management
 
-For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alchemy`.
+For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alchemy`
 
 ## CHILD INTENT NODES
 

@@ -1,5 +1,7 @@
 # Auth Subsystem
 
+> **When to read:** Auth flows, roles, permissions, org/team relationships.
+
 better-auth integration with organization/team multi-tenancy and role-based access control.
 
 ## ARCHITECTURE
@@ -83,4 +85,4 @@ User ←→ Member ←→ Organization
 - `../organization/` - Organization CRUD
 - `../team/` - Team management
 - `../../api/src/auth/` - API layer auth handlers
-- `llms/better-auth.txt` - better-auth reference docs
+- `references/better-auth.txt` - better-auth reference docs

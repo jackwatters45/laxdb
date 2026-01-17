@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - "llms/**"
+      - "references/**"
       - "docs/**"
       - "scratchpad/**"
       - "README.md"

@@ -1,5 +1,7 @@
 # Drizzle Database Layer
 
+> **When to read:** DB connection issues, Hyperdrive config, custom Drizzle types.
+
 Database connection and Drizzle ORM setup for Effect-TS.
 
 ## FILES

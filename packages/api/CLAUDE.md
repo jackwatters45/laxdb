@@ -1,5 +1,7 @@
 # @laxdb/api - Effect RPC + HTTP API
 
+> **When to read:** Adding/modifying API endpoints, RPC handlers, HTTP routes.
+
 Cloudflare Worker exposing Effect RPC and REST endpoints. Consumes @laxdb/core services.
 
 ## STRUCTURE
