@@ -216,3 +216,10 @@ Description: Create NLLExtractionManifest schema
 Status: COMPLETE
 Commit: f224870
 Timestamp: 2026-01-18T00:18:02+11:00
+
+=== Iteration 30 ===
+Story: nll-manifest-003
+Description: Create NLLManifestService
+Status: COMPLETE
+Commit: 2fdd554
+Timestamp: 2026-01-18T00:20:02+11:00

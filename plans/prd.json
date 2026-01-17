@@ -381,7 +381,7 @@
     "id": "nll-manifest-003",
     "category": "extract",
     "description": "Create NLLManifestService",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLManifestService as Effect.Service",
       "Inject ExtractConfigService, FileSystem, Path",
