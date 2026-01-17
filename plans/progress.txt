@@ -160,3 +160,10 @@ Description: Create NLL integration test file
 Status: COMPLETE
 Commit: a3e4767
 Timestamp: 2026-01-17T23:50:18+11:00
+
+=== Iteration 23 ===
+Story: nll-test-002
+Description: getTeams integration test
+Status: COMPLETE
+Commit: 6c401e3
+Timestamp: 2026-01-17T23:55:09+11:00

@@ -188,65 +188,108 @@ export const TeamsMapToArray = Schema.transform(
   },
 );
 
+// NLLPlayerMatchesRaw - raw API structure for player matches (just season games count)
+const NLLPlayerMatchesRaw = Schema.Struct({
+  season: Schema.Number,
+}).pipe(Schema.annotations({ identifier: "NLLPlayerMatchesRaw" }));
+
 // NLLPlayerRaw - raw API response structure for a single player
-// API returns: { personId: { firstname, surname, ... } }
+// API returns: { map: { personId: { firstname, surname, ... } } }
+// Note: Many fields can be missing entirely from the API response
 export class NLLPlayerRaw extends Schema.Class<NLLPlayerRaw>("NLLPlayerRaw")({
-  firstname: Schema.NullOr(Schema.String),
-  surname: Schema.NullOr(Schema.String),
-  fullname: Schema.NullOr(Schema.String),
-  dateOfBirth: Schema.NullOr(Schema.String),
-  height: Schema.NullOr(Schema.String),
-  weight: Schema.NullOr(Schema.String),
-  position: Schema.NullOr(Schema.String),
-  jerseyNumber: Schema.NullOr(Schema.String),
-  team_id: Schema.NullOr(Schema.String),
-  team_code: Schema.NullOr(Schema.String),
-  team_name: Schema.NullOr(Schema.String),
-  matches: Schema.optional(NLLPlayerSeasonStats),
+  personId: Schema.Number,
+  firstname: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  surname: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  fullname: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  dateOfBirth: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  height: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  weight: Schema.optionalWith(Schema.NullOr(Schema.Number), {
+    default: () => null,
+  }),
+  position: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  jerseyNumber: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  team_id: Schema.optionalWith(Schema.NullOr(Schema.Number), {
+    default: () => null,
+  }),
+  team_code: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  team_name: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  matches: Schema.optional(NLLPlayerMatchesRaw),
 }) {}
 
-// PlayersMapToArray - transforms Record<personId, PlayerData> -> NLLPlayer[]
+// PlayersMapToArray - transforms { map: Record<personId, PlayerData> } -> NLLPlayer[]
 export const PlayersMapToArray = Schema.transform(
-  Schema.Record({ key: Schema.String, value: NLLPlayerRaw }),
+  Schema.Struct({
+    map: Schema.Record({ key: Schema.String, value: NLLPlayerRaw }),
+  }),
   Schema.Array(NLLPlayer),
   {
     strict: true,
-    decode: (record) =>
-      Object.entries(record).map(([personId, player]) => ({
-        personId,
+    decode: (response) =>
+      Object.values(response.map).map((player) => ({
+        personId: String(player.personId),
         firstname: player.firstname,
         surname: player.surname,
         fullname: player.fullname,
         dateOfBirth: player.dateOfBirth,
         height: player.height,
-        weight: player.weight,
+        weight: player.weight != null ? String(player.weight) : null,
         position: player.position,
         jerseyNumber: player.jerseyNumber,
-        team_id: player.team_id,
+        team_id: player.team_id != null ? String(player.team_id) : null,
         team_code: player.team_code,
         team_name: player.team_name,
-        matches: player.matches,
+        matches: player.matches
+          ? {
+              goals: 0,
+              assists: 0,
+              points: 0,
+              penalty_minutes: 0,
+              games_played: player.matches.season,
+            }
+          : undefined,
       })),
-    encode: (players) =>
-      Object.fromEntries(
+    encode: (players) => ({
+      map: Object.fromEntries(
         players.map((player) => [
           player.personId,
           {
+            personId: Number(player.personId),
             firstname: player.firstname,
             surname: player.surname,
             fullname: player.fullname,
             dateOfBirth: player.dateOfBirth,
             height: player.height,
-            weight: player.weight,
+            weight: player.weight != null ? Number(player.weight) : null,
             position: player.position,
             jerseyNumber: player.jerseyNumber,
-            team_id: player.team_id,
+            team_id: player.team_id != null ? Number(player.team_id) : null,
             team_code: player.team_code,
             team_name: player.team_name,
-            matches: player.matches,
+            matches: player.matches
+              ? { season: player.matches.games_played }
+              : undefined,
           },
         ]),
       ),
+    }),
   },
 );
 

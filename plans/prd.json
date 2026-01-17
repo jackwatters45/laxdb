@@ -289,7 +289,7 @@
     "id": "nll-test-002",
     "category": "test",
     "description": "getTeams integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getTeams",
       "Add test: 'fetches teams for season 225'",

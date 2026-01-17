@@ -36,4 +36,37 @@ describe("NLLClient", () => {
       expect(teams[0]?.code).toBeTypeOf("string");
     });
   });
+
+  describe("getPlayers", () => {
+    it("fetches players for season 225", async () => {
+      const program = Effect.gen(function* () {
+        const nll = yield* NLLClient;
+        return yield* nll.getPlayers({ seasonId: 225 });
+      });
+
+      const players = await Effect.runPromise(
+        program.pipe(Effect.provide(NLLClient.Default)),
+      );
+
+      expect(players.length).toBeGreaterThan(0);
+      expect(players[0]).toHaveProperty("personId");
+      expect(players[0]).toHaveProperty("firstname");
+      expect(players[0]).toHaveProperty("team_id");
+    }, 30000);
+
+    it("returns players with expected properties", async () => {
+      const program = Effect.gen(function* () {
+        const nll = yield* NLLClient;
+        return yield* nll.getPlayers({ seasonId: 225 });
+      });
+
+      const players = await Effect.runPromise(
+        program.pipe(Effect.provide(NLLClient.Default)),
+      );
+
+      expect(players[0]).toBeDefined();
+      expect(players[0]?.personId).toBeTypeOf("string");
+      expect(players[0]?.firstname).toBeTypeOf("string");
+    }, 30000);
+  });
 });
