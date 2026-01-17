@@ -34,3 +34,10 @@ Description: NLLStanding response schema
 Status: COMPLETE
 Commit: 476ff29
 Timestamp: 2026-01-17T23:20:32+11:00
+
+=== Iteration 5 ===
+Story: nll-schema-006
+Description: NLLVenue nested schema
+Status: COMPLETE
+Commit: b63cee8
+Timestamp: 2026-01-17T23:21:51+11:00

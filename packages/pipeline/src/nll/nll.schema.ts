@@ -71,3 +71,12 @@ export class NLLVenue extends Schema.Class<NLLVenue>("NLLVenue")({
   name: Schema.NullOr(Schema.String),
   city: Schema.NullOr(Schema.String),
 }) {}
+
+// NLL Squad nested schema - for match squad information
+export class NLLSquad extends Schema.Class<NLLSquad>("NLLSquad")({
+  id: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  code: Schema.NullOr(Schema.String),
+  score: Schema.Number,
+  isHome: Schema.Boolean,
+}) {}

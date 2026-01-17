@@ -60,7 +60,7 @@
     "id": "nll-schema-006",
     "category": "schema",
     "description": "NLLVenue nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLVenue Schema.Class",
       "Fields: id, name, city (all nullable strings except id)",
