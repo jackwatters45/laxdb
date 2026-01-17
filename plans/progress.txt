@@ -223,3 +223,10 @@ Description: Create NLLManifestService
 Status: COMPLETE
 Commit: 2fdd554
 Timestamp: 2026-01-18T00:20:02+11:00
+
+=== Iteration 31 ===
+Story: nll-manifest-004
+Description: Implement NLLManifestService.load method
+Status: COMPLETE
+Commit: ff824e0
+Timestamp: 2026-01-18T00:21:29+11:00
