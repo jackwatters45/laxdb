@@ -3,7 +3,8 @@ pre-commit:
   commands:
     fix:
       glob: "*.{js,ts,jsx,tsx}"
-      run: bun run fix && git update-index --again
+      run: bun run fix
+      stage_fixed: true
     typecheck:
       run: bun run typecheck
 
