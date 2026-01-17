@@ -238,7 +238,30 @@ const program = Effect.gen(function* () {
     fileResults.push(scheduleResult);
   }
 
-  // TODO: Implement remaining validations in subsequent stories
+  // Cross-reference validations
+  if (teams.length > 0 && players.length > 0) {
+    const playersToTeams = yield* crossReference(
+      players,
+      teams,
+      "team_id",
+      "id",
+      path.join(seasonDir, "players.json"),
+      path.join(seasonDir, "teams.json"),
+    );
+    crossRefs.push(playersToTeams);
+  }
+
+  if (teams.length > 0 && standings.length > 0) {
+    const standingsToTeams = yield* crossReference(
+      standings,
+      teams,
+      "team_id",
+      "id",
+      path.join(seasonDir, "standings.json"),
+      path.join(seasonDir, "teams.json"),
+    );
+    crossRefs.push(standingsToTeams);
+  }
 
   const report = buildReport("NLL", fileResults, crossRefs, startTime);
   yield* printReport(report);

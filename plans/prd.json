@@ -641,7 +641,7 @@
     "id": "nll-validate-006",
     "category": "validate",
     "description": "Implement schedule.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for schedule.json",
       "Validate required fields: id, date, status",

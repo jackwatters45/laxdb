@@ -349,3 +349,10 @@ Description: Implement standings.json validation
 Status: COMPLETE
 Commit: f2e867a
 Timestamp: 2026-01-18T00:57:38+11:00
+
+=== Iteration 2 ===
+Story: nll-validate-006
+Description: Implement schedule.json validation
+Status: COMPLETE
+Commit: acf2aca
+Timestamp: 2026-01-18T01:00:34+11:00
