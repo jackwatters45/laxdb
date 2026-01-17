@@ -21,7 +21,6 @@ export {
   // Raw API schemas (for transforms)
   NLLTeamRaw,
   NLLPlayerRaw,
-  NLLScheduleMatchRaw,
   // Transform schemas
   TeamsMapToArray,
   PlayersMapToArray,

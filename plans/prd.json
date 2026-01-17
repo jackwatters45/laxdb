@@ -317,7 +317,7 @@
     "id": "nll-test-004",
     "category": "test",
     "description": "getStandings integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getStandings",
       "Add test: 'fetches standings for season 225'",
@@ -331,7 +331,7 @@
     "id": "nll-test-005",
     "category": "test",
     "description": "getSchedule integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getSchedule",
       "Add test: 'fetches schedule for season 225'",

@@ -103,4 +103,39 @@ describe("NLLClient", () => {
       expect(standings[0]?.losses).toBeTypeOf("number");
     });
   });
+
+  describe("getSchedule", () => {
+    it("fetches schedule for season 225", async () => {
+      const program = Effect.gen(function* () {
+        const nll = yield* NLLClient;
+        return yield* nll.getSchedule({ seasonId: 225 });
+      });
+
+      const schedule = await Effect.runPromise(
+        program.pipe(Effect.provide(NLLClient.Default)),
+      );
+
+      expect(schedule.length).toBeGreaterThan(0);
+      expect(schedule[0]).toHaveProperty("id");
+      expect(schedule[0]).toHaveProperty("squads");
+      expect(schedule[0]).toHaveProperty("date");
+      expect(schedule[0]).toHaveProperty("status");
+    });
+
+    it("returns schedule with expected properties", async () => {
+      const program = Effect.gen(function* () {
+        const nll = yield* NLLClient;
+        return yield* nll.getSchedule({ seasonId: 225 });
+      });
+
+      const schedule = await Effect.runPromise(
+        program.pipe(Effect.provide(NLLClient.Default)),
+      );
+
+      expect(schedule[0]).toBeDefined();
+      expect(schedule[0]?.id).toBeTypeOf("string");
+      expect(schedule[0]?.squads).toHaveProperty("away");
+      expect(schedule[0]?.squads).toHaveProperty("home");
+    });
+  });
 });

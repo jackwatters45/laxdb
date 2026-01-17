@@ -366,43 +366,213 @@ export const StandingsMapToArray = Schema.transform(
 // NLLStandingsResponse - wraps the StandingsMapToArray transform
 export const NLLStandingsResponse = StandingsMapToArray;
 
-// NLLScheduleWeek - raw API structure for a single week's matches
-// API returns: { "Week 1": [match1, match2], "Week 2": [match3] }
-export class NLLScheduleMatchRaw extends Schema.Class<NLLScheduleMatchRaw>(
-  "NLLScheduleMatchRaw",
-)({
-  id: Schema.String,
-  date: Schema.NullOr(Schema.String),
-  status: Schema.NullOr(Schema.String),
-  venue: NLLVenue,
-  winningSquadId: Schema.NullOr(Schema.String),
-  squads: NLLMatchSquads,
-}) {}
+// Raw API structures for schedule response
+// API returns: [{ code: "WK01", id: 31382, matches: [...], name: "Week 01", ... }]
 
-// NLLScheduleResponse - transforms week-based structure to flat match array
-// API returns: { "Week 1": [...], "Week 2": [...] } -> NLLMatch[]
-export const NLLScheduleResponse = Schema.transform(
-  Schema.Record({
-    key: Schema.String,
-    value: Schema.Array(NLLScheduleMatchRaw),
+// Raw squad score structure
+const NLLSquadScoreRaw = Schema.Struct({
+  goals: Schema.Number,
+  score: Schema.Number,
+}).pipe(Schema.annotations({ identifier: "NLLSquadScoreRaw" }));
+
+// Raw squad structure in schedule matches
+const NLLScheduleSquadRaw = Schema.Struct({
+  id: Schema.Number,
+  code: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  nickname: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
   }),
+  displayName: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  score: NLLSquadScoreRaw,
+}).pipe(Schema.annotations({ identifier: "NLLScheduleSquadRaw" }));
+
+// Raw squads structure with away/home
+const NLLScheduleSquadsRaw = Schema.Struct({
+  away: NLLScheduleSquadRaw,
+  home: NLLScheduleSquadRaw,
+}).pipe(Schema.annotations({ identifier: "NLLScheduleSquadsRaw" }));
+
+// Raw date structure
+const NLLScheduleDateRaw = Schema.Struct({
+  startDate: Schema.NullOr(Schema.String),
+  startTime: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  utcMatchStart: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+}).pipe(Schema.annotations({ identifier: "NLLScheduleDateRaw" }));
+
+// Raw status structure
+const NLLScheduleStatusRaw = Schema.Struct({
+  id: Schema.Number,
+  name: Schema.NullOr(Schema.String),
+  code: Schema.NullOr(Schema.String),
+  typeId: Schema.optionalWith(Schema.Number, { default: () => 0 }),
+  typeName: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  period: Schema.optionalWith(Schema.Number, { default: () => 0 }),
+  periodSecs: Schema.optionalWith(Schema.Number, { default: () => 0 }),
+  periodDisplay: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  periodTime: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  remainingSecs: Schema.optionalWith(Schema.Number, { default: () => 0 }),
+  remainingDisplay: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  remainingTime: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+}).pipe(Schema.annotations({ identifier: "NLLScheduleStatusRaw" }));
+
+// Raw venue structure in schedule matches (includes timeZone)
+const NLLScheduleVenueRaw = Schema.Struct({
+  id: Schema.Number,
+  code: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+  name: Schema.NullOr(Schema.String),
+  timeZone: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    default: () => null,
+  }),
+}).pipe(Schema.annotations({ identifier: "NLLScheduleVenueRaw" }));
+
+// Raw match structure in schedule response
+const NLLScheduleMatchRaw = Schema.Struct({
+  id: Schema.Number,
+  weekOrder: Schema.optionalWith(Schema.Number, { default: () => 0 }),
+  squads: NLLScheduleSquadsRaw,
+  date: NLLScheduleDateRaw,
+  status: NLLScheduleStatusRaw,
+  type: Schema.optionalWith(
+    Schema.Struct({
+      id: Schema.Number,
+      name: Schema.NullOr(Schema.String),
+      code: Schema.NullOr(Schema.String),
+    }),
+    { default: () => ({ id: 0, name: null, code: null }) },
+  ),
+  venue: NLLScheduleVenueRaw,
+  winningSquadId: Schema.NullOr(Schema.Number),
+}).pipe(Schema.annotations({ identifier: "NLLScheduleMatchRaw" }));
+
+// Raw week structure in schedule response
+const NLLScheduleWeekRaw = Schema.Struct({
+  id: Schema.Number,
+  code: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  number: Schema.Number,
+  phaseNumber: Schema.optionalWith(Schema.Number, { default: () => 1 }),
+  season_id: Schema.String,
+  matches: Schema.Array(NLLScheduleMatchRaw),
+}).pipe(Schema.annotations({ identifier: "NLLScheduleWeekRaw" }));
+
+// NLLScheduleResponse - transforms week array to flat match array
+// API returns: [{ code: "WK01", matches: [...] }, ...] -> NLLMatch[]
+export const NLLScheduleResponse = Schema.transform(
+  Schema.Array(NLLScheduleWeekRaw),
   Schema.Array(NLLMatch),
   {
     strict: true,
-    decode: (weekRecord) =>
-      Object.values(weekRecord)
-        .flat()
-        .map((match) => ({
-          id: match.id,
-          date: match.date,
-          status: match.status,
-          venue: match.venue,
-          winningSquadId: match.winningSquadId,
-          squads: match.squads,
+    decode: (weeks) =>
+      weeks.flatMap((week) =>
+        week.matches.map((match) => ({
+          id: String(match.id),
+          date: match.date.startDate,
+          status: match.status.name,
+          venue: {
+            id: String(match.venue.id),
+            name: match.venue.name,
+            city: null, // Not provided in this API structure
+          },
+          winningSquadId:
+            match.winningSquadId != null ? String(match.winningSquadId) : null,
+          squads: {
+            away: {
+              id: String(match.squads.away.id),
+              name: match.squads.away.name,
+              code: match.squads.away.code,
+              score: match.squads.away.score.goals,
+              isHome: false,
+            },
+            home: {
+              id: String(match.squads.home.id),
+              name: match.squads.home.name,
+              code: match.squads.home.code,
+              score: match.squads.home.score.goals,
+              isHome: true,
+            },
+          },
         })),
-    encode: (matches) => {
-      // Group matches by a simple key (just return as "matches" since we don't track week info)
-      return { matches };
-    },
+      ),
+    encode: (matches) => [
+      {
+        id: 0,
+        code: "WK",
+        name: "Week",
+        number: 1,
+        phaseNumber: 1,
+        season_id: "0",
+        matches: matches.map((match) => ({
+          id: Number(match.id),
+          weekOrder: 0,
+          squads: {
+            away: {
+              id: Number(match.squads.away.id),
+              code: match.squads.away.code ?? "",
+              name: match.squads.away.name,
+              nickname: null,
+              displayName: null,
+              score: {
+                goals: match.squads.away.score,
+                score: match.squads.away.score,
+              },
+            },
+            home: {
+              id: Number(match.squads.home.id),
+              code: match.squads.home.code ?? "",
+              name: match.squads.home.name,
+              nickname: null,
+              displayName: null,
+              score: {
+                goals: match.squads.home.score,
+                score: match.squads.home.score,
+              },
+            },
+          },
+          date: { startDate: match.date, startTime: null, utcMatchStart: null },
+          status: {
+            id: 0,
+            name: match.status,
+            code: null,
+            typeId: 0,
+            typeName: null,
+            period: 0,
+            periodSecs: 0,
+            periodDisplay: null,
+            periodTime: null,
+            remainingSecs: 0,
+            remainingDisplay: null,
+            remainingTime: null,
+          },
+          type: { id: 0, name: null, code: null },
+          venue: {
+            id: Number(match.venue.id),
+            code: null,
+            name: match.venue.name,
+            timeZone: null,
+          },
+          winningSquadId:
+            match.winningSquadId != null ? Number(match.winningSquadId) : null,
+        })),
+      },
+    ],
   },
 );
