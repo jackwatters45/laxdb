@@ -8,6 +8,9 @@ import {
   type NLLPlayer,
   NLLPlayersRequest,
   NLLPlayersResponse,
+  type NLLStanding,
+  NLLStandingsRequest,
+  NLLStandingsResponse,
   type NLLTeam,
   NLLTeamsRequest,
   NLLTeamsResponse,
@@ -81,6 +84,34 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
           Effect.tap((players) =>
             Effect.log(
               `Fetched ${players.length} players for season ${input.seasonId}`,
+            ),
+          ),
+        ),
+
+      getStandings: (
+        input: typeof NLLStandingsRequest.Encoded,
+      ): Effect.Effect<readonly NLLStanding[], PipelineError> =>
+        Effect.gen(function* () {
+          const request = yield* Schema.decode(NLLStandingsRequest)(input).pipe(
+            Effect.mapError(mapParseError),
+          );
+          const endpoint = `?data_type=standings&season_id=${request.seasonId}`;
+          const standings = yield* Schema.decodeUnknown(NLLStandingsResponse)(
+            yield* restClient.get(endpoint, Schema.Unknown),
+          ).pipe(
+            Effect.mapError(
+              (error) =>
+                new ParseError({
+                  message: `Failed to parse standings response: ${String(error)}`,
+                  cause: error,
+                }),
+            ),
+          );
+          return standings;
+        }).pipe(
+          Effect.tap((standings) =>
+            Effect.log(
+              `Fetched ${standings.length} standings for season ${input.seasonId}`,
             ),
           ),
         ),

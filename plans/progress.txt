@@ -125,3 +125,10 @@ Description: Implement NLLClient.getTeams method
 Status: COMPLETE
 Commit: 5b41524
 Timestamp: 2026-01-17T23:40:21+11:00
+
+=== Iteration 18 ===
+Story: nll-client-005
+Description: Implement NLLClient.getPlayers method
+Status: COMPLETE
+Commit: 5a702b4
+Timestamp: 2026-01-17T23:43:13+11:00

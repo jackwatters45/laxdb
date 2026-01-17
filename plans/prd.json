@@ -221,7 +221,7 @@
     "id": "nll-client-005",
     "category": "client",
     "description": "Implement NLLClient.getPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getPlayers(input: NLLPlayersRequest.Encoded)",
       "Decode input via Schema.decode with mapParseError",
