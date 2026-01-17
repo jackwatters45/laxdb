@@ -1,4 +1,8 @@
-import { Schema } from "effect";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
+import { Effect, Layer, Schema } from "effect";
+
+import { ExtractConfigService } from "../extract.config";
 
 // NLL Entity Status - same structure as PLL
 export const NLLEntityStatus = Schema.Struct({
@@ -49,3 +53,106 @@ export const createEmptyNLLManifest = (): NLLExtractionManifest => ({
   lastRun: "",
   version: 1,
 });
+
+// NLL Manifest Service
+export class NLLManifestService extends Effect.Service<NLLManifestService>()(
+  "NLLManifestService",
+  {
+    effect: Effect.gen(function* () {
+      const config = yield* ExtractConfigService;
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const manifestPath = path.join(config.outputDir, "nll", "manifest.json");
+
+      const load = Effect.gen(function* () {
+        const exists = yield* fs.exists(manifestPath);
+
+        if (!exists) {
+          return createEmptyNLLManifest();
+        }
+
+        const content = yield* fs
+          .readFileString(manifestPath, "utf-8")
+          .pipe(
+            Effect.catchAll((e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            ),
+          );
+
+        const parsed = yield* Effect.try({
+          try: () => JSON.parse(content) as unknown,
+          catch: (e) =>
+            new Error(`Failed to parse manifest JSON: ${String(e)}`),
+        });
+        return yield* Schema.decodeUnknown(NLLExtractionManifest)(parsed).pipe(
+          Effect.catchAll(() => Effect.succeed(createEmptyNLLManifest())),
+        );
+      });
+
+      const save = (manifest: NLLExtractionManifest) =>
+        Effect.gen(function* () {
+          const dir = path.dirname(manifestPath);
+          yield* fs.makeDirectory(dir, { recursive: true });
+          const content = JSON.stringify(manifest, null, 2);
+          yield* fs.writeFileString(manifestPath, content);
+        }).pipe(
+          Effect.catchAll((e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          ),
+        );
+
+      const getSeasonManifest = (
+        manifest: NLLExtractionManifest,
+        seasonId: number,
+      ): NLLSeasonManifest => {
+        const key = String(seasonId);
+        return manifest.seasons[key] ?? createEmptyNLLSeasonManifest();
+      };
+
+      const markComplete = (
+        manifest: NLLExtractionManifest,
+        seasonId: number,
+        entity: keyof NLLSeasonManifest,
+        count: number,
+        durationMs: number,
+      ): NLLExtractionManifest => {
+        const key = String(seasonId);
+        const seasonManifest = getSeasonManifest(manifest, seasonId);
+        return {
+          ...manifest,
+          seasons: {
+            ...manifest.seasons,
+            [key]: {
+              ...seasonManifest,
+              [entity]: {
+                extracted: true,
+                count,
+                timestamp: new Date().toISOString(),
+                durationMs,
+              } satisfies NLLEntityStatus,
+            },
+          },
+          lastRun: new Date().toISOString(),
+        };
+      };
+
+      const isExtracted = (
+        manifest: NLLExtractionManifest,
+        seasonId: number,
+        entity: keyof NLLSeasonManifest,
+      ): boolean => {
+        const seasonManifest = getSeasonManifest(manifest, seasonId);
+        return seasonManifest[entity].extracted;
+      };
+
+      return {
+        load,
+        save,
+        getSeasonManifest,
+        markComplete,
+        isExtracted,
+      };
+    }),
+    dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],
+  },
+) {}

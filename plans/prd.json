@@ -368,7 +368,7 @@
     "id": "nll-manifest-002",
     "category": "extract",
     "description": "Create NLLExtractionManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLExtractionManifest schema",
       "Fields: source='nll', seasons Record, lastRun, version",

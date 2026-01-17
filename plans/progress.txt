@@ -209,3 +209,10 @@ Description: Create NLLSeasonManifest schema
 Status: COMPLETE
 Commit: 46bc66b
 Timestamp: 2026-01-18T00:16:29+11:00
+
+=== Iteration 29 ===
+Story: nll-manifest-002
+Description: Create NLLExtractionManifest schema
+Status: COMPLETE
+Commit: f224870
+Timestamp: 2026-01-18T00:18:02+11:00
