@@ -104,3 +104,10 @@ Description: Create nll.client.ts with base structure
 Status: COMPLETE
 Commit: f2c3d07
 Timestamp: 2026-01-17T23:35:01+11:00
+
+=== Iteration 15 ===
+Story: nll-client-002
+Description: Define mapParseError helper
+Status: COMPLETE
+Commit: c2a084c
+Timestamp: 2026-01-17T23:36:17+11:00

@@ -183,7 +183,7 @@
     "id": "nll-client-002",
     "category": "client",
     "description": "Define mapParseError helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add mapParseError function following PLL pattern",
       "Maps ParseResult.ParseError to ParseError",

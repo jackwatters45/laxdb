@@ -9,3 +9,19 @@ const mapParseError = (error: ParseResult.ParseError): ParseError =>
     message: `Invalid request: ${String(error)}`,
     cause: error,
   });
+
+export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
+  effect: Effect.gen(function* () {
+    const config = yield* NLLConfig;
+
+    const restClient = makeRestClient({
+      baseUrl: config.baseUrl,
+      defaultHeaders: config.headers,
+    });
+
+    return {
+      // Methods will be added in subsequent stories
+    };
+  }),
+  dependencies: [NLLConfig.Default],
+}) {}
