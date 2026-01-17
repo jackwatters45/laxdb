@@ -251,3 +251,10 @@ Description: Create NLLExtractorService base structure
 Status: COMPLETE
 Commit: 9f03520
 Timestamp: 2026-01-18T00:26:13+11:00
+
+=== Iteration 35 ===
+Story: nll-extract-002
+Description: Implement extractor helper functions
+Status: COMPLETE
+Commit: 924a6fd
+Timestamp: 2026-01-18T00:28:10+11:00
