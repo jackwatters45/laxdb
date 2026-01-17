@@ -574,7 +574,7 @@
     "id": "nll-validate-001",
     "category": "validate",
     "description": "Create validate-nll.ts file structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/validate/validate-nll.ts",
       "Import FileSystem, Path from @effect/platform",
