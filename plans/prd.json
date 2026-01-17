@@ -560,7 +560,7 @@
     "id": "nll-extract-010",
     "category": "extract",
     "description": "Test NLL extraction runs successfully",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/nll/run.ts",
       "Verify output/nll/225/teams.json created",

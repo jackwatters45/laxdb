@@ -1,0 +1,12 @@
+The file is complete. Let me verify the story requirements are met:
+
+**Story steps checklist:**
+1. ✅ Create src/validate/validate-nll.ts
+2. ✅ Import FileSystem, Path from @effect/platform
+3. ✅ Import BunContext, BunRuntime from @effect/platform-bun
+4. ✅ Import Effect, Layer from effect
+5. ✅ Import ExtractConfigService
+6. ✅ Import validation helpers from validate.service
+7. ✅ Run typecheck - PASSED
+
+STORY_COMPLETE

@@ -307,3 +307,10 @@ Description: Create NLL extraction CLI entry point
 Status: COMPLETE
 Commit: db12764
 Timestamp: 2026-01-18T00:42:00+11:00
+
+=== Iteration 43 ===
+Story: nll-extract-010
+Description: Test NLL extraction runs successfully
+Status: COMPLETE
+Commit: c1baada
+Timestamp: 2026-01-18T00:44:43+11:00
