@@ -377,3 +377,10 @@ Description: Test NLL validation runs successfully
 Status: COMPLETE
 Commit: 2f2151f
 Timestamp: 2026-01-18T01:06:00+11:00
+
+=== Iteration 1 ===
+Story: nll-docs-001
+Description: Add NLLClient Methods table to CLAUDE.md
+Status: COMPLETE
+Commit: b8dfb0e
+Timestamp: 2026-01-18T09:09:12+11:00

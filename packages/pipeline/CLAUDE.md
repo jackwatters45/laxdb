@@ -14,16 +14,22 @@ src/
 │   └── *.test.ts               # Client tests
 ├── extract/                 # Data extraction
 │   ├── pll/                    # PLL-specific extractors
+│   ├── nll/                    # NLL-specific extractors
 │   ├── run.ts                  # CLI entry point
 │   └── *.ts                    # Extraction scripts
 ├── validate/                # Data validation
 │   ├── validate.service.ts     # Reusable validators
 │   ├── validate-pll.ts         # PLL validation script
+│   ├── validate-nll.ts         # NLL validation script
 │   └── *.test.ts               # Validation tests
 ├── pll/                     # Premier Lacrosse League client
 │   ├── pll.client.ts           # PLLClient service
 │   ├── pll.schema.ts           # Response schemas
 │   └── pll.integration.test.ts # Integration tests
+├── nll/                     # National Lacrosse League client
+│   ├── nll.client.ts           # NLLClient service
+│   ├── nll.schema.ts           # Response schemas
+│   └── nll.integration.test.ts # Integration tests
 ├── scraper/                 # Web scraping
 ├── parser/                  # HTML parsing (Cheerio)
 ├── config.ts                # Configuration
@@ -42,11 +48,17 @@ bun run typecheck
 # Lint + format
 bun run fix
 
-# Data extraction
+# PLL data extraction (requires credentials)
 infisical run --env=dev -- bun src/extract/run.ts
 
-# Data validation
+# NLL data extraction (no credentials needed)
+bun src/extract/nll/run.ts
+
+# PLL data validation
 infisical run --env=dev -- bun src/validate/validate-pll.ts
+
+# NLL data validation (no credentials needed)
+bun src/validate/validate-nll.ts
 ```
 
 ## ADDING A NEW ENDPOINT
@@ -94,10 +106,14 @@ Quick summary:
 Run validation on extracted data:
 
 ```bash
+# PLL validation (requires credentials)
 infisical run --env=dev -- bun src/validate/validate-pll.ts
+
+# NLL validation (no credentials needed)
+bun src/validate/validate-nll.ts
 ```
 
-Outputs `data/pll/validation-report.json` with:
+Outputs `output/{source}/validation-report.json` with:
 - File checks (exists, size, parse)
 - Field validation (required, unique)
 - Cross-reference checks

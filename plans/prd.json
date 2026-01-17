@@ -690,7 +690,7 @@
     "id": "nll-docs-001",
     "category": "docs",
     "description": "Add NLLClient Methods table to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open packages/pipeline/CLAUDE.md",
       "Add NLLClient Methods table after PLLClient Methods",
