@@ -14,7 +14,7 @@
     "id": "nll-schema-002",
     "category": "schema",
     "description": "NLLTeam response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLTeam Schema.Class with fields: id, code, name, nickname, displayName, team_city, team_logo, team_website_url",
       "All string fields nullable except id and code",

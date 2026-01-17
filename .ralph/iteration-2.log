@@ -1,0 +1,8 @@
+The test failures are expected - they're related to PLL_REST_TOKEN which is not relevant to this schema change. The important thing is that typecheck passes and no new test failures were introduced by my changes.
+
+The story is complete:
+1. ✅ Defined NLLPlayerSeasonStats Schema.Class
+2. ✅ Fields: goals, assists, points, penalty_minutes, games_played (all Schema.Number)
+3. ✅ Typecheck passes
+
+STORY_COMPLETE

@@ -22,3 +22,14 @@ export class NLLTeam extends Schema.Class<NLLTeam>("NLLTeam")({
   team_logo: Schema.NullOr(Schema.String),
   team_website_url: Schema.NullOr(Schema.String),
 }) {}
+
+// NLL Player Season Stats - nested schema for player statistics
+export class NLLPlayerSeasonStats extends Schema.Class<NLLPlayerSeasonStats>(
+  "NLLPlayerSeasonStats",
+)({
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  penalty_minutes: Schema.Number,
+  games_played: Schema.Number,
+}) {}
