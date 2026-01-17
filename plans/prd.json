@@ -155,7 +155,7 @@
     "id": "nll-config-001",
     "category": "config",
     "description": "Add NLLConfig service to config.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open src/config.ts",
       "Add NLLConfig Effect.Service class",

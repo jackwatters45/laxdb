@@ -90,3 +90,10 @@ Description: Export all schemas from nll.schema.ts
 Status: COMPLETE
 Commit: d7a7c90
 Timestamp: 2026-01-17T23:32:23+11:00
+
+=== Iteration 13 ===
+Story: nll-config-001
+Description: Add NLLConfig service to config.ts
+Status: COMPLETE
+Commit: af2971e
+Timestamp: 2026-01-17T23:33:44+11:00
