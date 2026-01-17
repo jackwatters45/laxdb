@@ -139,3 +139,10 @@ Description: Implement NLLClient.getStandings method
 Status: COMPLETE
 Commit: 7dd3c5c
 Timestamp: 2026-01-17T23:44:45+11:00
+
+=== Iteration 20 ===
+Story: nll-client-007
+Description: Implement NLLClient.getSchedule method
+Status: COMPLETE
+Commit: df8c1c8
+Timestamp: 2026-01-17T23:47:05+11:00
