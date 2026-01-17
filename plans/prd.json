@@ -407,7 +407,7 @@
     "id": "nll-manifest-005",
     "category": "extract",
     "description": "Implement NLLManifestService.save method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add save(manifest) method",
       "Create directory if not exists",
