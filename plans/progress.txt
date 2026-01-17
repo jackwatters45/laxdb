@@ -265,3 +265,10 @@ Description: Implement extractTeams method
 Status: COMPLETE
 Commit: eb0c309
 Timestamp: 2026-01-18T00:30:02+11:00
+
+=== Iteration 37 ===
+Story: nll-extract-004
+Description: Implement extractPlayers method
+Status: COMPLETE
+Commit: 6d3a690
+Timestamp: 2026-01-18T00:32:09+11:00

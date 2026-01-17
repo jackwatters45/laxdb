@@ -471,7 +471,7 @@
     "id": "nll-extract-004",
     "category": "extract",
     "description": "Implement extractPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractPlayers(seasonId) method",
       "Log: '👥 Extracting players...'",
