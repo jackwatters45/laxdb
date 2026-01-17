@@ -48,3 +48,10 @@ Description: NLLSquad nested schema
 Status: COMPLETE
 Commit: 91595ae
 Timestamp: 2026-01-17T23:22:57+11:00
+
+=== Iteration 7 ===
+Story: nll-schema-008
+Description: NLLMatch response schema
+Status: COMPLETE
+Commit: ce631fc
+Timestamp: 2026-01-17T23:24:12+11:00

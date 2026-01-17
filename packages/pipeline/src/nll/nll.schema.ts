@@ -98,3 +98,33 @@ export class NLLMatch extends Schema.Class<NLLMatch>("NLLMatch")({
   winningSquadId: Schema.NullOr(Schema.String),
   squads: NLLMatchSquads,
 }) {}
+
+// --- Request Schemas ---
+
+// NLL Teams request schema
+export class NLLTeamsRequest extends Schema.Class<NLLTeamsRequest>(
+  "NLLTeamsRequest",
+)({
+  seasonId: NLLSeasonId,
+}) {}
+
+// NLL Players request schema
+export class NLLPlayersRequest extends Schema.Class<NLLPlayersRequest>(
+  "NLLPlayersRequest",
+)({
+  seasonId: NLLSeasonId,
+}) {}
+
+// NLL Standings request schema
+export class NLLStandingsRequest extends Schema.Class<NLLStandingsRequest>(
+  "NLLStandingsRequest",
+)({
+  seasonId: NLLSeasonId,
+}) {}
+
+// NLL Schedule request schema
+export class NLLScheduleRequest extends Schema.Class<NLLScheduleRequest>(
+  "NLLScheduleRequest",
+)({
+  seasonId: NLLSeasonId,
+}) {}

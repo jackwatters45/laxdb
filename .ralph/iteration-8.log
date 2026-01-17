@@ -1,0 +1,9 @@
+All four request schemas have been added:
+- `NLLTeamsRequest` with `seasonId: NLLSeasonId`
+- `NLLPlayersRequest` with `seasonId: NLLSeasonId`
+- `NLLStandingsRequest` with `seasonId: NLLSeasonId`
+- `NLLScheduleRequest` with `seasonId: NLLSeasonId`
+
+The implementation follows the existing PLL patterns and typecheck passes.
+
+STORY_COMPLETE

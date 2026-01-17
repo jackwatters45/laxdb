@@ -82,7 +82,7 @@
     "id": "nll-schema-008",
     "category": "schema",
     "description": "NLLMatch response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLMatch Schema.Class",
       "Fields: id, date, status, venue (NLLVenue), winningSquadId",
