@@ -1,0 +1,9 @@
+All tests pass. The implementation is complete:
+
+1. ✅ Defined `NLLExtractionManifest` schema with source='nll', seasons Record, lastRun, version
+2. ✅ Added `createEmptyNLLManifest` helper
+3. ✅ `createEmptyNLLSeasonManifest` helper already existed
+4. ✅ Typecheck passes
+5. ✅ All NLL tests pass
+
+STORY_COMPLETE

@@ -32,3 +32,20 @@ export const createEmptyNLLSeasonManifest = (): NLLSeasonManifest => ({
   standings: createEmptyNLLEntityStatus(),
   schedule: createEmptyNLLEntityStatus(),
 });
+
+// NLL Extraction Manifest - top-level manifest structure
+export const NLLExtractionManifest = Schema.Struct({
+  source: Schema.Literal("nll"),
+  seasons: Schema.Record({ key: Schema.String, value: NLLSeasonManifest }),
+  lastRun: Schema.String,
+  version: Schema.Number,
+});
+export type NLLExtractionManifest = typeof NLLExtractionManifest.Type;
+
+// Helper to create empty NLL manifest
+export const createEmptyNLLManifest = (): NLLExtractionManifest => ({
+  source: "nll",
+  seasons: {},
+  lastRun: "",
+  version: 1,
+});
