@@ -55,3 +55,10 @@ Description: NLLMatch response schema
 Status: COMPLETE
 Commit: ce631fc
 Timestamp: 2026-01-17T23:24:12+11:00
+
+=== Iteration 8 ===
+Story: nll-schema-009
+Description: NLL request schemas
+Status: COMPLETE
+Commit: 5f4bab4
+Timestamp: 2026-01-17T23:25:31+11:00

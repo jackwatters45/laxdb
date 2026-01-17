@@ -128,3 +128,52 @@ export class NLLScheduleRequest extends Schema.Class<NLLScheduleRequest>(
 )({
   seasonId: NLLSeasonId,
 }) {}
+
+// --- Transform Schemas ---
+
+// NLLTeamRaw - raw API response structure for a single team
+// API returns: { id: { code, name, nickname, ... } }
+export class NLLTeamRaw extends Schema.Class<NLLTeamRaw>("NLLTeamRaw")({
+  code: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  nickname: Schema.NullOr(Schema.String),
+  displayName: Schema.NullOr(Schema.String),
+  team_city: Schema.NullOr(Schema.String),
+  team_logo: Schema.NullOr(Schema.String),
+  team_website_url: Schema.NullOr(Schema.String),
+}) {}
+
+// TeamsMapToArray - transforms Record<id, TeamData> -> NLLTeam[]
+export const TeamsMapToArray = Schema.transform(
+  Schema.Record({ key: Schema.String, value: NLLTeamRaw }),
+  Schema.Array(NLLTeam),
+  {
+    strict: true,
+    decode: (record) =>
+      Object.entries(record).map(([id, team]) => ({
+        id,
+        code: team.code,
+        name: team.name,
+        nickname: team.nickname,
+        displayName: team.displayName,
+        team_city: team.team_city,
+        team_logo: team.team_logo,
+        team_website_url: team.team_website_url,
+      })),
+    encode: (teams) =>
+      Object.fromEntries(
+        teams.map((team) => [
+          team.id,
+          {
+            code: team.code,
+            name: team.name,
+            nickname: team.nickname,
+            displayName: team.displayName,
+            team_city: team.team_city,
+            team_logo: team.team_logo,
+            team_website_url: team.team_website_url,
+          },
+        ]),
+      ),
+  },
+);

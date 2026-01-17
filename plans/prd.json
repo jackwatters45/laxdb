@@ -94,7 +94,7 @@
     "id": "nll-schema-009",
     "category": "schema",
     "description": "NLL request schemas",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLTeamsRequest Schema.Class { seasonId: NLLSeasonId }",
       "Define NLLPlayersRequest Schema.Class { seasonId: NLLSeasonId }",
