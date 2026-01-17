@@ -312,26 +312,31 @@ src/extract/{source}/
 In `{source}.extractor.ts`:
 
 ```typescript
-import { Effect } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Layer } from "effect";
 import { NLLClient } from "../../{source}/{source}.client";
 import { ExtractConfigService } from "../extract.config";
 
 const YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
 
-const saveJson = (filePath: string, data: unknown) =>
-  Effect.tryPromise({
-    try: async () => {
-      await fs.mkdir(path.dirname(filePath), { recursive: true });
-      await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    },
-    catch: (e) => new Error(`Failed to write ${filePath}: ${String(e)}`),
-  });
+const saveJson = <T>(filePath: string, data: T) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const dir = path.dirname(filePath);
+    yield* fs.makeDirectory(dir, { recursive: true });
+    yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
+  }).pipe(
+    Effect.catchAll((e) =>
+      Effect.fail(new Error(`Failed to write ${filePath}: ${String(e)}`)),
+    ),
+  );
 
 export const extractAll = Effect.gen(function* () {
   const client = yield* NLLClient;
   const config = yield* ExtractConfigService;
+  const path = yield* Path.Path;
   const outputDir = path.join(config.outputDir, "{source}");
 
   for (const year of YEARS) {
@@ -363,17 +368,19 @@ export const extractAll = Effect.gen(function* () {
 In `src/extract/{source}/run.ts`:
 
 ```typescript
-import { Effect } from "effect";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Layer } from "effect";
 import { NLLClient } from "../../{source}/{source}.client";
 import { ExtractConfigService } from "../extract.config";
 import { extractAll } from "./{source}.extractor";
 
-await Effect.runPromise(
-  extractAll.pipe(
-    Effect.provide(NLLClient.Default),
-    Effect.provide(ExtractConfigService.Default),
-  ),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  NLLClient.Default,
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(extractAll.pipe(Effect.provide(MainLayer)));
 ```
 
 Run extraction:
@@ -417,8 +424,9 @@ yield* saveJson(path.join(outputDir, "player-details.json"), playerDetails);
 In `src/validate/validate-{source}.ts`:
 
 ```typescript
-import { Effect } from "effect";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Layer } from "effect";
 import { ExtractConfigService } from "../extract/extract.config";
 import {
   validateJsonArray,
@@ -432,6 +440,7 @@ import type { FileValidationResult, CrossReferenceResult } from "./validate.sche
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
+  const path = yield* Path.Path;
   const sourceDir = path.join(config.outputDir, "{source}");
   const startTime = Date.now();
 
@@ -488,9 +497,12 @@ const program = Effect.gen(function* () {
   return report;
 });
 
-await Effect.runPromise(
-  program.pipe(Effect.provide(ExtractConfigService.Default)),
-).catch(console.error);
+const MainLayer = Layer.mergeAll(
+  ExtractConfigService.Default,
+  BunContext.layer,
+);
+
+BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));
 ```
 
 Run validation:
@@ -504,22 +516,39 @@ infisical run --env=dev -- bun src/validate/validate-{source}.ts
 Create `src/validate/{source}-anomaly.test.ts` for data-specific checks:
 
 ```typescript
-import { describe, it, expect, beforeAll } from "vitest";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
+import { describe, beforeAll, it, expect, layer } from "@effect/vitest";
+import { Effect } from "effect";
 
-const OUTPUT_DIR = "data/{source}";
+interface Team { id: string; name: string; }
+interface Player { playerId: string; teamId?: string; }
 
-let teams: any[] = [];
-let players: any[] = [];
+let teams: Team[] = [];
+let players: Player[] = [];
 
 beforeAll(async () => {
-  try {
-    teams = JSON.parse(await fs.readFile(path.join(OUTPUT_DIR, "teams.json"), "utf-8"));
-    players = JSON.parse(await fs.readFile(path.join(OUTPUT_DIR, "players.json"), "utf-8"));
-  } catch {
-    // Files may not exist
-  }
+  const loadData = Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const outputDir = path.join("data", "{source}");
+
+    const teamsData = yield* fs.readFileString(path.join(outputDir, "teams.json")).pipe(
+      Effect.catchAll(() => Effect.succeed("[]")),
+    );
+    const playersData = yield* fs.readFileString(path.join(outputDir, "players.json")).pipe(
+      Effect.catchAll(() => Effect.succeed("[]")),
+    );
+
+    return {
+      teams: JSON.parse(teamsData) as Team[],
+      players: JSON.parse(playersData) as Player[],
+    };
+  });
+
+  const data = await Effect.runPromise(loadData.pipe(Effect.provide(BunContext.layer)));
+  teams = data.teams;
+  players = data.players;
 });
 
 describe("{Source} Data Anomalies", () => {

@@ -2,3 +2,7 @@ Ralph Progress Log
 Initialized: 2026-01-17T10:35:00+11:00
 
 --- Session History ---
+
+nll-schema-001 COMPLETE
+Summary: Created nll.schema.ts with NLLSeasonId branded type
+Files: packages/pipeline/src/nll/nll.schema.ts
