@@ -6,5 +6,5 @@
     "preserveDuplicates": false,
     "preserveWhitespace": false
   },
-  "ignorePatterns": [".source/**"]
+  "ignorePatterns": [".source/**", "**/*.gen.ts"]
 }
