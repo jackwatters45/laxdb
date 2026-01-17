@@ -76,3 +76,10 @@ Description: PlayersMapToArray transform schema
 Status: COMPLETE
 Commit: 432da5e
 Timestamp: 2026-01-17T23:29:34+11:00
+
+=== Iteration 11 ===
+Story: nll-schema-012
+Description: NLL response wrapper schemas
+Status: COMPLETE
+Commit: 1cdb0d7
+Timestamp: 2026-01-17T23:31:18+11:00

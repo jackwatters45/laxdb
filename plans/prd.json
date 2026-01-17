@@ -131,7 +131,7 @@
     "id": "nll-schema-012",
     "category": "schema",
     "description": "NLL response wrapper schemas",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLTeamsResponse using TeamsMapToArray",
       "Define NLLPlayersResponse using PlayersMapToArray",
