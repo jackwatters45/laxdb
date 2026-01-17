@@ -1,0 +1,8 @@
+Implementation complete. The `getPlayers` method has been added following the exact same pattern as `getTeams`:
+1. Takes `input: typeof NLLPlayersRequest.Encoded` parameter
+2. Decodes input via `Schema.decode` with `mapParseError`
+3. Builds endpoint: `?data_type=players&season_id={seasonId}`
+4. Calls `restClient.get` with `NLLPlayersResponse` schema
+5. Adds `Effect.tap` logging: "Fetched {n} players for season {id}"
+
+STORY_COMPLETE

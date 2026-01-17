@@ -4,7 +4,14 @@ import { makeRestClient } from "../api-client/rest-client.service";
 import { NLLConfig } from "../config";
 import { ParseError, type PipelineError } from "../error";
 
-import { type NLLTeam, NLLTeamsRequest, NLLTeamsResponse } from "./nll.schema";
+import {
+  type NLLPlayer,
+  NLLPlayersRequest,
+  NLLPlayersResponse,
+  type NLLTeam,
+  NLLTeamsRequest,
+  NLLTeamsResponse,
+} from "./nll.schema";
 
 const mapParseError = (error: ParseResult.ParseError): ParseError =>
   new ParseError({
@@ -46,6 +53,34 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
           Effect.tap((teams) =>
             Effect.log(
               `Fetched ${teams.length} teams for season ${input.seasonId}`,
+            ),
+          ),
+        ),
+
+      getPlayers: (
+        input: typeof NLLPlayersRequest.Encoded,
+      ): Effect.Effect<readonly NLLPlayer[], PipelineError> =>
+        Effect.gen(function* () {
+          const request = yield* Schema.decode(NLLPlayersRequest)(input).pipe(
+            Effect.mapError(mapParseError),
+          );
+          const endpoint = `?data_type=players&season_id=${request.seasonId}`;
+          const players = yield* Schema.decodeUnknown(NLLPlayersResponse)(
+            yield* restClient.get(endpoint, Schema.Unknown),
+          ).pipe(
+            Effect.mapError(
+              (error) =>
+                new ParseError({
+                  message: `Failed to parse players response: ${String(error)}`,
+                  cause: error,
+                }),
+            ),
+          );
+          return players;
+        }).pipe(
+          Effect.tap((players) =>
+            Effect.log(
+              `Fetched ${players.length} players for season ${input.seasonId}`,
             ),
           ),
         ),

@@ -118,3 +118,10 @@ Description: Create NLLClient service shell
 Status: COMPLETE
 Commit: e06c89a
 Timestamp: 2026-01-17T23:37:42+11:00
+
+=== Iteration 17 ===
+Story: nll-client-004
+Description: Implement NLLClient.getTeams method
+Status: COMPLETE
+Commit: 5b41524
+Timestamp: 2026-01-17T23:40:21+11:00

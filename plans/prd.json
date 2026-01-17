@@ -207,7 +207,7 @@
     "id": "nll-client-004",
     "category": "client",
     "description": "Implement NLLClient.getTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getTeams(input: NLLTeamsRequest.Encoded)",
       "Decode input via Schema.decode with mapParseError",
