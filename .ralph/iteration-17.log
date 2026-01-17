@@ -1,0 +1,20 @@
+Typecheck passes. The implementation is complete:
+
+## Summary
+
+Implemented `NLLClient.getTeams` method in `packages/pipeline/src/nll/nll.client.ts`:
+
+1. **Added imports**: `NLLTeam`, `NLLTeamsRequest`, `NLLTeamsResponse` from schema, and `PipelineError` type from error module
+
+2. **Implemented `getTeams` method**:
+   - Takes `NLLTeamsRequest.Encoded` input with `seasonId`
+   - Decodes input via `Schema.decode(NLLTeamsRequest)` with `mapParseError`
+   - Builds endpoint: `?data_type=teams&season_id={seasonId}`
+   - Fetches raw data via `restClient.get(endpoint, Schema.Unknown)`
+   - Decodes response using `Schema.decodeUnknown(NLLTeamsResponse)` which transforms the API's map format (`Record<id, TeamData>`) to `NLLTeam[]`
+   - Returns `readonly NLLTeam[]` with proper error typing `PipelineError`
+   - Adds `Effect.tap` logging: "Fetched {n} teams for season {id}"
+
+The test failures are pre-existing and unrelated to this change (missing `PLL_REST_TOKEN` environment variable for integration tests, and data anomaly test failures on pre-existing data).
+
+STORY_COMPLETE

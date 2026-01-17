@@ -194,7 +194,7 @@
     "id": "nll-client-003",
     "category": "client",
     "description": "Create NLLClient service shell",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLClient as Effect.Service",
       "Yield NLLConfig in effect",
