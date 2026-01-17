@@ -654,7 +654,7 @@
     "id": "nll-validate-007",
     "category": "validate",
     "description": "Implement cross-reference validations",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add crossReference: players.team_id -> teams.id",
       "Add crossReference: standings.team_id -> teams.id",
