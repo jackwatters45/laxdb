@@ -107,7 +107,7 @@
     "id": "nll-schema-010",
     "category": "schema",
     "description": "TeamsMapToArray transform schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create NLLTeamRaw schema for API response structure",
       "Create TeamsMapToArray Schema.transform",

@@ -177,3 +177,65 @@ export const TeamsMapToArray = Schema.transform(
       ),
   },
 );
+
+// NLLPlayerRaw - raw API response structure for a single player
+// API returns: { personId: { firstname, surname, ... } }
+export class NLLPlayerRaw extends Schema.Class<NLLPlayerRaw>("NLLPlayerRaw")({
+  firstname: Schema.NullOr(Schema.String),
+  surname: Schema.NullOr(Schema.String),
+  fullname: Schema.NullOr(Schema.String),
+  dateOfBirth: Schema.NullOr(Schema.String),
+  height: Schema.NullOr(Schema.String),
+  weight: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  jerseyNumber: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_code: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  matches: Schema.optional(NLLPlayerSeasonStats),
+}) {}
+
+// PlayersMapToArray - transforms Record<personId, PlayerData> -> NLLPlayer[]
+export const PlayersMapToArray = Schema.transform(
+  Schema.Record({ key: Schema.String, value: NLLPlayerRaw }),
+  Schema.Array(NLLPlayer),
+  {
+    strict: true,
+    decode: (record) =>
+      Object.entries(record).map(([personId, player]) => ({
+        personId,
+        firstname: player.firstname,
+        surname: player.surname,
+        fullname: player.fullname,
+        dateOfBirth: player.dateOfBirth,
+        height: player.height,
+        weight: player.weight,
+        position: player.position,
+        jerseyNumber: player.jerseyNumber,
+        team_id: player.team_id,
+        team_code: player.team_code,
+        team_name: player.team_name,
+        matches: player.matches,
+      })),
+    encode: (players) =>
+      Object.fromEntries(
+        players.map((player) => [
+          player.personId,
+          {
+            firstname: player.firstname,
+            surname: player.surname,
+            fullname: player.fullname,
+            dateOfBirth: player.dateOfBirth,
+            height: player.height,
+            weight: player.weight,
+            position: player.position,
+            jerseyNumber: player.jerseyNumber,
+            team_id: player.team_id,
+            team_code: player.team_code,
+            team_name: player.team_name,
+            matches: player.matches,
+          },
+        ]),
+      ),
+  },
+);

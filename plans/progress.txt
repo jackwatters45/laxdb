@@ -62,3 +62,10 @@ Description: NLL request schemas
 Status: COMPLETE
 Commit: 5f4bab4
 Timestamp: 2026-01-17T23:25:31+11:00
+
+=== Iteration 9 ===
+Story: nll-schema-010
+Description: TeamsMapToArray transform schema
+Status: COMPLETE
+Commit: 241c67c
+Timestamp: 2026-01-17T23:28:16+11:00
