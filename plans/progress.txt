@@ -398,3 +398,10 @@ Description: Run full typecheck
 Status: COMPLETE
 Commit: c864b31
 Timestamp: 2026-01-18T09:11:55+11:00
+
+=== Iteration 4 ===
+Story: nll-final-002
+Description: Run all NLL tests
+Status: COMPLETE
+Commit: 213a988
+Timestamp: 2026-01-18T09:13:11+11:00

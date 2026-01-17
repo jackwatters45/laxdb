@@ -723,7 +723,7 @@
     "id": "nll-final-002",
     "category": "final",
     "description": "Run all NLL tests",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun test src/nll/",
       "All integration tests pass",
