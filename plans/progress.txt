@@ -167,3 +167,10 @@ Description: getTeams integration test
 Status: COMPLETE
 Commit: 6c401e3
 Timestamp: 2026-01-17T23:55:09+11:00
+
+=== Iteration 24 ===
+Story: nll-test-003
+Description: getPlayers integration test
+Status: COMPLETE
+Commit: 1c62c4e
+Timestamp: 2026-01-18T00:02:18+11:00

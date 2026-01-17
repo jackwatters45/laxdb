@@ -301,8 +301,70 @@ export const NLLTeamsResponse = TeamsMapToArray;
 // NLLPlayersResponse - wraps the PlayersMapToArray transform
 export const NLLPlayersResponse = PlayersMapToArray;
 
-// NLLStandingsResponse - array of standings
-export const NLLStandingsResponse = Schema.Array(NLLStanding);
+// NLLStandingRaw - raw API response structure for a single standing
+// API returns team_id as number and win_percentage as string
+export class NLLStandingRaw extends Schema.Class<NLLStandingRaw>(
+  "NLLStandingRaw",
+)({
+  team_id: Schema.Number,
+  name: Schema.NullOr(Schema.String),
+  wins: Schema.Number,
+  losses: Schema.Number,
+  games_played: Schema.Number,
+  win_percentage: Schema.String,
+  goals_for: Schema.Number,
+  goals_against: Schema.Number,
+  goal_diff: Schema.Number,
+  position: Schema.Number,
+}) {}
+
+// StandingsMapToArray - transforms { standings_pretty: { "": [...] } } -> NLLStanding[]
+export const StandingsMapToArray = Schema.transform(
+  Schema.Struct({
+    standings_pretty: Schema.Record({
+      key: Schema.String,
+      value: Schema.Array(NLLStandingRaw),
+    }),
+  }),
+  Schema.Array(NLLStanding),
+  {
+    strict: true,
+    decode: (response) =>
+      Object.values(response.standings_pretty)
+        .flat()
+        .map((standing) => ({
+          team_id: String(standing.team_id),
+          name: standing.name,
+          wins: standing.wins,
+          losses: standing.losses,
+          games_played: standing.games_played,
+          win_percentage: Number.parseFloat(standing.win_percentage),
+          goals_for: standing.goals_for,
+          goals_against: standing.goals_against,
+          goal_diff: standing.goal_diff,
+          position: standing.position,
+        })),
+    encode: (standings) => ({
+      standings_pretty: {
+        "": standings.map((standing) => ({
+          team_id: Number(standing.team_id),
+          name: standing.name,
+          wins: standing.wins,
+          losses: standing.losses,
+          games_played: standing.games_played,
+          win_percentage: standing.win_percentage.toFixed(3),
+          goals_for: standing.goals_for,
+          goals_against: standing.goals_against,
+          goal_diff: standing.goal_diff,
+          position: standing.position,
+        })),
+      },
+    }),
+  },
+);
+
+// NLLStandingsResponse - wraps the StandingsMapToArray transform
+export const NLLStandingsResponse = StandingsMapToArray;
 
 // NLLScheduleWeek - raw API structure for a single week's matches
 // API returns: { "Week 1": [match1, match2], "Week 2": [match3] }
