@@ -13,3 +13,10 @@ Description: NLLTeam response schema
 Status: COMPLETE
 Commit: 91f34c6
 Timestamp: 2026-01-17T23:16:49+11:00
+
+=== Iteration 2 ===
+Story: nll-schema-003
+Description: NLLPlayerSeasonStats nested schema
+Status: COMPLETE
+Commit: d8ad2d9
+Timestamp: 2026-01-17T23:17:56+11:00

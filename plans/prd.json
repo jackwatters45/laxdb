@@ -25,7 +25,7 @@
     "id": "nll-schema-003",
     "category": "schema",
     "description": "NLLPlayerSeasonStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLPlayerSeasonStats Schema.Class",
       "Fields: goals, assists, points, penalty_minutes, games_played (all Schema.Number)",

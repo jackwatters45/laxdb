@@ -33,3 +33,20 @@ export class NLLPlayerSeasonStats extends Schema.Class<NLLPlayerSeasonStats>(
   penalty_minutes: Schema.Number,
   games_played: Schema.Number,
 }) {}
+
+// NLL Player response schema
+export class NLLPlayer extends Schema.Class<NLLPlayer>("NLLPlayer")({
+  personId: Schema.String,
+  firstname: Schema.NullOr(Schema.String),
+  surname: Schema.NullOr(Schema.String),
+  fullname: Schema.NullOr(Schema.String),
+  dateOfBirth: Schema.NullOr(Schema.String),
+  height: Schema.NullOr(Schema.String),
+  weight: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  jerseyNumber: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_code: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  matches: Schema.optional(NLLPlayerSeasonStats),
+}) {}
