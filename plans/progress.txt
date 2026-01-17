@@ -188,3 +188,10 @@ Description: getSchedule integration test
 Status: COMPLETE
 Notes: Fixed NLLScheduleResponse schema to handle actual API structure (array of week objects with nested matches). API returns [{ code, id, matches: [...], name, number, season_id }] not { weekName: [...matches] }.
 Timestamp: 2026-01-18T00:12:00+11:00
+
+=== Iteration 26 ===
+Story: nll-test-005
+Description: getSchedule integration test
+Status: COMPLETE
+Commit: e521057
+Timestamp: 2026-01-18T00:13:11+11:00
