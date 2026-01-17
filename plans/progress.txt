@@ -412,3 +412,22 @@ Description: Run full extraction
 Status: COMPLETE
 Commit: 78f0c1b
 Timestamp: 2026-01-18T09:14:42+11:00
+
+=== Iteration 6 ===
+Story: nll-final-004
+Description: Run full validation
+Status: COMPLETE
+Commit: c9f10a0
+Timestamp: 2026-01-18T09:16:08+11:00
+
+=== Iteration 7 ===
+Story: nll-final-005
+Description: Verify all output files
+Status: COMPLETE
+Files verified:
+- output/nll/225/teams.json (4,651 bytes, 14 teams)
+- output/nll/225/players.json (166,013 bytes, 369 players)
+- output/nll/225/standings.json (3,255 bytes, 14 standings)
+- output/nll/225/schedule.json (2,046 bytes, 4 matches)
+- output/nll/manifest.json (724 bytes, valid)
+Timestamp: 2026-01-18T09:17:00+11:00

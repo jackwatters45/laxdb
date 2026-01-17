@@ -745,7 +745,7 @@
     "id": "nll-final-004",
     "category": "final",
     "description": "Run full validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-nll.ts",
       "Validation report shows all checks pass",
@@ -756,7 +756,7 @@
     "id": "nll-final-005",
     "category": "final",
     "description": "Verify all output files",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Verify: ls -la output/nll/225/",
       "teams.json exists and has content",
