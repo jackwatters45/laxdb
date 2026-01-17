@@ -615,7 +615,7 @@
     "id": "nll-validate-004",
     "category": "validate",
     "description": "Implement players.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for players.json",
       "Validate required fields: personId, firstname, team_id",

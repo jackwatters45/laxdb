@@ -172,6 +172,39 @@ const program = Effect.gen(function* () {
     fileResults.push(playersResult);
   }
 
+  // Validate standings.json
+  const { result: standingsResult, data: standings } =
+    yield* validateJsonArray<NLLStanding>(
+      path.join(seasonDir, "standings.json"),
+      1,
+    );
+
+  if (standings.length > 0) {
+    const requiredCheck = yield* validateRequiredFields(standings, [
+      "team_id",
+      "wins",
+      "losses",
+    ]);
+    const uniqueIdCheck = yield* validateUniqueField(standings, "team_id");
+
+    const {
+      filePath: sFp,
+      exists: sExists,
+      sizeBytes: sSizeBytes,
+      recordCount: sRecordCount,
+      checks: sChecks,
+    } = standingsResult;
+    fileResults.push({
+      filePath: sFp,
+      exists: sExists,
+      sizeBytes: sSizeBytes,
+      recordCount: sRecordCount,
+      checks: [...sChecks, requiredCheck, uniqueIdCheck],
+    });
+  } else {
+    fileResults.push(standingsResult);
+  }
+
   // TODO: Implement remaining validations in subsequent stories
 
   const report = buildReport("NLL", fileResults, crossRefs, startTime);
