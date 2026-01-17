@@ -384,3 +384,10 @@ Description: Add NLLClient Methods table to CLAUDE.md
 Status: COMPLETE
 Commit: b8dfb0e
 Timestamp: 2026-01-18T09:09:12+11:00
+
+=== Iteration 2 ===
+Story: nll-docs-002
+Description: Add NLL commands to CLAUDE.md
+Status: COMPLETE
+Commit: 49174bf
+Timestamp: 2026-01-18T09:10:39+11:00

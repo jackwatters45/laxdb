@@ -701,7 +701,7 @@
     "id": "nll-docs-002",
     "category": "docs",
     "description": "Add NLL commands to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add NLL extraction command: bun src/extract/nll/run.ts",
       "Add NLL validation command: bun src/validate/validate-nll.ts",
