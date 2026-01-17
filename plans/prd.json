@@ -431,7 +431,7 @@
     "id": "nll-extract-001",
     "category": "extract",
     "description": "Create NLLExtractorService base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/nll/nll.extractor.ts",
       "Define NLLExtractorService as Effect.Service",

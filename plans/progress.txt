@@ -244,3 +244,10 @@ Description: Implement NLLManifestService helper methods
 Status: COMPLETE
 Commit: 97fc996
 Timestamp: 2026-01-18T00:24:22+11:00
+
+=== Iteration 34 ===
+Story: nll-extract-001
+Description: Create NLLExtractorService base structure
+Status: COMPLETE
+Commit: 9f03520
+Timestamp: 2026-01-18T00:26:13+11:00

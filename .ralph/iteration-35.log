@@ -1,0 +1,10 @@
+All tests pass. The implementation is complete:
+
+1. **`ExtractResult<T>` interface** - Holds extraction result with data, count, and timing
+2. **`withTiming<T, E, R>(effect)` wrapper** - Wraps any effect to measure execution time and count results
+3. **`getOutputPath(seasonId, entity)` helper** - Constructs the output path for NLL data files (`output/nll/{seasonId}/{entity}.json`)
+4. **`saveJson<T>(filePath, data)` helper** - Creates directories recursively and writes JSON data to file
+
+These helpers follow the exact same patterns as the PLL extractor and are exported from the service for use by the extraction methods that will be implemented in subsequent stories.
+
+STORY_COMPLETE
