@@ -64,3 +64,10 @@ export class NLLStanding extends Schema.Class<NLLStanding>("NLLStanding")({
   goal_diff: Schema.Number,
   position: Schema.Number,
 }) {}
+
+// NLL Venue nested schema - for match venue information
+export class NLLVenue extends Schema.Class<NLLVenue>("NLLVenue")({
+  id: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  city: Schema.NullOr(Schema.String),
+}) {}

@@ -49,7 +49,7 @@
     "id": "nll-schema-005",
     "category": "schema",
     "description": "NLLStanding response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLStanding Schema.Class",
       "Fields: team_id, name, wins, losses, games_played, win_percentage, goals_for, goals_against, goal_diff, position",
