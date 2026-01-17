@@ -1,5 +1,7 @@
 # @laxdb/core - Business Logic & Database
 
+> **When to read:** Domain logic, services, repos, DB schemas, Effect patterns.
+
 Effect-TS services, Drizzle ORM schemas, domain logic for lacrosse management.
 
 ## STRUCTURE

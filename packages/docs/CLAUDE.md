@@ -1,5 +1,7 @@
 # @laxdb/docs - Documentation Site
 
+> **When to read:** Adding/editing docs pages, Fumadocs config.
+
 Fumadocs-powered documentation site. TanStack Start + MDX. Deployed to Cloudflare Workers.
 
 ## STRUCTURE

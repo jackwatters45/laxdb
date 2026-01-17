@@ -1,5 +1,7 @@
 # @laxdb/scripts - Internal Utility Scripts
 
+> **When to read:** Placeholder package. Internal utility scripts only.
+
 Placeholder package for internal utility and maintenance scripts.
 
 ## STATUS

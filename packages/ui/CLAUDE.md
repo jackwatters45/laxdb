@@ -1,5 +1,7 @@
 # @laxdb/ui - Shared UI Components
 
+> **When to read:** Shared components. CRITICAL: Base UI, not Radix - APIs differ.
+
 shadcn/ui components built on **Base UI** (NOT Radix). Shared across web, marketing, docs.
 
 ## CRITICAL: Base UI vs Radix

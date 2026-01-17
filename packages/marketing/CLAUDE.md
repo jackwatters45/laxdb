@@ -1,5 +1,7 @@
 # @laxdb/marketing - Marketing Website
 
+> **When to read:** Marketing site pages, blog posts, landing content.
+
 TanStack Start marketing site. Based on Tremor Solar template. Deployed to Cloudflare Workers.
 
 ## STRUCTURE

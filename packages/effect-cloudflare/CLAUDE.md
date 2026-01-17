@@ -1,5 +1,7 @@
 # @laxdb/effect-cloudflare - Effect Bindings for Cloudflare (EXPERIMENTAL)
 
+> **When to read:** Experimental, not production-ready. Only for extending CF binding wrappers.
+
 Type-safe Effect wrappers for Cloudflare Workers primitives.
 
 ## STATUS

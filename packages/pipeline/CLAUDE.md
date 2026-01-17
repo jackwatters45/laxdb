@@ -1,5 +1,7 @@
 # @laxdb/pipeline - Data Pipeline
 
+> **When to read:** External data sources, PLL API, data validation/scraping.
+
 Effect-TS based data pipeline for consuming external APIs and web scraping.
 
 ## STRUCTURE

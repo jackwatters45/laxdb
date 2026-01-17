@@ -1,5 +1,7 @@
 # @laxdb/web - TanStack Start Frontend
 
+> **When to read:** Routes, pages, server functions, frontend features in main app.
+
 Main web application. TanStack Router (file-based routing) + React 19 + TanStack Query.
 
 ## STRUCTURE
