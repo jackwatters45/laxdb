@@ -345,7 +345,7 @@
     "id": "nll-test-006",
     "category": "test",
     "description": "All NLL client tests pass",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun test src/nll/",
       "All 4 endpoint tests pass",

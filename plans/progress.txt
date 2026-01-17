@@ -195,3 +195,10 @@ Description: getSchedule integration test
 Status: COMPLETE
 Commit: e521057
 Timestamp: 2026-01-18T00:13:11+11:00
+
+=== Iteration 27 ===
+Story: nll-test-006
+Description: All NLL client tests pass
+Status: COMPLETE
+Commit: 9005457
+Timestamp: 2026-01-18T00:14:33+11:00
