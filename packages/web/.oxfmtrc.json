@@ -1,4 +1,5 @@
 {
+  "ignorePatterns": ["**/*.gen.ts"],
   "experimentalTailwindcss": {
     "stylesheet": "./src/globals.css",
     "attributes": ["class", "className"],
