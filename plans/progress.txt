@@ -279,3 +279,10 @@ Description: Implement extractStandings method
 Status: COMPLETE
 Commit: b163dae
 Timestamp: 2026-01-18T00:34:08+11:00
+
+=== Iteration 39 ===
+Story: nll-extract-006
+Description: Implement extractSchedule method
+Status: COMPLETE
+Commit: 0bbac74
+Timestamp: 2026-01-18T00:36:07+11:00

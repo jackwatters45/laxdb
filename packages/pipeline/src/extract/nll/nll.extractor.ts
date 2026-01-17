@@ -1,6 +1,6 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Duration, Effect, Layer } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
 import type {
@@ -11,7 +11,7 @@ import type {
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
 
-import { NLLManifestService } from "./nll.manifest";
+import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
 
 const NLL_SEASONS = [225] as const;
 type _NLLSeason = (typeof NLL_SEASONS)[number];
@@ -153,6 +153,94 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           }),
         );
 
+      const extractSeason = (
+        seasonId: number,
+        options: { skipExisting?: boolean } = {},
+      ) =>
+        Effect.gen(function* () {
+          const { skipExisting = true } = options;
+
+          yield* Effect.log(`\n${"=".repeat(50)}`);
+          yield* Effect.log(`Extracting NLL Season ${seasonId}`);
+          yield* Effect.log("=".repeat(50));
+
+          let manifest = yield* manifestService.load;
+
+          const shouldExtract = (entity: keyof NLLSeasonManifest): boolean => {
+            if (!skipExisting) return true;
+            return !manifestService.isExtracted(manifest, seasonId, entity);
+          };
+
+          // Extract teams
+          if (shouldExtract("teams")) {
+            const result = yield* extractTeams(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "teams",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(500));
+          } else {
+            yield* Effect.log("  📊 Teams: skipped (already extracted)");
+          }
+
+          // Extract players
+          if (shouldExtract("players")) {
+            const result = yield* extractPlayers(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "players",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(500));
+          } else {
+            yield* Effect.log("  👥 Players: skipped (already extracted)");
+          }
+
+          // Extract standings
+          if (shouldExtract("standings")) {
+            const result = yield* extractStandings(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "standings",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(500));
+          } else {
+            yield* Effect.log("  📈 Standings: skipped (already extracted)");
+          }
+
+          // Extract schedule
+          if (shouldExtract("schedule")) {
+            const result = yield* extractSchedule(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "schedule",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+          } else {
+            yield* Effect.log("  🎮 Schedule: skipped (already extracted)");
+          }
+
+          yield* Effect.log(`\n${"=".repeat(50)}`);
+          yield* Effect.log(`NLL Season ${seasonId} extraction complete`);
+          yield* Effect.log("=".repeat(50));
+
+          return manifest;
+        });
+
       return {
         client,
         config,
@@ -167,6 +255,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         extractPlayers,
         extractStandings,
         extractSchedule,
+        extractSeason,
       };
     }),
     dependencies: [
