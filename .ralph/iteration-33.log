@@ -1,7 +1,1 @@
-All tests pass. The story `nll-manifest-006` is already complete - all three helper methods were implemented in the previous iteration (nll-manifest-005). The implementation includes:
-
-1. **`getSeasonManifest(manifest, seasonId)`** - Returns the season manifest for a given seasonId, or creates an empty one if not found
-2. **`markComplete(manifest, seasonId, entity, count, durationMs)`** - Updates the manifest to mark an entity as extracted with count and timing info
-3. **`isExtracted(manifest, seasonId, entity)`** - Checks if a specific entity has already been extracted for a season
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

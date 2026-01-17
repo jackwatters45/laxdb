@@ -1,10 +1,1 @@
-Implementation is complete. The `getStandings` method:
-1. Takes `NLLStandingsRequest.Encoded` input
-2. Decodes input via `Schema.decode` with `mapParseError`
-3. Builds endpoint: `?data_type=standings&season_id={seasonId}`
-4. Calls `restClient.get` with `NLLStandingsResponse`
-5. Adds `Effect.tap` logging: `Fetched {n} standings for season {id}`
-
-Typecheck passes. The test failures are unrelated (PLL credentials missing).
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

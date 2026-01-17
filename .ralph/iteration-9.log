@@ -1,8 +1,1 @@
-All checks pass. Story `nll-schema-010` is complete:
-
-1. ✅ Created `NLLTeamRaw` schema for API response structure (without id, since id is the key)
-2. ✅ Created `TeamsMapToArray` Schema.transform
-3. ✅ Transform `Record<id, TeamData>` → `NLLTeam[]`
-4. ✅ Typecheck passes
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

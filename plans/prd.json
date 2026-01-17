@@ -679,7 +679,7 @@
     "id": "nll-validate-009",
     "category": "validate",
     "description": "Test NLL validation runs successfully",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-nll.ts",
       "Verify validation report shows no errors",

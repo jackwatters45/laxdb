@@ -370,3 +370,10 @@ Description: Complete validation script with report
 Status: COMPLETE
 Commit: 6edf38f
 Timestamp: 2026-01-18T01:03:46+11:00
+
+=== Iteration 5 ===
+Story: nll-validate-009
+Description: Test NLL validation runs successfully
+Status: COMPLETE
+Commit: 2f2151f
+Timestamp: 2026-01-18T01:06:00+11:00

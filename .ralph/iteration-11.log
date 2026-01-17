@@ -1,9 +1,1 @@
-The implementation looks complete. Let me verify the task steps were covered:
-
-1. ✅ Define NLLTeamsResponse using TeamsMapToArray
-2. ✅ Define NLLPlayersResponse using PlayersMapToArray  
-3. ✅ Define NLLStandingsResponse as Schema.Array(NLLStanding)
-4. ✅ Define NLLScheduleResponse with week-based structure (transforms `Record<string, Match[]>` to `NLLMatch[]`)
-5. ✅ Run typecheck - passed
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

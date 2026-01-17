@@ -1,12 +1,1 @@
-All tests pass. The story `nll-manifest-004` was already implemented as part of the `nll-manifest-003` story (they created the full service shell with all methods).
-
-Looking at the implementation again, the `load` method at lines 67-90 implements all the required steps:
-
-1. **Check if manifest file exists**: `const exists = yield* fs.exists(manifestPath);`
-2. **If not exists, return createEmptyNLLManifest**: `if (!exists) { return createEmptyNLLManifest(); }`
-3. **Read and parse JSON file**: Uses `fs.readFileString` and `JSON.parse`
-4. **Decode with schema, fallback to empty on error**: `Schema.decodeUnknown(NLLExtractionManifest)(parsed).pipe(Effect.catchAll(() => Effect.succeed(createEmptyNLLManifest())))`
-
-The implementation is complete and follows the existing PLL patterns. Typecheck and tests both pass.
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

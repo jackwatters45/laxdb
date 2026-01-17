@@ -78,6 +78,17 @@ Quick summary:
 | `getEvents` | REST | Game events |
 | `getEventDetail` | GraphQL | Event with play-by-play logs |
 
+## NLLCLIENT METHODS
+
+| Method | Type | Description |
+|--------|------|-------------|
+| `getTeams` | REST | Teams for a season |
+| `getPlayers` | REST | Players with stats |
+| `getStandings` | REST | Team standings |
+| `getSchedule` | REST | Season schedule (matches) |
+
+> **Note:** NLL API is public - no credentials required.
+
 ## VALIDATION
 
 Run validation on extracted data:

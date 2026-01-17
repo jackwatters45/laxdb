@@ -1,12 +1,1 @@
-The implementation is complete. The `extractSeason` method:
-1. Takes `seasonId` and `options: { skipExisting?: boolean }` parameters
-2. Loads the manifest at start
-3. Checks manifest to skip existing entities when `skipExisting=true` (default)
-4. Calls extractTeams → updates manifest → saves
-5. Calls extractPlayers → updates manifest → saves  
-6. Calls extractStandings → updates manifest → saves
-7. Calls extractSchedule → updates manifest → saves
-8. Adds 500ms delay between requests for rate limiting (except after the last one)
-9. Returns the final manifest
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

@@ -1,11 +1,1 @@
-All tests pass.
-
-**Summary of changes:**
-
-1. **nll.schema.ts**: Added `NLLStandingRaw` schema class and `StandingsMapToArray` transform to handle the NLL API's nested response format (`{"standings_pretty": {"": [...]}}`) and type conversions (team_id: number→string, win_percentage: string→number).
-
-2. **nll.integration.test.ts**: Added getStandings describe block with two tests:
-   - "fetches standings for season 225" - validates array has items and required properties (team_id, wins, losses)
-   - "returns standings with expected properties" - validates proper types (team_id is string, wins/losses are numbers)
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

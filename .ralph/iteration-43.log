@@ -1,12 +1,1 @@
-All verification steps pass:
-
-1. ✅ `bun src/extract/nll/run.ts` ran successfully
-2. ✅ `output/nll/225/teams.json` created (14 teams)
-3. ✅ `output/nll/225/players.json` created (369 players)
-4. ✅ `output/nll/225/standings.json` created (14 standings)
-5. ✅ `output/nll/225/schedule.json` created (4 matches)
-6. ✅ `output/nll/manifest.json` created with all entities tracked
-
-The story requirements are met. Typecheck passes, NLL tests pass, and all output files are created correctly.
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

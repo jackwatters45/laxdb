@@ -1,14 +1,1 @@
-The implementation is complete:
-
-1. **NLLMatchSquads** - nested schema with `away` and `home` NLLSquad fields
-2. **NLLMatch** - response schema with:
-   - `id` (String)
-   - `date` (NullOr String)
-   - `status` (NullOr String)
-   - `venue` (NLLVenue)
-   - `winningSquadId` (NullOr String)
-   - `squads` (NLLMatchSquads with away/home)
-
-Typecheck passes. All steps from the PRD are complete.
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

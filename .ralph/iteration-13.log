@@ -1,9 +1,1 @@
-Typecheck passes with no errors. The implementation is complete:
-
-1. ✅ Added `NLLConfig` Effect.Service class to config.ts
-2. ✅ Set `baseUrl: "https://nllstatsapp.aordev.com/"`  
-3. ✅ Set headers with `origin: "https://www.nll.com"` and `referer: "https://www.nll.com/"`
-4. ✅ No auth tokens (public API) - used `succeed` instead of `effect` since no Config reads needed
-5. ✅ Typecheck passes
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)

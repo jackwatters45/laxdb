@@ -1,10 +1,1 @@
-The implementation is complete. I've:
-
-1. ✅ Defined NLLClient as Effect.Service
-2. ✅ Yielded NLLConfig in the effect 
-3. ✅ Created restClient via makeRestClient with config (baseUrl and headers)
-4. ✅ Set dependencies: [NLLConfig.Default]
-
-The typecheck passes. The test failures are pre-existing issues unrelated to this change (missing env vars for PLL tests, vitest compatibility issues).
-
-STORY_COMPLETE
+You've hit your limit · resets 3am (Australia/Melbourne)
