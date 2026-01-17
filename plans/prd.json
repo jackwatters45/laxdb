@@ -534,7 +534,7 @@
     "id": "nll-extract-008",
     "category": "extract",
     "description": "Create NLL extraction module exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/nll/index.ts",
       "Export NLLExtractorService",
