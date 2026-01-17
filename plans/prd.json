@@ -36,7 +36,7 @@
     "id": "nll-schema-004",
     "category": "schema",
     "description": "NLLPlayer response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLPlayer Schema.Class",
       "Fields: personId (string), firstname, surname, fullname, dateOfBirth, height, weight, position, jerseyNumber",

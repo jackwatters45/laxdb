@@ -50,3 +50,17 @@ export class NLLPlayer extends Schema.Class<NLLPlayer>("NLLPlayer")({
   team_name: Schema.NullOr(Schema.String),
   matches: Schema.optional(NLLPlayerSeasonStats),
 }) {}
+
+// NLL Standing response schema
+export class NLLStanding extends Schema.Class<NLLStanding>("NLLStanding")({
+  team_id: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  wins: Schema.Number,
+  losses: Schema.Number,
+  games_played: Schema.Number,
+  win_percentage: Schema.Number,
+  goals_for: Schema.Number,
+  goals_against: Schema.Number,
+  goal_diff: Schema.Number,
+  position: Schema.Number,
+}) {}

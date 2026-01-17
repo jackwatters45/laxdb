@@ -1,0 +1,13 @@
+The NLLStanding schema has been added with all the required fields from the PRD:
+- `team_id` (String)
+- `name` (nullable String)
+- `wins` (Number)
+- `losses` (Number)
+- `games_played` (Number)
+- `win_percentage` (Number)
+- `goals_for` (Number)
+- `goals_against` (Number)
+- `goal_diff` (Number)
+- `position` (Number)
+
+STORY_COMPLETE
