@@ -546,7 +546,7 @@
     "id": "nll-extract-009",
     "category": "extract",
     "description": "Create NLL extraction CLI entry point",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/nll/run.ts",
       "Parse CLI args for seasonId (default 225)",

@@ -300,3 +300,10 @@ Description: Create NLL extraction module exports
 Status: COMPLETE
 Commit: 3e7032c
 Timestamp: 2026-01-18T00:40:06+11:00
+
+=== Iteration 42 ===
+Story: nll-extract-009
+Description: Create NLL extraction CLI entry point
+Status: COMPLETE
+Commit: db12764
+Timestamp: 2026-01-18T00:42:00+11:00
