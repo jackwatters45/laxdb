@@ -93,11 +93,14 @@ interface NLLMatch {
   };
 }
 
+const NLL_SEASON = "225";
+
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const nllDir = path.join(config.outputDir, "nll");
+  const seasonDir = path.join(nllDir, NLL_SEASON);
   const startTime = Date.now();
 
   yield* Effect.log(`\nValidating NLL extracted data...`);
@@ -106,7 +109,37 @@ const program = Effect.gen(function* () {
   const fileResults: (typeof FileValidationResult.Type)[] = [];
   const crossRefs: (typeof CrossReferenceResult.Type)[] = [];
 
-  // TODO: Implement validations in subsequent stories
+  // Validate teams.json
+  const { result: teamsResult, data: teams } =
+    yield* validateJsonArray<NLLTeam>(path.join(seasonDir, "teams.json"), 1);
+
+  if (teams.length > 0) {
+    const requiredCheck = yield* validateRequiredFields(teams, [
+      "id",
+      "code",
+      "name",
+    ]);
+    const uniqueIdCheck = yield* validateUniqueField(teams, "id");
+
+    const {
+      filePath: fp,
+      exists,
+      sizeBytes,
+      recordCount,
+      checks,
+    } = teamsResult;
+    fileResults.push({
+      filePath: fp,
+      exists,
+      sizeBytes,
+      recordCount,
+      checks: [...checks, requiredCheck, uniqueIdCheck],
+    });
+  } else {
+    fileResults.push(teamsResult);
+  }
+
+  // TODO: Implement remaining validations in subsequent stories
 
   const report = buildReport("NLL", fileResults, crossRefs, startTime);
   yield* printReport(report);

@@ -589,7 +589,7 @@
     "id": "nll-validate-002",
     "category": "validate",
     "description": "Define NLL validation interfaces",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLTeam interface for validation",
       "Define NLLPlayer interface for validation",
