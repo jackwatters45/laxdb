@@ -132,3 +132,10 @@ Description: Implement NLLClient.getPlayers method
 Status: COMPLETE
 Commit: 5a702b4
 Timestamp: 2026-01-17T23:43:13+11:00
+
+=== Iteration 19 ===
+Story: nll-client-006
+Description: Implement NLLClient.getStandings method
+Status: COMPLETE
+Commit: 7dd3c5c
+Timestamp: 2026-01-17T23:44:45+11:00

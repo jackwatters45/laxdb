@@ -5,9 +5,12 @@ import { NLLConfig } from "../config";
 import { ParseError, type PipelineError } from "../error";
 
 import {
+  type NLLMatch,
   type NLLPlayer,
   NLLPlayersRequest,
   NLLPlayersResponse,
+  NLLScheduleRequest,
+  NLLScheduleResponse,
   type NLLStanding,
   NLLStandingsRequest,
   NLLStandingsResponse,
@@ -112,6 +115,34 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
           Effect.tap((standings) =>
             Effect.log(
               `Fetched ${standings.length} standings for season ${input.seasonId}`,
+            ),
+          ),
+        ),
+
+      getSchedule: (
+        input: typeof NLLScheduleRequest.Encoded,
+      ): Effect.Effect<readonly NLLMatch[], PipelineError> =>
+        Effect.gen(function* () {
+          const request = yield* Schema.decode(NLLScheduleRequest)(input).pipe(
+            Effect.mapError(mapParseError),
+          );
+          const endpoint = `?data_type=schedule&season_id=${request.seasonId}`;
+          const matches = yield* Schema.decodeUnknown(NLLScheduleResponse)(
+            yield* restClient.get(endpoint, Schema.Unknown),
+          ).pipe(
+            Effect.mapError(
+              (error) =>
+                new ParseError({
+                  message: `Failed to parse schedule response: ${String(error)}`,
+                  cause: error,
+                }),
+            ),
+          );
+          return matches;
+        }).pipe(
+          Effect.tap((matches) =>
+            Effect.log(
+              `Fetched ${matches.length} matches for season ${input.seasonId}`,
             ),
           ),
         ),

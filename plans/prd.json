@@ -235,7 +235,7 @@
     "id": "nll-client-006",
     "category": "client",
     "description": "Implement NLLClient.getStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getStandings(input: NLLStandingsRequest.Encoded)",
       "Decode input via Schema.decode with mapParseError",

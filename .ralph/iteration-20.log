@@ -1,0 +1,11 @@
+Typecheck passes. The implementation is complete:
+
+**Summary of changes:**
+- Added `getSchedule` method to `NLLClient` in `packages/pipeline/src/nll/nll.client.ts`
+- Method follows the same pattern as `getTeams`, `getPlayers`, and `getStandings`
+- Imports `NLLMatch`, `NLLScheduleRequest`, and `NLLScheduleResponse` from schema
+- Builds endpoint: `?data_type=schedule&season_id={seasonId}`
+- Uses `NLLScheduleResponse` transform schema which flattens weekly schedule to match array
+- Logs: "Fetched {n} matches for season {id}"
+
+STORY_COMPLETE
