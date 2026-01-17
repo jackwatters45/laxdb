@@ -1,3 +1,0 @@
-Typecheck passes. Since this is a documentation-only change (editing a markdown file), there's no test to run specifically for it. The typecheck is sufficient validation.
-
-STORY_COMPLETE

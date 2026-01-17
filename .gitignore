@@ -13,6 +13,9 @@ node_modules
 # claude
 .claude
 
+# ralph logs
+.ralph
+
 # coverage
 .coverage
 coverage
