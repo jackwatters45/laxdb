@@ -119,7 +119,7 @@
     "id": "nll-schema-011",
     "category": "schema",
     "description": "PlayersMapToArray transform schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create NLLPlayerRaw schema for API response structure",
       "Create PlayersMapToArray Schema.transform",

@@ -69,3 +69,10 @@ Description: TeamsMapToArray transform schema
 Status: COMPLETE
 Commit: 241c67c
 Timestamp: 2026-01-17T23:28:16+11:00
+
+=== Iteration 10 ===
+Story: nll-schema-011
+Description: PlayersMapToArray transform schema
+Status: COMPLETE
+Commit: 432da5e
+Timestamp: 2026-01-17T23:29:34+11:00

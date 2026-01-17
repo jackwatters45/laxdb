@@ -239,3 +239,55 @@ export const PlayersMapToArray = Schema.transform(
       ),
   },
 );
+
+// --- Response Wrapper Schemas ---
+
+// NLLTeamsResponse - wraps the TeamsMapToArray transform
+export const NLLTeamsResponse = TeamsMapToArray;
+
+// NLLPlayersResponse - wraps the PlayersMapToArray transform
+export const NLLPlayersResponse = PlayersMapToArray;
+
+// NLLStandingsResponse - array of standings
+export const NLLStandingsResponse = Schema.Array(NLLStanding);
+
+// NLLScheduleWeek - raw API structure for a single week's matches
+// API returns: { "Week 1": [match1, match2], "Week 2": [match3] }
+export class NLLScheduleMatchRaw extends Schema.Class<NLLScheduleMatchRaw>(
+  "NLLScheduleMatchRaw",
+)({
+  id: Schema.String,
+  date: Schema.NullOr(Schema.String),
+  status: Schema.NullOr(Schema.String),
+  venue: NLLVenue,
+  winningSquadId: Schema.NullOr(Schema.String),
+  squads: NLLMatchSquads,
+}) {}
+
+// NLLScheduleResponse - transforms week-based structure to flat match array
+// API returns: { "Week 1": [...], "Week 2": [...] } -> NLLMatch[]
+export const NLLScheduleResponse = Schema.transform(
+  Schema.Record({
+    key: Schema.String,
+    value: Schema.Array(NLLScheduleMatchRaw),
+  }),
+  Schema.Array(NLLMatch),
+  {
+    strict: true,
+    decode: (weekRecord) =>
+      Object.values(weekRecord)
+        .flat()
+        .map((match) => ({
+          id: match.id,
+          date: match.date,
+          status: match.status,
+          venue: match.venue,
+          winningSquadId: match.winningSquadId,
+          squads: match.squads,
+        })),
+    encode: (matches) => {
+      // Group matches by a simple key (just return as "matches" since we don't track week info)
+      return { matches };
+    },
+  },
+);
