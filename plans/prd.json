@@ -71,7 +71,7 @@
     "id": "nll-schema-007",
     "category": "schema",
     "description": "NLLSquad nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define NLLSquad Schema.Class",
       "Fields: id (string), name, code, score (number), isHome (boolean)",

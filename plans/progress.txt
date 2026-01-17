@@ -41,3 +41,10 @@ Description: NLLVenue nested schema
 Status: COMPLETE
 Commit: b63cee8
 Timestamp: 2026-01-17T23:21:51+11:00
+
+=== Iteration 6 ===
+Story: nll-schema-007
+Description: NLLSquad nested schema
+Status: COMPLETE
+Commit: 91595ae
+Timestamp: 2026-01-17T23:22:57+11:00

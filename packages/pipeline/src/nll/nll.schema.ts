@@ -80,3 +80,21 @@ export class NLLSquad extends Schema.Class<NLLSquad>("NLLSquad")({
   score: Schema.Number,
   isHome: Schema.Boolean,
 }) {}
+
+// NLL Match Squads nested schema - away and home squads
+export class NLLMatchSquads extends Schema.Class<NLLMatchSquads>(
+  "NLLMatchSquads",
+)({
+  away: NLLSquad,
+  home: NLLSquad,
+}) {}
+
+// NLL Match response schema - for schedule/game information
+export class NLLMatch extends Schema.Class<NLLMatch>("NLLMatch")({
+  id: Schema.String,
+  date: Schema.NullOr(Schema.String),
+  status: Schema.NullOr(Schema.String),
+  venue: NLLVenue,
+  winningSquadId: Schema.NullOr(Schema.String),
+  squads: NLLMatchSquads,
+}) {}
