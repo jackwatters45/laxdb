@@ -419,7 +419,7 @@
     "id": "nll-manifest-006",
     "category": "extract",
     "description": "Implement NLLManifestService helper methods",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getSeasonManifest(manifest, seasonId) method",
       "Add markComplete(manifest, seasonId, entity, count, durationMs) method",

@@ -237,3 +237,10 @@ Description: Implement NLLManifestService.save method
 Status: COMPLETE
 Commit: d99f8ce
 Timestamp: 2026-01-18T00:22:58+11:00
+
+=== Iteration 33 ===
+Story: nll-manifest-006
+Description: Implement NLLManifestService helper methods
+Status: COMPLETE
+Commit: 97fc996
+Timestamp: 2026-01-18T00:24:22+11:00
