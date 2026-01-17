@@ -3,7 +3,12 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
-import type { NLLPlayer, NLLStanding, NLLTeam } from "../../nll/nll.schema";
+import type {
+  NLLMatch,
+  NLLPlayer,
+  NLLStanding,
+  NLLTeam,
+} from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import { NLLManifestService } from "./nll.manifest";
@@ -124,6 +129,30 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           }),
         );
 
+      const extractSchedule = (seasonId: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(
+            `  🎮 Extracting schedule for season ${seasonId}...`,
+          );
+          const result = yield* withTiming(client.getSchedule({ seasonId }));
+          yield* saveJson(getOutputPath(seasonId, "schedule"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} matches (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly NLLMatch[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         client,
         config,
@@ -137,6 +166,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         extractTeams,
         extractPlayers,
         extractStandings,
+        extractSchedule,
       };
     }),
     dependencies: [

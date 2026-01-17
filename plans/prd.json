@@ -486,7 +486,7 @@
     "id": "nll-extract-005",
     "category": "extract",
     "description": "Implement extractStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractStandings(seasonId) method",
       "Log: '📈 Extracting standings...'",

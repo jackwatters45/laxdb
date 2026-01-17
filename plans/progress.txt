@@ -272,3 +272,10 @@ Description: Implement extractPlayers method
 Status: COMPLETE
 Commit: 6d3a690
 Timestamp: 2026-01-18T00:32:09+11:00
+
+=== Iteration 38 ===
+Story: nll-extract-005
+Description: Implement extractStandings method
+Status: COMPLETE
+Commit: b163dae
+Timestamp: 2026-01-18T00:34:08+11:00
