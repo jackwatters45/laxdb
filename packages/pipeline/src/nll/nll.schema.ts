@@ -10,3 +10,15 @@ export const NLLSeasonId = Schema.Number.pipe(
   }),
 );
 export type NLLSeasonId = typeof NLLSeasonId.Type;
+
+// NLL Team response schema
+export class NLLTeam extends Schema.Class<NLLTeam>("NLLTeam")({
+  id: Schema.String,
+  code: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  nickname: Schema.NullOr(Schema.String),
+  displayName: Schema.NullOr(Schema.String),
+  team_city: Schema.NullOr(Schema.String),
+  team_logo: Schema.NullOr(Schema.String),
+  team_website_url: Schema.NullOr(Schema.String),
+}) {}

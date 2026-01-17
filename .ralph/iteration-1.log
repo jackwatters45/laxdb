@@ -1,0 +1,5 @@
+Typecheck passes. The NLLTeam schema is now implemented with:
+- `id` and `code` as required strings
+- `name`, `nickname`, `displayName`, `team_city`, `team_logo`, `team_website_url` as nullable strings
+
+STORY_COMPLETE
