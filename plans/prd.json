@@ -734,7 +734,7 @@
     "id": "nll-final-003",
     "category": "final",
     "description": "Run full extraction",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/nll/run.ts",
       "All 4 data files created",

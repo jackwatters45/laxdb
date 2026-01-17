@@ -405,3 +405,10 @@ Description: Run all NLL tests
 Status: COMPLETE
 Commit: 213a988
 Timestamp: 2026-01-18T09:13:11+11:00
+
+=== Iteration 5 ===
+Story: nll-final-003
+Description: Run full extraction
+Status: COMPLETE
+Commit: 78f0c1b
+Timestamp: 2026-01-18T09:14:42+11:00

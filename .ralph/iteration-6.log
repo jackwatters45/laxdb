@@ -1,1 +1,9 @@
-You've hit your limit · resets 3am (Australia/Melbourne)
+All 8 tests pass. The validation is complete:
+
+- **Validation script ran successfully**: 16/16 checks passed, 0 errors
+- **Cross-references validated**: players.team_id → teams.id (369/369, 100%), standings.team_id → teams.id (14/14, 100%)
+- **Report saved**: output/nll/validation-report.json created
+- **Typecheck**: All packages pass
+- **Tests**: All 8 NLL integration tests pass
+
+STORY_COMPLETE
