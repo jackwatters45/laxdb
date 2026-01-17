@@ -146,3 +146,10 @@ Description: Implement NLLClient.getSchedule method
 Status: COMPLETE
 Commit: df8c1c8
 Timestamp: 2026-01-17T23:47:05+11:00
+
+=== Iteration 21 ===
+Story: nll-client-008
+Description: Create NLL module index exports
+Status: COMPLETE
+Commit: ac321ad
+Timestamp: 2026-01-17T23:48:52+11:00

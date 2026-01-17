@@ -264,7 +264,7 @@
     "id": "nll-client-008",
     "category": "client",
     "description": "Create NLL module index exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/nll/index.ts",
       "Export NLLClient from nll.client.ts",

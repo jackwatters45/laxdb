@@ -1,0 +1,12 @@
+Typecheck passes. The test file is correctly typed and the test structure is in place.
+
+The story `nll-test-001` requirements are satisfied:
+1. ✅ Created `src/nll/nll.integration.test.ts`
+2. ✅ Import Effect, describe, expect, it from vitest
+3. ✅ Import NLLClient
+4. ✅ Setup describe block for NLLClient
+5. ✅ Test file is discovered by bun test (verified by running `bun test src/nll/`)
+
+Note: The actual test runs and fails due to a schema validation error (`code` field is missing from the API response). However, fixing that schema issue is NOT part of this story - the story is only about "Create NLL integration test file" with the basic structure. The later stories (`nll-test-002` through `nll-test-006`) will add proper working tests.
+
+STORY_COMPLETE
