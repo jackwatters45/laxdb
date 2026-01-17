@@ -169,7 +169,7 @@
     "id": "nll-client-001",
     "category": "client",
     "description": "Create nll.client.ts with base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/nll/nll.client.ts",
       "Import Effect, Schema, ParseResult",

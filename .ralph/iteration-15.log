@@ -1,0 +1,5 @@
+The implementation is complete. The `mapParseError` helper function is added following the exact same pattern from the PLL client. It:
+1. Takes a `ParseResult.ParseError` as input
+2. Returns a `ParseError` with a descriptive message and the original error as cause
+
+STORY_COMPLETE
