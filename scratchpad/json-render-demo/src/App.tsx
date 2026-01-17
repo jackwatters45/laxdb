@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataProvider, ActionProvider, Renderer } from "@json-render/react";
+import { DataProvider, ActionProvider, VisibilityProvider, Renderer } from "@json-render/react";
 import type { UITree, Action } from "@json-render/core";
 import { componentRegistry } from "./components";
 import "./App.css";
@@ -302,12 +302,14 @@ function App() {
       <main className="main">
         <div className="render-area">
           <DataProvider initialData={data} onDataChange={handleDataChange}>
-            <ActionProvider handlers={actionHandlers}>
-              <Renderer
-                tree={sampleTrees[selectedTree]}
-                registry={componentRegistry}
-              />
-            </ActionProvider>
+            <VisibilityProvider>
+              <ActionProvider handlers={actionHandlers}>
+                <Renderer
+                  tree={sampleTrees[selectedTree]}
+                  registry={componentRegistry}
+                />
+              </ActionProvider>
+            </VisibilityProvider>
           </DataProvider>
         </div>
 
