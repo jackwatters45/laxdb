@@ -602,7 +602,7 @@
     "id": "nll-validate-003",
     "category": "validate",
     "description": "Implement teams.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for teams.json",
       "Validate required fields: id, code, name",
