@@ -342,3 +342,10 @@ Description: Implement players.json validation
 Status: COMPLETE
 Commit: f284746
 Timestamp: 2026-01-18T00:51:43+11:00
+
+=== Iteration 1 ===
+Story: nll-validate-005
+Description: Implement standings.json validation
+Status: COMPLETE
+Commit: f2e867a
+Timestamp: 2026-01-18T00:57:38+11:00

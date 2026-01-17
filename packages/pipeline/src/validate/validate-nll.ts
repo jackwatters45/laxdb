@@ -205,6 +205,39 @@ const program = Effect.gen(function* () {
     fileResults.push(standingsResult);
   }
 
+  // Validate schedule.json
+  const { result: scheduleResult, data: schedule } =
+    yield* validateJsonArray<NLLMatch>(
+      path.join(seasonDir, "schedule.json"),
+      1,
+    );
+
+  if (schedule.length > 0) {
+    const requiredCheck = yield* validateRequiredFields(schedule, [
+      "id",
+      "date",
+      "status",
+    ]);
+    const uniqueIdCheck = yield* validateUniqueField(schedule, "id");
+
+    const {
+      filePath: schFp,
+      exists: schExists,
+      sizeBytes: schSizeBytes,
+      recordCount: schRecordCount,
+      checks: schChecks,
+    } = scheduleResult;
+    fileResults.push({
+      filePath: schFp,
+      exists: schExists,
+      sizeBytes: schSizeBytes,
+      recordCount: schRecordCount,
+      checks: [...schChecks, requiredCheck, uniqueIdCheck],
+    });
+  } else {
+    fileResults.push(scheduleResult);
+  }
+
   // TODO: Implement remaining validations in subsequent stories
 
   const report = buildReport("NLL", fileResults, crossRefs, startTime);

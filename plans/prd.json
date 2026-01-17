@@ -628,7 +628,7 @@
     "id": "nll-validate-005",
     "category": "validate",
     "description": "Implement standings.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for standings.json",
       "Validate required fields: team_id, wins, losses",
