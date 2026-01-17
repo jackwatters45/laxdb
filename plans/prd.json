@@ -666,7 +666,7 @@
     "id": "nll-validate-008",
     "category": "validate",
     "description": "Complete validation script with report",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Build validation report using buildReport",
       "Print report using printReport",
