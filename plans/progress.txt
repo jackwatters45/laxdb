@@ -83,3 +83,10 @@ Description: NLL response wrapper schemas
 Status: COMPLETE
 Commit: 1cdb0d7
 Timestamp: 2026-01-17T23:31:18+11:00
+
+=== Iteration 12 ===
+Story: nll-schema-013
+Description: Export all schemas from nll.schema.ts
+Status: COMPLETE
+Commit: d7a7c90
+Timestamp: 2026-01-17T23:32:23+11:00
