@@ -276,7 +276,7 @@
     "id": "nll-test-001",
     "category": "test",
     "description": "Create NLL integration test file",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/nll/nll.integration.test.ts",
       "Import Effect, describe, expect, it from vitest",

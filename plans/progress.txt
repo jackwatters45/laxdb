@@ -153,3 +153,10 @@ Description: Create NLL module index exports
 Status: COMPLETE
 Commit: ac321ad
 Timestamp: 2026-01-17T23:48:52+11:00
+
+=== Iteration 22 ===
+Story: nll-test-001
+Description: Create NLL integration test file
+Status: COMPLETE
+Commit: a3e4767
+Timestamp: 2026-01-17T23:50:18+11:00

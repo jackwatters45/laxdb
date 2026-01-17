@@ -131,50 +131,60 @@ export class NLLScheduleRequest extends Schema.Class<NLLScheduleRequest>(
 
 // --- Transform Schemas ---
 
+// NLLTeamLogo - raw API structure for team logo object
+const NLLTeamLogoRaw = Schema.Struct({
+  url: Schema.String,
+}).pipe(Schema.annotations({ identifier: "NLLTeamLogoRaw" }));
+
 // NLLTeamRaw - raw API response structure for a single team
-// API returns: { id: { code, name, nickname, ... } }
+// API returns: { map: { id: { id, code, name, nickname, team_logo: {...}, ... } } }
 export class NLLTeamRaw extends Schema.Class<NLLTeamRaw>("NLLTeamRaw")({
+  id: Schema.Number,
   code: Schema.String,
   name: Schema.NullOr(Schema.String),
   nickname: Schema.NullOr(Schema.String),
   displayName: Schema.NullOr(Schema.String),
   team_city: Schema.NullOr(Schema.String),
-  team_logo: Schema.NullOr(Schema.String),
+  team_logo: Schema.NullOr(NLLTeamLogoRaw),
   team_website_url: Schema.NullOr(Schema.String),
 }) {}
 
-// TeamsMapToArray - transforms Record<id, TeamData> -> NLLTeam[]
+// TeamsMapToArray - transforms { map: Record<id, TeamData> } -> NLLTeam[]
 export const TeamsMapToArray = Schema.transform(
-  Schema.Record({ key: Schema.String, value: NLLTeamRaw }),
+  Schema.Struct({
+    map: Schema.Record({ key: Schema.String, value: NLLTeamRaw }),
+  }),
   Schema.Array(NLLTeam),
   {
     strict: true,
-    decode: (record) =>
-      Object.entries(record).map(([id, team]) => ({
-        id,
+    decode: (response) =>
+      Object.values(response.map).map((team) => ({
+        id: String(team.id),
         code: team.code,
         name: team.name,
         nickname: team.nickname,
         displayName: team.displayName,
         team_city: team.team_city,
-        team_logo: team.team_logo,
+        team_logo: team.team_logo?.url ?? null,
         team_website_url: team.team_website_url,
       })),
-    encode: (teams) =>
-      Object.fromEntries(
+    encode: (teams) => ({
+      map: Object.fromEntries(
         teams.map((team) => [
           team.id,
           {
+            id: Number(team.id),
             code: team.code,
             name: team.name,
             nickname: team.nickname,
             displayName: team.displayName,
             team_city: team.team_city,
-            team_logo: team.team_logo,
+            team_logo: team.team_logo ? { url: team.team_logo } : null,
             team_website_url: team.team_website_url,
           },
         ]),
       ),
+    }),
   },
 );
 
