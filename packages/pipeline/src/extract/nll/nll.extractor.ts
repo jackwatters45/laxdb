@@ -3,7 +3,7 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
-import type { NLLTeam } from "../../nll/nll.schema";
+import type { NLLPlayer, NLLTeam } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import { NLLManifestService } from "./nll.manifest";
@@ -76,6 +76,30 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           }),
         );
 
+      const extractPlayers = (seasonId: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(
+            `  👥 Extracting players for season ${seasonId}...`,
+          );
+          const result = yield* withTiming(client.getPlayers({ seasonId }));
+          yield* saveJson(getOutputPath(seasonId, "players"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} players (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly NLLPlayer[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         client,
         config,
@@ -87,6 +111,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         saveJson,
         withTiming,
         extractTeams,
+        extractPlayers,
       };
     }),
     dependencies: [

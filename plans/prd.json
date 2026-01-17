@@ -456,7 +456,7 @@
     "id": "nll-extract-003",
     "category": "extract",
     "description": "Implement extractTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractTeams(seasonId) method",
       "Log: '📊 Extracting teams...'",

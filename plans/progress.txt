@@ -258,3 +258,10 @@ Description: Implement extractor helper functions
 Status: COMPLETE
 Commit: 924a6fd
 Timestamp: 2026-01-18T00:28:10+11:00
+
+=== Iteration 36 ===
+Story: nll-extract-003
+Description: Implement extractTeams method
+Status: COMPLETE
+Commit: eb0c309
+Timestamp: 2026-01-18T00:30:02+11:00
