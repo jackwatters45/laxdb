@@ -1422,7 +1422,7 @@
     "id": "msl-extract-001",
     "category": "extract",
     "description": "Create MSLExtractorService base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/msl/msl.extractor.ts",
       "Define MSLExtractorService as Effect.Service",
