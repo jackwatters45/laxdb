@@ -839,3 +839,10 @@ Description: Implement extractGoalies method
 Status: COMPLETE
 Commit: 3031336
 Timestamp: 2026-01-19T06:55:36+11:00
+
+=== Iteration 112 ===
+Story: msl-extract-006
+Description: Implement extractStandings method
+Status: COMPLETE
+Commit: e419e7e
+Timestamp: 2026-01-19T07:00:15+11:00

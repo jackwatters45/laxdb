@@ -1486,7 +1486,7 @@
     "id": "msl-extract-006",
     "category": "extract",
     "description": "Implement extractStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractStandings(seasonId) method",
       "Log progress, call client.getStandings with timing",

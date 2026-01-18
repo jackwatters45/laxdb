@@ -4,6 +4,7 @@ import { Effect, Layer } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
 import type {
+  MSLGame,
   MSLGoalie,
   MSLPlayer,
   MSLStanding,
@@ -170,12 +171,31 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           }),
         );
 
-      const extractSchedule = (_seasonId: number) =>
-        Effect.succeed({
-          data: [] as readonly unknown[],
-          count: 0,
-          durationMs: 0,
-        });
+      const extractSchedule = (seasonId: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(
+            `  📅 Extracting schedule for season ${seasonId}...`,
+          );
+          const result = yield* withTiming(
+            client.getSchedule({ seasonId: MSLSeasonId.make(seasonId) }),
+          );
+          yield* saveJson(getOutputPath(seasonId, "schedule"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} games (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MSLGame[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
 
       // Placeholder for orchestration methods (implemented in subsequent stories)
       const extractSeason = (
