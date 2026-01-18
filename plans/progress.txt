@@ -405,3 +405,10 @@ Description: Implement extractStatLeaders method
 Status: COMPLETE
 Commit: f28dbc4
 Timestamp: 2026-01-19T02:27:23+11:00
+
+=== Iteration 50 ===
+Story: mll-extract-008
+Description: Implement extractSchedule method (Wayback)
+Status: COMPLETE
+Commit: d7615df
+Timestamp: 2026-01-19T02:34:24+11:00

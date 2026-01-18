@@ -659,7 +659,7 @@
     "id": "mll-extract-008",
     "category": "extract",
     "description": "Implement extractSchedule method (Wayback)",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractSchedule(year) method",
       "Log progress, call client.getSchedule with timing",

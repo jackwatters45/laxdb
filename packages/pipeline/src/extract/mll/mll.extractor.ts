@@ -1,6 +1,6 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Duration, Effect, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
 import type {
@@ -13,6 +13,7 @@ import type {
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 
+import type { MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
 
 // MLL operated from 2001-2020 (20 seasons)
@@ -207,6 +208,132 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      // Delay constants for rate limiting
+      const STATSCREW_DELAY_MS = 2000;
+      const WAYBACK_DELAY_MS = 5000;
+
+      const extractSeason = (
+        year: number,
+        options: {
+          skipExisting?: boolean;
+          includeSchedule?: boolean;
+        } = {},
+      ) =>
+        Effect.gen(function* () {
+          const { skipExisting = true, includeSchedule = false } = options;
+
+          yield* Effect.log(`\n${"=".repeat(50)}`);
+          yield* Effect.log(`Extracting MLL ${year}`);
+          yield* Effect.log("=".repeat(50));
+
+          let manifest = yield* manifestService.load;
+
+          const shouldExtract = (entity: keyof MLLSeasonManifest): boolean => {
+            if (!skipExisting) return true;
+            return !manifestService.isExtracted(manifest, year, entity);
+          };
+
+          // Extract teams
+          if (shouldExtract("teams")) {
+            const result = yield* extractTeams(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "teams",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+          } else {
+            yield* Effect.log("  📊 Teams: skipped (already extracted)");
+          }
+
+          // Extract players
+          if (shouldExtract("players")) {
+            const result = yield* extractPlayers(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "players",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+          } else {
+            yield* Effect.log("  🏃 Players: skipped (already extracted)");
+          }
+
+          // Extract goalies
+          if (shouldExtract("goalies")) {
+            const result = yield* extractGoalies(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "goalies",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+          } else {
+            yield* Effect.log("  🥅 Goalies: skipped (already extracted)");
+          }
+
+          // Extract standings
+          if (shouldExtract("standings")) {
+            const result = yield* extractStandings(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "standings",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+          } else {
+            yield* Effect.log("  🏆 Standings: skipped (already extracted)");
+          }
+
+          // Extract stat leaders
+          if (shouldExtract("statLeaders")) {
+            const result = yield* extractStatLeaders(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "statLeaders",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+          } else {
+            yield* Effect.log("  ⭐ Stat leaders: skipped (already extracted)");
+          }
+
+          // Optionally extract schedule (slower due to Wayback)
+          if (includeSchedule && shouldExtract("schedule")) {
+            yield* Effect.log("  ⏳ Waiting before Wayback request...");
+            yield* Effect.sleep(Duration.millis(WAYBACK_DELAY_MS));
+            const result = yield* extractSchedule(year);
+            manifest = manifestService.markComplete(
+              manifest,
+              year,
+              "schedule",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+          } else if (includeSchedule) {
+            yield* Effect.log("  📅 Schedule: skipped (already extracted)");
+          } else {
+            yield* Effect.log("  📅 Schedule: skipped (includeSchedule=false)");
+          }
+
+          return manifest;
+        });
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -218,6 +345,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractStandings,
         extractStatLeaders,
         extractSchedule,
+        extractSeason,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
