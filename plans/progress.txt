@@ -433,3 +433,10 @@ Description: Create MLL extraction module exports
 Status: COMPLETE
 Commit: 6548477
 Timestamp: 2026-01-19T02:52:51+11:00
+
+=== Iteration 54 ===
+Story: mll-extract-012
+Description: Create MLL extraction CLI entry point
+Status: COMPLETE
+Commit: bbe7716
+Timestamp: 2026-01-19T02:57:29+11:00

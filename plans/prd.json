@@ -715,7 +715,7 @@
     "id": "mll-extract-012",
     "category": "extract",
     "description": "Create MLL extraction CLI entry point",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/mll/run.ts",
       "Parse CLI args: --year=YYYY, --all, --force, --with-schedule, --help",
