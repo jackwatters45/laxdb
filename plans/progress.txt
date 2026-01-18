@@ -1028,3 +1028,10 @@ Description: WLAGoalie response schema
 Status: COMPLETE
 Commit: 5ed3f5e
 Timestamp: 2026-01-19T08:32:06+11:00
+
+=== Iteration 139 ===
+Story: wla-schema-007
+Description: WLAStanding response schema
+Status: COMPLETE
+Commit: 0d9fa5c
+Timestamp: 2026-01-19T08:35:01+11:00

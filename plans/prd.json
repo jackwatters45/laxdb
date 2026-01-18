@@ -1826,7 +1826,7 @@
     "id": "wla-schema-007",
     "category": "schema",
     "description": "WLAStanding response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAStanding Schema.Class",
       "Fields: team_id (string), team_name (nullable string), position (number)",

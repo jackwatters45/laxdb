@@ -113,3 +113,23 @@ export class WLAStanding extends Schema.Class<WLAStanding>("WLAStanding")({
   // Win percentage
   win_pct: Schema.Number,
 }) {}
+
+// WLA Game response schema
+export class WLAGame extends Schema.Class<WLAGame>("WLAGame")({
+  id: Schema.String,
+  date: Schema.NullOr(Schema.String),
+  status: Schema.NullOr(Schema.String),
+
+  // Team references
+  home_team_id: Schema.NullOr(Schema.String),
+  away_team_id: Schema.NullOr(Schema.String),
+  home_team_name: Schema.NullOr(Schema.String),
+  away_team_name: Schema.NullOr(Schema.String),
+
+  // Scores
+  home_score: Schema.Number,
+  away_score: Schema.Number,
+
+  // Location
+  venue: Schema.NullOr(Schema.String),
+}) {}
