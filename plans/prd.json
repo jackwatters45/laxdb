@@ -41,7 +41,7 @@
     "id": "mll-schema-001",
     "category": "schema",
     "description": "Create mll.schema.ts with MLLYear branded type",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/mll/mll.schema.ts",
       "Define MLLYear: Schema.Number.pipe(Schema.int(), Schema.between(2001, 2020), Schema.brand('MLLYear'))",

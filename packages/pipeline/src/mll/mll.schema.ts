@@ -11,3 +11,13 @@ export const MLLYear = Schema.Number.pipe(
   }),
 );
 export type MLLYear = typeof MLLYear.Type;
+
+// MLL Team response schema
+export class MLLTeam extends Schema.Class<MLLTeam>("MLLTeam")({
+  id: Schema.String,
+  name: Schema.String,
+  city: Schema.NullOr(Schema.String),
+  abbreviation: Schema.NullOr(Schema.String),
+  founded_year: Schema.NullOr(Schema.Number),
+  final_year: Schema.NullOr(Schema.Number),
+}) {}

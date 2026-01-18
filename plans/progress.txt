@@ -84,3 +84,10 @@ Description: Map MLL teams by year
 Status: COMPLETE
 Commit: 2c4e93d
 Timestamp: 2026-01-18T23:47:54+11:00
+
+=== Iteration 4 ===
+Story: mll-schema-001
+Description: Create mll.schema.ts with MLLYear branded type
+Status: COMPLETE
+Commit: 365bfb4
+Timestamp: 2026-01-18T23:50:49+11:00
