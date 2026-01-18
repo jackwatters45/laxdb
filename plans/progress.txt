@@ -231,3 +231,10 @@ Description: Implement MLLClient.getGoalies method
 Status: COMPLETE
 Commit: 59af328
 Timestamp: 2026-01-19T00:35:42+11:00
+
+=== Iteration 25 ===
+Story: mll-client-009
+Description: Implement MLLClient.getStandings method
+Status: COMPLETE
+Commit: a698bc2
+Timestamp: 2026-01-19T00:39:12+11:00

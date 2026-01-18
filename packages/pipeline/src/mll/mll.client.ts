@@ -13,7 +13,7 @@ import {
   MLLScheduleRequest,
   MLLStanding,
   MLLStandingsRequest,
-  type MLLStatLeader,
+  MLLStatLeader,
   MLLStatLeadersRequest,
   MLLTeam,
   MLLTeamsRequest,
@@ -841,6 +841,177 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       );
 
     /**
+     * Fetches stat leaders for a given MLL season year.
+     * Scrapes the league leaders page for top performers.
+     *
+     * @param input - Request containing the year (2001-2020) and optional stat type filter
+     * @returns Array of MLLStatLeader objects
+     */
+    const getStatLeaders = (
+      input: typeof MLLStatLeadersRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLStatLeader[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLStatLeadersRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        const path = `/lacrosse/leaders/l-MLL/y-${request.year}`;
+
+        const html = yield* fetchStatscrewPageWithRetry(path);
+
+        const doc = $.load(html);
+
+        // Extract stat leaders from the leaders page
+        // The page has sections for different stat categories (Points, Goals, Assists)
+        const leaders: MLLStatLeader[] = [];
+
+        // Find all tables on the page
+        const tables = doc("table");
+
+        // Track which stat type we're parsing based on table position/headers
+        let currentStatType = "points";
+
+        tables.each((_tableIndex, table) => {
+          const headerRow = doc(table).find("tr").first();
+          const headers = headerRow
+            .find("th, td")
+            .map((_i, el) => doc(el).text().trim().toLowerCase())
+            .get();
+
+          // Determine the stat type based on headers
+          // Points table has: Player, Team, Pts, G, A
+          // Goals table has: Player, Team, G
+          // Assists table has: Player, Team, A
+          const hasPlayer =
+            headers.includes("player") || headers.includes("name");
+          const hasTeam = headers.includes("team");
+          const hasPts = headers.includes("pts");
+          const hasG = headers.includes("g");
+          const hasA = headers.includes("a");
+
+          if (!hasPlayer) {
+            return; // Not a leaders table, skip
+          }
+
+          // Determine stat type from column structure
+          if (hasPts) {
+            currentStatType = "points";
+          } else if (hasG && !hasA) {
+            currentStatType = "goals";
+          } else if (hasA && !hasG) {
+            currentStatType = "assists";
+          } else if (hasG && hasA) {
+            // Could be points table variant, check for pts column
+            if (!hasPts) {
+              currentStatType = "goals"; // Default to goals if ambiguous
+            }
+          }
+
+          // Skip if filtering by stat type and this doesn't match
+          if (request.statType && currentStatType !== request.statType) {
+            return;
+          }
+
+          // Find column indices
+          const playerIdx = headers.findIndex(
+            (h) => h === "player" || h === "name",
+          );
+          const teamIdx = headers.findIndex((h) => h === "team");
+
+          // Find the stat value column based on current stat type
+          let statValueIdx: number;
+          if (currentStatType === "points") {
+            statValueIdx = headers.findIndex((h) => h === "pts");
+          } else if (currentStatType === "goals") {
+            statValueIdx = headers.findIndex((h) => h === "g");
+          } else {
+            statValueIdx = headers.findIndex((h) => h === "a");
+          }
+
+          // If we can't find the stat column, try to use the first numeric-looking column after team
+          if (statValueIdx < 0) {
+            statValueIdx = Math.max(playerIdx, teamIdx) + 1;
+          }
+
+          // Parse data rows (skip header row)
+          let rank = 1;
+          doc(table)
+            .find("tr")
+            .slice(1)
+            .each((_rowIndex, row) => {
+              const cells = doc(row)
+                .find("td")
+                .map((_i, el) => doc(el))
+                .get();
+
+              if (cells.length < Math.max(playerIdx, statValueIdx) + 1) {
+                return; // Skip malformed rows
+              }
+
+              // Extract player info
+              const playerCell = cells[playerIdx];
+              const playerLink = playerCell?.find("a").attr("href") ?? "";
+              const playerName = playerCell?.text().trim() ?? "";
+
+              // Extract player ID from link
+              const playerIdMatch = playerLink.match(
+                /\/lacrosse\/stats\/p-([a-z0-9]+)/i,
+              );
+              const playerId =
+                playerIdMatch?.[1] ??
+                playerName.toLowerCase().replaceAll(/\s+/g, "");
+
+              if (!playerName) {
+                return; // Skip empty rows
+              }
+
+              // Extract team info
+              const teamCell = teamIdx >= 0 ? cells[teamIdx] : null;
+              const teamLink = teamCell?.find("a").attr("href") ?? "";
+              const teamName = teamCell?.text().trim() ?? null;
+
+              // Extract team ID from link
+              const teamIdMatch = teamLink.match(
+                /\/lacrosse\/(?:stats|roster)\/t-(MLL[A-Z]{2,3})\/y-/,
+              );
+              const teamId = teamIdMatch?.[1] ?? null;
+
+              // Parse stat value
+              const statText = cells[statValueIdx]?.text().trim() ?? "";
+              const statValue = Number.parseFloat(statText);
+
+              if (Number.isNaN(statValue)) {
+                return; // Skip rows with invalid stat values
+              }
+
+              const leader = new MLLStatLeader({
+                player_id: playerId,
+                player_name: playerName,
+                team_id: teamId,
+                team_name: teamName,
+                stat_type: currentStatType,
+                stat_value: statValue,
+                rank,
+              });
+
+              leaders.push(leader);
+              rank++;
+            });
+        });
+
+        return leaders;
+      }).pipe(
+        Effect.tap((leaders) =>
+          Effect.log(
+            `Fetched ${leaders.length} stat leaders for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
+    /**
      * Fetches all goalies for a given MLL season year.
      * Scrapes team stats pages to extract goalie data.
      *
@@ -1053,6 +1224,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       getPlayers,
       getGoalies,
       getStandings,
+      getStatLeaders,
 
       // Type exports for method signatures (to be implemented)
       _types: {

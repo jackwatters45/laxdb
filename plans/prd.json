@@ -335,7 +335,7 @@
     "id": "mll-client-009",
     "category": "client",
     "description": "Implement MLLClient.getStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getStandings(input: MLLStandingsRequest.Encoded)",
       "Build URL: /l-MLL/y-{year}",
