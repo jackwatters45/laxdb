@@ -582,7 +582,7 @@
     "id": "mll-extract-002",
     "category": "extract",
     "description": "Implement extractor helper functions",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getOutputPath(year, entity) helper",
       "Add saveJson<T>(filePath, data) helper",

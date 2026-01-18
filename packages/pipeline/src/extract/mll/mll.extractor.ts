@@ -3,6 +3,7 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
+import type { MLLTeam } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import { MLLManifestService } from "./mll.manifest";
@@ -57,12 +58,34 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           ),
         );
 
-      // Placeholder - methods will be implemented in subsequent stories
+      const extractTeams = (year: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(`  📊 Extracting teams for year ${year}...`);
+          const result = yield* withTiming(client.getTeams({ year }));
+          yield* saveJson(getOutputPath(year, "teams"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MLLTeam[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         MLL_YEARS,
         getOutputPath,
         saveJson,
         withTiming,
+        extractTeams,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
