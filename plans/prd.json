@@ -531,7 +531,7 @@
     "id": "mll-manifest-001",
     "category": "extract",
     "description": "Create MLLSeasonManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/mll/mll.manifest.ts",
       "Define MLLEntityStatus schema (same pattern as NLL)",

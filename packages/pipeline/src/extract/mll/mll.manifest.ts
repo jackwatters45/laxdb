@@ -36,3 +36,20 @@ export const createEmptyMLLSeasonManifest = (): MLLSeasonManifest => ({
   statLeaders: createEmptyMLLEntityStatus(),
   schedule: createEmptyMLLEntityStatus(),
 });
+
+// MLL Extraction Manifest - top-level manifest for MLL data extraction
+export const MLLExtractionManifest = Schema.Struct({
+  source: Schema.Literal("mll"),
+  seasons: Schema.Record({ key: Schema.String, value: MLLSeasonManifest }),
+  lastRun: Schema.String,
+  version: Schema.Number,
+});
+export type MLLExtractionManifest = typeof MLLExtractionManifest.Type;
+
+// Helper to create empty MLL manifest
+export const createEmptyMLLManifest = (): MLLExtractionManifest => ({
+  source: "mll",
+  seasons: {},
+  lastRun: "",
+  version: 1,
+});

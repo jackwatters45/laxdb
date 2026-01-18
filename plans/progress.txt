@@ -335,3 +335,10 @@ Description: All MLL client tests pass
 Status: COMPLETE
 Commit: 2f865cd
 Timestamp: 2026-01-19T01:34:32+11:00
+
+=== Iteration 40 ===
+Story: mll-manifest-001
+Description: Create MLLSeasonManifest schema
+Status: COMPLETE
+Commit: b9dbbca
+Timestamp: 2026-01-19T01:39:12+11:00
