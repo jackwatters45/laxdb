@@ -394,7 +394,7 @@
     "id": "mll-client-013",
     "category": "client",
     "description": "Implement MLLClient.getSchedule method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getSchedule(input: MLLScheduleRequest.Encoded)",
       "Call findScheduleSnapshots to get best archive URLs",

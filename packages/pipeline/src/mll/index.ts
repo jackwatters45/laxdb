@@ -1,3 +1,6 @@
+// Client service
+export { MLLClient } from "./mll.client";
+
 // Schema types and branded types
 export {
   MLLYear,

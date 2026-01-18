@@ -259,3 +259,10 @@ Description: Implement parseWaybackSchedule helper
 Status: COMPLETE
 Commit: 826e543
 Timestamp: 2026-01-19T00:49:25+11:00
+
+=== Iteration 29 ===
+Story: mll-client-013
+Description: Implement MLLClient.getSchedule method
+Status: COMPLETE
+Commit: 876a79d
+Timestamp: 2026-01-19T00:53:28+11:00
