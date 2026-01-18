@@ -259,7 +259,7 @@
     "id": "mll-client-004",
     "category": "client",
     "description": "Implement queryWaybackCDX helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add queryWaybackCDX(url: string, params: object) internal helper",
       "Build CDX API query URL",

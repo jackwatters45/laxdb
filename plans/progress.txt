@@ -196,3 +196,10 @@ Description: Implement fetchStatscrewPage helper
 Status: COMPLETE
 Commit: 56e26f4
 Timestamp: 2026-01-19T00:20:18+11:00
+
+=== Iteration 20 ===
+Story: mll-client-004
+Description: Implement queryWaybackCDX helper
+Status: COMPLETE
+Commit: 5d618fd
+Timestamp: 2026-01-19T00:22:51+11:00

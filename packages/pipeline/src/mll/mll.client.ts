@@ -279,6 +279,106 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Fetches an archived page from the Wayback Machine.
+     * Returns the HTML content as a string.
+     *
+     * @param timestamp - Wayback timestamp (e.g., "20060501120000")
+     * @param url - Original URL to fetch (e.g., "http://majorleaguelacrosse.com/schedule/")
+     */
+    const fetchWaybackPage = (
+      timestamp: string,
+      url: string,
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
+      Effect.gen(function* () {
+        const waybackUrl = `${mllConfig.waybackWebUrl}/${timestamp}/${url}`;
+        const timeoutMs = pipelineConfig.defaultTimeoutMs;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, timeoutMs);
+
+        const response = yield* Effect.tryPromise({
+          try: () =>
+            fetch(waybackUrl, {
+              method: "GET",
+              headers: {
+                ...mllConfig.headers,
+                Accept:
+                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+              },
+              signal: controller.signal,
+              redirect: "follow",
+            }),
+          catch: (error) => {
+            clearTimeout(timeoutId);
+            if (error instanceof Error && error.name === "AbortError") {
+              return new TimeoutError({
+                message: `Wayback request timed out after ${timeoutMs}ms`,
+                url: waybackUrl,
+                timeoutMs,
+              });
+            }
+            return new NetworkError({
+              message: `Wayback network error: ${String(error)}`,
+              url: waybackUrl,
+              cause: error,
+            });
+          },
+        }).pipe(
+          Effect.tap(() =>
+            Effect.sync(() => {
+              clearTimeout(timeoutId);
+            }),
+          ),
+        );
+
+        if (response.status >= 400) {
+          return yield* Effect.fail(
+            new HttpError({
+              message: `Wayback HTTP ${response.status} error`,
+              url: waybackUrl,
+              method: "GET",
+              statusCode: response.status,
+            }),
+          );
+        }
+
+        const html = yield* Effect.tryPromise({
+          try: () => response.text(),
+          catch: (error) =>
+            new NetworkError({
+              message: `Failed to read Wayback response body: ${String(error)}`,
+              url: waybackUrl,
+              cause: error,
+            }),
+        });
+
+        return html;
+      });
+
+    /**
+     * Fetches a Wayback page with exponential backoff retry.
+     * Retries on network and timeout errors only.
+     */
+    const fetchWaybackPageWithRetry = (
+      timestamp: string,
+      url: string,
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
+      fetchWaybackPage(timestamp, url).pipe(
+        Effect.retry(
+          Schedule.exponential(pipelineConfig.retryDelay).pipe(
+            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
+            Schedule.whileInput(
+              (error: HttpError | NetworkError | TimeoutError) =>
+                error._tag === "NetworkError" || error._tag === "TimeoutError",
+            ),
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -290,6 +390,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Internal helpers for Wayback Machine CDX queries
       queryWaybackCDX: queryWaybackCDXWithRetry,
+
+      // Internal helpers for fetching Wayback archived pages
+      fetchWaybackPage: fetchWaybackPageWithRetry,
 
       // Type exports for method signatures (to be implemented)
       _types: {
