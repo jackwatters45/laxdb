@@ -463,7 +463,7 @@
     "id": "mll-test-004",
     "category": "test",
     "description": "getGoalies integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getGoalies",
       "Add test: 'fetches goalies for year 2019'",

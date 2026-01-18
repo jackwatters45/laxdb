@@ -181,4 +181,48 @@ describe("MLLClient", () => {
       PLAYER_TIMEOUT,
     );
   });
+
+  describe("getStandings", () => {
+    it(
+      "fetches standings for year 2019",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getStandings({ year: 2019 });
+        });
+
+        const standings = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(standings.length).toBe(6);
+        expect(standings[0]).toHaveProperty("team_id");
+        expect(standings[0]).toHaveProperty("wins");
+        expect(standings[0]).toHaveProperty("losses");
+      },
+      TEAM_TIMEOUT,
+    );
+
+    it(
+      "returns standings with expected properties",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getStandings({ year: 2019 });
+        });
+
+        const standings = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(standings[0]).toBeDefined();
+        expect(standings[0]?.team_id).toBeTypeOf("string");
+        expect(standings[0]?.wins).toBeTypeOf("number");
+        expect(standings[0]?.losses).toBeTypeOf("number");
+        expect(standings[0]?.games_played).toBeTypeOf("number");
+        expect(standings[0]?.position).toBeTypeOf("number");
+      },
+      TEAM_TIMEOUT,
+    );
+  });
 });

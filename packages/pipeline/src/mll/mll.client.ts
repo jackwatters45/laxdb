@@ -700,13 +700,14 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
           Effect.mapError(mapParseError),
         );
 
-        const path = `/l-MLL/y-${request.year}`;
+        // Standings are on a dedicated page, not the season overview
+        const path = `/standings/l-MLL/y-${request.year}`;
 
         const html = yield* fetchStatscrewPageWithRetry(path);
 
         const doc = $.load(html);
 
-        // Extract standings from the standings table on the season page
+        // Extract standings from the standings table
         // Look for table with headers: Team (or Position), W, L, GF, GA, Win%
         const standings: MLLStanding[] = [];
 

@@ -300,3 +300,10 @@ Description: getPlayers integration test
 Status: COMPLETE
 Commit: bd4e3c3
 Timestamp: 2026-01-19T01:08:52+11:00
+
+=== Iteration 35 ===
+Story: mll-test-004
+Description: getGoalies integration test
+Status: COMPLETE
+Commit: 3d55e3d
+Timestamp: 2026-01-19T01:13:17+11:00
