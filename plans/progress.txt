@@ -175,3 +175,10 @@ Description: Add MLLConfig service to config.ts
 Status: COMPLETE
 Commit: 7a52713
 Timestamp: 2026-01-19T00:13:14+11:00
+
+=== Iteration 17 ===
+Story: mll-client-001
+Description: Create mll.client.ts with base structure
+Status: COMPLETE
+Commit: 7670a9e
+Timestamp: 2026-01-19T00:15:22+11:00

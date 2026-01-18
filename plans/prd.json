@@ -218,7 +218,7 @@
     "id": "mll-client-001",
     "category": "client",
     "description": "Create mll.client.ts with base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/mll/mll.client.ts",
       "Import Effect, Schema, Duration from effect",
