@@ -969,7 +969,7 @@
     "id": "msl-discovery-003",
     "category": "discovery",
     "description": "Analyze main MSL website structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Visit https://www.majorserieslacrosse.ca/",
       "Document team list and links",
