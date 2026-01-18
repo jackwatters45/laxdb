@@ -52,3 +52,28 @@ Key Findings:
 - Alternative sources identified: Sports Reference, Wikipedia, ESPN archives
 
 Timestamp: 2026-01-18T23:41:00+11:00
+
+=== Iteration 2 ===
+Story: mll-discovery-002
+Description: Analyze Wayback Machine CDX API for MLL schedules
+Status: COMPLETE
+Commit: 8ffd308
+Timestamp: 2026-01-18T23:42:20+11:00
+
+=== Iteration 3 ===
+Story: mll-discovery-003
+Description: Map MLL teams by year
+Status: COMPLETE
+Output: packages/pipeline/docs/MLL_TEAMS_BY_YEAR.md
+
+Key Deliverables:
+- Year-by-year team roster (2001-2020, all 20 seasons)
+- Team count validation: 6→10→8→6→9→6 pattern mapped
+- 22 franchise codes documented (StatsCrew MLL{XXX} format)
+- Wayback Machine 2006 team IDs cross-referenced
+- Franchise histories: relocations, expansions, contractions
+- Validation rules (TypeScript) for team existence by year
+- Championship winners per season
+- Data quality notes for edge cases (Rochester gaps, 2009/2010 mergers)
+
+Sources: Wikipedia, StatsCrew, funwhileitlasted.net, InsideLacrosse, PLL merger docs
