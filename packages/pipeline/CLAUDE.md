@@ -30,6 +30,10 @@ src/
 │   ├── nll.client.ts           # NLLClient service
 │   ├── nll.schema.ts           # Response schemas
 │   └── nll.integration.test.ts # Integration tests
+├── mll/                     # Major League Lacrosse client
+│   ├── mll.client.ts           # MLLClient service
+│   ├── mll.schema.ts           # Response schemas
+│   └── mll.integration.test.ts # Integration tests
 ├── scraper/                 # Web scraping
 ├── parser/                  # HTML parsing (Cheerio)
 ├── config.ts                # Configuration
@@ -59,6 +63,12 @@ infisical run --env=dev -- bun src/validate/validate-pll.ts
 
 # NLL data validation (no credentials needed)
 bun src/validate/validate-nll.ts
+
+# MLL data extraction (no credentials needed)
+bun src/extract/mll/run.ts
+
+# MLL data validation (no credentials needed)
+bun src/validate/validate-mll.ts
 ```
 
 ## ADDING A NEW ENDPOINT
@@ -101,6 +111,54 @@ Quick summary:
 
 > **Note:** NLL API is public - no credentials required.
 
+## MLLCLIENT METHODS
+
+| Method | Source | Description |
+|--------|--------|-------------|
+| `getTeams` | StatsCrew | Teams for a season (2001-2020) |
+| `getPlayers` | StatsCrew | Players with stats |
+| `getGoalies` | StatsCrew | Goalies with stats |
+| `getStandings` | StatsCrew | Team standings |
+| `getStatLeaders` | StatsCrew | Stat leaders by category |
+| `getSchedule` | Wayback | Season schedule from archived pages |
+
+> **Note:** MLL data via StatsCrew + Wayback Machine scraping - no credentials needed.
+> Schedule data from Wayback may have gaps (especially 2007-2019).
+
+## MLL EXTRACTION
+
+MLL data is scraped from StatsCrew (stats) and Wayback Machine (schedules).
+
+```bash
+# Extract single year (default: 2019)
+bun src/extract/mll/run.ts
+
+# Extract specific year
+bun src/extract/mll/run.ts --year=2006
+
+# Extract all seasons (2001-2020)
+bun src/extract/mll/run.ts --all
+
+# Include Wayback schedule extraction (slower, may have gaps)
+bun src/extract/mll/run.ts --with-schedule
+
+# Re-extract even if already done
+bun src/extract/mll/run.ts --force
+
+# Full historical extraction with schedules
+bun src/extract/mll/run.ts --all --with-schedule
+```
+
+| Flag | Description |
+|------|-------------|
+| `--year=YYYY` | Extract specific year (default: 2019) |
+| `--all` | Extract all seasons (2001-2020) |
+| `--with-schedule` | Include Wayback schedule extraction |
+| `--force` | Re-extract even if already done |
+
+> **Note:** Schedule data from Wayback has gaps, especially 2007-2019.
+> Output: `output/mll/{year}/` with JSON files per entity type.
+
 ## VALIDATION
 
 Run validation on extracted data:
@@ -111,6 +169,9 @@ infisical run --env=dev -- bun src/validate/validate-pll.ts
 
 # NLL validation (no credentials needed)
 bun src/validate/validate-nll.ts
+
+# MLL validation (no credentials needed)
+bun src/validate/validate-mll.ts
 ```
 
 Outputs `output/{source}/validation-report.json` with:

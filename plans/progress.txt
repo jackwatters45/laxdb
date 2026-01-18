@@ -482,3 +482,38 @@ Description: Implement entity validations
 Status: COMPLETE
 Commit: 3d67493
 Timestamp: 2026-01-19T03:35:33+11:00
+
+=== Iteration 61 ===
+Story: mll-validate-004
+Description: Implement cross-reference validations
+Status: COMPLETE
+Commit: 34a1153
+Timestamp: 2026-01-19T03:43:32+11:00
+
+=== Iteration 62 ===
+Story: mll-validate-005
+Description: Complete validation script with report
+Status: COMPLETE
+Commit: 34a1153
+Timestamp: 2026-01-19T03:47:14+11:00
+
+=== Iteration 63 ===
+Story: mll-validate-006
+Description: Test MLL validation runs successfully
+Status: COMPLETE
+Commit: 34a1153
+Timestamp: 2026-01-19T03:51:46+11:00
+
+=== Iteration 64 ===
+Story: mll-docs-001
+Description: Add MLLClient Methods table to CLAUDE.md
+Status: COMPLETE
+Commit: 34a1153
+Timestamp: 2026-01-19T03:54:16+11:00
+
+=== Iteration 65 ===
+Story: mll-docs-002
+Description: Add MLL commands to CLAUDE.md
+Status: COMPLETE
+Commit: 34a1153
+Timestamp: 2026-01-19T03:57:09+11:00

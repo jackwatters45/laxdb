@@ -808,7 +808,7 @@
     "id": "mll-validate-004",
     "category": "validate",
     "description": "Implement cross-reference validations",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add crossReference: players.team_id -> teams.id",
       "Add crossReference: goalies.team_id -> teams.id",
@@ -822,7 +822,7 @@
     "id": "mll-validate-005",
     "category": "validate",
     "description": "Complete validation script with report",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Build validation report using buildReport",
       "Print report using printReport",
@@ -836,7 +836,7 @@
     "id": "mll-validate-006",
     "category": "validate",
     "description": "Test MLL validation runs successfully",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-mll.ts",
       "Verify validation report shows pass/fail status",
@@ -847,7 +847,7 @@
     "id": "mll-docs-001",
     "category": "docs",
     "description": "Add MLLClient Methods table to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open packages/pipeline/CLAUDE.md",
       "Add MLLClient Methods table",
@@ -860,7 +860,7 @@
     "id": "mll-docs-002",
     "category": "docs",
     "description": "Add MLL commands to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add MLL extraction command: bun src/extract/mll/run.ts",
       "Add MLL validation command: bun src/validate/validate-mll.ts",

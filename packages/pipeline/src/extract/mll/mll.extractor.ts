@@ -199,7 +199,8 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           const teamsContent = yield* fs
             .readFileString(teamsPath)
             .pipe(Effect.catchAll(() => Effect.succeed("[]")));
-          const teams = JSON.parse(teamsContent) as unknown[];
+          const parsed: unknown = JSON.parse(teamsContent);
+          const teams: unknown[] = Array.isArray(parsed) ? parsed : [];
           const teamCount = teams.length || 6; // Default to 6 if no teams file
           const expectedGames = getExpectedGames(teamCount);
           const coverage =
