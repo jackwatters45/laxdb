@@ -101,6 +101,7 @@ describe("MSLClient", () => {
         expect(standings[0]).toHaveProperty("team_id");
         expect(standings[0]).toHaveProperty("wins");
         expect(standings[0]).toHaveProperty("losses");
+        expect(standings[0]).toHaveProperty("points");
       },
       TEAM_TIMEOUT,
     );
