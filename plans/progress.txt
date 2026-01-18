@@ -643,3 +643,10 @@ Description: MSLGame response schema
 Status: COMPLETE
 Commit: ec84510
 Timestamp: 2026-01-19T05:16:07+11:00
+
+=== Iteration 84 ===
+Story: msl-schema-010
+Description: MSL request schemas
+Status: COMPLETE
+Commit: 62133ef
+Timestamp: 2026-01-19T05:19:35+11:00

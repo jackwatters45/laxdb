@@ -1103,7 +1103,7 @@
     "id": "msl-schema-010",
     "category": "schema",
     "description": "MSL request schemas",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLTeamsRequest Schema.Class { seasonId: MSLSeasonId }",
       "Define MSLPlayersRequest Schema.Class { seasonId: MSLSeasonId }",
