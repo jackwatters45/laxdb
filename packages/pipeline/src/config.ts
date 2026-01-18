@@ -123,3 +123,14 @@ export class MSLConfig extends Effect.Service<MSLConfig>()("MSLConfig", {
     },
   } as const,
 }) {}
+
+export class WLAConfig extends Effect.Service<WLAConfig>()("WLAConfig", {
+  succeed: {
+    baseUrl: "https://www.wlalacrosse.com",
+    statsUrl: "https://www.wlalacrosse.com/stats",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  } as const,
+}) {}

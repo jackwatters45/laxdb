@@ -1049,3 +1049,10 @@ Description: WLA request schemas
 Status: COMPLETE
 Commit: 8176ad7
 Timestamp: 2026-01-19T08:39:49+11:00
+
+=== Iteration 142 ===
+Story: wla-schema-010
+Description: Export all schemas from wla.schema.ts
+Status: COMPLETE
+Commit: f8f2d8e
+Timestamp: 2026-01-19T08:43:08+11:00
