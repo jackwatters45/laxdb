@@ -15,6 +15,7 @@ import {
   crossReference,
   buildReport,
   printReport,
+  validateFileExists,
 } from "./validate.service";
 
 // ============================================================================
@@ -132,7 +133,231 @@ const program = Effect.gen(function* () {
   const fileResults: (typeof FileValidationResult.Type)[] = [];
   const crossRefs: (typeof CrossReferenceResult.Type)[] = [];
 
-  // TODO: Implement MLL validation logic in subsequent stories
+  // Validate each year's data files
+  for (const year of MLL_YEARS) {
+    const yearDir = path.join(mllDir, String(year));
+    yield* Effect.log(`Validating year ${year}...`);
+
+    // Validate teams.json
+    const { result: teamsResult, data: teams } =
+      yield* validateJsonArray<MLLTeam>(path.join(yearDir, "teams.json"), 1);
+
+    if (teams.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(teams, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(teams, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = teamsResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(teamsResult);
+    }
+
+    // Validate players.json
+    const { result: playersResult, data: players } =
+      yield* validateJsonArray<MLLPlayer>(
+        path.join(yearDir, "players.json"),
+        1,
+      );
+
+    if (players.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(players, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(players, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = playersResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(playersResult);
+    }
+
+    // Validate goalies.json
+    const { result: goaliesResult, data: goalies } =
+      yield* validateJsonArray<MLLGoalie>(
+        path.join(yearDir, "goalies.json"),
+        1,
+      );
+
+    if (goalies.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(goalies, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(goalies, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = goaliesResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(goaliesResult);
+    }
+
+    // Validate standings.json
+    const { result: standingsResult, data: standings } =
+      yield* validateJsonArray<MLLStanding>(
+        path.join(yearDir, "standings.json"),
+        1,
+      );
+
+    if (standings.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(standings, [
+        "team_id",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(standings, "team_id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = standingsResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(standingsResult);
+    }
+
+    // Validate stat-leaders.json
+    const { result: leadersResult, data: leaders } =
+      yield* validateJsonArray<MLLStatLeader>(
+        path.join(yearDir, "stat-leaders.json"),
+        1,
+      );
+
+    if (leaders.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(leaders, [
+        "player_id",
+      ]);
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = leadersResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck],
+      });
+    } else {
+      fileResults.push(leadersResult);
+    }
+
+    // Validate schedule.json (optional file - from Wayback Machine)
+    const schedulePath = path.join(yearDir, "schedule.json");
+    const scheduleFileResult = yield* validateFileExists(schedulePath);
+
+    if (scheduleFileResult.exists) {
+      const { result: scheduleResult, data: games } =
+        yield* validateJsonArray<MLLGame>(schedulePath, 0);
+
+      if (games.length > 0) {
+        const requiredCheck = yield* validateRequiredFields(games, ["id"]);
+        const uniqueIdCheck = yield* validateUniqueField(games, "id");
+        const {
+          filePath: fp,
+          exists,
+          sizeBytes,
+          recordCount,
+          checks,
+        } = scheduleResult;
+        fileResults.push({
+          filePath: fp,
+          exists,
+          sizeBytes,
+          recordCount,
+          checks: [...checks, requiredCheck, uniqueIdCheck],
+        });
+      } else {
+        fileResults.push(scheduleResult);
+      }
+    }
+
+    // Cross-reference: standings.team_id -> teams.id
+    if (standings.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        standings,
+        teams,
+        "team_id",
+        "id",
+        `${year}/standings.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // Cross-reference: players.team_id -> teams.id
+    const playersWithTeam = players.filter((p) => p.team_id !== null);
+    if (playersWithTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        playersWithTeam,
+        teams,
+        "team_id",
+        "id",
+        `${year}/players.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // Cross-reference: goalies.team_id -> teams.id
+    const goaliesWithTeam = goalies.filter((g) => g.team_id !== null);
+    if (goaliesWithTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        goaliesWithTeam,
+        teams,
+        "team_id",
+        "id",
+        `${year}/goalies.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+  }
 
   const report = buildReport("MLL", fileResults, crossRefs, startTime);
   yield* printReport(report);
