@@ -1213,7 +1213,7 @@
     "id": "msl-client-006",
     "category": "client",
     "description": "Implement MSLClient.getPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getPlayers(input: MSLPlayersRequest.Encoded)",
       "Build URL: /seasons/{seasonId}/players",

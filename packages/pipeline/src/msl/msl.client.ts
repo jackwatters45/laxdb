@@ -485,6 +485,144 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         ),
       );
 
+    /**
+     * Fetches all goalies for a given MSL season.
+     * Uses the Gamesheet internal REST API for structured data.
+     *
+     * @param input - Request containing the seasonId (MSL Gamesheet season ID)
+     * @returns Array of MSLGoalie objects with stats
+     */
+    const getGoalies = (
+      input: typeof MSLGoaliesRequest.Encoded,
+    ): Effect.Effect<
+      readonly MSLGoalie[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MSLGoaliesRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch goalie standings from Gamesheet internal API
+        // API returns paginated results, so we need to fetch all pages
+        const allGoalies: MSLGoalie[] = [];
+        const pageSize = 100; // Fetch 100 goalies at a time
+        let offset = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+          const path = `/api/usePlayers/getGoalieStandings/${request.seasonId}?filter[gametype]=overall&filter[sort]=-svpct&filter[limit]=${pageSize}&filter[offset]=${offset}`;
+
+          const response = yield* fetchGamesheetPageWithRetry(path);
+
+          // Parse JSON response
+          interface GoalieApiResponse {
+            names?: { firstName: string; lastName: string; id: number }[];
+            ids?: number[];
+            teamNames?: { title: string; id: number }[];
+            jersey?: (string | number | null)[];
+            gp?: number[];
+            w?: number[];
+            l?: number[];
+            t?: number[];
+            ga?: number[];
+            sv?: number[];
+            sa?: number[];
+            gaa?: number[];
+            svpct?: number[];
+            so?: number[];
+            min?: number[];
+          }
+
+          let data: GoalieApiResponse;
+          try {
+            data = JSON.parse(response) as GoalieApiResponse;
+          } catch {
+            return yield* Effect.fail(
+              new ParseError({
+                message: `Failed to parse goalie API response as JSON`,
+                cause: response.slice(0, 200),
+              }),
+            );
+          }
+
+          // Check if we have data
+          const names = data.names ?? [];
+          if (names.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Parse each goalie from the parallel arrays
+          for (let i = 0; i < names.length; i++) {
+            const name = names[i];
+            const goalieId = data.ids?.[i] ?? name?.id ?? i;
+            const firstName = name?.firstName ?? null;
+            const lastName = name?.lastName ?? null;
+            const fullName =
+              firstName && lastName
+                ? `${firstName} ${lastName}`
+                : (firstName ?? lastName ?? `Goalie ${goalieId}`);
+
+            const teamInfo = data.teamNames?.[i];
+            const jersey = data.jersey?.[i];
+
+            // Build stats
+            const gamesPlayed = data.gp?.[i] ?? 0;
+            const wins = data.w?.[i] ?? 0;
+            const losses = data.l?.[i] ?? 0;
+            const ties = data.t?.[i] ?? 0;
+            const goalsAgainst = data.ga?.[i] ?? 0;
+            const saves = data.sv?.[i] ?? 0;
+            const shotsAgainst = data.sa?.[i] ?? 0;
+            const gaa = data.gaa?.[i] ?? 0;
+            const savePct = data.svpct?.[i] ?? 0;
+            const shutouts = data.so?.[i] ?? 0;
+            const minutes = data.min?.[i] ?? 0;
+
+            const goalie = new MSLGoalie({
+              id: String(goalieId),
+              name: fullName,
+              first_name: firstName,
+              last_name: lastName,
+              jersey_number: jersey !== null ? String(jersey) : null,
+              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_name: teamInfo?.title ?? null,
+              stats: new MSLGoalieStats({
+                games_played: gamesPlayed,
+                wins,
+                losses,
+                ties,
+                goals_against: goalsAgainst,
+                saves,
+                shots_against: shotsAgainst,
+                gaa,
+                save_pct: savePct,
+                shutouts,
+                minutes_played: minutes,
+              }),
+            });
+
+            allGoalies.push(goalie);
+          }
+
+          // Check if there are more pages
+          if (names.length < pageSize) {
+            hasMore = false;
+          } else {
+            offset += pageSize;
+          }
+        }
+
+        return allGoalies;
+      }).pipe(
+        Effect.tap((goalies) =>
+          Effect.log(
+            `Fetched ${goalies.length} goalies for MSL season ${input.seasonId}`,
+          ),
+        ),
+      );
+
     return {
       // Config and utilities
       config: mslConfig,
@@ -498,6 +636,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       // Public API methods
       getTeams,
       getPlayers,
+      getGoalies,
     };
   }),
   dependencies: [MSLConfig.Default, PipelineConfig.Default],
