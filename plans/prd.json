@@ -1384,7 +1384,7 @@
     "id": "msl-manifest-001",
     "category": "extract",
     "description": "Create MSLSeasonManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/msl/msl.manifest.ts",
       "Define MSLEntityStatus schema (same pattern as NLL)",

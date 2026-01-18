@@ -783,3 +783,10 @@ Description: All MSL client tests pass
 Status: COMPLETE
 Commit: 658db79
 Timestamp: 2026-01-19T06:30:03+11:00
+
+=== Iteration 104 ===
+Story: msl-manifest-001
+Description: Create MSLSeasonManifest schema
+Status: COMPLETE
+Commit: ba5099b
+Timestamp: 2026-01-19T06:35:25+11:00
