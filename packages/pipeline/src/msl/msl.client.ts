@@ -803,114 +803,115 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         );
 
         // Fetch scores from Gamesheet internal API
-        // API returns paginated results, so we need to fetch all pages
+        // Note: API returns all games at once, no pagination needed
+        const path = `/api/useScoredGames/getSeasonScores/${request.seasonId}`;
+
+        const response = yield* fetchGamesheetPageWithRetry(path);
+
+        // Parse JSON response - API returns array of game entries
+        interface PeriodScore {
+          title: string;
+          homeGoals: string | number;
+          visitorGoals: string | number;
+        }
+        interface TeamInfo {
+          id: string;
+          name: string;
+          logo?: string;
+        }
+        interface GameInfo {
+          gameId: string;
+          date?: string;
+          time?: string;
+          type?: string;
+          homeTeam: TeamInfo;
+          visitorTeam: TeamInfo;
+          finalScore?: {
+            homeGoals: number;
+            visitorGoals: number;
+          };
+          scoresByPeriod?: PeriodScore[];
+          location?: string;
+        }
+        interface GameEntry {
+          date: string;
+          game: GameInfo;
+        }
+
+        let data: GameEntry[];
+        try {
+          const parsed = JSON.parse(response);
+          // API returns array of game entries
+          data = Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return yield* Effect.fail(
+            new ParseError({
+              message: `Failed to parse schedule API response as JSON`,
+              cause: response.slice(0, 200),
+            }),
+          );
+        }
+
         const allGames: MSLGame[] = [];
-        const pageSize = 100; // Fetch 100 games at a time
-        let offset = 0;
-        let hasMore = true;
 
-        while (hasMore) {
-          const path = `/api/useScoredGames/getSeasonScores/${request.seasonId}?filter[gametype]=overall&filter[limit]=${pageSize}&filter[offset]=${offset}`;
+        for (const entry of data) {
+          const gameInfo = entry.game;
+          if (!gameInfo) continue;
 
-          const response = yield* fetchGamesheetPageWithRetry(path);
+          const gameId = gameInfo.gameId;
+          const date = gameInfo.date ?? null;
+          const time = gameInfo.time ?? null;
+          const status = gameInfo.type ?? null;
 
-          // Parse JSON response
-          interface GameApiResponse {
-            gameIds?: number[];
-            dates?: string[];
-            times?: string[];
-            homeTitles?: { title: string; id: number }[];
-            visitorTitles?: { title: string; id: number }[];
-            homeScores?: number[];
-            visitorScores?: number[];
-            locations?: string[];
-            statuses?: string[];
-            periodScores?: {
-              home: number[];
-              visitor: number[];
-            }[];
-          }
+          const homeTeam = gameInfo.homeTeam;
+          const visitorTeam = gameInfo.visitorTeam;
 
-          let data: GameApiResponse;
-          try {
-            data = JSON.parse(response) as GameApiResponse;
-          } catch {
-            return yield* Effect.fail(
-              new ParseError({
-                message: `Failed to parse schedule API response as JSON`,
-                cause: response.slice(0, 200),
-              }),
-            );
-          }
+          const homeScore = gameInfo.finalScore?.homeGoals ?? 0;
+          const awayScore = gameInfo.finalScore?.visitorGoals ?? 0;
+          const venue = gameInfo.location ?? null;
 
-          // Check if we have data
-          const gameIds = data.gameIds ?? [];
-          if (gameIds.length === 0) {
-            hasMore = false;
-            break;
-          }
+          // Build period scores if available
+          let periodScores: MSLGamePeriodScore[] | undefined;
 
-          // Parse each game from the parallel arrays
-          for (let i = 0; i < gameIds.length; i++) {
-            const gameId = gameIds[i];
-            const date = data.dates?.[i] ?? null;
-            const time = data.times?.[i] ?? null;
-            const status = data.statuses?.[i] ?? null;
-
-            const homeTeam = data.homeTitles?.[i];
-            const visitorTeam = data.visitorTitles?.[i];
-
-            const homeScore = data.homeScores?.[i] ?? 0;
-            const visitorScore = data.visitorScores?.[i] ?? 0;
-            const venue = data.locations?.[i] ?? null;
-
-            // Build period scores if available
-            const periodData = data.periodScores?.[i];
-            let periodScores: MSLGamePeriodScore[] | undefined;
-
-            if (periodData?.home && periodData?.visitor) {
-              periodScores = [];
-              for (
-                let p = 0;
-                p < Math.min(periodData.home.length, periodData.visitor.length);
-                p++
-              ) {
-                periodScores.push(
-                  new MSLGamePeriodScore({
-                    period: p + 1,
-                    home_score: periodData.home[p] ?? 0,
-                    away_score: periodData.visitor[p] ?? 0,
-                  }),
-                );
-              }
+          if (gameInfo.scoresByPeriod && gameInfo.scoresByPeriod.length > 0) {
+            periodScores = [];
+            for (let p = 0; p < gameInfo.scoresByPeriod.length; p++) {
+              const period = gameInfo.scoresByPeriod[p];
+              if (!period) continue;
+              const homeGoals =
+                typeof period.homeGoals === "string"
+                  ? parseInt(period.homeGoals, 10)
+                  : period.homeGoals;
+              const awayGoals =
+                typeof period.visitorGoals === "string"
+                  ? parseInt(period.visitorGoals, 10)
+                  : period.visitorGoals;
+              periodScores.push(
+                new MSLGamePeriodScore({
+                  period: p + 1,
+                  home_score: homeGoals ?? 0,
+                  away_score: awayGoals ?? 0,
+                }),
+              );
             }
-
-            const game = new MSLGame({
-              id: String(gameId),
-              date,
-              time,
-              status,
-              home_team_id:
-                homeTeam?.id !== undefined ? String(homeTeam.id) : null,
-              away_team_id:
-                visitorTeam?.id !== undefined ? String(visitorTeam.id) : null,
-              home_team_name: homeTeam?.title ?? null,
-              away_team_name: visitorTeam?.title ?? null,
-              home_score: homeScore,
-              away_score: visitorScore,
-              venue,
-              period_scores: periodScores,
-            });
-
-            allGames.push(game);
           }
 
-          // Check if there are more pages
-          if (gameIds.length < pageSize) {
-            hasMore = false;
-          } else {
-            offset += pageSize;
-          }
+          const game = new MSLGame({
+            id: String(gameId),
+            date,
+            time,
+            status,
+            home_team_id: homeTeam?.id ?? null,
+            away_team_id: visitorTeam?.id ?? null,
+            home_team_name: homeTeam?.name ?? null,
+            away_team_name: visitorTeam?.name ?? null,
+            home_score: homeScore,
+            away_score: awayScore,
+            venue,
+            period_scores: periodScores,
+          });
+
+          allGames.push(game);
         }
 
         return allGames;

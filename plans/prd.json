@@ -1345,7 +1345,7 @@
     "id": "msl-test-005",
     "category": "test",
     "description": "getStandings integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getStandings",
       "Add test: 'fetches standings for season 9567'",

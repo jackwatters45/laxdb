@@ -109,11 +109,11 @@ describe("MSLClient", () => {
 
   describe("getSchedule", () => {
     it(
-      "fetches schedule for season",
+      "fetches schedule for season 9567",
       async () => {
         const program = Effect.gen(function* () {
           const msl = yield* MSLClient;
-          return yield* msl.getSchedule({ seasonId: TEST_SEASON_ID });
+          return yield* msl.getSchedule({ seasonId: 9567 });
         });
 
         const games = await Effect.runPromise(
@@ -124,6 +124,7 @@ describe("MSLClient", () => {
         expect(games[0]).toHaveProperty("id");
         expect(games[0]).toHaveProperty("home_team_id");
         expect(games[0]).toHaveProperty("away_team_id");
+        expect(games[0]).toHaveProperty("date");
       },
       TEAM_TIMEOUT,
     );
