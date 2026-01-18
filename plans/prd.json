@@ -1567,7 +1567,7 @@
     "id": "msl-extract-012",
     "category": "extract",
     "description": "Test MSL extraction runs for single season",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/msl/run.ts --season=9567",
       "Verify output/msl/9567/*.json files created",

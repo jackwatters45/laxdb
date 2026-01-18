@@ -881,3 +881,10 @@ Description: Create MSL extraction CLI entry point
 Status: COMPLETE
 Commit: f4a68b6
 Timestamp: 2026-01-19T07:19:34+11:00
+
+=== Iteration 118 ===
+Story: msl-extract-012
+Description: Test MSL extraction runs for single season
+Status: COMPLETE
+Commit: c19d206
+Timestamp: 2026-01-19T07:24:52+11:00
