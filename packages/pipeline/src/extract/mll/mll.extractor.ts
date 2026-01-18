@@ -176,6 +176,16 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      // Estimate expected games based on MLL team counts
+      // MLL had ~12-14 reg season games per team + playoffs
+      const getExpectedGames = (teamCount: number): number => {
+        // Regular season: each team plays ~12 games
+        // Playoffs: 4 teams, 3 games (2 semi + 1 final)
+        const regSeasonGames = Math.floor((teamCount * 12) / 2); // divide by 2 (each game has 2 teams)
+        const playoffGames = 3;
+        return regSeasonGames + playoffGames;
+      };
+
       const extractSchedule = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -183,13 +193,33 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           );
           const result = yield* withTiming(client.getSchedule({ year }));
           yield* saveJson(getOutputPath(year, "schedule"), result.data);
+
+          // Get team count for coverage calculation
+          const teamsPath = getOutputPath(year, "teams");
+          const teamsContent = yield* fs
+            .readFileString(teamsPath)
+            .pipe(Effect.catchAll(() => Effect.succeed("[]")));
+          const teams = JSON.parse(teamsContent) as unknown[];
+          const teamCount = teams.length || 6; // Default to 6 if no teams file
+          const expectedGames = getExpectedGames(teamCount);
+          const coverage =
+            expectedGames > 0
+              ? Math.round((result.count / expectedGames) * 100)
+              : 0;
+
           if (result.count === 0) {
             yield* Effect.log(
               `     ⚠ No schedule data found (Wayback coverage may be incomplete)`,
             );
+            yield* Effect.log(
+              `     📊 Schedule coverage: 0% (0/${expectedGames} expected games)`,
+            );
           } else {
             yield* Effect.log(
               `     ✓ ${result.count} games (${result.durationMs}ms)`,
+            );
+            yield* Effect.log(
+              `     📊 Schedule coverage: ${coverage}% (${result.count}/${expectedGames} expected games)`,
             );
           }
           return result;
@@ -199,6 +229,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               yield* Effect.log(
                 `     ✗ Failed: ${e} (schedule may be incomplete for this year)`,
               );
+              yield* Effect.log(`     📊 Schedule coverage: 0%`);
               return {
                 data: [] as readonly MLLGame[],
                 count: 0,

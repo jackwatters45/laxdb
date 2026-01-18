@@ -731,7 +731,7 @@
     "id": "mll-extract-013",
     "category": "extract",
     "description": "Test MLL extraction runs for single year",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/mll/run.ts --year=2019",
       "Verify output/mll/2019/*.json files created (without schedule)",

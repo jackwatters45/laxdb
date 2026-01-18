@@ -440,3 +440,10 @@ Description: Create MLL extraction CLI entry point
 Status: COMPLETE
 Commit: bbe7716
 Timestamp: 2026-01-19T02:57:29+11:00
+
+=== Iteration 55 ===
+Story: mll-extract-013
+Description: Test MLL extraction runs for single year
+Status: COMPLETE
+Commit: a7e31d0
+Timestamp: 2026-01-19T03:04:19+11:00
