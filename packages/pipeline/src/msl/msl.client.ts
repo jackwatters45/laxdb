@@ -623,6 +623,139 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         ),
       );
 
+    /**
+     * Fetches standings for a given MSL season.
+     * Uses the Gamesheet internal REST API for structured data.
+     *
+     * @param input - Request containing the seasonId (MSL Gamesheet season ID)
+     * @returns Array of MSLStanding objects
+     */
+    const getStandings = (
+      input: typeof MSLStandingsRequest.Encoded,
+    ): Effect.Effect<
+      readonly MSLStanding[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MSLStandingsRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch standings from Gamesheet internal API
+        // Note: The API requires no filter[gametype] parameter to return data
+        const path = `/api/useStandings/getDivisionStandings/${request.seasonId}`;
+
+        const response = yield* fetchGamesheetPageWithRetry(path);
+
+        // Parse JSON response - returns array of divisions with nested tableData
+        interface TeamTitle {
+          title: string;
+          id: number;
+        }
+
+        interface StandingsTableData {
+          ranks?: number[];
+          teamTitles?: TeamTitle[];
+          teamLogos?: (string | null)[];
+          teamIds?: number[];
+          gp?: number[];
+          w?: number[];
+          l?: number[];
+          t?: number[];
+          pts?: number[];
+          gf?: number[];
+          ga?: number[];
+          diff?: number[];
+          stk?: string[];
+        }
+
+        interface StandingsApiResponse {
+          title?: string;
+          id?: number;
+          tableData?: StandingsTableData;
+        }
+
+        let data: StandingsApiResponse | StandingsApiResponse[];
+        try {
+          data = JSON.parse(response) as
+            | StandingsApiResponse
+            | StandingsApiResponse[];
+        } catch {
+          return yield* Effect.fail(
+            new ParseError({
+              message: `Failed to parse standings API response as JSON`,
+              cause: response.slice(0, 200),
+            }),
+          );
+        }
+
+        // Normalize to array (single division returns object, multiple returns array)
+        const divisions = Array.isArray(data) ? data : [data];
+
+        const allStandings: MSLStanding[] = [];
+
+        for (const division of divisions) {
+          // Data is nested under tableData
+          const tableData = division.tableData ?? {};
+          const teamTitles = tableData.teamTitles ?? [];
+          const teamIds = tableData.teamIds ?? [];
+          const ranks = tableData.ranks ?? [];
+          const gp = tableData.gp ?? [];
+          const wins = tableData.w ?? [];
+          const losses = tableData.l ?? [];
+          const ties = tableData.t ?? [];
+          const points = tableData.pts ?? [];
+          const goalsFor = tableData.gf ?? [];
+          const goalsAgainst = tableData.ga ?? [];
+          const goalDiff = tableData.diff ?? [];
+          const streaks = tableData.stk ?? [];
+
+          for (let i = 0; i < teamTitles.length; i++) {
+            const teamInfo = teamTitles[i];
+            const teamId = teamIds[i] ?? teamInfo?.id;
+            const teamName = teamInfo?.title ?? null;
+            const position = ranks[i] ?? i + 1;
+            const gamesPlayed = gp[i] ?? 0;
+            const w = wins[i] ?? 0;
+            const l = losses[i] ?? 0;
+            const t = ties[i] ?? 0;
+            const pts = points[i] ?? 0;
+            const gf = goalsFor[i] ?? 0;
+            const ga = goalsAgainst[i] ?? 0;
+            const diff = goalDiff[i] ?? gf - ga;
+            const streak = streaks[i] ?? null;
+
+            const standing = new MSLStanding({
+              team_id: teamId !== undefined ? String(teamId) : String(i),
+              team_name: teamName,
+              position,
+              wins: w,
+              losses: l,
+              ties: t,
+              games_played: gamesPlayed,
+              points: pts,
+              goals_for: gf,
+              goals_against: ga,
+              goal_diff: diff,
+              streak,
+            });
+
+            allStandings.push(standing);
+          }
+        }
+
+        // Sort by position
+        allStandings.sort((a, b) => a.position - b.position);
+
+        return allStandings;
+      }).pipe(
+        Effect.tap((standings) =>
+          Effect.log(
+            `Fetched ${standings.length} standings for MSL season ${input.seasonId}`,
+          ),
+        ),
+      );
+
     return {
       // Config and utilities
       config: mslConfig,
@@ -637,6 +770,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       getTeams,
       getPlayers,
       getGoalies,
+      getStandings,
     };
   }),
   dependencies: [MSLConfig.Default, PipelineConfig.Default],

@@ -706,3 +706,10 @@ Description: Implement MSLClient.getPlayers method
 Status: COMPLETE
 Commit: 71d69a9
 Timestamp: 2026-01-19T05:45:25+11:00
+
+=== Iteration 93 ===
+Story: msl-client-007
+Description: Implement MSLClient.getGoalies method
+Status: COMPLETE
+Commit: 65f7dcf
+Timestamp: 2026-01-19T05:49:58+11:00

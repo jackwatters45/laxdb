@@ -1230,7 +1230,7 @@
     "id": "msl-client-007",
     "category": "client",
     "description": "Implement MSLClient.getGoalies method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getGoalies(input: MSLGoaliesRequest.Encoded)",
       "Build URL: /seasons/{seasonId}/goalies or goalie tab",
