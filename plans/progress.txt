@@ -98,3 +98,10 @@ Description: MLLTeam response schema
 Status: COMPLETE
 Commit: 5c02534
 Timestamp: 2026-01-18T23:53:06+11:00
+
+=== Iteration 6 ===
+Story: mll-schema-003
+Description: MLLPlayerStats nested schema
+Status: COMPLETE
+Commit: 5f91c11
+Timestamp: 2026-01-18T23:54:40+11:00

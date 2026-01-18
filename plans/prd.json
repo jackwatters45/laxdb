@@ -65,7 +65,7 @@
     "id": "mll-schema-003",
     "category": "schema",
     "description": "MLLPlayerStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLPlayerStats Schema.Class",
       "Fields: games_played, goals, assists, points (Schema.Number)",

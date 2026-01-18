@@ -22,6 +22,19 @@ export class MLLTeam extends Schema.Class<MLLTeam>("MLLTeam")({
   final_year: Schema.NullOr(Schema.Number),
 }) {}
 
+// MLL Player response schema
+export class MLLPlayer extends Schema.Class<MLLPlayer>("MLLPlayer")({
+  id: Schema.String,
+  name: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  college: Schema.NullOr(Schema.String),
+  stats: Schema.optional(Schema.suspend(() => MLLPlayerStats)),
+}) {}
+
 // MLL Player Stats nested schema
 export class MLLPlayerStats extends Schema.Class<MLLPlayerStats>(
   "MLLPlayerStats",
