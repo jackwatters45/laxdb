@@ -853,3 +853,10 @@ Description: Implement extractSchedule method
 Status: COMPLETE
 Commit: 29eef86
 Timestamp: 2026-01-19T07:02:47+11:00
+
+=== Iteration 114 ===
+Story: msl-extract-008
+Description: Implement extractSeason orchestrator
+Status: COMPLETE
+Commit: 5fa2859
+Timestamp: 2026-01-19T07:05:38+11:00

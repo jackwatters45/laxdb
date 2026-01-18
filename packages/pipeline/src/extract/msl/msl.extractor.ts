@@ -306,14 +306,55 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return manifest;
         });
 
-      // Placeholder for extractAllSeasons (implemented in subsequent story)
       const extractAllSeasons = (
-        _options: {
+        options: {
           skipExisting?: boolean;
           startYear?: number;
           endYear?: number;
         } = {},
-      ) => Effect.succeed({} as MSLSeasonManifest);
+      ) =>
+        Effect.gen(function* () {
+          const skipExisting = options.skipExisting ?? true;
+          const startYear = options.startYear ?? 2023;
+          const endYear = options.endYear ?? 2025;
+
+          const seasonsToExtract = MSL_SEASONS.filter(
+            (s) => s.year >= startYear && s.year <= endYear,
+          );
+          const totalSeasons = seasonsToExtract.length;
+
+          yield* Effect.log(`\n${"#".repeat(60)}`);
+          yield* Effect.log(
+            `MSL EXTRACTION: ${totalSeasons} seasons (${startYear}-${endYear})`,
+          );
+          yield* Effect.log(`Options: skipExisting=${skipExisting}`);
+          yield* Effect.log("#".repeat(60));
+
+          const overallStart = Date.now();
+          let lastManifest = yield* manifestService.load;
+
+          for (const [i, season] of seasonsToExtract.entries()) {
+            yield* Effect.log(
+              `\n>>> Progress: ${i + 1}/${totalSeasons} seasons`,
+            );
+            lastManifest = yield* extractSeason(season.seasonId, {
+              skipExisting,
+            });
+          }
+
+          const totalDurationMs = Date.now() - overallStart;
+          const minutes = Math.floor(totalDurationMs / 60000);
+          const seconds = Math.floor((totalDurationMs % 60000) / 1000);
+
+          yield* Effect.log(`\n${"#".repeat(60)}`);
+          yield* Effect.log(`EXTRACTION COMPLETE`);
+          yield* Effect.log(
+            `Total: ${totalSeasons} seasons in ${minutes}m ${seconds}s`,
+          );
+          yield* Effect.log("#".repeat(60));
+
+          return lastManifest;
+        });
 
       return {
         MSL_SEASONS,
