@@ -238,3 +238,10 @@ Description: Implement MLLClient.getStandings method
 Status: COMPLETE
 Commit: a698bc2
 Timestamp: 2026-01-19T00:39:12+11:00
+
+=== Iteration 26 ===
+Story: mll-client-010
+Description: Implement MLLClient.getStatLeaders method
+Status: COMPLETE
+Commit: 8ff52aa
+Timestamp: 2026-01-19T00:42:22+11:00

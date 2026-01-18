@@ -841,6 +841,80 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       );
 
     /**
+     * Finds archived schedule snapshots from Wayback Machine for a given MLL season.
+     * Queries CDX API for majorleaguelacrosse.com/schedule URLs within the season date range.
+     *
+     * MLL seasons typically run from late May through late August.
+     * We query with a buffer (March-October) to capture preseason and playoff data.
+     *
+     * @param year - MLL season year (2001-2020)
+     * @returns Sorted array of WaybackCDXEntry objects (best snapshots first)
+     */
+    const findScheduleSnapshots = (
+      year: number,
+    ): Effect.Effect<
+      readonly WaybackCDXEntry[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        // MLL season typically runs May-August
+        // Use March-October range to capture preseason, playoffs, and off-season updates
+        const fromDate = `${year}0301`;
+        const toDate = `${year}1031`;
+
+        // Query CDX for all schedule URLs in this date range
+        const entries = yield* queryWaybackCDXWithRetry(
+          "majorleaguelacrosse.com/schedule*",
+          {
+            from: fromDate,
+            to: toDate,
+            // Collapse by digest to remove duplicate content
+            collapse: "digest",
+          },
+        );
+
+        if (entries.length === 0) {
+          return [] as readonly WaybackCDXEntry[];
+        }
+
+        // Sort by timestamp descending (most recent first)
+        // This prioritizes snapshots closer to end of season (more complete data)
+        const sortedEntries = [...entries].toSorted((a, b) =>
+          b.timestamp.localeCompare(a.timestamp),
+        );
+
+        // Filter to prioritize main schedule pages over team-specific or event pages
+        // Priority: /schedule/league/ > /schedule/ > /schedule?team= > /schedule/events
+        const prioritized = sortedEntries.toSorted((a, b) => {
+          const getPriority = (url: string): number => {
+            if (url.includes("/schedule/league")) return 0;
+            if (url.includes("/schedule.html")) return 1;
+            if (url.endsWith("/schedule/") || url.endsWith("/schedule"))
+              return 2;
+            if (url.includes("/schedule.aspx")) return 3;
+            if (url.includes("?team=")) return 4;
+            if (url.includes("/events")) return 5;
+            return 6;
+          };
+
+          const priorityDiff =
+            getPriority(a.original) - getPriority(b.original);
+          if (priorityDiff !== 0) return priorityDiff;
+
+          // For same priority, prefer more recent timestamp
+          return b.timestamp.localeCompare(a.timestamp);
+        });
+
+        return prioritized;
+      }).pipe(
+        Effect.tap((snapshots) =>
+          Effect.log(
+            `Found ${snapshots.length} schedule snapshots for MLL year ${year}`,
+          ),
+        ),
+      );
+
+    /**
      * Fetches stat leaders for a given MLL season year.
      * Scrapes the league leaders page for top performers.
      *
@@ -1218,6 +1292,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Internal helpers for fetching Wayback archived pages
       fetchWaybackPage: fetchWaybackPageWithRetry,
+
+      // Internal helpers for finding Wayback schedule snapshots
+      findScheduleSnapshots,
 
       // Public API methods
       getTeams,
