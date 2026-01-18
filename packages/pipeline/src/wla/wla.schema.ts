@@ -2,6 +2,23 @@ import { Schema } from "effect";
 
 // WLA (Western Lacrosse Association) data source: Pointstreak
 // Season years range from 2005 to present (mapped to season IDs on Pointstreak)
+// League ID: 62, Season IDs: opaque integers per season
+
+// Pointstreak league ID for WLA
+export const WLA_LEAGUE_ID = 62;
+
+// Year to Pointstreak Season ID mapping
+// Note: Season IDs are discovered from the stats SPA at wlalacrosse.com/stats
+// URL pattern: /stats#/{league_id}/{section}?season_id={season_id}
+export const WLA_POINTSTREAK_SEASONS: Record<number, number> = {
+  2024: 8669,
+  // Historical seasons TBD - require manual discovery from stats page
+};
+
+// Years with known Pointstreak season IDs
+export const WLA_POINTSTREAK_YEARS = Object.keys(WLA_POINTSTREAK_SEASONS)
+  .map(Number)
+  .toSorted((a, b) => b - a); // Most recent first
 
 export const WLASeasonId = Schema.Number.pipe(
   Schema.int(),

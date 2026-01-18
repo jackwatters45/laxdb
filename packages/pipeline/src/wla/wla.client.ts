@@ -5,6 +5,8 @@ import { PipelineConfig, WLAConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
 
 import {
+  WLA_LEAGUE_ID,
+  WLA_POINTSTREAK_SEASONS,
   WLAGame,
   WLAGoalie,
   WLAGoalieStats,
@@ -128,6 +130,31 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
         ),
       );
 
+    /**
+     * Maps a calendar year to WLA's Pointstreak season ID.
+     * Returns Effect.fail with ParseError if year not found in mapping.
+     *
+     * @param year - Calendar year (e.g., 2024)
+     */
+    const getSeasonIdFromYear = (
+      year: number,
+    ): Effect.Effect<number, ParseError> =>
+      Effect.gen(function* () {
+        const seasonId = WLA_POINTSTREAK_SEASONS[year];
+        if (seasonId === undefined) {
+          return yield* Effect.fail(
+            new ParseError({
+              message: `No WLA Pointstreak season ID found for year ${year}. Available years: ${Object.keys(WLA_POINTSTREAK_SEASONS).join(", ")}`,
+            }),
+          );
+        }
+        return seasonId;
+      }).pipe(
+        Effect.tap((seasonId) =>
+          Effect.log(`WLA: year ${year} -> season ID ${seasonId}`),
+        ),
+      );
+
     // TODO: Implement WLA client methods in subsequent stories
     // - getTeams
     // - getPlayers
@@ -140,9 +167,12 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       config: wlaConfig,
       pipelineConfig,
       cheerio: $,
+      leagueId: WLA_LEAGUE_ID,
       // Fetch helpers
       fetchPage,
       fetchPageWithRetry,
+      // Season helpers
+      getSeasonIdFromYear,
     };
   }),
   dependencies: [WLAConfig.Default, PipelineConfig.Default],

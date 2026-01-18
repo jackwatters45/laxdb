@@ -1922,7 +1922,7 @@
     "id": "wla-client-003",
     "category": "client",
     "description": "Implement fetchPage helper for SPA scraping",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add fetchPage(url: string) internal helper",
       "Use fetch with browser-like headers",
