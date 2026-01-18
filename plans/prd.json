@@ -1262,7 +1262,7 @@
     "id": "msl-client-009",
     "category": "client",
     "description": "Implement MSLClient.getSchedule method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getSchedule(input: MSLScheduleRequest.Encoded)",
       "Build URL: /seasons/{seasonId}/schedule or /seasons/{seasonId}/scores",
