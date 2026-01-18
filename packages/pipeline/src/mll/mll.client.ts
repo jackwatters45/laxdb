@@ -397,7 +397,8 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
           Effect.mapError(mapParseError),
         );
 
-        const path = `/lacrosse/l-MLL/y-${request.year}`;
+        // Path relative to statscrewBaseUrl (https://www.statscrew.com/lacrosse)
+        const path = `/l-MLL/y-${request.year}`;
 
         const html = yield* fetchStatscrewPageWithRetry(path);
 
@@ -508,7 +509,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         const seenPlayerIds = new Set<string>();
 
         for (const team of teams) {
-          const path = `/lacrosse/stats/t-${team.id}/y-${request.year}`;
+          const path = `/stats/t-${team.id}/y-${request.year}`;
 
           const html = yield* fetchStatscrewPageWithRetry(path).pipe(
             Effect.catchTag("HttpError", (error) => {
@@ -697,7 +698,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
           Effect.mapError(mapParseError),
         );
 
-        const path = `/lacrosse/l-MLL/y-${request.year}`;
+        const path = `/l-MLL/y-${request.year}`;
 
         const html = yield* fetchStatscrewPageWithRetry(path);
 
@@ -1257,7 +1258,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
           Effect.mapError(mapParseError),
         );
 
-        const path = `/lacrosse/leaders/l-MLL/y-${request.year}`;
+        const path = `/leaders/l-MLL/y-${request.year}`;
 
         const html = yield* fetchStatscrewPageWithRetry(path);
 
@@ -1440,7 +1441,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         const seenGoalieIds = new Set<string>();
 
         for (const team of teams) {
-          const path = `/lacrosse/stats/t-${team.id}/y-${request.year}`;
+          const path = `/stats/t-${team.id}/y-${request.year}`;
 
           const html = yield* fetchStatscrewPageWithRetry(path).pipe(
             Effect.catchTag("HttpError", (error) => {

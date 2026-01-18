@@ -34,5 +34,20 @@ describe("MLLClient", () => {
       expect(teams[0]?.id).toBeTypeOf("string");
       expect(teams[0]?.name).toBeTypeOf("string");
     });
+
+    it("fetches teams for year 2019", async () => {
+      const program = Effect.gen(function* () {
+        const mll = yield* MLLClient;
+        return yield* mll.getTeams({ year: 2019 });
+      });
+
+      const teams = await Effect.runPromise(
+        program.pipe(Effect.provide(MLLClient.Default)),
+      );
+
+      expect(teams.length).toBe(6);
+      expect(teams[0]).toHaveProperty("id");
+      expect(teams[0]).toHaveProperty("name");
+    });
   });
 });

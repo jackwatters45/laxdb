@@ -273,3 +273,16 @@ Description: Create MLL module index exports
 Status: COMPLETE
 Commit: 08e7191
 Timestamp: 2026-01-19T00:55:19+11:00
+
+=== Iteration 31 ===
+Story: mll-test-001
+Description: Create MLL integration test file
+Status: COMPLETE
+Commit: 4012d9a
+Timestamp: 2026-01-19T00:57:54+11:00
+
+=== Iteration 32 ===
+Story: mll-test-002
+Status: BLOCKED
+Reason: MLLClient.getTeams returns 0 teams for all years - underlying client parsing is broken (HTML structure changed on statscrew.com or parsing logic issue). Test code is correct but cannot pass until client is fixed.
+Timestamp: 2026-01-19T00:59:19+11:00

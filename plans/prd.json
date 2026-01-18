@@ -422,7 +422,7 @@
     "id": "mll-test-001",
     "category": "test",
     "description": "Create MLL integration test file",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/mll/mll.integration.test.ts",
       "Import Effect, describe, expect, it from vitest",
