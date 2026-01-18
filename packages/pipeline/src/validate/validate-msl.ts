@@ -135,7 +135,156 @@ const program = Effect.gen(function* () {
   const fileResults: (typeof FileValidationResult.Type)[] = [];
   const crossRefs: (typeof CrossReferenceResult.Type)[] = [];
 
-  // TODO: Implement year-by-year validation (msl-validate-002+)
+  // Validate each season's data files
+  for (const year of MSL_YEARS) {
+    const yearDir = path.join(mslDir, String(year));
+    yield* Effect.log(`Validating season ${year}...`);
+
+    // Validate teams.json
+    const { result: teamsResult, data: teams } =
+      yield* validateJsonArray<MSLTeam>(path.join(yearDir, "teams.json"), 1);
+
+    if (teams.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(teams, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(teams, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = teamsResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(teamsResult);
+    }
+
+    // Validate players.json
+    const { result: playersResult, data: players } =
+      yield* validateJsonArray<MSLPlayer>(
+        path.join(yearDir, "players.json"),
+        1,
+      );
+
+    if (players.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(players, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(players, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = playersResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(playersResult);
+    }
+
+    // Validate goalies.json
+    const { result: goaliesResult, data: goalies } =
+      yield* validateJsonArray<MSLGoalie>(
+        path.join(yearDir, "goalies.json"),
+        1,
+      );
+
+    if (goalies.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(goalies, [
+        "id",
+        "name",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(goalies, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = goaliesResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(goaliesResult);
+    }
+
+    // Validate standings.json
+    const { result: standingsResult, data: standings } =
+      yield* validateJsonArray<MSLStanding>(
+        path.join(yearDir, "standings.json"),
+        1,
+      );
+
+    if (standings.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(standings, [
+        "team_id",
+      ]);
+      const uniqueIdCheck = yield* validateUniqueField(standings, "team_id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = standingsResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(standingsResult);
+    }
+
+    // Validate schedule.json
+    const { result: scheduleResult, data: games } =
+      yield* validateJsonArray<MSLGame>(path.join(yearDir, "schedule.json"), 1);
+
+    if (games.length > 0) {
+      const requiredCheck = yield* validateRequiredFields(games, ["id"]);
+      const uniqueIdCheck = yield* validateUniqueField(games, "id");
+      const {
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks,
+      } = scheduleResult;
+      fileResults.push({
+        filePath: fp,
+        exists,
+        sizeBytes,
+        recordCount,
+        checks: [...checks, requiredCheck, uniqueIdCheck],
+      });
+    } else {
+      fileResults.push(scheduleResult);
+    }
+  }
 
   const report = buildReport("MSL", fileResults, crossRefs, startTime);
   yield* printReport(report);

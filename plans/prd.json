@@ -1603,7 +1603,7 @@
     "id": "msl-validate-002",
     "category": "validate",
     "description": "Define MSL validation interfaces",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLTeam interface for validation",
       "Define MSLPlayer interface for validation",
