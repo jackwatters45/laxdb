@@ -703,7 +703,7 @@
     "id": "mll-extract-011",
     "category": "extract",
     "description": "Create MLL extraction module exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/mll/index.ts",
       "Export MLLExtractorService",
