@@ -334,6 +334,59 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return manifest;
         });
 
+      const extractAllSeasons = (
+        options: {
+          skipExisting?: boolean;
+          includeSchedule?: boolean;
+          startYear?: number;
+          endYear?: number;
+        } = {},
+      ) =>
+        Effect.gen(function* () {
+          const skipExisting = options.skipExisting ?? true;
+          const includeSchedule = options.includeSchedule ?? false;
+          const startYear = options.startYear ?? 2001;
+          const endYear = options.endYear ?? 2020;
+
+          const yearsToExtract = MLL_YEARS.filter(
+            (y) => y >= startYear && y <= endYear,
+          );
+          const totalYears = yearsToExtract.length;
+
+          yield* Effect.log(`\n${"#".repeat(60)}`);
+          yield* Effect.log(
+            `MLL EXTRACTION: ${totalYears} seasons (${startYear}-${endYear})`,
+          );
+          yield* Effect.log(
+            `Options: skipExisting=${skipExisting}, includeSchedule=${includeSchedule}`,
+          );
+          yield* Effect.log("#".repeat(60));
+
+          const overallStart = Date.now();
+          let lastManifest = yield* manifestService.load;
+
+          for (const [i, year] of yearsToExtract.entries()) {
+            yield* Effect.log(`\n>>> Progress: ${i + 1}/${totalYears} seasons`);
+            lastManifest = yield* extractSeason(year, {
+              skipExisting,
+              includeSchedule,
+            });
+          }
+
+          const totalDurationMs = Date.now() - overallStart;
+          const minutes = Math.floor(totalDurationMs / 60000);
+          const seconds = Math.floor((totalDurationMs % 60000) / 1000);
+
+          yield* Effect.log(`\n${"#".repeat(60)}`);
+          yield* Effect.log(`EXTRACTION COMPLETE`);
+          yield* Effect.log(
+            `Total: ${totalYears} seasons in ${minutes}m ${seconds}s`,
+          );
+          yield* Effect.log("#".repeat(60));
+
+          return lastManifest;
+        });
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -346,6 +399,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractStatLeaders,
         extractSchedule,
         extractSeason,
+        extractAllSeasons,
         // Expose injected dependencies for use by extractor methods
         client,
         config,

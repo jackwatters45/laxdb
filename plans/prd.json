@@ -673,7 +673,7 @@
     "id": "mll-extract-009",
     "category": "extract",
     "description": "Implement extractSeason orchestrator",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractSeason(year, options) method",
       "Options: { skipExisting: boolean, includeSchedule: boolean }",
