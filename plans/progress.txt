@@ -811,3 +811,10 @@ Description: Create MSLExtractorService base structure
 Status: COMPLETE
 Commit: 084acd7
 Timestamp: 2026-01-19T06:43:51+11:00
+
+=== Iteration 108 ===
+Story: msl-extract-002
+Description: Implement extractor helper functions
+Status: COMPLETE
+Commit: 95e0f7f
+Timestamp: 2026-01-19T06:46:24+11:00

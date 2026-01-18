@@ -3,7 +3,8 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
-import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
+import type { MSLTeam } from "../../msl/msl.schema";
+import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
@@ -62,13 +63,29 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           ),
         );
 
-      // Placeholder for entity extraction methods (implemented in subsequent stories)
-      const extractTeams = (_seasonId: number) =>
-        Effect.succeed({
-          data: [] as readonly unknown[],
-          count: 0,
-          durationMs: 0,
-        });
+      const extractTeams = (seasonId: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
+          const result = yield* withTiming(
+            client.getTeams({ seasonId: MSLSeasonId.make(seasonId) }),
+          );
+          yield* saveJson(getOutputPath(seasonId, "teams"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MSLTeam[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
 
       const extractPlayers = (_seasonId: number) =>
         Effect.succeed({
