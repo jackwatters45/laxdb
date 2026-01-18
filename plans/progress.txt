@@ -3,3 +3,27 @@ Started: 2026-01-18T09:30:00+11:00
 Previous: plans/archive/v0.0.1/
 
 --- Session History ---
+
+=== Iteration 1 ===
+Story: mll-setup-001
+Status: BLOCKED
+Reason: Story requires git commands (git checkout -b feature/mll) but rules prohibit running git commands - harness must handle branch creation
+Timestamp: 2026-01-18T23:22:31+11:00
+
+=== Iteration 2 ===
+Story: mll-setup-001
+Status: BLOCKED
+Reason: Story requires git branch creation (git checkout -b feature/mll) but rules prohibit running git commands - harness must handle branch creation
+Timestamp: 2026-01-18T23:22:59+11:00
+
+=== Iteration 3 ===
+Story: mll-setup-001
+Status: BLOCKED
+Reason: Story requires git branch creation (git checkout -b feature/mll) but rules prohibit running git commands - harness must handle branch creation
+Timestamp: 2026-01-18T23:23:21+11:00
+
+=== Iteration 1 ===
+Story: mll-setup-001
+Status: BLOCKED
+Reason: Story mll-setup-001 requires git branch creation (git checkout -b feature/mll) which is prohibited by rules - harness must handle branch creation
+Timestamp: 2026-01-18T23:26:54+11:00

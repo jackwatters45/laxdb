@@ -1,1 +1,2571 @@
-[]
+[
+{
+  "id": "mll-discovery-001",
+  "category": "discovery",
+  "description": "Analyze StatsCrew page structure",
+  "passes": false,
+  "steps": [
+    "Visit https://www.statscrew.com/lacrosse/l-MLL",
+    "Document available years (2001-2020)",
+    "Document URL patterns for standings, leaders, rosters",
+    "Analyze HTML table structure",
+    "Note: StatsCrew does NOT have schedules/game results"
+  ]
+},
+{
+  "id": "mll-discovery-002",
+  "category": "discovery",
+  "description": "Analyze Wayback Machine CDX API for MLL schedules",
+  "passes": false,
+  "steps": [
+    "Query CDX API: web.archive.org/cdx/search/cdx?url=majorleaguelacrosse.com/schedule*&output=json",
+    "Document available archive captures by year",
+    "Identify best snapshots for each season's schedule",
+    "Note gaps in coverage",
+    "Document URL patterns for schedule/results pages"
+  ]
+},
+{
+  "id": "mll-discovery-003",
+  "category": "discovery",
+  "description": "Map MLL teams by year",
+  "passes": false,
+  "steps": [
+    "Document team roster changes 2001-2020",
+    "Note: 6 teams in final year (2019): Atlanta Blaze, Boston Cannons, Chesapeake Bayhawks, Dallas Rattlers, Denver Outlaws, New York Lizards",
+    "Create year->teams mapping for validation",
+    "Document team code/abbreviation conventions"
+  ]
+},
+{
+  "id": "mll-schema-001",
+  "category": "schema",
+  "description": "Create mll.schema.ts with MLLYear branded type",
+  "passes": false,
+  "steps": [
+    "Create src/mll/mll.schema.ts",
+    "Define MLLYear: Schema.Number.pipe(Schema.int(), Schema.between(2001, 2020), Schema.brand('MLLYear'))",
+    "Add description annotation",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-002",
+  "category": "schema",
+  "description": "MLLTeam response schema",
+  "passes": false,
+  "steps": [
+    "Define MLLTeam Schema.Class",
+    "Fields: id (string), name (string), city (nullable), abbreviation (nullable)",
+    "Fields: founded_year, final_year (nullable numbers for team lifespan)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-003",
+  "category": "schema",
+  "description": "MLLPlayerStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define MLLPlayerStats Schema.Class",
+    "Fields: games_played, goals, assists, points (Schema.Number)",
+    "Fields: shots, shot_pct (nullable)",
+    "Fields: ground_balls, caused_turnovers, turnovers (nullable)",
+    "Fields: faceoffs_won, faceoffs_lost, faceoff_pct (nullable)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-004",
+  "category": "schema",
+  "description": "MLLPlayer response schema",
+  "passes": false,
+  "steps": [
+    "Define MLLPlayer Schema.Class",
+    "Fields: id (string), name (string), first_name, last_name (nullable)",
+    "Fields: position (nullable string)",
+    "Fields: team_id, team_name (nullable strings)",
+    "Fields: college (nullable string for college attended)",
+    "Field: stats (Schema.optional(MLLPlayerStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-005",
+  "category": "schema",
+  "description": "MLLGoalieStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define MLLGoalieStats Schema.Class",
+    "Fields: games_played, wins, losses (Schema.Number)",
+    "Fields: goals_against, saves (Schema.Number)",
+    "Fields: gaa (goals against average), save_pct (save percentage)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-006",
+  "category": "schema",
+  "description": "MLLGoalie response schema",
+  "passes": false,
+  "steps": [
+    "Define MLLGoalie Schema.Class",
+    "Fields: id (string), name (string), first_name, last_name (nullable)",
+    "Fields: team_id, team_name (nullable strings)",
+    "Field: stats (Schema.optional(MLLGoalieStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-007",
+  "category": "schema",
+  "description": "MLLStanding response schema",
+  "passes": false,
+  "steps": [
+    "Define MLLStanding Schema.Class",
+    "Fields: team_id (string), team_name (nullable string), position (number)",
+    "Fields: wins, losses, games_played (Schema.Number)",
+    "Fields: goals_for, goals_against, goal_diff (Schema.Number)",
+    "Field: win_pct (Schema.Number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-008",
+  "category": "schema",
+  "description": "MLLStatLeader response schema",
+  "passes": false,
+  "steps": [
+    "Define MLLStatLeader Schema.Class",
+    "Fields: player_id, player_name (string)",
+    "Fields: team_id, team_name (nullable strings)",
+    "Fields: stat_type (string), stat_value (number)",
+    "Field: rank (number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-009",
+  "category": "schema",
+  "description": "MLLGame response schema (from Wayback)",
+  "passes": false,
+  "steps": [
+    "Define MLLGame Schema.Class",
+    "Fields: id (string), date (nullable string), status (nullable string)",
+    "Fields: home_team_id, away_team_id (nullable strings)",
+    "Fields: home_team_name, away_team_name (nullable strings)",
+    "Fields: home_score, away_score (nullable numbers - may not have scores for all games)",
+    "Field: venue (nullable string)",
+    "Field: source_url (nullable string - Wayback archive URL)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-010",
+  "category": "schema",
+  "description": "MLL request schemas",
+  "passes": false,
+  "steps": [
+    "Define MLLTeamsRequest Schema.Class { year: MLLYear }",
+    "Define MLLPlayersRequest Schema.Class { year: MLLYear }",
+    "Define MLLGoaliesRequest Schema.Class { year: MLLYear }",
+    "Define MLLStandingsRequest Schema.Class { year: MLLYear }",
+    "Define MLLStatLeadersRequest Schema.Class { year: MLLYear, statType?: string }",
+    "Define MLLScheduleRequest Schema.Class { year: MLLYear }",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-011",
+  "category": "schema",
+  "description": "Wayback CDX response schema",
+  "passes": false,
+  "steps": [
+    "Define WaybackCDXEntry Schema.Class",
+    "Fields: urlkey, timestamp, original, mimetype, statuscode, digest, length",
+    "Define WaybackCDXResponse as Schema.Array(WaybackCDXEntry)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-schema-012",
+  "category": "schema",
+  "description": "Export all schemas from mll.schema.ts",
+  "passes": false,
+  "steps": [
+    "Add export statements for all schemas",
+    "Add export for branded MLLYear type",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-config-001",
+  "category": "config",
+  "description": "Add MLLConfig service to config.ts",
+  "passes": false,
+  "steps": [
+    "Open src/config.ts",
+    "Add MLLConfig Effect.Service class",
+    "Set statscrewBaseUrl: https://www.statscrew.com/lacrosse",
+    "Set waybackCdxUrl: https://web.archive.org/cdx/search/cdx",
+    "Set waybackWebUrl: https://web.archive.org/web",
+    "Set headers: standard browser User-Agent",
+    "No auth tokens needed (public sites)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-001",
+  "category": "client",
+  "description": "Create mll.client.ts with base structure",
+  "passes": false,
+  "steps": [
+    "Create src/mll/mll.client.ts",
+    "Import Effect, Schema, Duration from effect",
+    "Import cheerio for HTML parsing",
+    "Import MLLConfig, PipelineConfig from config",
+    "Import ParseError from error",
+    "Import all schemas from mll.schema",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-002",
+  "category": "client",
+  "description": "Create MLLClient service shell",
+  "passes": false,
+  "steps": [
+    "Define MLLClient as Effect.Service",
+    "Yield MLLConfig and PipelineConfig in effect",
+    "Set dependencies: [MLLConfig.Default, PipelineConfig.Default]",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-003",
+  "category": "client",
+  "description": "Implement fetchStatscrewPage helper",
+  "passes": false,
+  "steps": [
+    "Add fetchStatscrewPage(path: string) internal helper",
+    "Build full URL from statscrewBaseUrl",
+    "Use fetch with browser-like headers",
+    "Return HTML string",
+    "Add retry with exponential backoff",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-004",
+  "category": "client",
+  "description": "Implement queryWaybackCDX helper",
+  "passes": false,
+  "steps": [
+    "Add queryWaybackCDX(url: string, params: object) internal helper",
+    "Build CDX API query URL",
+    "Fetch JSON response",
+    "Parse to WaybackCDXEntry[]",
+    "Filter by statuscode=200",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-005",
+  "category": "client",
+  "description": "Implement fetchWaybackPage helper",
+  "passes": false,
+  "steps": [
+    "Add fetchWaybackPage(timestamp: string, url: string) internal helper",
+    "Build Wayback URL: /web/{timestamp}/{url}",
+    "Fetch archived page HTML",
+    "Handle redirects and errors",
+    "Return HTML string",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-006",
+  "category": "client",
+  "description": "Implement MLLClient.getTeams method",
+  "passes": false,
+  "steps": [
+    "Add getTeams(input: MLLTeamsRequest.Encoded)",
+    "Build URL: /l-MLL/y-{year}",
+    "Fetch StatsCrew page",
+    "Parse HTML with cheerio to extract team list from standings or roster pages",
+    "Map to MLLTeam[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-007",
+  "category": "client",
+  "description": "Implement MLLClient.getPlayers method",
+  "passes": false,
+  "steps": [
+    "Add getPlayers(input: MLLPlayersRequest.Encoded)",
+    "Build URL for player stats/leaders page",
+    "Fetch StatsCrew page",
+    "Parse stats table with cheerio",
+    "Extract: name, team, GP, G, A, Pts, etc.",
+    "Map to MLLPlayer[] array",
+    "Handle pagination if present",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-008",
+  "category": "client",
+  "description": "Implement MLLClient.getGoalies method",
+  "passes": false,
+  "steps": [
+    "Add getGoalies(input: MLLGoaliesRequest.Encoded)",
+    "Build URL for goalie stats page",
+    "Fetch StatsCrew page",
+    "Parse goalie stats table with cheerio",
+    "Extract: name, team, GP, W, L, GAA, SV%",
+    "Map to MLLGoalie[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-009",
+  "category": "client",
+  "description": "Implement MLLClient.getStandings method",
+  "passes": false,
+  "steps": [
+    "Add getStandings(input: MLLStandingsRequest.Encoded)",
+    "Build URL: /l-MLL/y-{year}",
+    "Fetch StatsCrew page",
+    "Parse standings table with cheerio",
+    "Extract: team, W, L, GF, GA, Win%",
+    "Map to MLLStanding[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-010",
+  "category": "client",
+  "description": "Implement MLLClient.getStatLeaders method",
+  "passes": false,
+  "steps": [
+    "Add getStatLeaders(input: MLLStatLeadersRequest.Encoded)",
+    "Build URL for yearly leaders page",
+    "Fetch StatsCrew page",
+    "Parse leaders table with cheerio",
+    "Extract: player, team, stat_type, stat_value, rank",
+    "Map to MLLStatLeader[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-011",
+  "category": "client",
+  "description": "Implement findScheduleSnapshots helper",
+  "passes": false,
+  "steps": [
+    "Add findScheduleSnapshots(year: number) internal helper",
+    "Query Wayback CDX for majorleaguelacrosse.com/schedule URLs",
+    "Filter by year range (season dates)",
+    "Return sorted list of best snapshots",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-012",
+  "category": "client",
+  "description": "Implement parseWaybackSchedule helper",
+  "passes": false,
+  "steps": [
+    "Add parseWaybackSchedule(html: string, sourceUrl: string) internal helper",
+    "Parse archived schedule HTML with cheerio",
+    "Handle multiple HTML layout variations over the years",
+    "Extract: date, home team, away team, scores (if available), venue",
+    "Return MLLGame[] array",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-013",
+  "category": "client",
+  "description": "Implement MLLClient.getSchedule method",
+  "passes": false,
+  "steps": [
+    "Add getSchedule(input: MLLScheduleRequest.Encoded)",
+    "Call findScheduleSnapshots to get best archive URLs",
+    "Fetch each snapshot from Wayback",
+    "Parse and deduplicate games",
+    "Handle missing/incomplete data gracefully",
+    "Map to MLLGame[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-client-014",
+  "category": "client",
+  "description": "Create MLL module index exports",
+  "passes": false,
+  "steps": [
+    "Create src/mll/index.ts",
+    "Export MLLClient from mll.client.ts",
+    "Export all schema types from mll.schema.ts",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-test-001",
+  "category": "test",
+  "description": "Create MLL integration test file",
+  "passes": false,
+  "steps": [
+    "Create src/mll/mll.integration.test.ts",
+    "Import Effect, describe, expect, it from vitest",
+    "Import MLLClient",
+    "Setup describe block for MLLClient",
+    "Run: bun test src/mll/ --dry-run"
+  ]
+},
+{
+  "id": "mll-test-002",
+  "category": "test",
+  "description": "getTeams integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getTeams",
+    "Add test: 'fetches teams for year 2019'",
+    "Call client.getTeams({ year: 2019 })",
+    "Assert result.length === 6 (known final year team count)",
+    "Assert team has id, name fields",
+    "Run: bun test src/mll/ -t 'getTeams'"
+  ]
+},
+{
+  "id": "mll-test-003",
+  "category": "test",
+  "description": "getPlayers integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getPlayers",
+    "Add test: 'fetches players for year 2019'",
+    "Call client.getPlayers({ year: 2019 })",
+    "Assert result.length > 0",
+    "Assert player has id, name, stats with goals/assists/points",
+    "Run: bun test src/mll/ -t 'getPlayers'"
+  ]
+},
+{
+  "id": "mll-test-004",
+  "category": "test",
+  "description": "getGoalies integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getGoalies",
+    "Add test: 'fetches goalies for year 2019'",
+    "Call client.getGoalies({ year: 2019 })",
+    "Assert result.length > 0",
+    "Assert goalie has id, name, stats with gaa/save_pct",
+    "Run: bun test src/mll/ -t 'getGoalies'"
+  ]
+},
+{
+  "id": "mll-test-005",
+  "category": "test",
+  "description": "getStandings integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getStandings",
+    "Add test: 'fetches standings for year 2019'",
+    "Call client.getStandings({ year: 2019 })",
+    "Assert result.length === 6",
+    "Assert standing has team_id, wins, losses",
+    "Run: bun test src/mll/ -t 'getStandings'"
+  ]
+},
+{
+  "id": "mll-test-006",
+  "category": "test",
+  "description": "getStatLeaders integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getStatLeaders",
+    "Add test: 'fetches stat leaders for year 2019'",
+    "Call client.getStatLeaders({ year: 2019 })",
+    "Assert result.length > 0",
+    "Assert leader has player_name, stat_type, stat_value",
+    "Run: bun test src/mll/ -t 'getStatLeaders'"
+  ]
+},
+{
+  "id": "mll-test-007",
+  "category": "test",
+  "description": "getSchedule integration test (Wayback)",
+  "passes": false,
+  "steps": [
+    "Add describe block for getSchedule",
+    "Add test: 'fetches schedule for year 2019 from Wayback'",
+    "Call client.getSchedule({ year: 2019 })",
+    "Assert result.length > 0 (may have gaps)",
+    "Assert game has id, home_team_id, away_team_id",
+    "Log coverage percentage for transparency",
+    "Run: bun test src/mll/ -t 'getSchedule'"
+  ]
+},
+{
+  "id": "mll-test-008",
+  "category": "test",
+  "description": "All MLL client tests pass",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/mll/",
+    "All 6 endpoint tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "mll-manifest-001",
+  "category": "extract",
+  "description": "Create MLLSeasonManifest schema",
+  "passes": false,
+  "steps": [
+    "Create src/extract/mll/mll.manifest.ts",
+    "Define MLLEntityStatus schema (same pattern as NLL)",
+    "Define MLLSeasonManifest with teams, players, goalies, standings, statLeaders, schedule fields",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-manifest-002",
+  "category": "extract",
+  "description": "Create MLLExtractionManifest schema",
+  "passes": false,
+  "steps": [
+    "Define MLLExtractionManifest schema",
+    "Fields: source='mll', seasons Record, lastRun, version",
+    "Add createEmptyMLLManifest helper",
+    "Add createEmptyMLLSeasonManifest helper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-manifest-003",
+  "category": "extract",
+  "description": "Create MLLManifestService",
+  "passes": false,
+  "steps": [
+    "Define MLLManifestService as Effect.Service",
+    "Inject ExtractConfigService, FileSystem, Path",
+    "Set manifestPath: output/mll/manifest.json",
+    "Implement load, save, getSeasonManifest, markComplete, isExtracted methods",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-001",
+  "category": "extract",
+  "description": "Create MLLExtractorService base structure",
+  "passes": false,
+  "steps": [
+    "Create src/extract/mll/mll.extractor.ts",
+    "Define MLLExtractorService as Effect.Service",
+    "Inject MLLClient, ExtractConfigService, MLLManifestService, FileSystem, Path",
+    "Define MLL_YEARS array: range 2001-2020 (20 years)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-002",
+  "category": "extract",
+  "description": "Implement extractor helper functions",
+  "passes": false,
+  "steps": [
+    "Add getOutputPath(year, entity) helper",
+    "Add saveJson<T>(filePath, data) helper",
+    "Add withTiming<T>(effect) wrapper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-003",
+  "category": "extract",
+  "description": "Implement extractTeams method",
+  "passes": false,
+  "steps": [
+    "Add extractTeams(year) method",
+    "Log progress, call client.getTeams with timing",
+    "Save to output/mll/{year}/teams.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-004",
+  "category": "extract",
+  "description": "Implement extractPlayers method",
+  "passes": false,
+  "steps": [
+    "Add extractPlayers(year) method",
+    "Log progress, call client.getPlayers with timing",
+    "Save to output/mll/{year}/players.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-005",
+  "category": "extract",
+  "description": "Implement extractGoalies method",
+  "passes": false,
+  "steps": [
+    "Add extractGoalies(year) method",
+    "Log progress, call client.getGoalies with timing",
+    "Save to output/mll/{year}/goalies.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-006",
+  "category": "extract",
+  "description": "Implement extractStandings method",
+  "passes": false,
+  "steps": [
+    "Add extractStandings(year) method",
+    "Log progress, call client.getStandings with timing",
+    "Save to output/mll/{year}/standings.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-007",
+  "category": "extract",
+  "description": "Implement extractStatLeaders method",
+  "passes": false,
+  "steps": [
+    "Add extractStatLeaders(year) method",
+    "Log progress, call client.getStatLeaders with timing",
+    "Save to output/mll/{year}/stat-leaders.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-008",
+  "category": "extract",
+  "description": "Implement extractSchedule method (Wayback)",
+  "passes": false,
+  "steps": [
+    "Add extractSchedule(year) method",
+    "Log progress, call client.getSchedule with timing",
+    "Save to output/mll/{year}/schedule.json",
+    "Log coverage info (may have gaps from Wayback)",
+    "Handle errors gracefully - schedule may be incomplete",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-009",
+  "category": "extract",
+  "description": "Implement extractSeason orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractSeason(year, options) method",
+    "Options: { skipExisting: boolean, includeSchedule: boolean }",
+    "Load manifest, check skipExisting for each entity",
+    "Call extract methods: teams, players, goalies, standings, statLeaders",
+    "Optionally call extractSchedule (slower due to Wayback)",
+    "Update manifest after each entity, save",
+    "Add 2000ms delay between StatsCrew requests",
+    "Add 5000ms delay before Wayback requests (rate limiting)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-010",
+  "category": "extract",
+  "description": "Implement extractAllSeasons orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractAllSeasons(options) method",
+    "Loop through MLL_YEARS array (2001-2020)",
+    "Call extractSeason for each year",
+    "Log overall progress",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-011",
+  "category": "extract",
+  "description": "Create MLL extraction module exports",
+  "passes": false,
+  "steps": [
+    "Create src/extract/mll/index.ts",
+    "Export MLLExtractorService",
+    "Export MLLManifestService",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-012",
+  "category": "extract",
+  "description": "Create MLL extraction CLI entry point",
+  "passes": false,
+  "steps": [
+    "Create src/extract/mll/run.ts",
+    "Parse CLI args: --year=YYYY, --all, --force, --with-schedule, --help",
+    "Default to extracting single year (2019 - final full season)",
+    "--with-schedule flag to include Wayback schedule extraction",
+    "Build Layer with MLLExtractorService.Default + BunContext.layer",
+    "Call extractor.extractSeason or extractAllSeasons",
+    "Use BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-extract-013",
+  "category": "extract",
+  "description": "Test MLL extraction runs for single year",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/mll/run.ts --year=2019",
+    "Verify output/mll/2019/*.json files created (without schedule)",
+    "Verify manifest.json updated"
+  ]
+},
+{
+  "id": "mll-extract-014",
+  "category": "extract",
+  "description": "Test MLL extraction with schedule for single year",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/mll/run.ts --year=2019 --with-schedule",
+    "Verify output/mll/2019/schedule.json created",
+    "Log schedule coverage percentage"
+  ]
+},
+{
+  "id": "mll-extract-015",
+  "category": "extract",
+  "description": "Test MLL extraction runs for all years",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/mll/run.ts --all",
+    "Verify output/mll/{2001-2020}/*.json files created",
+    "Verify manifest.json tracks all 20 years"
+  ]
+},
+{
+  "id": "mll-validate-001",
+  "category": "validate",
+  "description": "Create validate-mll.ts file structure",
+  "passes": false,
+  "steps": [
+    "Create src/validate/validate-mll.ts",
+    "Import FileSystem, Path from @effect/platform",
+    "Import BunContext, BunRuntime from @effect/platform-bun",
+    "Import Effect, Layer from effect",
+    "Import validation helpers from validate.service",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-validate-002",
+  "category": "validate",
+  "description": "Define MLL validation interfaces",
+  "passes": false,
+  "steps": [
+    "Define MLLTeam interface for validation",
+    "Define MLLPlayer interface for validation",
+    "Define MLLGoalie interface for validation",
+    "Define MLLStanding interface for validation",
+    "Define MLLStatLeader interface for validation",
+    "Define MLLGame interface for validation",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-validate-003",
+  "category": "validate",
+  "description": "Implement entity validations",
+  "passes": false,
+  "steps": [
+    "Add validation for teams.json (id, name required, unique id)",
+    "Add validation for players.json (id, name required, unique id)",
+    "Add validation for goalies.json (id, name required, unique id)",
+    "Add validation for standings.json (team_id required, unique)",
+    "Add validation for stat-leaders.json (player_id required)",
+    "Add validation for schedule.json (id required, unique) - optional file",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-validate-004",
+  "category": "validate",
+  "description": "Implement cross-reference validations",
+  "passes": false,
+  "steps": [
+    "Add crossReference: players.team_id -> teams.id",
+    "Add crossReference: goalies.team_id -> teams.id",
+    "Add crossReference: standings.team_id -> teams.id",
+    "Add crossReference: schedule.home_team_id -> teams.id (if schedule exists)",
+    "Add crossReference: schedule.away_team_id -> teams.id (if schedule exists)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-validate-005",
+  "category": "validate",
+  "description": "Complete validation script with report",
+  "passes": false,
+  "steps": [
+    "Build validation report using buildReport",
+    "Print report using printReport",
+    "Save report to output/mll/validation-report.json",
+    "Include schedule coverage statistics",
+    "Add BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "mll-validate-006",
+  "category": "validate",
+  "description": "Test MLL validation runs successfully",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-mll.ts",
+    "Verify validation report shows pass/fail status",
+    "Verify output/mll/validation-report.json created"
+  ]
+},
+{
+  "id": "mll-docs-001",
+  "category": "docs",
+  "description": "Add MLLClient Methods table to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Open packages/pipeline/CLAUDE.md",
+    "Add MLLClient Methods table",
+    "Include getTeams, getPlayers, getGoalies, getStandings, getStatLeaders, getSchedule methods",
+    "Note: StatsCrew + Wayback scraping, no credentials needed",
+    "Note: Schedule data from Wayback may have gaps"
+  ]
+},
+{
+  "id": "mll-docs-002",
+  "category": "docs",
+  "description": "Add MLL commands to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Add MLL extraction command: bun src/extract/mll/run.ts",
+    "Add MLL validation command: bun src/validate/validate-mll.ts",
+    "Document --with-schedule flag for Wayback schedule extraction",
+    "Document --all flag for full historical extraction (2001-2020)"
+  ]
+},
+{
+  "id": "mll-final-001",
+  "category": "final",
+  "description": "Run full typecheck",
+  "passes": false,
+  "steps": [
+    "Run: bun run typecheck",
+    "Fix any type errors",
+    "All files compile successfully"
+  ]
+},
+{
+  "id": "mll-final-002",
+  "category": "final",
+  "description": "Run all MLL tests",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/mll/",
+    "All integration tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "mll-final-003",
+  "category": "final",
+  "description": "Run full extraction for all years (without schedule)",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/mll/run.ts --all",
+    "All 20 years extracted (2001-2020)",
+    "Manifest shows core entities complete"
+  ]
+},
+{
+  "id": "mll-final-004",
+  "category": "final",
+  "description": "Run schedule extraction for recent years",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/mll/run.ts --year=2019 --with-schedule",
+    "Run: bun src/extract/mll/run.ts --year=2018 --with-schedule",
+    "Run: bun src/extract/mll/run.ts --year=2017 --with-schedule",
+    "Document schedule coverage for each year"
+  ]
+},
+{
+  "id": "mll-final-005",
+  "category": "final",
+  "description": "Run full validation",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-mll.ts",
+    "Validation report shows all checks pass",
+    "Cross-references validate correctly",
+    "Schedule coverage documented"
+  ]
+},
+{
+  "id": "mll-final-006",
+  "category": "final",
+  "description": "Verify all output files",
+  "passes": false,
+  "steps": [
+    "Verify: ls -la output/mll/",
+    "All year directories exist (2001-2020)",
+    "Each directory has: teams.json, players.json, goalies.json, standings.json, stat-leaders.json",
+    "Select years have schedule.json",
+    "manifest.json exists and is valid"
+  ]
+},
+{
+  "id": "msl-discovery-001",
+  "category": "discovery",
+  "description": "Discover available season IDs on Gamesheet",
+  "passes": false,
+  "steps": [
+    "Visit https://gamesheetstats.com",
+    "Navigate to MSL/Ontario Lacrosse Association stats",
+    "Document season IDs format (e.g., 9567 = 2024)",
+    "List all available historical season IDs",
+    "Create mapping: year -> seasonId"
+  ]
+},
+{
+  "id": "msl-discovery-002",
+  "category": "discovery",
+  "description": "Analyze Gamesheet page structure",
+  "passes": false,
+  "steps": [
+    "Inspect https://gamesheetstats.com/seasons/9567/players",
+    "Identify if Next.js SSR or client-side rendering",
+    "Document HTML table structure for players",
+    "Document HTML table structure for goalies",
+    "Check for API endpoints in Network tab",
+    "Note pagination mechanism"
+  ]
+},
+{
+  "id": "msl-discovery-003",
+  "category": "discovery",
+  "description": "Analyze main MSL website structure",
+  "passes": false,
+  "steps": [
+    "Visit https://www.majorserieslacrosse.ca/",
+    "Document team list and links",
+    "Check for API or structured data",
+    "Note draft info location",
+    "Document any schedule/results pages"
+  ]
+},
+{
+  "id": "msl-schema-001",
+  "category": "schema",
+  "description": "Create msl.schema.ts with MSLSeasonId branded type",
+  "passes": false,
+  "steps": [
+    "Create src/msl/msl.schema.ts",
+    "Define MSLSeasonId: Schema.Number.pipe(Schema.int(), Schema.positive(), Schema.brand('MSLSeasonId'))",
+    "Add year mapping helper based on discovery",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-002",
+  "category": "schema",
+  "description": "MSLTeam response schema",
+  "passes": false,
+  "steps": [
+    "Define MSLTeam Schema.Class",
+    "Fields: id (string), name (string), city (nullable), abbreviation (nullable)",
+    "Fields: logo_url (nullable), website_url (nullable)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-003",
+  "category": "schema",
+  "description": "MSLPlayerStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define MSLPlayerStats Schema.Class",
+    "Fields: games_played, goals, assists, points, penalty_minutes (Schema.Number)",
+    "Fields: points_per_game (Schema.Number)",
+    "Fields: ppg, ppa, shg, sha (power play/short-handed goals/assists)",
+    "Fields: gwg, fg, otg (game-winning, first, overtime goals)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-004",
+  "category": "schema",
+  "description": "MSLPlayer response schema",
+  "passes": false,
+  "steps": [
+    "Define MSLPlayer Schema.Class",
+    "Fields: id (string), name (string), first_name, last_name (nullable)",
+    "Fields: jersey_number (nullable string), position (nullable string)",
+    "Fields: team_id, team_name (nullable strings)",
+    "Field: stats (Schema.optional(MSLPlayerStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-005",
+  "category": "schema",
+  "description": "MSLGoalieStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define MSLGoalieStats Schema.Class",
+    "Fields: games_played, wins, losses, ties (Schema.Number)",
+    "Fields: goals_against, saves, shots_against (Schema.Number)",
+    "Fields: gaa (goals against average), save_pct (save percentage)",
+    "Fields: shutouts, minutes_played (Schema.Number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-006",
+  "category": "schema",
+  "description": "MSLGoalie response schema",
+  "passes": false,
+  "steps": [
+    "Define MSLGoalie Schema.Class",
+    "Fields: id (string), name (string), first_name, last_name (nullable)",
+    "Fields: jersey_number (nullable string)",
+    "Fields: team_id, team_name (nullable strings)",
+    "Field: stats (Schema.optional(MSLGoalieStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-007",
+  "category": "schema",
+  "description": "MSLStanding response schema",
+  "passes": false,
+  "steps": [
+    "Define MSLStanding Schema.Class",
+    "Fields: team_id (string), team_name (nullable string), position (number)",
+    "Fields: wins, losses, ties, games_played, points (Schema.Number)",
+    "Fields: goals_for, goals_against, goal_diff (Schema.Number)",
+    "Field: streak (nullable string)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-008",
+  "category": "schema",
+  "description": "MSLGamePeriodScore nested schema",
+  "passes": false,
+  "steps": [
+    "Define MSLGamePeriodScore Schema.Class",
+    "Fields: period (number), home_score, away_score (Schema.Number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-009",
+  "category": "schema",
+  "description": "MSLGame response schema",
+  "passes": false,
+  "steps": [
+    "Define MSLGame Schema.Class",
+    "Fields: id (string), date (nullable string), time (nullable string), status (nullable string)",
+    "Fields: home_team_id, away_team_id (nullable strings)",
+    "Fields: home_team_name, away_team_name (nullable strings)",
+    "Fields: home_score, away_score (Schema.Number)",
+    "Field: venue (nullable string)",
+    "Field: period_scores (Schema.optional(Schema.Array(MSLGamePeriodScore)))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-010",
+  "category": "schema",
+  "description": "MSL request schemas",
+  "passes": false,
+  "steps": [
+    "Define MSLTeamsRequest Schema.Class { seasonId: MSLSeasonId }",
+    "Define MSLPlayersRequest Schema.Class { seasonId: MSLSeasonId }",
+    "Define MSLGoaliesRequest Schema.Class { seasonId: MSLSeasonId }",
+    "Define MSLStandingsRequest Schema.Class { seasonId: MSLSeasonId }",
+    "Define MSLScheduleRequest Schema.Class { seasonId: MSLSeasonId }",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-schema-011",
+  "category": "schema",
+  "description": "Export all schemas from msl.schema.ts",
+  "passes": false,
+  "steps": [
+    "Add export statements for all schemas",
+    "Add export for branded MSLSeasonId type",
+    "Add export for seasonId<->year mapping",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-config-001",
+  "category": "config",
+  "description": "Add MSLConfig service to config.ts",
+  "passes": false,
+  "steps": [
+    "Open src/config.ts",
+    "Add MSLConfig Effect.Service class",
+    "Set gamesheetBaseUrl: https://gamesheetstats.com",
+    "Set mainSiteBaseUrl: https://www.majorserieslacrosse.ca",
+    "Set headers: standard browser User-Agent",
+    "No auth tokens needed (public sites)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-001",
+  "category": "client",
+  "description": "Create msl.client.ts with base structure",
+  "passes": false,
+  "steps": [
+    "Create src/msl/msl.client.ts",
+    "Import Effect, Schema, Duration from effect",
+    "Import cheerio for HTML parsing",
+    "Import MSLConfig, PipelineConfig from config",
+    "Import ParseError from error",
+    "Import all schemas from msl.schema",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-002",
+  "category": "client",
+  "description": "Create MSLClient service shell",
+  "passes": false,
+  "steps": [
+    "Define MSLClient as Effect.Service",
+    "Yield MSLConfig and PipelineConfig in effect",
+    "Set dependencies: [MSLConfig.Default, PipelineConfig.Default]",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-003",
+  "category": "client",
+  "description": "Implement fetchGamesheetPage helper",
+  "passes": false,
+  "steps": [
+    "Add fetchGamesheetPage(path: string) internal helper",
+    "Build full URL from gamesheetBaseUrl",
+    "Use fetch with browser-like headers",
+    "Return HTML string",
+    "Add retry with exponential backoff",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-004",
+  "category": "client",
+  "description": "Implement fetchMainSitePage helper",
+  "passes": false,
+  "steps": [
+    "Add fetchMainSitePage(path: string) internal helper",
+    "Build full URL from mainSiteBaseUrl",
+    "Use fetch with browser-like headers",
+    "Return HTML string",
+    "Add retry with exponential backoff",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-005",
+  "category": "client",
+  "description": "Implement MSLClient.getTeams method",
+  "passes": false,
+  "steps": [
+    "Add getTeams(input: MSLTeamsRequest.Encoded)",
+    "Fetch teams from main site or Gamesheet standings page",
+    "Parse HTML with cheerio to extract team list",
+    "Map to MSLTeam[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-006",
+  "category": "client",
+  "description": "Implement MSLClient.getPlayers method",
+  "passes": false,
+  "steps": [
+    "Add getPlayers(input: MSLPlayersRequest.Encoded)",
+    "Build URL: /seasons/{seasonId}/players",
+    "Fetch page HTML from Gamesheet",
+    "Parse stats table with cheerio",
+    "Extract: name, team, GP, G, A, PTS, PIM, PT/G, PPG, PPA, SHG, SHA, GWG, FG, OTG",
+    "Map to MSLPlayer[] array",
+    "Handle pagination (check for next page links)",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-007",
+  "category": "client",
+  "description": "Implement MSLClient.getGoalies method",
+  "passes": false,
+  "steps": [
+    "Add getGoalies(input: MSLGoaliesRequest.Encoded)",
+    "Build URL: /seasons/{seasonId}/goalies or goalie tab",
+    "Fetch page HTML from Gamesheet",
+    "Parse goalie stats table with cheerio",
+    "Extract: name, team, GP, W, L, GAA, SV%, Saves, SO, MIN",
+    "Map to MSLGoalie[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-008",
+  "category": "client",
+  "description": "Implement MSLClient.getStandings method",
+  "passes": false,
+  "steps": [
+    "Add getStandings(input: MSLStandingsRequest.Encoded)",
+    "Build URL: /seasons/{seasonId}/standings",
+    "Fetch page HTML from Gamesheet",
+    "Parse standings table with cheerio",
+    "Extract: team, W, L, T, GP, PTS, GF, GA, DIFF, Streak",
+    "Map to MSLStanding[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-009",
+  "category": "client",
+  "description": "Implement MSLClient.getSchedule method",
+  "passes": false,
+  "steps": [
+    "Add getSchedule(input: MSLScheduleRequest.Encoded)",
+    "Build URL: /seasons/{seasonId}/schedule or /seasons/{seasonId}/scores",
+    "Fetch page HTML from Gamesheet",
+    "Parse schedule/scores with cheerio",
+    "Extract: date, time, home team, away team, scores, venue, period breakdown",
+    "Map to MSLGame[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-client-010",
+  "category": "client",
+  "description": "Create MSL module index exports",
+  "passes": false,
+  "steps": [
+    "Create src/msl/index.ts",
+    "Export MSLClient from msl.client.ts",
+    "Export all schema types from msl.schema.ts",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-test-001",
+  "category": "test",
+  "description": "Create MSL integration test file",
+  "passes": false,
+  "steps": [
+    "Create src/msl/msl.integration.test.ts",
+    "Import Effect, describe, expect, it from vitest",
+    "Import MSLClient",
+    "Setup describe block for MSLClient",
+    "Run: bun test src/msl/ --dry-run"
+  ]
+},
+{
+  "id": "msl-test-002",
+  "category": "test",
+  "description": "getTeams integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getTeams",
+    "Add test: 'fetches teams for season 9567'",
+    "Call client.getTeams({ seasonId: 9567 })",
+    "Assert result.length > 0",
+    "Assert team has id, name fields",
+    "Run: bun test src/msl/ -t 'getTeams'"
+  ]
+},
+{
+  "id": "msl-test-003",
+  "category": "test",
+  "description": "getPlayers integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getPlayers",
+    "Add test: 'fetches players for season 9567'",
+    "Call client.getPlayers({ seasonId: 9567 })",
+    "Assert result.length > 0",
+    "Assert player has id, name, stats with goals/assists/points",
+    "Run: bun test src/msl/ -t 'getPlayers'"
+  ]
+},
+{
+  "id": "msl-test-004",
+  "category": "test",
+  "description": "getGoalies integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getGoalies",
+    "Add test: 'fetches goalies for season 9567'",
+    "Call client.getGoalies({ seasonId: 9567 })",
+    "Assert result.length > 0",
+    "Assert goalie has id, name, stats with gaa/save_pct",
+    "Run: bun test src/msl/ -t 'getGoalies'"
+  ]
+},
+{
+  "id": "msl-test-005",
+  "category": "test",
+  "description": "getStandings integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getStandings",
+    "Add test: 'fetches standings for season 9567'",
+    "Call client.getStandings({ seasonId: 9567 })",
+    "Assert result.length > 0",
+    "Assert standing has team_id, wins, losses, points",
+    "Run: bun test src/msl/ -t 'getStandings'"
+  ]
+},
+{
+  "id": "msl-test-006",
+  "category": "test",
+  "description": "getSchedule integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getSchedule",
+    "Add test: 'fetches schedule for season 9567'",
+    "Call client.getSchedule({ seasonId: 9567 })",
+    "Assert result.length > 0",
+    "Assert game has id, home_team_id, away_team_id, date",
+    "Run: bun test src/msl/ -t 'getSchedule'"
+  ]
+},
+{
+  "id": "msl-test-007",
+  "category": "test",
+  "description": "All MSL client tests pass",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/msl/",
+    "All 5 endpoint tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "msl-manifest-001",
+  "category": "extract",
+  "description": "Create MSLSeasonManifest schema",
+  "passes": false,
+  "steps": [
+    "Create src/extract/msl/msl.manifest.ts",
+    "Define MSLEntityStatus schema (same pattern as NLL)",
+    "Define MSLSeasonManifest with teams, players, goalies, standings, schedule fields",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-manifest-002",
+  "category": "extract",
+  "description": "Create MSLExtractionManifest schema",
+  "passes": false,
+  "steps": [
+    "Define MSLExtractionManifest schema",
+    "Fields: source='msl', seasons Record, lastRun, version",
+    "Add createEmptyMSLManifest helper",
+    "Add createEmptyMSLSeasonManifest helper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-manifest-003",
+  "category": "extract",
+  "description": "Create MSLManifestService",
+  "passes": false,
+  "steps": [
+    "Define MSLManifestService as Effect.Service",
+    "Inject ExtractConfigService, FileSystem, Path",
+    "Set manifestPath: output/msl/manifest.json",
+    "Implement load, save, getSeasonManifest, markComplete, isExtracted methods",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-001",
+  "category": "extract",
+  "description": "Create MSLExtractorService base structure",
+  "passes": false,
+  "steps": [
+    "Create src/extract/msl/msl.extractor.ts",
+    "Define MSLExtractorService as Effect.Service",
+    "Inject MSLClient, ExtractConfigService, MSLManifestService, FileSystem, Path",
+    "Define MSL_SEASONS array based on discovered season IDs",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-002",
+  "category": "extract",
+  "description": "Implement extractor helper functions",
+  "passes": false,
+  "steps": [
+    "Add getOutputPath(seasonId, entity) helper",
+    "Add saveJson<T>(filePath, data) helper",
+    "Add withTiming<T>(effect) wrapper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-003",
+  "category": "extract",
+  "description": "Implement extractTeams method",
+  "passes": false,
+  "steps": [
+    "Add extractTeams(seasonId) method",
+    "Log progress, call client.getTeams with timing",
+    "Save to output/msl/{seasonId}/teams.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-004",
+  "category": "extract",
+  "description": "Implement extractPlayers method",
+  "passes": false,
+  "steps": [
+    "Add extractPlayers(seasonId) method",
+    "Log progress, call client.getPlayers with timing",
+    "Save to output/msl/{seasonId}/players.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-005",
+  "category": "extract",
+  "description": "Implement extractGoalies method",
+  "passes": false,
+  "steps": [
+    "Add extractGoalies(seasonId) method",
+    "Log progress, call client.getGoalies with timing",
+    "Save to output/msl/{seasonId}/goalies.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-006",
+  "category": "extract",
+  "description": "Implement extractStandings method",
+  "passes": false,
+  "steps": [
+    "Add extractStandings(seasonId) method",
+    "Log progress, call client.getStandings with timing",
+    "Save to output/msl/{seasonId}/standings.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-007",
+  "category": "extract",
+  "description": "Implement extractSchedule method",
+  "passes": false,
+  "steps": [
+    "Add extractSchedule(seasonId) method",
+    "Log progress, call client.getSchedule with timing",
+    "Save to output/msl/{seasonId}/schedule.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-008",
+  "category": "extract",
+  "description": "Implement extractSeason orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractSeason(seasonId, options) method",
+    "Options: { skipExisting: boolean }",
+    "Load manifest, check skipExisting for each entity",
+    "Call extract methods in order: teams, players, goalies, standings, schedule",
+    "Update manifest after each entity, save",
+    "Add 1000ms delay between requests (rate limiting)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-009",
+  "category": "extract",
+  "description": "Implement extractAllSeasons orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractAllSeasons(options) method",
+    "Loop through MSL_SEASONS array",
+    "Call extractSeason for each seasonId",
+    "Log overall progress",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-010",
+  "category": "extract",
+  "description": "Create MSL extraction module exports",
+  "passes": false,
+  "steps": [
+    "Create src/extract/msl/index.ts",
+    "Export MSLExtractorService",
+    "Export MSLManifestService",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-011",
+  "category": "extract",
+  "description": "Create MSL extraction CLI entry point",
+  "passes": false,
+  "steps": [
+    "Create src/extract/msl/run.ts",
+    "Parse CLI args: --season=ID, --all, --force, --help",
+    "Default to extracting single season (most recent)",
+    "Build Layer with MSLExtractorService.Default + BunContext.layer",
+    "Call extractor.extractSeason or extractAllSeasons",
+    "Use BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-extract-012",
+  "category": "extract",
+  "description": "Test MSL extraction runs for single season",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/msl/run.ts --season=9567",
+    "Verify output/msl/9567/*.json files created",
+    "Verify manifest.json updated"
+  ]
+},
+{
+  "id": "msl-extract-013",
+  "category": "extract",
+  "description": "Test MSL extraction runs for all seasons",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/msl/run.ts --all",
+    "Verify all discovered season directories created",
+    "Verify manifest.json tracks all seasons"
+  ]
+},
+{
+  "id": "msl-validate-001",
+  "category": "validate",
+  "description": "Create validate-msl.ts file structure",
+  "passes": false,
+  "steps": [
+    "Create src/validate/validate-msl.ts",
+    "Import FileSystem, Path from @effect/platform",
+    "Import BunContext, BunRuntime from @effect/platform-bun",
+    "Import Effect, Layer from effect",
+    "Import validation helpers from validate.service",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-validate-002",
+  "category": "validate",
+  "description": "Define MSL validation interfaces",
+  "passes": false,
+  "steps": [
+    "Define MSLTeam interface for validation",
+    "Define MSLPlayer interface for validation",
+    "Define MSLGoalie interface for validation",
+    "Define MSLStanding interface for validation",
+    "Define MSLGame interface for validation",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-validate-003",
+  "category": "validate",
+  "description": "Implement entity validations",
+  "passes": false,
+  "steps": [
+    "Add validation for teams.json (id, name required, unique id)",
+    "Add validation for players.json (id, name required, unique id)",
+    "Add validation for goalies.json (id, name required, unique id)",
+    "Add validation for standings.json (team_id required, unique)",
+    "Add validation for schedule.json (id required, unique)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-validate-004",
+  "category": "validate",
+  "description": "Implement cross-reference validations",
+  "passes": false,
+  "steps": [
+    "Add crossReference: players.team_id -> teams.id",
+    "Add crossReference: goalies.team_id -> teams.id",
+    "Add crossReference: standings.team_id -> teams.id",
+    "Add crossReference: schedule.home_team_id -> teams.id",
+    "Add crossReference: schedule.away_team_id -> teams.id",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-validate-005",
+  "category": "validate",
+  "description": "Complete validation script with report",
+  "passes": false,
+  "steps": [
+    "Build validation report using buildReport",
+    "Print report using printReport",
+    "Save report to output/msl/validation-report.json",
+    "Add BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "msl-validate-006",
+  "category": "validate",
+  "description": "Test MSL validation runs successfully",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-msl.ts",
+    "Verify validation report shows pass/fail status",
+    "Verify output/msl/validation-report.json created"
+  ]
+},
+{
+  "id": "msl-docs-001",
+  "category": "docs",
+  "description": "Add MSLClient Methods table to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Open packages/pipeline/CLAUDE.md",
+    "Add MSLClient Methods table",
+    "Include getTeams, getPlayers, getGoalies, getStandings, getSchedule methods",
+    "Note: Gamesheet scraping, no credentials needed"
+  ]
+},
+{
+  "id": "msl-docs-002",
+  "category": "docs",
+  "description": "Add MSL commands to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Add MSL extraction command: bun src/extract/msl/run.ts",
+    "Add MSL validation command: bun src/validate/validate-msl.ts",
+    "Document season ID discovery process"
+  ]
+},
+{
+  "id": "msl-final-001",
+  "category": "final",
+  "description": "Run full typecheck",
+  "passes": false,
+  "steps": [
+    "Run: bun run typecheck",
+    "Fix any type errors",
+    "All files compile successfully"
+  ]
+},
+{
+  "id": "msl-final-002",
+  "category": "final",
+  "description": "Run all MSL tests",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/msl/",
+    "All integration tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "msl-final-003",
+  "category": "final",
+  "description": "Run full extraction for all seasons",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/msl/run.ts --all",
+    "All discovered seasons extracted",
+    "Manifest shows all entities complete"
+  ]
+},
+{
+  "id": "msl-final-004",
+  "category": "final",
+  "description": "Run full validation",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-msl.ts",
+    "Validation report shows all checks pass",
+    "Cross-references validate correctly"
+  ]
+},
+{
+  "id": "msl-final-005",
+  "category": "final",
+  "description": "Verify all output files",
+  "passes": false,
+  "steps": [
+    "Verify: ls -la output/msl/",
+    "All season directories exist",
+    "Each directory has: teams.json, players.json, goalies.json, standings.json, schedule.json",
+    "manifest.json exists and is valid"
+  ]
+},
+{
+  "id": "wla-schema-001",
+  "category": "schema",
+  "description": "Create wla.schema.ts with WLASeasonId branded type",
+  "passes": false,
+  "steps": [
+    "Create src/wla/wla.schema.ts",
+    "Define WLASeasonId: Schema.Number.pipe(Schema.int(), Schema.between(2005, 2035), Schema.brand('WLASeasonId'))",
+    "Add description annotation",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-002",
+  "category": "schema",
+  "description": "WLATeam response schema",
+  "passes": false,
+  "steps": [
+    "Define WLATeam Schema.Class",
+    "Fields: id (string), code (string), name (string), city (nullable), logo_url (nullable), website_url (nullable)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-003",
+  "category": "schema",
+  "description": "WLAPlayerStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define WLAPlayerStats Schema.Class",
+    "Fields: games_played, goals, assists, points, penalty_minutes (all Schema.Number)",
+    "Fields: ppg, shg, gwg (power play/short-handed/game-winning goals)",
+    "Field: scoring_pct (Schema.Number for scoring percentage)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-004",
+  "category": "schema",
+  "description": "WLAPlayer response schema",
+  "passes": false,
+  "steps": [
+    "Define WLAPlayer Schema.Class",
+    "Fields: id (string), first_name, last_name, full_name (nullable strings)",
+    "Fields: jersey_number (nullable string), position (nullable string)",
+    "Fields: team_id, team_code, team_name (nullable strings)",
+    "Field: stats (Schema.optional(WLAPlayerStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-005",
+  "category": "schema",
+  "description": "WLAGoalieStats nested schema",
+  "passes": false,
+  "steps": [
+    "Define WLAGoalieStats Schema.Class",
+    "Fields: games_played, wins, losses, ties (Schema.Number)",
+    "Fields: goals_against, saves, shots_against (Schema.Number)",
+    "Fields: gaa (goals against average), save_pct (save percentage)",
+    "Field: shutouts (Schema.Number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-006",
+  "category": "schema",
+  "description": "WLAGoalie response schema",
+  "passes": false,
+  "steps": [
+    "Define WLAGoalie Schema.Class",
+    "Fields: id (string), first_name, last_name, full_name (nullable strings)",
+    "Fields: jersey_number (nullable string)",
+    "Fields: team_id, team_code, team_name (nullable strings)",
+    "Field: stats (Schema.optional(WLAGoalieStats))",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-007",
+  "category": "schema",
+  "description": "WLAStanding response schema",
+  "passes": false,
+  "steps": [
+    "Define WLAStanding Schema.Class",
+    "Fields: team_id (string), team_name (nullable string), position (number)",
+    "Fields: wins, losses, ties, games_played (Schema.Number)",
+    "Fields: goals_for, goals_against, goal_diff (Schema.Number)",
+    "Field: win_pct (Schema.Number)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-008",
+  "category": "schema",
+  "description": "WLAGame response schema",
+  "passes": false,
+  "steps": [
+    "Define WLAGame Schema.Class",
+    "Fields: id (string), date (nullable string), status (nullable string)",
+    "Fields: home_team_id, away_team_id (nullable strings)",
+    "Fields: home_team_name, away_team_name (nullable strings)",
+    "Fields: home_score, away_score (Schema.Number)",
+    "Field: venue (nullable string)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-009",
+  "category": "schema",
+  "description": "WLA request schemas",
+  "passes": false,
+  "steps": [
+    "Define WLATeamsRequest Schema.Class { seasonId: WLASeasonId }",
+    "Define WLAPlayersRequest Schema.Class { seasonId: WLASeasonId }",
+    "Define WLAGoaliesRequest Schema.Class { seasonId: WLASeasonId }",
+    "Define WLAStandingsRequest Schema.Class { seasonId: WLASeasonId }",
+    "Define WLAScheduleRequest Schema.Class { seasonId: WLASeasonId }",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-schema-010",
+  "category": "schema",
+  "description": "Export all schemas from wla.schema.ts",
+  "passes": false,
+  "steps": [
+    "Add export statements for all schemas",
+    "Add export for branded WLASeasonId type",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-config-001",
+  "category": "config",
+  "description": "Add WLAConfig service to config.ts",
+  "passes": false,
+  "steps": [
+    "Open src/config.ts",
+    "Add WLAConfig Effect.Service class",
+    "Set baseUrl: https://www.wlalacrosse.com",
+    "Set statsUrl: https://www.wlalacrosse.com/stats",
+    "Set headers: standard browser User-Agent",
+    "No auth tokens needed (public site)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-001",
+  "category": "client",
+  "description": "Create wla.client.ts with base structure",
+  "passes": false,
+  "steps": [
+    "Create src/wla/wla.client.ts",
+    "Import Effect, Schema, Duration from effect",
+    "Import cheerio for HTML parsing",
+    "Import WLAConfig, PipelineConfig from config",
+    "Import ParseError from error",
+    "Import all schemas from wla.schema",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-002",
+  "category": "client",
+  "description": "Create WLAClient service shell",
+  "passes": false,
+  "steps": [
+    "Define WLAClient as Effect.Service",
+    "Yield WLAConfig and PipelineConfig in effect",
+    "Set dependencies: [WLAConfig.Default, PipelineConfig.Default]",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-003",
+  "category": "client",
+  "description": "Implement fetchPage helper for SPA scraping",
+  "passes": false,
+  "steps": [
+    "Add fetchPage(url: string) internal helper",
+    "Use fetch with browser-like headers",
+    "Return HTML string",
+    "Add retry with exponential backoff",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-004",
+  "category": "client",
+  "description": "Implement getSeasonIdFromYear helper",
+  "passes": false,
+  "steps": [
+    "Add getSeasonIdFromYear(year: number) helper",
+    "Map year to WLA's internal season ID format",
+    "Analyze URL pattern from wlalacrosse.com/stats#/{id}/...",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-005",
+  "category": "client",
+  "description": "Implement WLAClient.getTeams method",
+  "passes": false,
+  "steps": [
+    "Add getTeams(input: WLATeamsRequest.Encoded)",
+    "Build URL: /stats#{seasonId}/teams or equivalent",
+    "Fetch page HTML",
+    "Parse HTML with cheerio to extract team list",
+    "Map to WLATeam[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-006",
+  "category": "client",
+  "description": "Implement WLAClient.getPlayers method",
+  "passes": false,
+  "steps": [
+    "Add getPlayers(input: WLAPlayersRequest.Encoded)",
+    "Build URL: /stats#{seasonId}/leaders or equivalent",
+    "Fetch page HTML",
+    "Parse stats table with cheerio",
+    "Extract: name, team, GP, G, A, Pts, PIM, PPG, SHG, GWG, Scoring%",
+    "Map to WLAPlayer[] array",
+    "Handle pagination if present",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-007",
+  "category": "client",
+  "description": "Implement WLAClient.getGoalies method",
+  "passes": false,
+  "steps": [
+    "Add getGoalies(input: WLAGoaliesRequest.Encoded)",
+    "Build URL for goalie stats page",
+    "Fetch page HTML",
+    "Parse goalie stats table with cheerio",
+    "Extract: name, team, GP, W, L, GAA, Save%, Saves, Shutouts",
+    "Map to WLAGoalie[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-008",
+  "category": "client",
+  "description": "Implement WLAClient.getStandings method",
+  "passes": false,
+  "steps": [
+    "Add getStandings(input: WLAStandingsRequest.Encoded)",
+    "Build URL for standings page",
+    "Fetch page HTML",
+    "Parse standings table with cheerio",
+    "Extract: team, W, L, T, GP, GF, GA, GD, Win%",
+    "Map to WLAStanding[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-009",
+  "category": "client",
+  "description": "Implement WLAClient.getSchedule method",
+  "passes": false,
+  "steps": [
+    "Add getSchedule(input: WLAScheduleRequest.Encoded)",
+    "Build URL for schedule page",
+    "Fetch page HTML",
+    "Parse schedule/scores with cheerio",
+    "Extract: date, home team, away team, scores, venue",
+    "Map to WLAGame[] array",
+    "Add Effect.tap logging",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-client-010",
+  "category": "client",
+  "description": "Create WLA module index exports",
+  "passes": false,
+  "steps": [
+    "Create src/wla/index.ts",
+    "Export WLAClient from wla.client.ts",
+    "Export all schema types from wla.schema.ts",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-test-001",
+  "category": "test",
+  "description": "Create WLA integration test file",
+  "passes": false,
+  "steps": [
+    "Create src/wla/wla.integration.test.ts",
+    "Import Effect, describe, expect, it from vitest",
+    "Import WLAClient",
+    "Setup describe block for WLAClient",
+    "Run: bun test src/wla/ --dry-run"
+  ]
+},
+{
+  "id": "wla-test-002",
+  "category": "test",
+  "description": "getTeams integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getTeams",
+    "Add test: 'fetches teams for season 2024'",
+    "Call client.getTeams({ seasonId: 2024 })",
+    "Assert result.length >= 7 (known team count)",
+    "Assert team has id, code, name fields",
+    "Run: bun test src/wla/ -t 'getTeams'"
+  ]
+},
+{
+  "id": "wla-test-003",
+  "category": "test",
+  "description": "getPlayers integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getPlayers",
+    "Add test: 'fetches players for season 2024'",
+    "Call client.getPlayers({ seasonId: 2024 })",
+    "Assert result.length > 0",
+    "Assert player has id, full_name, stats with goals/assists/points",
+    "Run: bun test src/wla/ -t 'getPlayers'"
+  ]
+},
+{
+  "id": "wla-test-004",
+  "category": "test",
+  "description": "getGoalies integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getGoalies",
+    "Add test: 'fetches goalies for season 2024'",
+    "Call client.getGoalies({ seasonId: 2024 })",
+    "Assert result.length > 0",
+    "Assert goalie has id, full_name, stats with gaa/save_pct",
+    "Run: bun test src/wla/ -t 'getGoalies'"
+  ]
+},
+{
+  "id": "wla-test-005",
+  "category": "test",
+  "description": "getStandings integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getStandings",
+    "Add test: 'fetches standings for season 2024'",
+    "Call client.getStandings({ seasonId: 2024 })",
+    "Assert result.length >= 7",
+    "Assert standing has team_id, wins, losses",
+    "Run: bun test src/wla/ -t 'getStandings'"
+  ]
+},
+{
+  "id": "wla-test-006",
+  "category": "test",
+  "description": "getSchedule integration test",
+  "passes": false,
+  "steps": [
+    "Add describe block for getSchedule",
+    "Add test: 'fetches schedule for season 2024'",
+    "Call client.getSchedule({ seasonId: 2024 })",
+    "Assert result.length > 0",
+    "Assert game has id, home_team_id, away_team_id, date",
+    "Run: bun test src/wla/ -t 'getSchedule'"
+  ]
+},
+{
+  "id": "wla-test-007",
+  "category": "test",
+  "description": "All WLA client tests pass",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/wla/",
+    "All 5 endpoint tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "wla-manifest-001",
+  "category": "extract",
+  "description": "Create WLASeasonManifest schema",
+  "passes": false,
+  "steps": [
+    "Create src/extract/wla/wla.manifest.ts",
+    "Define WLAEntityStatus schema (same pattern as NLL)",
+    "Define WLASeasonManifest with teams, players, goalies, standings, schedule fields",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-manifest-002",
+  "category": "extract",
+  "description": "Create WLAExtractionManifest schema",
+  "passes": false,
+  "steps": [
+    "Define WLAExtractionManifest schema",
+    "Fields: source='wla', seasons Record, lastRun, version",
+    "Add createEmptyWLAManifest helper",
+    "Add createEmptyWLASeasonManifest helper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-manifest-003",
+  "category": "extract",
+  "description": "Create WLAManifestService",
+  "passes": false,
+  "steps": [
+    "Define WLAManifestService as Effect.Service",
+    "Inject ExtractConfigService, FileSystem, Path",
+    "Set manifestPath: output/wla/manifest.json",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-manifest-004",
+  "category": "extract",
+  "description": "Implement WLAManifestService.load method",
+  "passes": false,
+  "steps": [
+    "Add load method",
+    "Check if manifest file exists",
+    "If not exists, return createEmptyWLAManifest",
+    "Read and parse JSON file",
+    "Decode with schema, fallback to empty on error",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-manifest-005",
+  "category": "extract",
+  "description": "Implement WLAManifestService.save and helpers",
+  "passes": false,
+  "steps": [
+    "Add save(manifest) method",
+    "Add getSeasonManifest(manifest, seasonId) method",
+    "Add markComplete(manifest, seasonId, entity, count, durationMs) method",
+    "Add isExtracted(manifest, seasonId, entity) method",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-001",
+  "category": "extract",
+  "description": "Create WLAExtractorService base structure",
+  "passes": false,
+  "steps": [
+    "Create src/extract/wla/wla.extractor.ts",
+    "Define WLAExtractorService as Effect.Service",
+    "Inject WLAClient, ExtractConfigService, WLAManifestService, FileSystem, Path",
+    "Define WLA_SEASONS array: range 2005-2025 (21 seasons)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-002",
+  "category": "extract",
+  "description": "Implement extractor helper functions",
+  "passes": false,
+  "steps": [
+    "Add getOutputPath(seasonId, entity) helper",
+    "Add saveJson<T>(filePath, data) helper",
+    "Add withTiming<T>(effect) wrapper",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-003",
+  "category": "extract",
+  "description": "Implement extractTeams method",
+  "passes": false,
+  "steps": [
+    "Add extractTeams(seasonId) method",
+    "Log progress, call client.getTeams with timing",
+    "Save to output/wla/{seasonId}/teams.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-004",
+  "category": "extract",
+  "description": "Implement extractPlayers method",
+  "passes": false,
+  "steps": [
+    "Add extractPlayers(seasonId) method",
+    "Log progress, call client.getPlayers with timing",
+    "Save to output/wla/{seasonId}/players.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-005",
+  "category": "extract",
+  "description": "Implement extractGoalies method",
+  "passes": false,
+  "steps": [
+    "Add extractGoalies(seasonId) method",
+    "Log progress, call client.getGoalies with timing",
+    "Save to output/wla/{seasonId}/goalies.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-006",
+  "category": "extract",
+  "description": "Implement extractStandings method",
+  "passes": false,
+  "steps": [
+    "Add extractStandings(seasonId) method",
+    "Log progress, call client.getStandings with timing",
+    "Save to output/wla/{seasonId}/standings.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-007",
+  "category": "extract",
+  "description": "Implement extractSchedule method",
+  "passes": false,
+  "steps": [
+    "Add extractSchedule(seasonId) method",
+    "Log progress, call client.getSchedule with timing",
+    "Save to output/wla/{seasonId}/schedule.json",
+    "Handle errors gracefully",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-008",
+  "category": "extract",
+  "description": "Implement extractSeason orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractSeason(seasonId, options) method",
+    "Options: { skipExisting: boolean }",
+    "Load manifest, check skipExisting for each entity",
+    "Call extract methods in order: teams, players, goalies, standings, schedule",
+    "Update manifest after each entity, save",
+    "Add 1000ms delay between requests (rate limiting for scraping)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-009",
+  "category": "extract",
+  "description": "Implement extractAllSeasons orchestrator",
+  "passes": false,
+  "steps": [
+    "Add extractAllSeasons(options) method",
+    "Loop through WLA_SEASONS array (2005-2025)",
+    "Call extractSeason for each year",
+    "Log overall progress",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-010",
+  "category": "extract",
+  "description": "Create WLA extraction module exports",
+  "passes": false,
+  "steps": [
+    "Create src/extract/wla/index.ts",
+    "Export WLAExtractorService",
+    "Export WLAManifestService",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-011",
+  "category": "extract",
+  "description": "Create WLA extraction CLI entry point",
+  "passes": false,
+  "steps": [
+    "Create src/extract/wla/run.ts",
+    "Parse CLI args: --season=YYYY, --all, --force, --help",
+    "Default to extracting single season (current year)",
+    "Build Layer with WLAExtractorService.Default + BunContext.layer",
+    "Call extractor.extractSeason or extractAllSeasons",
+    "Use BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-extract-012",
+  "category": "extract",
+  "description": "Test WLA extraction runs for single season",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/wla/run.ts --season=2024",
+    "Verify output/wla/2024/*.json files created",
+    "Verify manifest.json updated"
+  ]
+},
+{
+  "id": "wla-extract-013",
+  "category": "extract",
+  "description": "Test WLA extraction runs for all seasons",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/wla/run.ts --all",
+    "Verify output/wla/{2005-2025}/*.json files created",
+    "Verify manifest.json tracks all 21 seasons"
+  ]
+},
+{
+  "id": "wla-validate-001",
+  "category": "validate",
+  "description": "Create validate-wla.ts file structure",
+  "passes": false,
+  "steps": [
+    "Create src/validate/validate-wla.ts",
+    "Import FileSystem, Path from @effect/platform",
+    "Import BunContext, BunRuntime from @effect/platform-bun",
+    "Import Effect, Layer from effect",
+    "Import validation helpers from validate.service",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-002",
+  "category": "validate",
+  "description": "Define WLA validation interfaces",
+  "passes": false,
+  "steps": [
+    "Define WLATeam interface for validation",
+    "Define WLAPlayer interface for validation",
+    "Define WLAGoalie interface for validation",
+    "Define WLAStanding interface for validation",
+    "Define WLAGame interface for validation",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-003",
+  "category": "validate",
+  "description": "Implement teams.json validation",
+  "passes": false,
+  "steps": [
+    "Add validation for teams.json",
+    "Validate required fields: id, code, name",
+    "Validate unique id field",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-004",
+  "category": "validate",
+  "description": "Implement players.json validation",
+  "passes": false,
+  "steps": [
+    "Add validation for players.json",
+    "Validate required fields: id, full_name",
+    "Validate unique id field",
+    "Validate stats numeric fields when present",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-005",
+  "category": "validate",
+  "description": "Implement goalies.json validation",
+  "passes": false,
+  "steps": [
+    "Add validation for goalies.json",
+    "Validate required fields: id, full_name",
+    "Validate unique id field",
+    "Validate stats numeric fields (gaa, save_pct bounds)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-006",
+  "category": "validate",
+  "description": "Implement standings.json validation",
+  "passes": false,
+  "steps": [
+    "Add validation for standings.json",
+    "Validate required fields: team_id, wins, losses",
+    "Validate unique team_id field",
+    "Validate win_pct bounds (0-1)",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-007",
+  "category": "validate",
+  "description": "Implement schedule.json validation",
+  "passes": false,
+  "steps": [
+    "Add validation for schedule.json",
+    "Validate required fields: id, home_team_id, away_team_id",
+    "Validate unique id field",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-008",
+  "category": "validate",
+  "description": "Implement cross-reference validations",
+  "passes": false,
+  "steps": [
+    "Add crossReference: players.team_id -> teams.id",
+    "Add crossReference: goalies.team_id -> teams.id",
+    "Add crossReference: standings.team_id -> teams.id",
+    "Add crossReference: schedule.home_team_id -> teams.id",
+    "Add crossReference: schedule.away_team_id -> teams.id",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-009",
+  "category": "validate",
+  "description": "Complete validation script with report",
+  "passes": false,
+  "steps": [
+    "Build validation report using buildReport",
+    "Print report using printReport",
+    "Save report to output/wla/validation-report.json",
+    "Add BunRuntime.runMain",
+    "Run typecheck"
+  ]
+},
+{
+  "id": "wla-validate-010",
+  "category": "validate",
+  "description": "Test WLA validation runs successfully",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-wla.ts",
+    "Verify validation report shows pass/fail status",
+    "Verify output/wla/validation-report.json created"
+  ]
+},
+{
+  "id": "wla-docs-001",
+  "category": "docs",
+  "description": "Add WLAClient Methods table to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Open packages/pipeline/CLAUDE.md",
+    "Add WLAClient Methods table",
+    "Include getTeams, getPlayers, getGoalies, getStandings, getSchedule methods",
+    "Note: HTML scraping, no credentials needed"
+  ]
+},
+{
+  "id": "wla-docs-002",
+  "category": "docs",
+  "description": "Add WLA commands to CLAUDE.md",
+  "passes": false,
+  "steps": [
+    "Add WLA extraction command: bun src/extract/wla/run.ts",
+    "Add WLA validation command: bun src/validate/validate-wla.ts",
+    "Document --all flag for full historical extraction (2005-2025)"
+  ]
+},
+{
+  "id": "wla-final-001",
+  "category": "final",
+  "description": "Run full typecheck",
+  "passes": false,
+  "steps": [
+    "Run: bun run typecheck",
+    "Fix any type errors",
+    "All files compile successfully"
+  ]
+},
+{
+  "id": "wla-final-002",
+  "category": "final",
+  "description": "Run all WLA tests",
+  "passes": false,
+  "steps": [
+    "Run: bun test src/wla/",
+    "All integration tests pass",
+    "No schema validation errors"
+  ]
+},
+{
+  "id": "wla-final-003",
+  "category": "final",
+  "description": "Run full extraction for recent seasons",
+  "passes": false,
+  "steps": [
+    "Run: bun src/extract/wla/run.ts --all",
+    "All 21 seasons extracted (2005-2025)",
+    "Manifest shows all entities complete"
+  ]
+},
+{
+  "id": "wla-final-004",
+  "category": "final",
+  "description": "Run full validation",
+  "passes": false,
+  "steps": [
+    "Run: bun src/validate/validate-wla.ts",
+    "Validation report shows all checks pass",
+    "Cross-references validate correctly"
+  ]
+},
+{
+  "id": "wla-final-005",
+  "category": "final",
+  "description": "Verify all output files",
+  "passes": false,
+  "steps": [
+    "Verify: ls -la output/wla/",
+    "All season directories exist (2005-2025)",
+    "Each directory has: teams.json, players.json, goalies.json, standings.json, schedule.json",
+    "manifest.json exists and is valid"
+  ]}
+
+]
