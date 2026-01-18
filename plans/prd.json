@@ -620,7 +620,7 @@
     "id": "mll-extract-005",
     "category": "extract",
     "description": "Implement extractGoalies method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractGoalies(year) method",
       "Log progress, call client.getGoalies with timing",

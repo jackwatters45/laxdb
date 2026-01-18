@@ -384,3 +384,10 @@ Description: Implement extractPlayers method
 Status: COMPLETE
 Commit: e87830c
 Timestamp: 2026-01-19T02:08:49+11:00
+
+=== Iteration 47 ===
+Story: mll-extract-005
+Description: Implement extractGoalies method
+Status: COMPLETE
+Commit: 3d1f82f
+Timestamp: 2026-01-19T02:17:41+11:00

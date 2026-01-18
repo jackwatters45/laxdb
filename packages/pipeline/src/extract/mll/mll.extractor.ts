@@ -3,7 +3,12 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
-import type { MLLGoalie, MLLPlayer, MLLTeam } from "../../mll/mll.schema";
+import type {
+  MLLGoalie,
+  MLLPlayer,
+  MLLStanding,
+  MLLTeam,
+} from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import { MLLManifestService } from "./mll.manifest";
@@ -124,6 +129,28 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      const extractStandings = (year: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(`  🏆 Extracting standings for year ${year}...`);
+          const result = yield* withTiming(client.getStandings({ year }));
+          yield* saveJson(getOutputPath(year, "standings"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} standings (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MLLStanding[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -132,6 +159,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractTeams,
         extractPlayers,
         extractGoalies,
+        extractStandings,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
