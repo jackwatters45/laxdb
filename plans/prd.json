@@ -1117,7 +1117,7 @@
     "id": "msl-schema-011",
     "category": "schema",
     "description": "Export all schemas from msl.schema.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add export statements for all schemas",
       "Add export for branded MSLSeasonId type",

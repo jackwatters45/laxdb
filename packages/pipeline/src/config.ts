@@ -112,3 +112,14 @@ export class MLLConfig extends Effect.Service<MLLConfig>()("MLLConfig", {
     },
   } as const,
 }) {}
+
+export class MSLConfig extends Effect.Service<MSLConfig>()("MSLConfig", {
+  succeed: {
+    gamesheetBaseUrl: "https://gamesheetstats.com",
+    mainSiteBaseUrl: "https://www.majorserieslacrosse.ca",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  } as const,
+}) {}
