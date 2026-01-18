@@ -692,3 +692,10 @@ Description: Implement fetchMainSitePage helper
 Status: COMPLETE
 Commit: f55dc33
 Timestamp: 2026-01-19T05:37:40+11:00
+
+=== Iteration 91 ===
+Story: msl-client-005
+Description: Implement MSLClient.getTeams method
+Status: COMPLETE
+Commit: e7e7881
+Timestamp: 2026-01-19T05:42:17+11:00

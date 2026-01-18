@@ -1199,7 +1199,7 @@
     "id": "msl-client-005",
     "category": "client",
     "description": "Implement MSLClient.getTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getTeams(input: MSLTeamsRequest.Encoded)",
       "Fetch teams from main site or Gamesheet standings page",

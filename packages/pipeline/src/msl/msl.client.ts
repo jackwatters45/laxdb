@@ -338,6 +338,153 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         ),
       );
 
+    /**
+     * Fetches all players for a given MSL season.
+     * Uses the Gamesheet internal REST API for structured data.
+     *
+     * @param input - Request containing the seasonId (MSL Gamesheet season ID)
+     * @returns Array of MSLPlayer objects with stats
+     */
+    const getPlayers = (
+      input: typeof MSLPlayersRequest.Encoded,
+    ): Effect.Effect<
+      readonly MSLPlayer[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MSLPlayersRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch player standings from Gamesheet internal API
+        // API returns paginated results, so we need to fetch all pages
+        const allPlayers: MSLPlayer[] = [];
+        const pageSize = 100; // Fetch 100 players at a time
+        let offset = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+          const path = `/api/usePlayers/getPlayerStandings/${request.seasonId}?filter[gametype]=overall&filter[sort]=-pts&filter[limit]=${pageSize}&filter[offset]=${offset}`;
+
+          const response = yield* fetchGamesheetPageWithRetry(path);
+
+          // Parse JSON response
+          interface PlayerApiResponse {
+            names?: { firstName: string; lastName: string; id: number }[];
+            ids?: number[];
+            teamNames?: { title: string; id: number }[];
+            jersey?: (string | number | null)[];
+            positions?: string[];
+            gp?: number[];
+            g?: number[];
+            a?: number[];
+            pts?: number[];
+            pim?: number[];
+            ppg?: number[];
+            ppa?: number[];
+            shg?: number[];
+            sha?: number[];
+            gwg?: number[];
+            fg?: number[];
+            otg?: number[];
+            ptspg?: number[];
+          }
+
+          let data: PlayerApiResponse;
+          try {
+            data = JSON.parse(response) as PlayerApiResponse;
+          } catch {
+            return yield* Effect.fail(
+              new ParseError({
+                message: `Failed to parse player API response as JSON`,
+                cause: response.slice(0, 200),
+              }),
+            );
+          }
+
+          // Check if we have data
+          const names = data.names ?? [];
+          if (names.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Parse each player from the parallel arrays
+          for (let i = 0; i < names.length; i++) {
+            const name = names[i];
+            const playerId = data.ids?.[i] ?? name?.id ?? i;
+            const firstName = name?.firstName ?? null;
+            const lastName = name?.lastName ?? null;
+            const fullName =
+              firstName && lastName
+                ? `${firstName} ${lastName}`
+                : (firstName ?? lastName ?? `Player ${playerId}`);
+
+            const teamInfo = data.teamNames?.[i];
+            const jersey = data.jersey?.[i];
+            const position = data.positions?.[i] ?? null;
+
+            // Build stats
+            const gamesPlayed = data.gp?.[i] ?? 0;
+            const goals = data.g?.[i] ?? 0;
+            const assists = data.a?.[i] ?? 0;
+            const points = data.pts?.[i] ?? 0;
+            const penaltyMinutes = data.pim?.[i] ?? 0;
+            const pointsPerGame = data.ptspg?.[i] ?? 0;
+            const ppg = data.ppg?.[i] ?? null;
+            const ppa = data.ppa?.[i] ?? null;
+            const shg = data.shg?.[i] ?? null;
+            const sha = data.sha?.[i] ?? null;
+            const gwg = data.gwg?.[i] ?? null;
+            const fg = data.fg?.[i] ?? null;
+            const otg = data.otg?.[i] ?? null;
+
+            const player = new MSLPlayer({
+              id: String(playerId),
+              name: fullName,
+              first_name: firstName,
+              last_name: lastName,
+              jersey_number: jersey !== null ? String(jersey) : null,
+              position,
+              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_name: teamInfo?.title ?? null,
+              stats: new MSLPlayerStats({
+                games_played: gamesPlayed,
+                goals,
+                assists,
+                points,
+                penalty_minutes: penaltyMinutes,
+                points_per_game: pointsPerGame,
+                ppg,
+                ppa,
+                shg,
+                sha,
+                gwg,
+                fg,
+                otg,
+              }),
+            });
+
+            allPlayers.push(player);
+          }
+
+          // Check if there are more pages
+          if (names.length < pageSize) {
+            hasMore = false;
+          } else {
+            offset += pageSize;
+          }
+        }
+
+        return allPlayers;
+      }).pipe(
+        Effect.tap((players) =>
+          Effect.log(
+            `Fetched ${players.length} players for MSL season ${input.seasonId}`,
+          ),
+        ),
+      );
+
     return {
       // Config and utilities
       config: mslConfig,
@@ -350,6 +497,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
 
       // Public API methods
       getTeams,
+      getPlayers,
     };
   }),
   dependencies: [MSLConfig.Default, PipelineConfig.Default],
