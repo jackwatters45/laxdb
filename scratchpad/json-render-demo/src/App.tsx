@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataProvider, ActionProvider, VisibilityProvider, Renderer } from "@json-render/react";
 import type { UITree, Action } from "@json-render/core";
 import { componentRegistry } from "./components";
+import { lacrosseData } from "./lacrosseData";
 import "./App.css";
 
 // Helper to build flat UITree from nested structure
@@ -181,6 +182,234 @@ const nestedTrees: Record<string, NestedElement> = {
       },
     ],
   },
+
+  nllStandings: {
+    type: "Section",
+    props: { title: "NLL Standings (2024-25)" },
+    children: [
+      {
+        type: "Grid",
+        props: { columns: 4, gap: "md" },
+        children: [
+          {
+            type: "Card",
+            props: { title: "Teams" },
+            children: [{ type: "Metric", props: { label: "Total", valuePath: "/nll/metrics/teams", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Games Played" },
+            children: [{ type: "Metric", props: { label: "Total", valuePath: "/nll/metrics/gamesPlayed", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Total Goals" },
+            children: [{ type: "Metric", props: { label: "Scored", valuePath: "/nll/metrics/totalGoals", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Goals/Game" },
+            children: [{ type: "Metric", props: { label: "Average", valuePath: "/nll/metrics/avgGoalsPerGame", format: "number" } }],
+          },
+        ],
+      },
+      {
+        type: "Card",
+        props: { title: "Team Standings" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/nll/standings",
+              columns: [
+                { key: "team", label: "Team", format: "text" },
+                { key: "wins", label: "W", format: "number" },
+                { key: "losses", label: "L", format: "number" },
+                { key: "gp", label: "GP", format: "number" },
+                { key: "pct", label: "PCT", format: "text" },
+                { key: "gf", label: "GF", format: "number" },
+                { key: "ga", label: "GA", format: "number" },
+                { key: "diff", label: "DIFF", format: "text" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  pllStandings: {
+    type: "Section",
+    props: { title: "PLL Standings (2025)" },
+    children: [
+      {
+        type: "Grid",
+        props: { columns: 4, gap: "md" },
+        children: [
+          {
+            type: "Card",
+            props: { title: "Teams" },
+            children: [{ type: "Metric", props: { label: "Total", valuePath: "/pll/metrics/teams", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Games Played" },
+            children: [{ type: "Metric", props: { label: "Total", valuePath: "/pll/metrics/gamesPlayed", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Total Goals" },
+            children: [{ type: "Metric", props: { label: "Scored", valuePath: "/pll/metrics/totalGoals", format: "number" } }],
+          },
+          {
+            type: "Card",
+            props: { title: "Goals/Game" },
+            children: [{ type: "Metric", props: { label: "Average", valuePath: "/pll/metrics/avgGoalsPerGame", format: "number" } }],
+          },
+        ],
+      },
+      {
+        type: "Card",
+        props: { title: "Team Standings" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/pll/standings",
+              columns: [
+                { key: "rank", label: "#", format: "number" },
+                { key: "team", label: "Team", format: "text" },
+                { key: "conf", label: "Conf", format: "text" },
+                { key: "wins", label: "W", format: "number" },
+                { key: "losses", label: "L", format: "number" },
+                { key: "gf", label: "GF", format: "number" },
+                { key: "ga", label: "GA", format: "number" },
+                { key: "diff", label: "DIFF", format: "text" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  nllSchedule: {
+    type: "Section",
+    props: { title: "NLL Schedule (2024-25)" },
+    children: [
+      { type: "Alert", props: { message: "Recent completed games", variant: "info" } },
+      {
+        type: "Card",
+        props: { title: "Recent Results" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/nll/schedule",
+              columns: [
+                { key: "date", label: "Date", format: "text" },
+                { key: "away", label: "Away", format: "text" },
+                { key: "awayScore", label: "", format: "number" },
+                { key: "home", label: "Home", format: "text" },
+                { key: "homeScore", label: "", format: "number" },
+                { key: "venue", label: "Venue", format: "text" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  nllStats: {
+    type: "Section",
+    props: { title: "NLL Player Stats (2024-25)" },
+    children: [
+      { type: "Alert", props: { message: "Top 20 scorers by points", variant: "info" } },
+      {
+        type: "Card",
+        props: { title: "Scoring Leaders" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/nll/players",
+              columns: [
+                { key: "rank", label: "#", format: "number" },
+                { key: "player", label: "Player", format: "text" },
+                { key: "team", label: "Team", format: "text" },
+                { key: "pos", label: "Pos", format: "text" },
+                { key: "gp", label: "GP", format: "number" },
+                { key: "g", label: "G", format: "number" },
+                { key: "a", label: "A", format: "number" },
+                { key: "pts", label: "PTS", format: "number" },
+                { key: "pim", label: "PIM", format: "number" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  pllSchedule: {
+    type: "Section",
+    props: { title: "PLL Schedule (2025)" },
+    children: [
+      { type: "Alert", props: { message: "Recent completed games", variant: "info" } },
+      {
+        type: "Card",
+        props: { title: "Recent Results" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/pll/schedule",
+              columns: [
+                { key: "date", label: "Date", format: "text" },
+                { key: "away", label: "Away", format: "text" },
+                { key: "awayScore", label: "", format: "number" },
+                { key: "home", label: "Home", format: "text" },
+                { key: "homeScore", label: "", format: "number" },
+                { key: "venue", label: "Venue", format: "text" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  pllStats: {
+    type: "Section",
+    props: { title: "PLL Player Stats (2025)" },
+    children: [
+      { type: "Alert", props: { message: "Top 20 scorers by points", variant: "info" } },
+      {
+        type: "Card",
+        props: { title: "Scoring Leaders" },
+        children: [
+          {
+            type: "DataTable",
+            props: {
+              dataPath: "/pll/players",
+              columns: [
+                { key: "rank", label: "#", format: "number" },
+                { key: "player", label: "Player", format: "text" },
+                { key: "team", label: "Team", format: "text" },
+                { key: "pos", label: "Pos", format: "text" },
+                { key: "gp", label: "GP", format: "number" },
+                { key: "g", label: "G", format: "number" },
+                { key: "a", label: "A", format: "number" },
+                { key: "pts", label: "PTS", format: "number" },
+                { key: "gb", label: "GB", format: "number" },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 
 // Convert nested to flat UITree format
@@ -208,6 +437,8 @@ const initialData = {
     { id: "ORD-003", customer: "Initech", amount: 3200, date: "2024-01-13" },
     { id: "ORD-004", customer: "Umbrella Co", amount: 950, date: "2024-01-12" },
   ],
+  // Lacrosse data
+  ...lacrosseData,
 };
 
 function App() {

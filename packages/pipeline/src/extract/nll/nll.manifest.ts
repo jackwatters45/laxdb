@@ -13,12 +13,13 @@ export const NLLEntityStatus = Schema.Struct({
 });
 export type NLLEntityStatus = typeof NLLEntityStatus.Type;
 
-// NLL Season Manifest - NLL has teams, players, standings, schedule
+// NLL Season Manifest - NLL has teams, players, standings, schedule, playerStats
 export const NLLSeasonManifest = Schema.Struct({
   teams: NLLEntityStatus,
   players: NLLEntityStatus,
   standings: NLLEntityStatus,
   schedule: NLLEntityStatus,
+  playerStats: Schema.optional(NLLEntityStatus),
 });
 export type NLLSeasonManifest = typeof NLLSeasonManifest.Type;
 
@@ -35,6 +36,7 @@ export const createEmptyNLLSeasonManifest = (): NLLSeasonManifest => ({
   players: createEmptyNLLEntityStatus(),
   standings: createEmptyNLLEntityStatus(),
   schedule: createEmptyNLLEntityStatus(),
+  playerStats: createEmptyNLLEntityStatus(),
 });
 
 // NLL Extraction Manifest - top-level manifest structure
@@ -142,7 +144,8 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
         entity: keyof NLLSeasonManifest,
       ): boolean => {
         const seasonManifest = getSeasonManifest(manifest, seasonId);
-        return seasonManifest[entity].extracted;
+        const entityStatus = seasonManifest[entity];
+        return entityStatus?.extracted ?? false;
       };
 
       return {

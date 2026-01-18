@@ -34,6 +34,30 @@ export class NLLPlayerSeasonStats extends Schema.Class<NLLPlayerSeasonStats>(
   games_played: Schema.Number,
 }) {}
 
+// NLL Player Stats - comprehensive stats from scraping nll.com
+export class NLLPlayerStatsRow extends Schema.Class<NLLPlayerStatsRow>(
+  "NLLPlayerStatsRow",
+)({
+  personId: Schema.String,
+  fullname: Schema.String,
+  team_code: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  games_played: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  penalty_minutes: Schema.Number,
+  ppg: Schema.Number, // Power play goals
+  ppa: Schema.Number, // Power play assists
+  shg: Schema.Number, // Short-handed goals
+  looseballs: Schema.Number,
+  turnovers: Schema.Number,
+  caused_turnovers: Schema.Number,
+  blocked_shots: Schema.Number,
+  shots_on_goal: Schema.Number,
+}) {}
+
 // NLL Player response schema
 export class NLLPlayer extends Schema.Class<NLLPlayer>("NLLPlayer")({
   personId: Schema.String,

@@ -6,6 +6,7 @@ import { NLLClient } from "../../nll/nll.client";
 import type {
   NLLMatch,
   NLLPlayer,
+  NLLPlayerStatsRow,
   NLLStanding,
   NLLTeam,
 } from "../../nll/nll.schema";
@@ -98,6 +99,32 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               yield* Effect.log(`     ✗ Failed: ${e}`);
               return {
                 data: [] as readonly NLLPlayer[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
+      const extractPlayerStats = (seasonId: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(
+            `  📊 Extracting player stats for season ${seasonId}...`,
+          );
+          const result = yield* withTiming(
+            client.getPlayerStats({ seasonId, phase: "REG" }),
+          );
+          yield* saveJson(getOutputPath(seasonId, "player-stats"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} player stats (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly NLLPlayerStatsRow[],
                 count: 0,
                 durationMs: 0,
               };
@@ -230,8 +257,24 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(500));
           } else {
             yield* Effect.log("  🎮 Schedule: skipped (already extracted)");
+          }
+
+          // Extract player stats (scraped from nll.com)
+          if (shouldExtract("playerStats")) {
+            const result = yield* extractPlayerStats(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "playerStats",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+          } else {
+            yield* Effect.log("  📊 Player Stats: skipped (already extracted)");
           }
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
