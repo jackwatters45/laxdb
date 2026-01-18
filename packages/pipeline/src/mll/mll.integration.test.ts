@@ -225,4 +225,48 @@ describe("MLLClient", () => {
       TEAM_TIMEOUT,
     );
   });
+
+  describe("getStatLeaders", () => {
+    it(
+      "fetches stat leaders for year 2019",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getStatLeaders({ year: 2019 });
+        });
+
+        const leaders = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(leaders.length).toBeGreaterThan(0);
+        expect(leaders[0]).toHaveProperty("player_name");
+        expect(leaders[0]).toHaveProperty("stat_type");
+        expect(leaders[0]).toHaveProperty("stat_value");
+      },
+      TEAM_TIMEOUT,
+    );
+
+    it(
+      "returns stat leaders with expected properties",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getStatLeaders({ year: 2019 });
+        });
+
+        const leaders = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(leaders[0]).toBeDefined();
+        expect(leaders[0]?.player_id).toBeTypeOf("string");
+        expect(leaders[0]?.player_name).toBeTypeOf("string");
+        expect(leaders[0]?.stat_type).toBeTypeOf("string");
+        expect(leaders[0]?.stat_value).toBeTypeOf("number");
+        expect(leaders[0]?.rank).toBeTypeOf("number");
+      },
+      TEAM_TIMEOUT,
+    );
+  });
 });

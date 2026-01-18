@@ -307,3 +307,10 @@ Description: getGoalies integration test
 Status: COMPLETE
 Commit: 3d55e3d
 Timestamp: 2026-01-19T01:13:17+11:00
+
+=== Iteration 36 ===
+Story: mll-test-005
+Description: getStandings integration test
+Status: COMPLETE
+Commit: e77ae8e
+Timestamp: 2026-01-19T01:19:41+11:00
