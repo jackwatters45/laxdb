@@ -556,7 +556,7 @@
     "id": "mll-manifest-003",
     "category": "extract",
     "description": "Create MLLManifestService",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLManifestService as Effect.Service",
       "Inject ExtractConfigService, FileSystem, Path",

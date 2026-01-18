@@ -349,3 +349,10 @@ Description: Create MLLExtractionManifest schema
 Status: COMPLETE
 Commit: e85a37c
 Timestamp: 2026-01-19T01:44:58+11:00
+
+=== Iteration 42 ===
+Story: mll-manifest-003
+Description: Create MLLManifestService
+Status: COMPLETE
+Commit: 50a693e
+Timestamp: 2026-01-19T01:49:49+11:00
