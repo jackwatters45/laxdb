@@ -690,7 +690,7 @@
     "id": "mll-extract-010",
     "category": "extract",
     "description": "Implement extractAllSeasons orchestrator",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractAllSeasons(options) method",
       "Loop through MLL_YEARS array (2001-2020)",

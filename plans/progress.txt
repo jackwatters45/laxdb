@@ -419,3 +419,10 @@ Description: Implement extractSeason orchestrator
 Status: COMPLETE
 Commit: 3b4b199
 Timestamp: 2026-01-19T02:40:50+11:00
+
+=== Iteration 52 ===
+Story: mll-extract-010
+Description: Implement extractAllSeasons orchestrator
+Status: COMPLETE
+Commit: 0f677bb
+Timestamp: 2026-01-19T02:48:07+11:00
