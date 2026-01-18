@@ -793,7 +793,7 @@
     "id": "mll-validate-003",
     "category": "validate",
     "description": "Implement entity validations",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for teams.json (id, name required, unique id)",
       "Add validation for players.json (id, name required, unique id)",

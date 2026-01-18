@@ -475,3 +475,10 @@ Description: Define MLL validation interfaces
 Status: COMPLETE
 Commit: cf692aa
 Timestamp: 2026-01-19T03:30:54+11:00
+
+=== Iteration 60 ===
+Story: mll-validate-003
+Description: Implement entity validations
+Status: COMPLETE
+Commit: 3d67493
+Timestamp: 2026-01-19T03:35:33+11:00
