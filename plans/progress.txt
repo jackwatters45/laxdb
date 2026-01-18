@@ -916,3 +916,10 @@ Description: Implement entity validations
 Status: COMPLETE
 Commit: 28e016f
 Timestamp: 2026-01-19T07:42:06+11:00
+
+=== Iteration 123 ===
+Story: msl-validate-004
+Description: Implement cross-reference validations
+Status: COMPLETE
+Commit: b1431c2
+Timestamp: 2026-01-19T07:44:25+11:00

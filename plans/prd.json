@@ -1631,7 +1631,7 @@
     "id": "msl-validate-004",
     "category": "validate",
     "description": "Implement cross-reference validations",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add crossReference: players.team_id -> teams.id",
       "Add crossReference: goalies.team_id -> teams.id",
