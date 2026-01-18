@@ -1056,3 +1056,10 @@ Description: Export all schemas from wla.schema.ts
 Status: COMPLETE
 Commit: f8f2d8e
 Timestamp: 2026-01-19T08:43:08+11:00
+
+=== Iteration 143 ===
+Story: wla-config-001
+Description: Add WLAConfig service to config.ts
+Status: COMPLETE
+Commit: 44111c8
+Timestamp: 2026-01-19T08:47:24+11:00

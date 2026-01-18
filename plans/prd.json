@@ -1880,7 +1880,7 @@
     "id": "wla-config-001",
     "category": "config",
     "description": "Add WLAConfig service to config.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open src/config.ts",
       "Add WLAConfig Effect.Service class",
