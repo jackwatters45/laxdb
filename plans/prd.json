@@ -1736,7 +1736,7 @@
     "id": "msl-final-005",
     "category": "final",
     "description": "Verify all output files",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Verify: ls -la output/msl/",
       "All season directories exist",
