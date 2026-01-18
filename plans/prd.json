@@ -1006,7 +1006,7 @@
     "id": "msl-schema-003",
     "category": "schema",
     "description": "MSLPlayerStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLPlayerStats Schema.Class",
       "Fields: games_played, goals, assists, points, penalty_minutes (Schema.Number)",

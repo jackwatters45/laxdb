@@ -594,3 +594,10 @@ Description: MSLTeam response schema
 Status: COMPLETE
 Commit: e2cee6e
 Timestamp: 2026-01-19T04:53:12+11:00
+
+=== Iteration 77 ===
+Story: msl-schema-003
+Description: MSLPlayerStats nested schema
+Status: COMPLETE
+Commit: dfbe8c5
+Timestamp: 2026-01-19T04:55:59+11:00

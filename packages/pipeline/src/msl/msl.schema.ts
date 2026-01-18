@@ -76,6 +76,19 @@ export class MSLPlayerStats extends Schema.Class<MSLPlayerStats>(
   otg: Schema.NullOr(Schema.Number), // overtime goals
 }) {}
 
+// MSL Player response schema
+export class MSLPlayer extends Schema.Class<MSLPlayer>("MSLPlayer")({
+  id: Schema.String,
+  name: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  jersey_number: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  stats: Schema.optional(Schema.suspend(() => MSLPlayerStats)),
+}) {}
+
 // MSL Team response schema
 export class MSLTeam extends Schema.Class<MSLTeam>("MSLTeam")({
   id: Schema.String,
