@@ -1171,7 +1171,7 @@
     "id": "msl-client-003",
     "category": "client",
     "description": "Implement fetchGamesheetPage helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add fetchGamesheetPage(path: string) internal helper",
       "Build full URL from gamesheetBaseUrl",

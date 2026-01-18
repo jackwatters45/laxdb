@@ -678,3 +678,10 @@ Description: Create MSLClient service shell
 Status: COMPLETE
 Commit: c34970c
 Timestamp: 2026-01-19T05:29:50+11:00
+
+=== Iteration 89 ===
+Story: msl-client-003
+Description: Implement fetchGamesheetPage helper
+Status: COMPLETE
+Commit: a13bbd9
+Timestamp: 2026-01-19T05:34:43+11:00
