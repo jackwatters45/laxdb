@@ -1855,7 +1855,7 @@
     "id": "wla-schema-009",
     "category": "schema",
     "description": "WLA request schemas",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLATeamsRequest Schema.Class { seasonId: WLASeasonId }",
       "Define WLAPlayersRequest Schema.Class { seasonId: WLASeasonId }",

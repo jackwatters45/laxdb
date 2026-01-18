@@ -1042,3 +1042,10 @@ Description: WLAGame response schema
 Status: COMPLETE
 Commit: 14fe9a2
 Timestamp: 2026-01-19T08:37:27+11:00
+
+=== Iteration 141 ===
+Story: wla-schema-009
+Description: WLA request schemas
+Status: COMPLETE
+Commit: 8176ad7
+Timestamp: 2026-01-19T08:39:49+11:00
