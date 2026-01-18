@@ -144,3 +144,50 @@ export class MLLGame extends Schema.Class<MLLGame>("MLLGame")({
   // Source tracking
   source_url: Schema.NullOr(Schema.String),
 }) {}
+
+// ============================================================================
+// MLL Request Schemas
+// ============================================================================
+
+// Request schema for fetching MLL teams by year
+export class MLLTeamsRequest extends Schema.Class<MLLTeamsRequest>(
+  "MLLTeamsRequest",
+)({
+  year: MLLYear,
+}) {}
+
+// Request schema for fetching MLL players by year
+export class MLLPlayersRequest extends Schema.Class<MLLPlayersRequest>(
+  "MLLPlayersRequest",
+)({
+  year: MLLYear,
+}) {}
+
+// Request schema for fetching MLL goalies by year
+export class MLLGoaliesRequest extends Schema.Class<MLLGoaliesRequest>(
+  "MLLGoaliesRequest",
+)({
+  year: MLLYear,
+}) {}
+
+// Request schema for fetching MLL standings by year
+export class MLLStandingsRequest extends Schema.Class<MLLStandingsRequest>(
+  "MLLStandingsRequest",
+)({
+  year: MLLYear,
+}) {}
+
+// Request schema for fetching MLL stat leaders by year
+export class MLLStatLeadersRequest extends Schema.Class<MLLStatLeadersRequest>(
+  "MLLStatLeadersRequest",
+)({
+  year: MLLYear,
+  statType: Schema.optional(Schema.String),
+}) {}
+
+// Request schema for fetching MLL schedule by year
+export class MLLScheduleRequest extends Schema.Class<MLLScheduleRequest>(
+  "MLLScheduleRequest",
+)({
+  year: MLLYear,
+}) {}

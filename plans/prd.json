@@ -148,7 +148,7 @@
     "id": "mll-schema-009",
     "category": "schema",
     "description": "MLLGame response schema (from Wayback)",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLGame Schema.Class",
       "Fields: id (string), date (nullable string), status (nullable string)",

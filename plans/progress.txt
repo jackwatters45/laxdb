@@ -140,3 +140,10 @@ Description: MLLStatLeader response schema
 Status: COMPLETE
 Commit: adfeb3b
 Timestamp: 2026-01-19T00:02:25+11:00
+
+=== Iteration 12 ===
+Story: mll-schema-009
+Description: MLLGame response schema (from Wayback)
+Status: COMPLETE
+Commit: 309b354
+Timestamp: 2026-01-19T00:04:25+11:00
