@@ -17,7 +17,7 @@ import {
   MLLStatLeadersRequest,
   type MLLTeam,
   MLLTeamsRequest,
-  type WaybackCDXEntry,
+  WaybackCDXEntry,
 } from "./mll.schema";
 
 const mapParseError = (error: ParseResult.ParseError): ParseError =>
@@ -128,6 +128,157 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Queries the Wayback Machine CDX API for archived URLs.
+     * Returns entries filtered by statuscode=200.
+     *
+     * @param url - The URL pattern to search for (e.g., "majorleaguelacrosse.com/schedule*")
+     * @param params - Optional query parameters (from, to, collapse, filter, etc.)
+     */
+    const queryWaybackCDX = (
+      url: string,
+      params: Record<string, string> = {},
+    ): Effect.Effect<
+      readonly WaybackCDXEntry[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const queryParams = new URLSearchParams({
+          url,
+          output: "json",
+          ...params,
+        });
+        const cdxUrl = `${mllConfig.waybackCdxUrl}?${queryParams.toString()}`;
+        const timeoutMs = pipelineConfig.defaultTimeoutMs;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, timeoutMs);
+
+        const response = yield* Effect.tryPromise({
+          try: () =>
+            fetch(cdxUrl, {
+              method: "GET",
+              headers: {
+                ...mllConfig.headers,
+                Accept: "application/json",
+              },
+              signal: controller.signal,
+            }),
+          catch: (error) => {
+            clearTimeout(timeoutId);
+            if (error instanceof Error && error.name === "AbortError") {
+              return new TimeoutError({
+                message: `CDX request timed out after ${timeoutMs}ms`,
+                url: cdxUrl,
+                timeoutMs,
+              });
+            }
+            return new NetworkError({
+              message: `CDX network error: ${String(error)}`,
+              url: cdxUrl,
+              cause: error,
+            });
+          },
+        }).pipe(
+          Effect.tap(() =>
+            Effect.sync(() => {
+              clearTimeout(timeoutId);
+            }),
+          ),
+        );
+
+        if (response.status >= 400) {
+          return yield* Effect.fail(
+            new HttpError({
+              message: `CDX API HTTP ${response.status} error`,
+              url: cdxUrl,
+              method: "GET",
+              statusCode: response.status,
+            }),
+          );
+        }
+
+        const json = yield* Effect.tryPromise({
+          try: () => response.json(),
+          catch: (error) =>
+            new ParseError({
+              message: `Failed to parse CDX JSON response: ${String(error)}`,
+              cause: error,
+            }),
+        });
+
+        // CDX returns array where first row is headers, rest are data rows
+        // Format: [["urlkey", "timestamp", "original", "mimetype", "statuscode", "digest", "length"], [...data...], ...]
+        if (!Array.isArray(json)) {
+          return yield* Effect.fail(
+            new ParseError({
+              message: "CDX response is not an array",
+              cause: json,
+            }),
+          );
+        }
+
+        // Empty response or headers only
+        if (json.length <= 1) {
+          return [] as readonly WaybackCDXEntry[];
+        }
+
+        // Skip header row, parse data rows into WaybackCDXEntry objects
+        const dataRows = json.slice(1) as string[][];
+        const entries = dataRows.map(
+          ([
+            urlkey,
+            timestamp,
+            original,
+            mimetype,
+            statuscode,
+            digest,
+            length,
+          ]) =>
+            new WaybackCDXEntry({
+              urlkey: urlkey ?? "",
+              timestamp: timestamp ?? "",
+              original: original ?? "",
+              mimetype: mimetype ?? "",
+              statuscode: statuscode ?? "",
+              digest: digest ?? "",
+              length: length ?? "",
+            }),
+        );
+
+        // Filter by statuscode=200 (successful captures only)
+        const successfulEntries = entries.filter(
+          (entry) => entry.statuscode === "200",
+        );
+
+        return successfulEntries;
+      });
+
+    /**
+     * Queries Wayback CDX with exponential backoff retry.
+     * Retries on network and timeout errors only.
+     */
+    const queryWaybackCDXWithRetry = (
+      url: string,
+      params: Record<string, string> = {},
+    ): Effect.Effect<
+      readonly WaybackCDXEntry[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      queryWaybackCDX(url, params).pipe(
+        Effect.retry(
+          Schedule.exponential(pipelineConfig.retryDelay).pipe(
+            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
+            Schedule.whileInput(
+              (error: HttpError | NetworkError | TimeoutError | ParseError) =>
+                error._tag === "NetworkError" || error._tag === "TimeoutError",
+            ),
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -136,6 +287,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Internal helpers for fetching pages
       fetchStatscrewPage: fetchStatscrewPageWithRetry,
+
+      // Internal helpers for Wayback Machine CDX queries
+      queryWaybackCDX: queryWaybackCDXWithRetry,
 
       // Type exports for method signatures (to be implemented)
       _types: {

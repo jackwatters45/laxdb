@@ -189,3 +189,10 @@ Description: Create MLLClient service shell
 Status: COMPLETE
 Commit: 7527e83
 Timestamp: 2026-01-19T00:17:57+11:00
+
+=== Iteration 19 ===
+Story: mll-client-003
+Description: Implement fetchStatscrewPage helper
+Status: COMPLETE
+Commit: 56e26f4
+Timestamp: 2026-01-19T00:20:18+11:00

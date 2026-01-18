@@ -245,7 +245,7 @@
     "id": "mll-client-003",
     "category": "client",
     "description": "Implement fetchStatscrewPage helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add fetchStatscrewPage(path: string) internal helper",
       "Build full URL from statscrewBaseUrl",
