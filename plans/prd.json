@@ -1527,7 +1527,7 @@
     "id": "msl-extract-009",
     "category": "extract",
     "description": "Implement extractAllSeasons orchestrator",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractAllSeasons(options) method",
       "Loop through MSL_SEASONS array",
