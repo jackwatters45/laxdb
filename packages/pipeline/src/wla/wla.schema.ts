@@ -12,3 +12,13 @@ export const WLASeasonId = Schema.Number.pipe(
   }),
 );
 export type WLASeasonId = typeof WLASeasonId.Type;
+
+// WLA Team response schema
+export class WLATeam extends Schema.Class<WLATeam>("WLATeam")({
+  id: Schema.String,
+  code: Schema.String,
+  name: Schema.String,
+  city: Schema.NullOr(Schema.String),
+  logo_url: Schema.NullOr(Schema.String),
+  website_url: Schema.NullOr(Schema.String),
+}) {}

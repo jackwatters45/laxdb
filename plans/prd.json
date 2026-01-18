@@ -1748,7 +1748,7 @@
     "id": "wla-schema-001",
     "category": "schema",
     "description": "Create wla.schema.ts with WLASeasonId branded type",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/wla/wla.schema.ts",
       "Define WLASeasonId: Schema.Number.pipe(Schema.int(), Schema.between(2005, 2035), Schema.brand('WLASeasonId'))",
