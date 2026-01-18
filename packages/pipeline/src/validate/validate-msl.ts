@@ -284,6 +284,76 @@ const program = Effect.gen(function* () {
     } else {
       fileResults.push(scheduleResult);
     }
+
+    // Cross-reference validations
+    // players.team_id -> teams.id
+    const playersWithTeam = players.filter((p) => p.team_id !== null);
+    if (playersWithTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        playersWithTeam,
+        teams,
+        "team_id",
+        "id",
+        `${year}/players.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // goalies.team_id -> teams.id
+    const goaliesWithTeam = goalies.filter((g) => g.team_id !== null);
+    if (goaliesWithTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        goaliesWithTeam,
+        teams,
+        "team_id",
+        "id",
+        `${year}/goalies.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // standings.team_id -> teams.id
+    if (standings.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        standings,
+        teams,
+        "team_id",
+        "id",
+        `${year}/standings.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // schedule.home_team_id -> teams.id
+    const gamesWithHomeTeam = games.filter((g) => g.home_team_id !== null);
+    if (gamesWithHomeTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        gamesWithHomeTeam,
+        teams,
+        "home_team_id",
+        "id",
+        `${year}/schedule.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
+
+    // schedule.away_team_id -> teams.id
+    const gamesWithAwayTeam = games.filter((g) => g.away_team_id !== null);
+    if (gamesWithAwayTeam.length > 0 && teams.length > 0) {
+      const xref = yield* crossReference(
+        gamesWithAwayTeam,
+        teams,
+        "away_team_id",
+        "id",
+        `${year}/schedule.json`,
+        `${year}/teams.json`,
+      );
+      crossRefs.push(xref);
+    }
   }
 
   const report = buildReport("MSL", fileResults, crossRefs, startTime);
