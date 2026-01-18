@@ -29,7 +29,7 @@
     "id": "mll-discovery-003",
     "category": "discovery",
     "description": "Map MLL teams by year",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Document team roster changes 2001-2020",
       "Note: 6 teams in final year (2019): Atlanta Blaze, Boston Cannons, Chesapeake Bayhawks, Dallas Rattlers, Denver Outlaws, New York Lizards",

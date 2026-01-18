@@ -77,3 +77,10 @@ Key Deliverables:
 - Data quality notes for edge cases (Rochester gaps, 2009/2010 mergers)
 
 Sources: Wikipedia, StatsCrew, funwhileitlasted.net, InsideLacrosse, PLL merger docs
+
+=== Iteration 3 ===
+Story: mll-discovery-003
+Description: Map MLL teams by year
+Status: COMPLETE
+Commit: 2c4e93d
+Timestamp: 2026-01-18T23:47:54+11:00
