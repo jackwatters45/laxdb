@@ -1714,7 +1714,7 @@
     "id": "msl-final-003",
     "category": "final",
     "description": "Run full extraction for all seasons",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/msl/run.ts --all",
       "All discovered seasons extracted",

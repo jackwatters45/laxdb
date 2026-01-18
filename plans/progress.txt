@@ -965,3 +965,10 @@ Description: Run all MSL tests
 Status: COMPLETE
 Commit: b4f65b9
 Timestamp: 2026-01-19T08:01:33+11:00
+
+=== Iteration 130 ===
+Story: msl-final-003
+Description: Run full extraction for all seasons
+Status: COMPLETE
+Commit: 70ded6b
+Timestamp: 2026-01-19T08:07:45+11:00
