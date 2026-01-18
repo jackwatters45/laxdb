@@ -191,7 +191,7 @@
     "id": "mll-schema-012",
     "category": "schema",
     "description": "Export all schemas from mll.schema.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add export statements for all schemas",
       "Add export for branded MLLYear type",

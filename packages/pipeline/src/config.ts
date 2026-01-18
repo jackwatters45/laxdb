@@ -100,3 +100,15 @@ export class NLLConfig extends Effect.Service<NLLConfig>()("NLLConfig", {
     },
   } as const,
 }) {}
+
+export class MLLConfig extends Effect.Service<MLLConfig>()("MLLConfig", {
+  succeed: {
+    statscrewBaseUrl: "https://www.statscrew.com/lacrosse",
+    waybackCdxUrl: "https://web.archive.org/cdx/search/cdx",
+    waybackWebUrl: "https://web.archive.org/web",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  } as const,
+}) {}
