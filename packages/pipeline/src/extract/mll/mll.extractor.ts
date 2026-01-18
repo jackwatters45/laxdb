@@ -7,6 +7,7 @@ import type {
   MLLGoalie,
   MLLPlayer,
   MLLStanding,
+  MLLStatLeader,
   MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
@@ -151,6 +152,28 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      const extractStatLeaders = (year: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(`  ⭐ Extracting stat leaders for year ${year}...`);
+          const result = yield* withTiming(client.getStatLeaders({ year }));
+          yield* saveJson(getOutputPath(year, "stat-leaders"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} stat leaders (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MLLStatLeader[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -160,6 +183,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractPlayers,
         extractGoalies,
         extractStandings,
+        extractStatLeaders,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
