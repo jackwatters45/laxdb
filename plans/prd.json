@@ -1552,7 +1552,7 @@
     "id": "msl-extract-011",
     "category": "extract",
     "description": "Create MSL extraction CLI entry point",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/msl/run.ts",
       "Parse CLI args: --season=ID, --all, --force, --help",

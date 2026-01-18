@@ -874,3 +874,10 @@ Description: Create MSL extraction module exports
 Status: COMPLETE
 Commit: 7428695
 Timestamp: 2026-01-19T07:14:36+11:00
+
+=== Iteration 117 ===
+Story: msl-extract-011
+Description: Create MSL extraction CLI entry point
+Status: COMPLETE
+Commit: f4a68b6
+Timestamp: 2026-01-19T07:19:34+11:00
