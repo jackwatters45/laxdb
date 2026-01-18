@@ -319,7 +319,7 @@
     "id": "mll-client-008",
     "category": "client",
     "description": "Implement MLLClient.getGoalies method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getGoalies(input: MLLGoaliesRequest.Encoded)",
       "Build URL for goalie stats page",

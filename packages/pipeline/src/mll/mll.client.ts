@@ -11,7 +11,7 @@ import {
   MLLPlayer,
   MLLPlayersRequest,
   MLLScheduleRequest,
-  type MLLStanding,
+  MLLStanding,
   MLLStandingsRequest,
   type MLLStatLeader,
   MLLStatLeadersRequest,
@@ -680,6 +680,167 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       );
 
     /**
+     * Fetches standings for a given MLL season year.
+     * Parses the season home page to extract standings data.
+     *
+     * @param input - Request containing the year (2001-2020)
+     * @returns Array of MLLStanding objects
+     */
+    const getStandings = (
+      input: typeof MLLStandingsRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLStanding[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLStandingsRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        const path = `/lacrosse/l-MLL/y-${request.year}`;
+
+        const html = yield* fetchStatscrewPageWithRetry(path);
+
+        const doc = $.load(html);
+
+        // Extract standings from the standings table on the season page
+        // Look for table with headers: Team (or Position), W, L, GF, GA, Win%
+        const standings: MLLStanding[] = [];
+
+        const tables = doc("table");
+
+        tables.each((_tableIndex, table) => {
+          const headerRow = doc(table).find("tr").first();
+          const headers = headerRow
+            .find("th, td")
+            .map((_i, el) => doc(el).text().trim().toLowerCase())
+            .get();
+
+          // Check if this is a standings table
+          const hasW = headers.includes("w");
+          const hasL = headers.includes("l");
+          const hasGF = headers.includes("gf");
+          const hasGA = headers.includes("ga");
+          const hasTeam = headers.some(
+            (h) =>
+              h === "team" ||
+              h === "club" ||
+              h === "name" ||
+              h === "" || // Sometimes team column has no header
+              h.includes("team"),
+          );
+
+          // Must have W, L and (GF + GA)
+          if (!(hasW && hasL && hasGF && hasGA && hasTeam)) {
+            return; // Not a standings table, skip
+          }
+
+          // Find column indices
+          const teamIdx = headers.findIndex(
+            (h) =>
+              h === "team" ||
+              h === "club" ||
+              h === "name" ||
+              h === "" ||
+              h.includes("team"),
+          );
+          const wIdx = headers.findIndex((h) => h === "w");
+          const lIdx = headers.findIndex((h) => h === "l");
+          const gfIdx = headers.findIndex((h) => h === "gf");
+          const gaIdx = headers.findIndex((h) => h === "ga");
+          const winPctIdx = headers.findIndex(
+            (h) => h === "win%" || h === "pct" || h === "pct." || h === "w%",
+          );
+
+          // Parse data rows (skip header row)
+          let position = 1;
+          doc(table)
+            .find("tr")
+            .slice(1)
+            .each((_rowIndex, row) => {
+              const cells = doc(row)
+                .find("td")
+                .map((_i, el) => doc(el))
+                .get();
+
+              if (cells.length < Math.max(teamIdx, wIdx, lIdx) + 1) {
+                return; // Skip malformed rows
+              }
+
+              // Extract team info
+              const teamCell = cells[teamIdx];
+              const teamLink = teamCell?.find("a").attr("href") ?? "";
+              const teamName = teamCell?.text().trim() ?? "";
+
+              // Extract team ID from link
+              // Format: /lacrosse/stats/t-{TEAM_ID}/y-{YEAR}
+              const teamIdMatch = teamLink.match(
+                /\/lacrosse\/(?:stats|roster)\/t-(MLL[A-Z]{2,3})\/y-/,
+              );
+              const teamId =
+                teamIdMatch?.[1] ?? `MLL${teamName.slice(0, 3).toUpperCase()}`;
+
+              if (!teamName) {
+                return; // Skip empty rows
+              }
+
+              // Parse numeric values
+              const parseNum = (idx: number): number => {
+                const text = cells[idx]?.text().trim() ?? "";
+                const num = Number.parseFloat(text);
+                return Number.isNaN(num) ? 0 : num;
+              };
+
+              const wins = parseNum(wIdx);
+              const losses = parseNum(lIdx);
+              const goalsFor = parseNum(gfIdx);
+              const goalsAgainst = parseNum(gaIdx);
+
+              // Calculate or extract win percentage
+              let winPct: number;
+              if (winPctIdx >= 0) {
+                const pctText = cells[winPctIdx]?.text().trim() ?? "";
+                const pct = Number.parseFloat(pctText);
+                winPct = Number.isNaN(pct) ? 0 : pct;
+                // If it looks like a percentage (e.g., "75%"), strip the %
+                // If it's already decimal (e.g., ".750" or "0.750"), use as-is
+                if (winPct > 1) {
+                  winPct = winPct / 100;
+                }
+              } else {
+                // Calculate from W/L
+                const totalGames = wins + losses;
+                winPct = totalGames > 0 ? wins / totalGames : 0;
+              }
+
+              const standing = new MLLStanding({
+                team_id: teamId,
+                team_name: teamName,
+                position,
+                wins,
+                losses,
+                games_played: wins + losses,
+                goals_for: goalsFor,
+                goals_against: goalsAgainst,
+                goal_diff: goalsFor - goalsAgainst,
+                win_pct: winPct,
+              });
+
+              standings.push(standing);
+              position++;
+            });
+        });
+
+        return standings;
+      }).pipe(
+        Effect.tap((standings) =>
+          Effect.log(
+            `Fetched ${standings.length} standings for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
+    /**
      * Fetches all goalies for a given MLL season year.
      * Scrapes team stats pages to extract goalie data.
      *
@@ -891,6 +1052,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       getTeams,
       getPlayers,
       getGoalies,
+      getStandings,
 
       // Type exports for method signatures (to be implemented)
       _types: {
