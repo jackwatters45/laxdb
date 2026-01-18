@@ -867,3 +867,10 @@ Description: Implement extractAllSeasons orchestrator
 Status: COMPLETE
 Commit: 70e8946
 Timestamp: 2026-01-19T07:12:25+11:00
+
+=== Iteration 116 ===
+Story: msl-extract-010
+Description: Create MSL extraction module exports
+Status: COMPLETE
+Commit: 7428695
+Timestamp: 2026-01-19T07:14:36+11:00

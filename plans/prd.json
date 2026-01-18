@@ -1540,7 +1540,7 @@
     "id": "msl-extract-010",
     "category": "extract",
     "description": "Create MSL extraction module exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/msl/index.ts",
       "Export MSLExtractorService",
