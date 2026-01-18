@@ -872,7 +872,7 @@
     "id": "mll-final-001",
     "category": "final",
     "description": "Run full typecheck",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun run typecheck",
       "Fix any type errors",
