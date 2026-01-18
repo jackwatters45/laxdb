@@ -1,4 +1,8 @@
-import { Schema } from "effect";
+import { FileSystem, Path } from "@effect/platform";
+import { BunContext } from "@effect/platform-bun";
+import { Effect, Layer, Schema } from "effect";
+
+import { ExtractConfigService } from "../extract.config";
 
 // MLL Entity Status - same structure as NLL/PLL
 export const MLLEntityStatus = Schema.Struct({
@@ -53,3 +57,116 @@ export const createEmptyMLLManifest = (): MLLExtractionManifest => ({
   lastRun: "",
   version: 1,
 });
+
+// MLLManifestService - manages the MLL extraction manifest
+export class MLLManifestService extends Effect.Service<MLLManifestService>()(
+  "MLLManifestService",
+  {
+    effect: Effect.gen(function* () {
+      const config = yield* ExtractConfigService;
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const manifestPath = path.join(config.outputDir, "mll", "manifest.json");
+
+      const load = Effect.gen(function* () {
+        const exists = yield* fs.exists(manifestPath);
+
+        if (!exists) {
+          return createEmptyMLLManifest();
+        }
+
+        const content = yield* fs
+          .readFileString(manifestPath, "utf-8")
+          .pipe(
+            Effect.catchAll((e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            ),
+          );
+
+        const parsed = yield* Effect.try({
+          try: () => JSON.parse(content) as unknown,
+          catch: (e) =>
+            new Error(`Failed to parse manifest JSON: ${String(e)}`),
+        });
+        return yield* Schema.decodeUnknown(MLLExtractionManifest)(parsed).pipe(
+          Effect.catchAll(() => Effect.succeed(createEmptyMLLManifest())),
+        );
+      });
+
+      const save = (manifest: MLLExtractionManifest) =>
+        Effect.gen(function* () {
+          const dir = path.dirname(manifestPath);
+          yield* fs.makeDirectory(dir, { recursive: true });
+          const content = JSON.stringify(manifest, null, 2);
+          yield* fs.writeFileString(manifestPath, content);
+        }).pipe(
+          Effect.catchAll((e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          ),
+        );
+
+      const getSeasonManifest = (
+        manifest: MLLExtractionManifest,
+        year: number,
+      ): MLLSeasonManifest => {
+        const key = String(year);
+        return manifest.seasons[key] ?? createEmptyMLLSeasonManifest();
+      };
+
+      const updateEntityStatus = (
+        manifest: MLLExtractionManifest,
+        year: number,
+        entity: keyof MLLSeasonManifest,
+        status: MLLEntityStatus,
+      ): MLLExtractionManifest => {
+        const key = String(year);
+        const seasonManifest = getSeasonManifest(manifest, year);
+        return {
+          ...manifest,
+          seasons: {
+            ...manifest.seasons,
+            [key]: {
+              ...seasonManifest,
+              [entity]: status,
+            },
+          },
+          lastRun: new Date().toISOString(),
+        };
+      };
+
+      const markComplete = (
+        manifest: MLLExtractionManifest,
+        year: number,
+        entity: keyof MLLSeasonManifest,
+        count: number,
+        durationMs: number,
+      ): MLLExtractionManifest => {
+        return updateEntityStatus(manifest, year, entity, {
+          extracted: true,
+          count,
+          timestamp: new Date().toISOString(),
+          durationMs,
+        });
+      };
+
+      const isExtracted = (
+        manifest: MLLExtractionManifest,
+        year: number,
+        entity: keyof MLLSeasonManifest,
+      ): boolean => {
+        const seasonManifest = getSeasonManifest(manifest, year);
+        return seasonManifest[entity].extracted;
+      };
+
+      return {
+        load,
+        save,
+        getSeasonManifest,
+        updateEntityStatus,
+        markComplete,
+        isExtracted,
+      };
+    }),
+    dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],
+  },
+) {}

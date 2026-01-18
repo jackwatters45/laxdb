@@ -543,7 +543,7 @@
     "id": "mll-manifest-002",
     "category": "extract",
     "description": "Create MLLExtractionManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLExtractionManifest schema",
       "Fields: source='mll', seasons Record, lastRun, version",

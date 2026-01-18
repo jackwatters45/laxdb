@@ -342,3 +342,10 @@ Description: Create MLLSeasonManifest schema
 Status: COMPLETE
 Commit: b9dbbca
 Timestamp: 2026-01-19T01:39:12+11:00
+
+=== Iteration 41 ===
+Story: mll-manifest-002
+Description: Create MLLExtractionManifest schema
+Status: COMPLETE
+Commit: e85a37c
+Timestamp: 2026-01-19T01:44:58+11:00
