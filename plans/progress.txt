@@ -286,3 +286,10 @@ Story: mll-test-002
 Status: BLOCKED
 Reason: MLLClient.getTeams returns 0 teams for all years - underlying client parsing is broken (HTML structure changed on statscrew.com or parsing logic issue). Test code is correct but cannot pass until client is fixed.
 Timestamp: 2026-01-19T00:59:19+11:00
+
+=== Iteration 33 ===
+Story: mll-test-002
+Description: getTeams integration test
+Status: COMPLETE
+Commit: 8038b98
+Timestamp: 2026-01-19T01:03:30+11:00

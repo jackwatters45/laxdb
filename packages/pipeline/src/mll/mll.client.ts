@@ -7,8 +7,10 @@ import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
 import {
   MLLGame,
   MLLGoalie,
+  MLLGoalieStats,
   MLLGoaliesRequest,
   MLLPlayer,
+  MLLPlayerStats,
   MLLPlayersRequest,
   MLLScheduleRequest,
   MLLStanding,
@@ -647,7 +649,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
                   team_id: team.id,
                   team_name: team.name,
                   college: null,
-                  stats: {
+                  stats: new MLLPlayerStats({
                     games_played: gamesPlayed,
                     goals,
                     assists,
@@ -663,7 +665,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
                         ? faceoffs - faceoffsWon
                         : null,
                     faceoff_pct: faceoffPct,
-                  },
+                  }),
                 });
 
                 allPlayers.push(player);
@@ -1579,7 +1581,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
                   last_name: lastName,
                   team_id: team.id,
                   team_name: team.name,
-                  stats: {
+                  stats: new MLLGoalieStats({
                     games_played: gamesPlayed,
                     wins,
                     losses,
@@ -1587,7 +1589,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
                     saves,
                     gaa,
                     save_pct: savePct,
-                  },
+                  }),
                 });
 
                 allGoalies.push(goalie);
