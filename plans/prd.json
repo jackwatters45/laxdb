@@ -1760,7 +1760,7 @@
     "id": "wla-schema-002",
     "category": "schema",
     "description": "WLATeam response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLATeam Schema.Class",
       "Fields: id (string), code (string), name (string), city (nullable), logo_url (nullable), website_url (nullable)",

@@ -22,3 +22,23 @@ export class WLATeam extends Schema.Class<WLATeam>("WLATeam")({
   logo_url: Schema.NullOr(Schema.String),
   website_url: Schema.NullOr(Schema.String),
 }) {}
+
+// WLA Player Stats nested schema (used in WLAPlayer)
+export class WLAPlayerStats extends Schema.Class<WLAPlayerStats>(
+  "WLAPlayerStats",
+)({
+  // Core stats
+  games_played: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  penalty_minutes: Schema.Number,
+
+  // Special teams goals (nullable - may not be tracked in all seasons)
+  ppg: Schema.NullOr(Schema.Number), // power play goals
+  shg: Schema.NullOr(Schema.Number), // short-handed goals
+  gwg: Schema.NullOr(Schema.Number), // game-winning goals
+
+  // Efficiency
+  scoring_pct: Schema.NullOr(Schema.Number), // scoring percentage
+}) {}
