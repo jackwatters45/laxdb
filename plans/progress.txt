@@ -398,3 +398,10 @@ Description: Implement extractStandings method
 Status: COMPLETE
 Commit: 94de405
 Timestamp: 2026-01-19T02:22:21+11:00
+
+=== Iteration 49 ===
+Story: mll-extract-007
+Description: Implement extractStatLeaders method
+Status: COMPLETE
+Commit: f28dbc4
+Timestamp: 2026-01-19T02:27:23+11:00

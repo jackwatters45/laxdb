@@ -646,7 +646,7 @@
     "id": "mll-extract-007",
     "category": "extract",
     "description": "Implement extractStatLeaders method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractStatLeaders(year) method",
       "Log progress, call client.getStatLeaders with timing",

@@ -4,6 +4,7 @@ import { Effect, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
 import type {
+  MLLGame,
   MLLGoalie,
   MLLPlayer,
   MLLStanding,
@@ -174,6 +175,38 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      const extractSchedule = (year: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(
+            `  📅 Extracting schedule for year ${year} (via Wayback)...`,
+          );
+          const result = yield* withTiming(client.getSchedule({ year }));
+          yield* saveJson(getOutputPath(year, "schedule"), result.data);
+          if (result.count === 0) {
+            yield* Effect.log(
+              `     ⚠ No schedule data found (Wayback coverage may be incomplete)`,
+            );
+          } else {
+            yield* Effect.log(
+              `     ✓ ${result.count} games (${result.durationMs}ms)`,
+            );
+          }
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(
+                `     ✗ Failed: ${e} (schedule may be incomplete for this year)`,
+              );
+              return {
+                data: [] as readonly MLLGame[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -184,6 +217,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractGoalies,
         extractStandings,
         extractStatLeaders,
+        extractSchedule,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
