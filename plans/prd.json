@@ -179,7 +179,7 @@
     "id": "mll-schema-011",
     "category": "schema",
     "description": "Wayback CDX response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WaybackCDXEntry Schema.Class",
       "Fields: urlkey, timestamp, original, mimetype, statuscode, digest, length",

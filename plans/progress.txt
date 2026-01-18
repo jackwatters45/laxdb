@@ -154,3 +154,10 @@ Description: MLL request schemas
 Status: COMPLETE
 Commit: 66de754
 Timestamp: 2026-01-19T00:06:28+11:00
+
+=== Iteration 14 ===
+Story: mll-schema-011
+Description: Wayback CDX response schema
+Status: COMPLETE
+Commit: f0b05d9
+Timestamp: 2026-01-19T00:08:13+11:00
