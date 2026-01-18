@@ -944,3 +944,10 @@ Description: Add MSLClient Methods table to CLAUDE.md
 Status: COMPLETE
 Commit: 19d0fbd
 Timestamp: 2026-01-19T07:54:55+11:00
+
+=== Iteration 127 ===
+Story: msl-docs-002
+Description: Add MSL commands to CLAUDE.md
+Status: COMPLETE
+Commit: 31f7f1a
+Timestamp: 2026-01-19T07:57:17+11:00

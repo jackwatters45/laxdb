@@ -1681,7 +1681,7 @@
     "id": "msl-docs-002",
     "category": "docs",
     "description": "Add MSL commands to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add MSL extraction command: bun src/extract/msl/run.ts",
       "Add MSL validation command: bun src/validate/validate-msl.ts",
