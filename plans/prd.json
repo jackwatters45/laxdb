@@ -1359,7 +1359,7 @@
     "id": "msl-test-006",
     "category": "test",
     "description": "getSchedule integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getSchedule",
       "Add test: 'fetches schedule for season 9567'",

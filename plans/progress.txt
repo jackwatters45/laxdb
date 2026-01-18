@@ -769,3 +769,10 @@ Description: getStandings integration test
 Status: COMPLETE
 Commit: 5fc3f90
 Timestamp: 2026-01-19T06:23:59+11:00
+
+=== Iteration 102 ===
+Story: msl-test-006
+Description: getSchedule integration test
+Status: COMPLETE
+Commit: 2e1ff19
+Timestamp: 2026-01-19T06:27:48+11:00
