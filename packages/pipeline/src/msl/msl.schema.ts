@@ -134,3 +134,25 @@ export class MSLGoalie extends Schema.Class<MSLGoalie>("MSLGoalie")({
   team_name: Schema.NullOr(Schema.String),
   stats: Schema.optional(Schema.suspend(() => MSLGoalieStats)),
 }) {}
+
+// MSL Standing response schema
+export class MSLStanding extends Schema.Class<MSLStanding>("MSLStanding")({
+  team_id: Schema.String,
+  team_name: Schema.NullOr(Schema.String),
+  position: Schema.Number,
+
+  // Win/loss record
+  wins: Schema.Number,
+  losses: Schema.Number,
+  ties: Schema.Number,
+  games_played: Schema.Number,
+  points: Schema.Number,
+
+  // Goal stats
+  goals_for: Schema.Number,
+  goals_against: Schema.Number,
+  goal_diff: Schema.Number,
+
+  // Streak info
+  streak: Schema.NullOr(Schema.String),
+}) {}

@@ -1048,7 +1048,7 @@
     "id": "msl-schema-006",
     "category": "schema",
     "description": "MSLGoalie response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLGoalie Schema.Class",
       "Fields: id (string), name (string), first_name, last_name (nullable)",
