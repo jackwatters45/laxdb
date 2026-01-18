@@ -31,7 +31,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
     const mslConfig = yield* MSLConfig;
     const pipelineConfig = yield* PipelineConfig;
 
-    // Re-export cheerio for HTML parsing in methods
+    // Re-export cheerio for potential future HTML parsing needs
     const $ = cheerio;
 
     /**
@@ -244,89 +244,81 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
           Effect.mapError(mapParseError),
         );
 
-        // Fetch standings page which contains all teams
-        const path = `/seasons/${request.seasonId}/standings`;
-        const html = yield* fetchGamesheetPageWithRetry(path);
+        // Fetch standings from Gamesheet internal API which contains team data
+        const path = `/api/useStandings/getDivisionStandings/${request.seasonId}`;
+        const response = yield* fetchGamesheetPageWithRetry(path);
 
-        const doc = $.load(html);
+        // Parse JSON response - returns array of divisions with nested tableData
+        interface TeamTitle {
+          title: string;
+          id: number;
+        }
 
-        // Extract teams from the standings table
-        // Gamesheet uses a custom table structure with data attributes
-        // Team names are in cells with team links
+        interface StandingsTableData {
+          teamTitles?: TeamTitle[];
+          teamLogos?: (string | null)[];
+          teamIds?: number[];
+        }
+
+        interface StandingsApiResponse {
+          tableData?: StandingsTableData;
+        }
+
+        let data: StandingsApiResponse | StandingsApiResponse[];
+        try {
+          data = JSON.parse(response) as
+            | StandingsApiResponse
+            | StandingsApiResponse[];
+        } catch {
+          return yield* Effect.fail(
+            new ParseError({
+              message: `Failed to parse standings API response as JSON`,
+              cause: response.slice(0, 200),
+            }),
+          );
+        }
+
+        // Normalize to array (single division returns object, multiple returns array)
+        const divisions = Array.isArray(data) ? data : [data];
+
         const teams: MSLTeam[] = [];
         const seenIds = new Set<string>();
 
-        // Look for team links in the standings table
-        // Pattern: /seasons/{seasonId}/teams/{teamId}
-        doc('a[href*="/teams/"]').each((_index, element) => {
-          const href = doc(element).attr("href") ?? "";
-          const teamMatch = href.match(/\/seasons\/\d+\/teams\/(\d+)/);
-          const teamId = teamMatch?.[1];
+        for (const division of divisions) {
+          const tableData = division.tableData ?? {};
+          const teamTitles = tableData.teamTitles ?? [];
+          const teamLogos = tableData.teamLogos ?? [];
+          const teamIds = tableData.teamIds ?? [];
 
-          if (teamId) {
-            // Skip if we've already seen this team
-            if (seenIds.has(teamId)) {
-              return;
-            }
-            seenIds.add(teamId);
+          for (let i = 0; i < teamTitles.length; i++) {
+            const teamInfo = teamTitles[i];
+            const teamId = teamIds[i] ?? teamInfo?.id;
+            const teamName = teamInfo?.title ?? null;
+            const logoUrl = teamLogos[i] ?? null;
 
-            const teamName = doc(element).text().trim();
-
-            // Skip empty names or navigation elements
-            if (!teamName || teamName.length < 2) {
-              return;
+            if (teamId === undefined || !teamName) {
+              continue;
             }
 
-            // Try to find logo URL from nearby img element
-            const parentCell = doc(element).closest("td, div");
-            const logoImg = parentCell.find("img").first();
-            const logoUrl = logoImg.attr("src") ?? null;
+            const teamIdStr = String(teamId);
+
+            // Skip if we've already seen this team (in case of multiple divisions)
+            if (seenIds.has(teamIdStr)) {
+              continue;
+            }
+            seenIds.add(teamIdStr);
 
             teams.push(
               new MSLTeam({
-                id: teamId,
+                id: teamIdStr,
                 name: teamName,
                 city: null, // Gamesheet doesn't expose city separately
-                abbreviation: null, // Not available in standings page
+                abbreviation: null, // Not available in API
                 logo_url: logoUrl,
                 website_url: null,
               }),
             );
           }
-        });
-
-        // If no teams found from team links, try alternative selectors
-        // Gamesheet sometimes renders teams without links
-        if (teams.length === 0) {
-          // Look for team titles in data attributes
-          doc('[data-testid*="team-title"], .team-title, .team-name').each(
-            (_index, element) => {
-              const teamName = doc(element).text().trim();
-
-              if (!teamName || teamName.length < 2) {
-                return;
-              }
-
-              // Generate a simple ID from the name
-              const teamId = teamName.toLowerCase().replaceAll(/\s+/g, "-");
-
-              if (seenIds.has(teamId)) {
-                return;
-              }
-              seenIds.add(teamId);
-
-              teams.push(
-                new MSLTeam({
-                  id: teamId,
-                  name: teamName,
-                  city: null,
-                  abbreviation: null,
-                  logo_url: null,
-                  website_url: null,
-                }),
-              );
-            },
-          );
         }
 
         return teams;
