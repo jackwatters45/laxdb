@@ -27,3 +27,28 @@ Story: mll-setup-001
 Status: BLOCKED
 Reason: Story mll-setup-001 requires git branch creation (git checkout -b feature/mll) which is prohibited by rules - harness must handle branch creation
 Timestamp: 2026-01-18T23:26:54+11:00
+
+=== Iteration 1 ===
+Story: mll-discovery-001
+Description: Analyze StatsCrew page structure
+Status: COMPLETE
+Commit: 2e08d79
+Timestamp: 2026-01-18T23:32:09+11:00
+
+=== Iteration 2 ===
+Story: mll-discovery-002
+Description: Analyze Wayback Machine CDX API for MLL schedules
+Status: COMPLETE
+Output: packages/pipeline/docs/MLL_WAYBACK_DATA_MODEL.md
+
+Key Findings:
+- CDX API: web.archive.org/cdx/search/cdx?url=majorleaguelacrosse.com/schedule*&output=json
+- Coverage: 2000-2001 (minimal), 2005-2006 (good), 2007-2019 (NO CAPTURES)
+- Critical gap: 2007-2019 schedules NOT archived - need alternative sources
+- Best snapshots: 2006 season has 45 captures with full schedule data
+- URL patterns documented: /schedule/, /schedule/league/, /schedule?team={ID}
+- HTML structure mapped: Date, Time, Away Team, Home Team, Scores
+- Team IDs mapped for 2006 season (10 teams)
+- Alternative sources identified: Sports Reference, Wikipedia, ESPN archives
+
+Timestamp: 2026-01-18T23:41:00+11:00
