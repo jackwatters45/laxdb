@@ -1669,7 +1669,7 @@
     "id": "msl-docs-001",
     "category": "docs",
     "description": "Add MSLClient Methods table to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open packages/pipeline/CLAUDE.md",
       "Add MSLClient Methods table",

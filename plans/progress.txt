@@ -937,3 +937,10 @@ Description: Test MSL validation runs successfully
 Status: COMPLETE
 Commit: a77c51c
 Timestamp: 2026-01-19T07:51:48+11:00
+
+=== Iteration 126 ===
+Story: msl-docs-001
+Description: Add MSLClient Methods table to CLAUDE.md
+Status: COMPLETE
+Commit: 19d0fbd
+Timestamp: 2026-01-19T07:54:55+11:00

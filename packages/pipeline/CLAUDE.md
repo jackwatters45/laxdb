@@ -69,6 +69,12 @@ bun src/extract/mll/run.ts
 
 # MLL data validation (no credentials needed)
 bun src/validate/validate-mll.ts
+
+# MSL data extraction (no credentials needed)
+bun src/extract/msl/run.ts
+
+# MSL data validation (no credentials needed)
+bun src/validate/validate-msl.ts
 ```
 
 ## ADDING A NEW ENDPOINT
@@ -137,6 +143,48 @@ Quick summary:
 
 > **Note:** MSL data via Gamesheet API scraping - no credentials needed.
 
+## MSL EXTRACTION
+
+MSL data is scraped from Gamesheet API.
+
+```bash
+# Extract single season (default: 9567 = 2024-25)
+bun src/extract/msl/run.ts
+
+# Extract specific season by Gamesheet ID
+bun src/extract/msl/run.ts --season=9567
+
+# Extract all seasons (2023-2025)
+bun src/extract/msl/run.ts --all
+
+# Re-extract even if already done
+bun src/extract/msl/run.ts --force
+
+# Show available season IDs
+bun src/extract/msl/run.ts --help
+```
+
+| Flag | Description |
+|------|-------------|
+| `--season=ID` | Extract specific season by Gamesheet ID (default: 9567) |
+| `--all` | Extract all seasons (2023-2025) |
+| `--force` | Re-extract even if already done |
+| `--help` | Show available season IDs |
+
+**Season Discovery:** Season IDs are Gamesheet-specific. To find new season IDs:
+1. Visit https://www.mslax.com/
+2. Navigate to standings/stats page
+3. Inspect network requests to `gamesheet.app/api/`
+4. Look for `season_id` parameter
+
+| Year | Gamesheet Season ID |
+|------|---------------------|
+| 2025 | 9567 |
+| 2024 | 6007 |
+| 2023 | 3246 |
+
+> **Note:** Output: `output/msl/{seasonId}/` with JSON files per entity type.
+
 ## MLL EXTRACTION
 
 MLL data is scraped from StatsCrew (stats) and Wayback Machine (schedules).
@@ -184,6 +232,9 @@ bun src/validate/validate-nll.ts
 
 # MLL validation (no credentials needed)
 bun src/validate/validate-mll.ts
+
+# MSL validation (no credentials needed)
+bun src/validate/validate-msl.ts
 ```
 
 Outputs `output/{source}/validation-report.json` with:
