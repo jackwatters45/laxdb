@@ -56,3 +56,26 @@ export class WLAPlayer extends Schema.Class<WLAPlayer>("WLAPlayer")({
   team_name: Schema.NullOr(Schema.String),
   stats: Schema.optional(WLAPlayerStats),
 }) {}
+
+// WLA Goalie Stats nested schema (used in WLAGoalie)
+export class WLAGoalieStats extends Schema.Class<WLAGoalieStats>(
+  "WLAGoalieStats",
+)({
+  // Core goalie stats
+  games_played: Schema.Number,
+  wins: Schema.Number,
+  losses: Schema.Number,
+  ties: Schema.Number,
+
+  // Goals against / saves
+  goals_against: Schema.Number,
+  saves: Schema.Number,
+  shots_against: Schema.Number,
+
+  // Calculated stats
+  gaa: Schema.Number, // Goals Against Average
+  save_pct: Schema.Number, // Save Percentage
+
+  // Additional stats
+  shutouts: Schema.Number,
+}) {}

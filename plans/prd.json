@@ -1784,7 +1784,7 @@
     "id": "wla-schema-004",
     "category": "schema",
     "description": "WLAPlayer response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAPlayer Schema.Class",
       "Fields: id (string), first_name, last_name, full_name (nullable strings)",
