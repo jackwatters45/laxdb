@@ -119,8 +119,13 @@ interface MSLGame {
   }>;
 }
 
-// MSL Gamesheet years (currently available data)
-const MSL_YEARS = [2023, 2024, 2025] as const;
+// MSL Gamesheet seasons (season ID → year mapping)
+// Extraction outputs files by season ID, not year
+const MSL_SEASONS = [
+  { seasonId: 3246, year: 2023 },
+  { seasonId: 6007, year: 2024 },
+  { seasonId: 9567, year: 2025 },
+] as const;
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
@@ -136,13 +141,13 @@ const program = Effect.gen(function* () {
   const crossRefs: (typeof CrossReferenceResult.Type)[] = [];
 
   // Validate each season's data files
-  for (const year of MSL_YEARS) {
-    const yearDir = path.join(mslDir, String(year));
-    yield* Effect.log(`Validating season ${year}...`);
+  for (const { seasonId, year } of MSL_SEASONS) {
+    const seasonDir = path.join(mslDir, String(seasonId));
+    yield* Effect.log(`Validating season ${year} (ID: ${seasonId})...`);
 
     // Validate teams.json
     const { result: teamsResult, data: teams } =
-      yield* validateJsonArray<MSLTeam>(path.join(yearDir, "teams.json"), 1);
+      yield* validateJsonArray<MSLTeam>(path.join(seasonDir, "teams.json"), 1);
 
     if (teams.length > 0) {
       const requiredCheck = yield* validateRequiredFields(teams, [
@@ -171,7 +176,7 @@ const program = Effect.gen(function* () {
     // Validate players.json
     const { result: playersResult, data: players } =
       yield* validateJsonArray<MSLPlayer>(
-        path.join(yearDir, "players.json"),
+        path.join(seasonDir, "players.json"),
         1,
       );
 
@@ -202,7 +207,7 @@ const program = Effect.gen(function* () {
     // Validate goalies.json
     const { result: goaliesResult, data: goalies } =
       yield* validateJsonArray<MSLGoalie>(
-        path.join(yearDir, "goalies.json"),
+        path.join(seasonDir, "goalies.json"),
         1,
       );
 
@@ -233,7 +238,7 @@ const program = Effect.gen(function* () {
     // Validate standings.json
     const { result: standingsResult, data: standings } =
       yield* validateJsonArray<MSLStanding>(
-        path.join(yearDir, "standings.json"),
+        path.join(seasonDir, "standings.json"),
         1,
       );
 
@@ -262,7 +267,10 @@ const program = Effect.gen(function* () {
 
     // Validate schedule.json
     const { result: scheduleResult, data: games } =
-      yield* validateJsonArray<MSLGame>(path.join(yearDir, "schedule.json"), 1);
+      yield* validateJsonArray<MSLGame>(
+        path.join(seasonDir, "schedule.json"),
+        1,
+      );
 
     if (games.length > 0) {
       const requiredCheck = yield* validateRequiredFields(games, ["id"]);
@@ -294,8 +302,8 @@ const program = Effect.gen(function* () {
         teams,
         "team_id",
         "id",
-        `${year}/players.json`,
-        `${year}/teams.json`,
+        `${seasonId}/players.json`,
+        `${seasonId}/teams.json`,
       );
       crossRefs.push(xref);
     }
@@ -308,8 +316,8 @@ const program = Effect.gen(function* () {
         teams,
         "team_id",
         "id",
-        `${year}/goalies.json`,
-        `${year}/teams.json`,
+        `${seasonId}/goalies.json`,
+        `${seasonId}/teams.json`,
       );
       crossRefs.push(xref);
     }
@@ -321,8 +329,8 @@ const program = Effect.gen(function* () {
         teams,
         "team_id",
         "id",
-        `${year}/standings.json`,
-        `${year}/teams.json`,
+        `${seasonId}/standings.json`,
+        `${seasonId}/teams.json`,
       );
       crossRefs.push(xref);
     }
@@ -335,8 +343,8 @@ const program = Effect.gen(function* () {
         teams,
         "home_team_id",
         "id",
-        `${year}/schedule.json`,
-        `${year}/teams.json`,
+        `${seasonId}/schedule.json`,
+        `${seasonId}/teams.json`,
       );
       crossRefs.push(xref);
     }
@@ -349,8 +357,8 @@ const program = Effect.gen(function* () {
         teams,
         "away_team_id",
         "id",
-        `${year}/schedule.json`,
-        `${year}/teams.json`,
+        `${seasonId}/schedule.json`,
+        `${seasonId}/teams.json`,
       );
       crossRefs.push(xref);
     }
