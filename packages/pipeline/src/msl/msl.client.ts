@@ -226,6 +226,118 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         ),
       );
 
+    /**
+     * Fetches all teams for a given MSL season.
+     * Uses the Gamesheet standings API which includes team data.
+     *
+     * @param input - Request containing the seasonId (MSL Gamesheet season ID)
+     * @returns Array of MSLTeam objects
+     */
+    const getTeams = (
+      input: typeof MSLTeamsRequest.Encoded,
+    ): Effect.Effect<
+      readonly MSLTeam[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MSLTeamsRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch standings page which contains all teams
+        const path = `/seasons/${request.seasonId}/standings`;
+        const html = yield* fetchGamesheetPageWithRetry(path);
+
+        const doc = $.load(html);
+
+        // Extract teams from the standings table
+        // Gamesheet uses a custom table structure with data attributes
+        // Team names are in cells with team links
+        const teams: MSLTeam[] = [];
+        const seenIds = new Set<string>();
+
+        // Look for team links in the standings table
+        // Pattern: /seasons/{seasonId}/teams/{teamId}
+        doc('a[href*="/teams/"]').each((_index, element) => {
+          const href = doc(element).attr("href") ?? "";
+          const teamMatch = href.match(/\/seasons\/\d+\/teams\/(\d+)/);
+          const teamId = teamMatch?.[1];
+
+          if (teamId) {
+            // Skip if we've already seen this team
+            if (seenIds.has(teamId)) {
+              return;
+            }
+            seenIds.add(teamId);
+
+            const teamName = doc(element).text().trim();
+
+            // Skip empty names or navigation elements
+            if (!teamName || teamName.length < 2) {
+              return;
+            }
+
+            // Try to find logo URL from nearby img element
+            const parentCell = doc(element).closest("td, div");
+            const logoImg = parentCell.find("img").first();
+            const logoUrl = logoImg.attr("src") ?? null;
+
+            teams.push(
+              new MSLTeam({
+                id: teamId,
+                name: teamName,
+                city: null, // Gamesheet doesn't expose city separately
+                abbreviation: null, // Not available in standings page
+                logo_url: logoUrl,
+                website_url: null,
+              }),
+            );
+          }
+        });
+
+        // If no teams found from team links, try alternative selectors
+        // Gamesheet sometimes renders teams without links
+        if (teams.length === 0) {
+          // Look for team titles in data attributes
+          doc('[data-testid*="team-title"], .team-title, .team-name').each(
+            (_index, element) => {
+              const teamName = doc(element).text().trim();
+
+              if (!teamName || teamName.length < 2) {
+                return;
+              }
+
+              // Generate a simple ID from the name
+              const teamId = teamName.toLowerCase().replaceAll(/\s+/g, "-");
+
+              if (seenIds.has(teamId)) {
+                return;
+              }
+              seenIds.add(teamId);
+
+              teams.push(
+                new MSLTeam({
+                  id: teamId,
+                  name: teamName,
+                  city: null,
+                  abbreviation: null,
+                  logo_url: null,
+                  website_url: null,
+                }),
+              );
+            },
+          );
+        }
+
+        return teams;
+      }).pipe(
+        Effect.tap((teams) =>
+          Effect.log(
+            `Fetched ${teams.length} teams for MSL season ${input.seasonId}`,
+          ),
+        ),
+      );
+
     return {
       // Config and utilities
       config: mslConfig,
@@ -235,6 +347,9 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       // Internal helpers for fetching pages
       fetchGamesheetPage: fetchGamesheetPageWithRetry,
       fetchMainSitePage: fetchMainSitePageWithRetry,
+
+      // Public API methods
+      getTeams,
     };
   }),
   dependencies: [MSLConfig.Default, PipelineConfig.Default],

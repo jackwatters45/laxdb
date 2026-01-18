@@ -685,3 +685,10 @@ Description: Implement fetchGamesheetPage helper
 Status: COMPLETE
 Commit: a13bbd9
 Timestamp: 2026-01-19T05:34:43+11:00
+
+=== Iteration 90 ===
+Story: msl-client-004
+Description: Implement fetchMainSitePage helper
+Status: COMPLETE
+Commit: f55dc33
+Timestamp: 2026-01-19T05:37:40+11:00
