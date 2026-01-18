@@ -1014,3 +1014,10 @@ Description: WLAPlayer response schema
 Status: COMPLETE
 Commit: 7232b5f
 Timestamp: 2026-01-19T08:27:21+11:00
+
+=== Iteration 137 ===
+Story: wla-schema-005
+Description: WLAGoalieStats nested schema
+Status: COMPLETE
+Commit: 6e42940
+Timestamp: 2026-01-19T08:29:15+11:00

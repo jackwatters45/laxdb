@@ -1798,7 +1798,7 @@
     "id": "wla-schema-005",
     "category": "schema",
     "description": "WLAGoalieStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAGoalieStats Schema.Class",
       "Fields: games_played, wins, losses, ties (Schema.Number)",

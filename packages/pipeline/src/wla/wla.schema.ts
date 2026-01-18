@@ -79,3 +79,16 @@ export class WLAGoalieStats extends Schema.Class<WLAGoalieStats>(
   // Additional stats
   shutouts: Schema.Number,
 }) {}
+
+// WLA Goalie response schema
+export class WLAGoalie extends Schema.Class<WLAGoalie>("WLAGoalie")({
+  id: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  full_name: Schema.NullOr(Schema.String),
+  jersey_number: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_code: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  stats: Schema.optional(WLAGoalieStats),
+}) {}
