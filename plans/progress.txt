@@ -370,3 +370,10 @@ Description: Implement extractor helper functions
 Status: COMPLETE
 Commit: 8ff8019
 Timestamp: 2026-01-19T01:57:42+11:00
+
+=== Iteration 45 ===
+Story: mll-extract-003
+Description: Implement extractTeams method
+Status: COMPLETE
+Commit: 0ea1f18
+Timestamp: 2026-01-19T02:02:46+11:00

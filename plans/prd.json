@@ -594,7 +594,7 @@
     "id": "mll-extract-003",
     "category": "extract",
     "description": "Implement extractTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractTeams(year) method",
       "Log progress, call client.getTeams with timing",
