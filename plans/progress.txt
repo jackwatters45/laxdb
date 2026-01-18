@@ -293,3 +293,10 @@ Description: getTeams integration test
 Status: COMPLETE
 Commit: 8038b98
 Timestamp: 2026-01-19T01:03:30+11:00
+
+=== Iteration 34 ===
+Story: mll-test-003
+Description: getPlayers integration test
+Status: COMPLETE
+Commit: bd4e3c3
+Timestamp: 2026-01-19T01:08:52+11:00

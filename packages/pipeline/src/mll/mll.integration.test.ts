@@ -133,4 +133,52 @@ describe("MLLClient", () => {
       PLAYER_TIMEOUT,
     );
   });
+
+  describe("getGoalies", () => {
+    it(
+      "fetches goalies for year 2019",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getGoalies({ year: 2019 });
+        });
+
+        const goalies = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(goalies.length).toBeGreaterThan(0);
+        expect(goalies[0]).toHaveProperty("id");
+        expect(goalies[0]).toHaveProperty("name");
+        expect(goalies[0]).toHaveProperty("team_id");
+      },
+      PLAYER_TIMEOUT,
+    );
+
+    it(
+      "returns goalies with expected properties",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getGoalies({ year: 2019 });
+        });
+
+        const goalies = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        expect(goalies[0]).toBeDefined();
+        expect(goalies[0]?.id).toBeTypeOf("string");
+        expect(goalies[0]?.name).toBeTypeOf("string");
+        expect(goalies[0]?.stats).toBeDefined();
+        expect(goalies[0]?.stats?.gaa).toSatisfy(
+          (v: unknown) => v === null || typeof v === "number",
+        );
+        expect(goalies[0]?.stats?.save_pct).toSatisfy(
+          (v: unknown) => v === null || typeof v === "number",
+        );
+      },
+      PLAYER_TIMEOUT,
+    );
+  });
 });
