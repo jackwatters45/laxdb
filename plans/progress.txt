@@ -748,3 +748,10 @@ Description: getTeams integration test
 Status: COMPLETE
 Commit: 9ec073e
 Timestamp: 2026-01-19T06:10:22+11:00
+
+=== Iteration 99 ===
+Story: msl-test-003
+Description: getPlayers integration test
+Status: COMPLETE
+Commit: 3acb6c7
+Timestamp: 2026-01-19T06:13:58+11:00

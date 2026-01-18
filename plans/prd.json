@@ -1317,7 +1317,7 @@
     "id": "msl-test-003",
     "category": "test",
     "description": "getPlayers integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getPlayers",
       "Add test: 'fetches players for season 9567'",

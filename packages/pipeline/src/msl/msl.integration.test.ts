@@ -75,6 +75,10 @@ describe("MSLClient", () => {
         expect(goalies.length).toBeGreaterThan(0);
         expect(goalies[0]).toHaveProperty("id");
         expect(goalies[0]).toHaveProperty("name");
+        expect(goalies[0]).toHaveProperty("stats");
+        expect(goalies[0]?.stats).toHaveProperty("games_played");
+        expect(goalies[0]?.stats).toHaveProperty("wins");
+        expect(goalies[0]?.stats).toHaveProperty("save_pct");
       },
       PLAYER_TIMEOUT,
     );
