@@ -622,3 +622,10 @@ Description: MSLGoalie response schema
 Status: COMPLETE
 Commit: 8d595df
 Timestamp: 2026-01-19T05:06:25+11:00
+
+=== Iteration 81 ===
+Story: msl-schema-007
+Description: MSLStanding response schema
+Status: COMPLETE
+Commit: 8b18be9
+Timestamp: 2026-01-19T05:10:56+11:00

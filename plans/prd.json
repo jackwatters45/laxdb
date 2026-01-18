@@ -1062,7 +1062,7 @@
     "id": "msl-schema-007",
     "category": "schema",
     "description": "MSLStanding response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLStanding Schema.Class",
       "Fields: team_id (string), team_name (nullable string), position (number)",

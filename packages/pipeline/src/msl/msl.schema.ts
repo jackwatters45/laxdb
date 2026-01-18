@@ -156,3 +156,12 @@ export class MSLStanding extends Schema.Class<MSLStanding>("MSLStanding")({
   // Streak info
   streak: Schema.NullOr(Schema.String),
 }) {}
+
+// MSL Game Period Score nested schema (used in MSLGame)
+export class MSLGamePeriodScore extends Schema.Class<MSLGamePeriodScore>(
+  "MSLGamePeriodScore",
+)({
+  period: Schema.Number,
+  home_score: Schema.Number,
+  away_score: Schema.Number,
+}) {}
