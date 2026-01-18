@@ -108,3 +108,16 @@ export class MLLStanding extends Schema.Class<MLLStanding>("MLLStanding")({
   // Percentage
   win_pct: Schema.Number,
 }) {}
+
+// MLL Stat Leader response schema
+export class MLLStatLeader extends Schema.Class<MLLStatLeader>("MLLStatLeader")(
+  {
+    player_id: Schema.String,
+    player_name: Schema.String,
+    team_id: Schema.NullOr(Schema.String),
+    team_name: Schema.NullOr(Schema.String),
+    stat_type: Schema.String,
+    stat_value: Schema.Number,
+    rank: Schema.Number,
+  },
+) {}

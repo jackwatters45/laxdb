@@ -126,3 +126,10 @@ Description: MLLGoalie response schema
 Status: COMPLETE
 Commit: b2992af
 Timestamp: 2026-01-18T23:59:16+11:00
+
+=== Iteration 10 ===
+Story: mll-schema-007
+Description: MLLStanding response schema
+Status: COMPLETE
+Commit: a2f31d9
+Timestamp: 2026-01-19T00:00:41+11:00

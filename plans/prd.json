@@ -120,7 +120,7 @@
     "id": "mll-schema-007",
     "category": "schema",
     "description": "MLLStanding response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLStanding Schema.Class",
       "Fields: team_id (string), team_name (nullable string), position (number)",
