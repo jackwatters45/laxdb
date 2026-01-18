@@ -955,7 +955,7 @@
     "id": "msl-discovery-002",
     "category": "discovery",
     "description": "Analyze Gamesheet page structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Inspect https://gamesheetstats.com/seasons/9567/players",
       "Identify if Next.js SSR or client-side rendering",
