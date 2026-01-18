@@ -727,3 +727,10 @@ Description: Implement MSLClient.getSchedule method
 Status: COMPLETE
 Commit: 80201c3
 Timestamp: 2026-01-19T06:00:33+11:00
+
+=== Iteration 96 ===
+Story: msl-client-010
+Description: Create MSL module index exports
+Status: COMPLETE
+Commit: 8e37821
+Timestamp: 2026-01-19T06:02:28+11:00

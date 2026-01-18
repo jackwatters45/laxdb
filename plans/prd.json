@@ -1278,7 +1278,7 @@
     "id": "msl-client-010",
     "category": "client",
     "description": "Create MSL module index exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/msl/index.ts",
       "Export MSLClient from msl.client.ts",
