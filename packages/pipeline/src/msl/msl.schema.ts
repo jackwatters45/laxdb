@@ -165,3 +165,27 @@ export class MSLGamePeriodScore extends Schema.Class<MSLGamePeriodScore>(
   home_score: Schema.Number,
   away_score: Schema.Number,
 }) {}
+
+// MSL Game response schema
+export class MSLGame extends Schema.Class<MSLGame>("MSLGame")({
+  id: Schema.String,
+  date: Schema.NullOr(Schema.String),
+  time: Schema.NullOr(Schema.String),
+  status: Schema.NullOr(Schema.String),
+
+  // Team references
+  home_team_id: Schema.NullOr(Schema.String),
+  away_team_id: Schema.NullOr(Schema.String),
+  home_team_name: Schema.NullOr(Schema.String),
+  away_team_name: Schema.NullOr(Schema.String),
+
+  // Scores
+  home_score: Schema.Number,
+  away_score: Schema.Number,
+
+  // Location
+  venue: Schema.NullOr(Schema.String),
+
+  // Period breakdown
+  period_scores: Schema.optional(Schema.Array(MSLGamePeriodScore)),
+}) {}

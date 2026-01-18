@@ -629,3 +629,10 @@ Description: MSLStanding response schema
 Status: COMPLETE
 Commit: 8b18be9
 Timestamp: 2026-01-19T05:10:56+11:00
+
+=== Iteration 82 ===
+Story: msl-schema-008
+Description: MSLGamePeriodScore nested schema
+Status: COMPLETE
+Commit: 8ef88b8
+Timestamp: 2026-01-19T05:13:30+11:00

@@ -1076,7 +1076,7 @@
     "id": "msl-schema-008",
     "category": "schema",
     "description": "MSLGamePeriodScore nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLGamePeriodScore Schema.Class",
       "Fields: period (number), home_score, away_score (Schema.Number)",
