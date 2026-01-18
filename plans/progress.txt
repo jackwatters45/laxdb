@@ -1084,3 +1084,10 @@ Description: Implement fetchPage helper for SPA scraping
 Status: COMPLETE
 Commit: 3c031ac
 Timestamp: 2026-01-19T08:58:43+11:00
+
+=== Iteration 147 ===
+Story: wla-client-004
+Description: Implement getSeasonIdFromYear helper
+Status: COMPLETE
+Commit: ba13dc8
+Timestamp: 2026-01-19T09:02:25+11:00

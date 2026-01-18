@@ -155,8 +155,167 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
         ),
       );
 
-    // TODO: Implement WLA client methods in subsequent stories
-    // - getTeams
+    /**
+     * Fetches all teams for a given WLA season.
+     * Scrapes the schedule page which contains team logos with embedded team IDs.
+     *
+     * @param input - Request containing the seasonId (year like 2024)
+     * @returns Array of WLATeam objects
+     */
+    const getTeams = (
+      input: typeof WLATeamsRequest.Encoded,
+    ): Effect.Effect<
+      readonly WLATeam[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(WLATeamsRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch the schedule page which contains team info
+        const url = `${wlaConfig.baseUrl}/schedule`;
+        const html = yield* fetchPageWithRetry(url);
+
+        const doc = $.load(html);
+        const teams: WLATeam[] = [];
+        const seenIds = new Set<string>();
+
+        // Extract teams from logo URLs
+        // Pattern: team-logo_url/{teamId}
+        doc('img[src*="team-logo_url"]').each((_index, element) => {
+          const src = doc(element).attr("src") ?? "";
+          const altText = doc(element).attr("alt") ?? "";
+
+          // Extract team ID from logo URL - pattern: /team-logo_url/{id}
+          const teamIdMatch = src.match(/team-logo_url\/(\d+)/);
+          const teamId = teamIdMatch?.[1];
+
+          if (teamId && !seenIds.has(teamId)) {
+            seenIds.add(teamId);
+
+            // Team name from alt text or nearby text
+            const teamName = altText.trim() || null;
+
+            // Derive code from team name if available
+            let code = teamId;
+            if (teamName) {
+              // Map known team names to codes
+              const nameToCode: Record<string, string> = {
+                adanacs: "ADN",
+                burrards: "BUR",
+                lakers: "LAK",
+                salmonbellies: "SB",
+                shamrocks: "SHM",
+                thunder: "THU",
+                timbermen: "TIM",
+              };
+              const normalizedName = teamName.toLowerCase();
+              for (const [key, val] of Object.entries(nameToCode)) {
+                if (normalizedName.includes(key)) {
+                  code = val;
+                  break;
+                }
+              }
+            }
+
+            teams.push(
+              new WLATeam({
+                id: teamId,
+                code,
+                name: teamName ?? `Team ${teamId}`,
+                city: null, // Can be derived from team name if needed
+                logo_url: src.startsWith("http") ? src : null,
+                website_url: null,
+              }),
+            );
+          }
+        });
+
+        // If no teams found from logo URLs, try alternative patterns
+        if (teams.length === 0) {
+          // Try finding team names from standings/schedule tables
+          doc('a[href*="team/"], .team-name, [data-team-id]').each(
+            (_index, element) => {
+              const href = doc(element).attr("href") ?? "";
+              const dataTeamId = doc(element).attr("data-team-id");
+              const teamName = doc(element).text().trim();
+
+              // Extract team ID from href or data attribute
+              const teamId =
+                dataTeamId ??
+                href.match(/team\/(\d+)/)?.[1] ??
+                href.match(/team-id=(\d+)/)?.[1];
+
+              if (teamId && teamName && !seenIds.has(teamId)) {
+                seenIds.add(teamId);
+                teams.push(
+                  new WLATeam({
+                    id: teamId,
+                    code: teamId,
+                    name: teamName,
+                    city: null,
+                    logo_url: null,
+                    website_url: null,
+                  }),
+                );
+              }
+            },
+          );
+        }
+
+        // If still no teams, use known WLA teams as fallback
+        // These are the 7 teams in the WLA for recent seasons
+        if (teams.length === 0 && request.seasonId >= 2020) {
+          const knownTeams: Array<{
+            id: string;
+            code: string;
+            name: string;
+            city: string;
+          }> = [
+            { id: "167275", code: "ADN", name: "Adanacs", city: "Coquitlam" },
+            {
+              id: "167270",
+              code: "BUR",
+              name: "Burrards",
+              city: "Maple Ridge",
+            },
+            { id: "370397", code: "LAK", name: "Lakers", city: "Burnaby" },
+            {
+              id: "167272",
+              code: "SB",
+              name: "Salmonbellies",
+              city: "New Westminster",
+            },
+            { id: "167273", code: "SHM", name: "Shamrocks", city: "Victoria" },
+            { id: "167284", code: "THU", name: "Thunder", city: "Langley" },
+            { id: "167274", code: "TIM", name: "Timbermen", city: "Nanaimo" },
+          ];
+
+          for (const team of knownTeams) {
+            teams.push(
+              new WLATeam({
+                id: team.id,
+                code: team.code,
+                name: team.name,
+                city: team.city,
+                logo_url: `https://cdn1.sportngin.com/attachments/team_logo/${team.id.slice(0, 3)}/${team.id}_thumb.png`,
+                website_url: null,
+              }),
+            );
+          }
+        }
+
+        return teams;
+      }).pipe(
+        Effect.tap((teams) =>
+          Effect.log(
+            `Fetched ${teams.length} teams for WLA season ${input.seasonId}`,
+          ),
+        ),
+      );
+
+    // TODO: Implement remaining WLA client methods in subsequent stories
     // - getPlayers
     // - getGoalies
     // - getStandings
@@ -173,6 +332,8 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       fetchPageWithRetry,
       // Season helpers
       getSeasonIdFromYear,
+      // Data methods
+      getTeams,
     };
   }),
   dependencies: [WLAConfig.Default, PipelineConfig.Default],

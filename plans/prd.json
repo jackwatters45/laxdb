@@ -1935,7 +1935,7 @@
     "id": "wla-client-004",
     "category": "client",
     "description": "Implement getSeasonIdFromYear helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getSeasonIdFromYear(year: number) helper",
       "Map year to WLA's internal season ID format",
