@@ -98,42 +98,200 @@ MSL data prior to Gamesheet is available on Pointstreak:
 
 ---
 
+## Page Structure Analysis
+
+### Rendering Method
+
+**Server-Side Rendered (SSR)** via Next.js with client-side hydration.
+
+- `__NEXT_DATA__` script contains minimal metadata (season title, association)
+- Actual statistics data loads via internal REST API after hydration
+- `__N_SSP: true` indicates server-side props rendering
+
+### HTML Table Structure
+
+Tables use styled-components with these key CSS classes:
+
+| Class | Purpose |
+|-------|---------|
+| `.gs-table` | Main table wrapper |
+| `.fixed-cols` | Fixed rank column (24px width) |
+| `.flexible-cols` | Scrollable stats columns |
+| `.column-header` | Header cells (yellow #FEC307 background) |
+| `.row-header` | Row identifier cells |
+| `.cell` | Data cells |
+| `.data` | Cell content wrapper |
+
+### Navigation Structure
+
+All season pages share consistent navigation:
+- Scores → Schedule → Standings → Players → Goalies
+
+### Pagination
+
+- API-based pagination with `limit` and `offset` parameters
+- Default page size: 20 records
+- No infinite scroll; data loads in batches
+
+---
+
+## Internal REST API
+
+### Base Pattern
+
+```
+https://gamesheetstats.com/api/{hook}/{method}/{seasonId}?filter[param]=value
+```
+
+### Discovered Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/useSeasonDivisions/getSeason/{id}` | GET | Season metadata |
+| `/api/useSeasonDivisions/getDivisions/{id}` | GET | Division list |
+| `/api/usePlayers/getPlayerStandings/{id}` | GET | Player statistics |
+| `/api/useGoalies/getGoalieStandings/{id}` | GET | Goalie statistics |
+| `/api/useStandings/getDivisionStandings/{id}` | GET | Team standings |
+| `/api/useScoredGames/getSeasonScores/{id}` | GET | Game results |
+
+### Common Query Parameters
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `filter[gametype]` | `overall`, `playoff`, `regular_season`, `exhibition` | Game type filter |
+| `filter[sort]` | `-pts`, `gaa`, etc. | Sort field (prefix `-` for descending) |
+| `filter[limit]` | integer | Records per page |
+| `filter[offset]` | integer | Pagination offset |
+| `filter[timeZoneOffset]` | integer | Client timezone offset in minutes |
+
+---
+
 ## Data Model
 
-### Player Stats Response
+### Player Stats API Response
 
-Fields available in player stats tables:
+Full field list from `/api/usePlayers/getPlayerStandings`:
 
-- Player name
-- Team
-- GP (Games Played)
-- G (Goals)
-- A (Assists)
-- PTS (Points)
-- PIM (Penalty Minutes)
-- PPG (Power Play Goals)
-- SHG (Shorthanded Goals)
+| Field | Type | Description |
+|-------|------|-------------|
+| `names` | array | `{firstName, lastName, id, photo}` |
+| `ids` | array | Player IDs |
+| `teamNames` | object | `{title, id}` |
+| `jersey` | array | Jersey numbers |
+| `positions` | array | `"forward"` or `"defence"` |
+| `rk` | array | Rankings |
+| `gp` | array | Games played |
+| `g` | array | Goals |
+| `a` | array | Assists |
+| `pts` | array | Total points |
+| `pim` | array | Penalty minutes |
+| `ppg` | array | Power play goals |
+| `ppa` | array | Power play assists |
+| `shg` | array | Shorthanded goals |
+| `sha` | array | Shorthanded assists |
+| `ht` | array | Hat tricks |
+| `gwg` | array | Game-winning goals |
+| `fg` | array | First goals |
+| `otg` | array | Overtime goals |
+| `eng` | array | Empty net goals |
+| `uag` | array | Unassisted goals |
+| `sog` | array | Shootout goals |
+| `shots` | array | Total shots |
+| `ptspg` | array | Points per game |
+| `pimpg` | array | Penalties per game |
+| `flags` | array | Special status (`"X"`, `"A"`, etc.) |
 
-### Goalie Stats Response
+### Goalie Stats API Response
 
-- Goalie name
-- Team
-- GP (Games Played)
-- W (Wins)
-- L (Losses)
-- GA (Goals Against)
-- GAA (Goals Against Average)
-- SV (Saves)
-- SV% (Save Percentage)
+Full field list from `/api/useGoalies/getGoalieStandings`:
 
-### Standings Response
+| Field | Type | Description |
+|-------|------|-------------|
+| `names` | object | `{firstName, lastName, id, photo}` |
+| `teamNames` | object | `{title, id}` |
+| `jersey` | array | Jersey numbers |
+| `positions` | array | Always `"G"` |
+| `rk` | array | Rankings |
+| `gp` | array | Games played |
+| `gs` | array | Games started |
+| `sa` | array | Shots against |
+| `ga` | array | Goals against |
+| `gaa` | array | Goals against average |
+| `svpct` | array | Save percentage |
+| `wins` | array | Wins |
+| `losses` | array | Losses |
+| `ties` | array | Ties |
+| `otl` | array | Overtime losses |
+| `so` | array | Shutouts |
+| `ice_time` | array | Ice time (seconds) |
+| `g` | array | Goals scored |
+| `a` | array | Assists |
+| `pts` | array | Points |
+| `ppga` | array | Power play goals against |
+| `shga` | array | Shorthanded goals against |
+| `flags` | array | Special status |
 
-- Team name
-- GP (Games Played)
-- W (Wins)
-- L (Losses)
-- T (Ties)
-- PTS (Points)
+### Standings API Response
+
+Full field list from `/api/useStandings/getDivisionStandings`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Division name |
+| `id` | number | Division ID |
+| `ranks` | array | Team rankings |
+| `teamTitles` | array | Team names |
+| `teamLogos` | array | Logo URLs |
+| `teamIds` | array | Team IDs |
+| `gp` | array | Games played |
+| `w` | array | Wins |
+| `l` | array | Losses |
+| `t` | array | Ties |
+| `otw` | array | Overtime wins |
+| `otl` | array | Overtime losses |
+| `sow` | array | Shootout wins |
+| `sol` | array | Shootout losses |
+| `rw` | array | Regulation wins |
+| `pts` | array | Points |
+| `gf` | array | Goals for |
+| `ga` | array | Goals against |
+| `diff` | array | Goal differential |
+| `ppg` | array | Power play goals |
+| `shg` | array | Shorthanded goals |
+| `ppga` | array | PP goals against |
+| `shga` | array | SH goals against |
+| `ppo` | array | Power play opportunities |
+| `ppct` | array | Power play percentage |
+| `pkp` | array | Penalty kill percentage |
+| `pim` | array | Penalty minutes |
+| `tsh` | array | Total shots |
+| `stk` | array | Current streak |
+| `p10` | array | Last 10 games record |
+
+### Box Score Page Structure
+
+Game detail pages at `/seasons/{seasonId}/games/{gameId}` include:
+
+| Element | Data Attributes | Content |
+|---------|-----------------|---------|
+| Game info | `data-testid="game-number"` | Game title/series |
+| Game type | `data-testid="game-type"` | `playoff`, `regular_season` |
+| Date/time | `data-testid="game-date-time"` | Full timestamp |
+| Location | `data-testid="game-location"` | Venue name |
+| Status | `data-testid="game-status-text"` | `Final`, `In Progress` |
+| Visitor | `data-testid="visitor-title"` | Team name |
+| Home | `data-testid="home-title"` | Team name |
+| Score | `data-testid="visitor-score"`, `data-testid="home-score"` | Final scores |
+| SOG | `data-testid="visitor-sog"`, `data-testid="home-sog"` | Shots on goal |
+
+Tabs available: Matchup, Lineups, Play-by-Play (sometimes disabled), Box Score
+
+### Team Page Structure
+
+Team pages at `/seasons/{seasonId}/teams/{teamId}` show:
+- Team schedule with game links
+- Columns: Date, Visitor, Home, Score, Location
+- Links to individual box scores
 
 ---
 
@@ -159,17 +317,17 @@ export const MSL_POINTSTREAK_YEARS = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 
 
 ## MSL Teams (2024)
 
-From Gamesheet season 6007:
+From Gamesheet season 6007 (verified from standings API):
 
 | Team | Team ID |
 |------|---------|
 | Six Nations Chiefs | 222134 |
 | Peterborough Lakers | 222133 |
-| Brooklin L.C. | (TBD) |
+| Brooklin L.C. | 222131 |
 | Brampton Excelsiors | 222135 |
 | Oakville Rock | 222154 |
-| Cobourg Kodiaks | 347550 |
-| Owen Sound North Stars | (TBD) |
+| Cobourg Kodiaks | 222132 |
+| Owen Sound North Stars | 222153 |
 
 ---
 

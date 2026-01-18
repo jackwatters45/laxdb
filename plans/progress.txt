@@ -559,3 +559,10 @@ Description: Verify all output files
 Status: COMPLETE
 Commit: 0fc43f8
 Timestamp: 2026-01-19T04:30:58+11:00
+
+=== Iteration 72 ===
+Story: msl-discovery-001
+Description: Discover available season IDs on Gamesheet
+Status: COMPLETE
+Commit: 99c4465
+Timestamp: 2026-01-19T04:36:05+11:00

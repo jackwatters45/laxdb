@@ -942,7 +942,7 @@
     "id": "msl-discovery-001",
     "category": "discovery",
     "description": "Discover available season IDs on Gamesheet",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Visit https://gamesheetstats.com",
       "Navigate to MSL/Ontario Lacrosse Association stats",
