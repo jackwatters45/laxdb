@@ -380,7 +380,7 @@
     "id": "mll-client-012",
     "category": "client",
     "description": "Implement parseWaybackSchedule helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add parseWaybackSchedule(html: string, sourceUrl: string) internal helper",
       "Parse archived schedule HTML with cheerio",

@@ -1603,6 +1603,110 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Fetches the schedule/games for a given MLL season year from Wayback Machine archives.
+     * Queries multiple archived snapshots, parses games, and deduplicates results.
+     *
+     * Note: Wayback coverage is spotty. 2000-2001 and 2005-2006 have good coverage.
+     * Years 2007-2019 may have NO archived schedule pages.
+     *
+     * @param input - Request containing the year (2001-2020)
+     * @returns Array of MLLGame objects with schedule/result data
+     */
+    const getSchedule = (
+      input: typeof MLLScheduleRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLGame[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLScheduleRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Find archived schedule snapshots for this year
+        const snapshots = yield* findScheduleSnapshots(request.year);
+
+        if (snapshots.length === 0) {
+          // No Wayback archives for this year
+          return [] as readonly MLLGame[];
+        }
+
+        // Fetch and parse up to 5 snapshots (prioritized list)
+        // More snapshots = better coverage but more requests
+        const maxSnapshots = Math.min(snapshots.length, 5);
+        const snapshotsToFetch = snapshots.slice(0, maxSnapshots);
+
+        const allGames: MLLGame[] = [];
+        const seenGameIds = new Set<string>();
+
+        for (const snapshot of snapshotsToFetch) {
+          const html = yield* fetchWaybackPageWithRetry(
+            snapshot.timestamp,
+            snapshot.original,
+          ).pipe(
+            Effect.catchTag("HttpError", (error) => {
+              // 404/503 is common for Wayback - archive may be unavailable
+              if (error.statusCode === 404 || error.statusCode === 503) {
+                return Effect.succeed("");
+              }
+              return Effect.fail(error);
+            }),
+            Effect.catchTag("TimeoutError", () => {
+              // Wayback can be slow, skip timed out pages
+              return Effect.succeed("");
+            }),
+          );
+
+          if (!html) {
+            continue;
+          }
+
+          const sourceUrl = `${mllConfig.waybackWebUrl}/${snapshot.timestamp}/${snapshot.original}`;
+          const games = parseWaybackSchedule(html, sourceUrl);
+
+          // Deduplicate games by ID
+          for (const game of games) {
+            if (!seenGameIds.has(game.id)) {
+              seenGameIds.add(game.id);
+              allGames.push(game);
+            } else {
+              // If we already have this game, update with better data if available
+              const existingIdx = allGames.findIndex((g) => g.id === game.id);
+              if (existingIdx >= 0) {
+                const existing = allGames[existingIdx];
+                // Prefer games with scores over those without
+                if (
+                  existing &&
+                  (existing.home_score === null ||
+                    existing.away_score === null) &&
+                  game.home_score !== null &&
+                  game.away_score !== null
+                ) {
+                  allGames[existingIdx] = game;
+                }
+              }
+            }
+          }
+        }
+
+        // Sort by date
+        allGames.sort((a, b) => {
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return a.date.localeCompare(b.date);
+        });
+
+        return allGames;
+      }).pipe(
+        Effect.tap((games) =>
+          Effect.log(
+            `Fetched ${games.length} games for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -1630,6 +1734,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       getGoalies,
       getStandings,
       getStatLeaders,
+      getSchedule,
 
       // Type exports for method signatures (to be implemented)
       _types: {

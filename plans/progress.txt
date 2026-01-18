@@ -252,3 +252,10 @@ Description: Implement findScheduleSnapshots helper
 Status: COMPLETE
 Commit: be54835
 Timestamp: 2026-01-19T00:46:08+11:00
+
+=== Iteration 28 ===
+Story: mll-client-012
+Description: Implement parseWaybackSchedule helper
+Status: COMPLETE
+Commit: 826e543
+Timestamp: 2026-01-19T00:49:25+11:00
