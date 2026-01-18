@@ -1725,7 +1725,7 @@
     "id": "msl-final-004",
     "category": "final",
     "description": "Run full validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-msl.ts",
       "Validation report shows all checks pass",
