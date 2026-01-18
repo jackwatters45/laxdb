@@ -569,7 +569,7 @@
     "id": "mll-extract-001",
     "category": "extract",
     "description": "Create MLLExtractorService base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/mll/mll.extractor.ts",
       "Define MLLExtractorService as Effect.Service",

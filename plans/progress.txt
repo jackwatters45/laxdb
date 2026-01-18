@@ -356,3 +356,10 @@ Description: Create MLLManifestService
 Status: COMPLETE
 Commit: 50a693e
 Timestamp: 2026-01-19T01:49:49+11:00
+
+=== Iteration 43 ===
+Story: mll-extract-001
+Description: Create MLLExtractorService base structure
+Status: COMPLETE
+Commit: 9805d85
+Timestamp: 2026-01-19T01:53:19+11:00
