@@ -818,3 +818,10 @@ Description: Implement extractor helper functions
 Status: COMPLETE
 Commit: 95e0f7f
 Timestamp: 2026-01-19T06:46:24+11:00
+
+=== Iteration 109 ===
+Story: msl-extract-003
+Description: Implement extractTeams method
+Status: COMPLETE
+Commit: dac32af
+Timestamp: 2026-01-19T06:49:16+11:00
