@@ -122,3 +122,15 @@ export class MSLGoalieStats extends Schema.Class<MSLGoalieStats>(
   shutouts: Schema.Number,
   minutes_played: Schema.Number,
 }) {}
+
+// MSL Goalie response schema
+export class MSLGoalie extends Schema.Class<MSLGoalie>("MSLGoalie")({
+  id: Schema.String,
+  name: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  jersey_number: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  stats: Schema.optional(Schema.suspend(() => MSLGoalieStats)),
+}) {}

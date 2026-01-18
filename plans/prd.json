@@ -1034,7 +1034,7 @@
     "id": "msl-schema-005",
     "category": "schema",
     "description": "MSLGoalieStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLGoalieStats Schema.Class",
       "Fields: games_played, wins, losses, ties (Schema.Number)",

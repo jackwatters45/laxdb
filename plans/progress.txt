@@ -608,3 +608,10 @@ Description: MSLPlayer response schema
 Status: COMPLETE
 Commit: f62a6e9
 Timestamp: 2026-01-19T04:58:00+11:00
+
+=== Iteration 79 ===
+Story: msl-schema-005
+Description: MSLGoalieStats nested schema
+Status: COMPLETE
+Commit: 3353ae9
+Timestamp: 2026-01-19T05:01:39+11:00
