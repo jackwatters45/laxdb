@@ -917,7 +917,7 @@
     "id": "mll-final-005",
     "category": "final",
     "description": "Run full validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-mll.ts",
       "Validation report shows all checks pass",
