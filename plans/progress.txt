@@ -168,3 +168,10 @@ Description: Export all schemas from mll.schema.ts
 Status: COMPLETE
 Commit: e534b4e
 Timestamp: 2026-01-19T00:10:53+11:00
+
+=== Iteration 16 ===
+Story: mll-config-001
+Description: Add MLLConfig service to config.ts
+Status: COMPLETE
+Commit: 7a52713
+Timestamp: 2026-01-19T00:13:14+11:00

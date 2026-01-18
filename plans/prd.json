@@ -202,7 +202,7 @@
     "id": "mll-config-001",
     "category": "config",
     "description": "Add MLLConfig service to config.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open src/config.ts",
       "Add MLLConfig Effect.Service class",
