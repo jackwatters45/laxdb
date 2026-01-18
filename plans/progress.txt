@@ -182,3 +182,10 @@ Description: Create mll.client.ts with base structure
 Status: COMPLETE
 Commit: 7670a9e
 Timestamp: 2026-01-19T00:15:22+11:00
+
+=== Iteration 18 ===
+Story: mll-client-002
+Description: Create MLLClient service shell
+Status: COMPLETE
+Commit: 7527e83
+Timestamp: 2026-01-19T00:17:57+11:00

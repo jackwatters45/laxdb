@@ -233,7 +233,7 @@
     "id": "mll-client-002",
     "category": "client",
     "description": "Create MLLClient service shell",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLClient as Effect.Service",
       "Yield MLLConfig and PipelineConfig in effect",
