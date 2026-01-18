@@ -321,3 +321,10 @@ Description: getStatLeaders integration test
 Status: COMPLETE
 Commit: 3c4295d
 Timestamp: 2026-01-19T01:24:02+11:00
+
+=== Iteration 38 ===
+Story: mll-test-007
+Description: getSchedule integration test (Wayback)
+Status: COMPLETE
+Commit: 25ee3ae
+Timestamp: 2026-01-19T01:28:43+11:00

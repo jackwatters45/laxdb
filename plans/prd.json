@@ -505,7 +505,7 @@
     "id": "mll-test-007",
     "category": "test",
     "description": "getSchedule integration test (Wayback)",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getSchedule",
       "Add test: 'fetches schedule for year 2019 from Wayback'",
