@@ -1087,7 +1087,7 @@
     "id": "msl-schema-009",
     "category": "schema",
     "description": "MSLGame response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLGame Schema.Class",
       "Fields: id (string), date (nullable string), time (nullable string), status (nullable string)",

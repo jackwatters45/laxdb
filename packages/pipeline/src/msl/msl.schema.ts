@@ -189,3 +189,42 @@ export class MSLGame extends Schema.Class<MSLGame>("MSLGame")({
   // Period breakdown
   period_scores: Schema.optional(Schema.Array(MSLGamePeriodScore)),
 }) {}
+
+// ============================================================================
+// Request Schemas
+// ============================================================================
+
+// MSL Teams request schema
+export class MSLTeamsRequest extends Schema.Class<MSLTeamsRequest>(
+  "MSLTeamsRequest",
+)({
+  seasonId: MSLSeasonId,
+}) {}
+
+// MSL Players request schema
+export class MSLPlayersRequest extends Schema.Class<MSLPlayersRequest>(
+  "MSLPlayersRequest",
+)({
+  seasonId: MSLSeasonId,
+}) {}
+
+// MSL Goalies request schema
+export class MSLGoaliesRequest extends Schema.Class<MSLGoaliesRequest>(
+  "MSLGoaliesRequest",
+)({
+  seasonId: MSLSeasonId,
+}) {}
+
+// MSL Standings request schema
+export class MSLStandingsRequest extends Schema.Class<MSLStandingsRequest>(
+  "MSLStandingsRequest",
+)({
+  seasonId: MSLSeasonId,
+}) {}
+
+// MSL Schedule request schema
+export class MSLScheduleRequest extends Schema.Class<MSLScheduleRequest>(
+  "MSLScheduleRequest",
+)({
+  seasonId: MSLSeasonId,
+}) {}

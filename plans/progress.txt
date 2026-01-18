@@ -636,3 +636,10 @@ Description: MSLGamePeriodScore nested schema
 Status: COMPLETE
 Commit: 8ef88b8
 Timestamp: 2026-01-19T05:13:30+11:00
+
+=== Iteration 83 ===
+Story: msl-schema-009
+Description: MSLGame response schema
+Status: COMPLETE
+Commit: ec84510
+Timestamp: 2026-01-19T05:16:07+11:00
