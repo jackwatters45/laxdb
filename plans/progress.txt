@@ -147,3 +147,10 @@ Description: MLLGame response schema (from Wayback)
 Status: COMPLETE
 Commit: 309b354
 Timestamp: 2026-01-19T00:04:25+11:00
+
+=== Iteration 13 ===
+Story: mll-schema-010
+Description: MLL request schemas
+Status: COMPLETE
+Commit: 66de754
+Timestamp: 2026-01-19T00:06:28+11:00

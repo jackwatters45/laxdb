@@ -191,3 +191,24 @@ export class MLLScheduleRequest extends Schema.Class<MLLScheduleRequest>(
 )({
   year: MLLYear,
 }) {}
+
+// ============================================================================
+// Wayback Machine CDX API Response Schemas
+// ============================================================================
+
+// Single entry from the Wayback Machine CDX API
+// See: https://archive.org/developers/wayback-cdx-server.html
+export class WaybackCDXEntry extends Schema.Class<WaybackCDXEntry>(
+  "WaybackCDXEntry",
+)({
+  urlkey: Schema.String,
+  timestamp: Schema.String,
+  original: Schema.String,
+  mimetype: Schema.String,
+  statuscode: Schema.String,
+  digest: Schema.String,
+  length: Schema.String,
+}) {}
+
+// CDX API returns an array of entries
+export const WaybackCDXResponse = Schema.Array(WaybackCDXEntry);

@@ -164,7 +164,7 @@
     "id": "mll-schema-010",
     "category": "schema",
     "description": "MLL request schemas",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLTeamsRequest Schema.Class { year: MLLYear }",
       "Define MLLPlayersRequest Schema.Class { year: MLLYear }",
