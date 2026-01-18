@@ -607,7 +607,7 @@
     "id": "mll-extract-004",
     "category": "extract",
     "description": "Implement extractPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractPlayers(year) method",
       "Log progress, call client.getPlayers with timing",

@@ -3,7 +3,7 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
-import type { MLLPlayer, MLLTeam } from "../../mll/mll.schema";
+import type { MLLGoalie, MLLPlayer, MLLTeam } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 
 import { MLLManifestService } from "./mll.manifest";
@@ -102,6 +102,28 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           }),
         );
 
+      const extractGoalies = (year: number) =>
+        Effect.gen(function* () {
+          yield* Effect.log(`  🥅 Extracting goalies for year ${year}...`);
+          const result = yield* withTiming(client.getGoalies({ year }));
+          yield* saveJson(getOutputPath(year, "goalies"), result.data);
+          yield* Effect.log(
+            `     ✓ ${result.count} goalies (${result.durationMs}ms)`,
+          );
+          return result;
+        }).pipe(
+          Effect.catchAll((e) => {
+            return Effect.gen(function* () {
+              yield* Effect.log(`     ✗ Failed: ${e}`);
+              return {
+                data: [] as readonly MLLGoalie[],
+                count: 0,
+                durationMs: 0,
+              };
+            });
+          }),
+        );
+
       return {
         MLL_YEARS,
         getOutputPath,
@@ -109,6 +131,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         withTiming,
         extractTeams,
         extractPlayers,
+        extractGoalies,
         // Expose injected dependencies for use by extractor methods
         client,
         config,
