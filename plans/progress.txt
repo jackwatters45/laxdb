@@ -203,3 +203,10 @@ Description: Implement queryWaybackCDX helper
 Status: COMPLETE
 Commit: 5d618fd
 Timestamp: 2026-01-19T00:22:51+11:00
+
+=== Iteration 21 ===
+Story: mll-client-005
+Description: Implement fetchWaybackPage helper
+Status: COMPLETE
+Commit: 20c59e6
+Timestamp: 2026-01-19T00:25:01+11:00

@@ -15,7 +15,7 @@ import {
   MLLStandingsRequest,
   type MLLStatLeader,
   MLLStatLeadersRequest,
-  type MLLTeam,
+  MLLTeam,
   MLLTeamsRequest,
   WaybackCDXEntry,
 } from "./mll.schema";
@@ -379,6 +379,105 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Fetches all teams for a given MLL season year.
+     * Parses the season home page to extract team links from standings/roster sections.
+     *
+     * @param input - Request containing the year (2001-2020)
+     * @returns Array of MLLTeam objects
+     */
+    const getTeams = (
+      input: typeof MLLTeamsRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLTeam[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLTeamsRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        const path = `/lacrosse/l-MLL/y-${request.year}`;
+
+        const html = yield* fetchStatscrewPageWithRetry(path);
+
+        const doc = $.load(html);
+
+        // Extract teams from the standings table on the season page
+        // The page contains a table with team links in format: /lacrosse/stats/t-{TEAM_CODE}/y-{YEAR}
+        const teams: MLLTeam[] = [];
+        const seenIds = new Set<string>();
+
+        // Find all links that match the team stats URL pattern
+        doc('a[href*="/lacrosse/stats/t-MLL"]').each((_index, element) => {
+          const href = doc(element).attr("href") ?? "";
+          const teamMatch = href.match(
+            /\/lacrosse\/stats\/t-(MLL[A-Z]{2,3})\/y-/,
+          );
+          const teamCode = teamMatch?.[1];
+
+          if (teamCode) {
+            // Skip if we've already seen this team
+            if (seenIds.has(teamCode)) {
+              return;
+            }
+            seenIds.add(teamCode);
+
+            const teamName = doc(element).text().trim();
+
+            teams.push(
+              new MLLTeam({
+                id: teamCode,
+                name: teamName,
+                city: null,
+                abbreviation: teamCode.replace("MLL", ""),
+                founded_year: null,
+                final_year: null,
+              }),
+            );
+          }
+        });
+
+        // If no teams found from stats links, try roster links
+        if (teams.length === 0) {
+          doc('a[href*="/lacrosse/roster/t-MLL"]').each((_index, element) => {
+            const href = doc(element).attr("href") ?? "";
+            const teamMatch = href.match(
+              /\/lacrosse\/roster\/t-(MLL[A-Z]{2,3})\/y-/,
+            );
+            const teamCode = teamMatch?.[1];
+
+            if (teamCode) {
+              if (seenIds.has(teamCode)) {
+                return;
+              }
+              seenIds.add(teamCode);
+
+              const teamName = doc(element).text().trim();
+
+              teams.push(
+                new MLLTeam({
+                  id: teamCode,
+                  name: teamName,
+                  city: null,
+                  abbreviation: teamCode.replace("MLL", ""),
+                  founded_year: null,
+                  final_year: null,
+                }),
+              );
+            }
+          });
+        }
+
+        return teams;
+      }).pipe(
+        Effect.tap((teams) =>
+          Effect.log(
+            `Fetched ${teams.length} teams for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -393,6 +492,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Internal helpers for fetching Wayback archived pages
       fetchWaybackPage: fetchWaybackPageWithRetry,
+
+      // Public API methods
+      getTeams,
 
       // Type exports for method signatures (to be implemented)
       _types: {

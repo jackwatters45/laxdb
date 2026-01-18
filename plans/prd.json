@@ -273,7 +273,7 @@
     "id": "mll-client-005",
     "category": "client",
     "description": "Implement fetchWaybackPage helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add fetchWaybackPage(timestamp: string, url: string) internal helper",
       "Build Wayback URL: /web/{timestamp}/{url}",
