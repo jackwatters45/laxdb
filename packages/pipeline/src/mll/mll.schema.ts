@@ -60,6 +60,17 @@ export class MLLPlayerStats extends Schema.Class<MLLPlayerStats>(
   faceoff_pct: Schema.NullOr(Schema.Number),
 }) {}
 
+// MLL Goalie response schema
+export class MLLGoalie extends Schema.Class<MLLGoalie>("MLLGoalie")({
+  id: Schema.String,
+  name: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  stats: Schema.optional(Schema.suspend(() => MLLGoalieStats)),
+}) {}
+
 // MLL Goalie Stats nested schema
 export class MLLGoalieStats extends Schema.Class<MLLGoalieStats>(
   "MLLGoalieStats",

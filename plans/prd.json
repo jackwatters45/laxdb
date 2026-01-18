@@ -94,7 +94,7 @@
     "id": "mll-schema-005",
     "category": "schema",
     "description": "MLLGoalieStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLGoalieStats Schema.Class",
       "Fields: games_played, wins, losses (Schema.Number)",
