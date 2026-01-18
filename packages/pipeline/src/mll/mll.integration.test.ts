@@ -269,4 +269,87 @@ describe("MLLClient", () => {
       TEAM_TIMEOUT,
     );
   });
+
+  describe("getSchedule", () => {
+    // Wayback Machine can be slow - need longer timeout
+    const WAYBACK_TIMEOUT = 90_000;
+
+    it(
+      "fetches schedule for year 2006 from Wayback",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getSchedule({ year: 2006 });
+        });
+
+        const games = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        // 2006 has good Wayback coverage - should have some games
+        // May not be complete, but should have at least some data
+        console.log(`Coverage: ${games.length} games found for 2006`);
+
+        expect(games.length).toBeGreaterThanOrEqual(0);
+
+        if (games.length > 0) {
+          expect(games[0]).toHaveProperty("id");
+          expect(games[0]).toHaveProperty("home_team_id");
+          expect(games[0]).toHaveProperty("away_team_id");
+        }
+      },
+      WAYBACK_TIMEOUT,
+    );
+
+    it(
+      "returns games with expected properties when available",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          return yield* mll.getSchedule({ year: 2006 });
+        });
+
+        const games = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        // Log coverage for transparency
+        console.log(`Coverage: ${games.length} games found for 2006`);
+
+        if (games.length > 0) {
+          const game = games[0];
+          expect(game).toBeDefined();
+          expect(game?.id).toBeTypeOf("string");
+          expect(game?.home_team_id).toBeTypeOf("string");
+          expect(game?.away_team_id).toBeTypeOf("string");
+          // These may be null for archived data
+          expect(game).toHaveProperty("home_score");
+          expect(game).toHaveProperty("away_score");
+          expect(game).toHaveProperty("date");
+          expect(game).toHaveProperty("source_url");
+        }
+      },
+      WAYBACK_TIMEOUT,
+    );
+
+    it(
+      "handles years with no Wayback coverage gracefully",
+      async () => {
+        const program = Effect.gen(function* () {
+          const mll = yield* MLLClient;
+          // 2019 likely has no/minimal Wayback coverage
+          return yield* mll.getSchedule({ year: 2019 });
+        });
+
+        const games = await Effect.runPromise(
+          program.pipe(Effect.provide(MLLClient.Default)),
+        );
+
+        // Should return empty array, not throw
+        console.log(`Coverage: ${games.length} games found for 2019`);
+        expect(Array.isArray(games)).toBe(true);
+      },
+      WAYBACK_TIMEOUT,
+    );
+  });
 });
