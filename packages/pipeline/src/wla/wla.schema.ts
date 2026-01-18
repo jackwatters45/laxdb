@@ -133,3 +133,38 @@ export class WLAGame extends Schema.Class<WLAGame>("WLAGame")({
   // Location
   venue: Schema.NullOr(Schema.String),
 }) {}
+
+// WLA Teams request schema
+export class WLATeamsRequest extends Schema.Class<WLATeamsRequest>(
+  "WLATeamsRequest",
+)({
+  seasonId: WLASeasonId,
+}) {}
+
+// WLA Players request schema
+export class WLAPlayersRequest extends Schema.Class<WLAPlayersRequest>(
+  "WLAPlayersRequest",
+)({
+  seasonId: WLASeasonId,
+}) {}
+
+// WLA Goalies request schema
+export class WLAGoaliesRequest extends Schema.Class<WLAGoaliesRequest>(
+  "WLAGoaliesRequest",
+)({
+  seasonId: WLASeasonId,
+}) {}
+
+// WLA Standings request schema
+export class WLAStandingsRequest extends Schema.Class<WLAStandingsRequest>(
+  "WLAStandingsRequest",
+)({
+  seasonId: WLASeasonId,
+}) {}
+
+// WLA Schedule request schema
+export class WLAScheduleRequest extends Schema.Class<WLAScheduleRequest>(
+  "WLAScheduleRequest",
+)({
+  seasonId: WLASeasonId,
+}) {}

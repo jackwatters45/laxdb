@@ -1840,7 +1840,7 @@
     "id": "wla-schema-008",
     "category": "schema",
     "description": "WLAGame response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAGame Schema.Class",
       "Fields: id (string), date (nullable string), status (nullable string)",
