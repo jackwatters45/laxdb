@@ -601,3 +601,10 @@ Description: MSLPlayerStats nested schema
 Status: COMPLETE
 Commit: dfbe8c5
 Timestamp: 2026-01-19T04:55:59+11:00
+
+=== Iteration 78 ===
+Story: msl-schema-004
+Description: MSLPlayer response schema
+Status: COMPLETE
+Commit: f62a6e9
+Timestamp: 2026-01-19T04:58:00+11:00

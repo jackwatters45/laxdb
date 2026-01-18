@@ -98,3 +98,27 @@ export class MSLTeam extends Schema.Class<MSLTeam>("MSLTeam")({
   logo_url: Schema.NullOr(Schema.String),
   website_url: Schema.NullOr(Schema.String),
 }) {}
+
+// MSL Goalie Stats nested schema (used in MSLGoalie)
+export class MSLGoalieStats extends Schema.Class<MSLGoalieStats>(
+  "MSLGoalieStats",
+)({
+  // Core goalie stats
+  games_played: Schema.Number,
+  wins: Schema.Number,
+  losses: Schema.Number,
+  ties: Schema.Number,
+
+  // Goals against / saves
+  goals_against: Schema.Number,
+  saves: Schema.Number,
+  shots_against: Schema.Number,
+
+  // Calculated stats
+  gaa: Schema.Number, // Goals Against Average
+  save_pct: Schema.Number, // Save Percentage
+
+  // Additional stats
+  shutouts: Schema.Number,
+  minutes_played: Schema.Number,
+}) {}
