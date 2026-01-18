@@ -1144,7 +1144,7 @@
     "id": "msl-client-001",
     "category": "client",
     "description": "Create msl.client.ts with base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/msl/msl.client.ts",
       "Import Effect, Schema, Duration from effect",
