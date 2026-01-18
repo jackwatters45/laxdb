@@ -1578,7 +1578,7 @@
     "id": "msl-extract-013",
     "category": "extract",
     "description": "Test MSL extraction runs for all seasons",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/msl/run.ts --all",
       "Verify all discovered season directories created",

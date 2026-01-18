@@ -888,3 +888,10 @@ Description: Test MSL extraction runs for single season
 Status: COMPLETE
 Commit: c19d206
 Timestamp: 2026-01-19T07:24:52+11:00
+
+=== Iteration 119 ===
+Story: msl-extract-013
+Description: Test MSL extraction runs for all seasons
+Status: COMPLETE
+Commit: 6d77e37
+Timestamp: 2026-01-19T07:29:53+11:00
