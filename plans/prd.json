@@ -1396,7 +1396,7 @@
     "id": "msl-manifest-002",
     "category": "extract",
     "description": "Create MSLExtractionManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLExtractionManifest schema",
       "Fields: source='msl', seasons Record, lastRun, version",

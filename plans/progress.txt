@@ -790,3 +790,10 @@ Description: Create MSLSeasonManifest schema
 Status: COMPLETE
 Commit: ba5099b
 Timestamp: 2026-01-19T06:35:25+11:00
+
+=== Iteration 105 ===
+Story: msl-manifest-002
+Description: Create MSLExtractionManifest schema
+Status: COMPLETE
+Commit: 9c01dac
+Timestamp: 2026-01-19T06:37:40+11:00
