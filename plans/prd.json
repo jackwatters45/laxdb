@@ -1895,7 +1895,7 @@
     "id": "wla-client-001",
     "category": "client",
     "description": "Create wla.client.ts with base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/wla/wla.client.ts",
       "Import Effect, Schema, Duration from effect",
