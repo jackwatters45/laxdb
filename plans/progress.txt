@@ -825,3 +825,10 @@ Description: Implement extractTeams method
 Status: COMPLETE
 Commit: dac32af
 Timestamp: 2026-01-19T06:49:16+11:00
+
+=== Iteration 110 ===
+Story: msl-extract-004
+Description: Implement extractPlayers method
+Status: COMPLETE
+Commit: c75fda8
+Timestamp: 2026-01-19T06:53:14+11:00
