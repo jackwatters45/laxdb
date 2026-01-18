@@ -1246,7 +1246,7 @@
     "id": "msl-client-008",
     "category": "client",
     "description": "Implement MSLClient.getStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getStandings(input: MSLStandingsRequest.Encoded)",
       "Build URL: /seasons/{seasonId}/standings",

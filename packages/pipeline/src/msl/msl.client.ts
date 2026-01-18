@@ -756,6 +756,144 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
         ),
       );
 
+    /**
+     * Fetches all games (schedule/scores) for a given MSL season.
+     * Uses the Gamesheet internal REST API for structured data.
+     *
+     * @param input - Request containing the seasonId (MSL Gamesheet season ID)
+     * @returns Array of MSLGame objects
+     */
+    const getSchedule = (
+      input: typeof MSLScheduleRequest.Encoded,
+    ): Effect.Effect<
+      readonly MSLGame[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MSLScheduleRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // Fetch scores from Gamesheet internal API
+        // API returns paginated results, so we need to fetch all pages
+        const allGames: MSLGame[] = [];
+        const pageSize = 100; // Fetch 100 games at a time
+        let offset = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+          const path = `/api/useScoredGames/getSeasonScores/${request.seasonId}?filter[gametype]=overall&filter[limit]=${pageSize}&filter[offset]=${offset}`;
+
+          const response = yield* fetchGamesheetPageWithRetry(path);
+
+          // Parse JSON response
+          interface GameApiResponse {
+            gameIds?: number[];
+            dates?: string[];
+            times?: string[];
+            homeTitles?: { title: string; id: number }[];
+            visitorTitles?: { title: string; id: number }[];
+            homeScores?: number[];
+            visitorScores?: number[];
+            locations?: string[];
+            statuses?: string[];
+            periodScores?: {
+              home: number[];
+              visitor: number[];
+            }[];
+          }
+
+          let data: GameApiResponse;
+          try {
+            data = JSON.parse(response) as GameApiResponse;
+          } catch {
+            return yield* Effect.fail(
+              new ParseError({
+                message: `Failed to parse schedule API response as JSON`,
+                cause: response.slice(0, 200),
+              }),
+            );
+          }
+
+          // Check if we have data
+          const gameIds = data.gameIds ?? [];
+          if (gameIds.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Parse each game from the parallel arrays
+          for (let i = 0; i < gameIds.length; i++) {
+            const gameId = gameIds[i];
+            const date = data.dates?.[i] ?? null;
+            const time = data.times?.[i] ?? null;
+            const status = data.statuses?.[i] ?? null;
+
+            const homeTeam = data.homeTitles?.[i];
+            const visitorTeam = data.visitorTitles?.[i];
+
+            const homeScore = data.homeScores?.[i] ?? 0;
+            const visitorScore = data.visitorScores?.[i] ?? 0;
+            const venue = data.locations?.[i] ?? null;
+
+            // Build period scores if available
+            const periodData = data.periodScores?.[i];
+            let periodScores: MSLGamePeriodScore[] | undefined;
+
+            if (periodData?.home && periodData?.visitor) {
+              periodScores = [];
+              for (
+                let p = 0;
+                p < Math.min(periodData.home.length, periodData.visitor.length);
+                p++
+              ) {
+                periodScores.push(
+                  new MSLGamePeriodScore({
+                    period: p + 1,
+                    home_score: periodData.home[p] ?? 0,
+                    away_score: periodData.visitor[p] ?? 0,
+                  }),
+                );
+              }
+            }
+
+            const game = new MSLGame({
+              id: String(gameId),
+              date,
+              time,
+              status,
+              home_team_id:
+                homeTeam?.id !== undefined ? String(homeTeam.id) : null,
+              away_team_id:
+                visitorTeam?.id !== undefined ? String(visitorTeam.id) : null,
+              home_team_name: homeTeam?.title ?? null,
+              away_team_name: visitorTeam?.title ?? null,
+              home_score: homeScore,
+              away_score: visitorScore,
+              venue,
+              period_scores: periodScores,
+            });
+
+            allGames.push(game);
+          }
+
+          // Check if there are more pages
+          if (gameIds.length < pageSize) {
+            hasMore = false;
+          } else {
+            offset += pageSize;
+          }
+        }
+
+        return allGames;
+      }).pipe(
+        Effect.tap((games) =>
+          Effect.log(
+            `Fetched ${games.length} games for MSL season ${input.seasonId}`,
+          ),
+        ),
+      );
+
     return {
       // Config and utilities
       config: mslConfig,
@@ -771,6 +909,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       getPlayers,
       getGoalies,
       getStandings,
+      getSchedule,
     };
   }),
   dependencies: [MSLConfig.Default, PipelineConfig.Default],
