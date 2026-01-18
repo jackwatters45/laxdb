@@ -287,7 +287,7 @@
     "id": "mll-client-006",
     "category": "client",
     "description": "Implement MLLClient.getTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getTeams(input: MLLTeamsRequest.Encoded)",
       "Build URL: /l-MLL/y-{year}",

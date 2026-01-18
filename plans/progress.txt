@@ -210,3 +210,10 @@ Description: Implement fetchWaybackPage helper
 Status: COMPLETE
 Commit: 20c59e6
 Timestamp: 2026-01-19T00:25:01+11:00
+
+=== Iteration 22 ===
+Story: mll-client-006
+Description: Implement MLLClient.getTeams method
+Status: COMPLETE
+Commit: d9f7560
+Timestamp: 2026-01-19T00:28:06+11:00

@@ -8,7 +8,7 @@ import {
   type MLLGame,
   type MLLGoalie,
   MLLGoaliesRequest,
-  type MLLPlayer,
+  MLLPlayer,
   MLLPlayersRequest,
   MLLScheduleRequest,
   type MLLStanding,
@@ -478,6 +478,207 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Fetches all players for a given MLL season year.
+     * Scrapes team stats pages to extract player scoring data.
+     *
+     * @param input - Request containing the year (2001-2020)
+     * @returns Array of MLLPlayer objects with stats
+     */
+    const getPlayers = (
+      input: typeof MLLPlayersRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLPlayer[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLPlayersRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // First get all teams for this year
+        const teams = yield* getTeams({ year: request.year });
+
+        if (teams.length === 0) {
+          return [] as readonly MLLPlayer[];
+        }
+
+        // Fetch stats for each team and collect players
+        const allPlayers: MLLPlayer[] = [];
+        const seenPlayerIds = new Set<string>();
+
+        for (const team of teams) {
+          const path = `/lacrosse/stats/t-${team.id}/y-${request.year}`;
+
+          const html = yield* fetchStatscrewPageWithRetry(path).pipe(
+            Effect.catchTag("HttpError", (error) => {
+              // 404 is expected for some teams (relocated/defunct)
+              if (error.statusCode === 404) {
+                return Effect.succeed("");
+              }
+              return Effect.fail(error);
+            }),
+          );
+
+          if (!html) {
+            continue;
+          }
+
+          const doc = $.load(html);
+
+          // Find the scoring table (Regular Season)
+          // Look for table with headers: Player, Pos, GP, G, A, Pts
+          const tables = doc("table");
+
+          tables.each((_tableIndex, table) => {
+            const headerRow = doc(table).find("tr").first();
+            const headers = headerRow
+              .find("th, td")
+              .map((_i, el) => doc(el).text().trim().toLowerCase())
+              .get();
+
+            // Check if this is a scoring table
+            const hasGP = headers.includes("gp");
+            const hasG = headers.includes("g");
+            const hasA = headers.includes("a");
+            const hasPts = headers.includes("pts");
+            const hasPlayer =
+              headers.includes("player") || headers.includes("name");
+
+            if (!(hasGP && hasG && hasA && hasPts && hasPlayer)) {
+              return; // Not a scoring table, skip
+            }
+
+            // Find column indices
+            const playerIdx = headers.findIndex(
+              (h) => h === "player" || h === "name",
+            );
+            const posIdx = headers.findIndex(
+              (h) => h === "pos" || h === "pos.",
+            );
+            const gpIdx = headers.findIndex((h) => h === "gp");
+            const gIdx = headers.findIndex((h) => h === "g");
+            const aIdx = headers.findIndex((h) => h === "a");
+            const ptsIdx = headers.findIndex((h) => h === "pts");
+            const shIdx = headers.findIndex((h) => h === "sh");
+            const shPctIdx = headers.findIndex(
+              (h) => h === "sh%" || h === "s%",
+            );
+            const gbIdx = headers.findIndex((h) => h === "gb");
+            const foIdx = headers.findIndex((h) => h === "fo");
+            const fowIdx = headers.findIndex((h) => h === "fow");
+            const foPctIdx = headers.findIndex((h) => h === "fo%");
+
+            // Parse data rows (skip header row)
+            doc(table)
+              .find("tr")
+              .slice(1)
+              .each((_rowIndex, row) => {
+                const cells = doc(row)
+                  .find("td")
+                  .map((_i, el) => doc(el))
+                  .get();
+
+                if (cells.length < Math.max(playerIdx, gpIdx, gIdx, aIdx) + 1) {
+                  return; // Skip malformed rows
+                }
+
+                // Extract player info
+                const playerCell = cells[playerIdx];
+                const playerLink = playerCell?.find("a").attr("href") ?? "";
+                const playerName = playerCell?.text().trim() ?? "";
+
+                // Extract player ID from link
+                // Format: /lacrosse/stats/p-{PLAYER_ID}
+                const playerIdMatch = playerLink.match(
+                  /\/lacrosse\/stats\/p-([a-z0-9]+)/i,
+                );
+                const playerId =
+                  playerIdMatch?.[1] ??
+                  playerName.toLowerCase().replaceAll(/\s+/g, "");
+
+                if (!playerName || seenPlayerIds.has(playerId)) {
+                  return; // Skip empty or duplicate players
+                }
+                seenPlayerIds.add(playerId);
+
+                // Parse numeric values
+                const parseNum = (idx: number): number => {
+                  const text = cells[idx]?.text().trim() ?? "";
+                  const num = Number.parseFloat(text);
+                  return Number.isNaN(num) ? 0 : num;
+                };
+
+                const parseNullNum = (idx: number): number | null => {
+                  if (idx < 0) return null;
+                  const text = cells[idx]?.text().trim() ?? "";
+                  if (!text) return null;
+                  const num = Number.parseFloat(text);
+                  return Number.isNaN(num) ? null : num;
+                };
+
+                const position =
+                  posIdx >= 0 ? (cells[posIdx]?.text().trim() ?? null) : null;
+                const gamesPlayed = parseNum(gpIdx);
+                const goals = parseNum(gIdx);
+                const assists = parseNum(aIdx);
+                const points = parseNum(ptsIdx);
+
+                // Optional stats
+                const shots = parseNullNum(shIdx);
+                const shotPct = parseNullNum(shPctIdx);
+                const groundBalls = parseNullNum(gbIdx);
+                const faceoffs = parseNullNum(foIdx);
+                const faceoffsWon = parseNullNum(fowIdx);
+                const faceoffPct = parseNullNum(foPctIdx);
+
+                // Parse name into first/last
+                const nameParts = playerName.split(" ");
+                const firstName = nameParts[0] ?? null;
+                const lastName = nameParts.slice(1).join(" ") || null;
+
+                const player = new MLLPlayer({
+                  id: playerId,
+                  name: playerName,
+                  first_name: firstName,
+                  last_name: lastName,
+                  position,
+                  team_id: team.id,
+                  team_name: team.name,
+                  college: null,
+                  stats: {
+                    games_played: gamesPlayed,
+                    goals,
+                    assists,
+                    points,
+                    shots,
+                    shot_pct: shotPct,
+                    ground_balls: groundBalls,
+                    caused_turnovers: null,
+                    turnovers: null,
+                    faceoffs_won: faceoffsWon,
+                    faceoffs_lost:
+                      faceoffs !== null && faceoffsWon !== null
+                        ? faceoffs - faceoffsWon
+                        : null,
+                    faceoff_pct: faceoffPct,
+                  },
+                });
+
+                allPlayers.push(player);
+              });
+          });
+        }
+
+        return allPlayers;
+      }).pipe(
+        Effect.tap((players) =>
+          Effect.log(
+            `Fetched ${players.length} players for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -495,6 +696,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Public API methods
       getTeams,
+      getPlayers,
 
       // Type exports for method signatures (to be implemented)
       _types: {
