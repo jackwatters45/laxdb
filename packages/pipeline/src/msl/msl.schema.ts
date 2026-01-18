@@ -48,6 +48,34 @@ export function hasMSLPointstreakData(year: number): boolean {
   );
 }
 
+// MSL Player Stats nested schema (used in MSLPlayer)
+export class MSLPlayerStats extends Schema.Class<MSLPlayerStats>(
+  "MSLPlayerStats",
+)({
+  // Core stats
+  games_played: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+  penalty_minutes: Schema.Number,
+
+  // Per-game stats
+  points_per_game: Schema.Number,
+
+  // Power play stats (nullable - may not be tracked in all seasons)
+  ppg: Schema.NullOr(Schema.Number), // power play goals
+  ppa: Schema.NullOr(Schema.Number), // power play assists
+
+  // Short-handed stats (nullable)
+  shg: Schema.NullOr(Schema.Number), // short-handed goals
+  sha: Schema.NullOr(Schema.Number), // short-handed assists
+
+  // Situational goals (nullable)
+  gwg: Schema.NullOr(Schema.Number), // game-winning goals
+  fg: Schema.NullOr(Schema.Number), // first goals
+  otg: Schema.NullOr(Schema.Number), // overtime goals
+}) {}
+
 // MSL Team response schema
 export class MSLTeam extends Schema.Class<MSLTeam>("MSLTeam")({
   id: Schema.String,

@@ -994,7 +994,7 @@
     "id": "msl-schema-002",
     "category": "schema",
     "description": "MSLTeam response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLTeam Schema.Class",
       "Fields: id (string), name (string), city (nullable), abbreviation (nullable)",

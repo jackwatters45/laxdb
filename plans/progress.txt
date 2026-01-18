@@ -587,3 +587,10 @@ Description: Create msl.schema.ts with MSLSeasonId branded type
 Status: COMPLETE
 Commit: 7101b88
 Timestamp: 2026-01-19T04:51:28+11:00
+
+=== Iteration 76 ===
+Story: msl-schema-002
+Description: MSLTeam response schema
+Status: COMPLETE
+Commit: e2cee6e
+Timestamp: 2026-01-19T04:53:12+11:00
