@@ -657,3 +657,10 @@ Description: Export all schemas from msl.schema.ts
 Status: COMPLETE
 Commit: 7931903
 Timestamp: 2026-01-19T05:22:02+11:00
+
+=== Iteration 86 ===
+Story: msl-config-001
+Description: Add MSLConfig service to config.ts
+Status: COMPLETE
+Commit: bb4a6c4
+Timestamp: 2026-01-19T05:24:11+11:00

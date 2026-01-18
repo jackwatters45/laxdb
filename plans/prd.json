@@ -1129,7 +1129,7 @@
     "id": "msl-config-001",
     "category": "config",
     "description": "Add MSLConfig service to config.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open src/config.ts",
       "Add MSLConfig Effect.Service class",
