@@ -753,7 +753,7 @@
     "id": "mll-extract-015",
     "category": "extract",
     "description": "Test MLL extraction runs for all years",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/mll/run.ts --all",
       "Verify output/mll/{2001-2020}/*.json files created",

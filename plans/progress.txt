@@ -454,3 +454,10 @@ Description: Test MLL extraction with schedule for single year
 Status: COMPLETE
 Commit: 48bde5e
 Timestamp: 2026-01-19T03:13:27+11:00
+
+=== Iteration 57 ===
+Story: mll-extract-015
+Description: Test MLL extraction runs for all years
+Status: COMPLETE
+Commit: 41d5bef
+Timestamp: 2026-01-19T03:25:49+11:00
