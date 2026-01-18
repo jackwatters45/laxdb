@@ -1812,7 +1812,7 @@
     "id": "wla-schema-006",
     "category": "schema",
     "description": "WLAGoalie response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAGoalie Schema.Class",
       "Fields: id (string), first_name, last_name, full_name (nullable strings)",

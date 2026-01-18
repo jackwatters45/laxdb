@@ -92,3 +92,24 @@ export class WLAGoalie extends Schema.Class<WLAGoalie>("WLAGoalie")({
   team_name: Schema.NullOr(Schema.String),
   stats: Schema.optional(WLAGoalieStats),
 }) {}
+
+// WLA Standing response schema
+export class WLAStanding extends Schema.Class<WLAStanding>("WLAStanding")({
+  team_id: Schema.String,
+  team_name: Schema.NullOr(Schema.String),
+  position: Schema.Number,
+
+  // Win/loss record
+  wins: Schema.Number,
+  losses: Schema.Number,
+  ties: Schema.Number,
+  games_played: Schema.Number,
+
+  // Goal stats
+  goals_for: Schema.Number,
+  goals_against: Schema.Number,
+  goal_diff: Schema.Number,
+
+  // Win percentage
+  win_pct: Schema.Number,
+}) {}
