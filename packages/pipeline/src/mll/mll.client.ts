@@ -6,7 +6,7 @@ import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
 
 import {
   type MLLGame,
-  type MLLGoalie,
+  MLLGoalie,
   MLLGoaliesRequest,
   MLLPlayer,
   MLLPlayersRequest,
@@ -679,6 +679,199 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         ),
       );
 
+    /**
+     * Fetches all goalies for a given MLL season year.
+     * Scrapes team stats pages to extract goalie data.
+     *
+     * @param input - Request containing the year (2001-2020)
+     * @returns Array of MLLGoalie objects with stats
+     */
+    const getGoalies = (
+      input: typeof MLLGoaliesRequest.Encoded,
+    ): Effect.Effect<
+      readonly MLLGoalie[],
+      HttpError | NetworkError | TimeoutError | ParseError
+    > =>
+      Effect.gen(function* () {
+        const request = yield* Schema.decode(MLLGoaliesRequest)(input).pipe(
+          Effect.mapError(mapParseError),
+        );
+
+        // First get all teams for this year
+        const teams = yield* getTeams({ year: request.year });
+
+        if (teams.length === 0) {
+          return [] as readonly MLLGoalie[];
+        }
+
+        // Fetch stats for each team and collect goalies
+        const allGoalies: MLLGoalie[] = [];
+        const seenGoalieIds = new Set<string>();
+
+        for (const team of teams) {
+          const path = `/lacrosse/stats/t-${team.id}/y-${request.year}`;
+
+          const html = yield* fetchStatscrewPageWithRetry(path).pipe(
+            Effect.catchTag("HttpError", (error) => {
+              // 404 is expected for some teams (relocated/defunct)
+              if (error.statusCode === 404) {
+                return Effect.succeed("");
+              }
+              return Effect.fail(error);
+            }),
+          );
+
+          if (!html) {
+            continue;
+          }
+
+          const doc = $.load(html);
+
+          // Find the goalie table
+          // Look for table with headers: Player, GP, W, L, GA, Svs, GAA, Sv%
+          const tables = doc("table");
+
+          tables.each((_tableIndex, table) => {
+            const headerRow = doc(table).find("tr").first();
+            const headers = headerRow
+              .find("th, td")
+              .map((_i, el) => doc(el).text().trim().toLowerCase())
+              .get();
+
+            // Check if this is a goalie table
+            const hasGP = headers.includes("gp");
+            const hasW = headers.includes("w");
+            const hasL = headers.includes("l");
+            const hasGA = headers.includes("ga");
+            const hasSvs = headers.includes("svs") || headers.includes("saves");
+            const hasPlayer =
+              headers.includes("player") || headers.includes("name");
+
+            // Must have goalie-specific stats (W, L) plus GA or Svs
+            if (!(hasGP && hasW && hasL && (hasGA || hasSvs) && hasPlayer)) {
+              return; // Not a goalie table, skip
+            }
+
+            // Make sure it's NOT a player scoring table (which has G, A, Pts)
+            const hasGoals = headers.includes("g") && !headers.includes("ga");
+            const hasAssists = headers.includes("a");
+            const hasPts = headers.includes("pts");
+
+            if (hasGoals && hasAssists && hasPts) {
+              return; // This is a player scoring table, skip
+            }
+
+            // Find column indices
+            const playerIdx = headers.findIndex(
+              (h) => h === "player" || h === "name",
+            );
+            const gpIdx = headers.findIndex((h) => h === "gp");
+            const wIdx = headers.findIndex((h) => h === "w");
+            const lIdx = headers.findIndex((h) => h === "l");
+            const gaIdx = headers.findIndex((h) => h === "ga");
+            const svsIdx = headers.findIndex(
+              (h) => h === "svs" || h === "saves",
+            );
+            const gaaIdx = headers.findIndex((h) => h === "gaa");
+            const svPctIdx = headers.findIndex(
+              (h) => h === "sv%" || h === "svpct" || h === "sv pct",
+            );
+
+            // Parse data rows (skip header row)
+            doc(table)
+              .find("tr")
+              .slice(1)
+              .each((_rowIndex, row) => {
+                const cells = doc(row)
+                  .find("td")
+                  .map((_i, el) => doc(el))
+                  .get();
+
+                if (cells.length < Math.max(playerIdx, gpIdx, wIdx, lIdx) + 1) {
+                  return; // Skip malformed rows
+                }
+
+                // Extract goalie info
+                const playerCell = cells[playerIdx];
+                const playerLink = playerCell?.find("a").attr("href") ?? "";
+                const playerName = playerCell?.text().trim() ?? "";
+
+                // Extract player ID from link
+                // Format: /lacrosse/stats/p-{PLAYER_ID}
+                const playerIdMatch = playerLink.match(
+                  /\/lacrosse\/stats\/p-([a-z0-9]+)/i,
+                );
+                const goalieId =
+                  playerIdMatch?.[1] ??
+                  playerName.toLowerCase().replaceAll(/\s+/g, "");
+
+                if (!playerName || seenGoalieIds.has(goalieId)) {
+                  return; // Skip empty or duplicate goalies
+                }
+                seenGoalieIds.add(goalieId);
+
+                // Parse numeric values
+                const parseNum = (idx: number): number => {
+                  const text = cells[idx]?.text().trim() ?? "";
+                  const num = Number.parseFloat(text);
+                  return Number.isNaN(num) ? 0 : num;
+                };
+
+                const parseNullNum = (idx: number): number | null => {
+                  if (idx < 0) return null;
+                  const text = cells[idx]?.text().trim() ?? "";
+                  if (!text) return null;
+                  const num = Number.parseFloat(text);
+                  return Number.isNaN(num) ? null : num;
+                };
+
+                const gamesPlayed = parseNum(gpIdx);
+                const wins = parseNum(wIdx);
+                const losses = parseNum(lIdx);
+                const goalsAgainst = gaIdx >= 0 ? parseNum(gaIdx) : 0;
+                const saves = svsIdx >= 0 ? parseNum(svsIdx) : 0;
+
+                // Optional stats
+                const gaa = parseNullNum(gaaIdx);
+                const savePct = parseNullNum(svPctIdx);
+
+                // Parse name into first/last
+                const nameParts = playerName.split(" ");
+                const firstName = nameParts[0] ?? null;
+                const lastName = nameParts.slice(1).join(" ") || null;
+
+                const goalie = new MLLGoalie({
+                  id: goalieId,
+                  name: playerName,
+                  first_name: firstName,
+                  last_name: lastName,
+                  team_id: team.id,
+                  team_name: team.name,
+                  stats: {
+                    games_played: gamesPlayed,
+                    wins,
+                    losses,
+                    goals_against: goalsAgainst,
+                    saves,
+                    gaa,
+                    save_pct: savePct,
+                  },
+                });
+
+                allGoalies.push(goalie);
+              });
+          });
+        }
+
+        return allGoalies;
+      }).pipe(
+        Effect.tap((goalies) =>
+          Effect.log(
+            `Fetched ${goalies.length} goalies for MLL year ${input.year}`,
+          ),
+        ),
+      );
+
     return {
       // Placeholder methods - implementations will be added in subsequent stories
       config: mllConfig,
@@ -697,6 +890,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       // Public API methods
       getTeams,
       getPlayers,
+      getGoalies,
 
       // Type exports for method signatures (to be implemented)
       _types: {

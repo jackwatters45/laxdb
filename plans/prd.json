@@ -302,7 +302,7 @@
     "id": "mll-client-007",
     "category": "client",
     "description": "Implement MLLClient.getPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getPlayers(input: MLLPlayersRequest.Encoded)",
       "Build URL for player stats/leaders page",

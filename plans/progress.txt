@@ -217,3 +217,10 @@ Description: Implement MLLClient.getTeams method
 Status: COMPLETE
 Commit: d9f7560
 Timestamp: 2026-01-19T00:28:06+11:00
+
+=== Iteration 23 ===
+Story: mll-client-007
+Description: Implement MLLClient.getPlayers method
+Status: COMPLETE
+Commit: d9a3209
+Timestamp: 2026-01-19T00:32:07+11:00
