@@ -328,3 +328,10 @@ Description: getSchedule integration test (Wayback)
 Status: COMPLETE
 Commit: 25ee3ae
 Timestamp: 2026-01-19T01:28:43+11:00
+
+=== Iteration 39 ===
+Story: mll-test-008
+Description: All MLL client tests pass
+Status: COMPLETE
+Commit: 2f865cd
+Timestamp: 2026-01-19T01:34:32+11:00

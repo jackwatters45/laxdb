@@ -520,7 +520,7 @@
     "id": "mll-test-008",
     "category": "test",
     "description": "All MLL client tests pass",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun test src/mll/",
       "All 6 endpoint tests pass",
