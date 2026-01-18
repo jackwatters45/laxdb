@@ -5,7 +5,7 @@ import { MLLConfig, PipelineConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
 
 import {
-  type MLLGame,
+  MLLGame,
   MLLGoalie,
   MLLGoaliesRequest,
   MLLPlayer,
@@ -915,6 +915,331 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       );
 
     /**
+     * Parses archived schedule HTML from Wayback Machine and extracts game data.
+     * Handles multiple HTML layout variations across different eras (2000-2006).
+     *
+     * Layout Variations:
+     * - 2000-2001: Static HTML tables in /schedule.html
+     * - 2005-2006: PHP era with /schedule/, /schedule/league/ patterns
+     *
+     * @param html - Raw HTML content from Wayback Machine
+     * @param sourceUrl - The source URL for tracking purposes
+     * @returns Array of MLLGame objects
+     */
+    const parseWaybackSchedule = (
+      html: string,
+      sourceUrl: string,
+    ): readonly MLLGame[] => {
+      const doc = $.load(html);
+      const games: MLLGame[] = [];
+      const seenGameIds = new Set<string>();
+
+      // Extract year from sourceUrl timestamp or URL path
+      // Timestamp format: 20060701160324
+      const timestampMatch = sourceUrl.match(/\/web\/(\d{4})/);
+      const yearFromTimestamp = timestampMatch?.[1] ?? "";
+
+      // Helper to normalize team name for ID generation
+      const normalizeTeamName = (name: string): string =>
+        name
+          .toLowerCase()
+          .replaceAll(/[^a-z0-9]+/g, "")
+          .slice(0, 10);
+
+      // Helper to extract team ID from href
+      const extractTeamId = (href: string): string | null => {
+        // Pattern: ?team={ID} or /schedule/?team={ID}
+        const teamIdMatch = href.match(/[?&]team=(\d+)/);
+        return teamIdMatch?.[1] ?? null;
+      };
+
+      // Helper to parse date strings
+      const parseDate = (dateStr: string): string | null => {
+        const cleaned = dateStr.trim();
+        if (!cleaned) return null;
+
+        // Format: MM/DD/YY
+        const shortMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+        if (shortMatch) {
+          const [, month, day, year] = shortMatch;
+          // Assume 2000s for MLL era
+          const fullYear = Number.parseInt(year ?? "0", 10);
+          const century = fullYear > 50 ? 1900 : 2000;
+          return `${century + fullYear}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+        }
+
+        // Format: MM/DD/YYYY
+        const longMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (longMatch) {
+          const [, month, day, year] = longMatch;
+          return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+        }
+
+        // Format: Month D, YYYY (e.g., "July 1, 2006")
+        const textMatch = cleaned.match(
+          /^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/,
+        );
+        if (textMatch) {
+          const [, monthName, day, year] = textMatch;
+          const months: Record<string, string> = {
+            january: "01",
+            february: "02",
+            march: "03",
+            april: "04",
+            may: "05",
+            june: "06",
+            july: "07",
+            august: "08",
+            september: "09",
+            october: "10",
+            november: "11",
+            december: "12",
+          };
+          const month = months[(monthName ?? "").toLowerCase()];
+          if (month) {
+            return `${year}-${month}-${day?.padStart(2, "0")}`;
+          }
+        }
+
+        return null;
+      };
+
+      // Helper to parse score (may be empty, "&nbsp;", or number)
+      const parseScore = (text: string): number | null => {
+        const cleaned = text.trim().replaceAll(/[&]nbsp;?/gi, "");
+        if (!cleaned) return null;
+        const num = Number.parseInt(cleaned, 10);
+        return Number.isNaN(num) ? null : num;
+      };
+
+      // Generate unique game ID
+      const generateGameId = (
+        date: string | null,
+        awayTeam: string,
+        homeTeam: string,
+      ): string => {
+        const dateStr = date ?? "unknown";
+        const away = normalizeTeamName(awayTeam);
+        const home = normalizeTeamName(homeTeam);
+        return `${dateStr}-${away}-${home}`;
+      };
+
+      // Try parsing 2005-2006 era layout (table with team links)
+      const tables = doc("table");
+
+      tables.each((_tableIndex, table) => {
+        const rows = doc(table).find("tr");
+
+        rows.each((_rowIndex, row) => {
+          const cells = doc(row).find("td").toArray();
+
+          // Skip rows with too few cells
+          if (cells.length < 4) return;
+
+          // Look for rows that might contain schedule data
+          // Pattern 1 (2006): Date, Time, AwayLogo, AwayTeam, AwayScore, HomeLogo, HomeTeam, HomeScore
+          // Pattern 2: Date, AwayTeam, AwayScore, HomeTeam, HomeScore
+
+          // Find cells with team links
+          const teamLinks: Array<{
+            index: number;
+            name: string;
+            href: string;
+            teamId: string | null;
+          }> = [];
+
+          cells.forEach((cell, idx) => {
+            const link = doc(cell).find("a");
+            const href = link.attr("href") ?? "";
+            const text = link.text().trim() || doc(cell).text().trim();
+
+            // Check if this looks like a team link
+            if (
+              href.includes("team=") ||
+              (href.includes("/schedule") && text.length > 2)
+            ) {
+              teamLinks.push({
+                index: idx,
+                name: text,
+                href,
+                teamId: extractTeamId(href),
+              });
+            }
+          });
+
+          // Need at least 2 teams (away and home)
+          if (teamLinks.length < 2) return;
+
+          // Try to extract date from first cells
+          let dateStr: string | null = null;
+          for (let i = 0; i < Math.min(3, cells.length); i++) {
+            const cellText = doc(cells[i]).text().trim();
+            const parsed = parseDate(cellText);
+            if (parsed) {
+              dateStr = parsed;
+              break;
+            }
+          }
+
+          // Get away and home teams (first two team links found)
+          const awayTeam = teamLinks[0];
+          const homeTeam = teamLinks[1];
+
+          if (!awayTeam || !homeTeam) return;
+
+          // Try to find scores (cells after team links)
+          let awayScore: number | null = null;
+          let homeScore: number | null = null;
+
+          // Score is typically in the cell after the team name
+          if (awayTeam.index + 1 < cells.length) {
+            awayScore = parseScore(doc(cells[awayTeam.index + 1]).text());
+          }
+
+          if (homeTeam.index + 1 < cells.length) {
+            homeScore = parseScore(doc(cells[homeTeam.index + 1]).text());
+          }
+
+          // Generate game ID and check for duplicates
+          const gameId = generateGameId(dateStr, awayTeam.name, homeTeam.name);
+          if (seenGameIds.has(gameId)) return;
+          seenGameIds.add(gameId);
+
+          // Determine game status
+          let status: string | null = null;
+          if (awayScore !== null && homeScore !== null) {
+            status = "final";
+          } else if (dateStr) {
+            // Check if date is in the past (game should be played)
+            const gameDate = new Date(dateStr);
+            const now = new Date();
+            if (gameDate < now) {
+              status = "completed"; // Played but score unknown
+            } else {
+              status = "scheduled";
+            }
+          }
+
+          // Map team IDs to MLL codes if possible
+          const awayTeamId = awayTeam.teamId
+            ? `MLL${awayTeam.teamId}`
+            : `MLL${normalizeTeamName(awayTeam.name).toUpperCase().slice(0, 3)}`;
+          const homeTeamId = homeTeam.teamId
+            ? `MLL${homeTeam.teamId}`
+            : `MLL${normalizeTeamName(homeTeam.name).toUpperCase().slice(0, 3)}`;
+
+          const game = new MLLGame({
+            id: gameId,
+            date: dateStr,
+            status,
+            home_team_id: homeTeamId,
+            away_team_id: awayTeamId,
+            home_team_name: homeTeam.name,
+            away_team_name: awayTeam.name,
+            home_score: homeScore,
+            away_score: awayScore,
+            venue: null,
+            source_url: sourceUrl,
+          });
+
+          games.push(game);
+        });
+      });
+
+      // If no games found with team links, try simpler table parsing
+      // This handles 2000-2001 era static HTML
+      if (games.length === 0) {
+        tables.each((_tableIndex, table) => {
+          const rows = doc(table).find("tr");
+
+          rows.each((_rowIndex, row) => {
+            const cells = doc(row)
+              .find("td")
+              .map((_i, el) => doc(el).text().trim())
+              .get();
+
+            // Skip header rows or rows with too few cells
+            if (cells.length < 4) return;
+
+            // Look for date pattern in first cell
+            const dateStr = parseDate(cells[0] ?? "");
+            if (!dateStr) return;
+
+            // Try to identify team names and scores
+            // Common patterns: Date, Time, Away Team, Score, Home Team, Score
+            // or: Date, Away Team, Away Score, Home Team, Home Score
+            let awayTeamName = "";
+            let homeTeamName = "";
+            let awayScore: number | null = null;
+            let homeScore: number | null = null;
+
+            // Find cells that look like team names (longer text, not numbers)
+            const teamCells = cells
+              .slice(1)
+              .filter((cell) => cell.length > 2 && !/^\d+$/.test(cell));
+
+            if (teamCells.length >= 2) {
+              awayTeamName = teamCells[0] ?? "";
+              homeTeamName = teamCells[1] ?? "";
+
+              // Find scores between/after team names
+              const scoreCells = cells
+                .slice(1)
+                .filter((cell) => /^\d{1,2}$/.test(cell));
+
+              if (scoreCells.length >= 2) {
+                awayScore = Number.parseInt(scoreCells[0] ?? "", 10);
+                homeScore = Number.parseInt(scoreCells[1] ?? "", 10);
+              }
+            }
+
+            if (!awayTeamName || !homeTeamName) return;
+
+            const gameId = generateGameId(dateStr, awayTeamName, homeTeamName);
+            if (seenGameIds.has(gameId)) return;
+            seenGameIds.add(gameId);
+
+            let status: string | null = null;
+            if (awayScore !== null && homeScore !== null) {
+              status = "final";
+            } else {
+              status = "scheduled";
+            }
+
+            const awayTeamId = `MLL${normalizeTeamName(awayTeamName).toUpperCase().slice(0, 3)}`;
+            const homeTeamId = `MLL${normalizeTeamName(homeTeamName).toUpperCase().slice(0, 3)}`;
+
+            const game = new MLLGame({
+              id: gameId,
+              date: dateStr,
+              status,
+              home_team_id: homeTeamId,
+              away_team_id: awayTeamId,
+              home_team_name: homeTeamName,
+              away_team_name: awayTeamName,
+              home_score: homeScore ?? null,
+              away_score: awayScore ?? null,
+              venue: null,
+              source_url: sourceUrl,
+            });
+
+            games.push(game);
+          });
+        });
+      }
+
+      // Sort games by date
+      games.sort((a, b) => {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return a.date.localeCompare(b.date);
+      });
+
+      return games;
+    };
+
+    /**
      * Fetches stat leaders for a given MLL season year.
      * Scrapes the league leaders page for top performers.
      *
@@ -1295,6 +1620,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
 
       // Internal helpers for finding Wayback schedule snapshots
       findScheduleSnapshots,
+
+      // Internal helper for parsing Wayback schedule HTML
+      parseWaybackSchedule,
 
       // Public API methods
       getTeams,

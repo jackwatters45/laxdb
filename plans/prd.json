@@ -367,7 +367,7 @@
     "id": "mll-client-011",
     "category": "client",
     "description": "Implement findScheduleSnapshots helper",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add findScheduleSnapshots(year: number) internal helper",
       "Query Wayback CDX for majorleaguelacrosse.com/schedule URLs",

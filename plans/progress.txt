@@ -245,3 +245,10 @@ Description: Implement MLLClient.getStatLeaders method
 Status: COMPLETE
 Commit: 8ff52aa
 Timestamp: 2026-01-19T00:42:22+11:00
+
+=== Iteration 27 ===
+Story: mll-client-011
+Description: Implement findScheduleSnapshots helper
+Status: COMPLETE
+Commit: be54835
+Timestamp: 2026-01-19T00:46:08+11:00
