@@ -929,7 +929,7 @@
     "id": "mll-final-006",
     "category": "final",
     "description": "Verify all output files",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Verify: ls -la output/mll/",
       "All year directories exist (2001-2020)",
