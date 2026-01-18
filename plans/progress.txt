@@ -832,3 +832,10 @@ Description: Implement extractPlayers method
 Status: COMPLETE
 Commit: c75fda8
 Timestamp: 2026-01-19T06:53:14+11:00
+
+=== Iteration 111 ===
+Story: msl-extract-005
+Description: Implement extractGoalies method
+Status: COMPLETE
+Commit: 3031336
+Timestamp: 2026-01-19T06:55:36+11:00
