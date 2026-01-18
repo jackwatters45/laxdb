@@ -894,7 +894,7 @@
     "id": "mll-final-003",
     "category": "final",
     "description": "Run full extraction for all years (without schedule)",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/mll/run.ts --all",
       "All 20 years extracted (2001-2020)",

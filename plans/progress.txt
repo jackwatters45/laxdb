@@ -531,3 +531,10 @@ Description: Run all MLL tests
 Status: COMPLETE
 Commit: db210b0
 Timestamp: 2026-01-19T04:07:55+11:00
+
+=== Iteration 68 ===
+Story: mll-final-003
+Description: Run full extraction for all years (without schedule)
+Status: COMPLETE
+Commit: 987a0db
+Timestamp: 2026-01-19T04:12:06+11:00
