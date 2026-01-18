@@ -88,3 +88,23 @@ export class MLLGoalieStats extends Schema.Class<MLLGoalieStats>(
   gaa: Schema.NullOr(Schema.Number), // Goals Against Average
   save_pct: Schema.NullOr(Schema.Number), // Save Percentage
 }) {}
+
+// MLL Standing response schema
+export class MLLStanding extends Schema.Class<MLLStanding>("MLLStanding")({
+  team_id: Schema.String,
+  team_name: Schema.NullOr(Schema.String),
+  position: Schema.Number,
+
+  // Win/Loss record
+  wins: Schema.Number,
+  losses: Schema.Number,
+  games_played: Schema.Number,
+
+  // Goals
+  goals_for: Schema.Number,
+  goals_against: Schema.Number,
+  goal_diff: Schema.Number,
+
+  // Percentage
+  win_pct: Schema.Number,
+}) {}

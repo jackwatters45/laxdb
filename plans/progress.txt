@@ -119,3 +119,10 @@ Description: MLLGoalieStats nested schema
 Status: COMPLETE
 Commit: 724a13b
 Timestamp: 2026-01-18T23:58:06+11:00
+
+=== Iteration 9 ===
+Story: mll-schema-006
+Description: MLLGoalie response schema
+Status: COMPLETE
+Commit: b2992af
+Timestamp: 2026-01-18T23:59:16+11:00
