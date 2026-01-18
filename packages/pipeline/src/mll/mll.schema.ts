@@ -21,3 +21,28 @@ export class MLLTeam extends Schema.Class<MLLTeam>("MLLTeam")({
   founded_year: Schema.NullOr(Schema.Number),
   final_year: Schema.NullOr(Schema.Number),
 }) {}
+
+// MLL Player Stats nested schema
+export class MLLPlayerStats extends Schema.Class<MLLPlayerStats>(
+  "MLLPlayerStats",
+)({
+  // Core stats (always present)
+  games_played: Schema.Number,
+  goals: Schema.Number,
+  assists: Schema.Number,
+  points: Schema.Number,
+
+  // Shooting stats (nullable - may not be available for all seasons)
+  shots: Schema.NullOr(Schema.Number),
+  shot_pct: Schema.NullOr(Schema.Number),
+
+  // Ball control stats (nullable)
+  ground_balls: Schema.NullOr(Schema.Number),
+  caused_turnovers: Schema.NullOr(Schema.Number),
+  turnovers: Schema.NullOr(Schema.Number),
+
+  // Faceoff stats (nullable - only for faceoff specialists)
+  faceoffs_won: Schema.NullOr(Schema.Number),
+  faceoffs_lost: Schema.NullOr(Schema.Number),
+  faceoff_pct: Schema.NullOr(Schema.Number),
+}) {}
