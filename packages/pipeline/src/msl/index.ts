@@ -26,3 +26,6 @@ export {
   MSLStandingsRequest,
   MSLScheduleRequest,
 } from "./msl.schema";
+
+// Client
+export { MSLClient } from "./msl.client";

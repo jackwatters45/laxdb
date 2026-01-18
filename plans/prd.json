@@ -1159,7 +1159,7 @@
     "id": "msl-client-002",
     "category": "client",
     "description": "Create MSLClient service shell",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MSLClient as Effect.Service",
       "Yield MSLConfig and PipelineConfig in effect",
