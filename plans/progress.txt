@@ -580,3 +580,10 @@ Description: Analyze main MSL website structure
 Status: COMPLETE
 Commit: e57f18a
 Timestamp: 2026-01-19T04:49:19+11:00
+
+=== Iteration 75 ===
+Story: msl-schema-001
+Description: Create msl.schema.ts with MSLSeasonId branded type
+Status: COMPLETE
+Commit: 7101b88
+Timestamp: 2026-01-19T04:51:28+11:00

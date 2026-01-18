@@ -47,3 +47,13 @@ export function hasMSLPointstreakData(year: number): boolean {
     year as (typeof MSL_POINTSTREAK_YEARS)[number],
   );
 }
+
+// MSL Team response schema
+export class MSLTeam extends Schema.Class<MSLTeam>("MSLTeam")({
+  id: Schema.String,
+  name: Schema.String,
+  city: Schema.NullOr(Schema.String),
+  abbreviation: Schema.NullOr(Schema.String),
+  logo_url: Schema.NullOr(Schema.String),
+  website_url: Schema.NullOr(Schema.String),
+}) {}

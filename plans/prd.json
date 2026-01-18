@@ -982,7 +982,7 @@
     "id": "msl-schema-001",
     "category": "schema",
     "description": "Create msl.schema.ts with MSLSeasonId branded type",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/msl/msl.schema.ts",
       "Define MSLSeasonId: Schema.Number.pipe(Schema.int(), Schema.positive(), Schema.brand('MSLSeasonId'))",
