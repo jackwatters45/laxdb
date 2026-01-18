@@ -125,6 +125,18 @@ Quick summary:
 > **Note:** MLL data via StatsCrew + Wayback Machine scraping - no credentials needed.
 > Schedule data from Wayback may have gaps (especially 2007-2019).
 
+## MSLCLIENT METHODS
+
+| Method | Source | Description |
+|--------|--------|-------------|
+| `getTeams` | Gamesheet | Teams for a season |
+| `getPlayers` | Gamesheet | Players with stats (paginated) |
+| `getGoalies` | Gamesheet | Goalies with stats (paginated) |
+| `getStandings` | Gamesheet | Team standings |
+| `getSchedule` | Gamesheet | Season schedule (games with scores) |
+
+> **Note:** MSL data via Gamesheet API scraping - no credentials needed.
+
 ## MLL EXTRACTION
 
 MLL data is scraped from StatsCrew (stats) and Wayback Machine (schedules).

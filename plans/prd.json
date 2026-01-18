@@ -1658,7 +1658,7 @@
     "id": "msl-validate-006",
     "category": "validate",
     "description": "Test MSL validation runs successfully",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-msl.ts",
       "Verify validation report shows pass/fail status",
