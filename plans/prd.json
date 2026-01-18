@@ -1771,7 +1771,7 @@
     "id": "wla-schema-003",
     "category": "schema",
     "description": "WLAPlayerStats nested schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAPlayerStats Schema.Class",
       "Fields: games_played, goals, assists, points, penalty_minutes (all Schema.Number)",

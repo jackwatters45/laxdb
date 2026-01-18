@@ -42,3 +42,17 @@ export class WLAPlayerStats extends Schema.Class<WLAPlayerStats>(
   // Efficiency
   scoring_pct: Schema.NullOr(Schema.Number), // scoring percentage
 }) {}
+
+// WLA Player response schema
+export class WLAPlayer extends Schema.Class<WLAPlayer>("WLAPlayer")({
+  id: Schema.String,
+  first_name: Schema.NullOr(Schema.String),
+  last_name: Schema.NullOr(Schema.String),
+  full_name: Schema.NullOr(Schema.String),
+  jersey_number: Schema.NullOr(Schema.String),
+  position: Schema.NullOr(Schema.String),
+  team_id: Schema.NullOr(Schema.String),
+  team_code: Schema.NullOr(Schema.String),
+  team_name: Schema.NullOr(Schema.String),
+  stats: Schema.optional(WLAPlayerStats),
+}) {}
