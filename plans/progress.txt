@@ -133,3 +133,10 @@ Description: MLLStanding response schema
 Status: COMPLETE
 Commit: a2f31d9
 Timestamp: 2026-01-19T00:00:41+11:00
+
+=== Iteration 11 ===
+Story: mll-schema-008
+Description: MLLStatLeader response schema
+Status: COMPLETE
+Commit: adfeb3b
+Timestamp: 2026-01-19T00:02:25+11:00

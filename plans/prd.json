@@ -134,7 +134,7 @@
     "id": "mll-schema-008",
     "category": "schema",
     "description": "MLLStatLeader response schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define MLLStatLeader Schema.Class",
       "Fields: player_id, player_name (string)",

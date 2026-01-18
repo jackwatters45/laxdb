@@ -121,3 +121,26 @@ export class MLLStatLeader extends Schema.Class<MLLStatLeader>("MLLStatLeader")(
     rank: Schema.Number,
   },
 ) {}
+
+// MLL Game response schema (from Wayback Machine archives)
+export class MLLGame extends Schema.Class<MLLGame>("MLLGame")({
+  id: Schema.String,
+  date: Schema.NullOr(Schema.String),
+  status: Schema.NullOr(Schema.String),
+
+  // Team references
+  home_team_id: Schema.NullOr(Schema.String),
+  away_team_id: Schema.NullOr(Schema.String),
+  home_team_name: Schema.NullOr(Schema.String),
+  away_team_name: Schema.NullOr(Schema.String),
+
+  // Scores (nullable - may not have scores for all games)
+  home_score: Schema.NullOr(Schema.Number),
+  away_score: Schema.NullOr(Schema.Number),
+
+  // Location
+  venue: Schema.NullOr(Schema.String),
+
+  // Source tracking
+  source_url: Schema.NullOr(Schema.String),
+}) {}
