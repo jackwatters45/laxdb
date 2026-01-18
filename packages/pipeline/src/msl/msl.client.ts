@@ -360,26 +360,35 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
 
           const response = yield* fetchGamesheetPageWithRetry(path);
 
-          // Parse JSON response
+          // Parse JSON response - data is wrapped in tableData object
+          interface DataWrapper<T> {
+            data: T;
+            subData?: unknown[][];
+          }
+          interface TeamNameEntry {
+            title: string;
+            id: number;
+          }
           interface PlayerApiResponse {
-            names?: { firstName: string; lastName: string; id: number }[];
-            ids?: number[];
-            teamNames?: { title: string; id: number }[];
-            jersey?: (string | number | null)[];
-            positions?: string[];
-            gp?: number[];
-            g?: number[];
-            a?: number[];
-            pts?: number[];
-            pim?: number[];
-            ppg?: number[];
-            ppa?: number[];
-            shg?: number[];
-            sha?: number[];
-            gwg?: number[];
-            fg?: number[];
-            otg?: number[];
-            ptspg?: number[];
+            tableData?: {
+              names?: { firstName: string; lastName: string; id: number }[];
+              ids?: number[];
+              teamNames?: { data: TeamNameEntry[][] };
+              jersey?: DataWrapper<(string | number | null)[]>;
+              positions?: DataWrapper<string[][]>;
+              gp?: DataWrapper<number[]>;
+              g?: DataWrapper<number[]>;
+              a?: DataWrapper<number[]>;
+              pts?: DataWrapper<number[]>;
+              pim?: DataWrapper<number[]>;
+              ppg?: DataWrapper<number[]>;
+              ppa?: DataWrapper<number[]>;
+              shg?: DataWrapper<number[]>;
+              sha?: DataWrapper<number[]>;
+              gwg?: DataWrapper<number[]>;
+              fg?: DataWrapper<number[]>;
+              otg?: DataWrapper<number[]>;
+            };
           }
 
           let data: PlayerApiResponse;
@@ -394,8 +403,9 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
             );
           }
 
-          // Check if we have data
-          const names = data.names ?? [];
+          // Check if we have data - names is directly under tableData
+          const tableData = data.tableData ?? {};
+          const names = tableData.names ?? [];
           if (names.length === 0) {
             hasMore = false;
             break;
@@ -404,7 +414,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
           // Parse each player from the parallel arrays
           for (let i = 0; i < names.length; i++) {
             const name = names[i];
-            const playerId = data.ids?.[i] ?? name?.id ?? i;
+            const playerId = tableData.ids?.[i] ?? name?.id ?? i;
             const firstName = name?.firstName ?? null;
             const lastName = name?.lastName ?? null;
             const fullName =
@@ -412,31 +422,39 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
                 ? `${firstName} ${lastName}`
                 : (firstName ?? lastName ?? `Player ${playerId}`);
 
-            const teamInfo = data.teamNames?.[i];
-            const jersey = data.jersey?.[i];
-            const position = data.positions?.[i] ?? null;
+            // teamNames.data is array of arrays, each containing team objects
+            const teamData = tableData.teamNames?.data?.[i];
+            const teamInfo = teamData?.[0];
+            // jersey and positions are wrapped in { data: [...] }
+            const jersey = tableData.jersey?.data?.[i];
+            const positionArr = tableData.positions?.data?.[i];
+            const position = positionArr?.[0] ?? null;
 
-            // Build stats
-            const gamesPlayed = data.gp?.[i] ?? 0;
-            const goals = data.g?.[i] ?? 0;
-            const assists = data.a?.[i] ?? 0;
-            const points = data.pts?.[i] ?? 0;
-            const penaltyMinutes = data.pim?.[i] ?? 0;
-            const pointsPerGame = data.ptspg?.[i] ?? 0;
-            const ppg = data.ppg?.[i] ?? null;
-            const ppa = data.ppa?.[i] ?? null;
-            const shg = data.shg?.[i] ?? null;
-            const sha = data.sha?.[i] ?? null;
-            const gwg = data.gwg?.[i] ?? null;
-            const fg = data.fg?.[i] ?? null;
-            const otg = data.otg?.[i] ?? null;
+            // Build stats - all wrapped in { data: [...] }
+            const gamesPlayed = tableData.gp?.data?.[i] ?? 0;
+            const goals = tableData.g?.data?.[i] ?? 0;
+            const assists = tableData.a?.data?.[i] ?? 0;
+            const points = tableData.pts?.data?.[i] ?? 0;
+            const penaltyMinutes = tableData.pim?.data?.[i] ?? 0;
+            const pointsPerGame =
+              gamesPlayed > 0
+                ? Math.round((points / gamesPlayed) * 100) / 100
+                : 0;
+            const ppg = tableData.ppg?.data?.[i] ?? null;
+            const ppa = tableData.ppa?.data?.[i] ?? null;
+            const shg = tableData.shg?.data?.[i] ?? null;
+            const sha = tableData.sha?.data?.[i] ?? null;
+            const gwg = tableData.gwg?.data?.[i] ?? null;
+            const fg = tableData.fg?.data?.[i] ?? null;
+            const otg = tableData.otg?.data?.[i] ?? null;
 
             const player = new MSLPlayer({
               id: String(playerId),
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number: jersey !== null ? String(jersey) : null,
+              jersey_number:
+                jersey !== null && jersey !== undefined ? String(jersey) : null,
               position,
               team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
               team_name: teamInfo?.title ?? null,

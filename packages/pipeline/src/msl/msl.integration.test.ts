@@ -50,6 +50,10 @@ describe("MSLClient", () => {
         expect(players.length).toBeGreaterThan(0);
         expect(players[0]).toHaveProperty("id");
         expect(players[0]).toHaveProperty("name");
+        expect(players[0]).toHaveProperty("stats");
+        expect(players[0]?.stats).toHaveProperty("goals");
+        expect(players[0]?.stats).toHaveProperty("assists");
+        expect(players[0]?.stats).toHaveProperty("points");
       },
       PLAYER_TIMEOUT,
     );
