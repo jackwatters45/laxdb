@@ -538,3 +538,10 @@ Description: Run full extraction for all years (without schedule)
 Status: COMPLETE
 Commit: 987a0db
 Timestamp: 2026-01-19T04:12:06+11:00
+
+=== Iteration 69 ===
+Story: mll-final-004
+Description: Run schedule extraction for recent years
+Status: COMPLETE
+Commit: 536a103
+Timestamp: 2026-01-19T04:17:30+11:00

@@ -905,7 +905,7 @@
     "id": "mll-final-004",
     "category": "final",
     "description": "Run schedule extraction for recent years",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/mll/run.ts --year=2019 --with-schedule",
       "Run: bun src/extract/mll/run.ts --year=2018 --with-schedule",
