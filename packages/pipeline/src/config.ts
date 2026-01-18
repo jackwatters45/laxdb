@@ -90,3 +90,13 @@ export class PLLConfig extends Effect.Service<PLLConfig>()("PLLConfig", {
     } as const;
   }),
 }) {}
+
+export class NLLConfig extends Effect.Service<NLLConfig>()("NLLConfig", {
+  succeed: {
+    baseUrl: "https://nllstatsapp.aordev.com/",
+    headers: {
+      origin: "https://www.nll.com",
+      referer: "https://www.nll.com/",
+    },
+  } as const,
+}) {}

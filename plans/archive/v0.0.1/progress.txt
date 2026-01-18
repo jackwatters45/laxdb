@@ -1,0 +1,438 @@
+Ralph Progress Log
+Initialized: 2026-01-17T10:35:00+11:00
+
+--- Session History ---
+
+nll-schema-001 COMPLETE
+Summary: Created nll.schema.ts with NLLSeasonId branded type
+Files: packages/pipeline/src/nll/nll.schema.ts
+
+=== Iteration 1 ===
+Story: nll-schema-002
+Description: NLLTeam response schema
+Status: COMPLETE
+Commit: 91f34c6
+Timestamp: 2026-01-17T23:16:49+11:00
+
+=== Iteration 2 ===
+Story: nll-schema-003
+Description: NLLPlayerSeasonStats nested schema
+Status: COMPLETE
+Commit: d8ad2d9
+Timestamp: 2026-01-17T23:17:56+11:00
+
+=== Iteration 3 ===
+Story: nll-schema-004
+Description: NLLPlayer response schema
+Status: COMPLETE
+Commit: 69d848a
+Timestamp: 2026-01-17T23:19:22+11:00
+
+=== Iteration 4 ===
+Story: nll-schema-005
+Description: NLLStanding response schema
+Status: COMPLETE
+Commit: 476ff29
+Timestamp: 2026-01-17T23:20:32+11:00
+
+=== Iteration 5 ===
+Story: nll-schema-006
+Description: NLLVenue nested schema
+Status: COMPLETE
+Commit: b63cee8
+Timestamp: 2026-01-17T23:21:51+11:00
+
+=== Iteration 6 ===
+Story: nll-schema-007
+Description: NLLSquad nested schema
+Status: COMPLETE
+Commit: 91595ae
+Timestamp: 2026-01-17T23:22:57+11:00
+
+=== Iteration 7 ===
+Story: nll-schema-008
+Description: NLLMatch response schema
+Status: COMPLETE
+Commit: ce631fc
+Timestamp: 2026-01-17T23:24:12+11:00
+
+=== Iteration 8 ===
+Story: nll-schema-009
+Description: NLL request schemas
+Status: COMPLETE
+Commit: 5f4bab4
+Timestamp: 2026-01-17T23:25:31+11:00
+
+=== Iteration 9 ===
+Story: nll-schema-010
+Description: TeamsMapToArray transform schema
+Status: COMPLETE
+Commit: 241c67c
+Timestamp: 2026-01-17T23:28:16+11:00
+
+=== Iteration 10 ===
+Story: nll-schema-011
+Description: PlayersMapToArray transform schema
+Status: COMPLETE
+Commit: 432da5e
+Timestamp: 2026-01-17T23:29:34+11:00
+
+=== Iteration 11 ===
+Story: nll-schema-012
+Description: NLL response wrapper schemas
+Status: COMPLETE
+Commit: 1cdb0d7
+Timestamp: 2026-01-17T23:31:18+11:00
+
+=== Iteration 12 ===
+Story: nll-schema-013
+Description: Export all schemas from nll.schema.ts
+Status: COMPLETE
+Commit: d7a7c90
+Timestamp: 2026-01-17T23:32:23+11:00
+
+=== Iteration 13 ===
+Story: nll-config-001
+Description: Add NLLConfig service to config.ts
+Status: COMPLETE
+Commit: af2971e
+Timestamp: 2026-01-17T23:33:44+11:00
+
+=== Iteration 14 ===
+Story: nll-client-001
+Description: Create nll.client.ts with base structure
+Status: COMPLETE
+Commit: f2c3d07
+Timestamp: 2026-01-17T23:35:01+11:00
+
+=== Iteration 15 ===
+Story: nll-client-002
+Description: Define mapParseError helper
+Status: COMPLETE
+Commit: c2a084c
+Timestamp: 2026-01-17T23:36:17+11:00
+
+=== Iteration 16 ===
+Story: nll-client-003
+Description: Create NLLClient service shell
+Status: COMPLETE
+Commit: e06c89a
+Timestamp: 2026-01-17T23:37:42+11:00
+
+=== Iteration 17 ===
+Story: nll-client-004
+Description: Implement NLLClient.getTeams method
+Status: COMPLETE
+Commit: 5b41524
+Timestamp: 2026-01-17T23:40:21+11:00
+
+=== Iteration 18 ===
+Story: nll-client-005
+Description: Implement NLLClient.getPlayers method
+Status: COMPLETE
+Commit: 5a702b4
+Timestamp: 2026-01-17T23:43:13+11:00
+
+=== Iteration 19 ===
+Story: nll-client-006
+Description: Implement NLLClient.getStandings method
+Status: COMPLETE
+Commit: 7dd3c5c
+Timestamp: 2026-01-17T23:44:45+11:00
+
+=== Iteration 20 ===
+Story: nll-client-007
+Description: Implement NLLClient.getSchedule method
+Status: COMPLETE
+Commit: df8c1c8
+Timestamp: 2026-01-17T23:47:05+11:00
+
+=== Iteration 21 ===
+Story: nll-client-008
+Description: Create NLL module index exports
+Status: COMPLETE
+Commit: ac321ad
+Timestamp: 2026-01-17T23:48:52+11:00
+
+=== Iteration 22 ===
+Story: nll-test-001
+Description: Create NLL integration test file
+Status: COMPLETE
+Commit: a3e4767
+Timestamp: 2026-01-17T23:50:18+11:00
+
+=== Iteration 23 ===
+Story: nll-test-002
+Description: getTeams integration test
+Status: COMPLETE
+Commit: 6c401e3
+Timestamp: 2026-01-17T23:55:09+11:00
+
+=== Iteration 24 ===
+Story: nll-test-003
+Description: getPlayers integration test
+Status: COMPLETE
+Commit: 1c62c4e
+Timestamp: 2026-01-18T00:02:18+11:00
+
+=== Iteration 25 ===
+Story: nll-test-004
+Description: getStandings integration test
+Status: COMPLETE
+Commit: c4038e2
+Timestamp: 2026-01-18T00:09:28+11:00
+
+=== Iteration 26 ===
+Story: nll-test-005
+Description: getSchedule integration test
+Status: COMPLETE
+Notes: Fixed NLLScheduleResponse schema to handle actual API structure (array of week objects with nested matches). API returns [{ code, id, matches: [...], name, number, season_id }] not { weekName: [...matches] }.
+Timestamp: 2026-01-18T00:12:00+11:00
+
+=== Iteration 26 ===
+Story: nll-test-005
+Description: getSchedule integration test
+Status: COMPLETE
+Commit: e521057
+Timestamp: 2026-01-18T00:13:11+11:00
+
+=== Iteration 27 ===
+Story: nll-test-006
+Description: All NLL client tests pass
+Status: COMPLETE
+Commit: 9005457
+Timestamp: 2026-01-18T00:14:33+11:00
+
+=== Iteration 28 ===
+Story: nll-manifest-001
+Description: Create NLLSeasonManifest schema
+Status: COMPLETE
+Commit: 46bc66b
+Timestamp: 2026-01-18T00:16:29+11:00
+
+=== Iteration 29 ===
+Story: nll-manifest-002
+Description: Create NLLExtractionManifest schema
+Status: COMPLETE
+Commit: f224870
+Timestamp: 2026-01-18T00:18:02+11:00
+
+=== Iteration 30 ===
+Story: nll-manifest-003
+Description: Create NLLManifestService
+Status: COMPLETE
+Commit: 2fdd554
+Timestamp: 2026-01-18T00:20:02+11:00
+
+=== Iteration 31 ===
+Story: nll-manifest-004
+Description: Implement NLLManifestService.load method
+Status: COMPLETE
+Commit: ff824e0
+Timestamp: 2026-01-18T00:21:29+11:00
+
+=== Iteration 32 ===
+Story: nll-manifest-005
+Description: Implement NLLManifestService.save method
+Status: COMPLETE
+Commit: d99f8ce
+Timestamp: 2026-01-18T00:22:58+11:00
+
+=== Iteration 33 ===
+Story: nll-manifest-006
+Description: Implement NLLManifestService helper methods
+Status: COMPLETE
+Commit: 97fc996
+Timestamp: 2026-01-18T00:24:22+11:00
+
+=== Iteration 34 ===
+Story: nll-extract-001
+Description: Create NLLExtractorService base structure
+Status: COMPLETE
+Commit: 9f03520
+Timestamp: 2026-01-18T00:26:13+11:00
+
+=== Iteration 35 ===
+Story: nll-extract-002
+Description: Implement extractor helper functions
+Status: COMPLETE
+Commit: 924a6fd
+Timestamp: 2026-01-18T00:28:10+11:00
+
+=== Iteration 36 ===
+Story: nll-extract-003
+Description: Implement extractTeams method
+Status: COMPLETE
+Commit: eb0c309
+Timestamp: 2026-01-18T00:30:02+11:00
+
+=== Iteration 37 ===
+Story: nll-extract-004
+Description: Implement extractPlayers method
+Status: COMPLETE
+Commit: 6d3a690
+Timestamp: 2026-01-18T00:32:09+11:00
+
+=== Iteration 38 ===
+Story: nll-extract-005
+Description: Implement extractStandings method
+Status: COMPLETE
+Commit: b163dae
+Timestamp: 2026-01-18T00:34:08+11:00
+
+=== Iteration 39 ===
+Story: nll-extract-006
+Description: Implement extractSchedule method
+Status: COMPLETE
+Commit: 0bbac74
+Timestamp: 2026-01-18T00:36:07+11:00
+
+=== Iteration 40 ===
+Story: nll-extract-007
+Description: Implement extractSeason orchestrator
+Status: COMPLETE
+Commit: 1ce2fdc
+Timestamp: 2026-01-18T00:38:29+11:00
+
+=== Iteration 41 ===
+Story: nll-extract-008
+Description: Create NLL extraction module exports
+Status: COMPLETE
+Commit: 3e7032c
+Timestamp: 2026-01-18T00:40:06+11:00
+
+=== Iteration 42 ===
+Story: nll-extract-009
+Description: Create NLL extraction CLI entry point
+Status: COMPLETE
+Commit: db12764
+Timestamp: 2026-01-18T00:42:00+11:00
+
+=== Iteration 43 ===
+Story: nll-extract-010
+Description: Test NLL extraction runs successfully
+Status: COMPLETE
+Commit: c1baada
+Timestamp: 2026-01-18T00:44:43+11:00
+
+=== Iteration 44 ===
+Story: nll-validate-001
+Description: Create validate-nll.ts file structure
+Status: COMPLETE
+Commit: c419acb
+Timestamp: 2026-01-18T00:46:12+11:00
+
+=== Iteration 45 ===
+Story: nll-validate-002
+Description: Define NLL validation interfaces
+Status: COMPLETE
+Commit: 3455983
+Timestamp: 2026-01-18T00:47:49+11:00
+
+=== Iteration 46 ===
+Story: nll-validate-003
+Description: Implement teams.json validation
+Status: COMPLETE
+Commit: 3dc033b
+Timestamp: 2026-01-18T00:50:12+11:00
+
+=== Iteration 47 ===
+Story: nll-validate-004
+Description: Implement players.json validation
+Status: COMPLETE
+Commit: f284746
+Timestamp: 2026-01-18T00:51:43+11:00
+
+=== Iteration 1 ===
+Story: nll-validate-005
+Description: Implement standings.json validation
+Status: COMPLETE
+Commit: f2e867a
+Timestamp: 2026-01-18T00:57:38+11:00
+
+=== Iteration 2 ===
+Story: nll-validate-006
+Description: Implement schedule.json validation
+Status: COMPLETE
+Commit: acf2aca
+Timestamp: 2026-01-18T01:00:34+11:00
+
+=== Iteration 3 ===
+Story: nll-validate-007
+Description: Implement cross-reference validations
+Status: COMPLETE
+Commit: 8f48b83
+Timestamp: 2026-01-18T01:02:16+11:00
+
+=== Iteration 4 ===
+Story: nll-validate-008
+Description: Complete validation script with report
+Status: COMPLETE
+Commit: 6edf38f
+Timestamp: 2026-01-18T01:03:46+11:00
+
+=== Iteration 5 ===
+Story: nll-validate-009
+Description: Test NLL validation runs successfully
+Status: COMPLETE
+Commit: 2f2151f
+Timestamp: 2026-01-18T01:06:00+11:00
+
+=== Iteration 1 ===
+Story: nll-docs-001
+Description: Add NLLClient Methods table to CLAUDE.md
+Status: COMPLETE
+Commit: b8dfb0e
+Timestamp: 2026-01-18T09:09:12+11:00
+
+=== Iteration 2 ===
+Story: nll-docs-002
+Description: Add NLL commands to CLAUDE.md
+Status: COMPLETE
+Commit: 49174bf
+Timestamp: 2026-01-18T09:10:39+11:00
+
+=== Iteration 3 ===
+Story: nll-final-001
+Description: Run full typecheck
+Status: COMPLETE
+Commit: c864b31
+Timestamp: 2026-01-18T09:11:55+11:00
+
+=== Iteration 4 ===
+Story: nll-final-002
+Description: Run all NLL tests
+Status: COMPLETE
+Commit: 213a988
+Timestamp: 2026-01-18T09:13:11+11:00
+
+=== Iteration 5 ===
+Story: nll-final-003
+Description: Run full extraction
+Status: COMPLETE
+Commit: 78f0c1b
+Timestamp: 2026-01-18T09:14:42+11:00
+
+=== Iteration 6 ===
+Story: nll-final-004
+Description: Run full validation
+Status: COMPLETE
+Commit: c9f10a0
+Timestamp: 2026-01-18T09:16:08+11:00
+
+=== Iteration 7 ===
+Story: nll-final-005
+Description: Verify all output files
+Status: COMPLETE
+Files verified:
+- output/nll/225/teams.json (4,651 bytes, 14 teams)
+- output/nll/225/players.json (166,013 bytes, 369 players)
+- output/nll/225/standings.json (3,255 bytes, 14 standings)
+- output/nll/225/schedule.json (2,046 bytes, 4 matches)
+- output/nll/manifest.json (724 bytes, valid)
+Timestamp: 2026-01-18T09:17:00+11:00
+
+---
+Archived: 2026-01-18T09:30:00+11:00
+Version: v0.0.1
+Features: 64/64 passing
