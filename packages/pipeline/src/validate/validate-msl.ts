@@ -18,6 +18,107 @@ import {
   validateFileExists,
 } from "./validate.service";
 
+// ============================================================================
+// MSL Validation Interfaces
+// ============================================================================
+
+/** MSL Team extracted data structure */
+interface MSLTeam {
+  id: string;
+  name: string;
+  city: string | null;
+  abbreviation: string | null;
+  logo_url: string | null;
+  website_url: string | null;
+}
+
+/** MSL Player extracted data structure */
+interface MSLPlayer {
+  id: string;
+  name: string;
+  first_name: string | null;
+  last_name: string | null;
+  jersey_number: string | null;
+  position: string | null;
+  team_id: string | null;
+  team_name: string | null;
+  stats?: {
+    games_played: number;
+    goals: number;
+    assists: number;
+    points: number;
+    penalty_minutes: number;
+    points_per_game: number;
+    ppg: number | null;
+    ppa: number | null;
+    shg: number | null;
+    sha: number | null;
+    gwg: number | null;
+    fg: number | null;
+    otg: number | null;
+  };
+}
+
+/** MSL Goalie extracted data structure */
+interface MSLGoalie {
+  id: string;
+  name: string;
+  first_name: string | null;
+  last_name: string | null;
+  jersey_number: string | null;
+  team_id: string | null;
+  team_name: string | null;
+  stats?: {
+    games_played: number;
+    wins: number;
+    losses: number;
+    ties: number;
+    goals_against: number;
+    saves: number;
+    shots_against: number;
+    gaa: number;
+    save_pct: number;
+    shutouts: number;
+    minutes_played: number;
+  };
+}
+
+/** MSL Standing extracted data structure */
+interface MSLStanding {
+  team_id: string;
+  team_name: string | null;
+  position: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  games_played: number;
+  points: number;
+  goals_for: number;
+  goals_against: number;
+  goal_diff: number;
+  streak: string | null;
+}
+
+/** MSL Game extracted data structure */
+interface MSLGame {
+  id: string;
+  date: string | null;
+  time: string | null;
+  status: string | null;
+  home_team_id: string | null;
+  away_team_id: string | null;
+  home_team_name: string | null;
+  away_team_name: string | null;
+  home_score: number;
+  away_score: number;
+  venue: string | null;
+  period_scores?: Array<{
+    period: number;
+    home_score: number;
+    away_score: number;
+  }>;
+}
+
 // MSL Gamesheet years (currently available data)
 const MSL_YEARS = [2023, 2024, 2025] as const;
 

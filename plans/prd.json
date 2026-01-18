@@ -1589,7 +1589,7 @@
     "id": "msl-validate-001",
     "category": "validate",
     "description": "Create validate-msl.ts file structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/validate/validate-msl.ts",
       "Import FileSystem, Path from @effect/platform",
