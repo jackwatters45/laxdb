@@ -33,8 +33,102 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
     // Re-export cheerio for potential future HTML parsing needs
     const $ = cheerio;
 
+    /**
+     * Fetches a page from the WLA website with browser-like headers.
+     * Returns the HTML content as a string.
+     *
+     * @param url - Full URL to fetch
+     */
+    const fetchPage = (
+      url: string,
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
+      Effect.gen(function* () {
+        const timeoutMs = pipelineConfig.defaultTimeoutMs;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, timeoutMs);
+
+        const response = yield* Effect.tryPromise({
+          try: () =>
+            fetch(url, {
+              method: "GET",
+              headers: {
+                ...wlaConfig.headers,
+                Accept:
+                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+              },
+              signal: controller.signal,
+            }),
+          catch: (error) => {
+            clearTimeout(timeoutId);
+            if (error instanceof Error && error.name === "AbortError") {
+              return new TimeoutError({
+                message: `WLA request timed out after ${timeoutMs}ms`,
+                url,
+                timeoutMs,
+              });
+            }
+            return new NetworkError({
+              message: `WLA network error: ${String(error)}`,
+              url,
+              cause: error,
+            });
+          },
+        }).pipe(
+          Effect.tap(() =>
+            Effect.sync(() => {
+              clearTimeout(timeoutId);
+            }),
+          ),
+        );
+
+        if (response.status >= 400) {
+          return yield* Effect.fail(
+            new HttpError({
+              message: `WLA HTTP ${response.status} error`,
+              url,
+              method: "GET",
+              statusCode: response.status,
+            }),
+          );
+        }
+
+        const html = yield* Effect.tryPromise({
+          try: () => response.text(),
+          catch: (error) =>
+            new NetworkError({
+              message: `Failed to read WLA response body: ${String(error)}`,
+              url,
+              cause: error,
+            }),
+        });
+
+        return html;
+      });
+
+    /**
+     * Fetches a WLA page with exponential backoff retry.
+     * Retries on network and timeout errors only.
+     */
+    const fetchPageWithRetry = (
+      url: string,
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
+      fetchPage(url).pipe(
+        Effect.retry(
+          Schedule.exponential(pipelineConfig.retryDelay).pipe(
+            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
+            Schedule.whileInput(
+              (error: HttpError | NetworkError | TimeoutError) =>
+                error._tag === "NetworkError" || error._tag === "TimeoutError",
+            ),
+          ),
+        ),
+      );
+
     // TODO: Implement WLA client methods in subsequent stories
-    // - fetchWLAPage helper
     // - getTeams
     // - getPlayers
     // - getGoalies
@@ -46,6 +140,9 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       config: wlaConfig,
       pipelineConfig,
       cheerio: $,
+      // Fetch helpers
+      fetchPage,
+      fetchPageWithRetry,
     };
   }),
   dependencies: [WLAConfig.Default, PipelineConfig.Default],

@@ -1910,7 +1910,7 @@
     "id": "wla-client-002",
     "category": "client",
     "description": "Create WLAClient service shell",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAClient as Effect.Service",
       "Yield WLAConfig and PipelineConfig in effect",
