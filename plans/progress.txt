@@ -105,3 +105,10 @@ Description: MLLPlayerStats nested schema
 Status: COMPLETE
 Commit: 5f91c11
 Timestamp: 2026-01-18T23:54:40+11:00
+
+=== Iteration 7 ===
+Story: mll-schema-004
+Description: MLLPlayer response schema
+Status: COMPLETE
+Commit: d037c64
+Timestamp: 2026-01-18T23:56:26+11:00

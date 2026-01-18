@@ -59,3 +59,21 @@ export class MLLPlayerStats extends Schema.Class<MLLPlayerStats>(
   faceoffs_lost: Schema.NullOr(Schema.Number),
   faceoff_pct: Schema.NullOr(Schema.Number),
 }) {}
+
+// MLL Goalie Stats nested schema
+export class MLLGoalieStats extends Schema.Class<MLLGoalieStats>(
+  "MLLGoalieStats",
+)({
+  // Core goalie stats (always present)
+  games_played: Schema.Number,
+  wins: Schema.Number,
+  losses: Schema.Number,
+
+  // Goals against / saves
+  goals_against: Schema.Number,
+  saves: Schema.Number,
+
+  // Calculated stats (nullable - may not be available for all seasons)
+  gaa: Schema.NullOr(Schema.Number), // Goals Against Average
+  save_pct: Schema.NullOr(Schema.Number), // Save Percentage
+}) {}
