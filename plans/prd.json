@@ -410,7 +410,7 @@
     "id": "mll-client-014",
     "category": "client",
     "description": "Create MLL module index exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/mll/index.ts",
       "Export MLLClient from mll.client.ts",
