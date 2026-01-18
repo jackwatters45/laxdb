@@ -846,3 +846,10 @@ Description: Implement extractStandings method
 Status: COMPLETE
 Commit: e419e7e
 Timestamp: 2026-01-19T07:00:15+11:00
+
+=== Iteration 113 ===
+Story: msl-extract-007
+Description: Implement extractSchedule method
+Status: COMPLETE
+Commit: 29eef86
+Timestamp: 2026-01-19T07:02:47+11:00

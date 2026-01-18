@@ -1,6 +1,6 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Duration, Effect, Layer } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
 import type {
@@ -197,14 +197,116 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           }),
         );
 
-      // Placeholder for orchestration methods (implemented in subsequent stories)
+      // Rate limiting delay between requests
+      const REQUEST_DELAY_MS = 1000;
+
       const extractSeason = (
-        _seasonId: number,
-        _options: {
+        seasonId: number,
+        options: {
           skipExisting?: boolean;
         } = {},
-      ) => Effect.succeed({} as MSLSeasonManifest);
+      ) =>
+        Effect.gen(function* () {
+          const { skipExisting = true } = options;
 
+          // Find year for this seasonId
+          const season = MSL_SEASONS.find((s) => s.seasonId === seasonId);
+          const year = season?.year ?? "unknown";
+
+          yield* Effect.log(`\n${"=".repeat(50)}`);
+          yield* Effect.log(`Extracting MSL ${year} (Season ID: ${seasonId})`);
+          yield* Effect.log("=".repeat(50));
+
+          let manifest = yield* manifestService.load;
+
+          const shouldExtract = (entity: keyof MSLSeasonManifest): boolean => {
+            if (!skipExisting) return true;
+            return !manifestService.isExtracted(manifest, seasonId, entity);
+          };
+
+          // Extract teams
+          if (shouldExtract("teams")) {
+            const result = yield* extractTeams(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "teams",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+          } else {
+            yield* Effect.log("  📊 Teams: skipped (already extracted)");
+          }
+
+          // Extract players
+          if (shouldExtract("players")) {
+            const result = yield* extractPlayers(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "players",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+          } else {
+            yield* Effect.log("  🏃 Players: skipped (already extracted)");
+          }
+
+          // Extract goalies
+          if (shouldExtract("goalies")) {
+            const result = yield* extractGoalies(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "goalies",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+          } else {
+            yield* Effect.log("  🧤 Goalies: skipped (already extracted)");
+          }
+
+          // Extract standings
+          if (shouldExtract("standings")) {
+            const result = yield* extractStandings(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "standings",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+          } else {
+            yield* Effect.log("  📋 Standings: skipped (already extracted)");
+          }
+
+          // Extract schedule
+          if (shouldExtract("schedule")) {
+            const result = yield* extractSchedule(seasonId);
+            manifest = manifestService.markComplete(
+              manifest,
+              seasonId,
+              "schedule",
+              result.count,
+              result.durationMs,
+            );
+            yield* manifestService.save(manifest);
+          } else {
+            yield* Effect.log("  📅 Schedule: skipped (already extracted)");
+          }
+
+          return manifest;
+        });
+
+      // Placeholder for extractAllSeasons (implemented in subsequent story)
       const extractAllSeasons = (
         _options: {
           skipExisting?: boolean;

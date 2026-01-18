@@ -1499,7 +1499,7 @@
     "id": "msl-extract-007",
     "category": "extract",
     "description": "Implement extractSchedule method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractSchedule(seasonId) method",
       "Log progress, call client.getSchedule with timing",
