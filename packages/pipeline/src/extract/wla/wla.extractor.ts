@@ -167,9 +167,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
 
       const extractSchedule = (season: number) =>
         Effect.gen(function* () {
-          yield* Effect.log(
-            `  📅 Extracting schedule for season ${season}...`,
-          );
+          yield* Effect.log(`  📅 Extracting schedule for season ${season}...`);
           const result = yield* withTiming(
             client.getSchedule({ seasonId: WLASeasonId.make(season) }),
           );
@@ -331,7 +329,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           let lastManifest = yield* manifestService.load;
 
           for (const [i, year] of seasonsToExtract.entries()) {
-            yield* Effect.log(`\n>>> Progress: ${i + 1}/${totalSeasons} seasons`);
+            yield* Effect.log(
+              `\n>>> Progress: ${i + 1}/${totalSeasons} seasons`,
+            );
             lastManifest = yield* extractSeason(year, {
               skipExisting,
               includeSchedule,

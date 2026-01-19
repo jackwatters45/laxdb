@@ -1,0 +1,107 @@
+[
+  {
+    "id": "lint-001",
+    "category": "type-safety",
+    "description": "Fix readJsonFile import in validate.service.ts and validate-pll.ts",
+    "passes": false,
+    "steps": [
+      "Check if readJsonFile is exported from @laxdb/core/util",
+      "If missing, create readJsonFile in packages/core/src/util.ts",
+      "Verify imports resolve in both files"
+    ]
+  },
+  {
+    "id": "lint-002",
+    "category": "type-safety",
+    "description": "Fix implicit any types in validate-mll.ts",
+    "passes": false,
+    "steps": [
+      "Line 352: Add MLLGame type to filter callback (g: MLLGame)",
+      "Line 366: Add MLLGame type to filter callback (g: MLLGame)",
+      "Line 406: Add MLLPlayer type to filter callback (p: MLLPlayer)",
+      "Line 420: Add MLLGoalie type to filter callback (g: MLLGoalie)",
+      "Run bun run typecheck in packages/pipeline"
+    ]
+  },
+  {
+    "id": "lint-003",
+    "category": "type-safety",
+    "description": "Fix implicit any types in validate-msl.ts",
+    "passes": false,
+    "steps": [
+      "Line 298: Add MSLPlayer type to filter callback (p: MSLPlayer)",
+      "Line 312: Add MSLGoalie type to filter callback (g: MSLGoalie)",
+      "Line 339: Add MSLGame type to filter callback (g: MSLGame)",
+      "Line 353: Add MSLGame type to filter callback (g: MSLGame)",
+      "Run bun run typecheck in packages/pipeline"
+    ]
+  },
+  {
+    "id": "lint-004",
+    "category": "type-safety",
+    "description": "Fix implicit any types in validate-pll.ts",
+    "passes": false,
+    "steps": [
+      "Line 148: Add type annotation to filter callback",
+      "Line 149: Add type annotation to filter callback",
+      "Line 172: Add types to reduce callback (sum: number, e: EventType)",
+      "Line 294: Add type annotation to filter callback",
+      "Run bun run typecheck in packages/pipeline"
+    ]
+  },
+  {
+    "id": "lint-005",
+    "category": "type-safety",
+    "description": "Fix implicit any types in validate-wla.ts",
+    "passes": false,
+    "steps": [
+      "Line 460: Add WLAPlayer type to filter callback (p: WLAPlayer)",
+      "Line 474: Add WLAGoalie type to filter callback (g: WLAGoalie)",
+      "Line 501: Add WLAGame type to filter callback (g: WLAGame)",
+      "Line 515: Add WLAGame type to filter callback (g: WLAGame)",
+      "Run bun run typecheck in packages/pipeline"
+    ]
+  },
+  {
+    "id": "lint-006",
+    "category": "type-safety",
+    "description": "Fix Effect.provide type errors in all validate-*.ts files",
+    "passes": false,
+    "steps": [
+      "Add explicit return type annotation to program: Effect.Effect<void, never, ...>",
+      "Or use Effect.asVoid at end of program",
+      "Fix in: validate-mll.ts:511, validate-msl.ts:382, validate-nll.ts:281, validate-pll.ts:331, validate-wla.ts:544"
+    ]
+  },
+  {
+    "id": "lint-007",
+    "category": "type-safety",
+    "description": "Fix Effect type errors in validate.service.ts",
+    "passes": false,
+    "steps": [
+      "Line 117: Fix Effect type annotation for validateRequiredFields return",
+      "Ensure proper error type propagation"
+    ]
+  },
+  {
+    "id": "lint-008",
+    "category": "type-safety",
+    "description": "Fix Effect type errors in validate.service.test.ts",
+    "passes": false,
+    "steps": [
+      "Lines 58, 81, 101, 120: Fix test callback types",
+      "Add proper type annotations to Effect.scoped callbacks",
+      "Or use Effect.asVoid/Effect.void pattern"
+    ]
+  },
+  {
+    "id": "lint-009",
+    "category": "lint-warnings",
+    "description": "Fix expect.objectContaining lint warnings in test files",
+    "passes": false,
+    "steps": [
+      "graphql.service.test.ts: Lines 52, 103, 128 - Cast expect result or disable rule",
+      "rest-client.test.ts: Lines 48, 87 - Cast expect result or disable rule"
+    ]
+  }
+]

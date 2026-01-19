@@ -3,7 +3,7 @@
   "include": ["**/*.ts", "**/*.tsx", "../../types/**/*.d.ts"],
   "compilerOptions": {
     "paths": {
-      "@laxdb/core/*": ["./src/*"]
+      "@laxdb/core/*": ["../core/src/*"]
     }
   }
 }
