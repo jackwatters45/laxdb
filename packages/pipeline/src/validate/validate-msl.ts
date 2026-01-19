@@ -15,7 +15,6 @@ import {
   crossReference,
   buildReport,
   printReport,
-  validateFileExists,
 } from "./validate.service";
 
 // ============================================================================
