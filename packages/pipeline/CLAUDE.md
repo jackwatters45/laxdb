@@ -30,6 +30,14 @@ src/
 │   ├── nll.client.ts           # NLLClient service
 │   ├── nll.schema.ts           # Response schemas
 │   └── nll.integration.test.ts # Integration tests
+├── mll/                     # Major League Lacrosse client
+│   ├── mll.client.ts           # MLLClient service
+│   ├── mll.schema.ts           # Response schemas
+│   └── mll.integration.test.ts # Integration tests
+├── wla/                     # Western Lacrosse Association client
+│   ├── wla.client.ts           # WLAClient service
+│   ├── wla.schema.ts           # Response schemas
+│   └── wla.integration.test.ts # Integration tests
 ├── scraper/                 # Web scraping
 ├── parser/                  # HTML parsing (Cheerio)
 ├── config.ts                # Configuration
@@ -59,6 +67,24 @@ infisical run --env=dev -- bun src/validate/validate-pll.ts
 
 # NLL data validation (no credentials needed)
 bun src/validate/validate-nll.ts
+
+# MLL data extraction (no credentials needed)
+bun src/extract/mll/run.ts
+
+# MLL data validation (no credentials needed)
+bun src/validate/validate-mll.ts
+
+# MSL data extraction (no credentials needed)
+bun src/extract/msl/run.ts
+
+# MSL data validation (no credentials needed)
+bun src/validate/validate-msl.ts
+
+# WLA data extraction (no credentials needed)
+bun src/extract/wla/run.ts
+
+# WLA data validation (no credentials needed)
+bun src/validate/validate-wla.ts
 ```
 
 ## ADDING A NEW ENDPOINT
@@ -101,6 +127,155 @@ Quick summary:
 
 > **Note:** NLL API is public - no credentials required.
 
+## MLLCLIENT METHODS
+
+| Method | Source | Description |
+|--------|--------|-------------|
+| `getTeams` | StatsCrew | Teams for a season (2001-2020) |
+| `getPlayers` | StatsCrew | Players with stats |
+| `getGoalies` | StatsCrew | Goalies with stats |
+| `getStandings` | StatsCrew | Team standings |
+| `getStatLeaders` | StatsCrew | Stat leaders by category |
+| `getSchedule` | Wayback | Season schedule from archived pages |
+
+> **Note:** MLL data via StatsCrew + Wayback Machine scraping - no credentials needed.
+> Schedule data from Wayback may have gaps (especially 2007-2019).
+
+## MSLCLIENT METHODS
+
+| Method | Source | Description |
+|--------|--------|-------------|
+| `getTeams` | Gamesheet | Teams for a season |
+| `getPlayers` | Gamesheet | Players with stats (paginated) |
+| `getGoalies` | Gamesheet | Goalies with stats (paginated) |
+| `getStandings` | Gamesheet | Team standings |
+| `getSchedule` | Gamesheet | Season schedule (games with scores) |
+
+> **Note:** MSL data via Gamesheet API scraping - no credentials needed.
+
+## WLACLIENT METHODS
+
+| Method | Source | Description |
+|--------|--------|-------------|
+| `getTeams` | Pointstreak | Teams for a season (2005-2025) |
+| `getPlayers` | Pointstreak | Players with stats (field players) |
+| `getGoalies` | Pointstreak | Goalies with stats |
+| `getStandings` | Pointstreak | Team standings |
+| `getSchedule` | Pointstreak | Season schedule (games with scores) |
+
+> **Note:** WLA data via Pointstreak/DigitalShift HTML scraping - no credentials needed.
+> Website is a JavaScript SPA - data extracted from embedded HTML tables.
+
+## MSL EXTRACTION
+
+MSL data is scraped from Gamesheet API.
+
+```bash
+# Extract single season (default: 9567 = 2024-25)
+bun src/extract/msl/run.ts
+
+# Extract specific season by Gamesheet ID
+bun src/extract/msl/run.ts --season=9567
+
+# Extract all seasons (2023-2025)
+bun src/extract/msl/run.ts --all
+
+# Re-extract even if already done
+bun src/extract/msl/run.ts --force
+
+# Show available season IDs
+bun src/extract/msl/run.ts --help
+```
+
+| Flag | Description |
+|------|-------------|
+| `--season=ID` | Extract specific season by Gamesheet ID (default: 9567) |
+| `--all` | Extract all seasons (2023-2025) |
+| `--force` | Re-extract even if already done |
+| `--help` | Show available season IDs |
+
+**Season Discovery:** Season IDs are Gamesheet-specific. To find new season IDs:
+1. Visit https://www.mslax.com/
+2. Navigate to standings/stats page
+3. Inspect network requests to `gamesheet.app/api/`
+4. Look for `season_id` parameter
+
+| Year | Gamesheet Season ID |
+|------|---------------------|
+| 2025 | 9567 |
+| 2024 | 6007 |
+| 2023 | 3246 |
+
+> **Note:** Output: `output/msl/{seasonId}/` with JSON files per entity type.
+
+## WLA EXTRACTION
+
+WLA data is scraped from Pointstreak/DigitalShift HTML.
+
+```bash
+# Extract single season (default: current year)
+bun src/extract/wla/run.ts
+
+# Extract specific season by year
+bun src/extract/wla/run.ts --season=2024
+
+# Extract all seasons (2005-2025)
+bun src/extract/wla/run.ts --all
+
+# Include schedule extraction
+bun src/extract/wla/run.ts --schedule
+
+# Re-extract even if already done
+bun src/extract/wla/run.ts --force
+
+# Full historical extraction with schedules
+bun src/extract/wla/run.ts --all --schedule
+```
+
+| Flag | Description |
+|------|-------------|
+| `--season=YYYY` | Extract specific season by year (default: current year) |
+| `--all` | Extract all seasons (2005-2025) |
+| `--schedule` | Include schedule extraction |
+| `--force` | Re-extract even if already done |
+
+> **Note:** Website is a JavaScript SPA - data extracted from embedded HTML tables.
+> Output: `output/wla/{year}/` with JSON files per entity type.
+
+## MLL EXTRACTION
+
+MLL data is scraped from StatsCrew (stats) and Wayback Machine (schedules).
+
+```bash
+# Extract single year (default: 2019)
+bun src/extract/mll/run.ts
+
+# Extract specific year
+bun src/extract/mll/run.ts --year=2006
+
+# Extract all seasons (2001-2020)
+bun src/extract/mll/run.ts --all
+
+# Include Wayback schedule extraction (slower, may have gaps)
+bun src/extract/mll/run.ts --with-schedule
+
+# Re-extract even if already done
+bun src/extract/mll/run.ts --force
+
+# Full historical extraction with schedules
+bun src/extract/mll/run.ts --all --with-schedule
+```
+
+| Flag | Description |
+|------|-------------|
+| `--year=YYYY` | Extract specific year (default: 2019) |
+| `--all` | Extract all seasons (2001-2020) |
+| `--with-schedule` | Include Wayback schedule extraction |
+| `--force` | Re-extract even if already done |
+
+> **Note:** Schedule data from Wayback has gaps, especially 2007-2019.
+> Output: `output/mll/{year}/` with JSON files per entity type.
+
 ## VALIDATION
 
 Run validation on extracted data:
@@ -111,6 +286,15 @@ infisical run --env=dev -- bun src/validate/validate-pll.ts
 
 # NLL validation (no credentials needed)
 bun src/validate/validate-nll.ts
+
+# MLL validation (no credentials needed)
+bun src/validate/validate-mll.ts
+
+# MSL validation (no credentials needed)
+bun src/validate/validate-msl.ts
+
+# WLA validation (no credentials needed)
+bun src/validate/validate-wla.ts
 ```
 
 Outputs `output/{source}/validation-report.json` with:

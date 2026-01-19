@@ -8,6 +8,11 @@
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:pll": "vitest run src/pll/",
+    "test:nll": "vitest run src/nll/",
+    "test:mll": "vitest run src/mll/",
+    "test:msl": "vitest run src/msl/",
+    "test:wla": "vitest run src/wla/",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
