@@ -457,7 +457,7 @@ const program = Effect.gen(function* () {
 
     // Cross-reference validations
     // players.team_id -> teams.id
-    const playersWithTeam = players.filter((p) => p.team_id !== null);
+    const playersWithTeam = players.filter((p: WLAPlayer) => p.team_id !== null);
     if (playersWithTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         playersWithTeam,
@@ -471,7 +471,7 @@ const program = Effect.gen(function* () {
     }
 
     // goalies.team_id -> teams.id
-    const goaliesWithTeam = goalies.filter((g) => g.team_id !== null);
+    const goaliesWithTeam = goalies.filter((g: WLAGoalie) => g.team_id !== null);
     if (goaliesWithTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         goaliesWithTeam,
@@ -498,7 +498,7 @@ const program = Effect.gen(function* () {
     }
 
     // schedule.home_team_id -> teams.id
-    const gamesWithHomeTeam = schedule.filter((g) => g.home_team_id !== null);
+    const gamesWithHomeTeam = schedule.filter((g: WLAGame) => g.home_team_id !== null);
     if (gamesWithHomeTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         gamesWithHomeTeam,
@@ -512,7 +512,7 @@ const program = Effect.gen(function* () {
     }
 
     // schedule.away_team_id -> teams.id
-    const gamesWithAwayTeam = schedule.filter((g) => g.away_team_id !== null);
+    const gamesWithAwayTeam = schedule.filter((g: WLAGame) => g.away_team_id !== null);
     if (gamesWithAwayTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         gamesWithAwayTeam,
