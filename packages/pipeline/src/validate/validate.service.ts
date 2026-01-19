@@ -84,11 +84,32 @@ export const validateFileExists = (filePath: string) =>
     } satisfies typeof FileValidationResult.Type;
   });
 
-export const validateJsonArray = <T>(filePath: string, minRecords = 0) =>
+export const validateJsonArray = <T>(
+  filePath: string,
+  minRecords = 0,
+  options?: { optional?: boolean },
+) =>
   Effect.gen(function* () {
     const fileResult = yield* validateFileExists(filePath);
 
     if (!fileResult.exists) {
+      // For optional files, don't report missing file as an error
+      if (options?.optional) {
+        return {
+          result: {
+            ...fileResult,
+            checks: [
+              {
+                checkName: "file_exists",
+                passed: true, // Treat as passed for optional files
+                issues: [],
+                durationMs: 0,
+              },
+            ],
+          },
+          data: [] as T[],
+        };
+      }
       return { result: fileResult, data: [] as T[] };
     }
 

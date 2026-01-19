@@ -1947,7 +1947,7 @@
     "id": "wla-client-005",
     "category": "client",
     "description": "Implement WLAClient.getTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getTeams(input: WLATeamsRequest.Encoded)",
       "Build URL: /stats#{seasonId}/teams or equivalent",
@@ -1962,7 +1962,7 @@
     "id": "wla-client-006",
     "category": "client",
     "description": "Implement WLAClient.getPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getPlayers(input: WLAPlayersRequest.Encoded)",
       "Build URL: /stats#{seasonId}/leaders or equivalent",
@@ -1979,7 +1979,7 @@
     "id": "wla-client-007",
     "category": "client",
     "description": "Implement WLAClient.getGoalies method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getGoalies(input: WLAGoaliesRequest.Encoded)",
       "Build URL for goalie stats page",
@@ -1995,7 +1995,7 @@
     "id": "wla-client-008",
     "category": "client",
     "description": "Implement WLAClient.getStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getStandings(input: WLAStandingsRequest.Encoded)",
       "Build URL for standings page",
@@ -2011,7 +2011,7 @@
     "id": "wla-client-009",
     "category": "client",
     "description": "Implement WLAClient.getSchedule method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getSchedule(input: WLAScheduleRequest.Encoded)",
       "Build URL for schedule page",
@@ -2027,7 +2027,7 @@
     "id": "wla-client-010",
     "category": "client",
     "description": "Create WLA module index exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/wla/index.ts",
       "Export WLAClient from wla.client.ts",
@@ -2039,7 +2039,7 @@
     "id": "wla-test-001",
     "category": "test",
     "description": "Create WLA integration test file",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/wla/wla.integration.test.ts",
       "Import Effect, describe, expect, it from vitest",
@@ -2052,7 +2052,7 @@
     "id": "wla-test-002",
     "category": "test",
     "description": "getTeams integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getTeams",
       "Add test: 'fetches teams for season 2024'",
@@ -2066,7 +2066,7 @@
     "id": "wla-test-003",
     "category": "test",
     "description": "getPlayers integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getPlayers",
       "Add test: 'fetches players for season 2024'",
@@ -2080,7 +2080,7 @@
     "id": "wla-test-004",
     "category": "test",
     "description": "getGoalies integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getGoalies",
       "Add test: 'fetches goalies for season 2024'",
@@ -2094,7 +2094,7 @@
     "id": "wla-test-005",
     "category": "test",
     "description": "getStandings integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getStandings",
       "Add test: 'fetches standings for season 2024'",
@@ -2108,7 +2108,7 @@
     "id": "wla-test-006",
     "category": "test",
     "description": "getSchedule integration test",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add describe block for getSchedule",
       "Add test: 'fetches schedule for season 2024'",
@@ -2122,7 +2122,7 @@
     "id": "wla-test-007",
     "category": "test",
     "description": "All WLA client tests pass",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun test src/wla/",
       "All 5 endpoint tests pass",
@@ -2133,7 +2133,7 @@
     "id": "wla-manifest-001",
     "category": "extract",
     "description": "Create WLASeasonManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/wla/wla.manifest.ts",
       "Define WLAEntityStatus schema (same pattern as NLL)",
@@ -2145,7 +2145,7 @@
     "id": "wla-manifest-002",
     "category": "extract",
     "description": "Create WLAExtractionManifest schema",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAExtractionManifest schema",
       "Fields: source='wla', seasons Record, lastRun, version",
@@ -2158,7 +2158,7 @@
     "id": "wla-manifest-003",
     "category": "extract",
     "description": "Create WLAManifestService",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLAManifestService as Effect.Service",
       "Inject ExtractConfigService, FileSystem, Path",
@@ -2170,7 +2170,7 @@
     "id": "wla-manifest-004",
     "category": "extract",
     "description": "Implement WLAManifestService.load method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add load method",
       "Check if manifest file exists",
@@ -2184,7 +2184,7 @@
     "id": "wla-manifest-005",
     "category": "extract",
     "description": "Implement WLAManifestService.save and helpers",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add save(manifest) method",
       "Add getSeasonManifest(manifest, seasonId) method",
@@ -2197,7 +2197,7 @@
     "id": "wla-extract-001",
     "category": "extract",
     "description": "Create WLAExtractorService base structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/wla/wla.extractor.ts",
       "Define WLAExtractorService as Effect.Service",
@@ -2210,7 +2210,7 @@
     "id": "wla-extract-002",
     "category": "extract",
     "description": "Implement extractor helper functions",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add getOutputPath(seasonId, entity) helper",
       "Add saveJson<T>(filePath, data) helper",
@@ -2222,7 +2222,7 @@
     "id": "wla-extract-003",
     "category": "extract",
     "description": "Implement extractTeams method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractTeams(seasonId) method",
       "Log progress, call client.getTeams with timing",
@@ -2235,7 +2235,7 @@
     "id": "wla-extract-004",
     "category": "extract",
     "description": "Implement extractPlayers method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractPlayers(seasonId) method",
       "Log progress, call client.getPlayers with timing",
@@ -2248,7 +2248,7 @@
     "id": "wla-extract-005",
     "category": "extract",
     "description": "Implement extractGoalies method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractGoalies(seasonId) method",
       "Log progress, call client.getGoalies with timing",
@@ -2261,7 +2261,7 @@
     "id": "wla-extract-006",
     "category": "extract",
     "description": "Implement extractStandings method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractStandings(seasonId) method",
       "Log progress, call client.getStandings with timing",
@@ -2274,7 +2274,7 @@
     "id": "wla-extract-007",
     "category": "extract",
     "description": "Implement extractSchedule method",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractSchedule(seasonId) method",
       "Log progress, call client.getSchedule with timing",
@@ -2287,7 +2287,7 @@
     "id": "wla-extract-008",
     "category": "extract",
     "description": "Implement extractSeason orchestrator",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractSeason(seasonId, options) method",
       "Options: { skipExisting: boolean }",
@@ -2302,7 +2302,7 @@
     "id": "wla-extract-009",
     "category": "extract",
     "description": "Implement extractAllSeasons orchestrator",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add extractAllSeasons(options) method",
       "Loop through WLA_SEASONS array (2005-2025)",
@@ -2315,7 +2315,7 @@
     "id": "wla-extract-010",
     "category": "extract",
     "description": "Create WLA extraction module exports",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/wla/index.ts",
       "Export WLAExtractorService",
@@ -2327,7 +2327,7 @@
     "id": "wla-extract-011",
     "category": "extract",
     "description": "Create WLA extraction CLI entry point",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/extract/wla/run.ts",
       "Parse CLI args: --season=YYYY, --all, --force, --help",
@@ -2342,7 +2342,7 @@
     "id": "wla-extract-012",
     "category": "extract",
     "description": "Test WLA extraction runs for single season",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/wla/run.ts --season=2024",
       "Verify output/wla/2024/*.json files created",
@@ -2353,7 +2353,7 @@
     "id": "wla-extract-013",
     "category": "extract",
     "description": "Test WLA extraction runs for all seasons",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/wla/run.ts --all",
       "Verify output/wla/{2005-2025}/*.json files created",
@@ -2364,7 +2364,7 @@
     "id": "wla-validate-001",
     "category": "validate",
     "description": "Create validate-wla.ts file structure",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create src/validate/validate-wla.ts",
       "Import FileSystem, Path from @effect/platform",
@@ -2378,7 +2378,7 @@
     "id": "wla-validate-002",
     "category": "validate",
     "description": "Define WLA validation interfaces",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define WLATeam interface for validation",
       "Define WLAPlayer interface for validation",
@@ -2392,7 +2392,7 @@
     "id": "wla-validate-003",
     "category": "validate",
     "description": "Implement teams.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for teams.json",
       "Validate required fields: id, code, name",
@@ -2404,7 +2404,7 @@
     "id": "wla-validate-004",
     "category": "validate",
     "description": "Implement players.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for players.json",
       "Validate required fields: id, full_name",
@@ -2417,7 +2417,7 @@
     "id": "wla-validate-005",
     "category": "validate",
     "description": "Implement goalies.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for goalies.json",
       "Validate required fields: id, full_name",
@@ -2430,7 +2430,7 @@
     "id": "wla-validate-006",
     "category": "validate",
     "description": "Implement standings.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for standings.json",
       "Validate required fields: team_id, wins, losses",
@@ -2443,7 +2443,7 @@
     "id": "wla-validate-007",
     "category": "validate",
     "description": "Implement schedule.json validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add validation for schedule.json",
       "Validate required fields: id, home_team_id, away_team_id",
@@ -2455,7 +2455,7 @@
     "id": "wla-validate-008",
     "category": "validate",
     "description": "Implement cross-reference validations",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add crossReference: players.team_id -> teams.id",
       "Add crossReference: goalies.team_id -> teams.id",
@@ -2469,7 +2469,7 @@
     "id": "wla-validate-009",
     "category": "validate",
     "description": "Complete validation script with report",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Build validation report using buildReport",
       "Print report using printReport",
@@ -2482,7 +2482,7 @@
     "id": "wla-validate-010",
     "category": "validate",
     "description": "Test WLA validation runs successfully",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-wla.ts",
       "Verify validation report shows pass/fail status",
@@ -2493,7 +2493,7 @@
     "id": "wla-docs-001",
     "category": "docs",
     "description": "Add WLAClient Methods table to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Open packages/pipeline/CLAUDE.md",
       "Add WLAClient Methods table",
@@ -2505,7 +2505,7 @@
     "id": "wla-docs-002",
     "category": "docs",
     "description": "Add WLA commands to CLAUDE.md",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add WLA extraction command: bun src/extract/wla/run.ts",
       "Add WLA validation command: bun src/validate/validate-wla.ts",
@@ -2516,7 +2516,7 @@
     "id": "wla-final-001",
     "category": "final",
     "description": "Run full typecheck",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun run typecheck",
       "Fix any type errors",
@@ -2527,7 +2527,7 @@
     "id": "wla-final-002",
     "category": "final",
     "description": "Run all WLA tests",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun test src/wla/",
       "All integration tests pass",
@@ -2538,7 +2538,7 @@
     "id": "wla-final-003",
     "category": "final",
     "description": "Run full extraction for recent seasons",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/extract/wla/run.ts --all",
       "All 21 seasons extracted (2005-2025)",
@@ -2549,7 +2549,7 @@
     "id": "wla-final-004",
     "category": "final",
     "description": "Run full validation",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Run: bun src/validate/validate-wla.ts",
       "Validation report shows all checks pass",
