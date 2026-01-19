@@ -3,6 +3,7 @@ import { Effect, type ParseResult, Schedule, Schema } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
+import { safeString, safeStringOrNull } from "../util";
 
 import {
   WLA_LEAGUE_ID,
@@ -395,8 +396,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
           const hasA = headers.some((h) => h === "a" || h === "assists");
           const hasPts = headers.some((h) => h === "pts" || h === "points");
           const hasPlayer = headers.some(
-            (h) =>
-              h === "player" || h === "name" || h.includes("player name"),
+            (h) => h === "player" || h === "name" || h.includes("player name"),
           );
 
           if (!(hasGP && hasG && hasA && hasPts && hasPlayer)) {
@@ -405,12 +405,9 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
 
           // Find column indices
           const playerIdx = headers.findIndex(
-            (h) =>
-              h === "player" || h === "name" || h.includes("player name"),
+            (h) => h === "player" || h === "name" || h.includes("player name"),
           );
-          const teamIdx = headers.findIndex(
-            (h) => h === "team" || h === "tm",
-          );
+          const teamIdx = headers.findIndex((h) => h === "team" || h === "tm");
           const gpIdx = headers.findIndex((h) => h === "gp" || h === "games");
           const gIdx = headers.findIndex((h) => h === "g" || h === "goals");
           const aIdx = headers.findIndex((h) => h === "a" || h === "assists");
@@ -615,10 +612,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
           );
           const hasSV = headers.some(
             (h) =>
-              h === "sv%" ||
-              h === "svpct" ||
-              h === "sv" ||
-              h.includes("save"),
+              h === "sv%" || h === "svpct" || h === "sv" || h.includes("save"),
           );
           const hasGoalie = headers.some(
             (h) =>
@@ -640,25 +634,17 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
               h === "name" ||
               h.includes("goalie name"),
           );
-          const teamIdx = headers.findIndex(
-            (h) => h === "team" || h === "tm",
-          );
+          const teamIdx = headers.findIndex((h) => h === "team" || h === "tm");
           const gpIdx = headers.findIndex((h) => h === "gp" || h === "games");
-          const wIdx = headers.findIndex(
-            (h) => h === "w" || h === "wins",
-          );
-          const lIdx = headers.findIndex(
-            (h) => h === "l" || h === "losses",
-          );
+          const wIdx = headers.findIndex((h) => h === "w" || h === "wins");
+          const lIdx = headers.findIndex((h) => h === "l" || h === "losses");
           const tIdx = headers.findIndex(
             (h) => h === "t" || h === "ties" || h === "otl",
           );
           const gaIdx = headers.findIndex(
             (h) => h === "ga" || h === "goals against",
           );
-          const svIdx = headers.findIndex(
-            (h) => h === "sv" || h === "saves",
-          );
+          const svIdx = headers.findIndex((h) => h === "sv" || h === "saves");
           const saIdx = headers.findIndex(
             (h) => h === "sa" || h === "shots" || h === "shots against",
           );
@@ -855,17 +841,24 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const obj = item as Record<string, unknown>;
 
       // Need at least a name or ID
-      const id = String(obj.id ?? obj.goalie_id ?? obj.goalieId ?? "");
-      const name = String(
-        obj.name ?? obj.full_name ?? obj.fullName ?? obj.goalie_name ?? "",
-      );
+      const id =
+        safeString(obj.id) ||
+        safeString(obj.goalie_id) ||
+        safeString(obj.goalieId);
+      const name =
+        safeString(obj.name) ||
+        safeString(obj.full_name) ||
+        safeString(obj.fullName) ||
+        safeString(obj.goalie_name);
 
       if (!id && !name) {
         return null;
       }
 
-      const firstName = obj.first_name ?? obj.firstName ?? null;
-      const lastName = obj.last_name ?? obj.lastName ?? null;
+      const firstName =
+        safeStringOrNull(obj.first_name) ?? safeStringOrNull(obj.firstName);
+      const lastName =
+        safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
       const stats = (obj.stats ?? obj) as Record<string, unknown>;
@@ -878,22 +871,21 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const shotsAgainst =
         Number(stats.shots_against ?? stats.sa ?? 0) || goalsAgainst + saves;
       const gaa = Number(stats.gaa ?? 0) || 0;
-      const savePct = Number(stats.save_pct ?? stats.svpct ?? stats.sv_pct ?? 0) || 0;
+      const savePct =
+        Number(stats.save_pct ?? stats.svpct ?? stats.sv_pct ?? 0) || 0;
       const shutouts = Number(stats.shutouts ?? stats.so ?? 0) || 0;
 
       return new WLAGoalie({
         id: id || name.toLowerCase().replaceAll(/\s+/g, "-"),
-        first_name: firstName ? String(firstName) : null,
-        last_name: lastName ? String(lastName) : null,
+        first_name: firstName,
+        last_name: lastName,
         full_name: name || null,
-        jersey_number: obj.jersey_number
-          ? String(obj.jersey_number)
-          : obj.jerseyNumber
-            ? String(obj.jerseyNumber)
-            : null,
-        team_id: obj.team_id ? String(obj.team_id) : null,
-        team_code: obj.team_code ? String(obj.team_code) : null,
-        team_name: obj.team_name ? String(obj.team_name) : null,
+        jersey_number:
+          safeStringOrNull(obj.jersey_number) ??
+          safeStringOrNull(obj.jerseyNumber),
+        team_id: safeStringOrNull(obj.team_id),
+        team_code: safeStringOrNull(obj.team_code),
+        team_name: safeStringOrNull(obj.team_name),
         stats: new WLAGoalieStats({
           games_played: gamesPlayed,
           wins,
@@ -967,17 +959,24 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const obj = item as Record<string, unknown>;
 
       // Need at least a name or ID
-      const id = String(obj.id ?? obj.player_id ?? obj.playerId ?? "");
-      const name = String(
-        obj.name ?? obj.full_name ?? obj.fullName ?? obj.player_name ?? "",
-      );
+      const id =
+        safeString(obj.id) ||
+        safeString(obj.player_id) ||
+        safeString(obj.playerId);
+      const name =
+        safeString(obj.name) ||
+        safeString(obj.full_name) ||
+        safeString(obj.fullName) ||
+        safeString(obj.player_name);
 
       if (!id && !name) {
         return null;
       }
 
-      const firstName = obj.first_name ?? obj.firstName ?? null;
-      const lastName = obj.last_name ?? obj.lastName ?? null;
+      const firstName =
+        safeStringOrNull(obj.first_name) ?? safeStringOrNull(obj.firstName);
+      const lastName =
+        safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
       const stats = (obj.stats ?? obj) as Record<string, unknown>;
@@ -985,7 +984,8 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const goals = Number(stats.goals ?? stats.g ?? 0) || 0;
       const assists = Number(stats.assists ?? stats.a ?? 0) || 0;
       const points = Number(stats.points ?? stats.pts ?? 0) || 0;
-      const penaltyMinutes = Number(stats.penalty_minutes ?? stats.pim ?? 0) || 0;
+      const penaltyMinutes =
+        Number(stats.penalty_minutes ?? stats.pim ?? 0) || 0;
       const ppg = stats.ppg != null ? Number(stats.ppg) || null : null;
       const shg = stats.shg != null ? Number(stats.shg) || null : null;
       const gwg = stats.gwg != null ? Number(stats.gwg) || null : null;
@@ -994,18 +994,16 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
 
       return new WLAPlayer({
         id: id || name.toLowerCase().replaceAll(/\s+/g, "-"),
-        first_name: firstName ? String(firstName) : null,
-        last_name: lastName ? String(lastName) : null,
+        first_name: firstName,
+        last_name: lastName,
         full_name: name || null,
-        jersey_number: obj.jersey_number
-          ? String(obj.jersey_number)
-          : obj.jerseyNumber
-            ? String(obj.jerseyNumber)
-            : null,
-        position: obj.position ? String(obj.position) : null,
-        team_id: obj.team_id ? String(obj.team_id) : null,
-        team_code: obj.team_code ? String(obj.team_code) : null,
-        team_name: obj.team_name ? String(obj.team_name) : null,
+        jersey_number:
+          safeStringOrNull(obj.jersey_number) ??
+          safeStringOrNull(obj.jerseyNumber),
+        position: safeStringOrNull(obj.position),
+        team_id: safeStringOrNull(obj.team_id),
+        team_code: safeStringOrNull(obj.team_code),
+        team_name: safeStringOrNull(obj.team_name),
         stats: new WLAPlayerStats({
           games_played: gamesPlayed,
           goals,
@@ -1289,18 +1287,23 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const obj = item as Record<string, unknown>;
 
       // Need at least a team name or ID
-      const id = String(obj.id ?? obj.team_id ?? obj.teamId ?? "");
-      const name = String(
-        obj.name ?? obj.team_name ?? obj.teamName ?? obj.team ?? "",
-      );
+      const id =
+        safeString(obj.id) || safeString(obj.team_id) || safeString(obj.teamId);
+      const name =
+        safeString(obj.name) ||
+        safeString(obj.team_name) ||
+        safeString(obj.teamName) ||
+        safeString(obj.team);
 
       if (!id && !name) {
         return null;
       }
 
       // Parse standings data
-      const position = Number(obj.position ?? obj.rank ?? defaultPosition) || defaultPosition;
-      const gamesPlayed = Number(obj.games_played ?? obj.gp ?? obj.games ?? 0) || 0;
+      const position =
+        Number(obj.position ?? obj.rank ?? defaultPosition) || defaultPosition;
+      const gamesPlayed =
+        Number(obj.games_played ?? obj.gp ?? obj.games ?? 0) || 0;
       const wins = Number(obj.wins ?? obj.w ?? 0) || 0;
       const losses = Number(obj.losses ?? obj.l ?? 0) || 0;
       const ties = Number(obj.ties ?? obj.t ?? obj.otl ?? 0) || 0;
@@ -1444,7 +1447,10 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
           );
           const venueIdx = headers.findIndex(
             (h) =>
-              h === "venue" || h === "location" || h === "arena" || h === "rink",
+              h === "venue" ||
+              h === "location" ||
+              h === "arena" ||
+              h === "rink",
           );
           const statusIdx = headers.findIndex(
             (h) => h === "status" || h === "type" || h === "game type",
@@ -1596,35 +1602,27 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const obj = item as Record<string, unknown>;
 
       // Need at least some identifying info
-      const id = String(obj.id ?? obj.game_id ?? obj.gameId ?? `game-${index}`);
-      const date = obj.date ? String(obj.date) : null;
-      const status = obj.status ? String(obj.status) : null;
+      const id =
+        safeString(obj.id) ||
+        safeString(obj.game_id) ||
+        safeString(obj.gameId) ||
+        `game-${index}`;
+      const date = safeStringOrNull(obj.date);
+      const status = safeStringOrNull(obj.status);
 
       // Parse team info
-      const homeTeamId = obj.home_team_id
-        ? String(obj.home_team_id)
-        : obj.homeTeamId
-          ? String(obj.homeTeamId)
-          : null;
-      const awayTeamId = obj.away_team_id
-        ? String(obj.away_team_id)
-        : obj.awayTeamId
-          ? String(obj.awayTeamId)
-          : obj.visitor_team_id
-            ? String(obj.visitor_team_id)
-            : null;
-      const homeTeamName = obj.home_team_name
-        ? String(obj.home_team_name)
-        : obj.homeTeam
-          ? String(obj.homeTeam)
-          : null;
-      const awayTeamName = obj.away_team_name
-        ? String(obj.away_team_name)
-        : obj.awayTeam
-          ? String(obj.awayTeam)
-          : obj.visitorTeam
-            ? String(obj.visitorTeam)
-            : null;
+      const homeTeamId =
+        safeStringOrNull(obj.home_team_id) ?? safeStringOrNull(obj.homeTeamId);
+      const awayTeamId =
+        safeStringOrNull(obj.away_team_id) ??
+        safeStringOrNull(obj.awayTeamId) ??
+        safeStringOrNull(obj.visitor_team_id);
+      const homeTeamName =
+        safeStringOrNull(obj.home_team_name) ?? safeStringOrNull(obj.homeTeam);
+      const awayTeamName =
+        safeStringOrNull(obj.away_team_name) ??
+        safeStringOrNull(obj.awayTeam) ??
+        safeStringOrNull(obj.visitorTeam);
 
       // Parse scores
       const homeScore = Number(obj.home_score ?? obj.homeScore ?? 0) || 0;
@@ -1632,11 +1630,8 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
         Number(obj.away_score ?? obj.awayScore ?? obj.visitor_score ?? 0) || 0;
 
       // Parse venue
-      const venue = obj.venue
-        ? String(obj.venue)
-        : obj.location
-          ? String(obj.location)
-          : null;
+      const venue =
+        safeStringOrNull(obj.venue) ?? safeStringOrNull(obj.location);
 
       return new WLAGame({
         id,
