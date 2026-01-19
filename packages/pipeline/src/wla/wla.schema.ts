@@ -11,8 +11,27 @@ export const WLA_LEAGUE_ID = 62;
 // Note: Season IDs are discovered from the stats SPA at wlalacrosse.com/stats
 // URL pattern: /stats#/{league_id}/{section}?season_id={season_id}
 export const WLA_POINTSTREAK_SEASONS: Record<number, number> = {
-  2024: 8669,
-  // Historical seasons TBD - require manual discovery from stats page
+  2025: 8669,
+  2024: 6810,
+  2023: 5207,
+  2022: 4089,
+  // 2021: COVID - no season
+  2020: 2330,
+  2019: 1528,
+  2018: 1059,
+  2017: 624,
+  2016: 307,
+  2015: 137,
+  2014: 160,
+  2013: 158,
+  2012: 171,
+  2011: 169,
+  2010: 174,
+  2009: 165,
+  2008: 175,
+  2007: 162,
+  2006: 156,
+  2005: 176,
 };
 
 // Years with known Pointstreak season IDs

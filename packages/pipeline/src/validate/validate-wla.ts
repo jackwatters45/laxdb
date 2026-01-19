@@ -115,7 +115,29 @@ interface WLAGame {
 
 // WLA Pointstreak seasons (season ID → year mapping)
 // Extraction outputs files by season year
-const WLA_SEASONS = [{ seasonId: 8669, year: 2024 }] as const;
+const WLA_SEASONS = [
+  { seasonId: 8669, year: 2025 },
+  { seasonId: 6810, year: 2024 },
+  { seasonId: 5207, year: 2023 },
+  { seasonId: 4089, year: 2022 },
+  // 2021: COVID - no season
+  { seasonId: 2330, year: 2020 },
+  { seasonId: 1528, year: 2019 },
+  { seasonId: 1059, year: 2018 },
+  { seasonId: 624, year: 2017 },
+  { seasonId: 307, year: 2016 },
+  { seasonId: 137, year: 2015 },
+  { seasonId: 160, year: 2014 },
+  { seasonId: 158, year: 2013 },
+  { seasonId: 171, year: 2012 },
+  { seasonId: 169, year: 2011 },
+  { seasonId: 174, year: 2010 },
+  { seasonId: 165, year: 2009 },
+  { seasonId: 175, year: 2008 },
+  { seasonId: 162, year: 2007 },
+  { seasonId: 156, year: 2006 },
+  { seasonId: 176, year: 2005 },
+] as const;
 
 // ============================================================================
 // WLA Validation Program
