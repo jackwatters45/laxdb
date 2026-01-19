@@ -274,10 +274,10 @@ export const PlayersMapToArray = Schema.transform(
         fullname: player.fullname,
         dateOfBirth: player.dateOfBirth,
         height: player.height,
-        weight: player.weight != null ? String(player.weight) : null,
+        weight: player.weight !== null ? String(player.weight) : null,
         position: player.position,
         jerseyNumber: player.jerseyNumber,
-        team_id: player.team_id != null ? String(player.team_id) : null,
+        team_id: player.team_id !== null ? String(player.team_id) : null,
         team_code: player.team_code,
         team_name: player.team_name,
         matches: player.matches
@@ -301,10 +301,10 @@ export const PlayersMapToArray = Schema.transform(
             fullname: player.fullname,
             dateOfBirth: player.dateOfBirth,
             height: player.height,
-            weight: player.weight != null ? Number(player.weight) : null,
+            weight: player.weight !== null ? Number(player.weight) : null,
             position: player.position,
             jerseyNumber: player.jerseyNumber,
-            team_id: player.team_id != null ? Number(player.team_id) : null,
+            team_id: player.team_id !== null ? Number(player.team_id) : null,
             team_code: player.team_code,
             team_name: player.team_name,
             matches: player.matches
@@ -517,7 +517,7 @@ export const NLLScheduleResponse = Schema.transform(
             city: null, // Not provided in this API structure
           },
           winningSquadId:
-            match.winningSquadId != null ? String(match.winningSquadId) : null,
+            match.winningSquadId !== null ? String(match.winningSquadId) : null,
           squads: {
             away: {
               id: String(match.squads.away.id),
@@ -594,7 +594,7 @@ export const NLLScheduleResponse = Schema.transform(
             timeZone: null,
           },
           winningSquadId:
-            match.winningSquadId != null ? Number(match.winningSquadId) : null,
+            match.winningSquadId !== null ? Number(match.winningSquadId) : null,
         })),
       },
     ],
