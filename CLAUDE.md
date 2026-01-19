@@ -99,6 +99,16 @@ External documentation in `references/`:
 
 For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alchemy`
 
+## PIPELINE SCRAPING PATTERNS
+
+Learnings from MLL/MSL/WLA implementation (v0.0.2):
+
+- **SPA sites need browser automation**: HTML fetch returns empty for JS-rendered content (Pointstreak/DigitalShift)
+- **Wayback Machine has gaps**: MLL schedules 2007-2019 not archived - always verify coverage first
+- **Season ID discovery**: Use API filters endpoint when available (e.g., `web.api.digitalshift.ca/partials/stats/filters?type=season`)
+- **Type filter callbacks**: Always annotate `.filter((x: Type) =>` to avoid implicit any errors
+- **Use safeString utils**: Import from `@laxdb/pipeline/util` for unknown-to-string conversions
+
 ## CHILD INTENT NODES
 
 - `packages/core/AGENTS.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
