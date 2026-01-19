@@ -373,10 +373,12 @@ const program = Effect.gen(function* () {
 
           for (const standing of standings) {
             const { win_pct, team_id } = standing;
-            if (win_pct !== undefined && win_pct !== null) {
-              if (typeof win_pct !== "number" || win_pct < 0 || win_pct > 1) {
-                invalidWinPct.push(`${team_id}: ${win_pct}`);
-              }
+            if (
+              win_pct !== undefined &&
+              win_pct !== null &&
+              (typeof win_pct !== "number" || win_pct < 0 || win_pct > 1)
+            ) {
+              invalidWinPct.push(`${team_id}: ${win_pct}`);
             }
           }
 

@@ -1306,11 +1306,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
             currentStatType = "goals";
           } else if (hasA && !hasG) {
             currentStatType = "assists";
-          } else if (hasG && hasA) {
-            // Could be points table variant, check for pts column
-            if (!hasPts) {
-              currentStatType = "goals"; // Default to goals if ambiguous
-            }
+          } else if (hasG && hasA && !hasPts) {
+            // Could be points table variant, default to goals if ambiguous
+            currentStatType = "goals";
           }
 
           // Skip if filtering by stat type and this doesn't match
