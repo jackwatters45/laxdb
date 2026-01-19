@@ -941,7 +941,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       // Extract year from sourceUrl timestamp or URL path
       // Timestamp format: 20060701160324
       const timestampMatch = sourceUrl.match(/\/web\/(\d{4})/);
-      const yearFromTimestamp = timestampMatch?.[1] ?? "";
+      const _yearFromTimestamp = timestampMatch?.[1] ?? "";
 
       // Helper to normalize team name for ID generation
       const normalizeTeamName = (name: string): string =>
@@ -1290,7 +1290,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
           // Assists table has: Player, Team, A
           const hasPlayer =
             headers.includes("player") || headers.includes("name");
-          const hasTeam = headers.includes("team");
+          const _hasTeam = headers.includes("team");
           const hasPts = headers.includes("pts");
           const hasG = headers.includes("g");
           const hasA = headers.includes("a");

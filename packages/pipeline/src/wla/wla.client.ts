@@ -1419,7 +1419,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
               h.includes("away") ||
               h.includes("visitor"),
           );
-          const hasScore = headers.some(
+          const _hasScore = headers.some(
             (h) => h === "score" || h === "final" || h.includes("score"),
           );
 
