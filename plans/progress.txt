@@ -9,3 +9,62 @@ Status: COMPLETE
 Summary: Fixed tsconfig paths mapping - changed @laxdb/core/* from "./src/*" to "../core/src/*"
 Files: packages/pipeline/tsconfig.json
 Commit: 3e4c193
+
+=== lint-002 ===
+Status: COMPLETE
+Summary: Added type annotations to filter callbacks (MLLGame, MLLPlayer, MLLGoalie)
+Files: packages/pipeline/src/validate/validate-mll.ts
+Commit: 66fe93b
+
+=== lint-003 ===
+Status: COMPLETE
+Summary: Added type annotations to filter callbacks (MSLPlayer, MSLGoalie, MSLGame)
+Files: packages/pipeline/src/validate/validate-msl.ts
+Commit: bbe78a8
+
+=== lint-004 ===
+Status: COMPLETE
+Summary: Added type annotations to filter/reduce callbacks (CareerStatsPlayer, EventDetailWrapper)
+Files: packages/pipeline/src/validate/validate-pll.ts
+Commit: d70390f
+
+=== lint-005 ===
+Status: COMPLETE
+Summary: Added type annotations to filter callbacks (WLAPlayer, WLAGoalie, WLAGame)
+Files: packages/pipeline/src/validate/validate-wla.ts
+Commit: 2cb957a
+
+=== lint-006 to lint-009 ===
+Status: VERIFIED_PASSING
+Summary: Typecheck passes with 0 errors, lint passes with 0 errors (65 warnings)
+Notes: Issues in original PRD did not exist in current codebase
+
+=== lint-010 ===
+Status: COMPLETE
+Summary: Removed unused validateFileExists imports
+Files: validate-msl.ts, validate-wla.ts
+Commit: 822e614
+
+=== lint-011 ===
+Status: COMPLETE
+Summary: Prefixed unused vars with underscore (hasScore, yearFromTimestamp, hasTeam)
+Files: wla.client.ts, mll.client.ts
+Commit: 43e9a1f
+
+=== lint-012 ===
+Status: COMPLETE
+Summary: Changed != null to !== null (6 occurrences)
+Files: nll.schema.ts
+Commit: 713665c
+
+=== lint-013 ===
+Status: COMPLETE
+Summary: Changed != null to !== null (4 occurrences)
+Files: wla.client.ts
+Commit: 0f17247
+
+=== lint-014 ===
+Status: COMPLETE
+Summary: Combined nested if conditions
+Files: validate-wla.ts, mll.client.ts
+Commit: 0ec6329

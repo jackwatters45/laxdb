@@ -14,7 +14,7 @@
     "id": "lint-002",
     "category": "type-safety",
     "description": "Fix implicit any types in validate-mll.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Line 352: Add MLLGame type to filter callback (g: MLLGame)",
       "Line 366: Add MLLGame type to filter callback (g: MLLGame)",
@@ -27,7 +27,7 @@
     "id": "lint-003",
     "category": "type-safety",
     "description": "Fix implicit any types in validate-msl.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Line 298: Add MSLPlayer type to filter callback (p: MSLPlayer)",
       "Line 312: Add MSLGoalie type to filter callback (g: MSLGoalie)",
@@ -40,7 +40,7 @@
     "id": "lint-004",
     "category": "type-safety",
     "description": "Fix implicit any types in validate-pll.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Line 148: Add type annotation to filter callback",
       "Line 149: Add type annotation to filter callback",
@@ -53,7 +53,7 @@
     "id": "lint-005",
     "category": "type-safety",
     "description": "Fix implicit any types in validate-wla.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Line 460: Add WLAPlayer type to filter callback (p: WLAPlayer)",
       "Line 474: Add WLAGoalie type to filter callback (g: WLAGoalie)",
@@ -66,7 +66,7 @@
     "id": "lint-006",
     "category": "type-safety",
     "description": "Fix Effect.provide type errors in all validate-*.ts files",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add explicit return type annotation to program: Effect.Effect<void, never, ...>",
       "Or use Effect.asVoid at end of program",
@@ -77,7 +77,7 @@
     "id": "lint-007",
     "category": "type-safety",
     "description": "Fix Effect type errors in validate.service.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Line 117: Fix Effect type annotation for validateRequiredFields return",
       "Ensure proper error type propagation"
@@ -87,7 +87,7 @@
     "id": "lint-008",
     "category": "type-safety",
     "description": "Fix Effect type errors in validate.service.test.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Lines 58, 81, 101, 120: Fix test callback types",
       "Add proper type annotations to Effect.scoped callbacks",
@@ -98,10 +98,64 @@
     "id": "lint-009",
     "category": "lint-warnings",
     "description": "Fix expect.objectContaining lint warnings in test files",
-    "passes": false,
+    "passes": true,
     "steps": [
       "graphql.service.test.ts: Lines 52, 103, 128 - Cast expect result or disable rule",
       "rest-client.test.ts: Lines 48, 87 - Cast expect result or disable rule"
+    ]
+  },
+  {
+    "id": "lint-010",
+    "category": "unused-imports",
+    "description": "Remove unused validateFileExists imports",
+    "passes": true,
+    "steps": [
+      "validate-msl.ts:18 - Remove validateFileExists from import",
+      "validate-wla.ts:18 - Remove validateFileExists from import"
+    ]
+  },
+  {
+    "id": "lint-011",
+    "category": "unused-vars",
+    "description": "Prefix unused variables with underscore",
+    "passes": true,
+    "steps": [
+      "wla.client.ts:1422 - Rename hasScore to _hasScore",
+      "mll.client.ts:944 - Rename yearFromTimestamp to _yearFromTimestamp",
+      "mll.client.ts:1293 - Rename hasTeam to _hasTeam"
+    ]
+  },
+  {
+    "id": "lint-012",
+    "category": "eqeqeq",
+    "description": "Fix != to !== in nll.schema.ts",
+    "passes": true,
+    "steps": [
+      "Line 277: player.weight != null -> player.weight !== null",
+      "Line 280: player.team_id != null -> player.team_id !== null",
+      "Line 304: player.weight != null -> player.weight !== null",
+      "Line 307: player.team_id != null -> player.team_id !== null",
+      "Line 520: match.winningSquadId != null -> match.winningSquadId !== null",
+      "Line 597: match.winningSquadId != null -> match.winningSquadId !== null"
+    ]
+  },
+  {
+    "id": "lint-013",
+    "category": "eqeqeq",
+    "description": "Fix != to !== in wla.client.ts",
+    "passes": true,
+    "steps": [
+      "Line 989: != null -> !== null"
+    ]
+  },
+  {
+    "id": "lint-014",
+    "category": "no-lonely-if",
+    "description": "Combine nested if conditions",
+    "passes": true,
+    "steps": [
+      "validate-wla.ts:377-379 - Combine win_pct check into single if",
+      "mll.client.ts:1309 - Combine nested if conditions"
     ]
   }
 ]
