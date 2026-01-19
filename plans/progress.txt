@@ -3,3 +3,9 @@ Started: 2026-01-19T15:00:00+11:00
 Previous: plans/archive/v0.0.2/
 
 --- Session History ---
+
+=== lint-001 ===
+Status: COMPLETE
+Summary: Fixed tsconfig paths mapping - changed @laxdb/core/* from "./src/*" to "../core/src/*"
+Files: packages/pipeline/tsconfig.json
+Commit: 3e4c193

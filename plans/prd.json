@@ -3,7 +3,7 @@
     "id": "lint-001",
     "category": "type-safety",
     "description": "Fix readJsonFile import in validate.service.ts and validate-pll.ts",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Check if readJsonFile is exported from @laxdb/core/util",
       "If missing, create readJsonFile in packages/core/src/util.ts",

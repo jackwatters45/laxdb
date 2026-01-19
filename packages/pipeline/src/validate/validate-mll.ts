@@ -349,7 +349,9 @@ const program = Effect.gen(function* () {
         });
 
         // Cross-reference: schedule.home_team_id -> teams.id
-        const gamesWithHomeTeam = games.filter((g) => g.home_team_id !== null);
+        const gamesWithHomeTeam = games.filter(
+          (g: MLLGame) => g.home_team_id !== null,
+        );
         if (gamesWithHomeTeam.length > 0 && teams.length > 0) {
           const xref = yield* crossReference(
             gamesWithHomeTeam,
@@ -363,7 +365,9 @@ const program = Effect.gen(function* () {
         }
 
         // Cross-reference: schedule.away_team_id -> teams.id
-        const gamesWithAwayTeam = games.filter((g) => g.away_team_id !== null);
+        const gamesWithAwayTeam = games.filter(
+          (g: MLLGame) => g.away_team_id !== null,
+        );
         if (gamesWithAwayTeam.length > 0 && teams.length > 0) {
           const xref = yield* crossReference(
             gamesWithAwayTeam,
@@ -403,7 +407,9 @@ const program = Effect.gen(function* () {
     }
 
     // Cross-reference: players.team_id -> teams.id
-    const playersWithTeam = players.filter((p) => p.team_id !== null);
+    const playersWithTeam = players.filter(
+      (p: MLLPlayer) => p.team_id !== null,
+    );
     if (playersWithTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         playersWithTeam,
@@ -417,7 +423,9 @@ const program = Effect.gen(function* () {
     }
 
     // Cross-reference: goalies.team_id -> teams.id
-    const goaliesWithTeam = goalies.filter((g) => g.team_id !== null);
+    const goaliesWithTeam = goalies.filter(
+      (g: MLLGoalie) => g.team_id !== null,
+    );
     if (goaliesWithTeam.length > 0 && teams.length > 0) {
       const xref = yield* crossReference(
         goaliesWithTeam,
