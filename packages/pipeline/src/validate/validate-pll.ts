@@ -145,8 +145,8 @@ const program = Effect.gen(function* () {
       checks: [...csChecks, requiredCheck],
     });
 
-    const pllPlayers = careerStats.filter((p) => p.inPlayerDetails);
-    const mllPlayers = careerStats.filter((p) => !p.inPlayerDetails);
+    const pllPlayers = careerStats.filter((p: CareerStatsPlayer) => p.inPlayerDetails);
+    const mllPlayers = careerStats.filter((p: CareerStatsPlayer) => !p.inPlayerDetails);
     yield* Effect.log(
       `  Career stats breakdown: ${pllPlayers.length} PLL, ${mllPlayers.length} MLL/retired`,
     );
@@ -169,7 +169,7 @@ const program = Effect.gen(function* () {
     const uniqueSlugCheck = yield* validateUniqueField(eventDetails, "slug");
 
     const playLogCount = eventDetails.reduce(
-      (sum, e) => sum + (e.detail?.playLogs?.length ?? 0),
+      (sum: number, e: EventDetailWrapper) => sum + (e.detail?.playLogs?.length ?? 0),
       0,
     );
     yield* Effect.log(
@@ -291,7 +291,7 @@ const program = Effect.gen(function* () {
   }
 
   if (careerStats.length > 0 && playerDetails.length > 0) {
-    const careerStatsWithSlugs = careerStats.filter((p) => p.slug !== null);
+    const careerStatsWithSlugs = careerStats.filter((p: CareerStatsPlayer) => p.slug !== null);
     const xref = yield* crossReference(
       careerStatsWithSlugs,
       playerDetails,
