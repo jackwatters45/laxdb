@@ -986,11 +986,11 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       const points = Number(stats.points ?? stats.pts ?? 0) || 0;
       const penaltyMinutes =
         Number(stats.penalty_minutes ?? stats.pim ?? 0) || 0;
-      const ppg = stats.ppg != null ? Number(stats.ppg) || null : null;
-      const shg = stats.shg != null ? Number(stats.shg) || null : null;
-      const gwg = stats.gwg != null ? Number(stats.gwg) || null : null;
+      const ppg = stats.ppg !== null ? Number(stats.ppg) || null : null;
+      const shg = stats.shg !== null ? Number(stats.shg) || null : null;
+      const gwg = stats.gwg !== null ? Number(stats.gwg) || null : null;
       const scoringPct =
-        stats.scoring_pct != null ? Number(stats.scoring_pct) || null : null;
+        stats.scoring_pct !== null ? Number(stats.scoring_pct) || null : null;
 
       return new WLAPlayer({
         id: id || name.toLowerCase().replaceAll(/\s+/g, "-"),
