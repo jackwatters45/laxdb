@@ -1,6 +1,9 @@
 import { FileSystem, Path } from "@effect/platform";
 import { Effect } from "effect";
 
+import type { GraphQLError } from "../api-client/graphql.service";
+import type { PipelineError } from "../error";
+
 /**
  * Saves data as JSON to a file path.
  * Creates parent directories if they don't exist.
@@ -21,3 +24,37 @@ export const saveJson = <T>(filePath: string, data: T) =>
       Effect.fail(new Error(`Failed to write ${filePath}: ${String(e)}`)),
     ),
   );
+
+/**
+ * Determines if an error is critical (transient) and should fail-fast,
+ * vs non-critical (permanent) where returning empty and continuing is appropriate.
+ *
+ * Critical errors: Network issues, timeouts, rate limits, server errors (5xx)
+ * Non-critical errors: Client errors (4xx), parse/schema errors, GraphQL errors
+ *
+ * @example
+ * if (Either.isLeft(result)) {
+ *   if (isCriticalError(result.left)) {
+ *     return yield* Effect.fail(result.left);
+ *   }
+ *   return emptyExtractResult([]);
+ * }
+ */
+export const isCriticalError = (
+  error: PipelineError | GraphQLError,
+): boolean => {
+  switch (error._tag) {
+    case "NetworkError":
+    case "TimeoutError":
+    case "RateLimitError":
+      return true;
+    case "HttpError":
+      // 5xx = server error (transient), 4xx = client error (permanent)
+      return error.statusCode !== undefined && error.statusCode >= 500;
+    case "ParseError":
+    case "GraphQLError":
+      return false;
+    default:
+      return false;
+  }
+};

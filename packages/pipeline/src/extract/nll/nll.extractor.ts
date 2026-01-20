@@ -12,7 +12,7 @@ import type {
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { saveJson } from "../util";
+import { isCriticalError, saveJson } from "../util";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
 
@@ -32,6 +32,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "nll", String(seasonId), `${entity}.json`);
 
+      /**
+       * Extracts teams for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
@@ -42,6 +49,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly NLLTeam[]);
           }
           yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
@@ -51,6 +61,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -63,6 +80,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly NLLPlayer[]);
           }
           yield* saveJson(
@@ -75,6 +95,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts player stats for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayerStats = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -87,6 +114,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly NLLPlayerStatsRow[]);
           }
           yield* saveJson(
@@ -99,6 +129,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -111,6 +148,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly NLLStanding[]);
           }
           yield* saveJson(
@@ -123,6 +163,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts schedule for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -135,6 +182,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly NLLMatch[]);
           }
           yield* saveJson(

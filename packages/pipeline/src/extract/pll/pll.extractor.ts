@@ -20,7 +20,7 @@ import {
   emptyExtractResult,
   withTiming,
 } from "../extract.schema";
-import { saveJson } from "../util";
+import { isCriticalError, saveJson } from "../util";
 
 import { PLLManifestService } from "./pll.manifest";
 
@@ -55,6 +55,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             ),
           );
 
+      /**
+       * Extracts teams for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for ${year}...`);
@@ -65,6 +72,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLTeam[]);
           }
           yield* saveJson(getOutputPath(year, "teams"), result.right.data);
@@ -114,6 +124,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
+      /**
+       * Extracts players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  👥 Extracting players for ${year}...`);
@@ -130,6 +147,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLPlayer[]);
           }
           yield* saveJson(getOutputPath(year, "players"), result.right.data);
@@ -139,6 +159,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts advanced players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractAdvancedPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🔬 Extracting advanced players for ${year}...`);
@@ -153,6 +180,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLAdvancedPlayer[]);
           }
           yield* saveJson(
@@ -214,6 +244,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
+      /**
+       * Extracts events for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractEvents = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🎮 Extracting events for ${year}...`);
@@ -224,6 +261,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLEvent[]);
           }
           yield* saveJson(getOutputPath(year, "events"), result.right.data);
@@ -272,6 +312,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
+      /**
+       * Extracts standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📈 Extracting standings for ${year}...`);
@@ -282,6 +329,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLTeamStanding[]);
           }
           yield* saveJson(getOutputPath(year, "standings"), result.right.data);
@@ -291,6 +341,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts championship series standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandingsCS = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -303,6 +360,9 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly PLLGraphQLStanding[]);
           }
           yield* saveJson(

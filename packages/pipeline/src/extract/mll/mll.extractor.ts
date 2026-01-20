@@ -13,7 +13,7 @@ import type {
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { saveJson } from "../util";
+import { isCriticalError, saveJson } from "../util";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
@@ -39,6 +39,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "mll", String(year), `${entity}.json`);
 
+      /**
+       * Extracts teams for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for year ${year}...`);
@@ -49,6 +56,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MLLTeam[]);
           }
           yield* saveJson(getOutputPath(year, "teams"), result.right.data);
@@ -58,6 +68,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏃 Extracting players for year ${year}...`);
@@ -68,6 +85,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MLLPlayer[]);
           }
           yield* saveJson(getOutputPath(year, "players"), result.right.data);
@@ -77,6 +97,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts goalies for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractGoalies = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🥅 Extracting goalies for year ${year}...`);
@@ -87,6 +114,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MLLGoalie[]);
           }
           yield* saveJson(getOutputPath(year, "goalies"), result.right.data);
@@ -96,6 +126,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏆 Extracting standings for year ${year}...`);
@@ -106,6 +143,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MLLStanding[]);
           }
           yield* saveJson(getOutputPath(year, "standings"), result.right.data);
@@ -115,6 +155,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts stat leaders for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStatLeaders = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  ⭐ Extracting stat leaders for year ${year}...`);
@@ -125,6 +172,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MLLStatLeader[]);
           }
           yield* saveJson(
@@ -147,6 +197,15 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         return regSeasonGames + playoffGames;
       };
 
+      /**
+       * Extracts schedule for a season via Wayback Machine.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       *
+       * Note: Wayback data may have gaps, especially for 2007-2019.
+       */
       const extractSchedule = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -160,6 +219,9 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message} (schedule may be incomplete for this year)`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             yield* Effect.log(`     📊 Schedule coverage: 0%`);
             return emptyExtractResult([] as readonly MLLGame[]);
           }

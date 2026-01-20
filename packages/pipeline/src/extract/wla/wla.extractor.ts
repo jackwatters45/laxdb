@@ -13,7 +13,7 @@ import type {
 import { WLASeasonId } from "../../wla/wla.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { saveJson } from "../util";
+import { isCriticalError, saveJson } from "../util";
 
 import type { WLASeasonManifest } from "./wla.manifest";
 import { WLAManifestService } from "./wla.manifest";
@@ -39,6 +39,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "wla", String(seasonId), `${entity}.json`);
 
+      /**
+       * Extracts teams for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
@@ -49,6 +56,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly WLATeam[]);
           }
           yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
@@ -58,6 +68,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -70,6 +87,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly WLAPlayer[]);
           }
           yield* saveJson(
@@ -82,6 +102,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts goalies for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractGoalies = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -94,6 +121,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly WLAGoalie[]);
           }
           yield* saveJson(
@@ -106,6 +136,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -118,6 +155,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly WLAStanding[]);
           }
           yield* saveJson(
@@ -130,6 +170,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts schedule for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -142,6 +189,9 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly WLAGame[]);
           }
           yield* saveJson(

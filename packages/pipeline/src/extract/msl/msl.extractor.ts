@@ -13,7 +13,7 @@ import type {
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { saveJson } from "../util";
+import { isCriticalError, saveJson } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
@@ -41,6 +41,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "msl", String(seasonId), `${entity}.json`);
 
+      /**
+       * Extracts teams for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
@@ -51,6 +58,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MSLTeam[]);
           }
           yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
@@ -60,6 +70,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts players for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -72,6 +89,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MSLPlayer[]);
           }
           yield* saveJson(
@@ -84,6 +104,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts goalies for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractGoalies = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -96,6 +123,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MSLGoalie[]);
           }
           yield* saveJson(
@@ -108,6 +138,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts standings for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -120,6 +157,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MSLStanding[]);
           }
           yield* saveJson(
@@ -132,6 +172,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
+      /**
+       * Extracts schedule for a season.
+       *
+       * Error handling:
+       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
+       * - Non-critical errors (404, parse): Returns empty result, continues extraction
+       */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
@@ -144,6 +191,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
             );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
             return emptyExtractResult([] as readonly MSLGame[]);
           }
           yield* saveJson(

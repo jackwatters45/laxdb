@@ -3,7 +3,16 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Exit, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { saveJson } from "./util";
+import { GraphQLError } from "../api-client/graphql.service";
+import {
+  HttpError,
+  NetworkError,
+  ParseError,
+  RateLimitError,
+  TimeoutError,
+} from "../error";
+
+import { isCriticalError, saveJson } from "./util";
 
 describe("saveJson", () => {
   const createTestLayer = (overrides: {
@@ -142,5 +151,108 @@ describe("saveJson", () => {
     expect(writtenContent).toContain("\n");
     expect(writtenContent).toContain("  ");
     expect(JSON.parse(writtenContent)).toEqual(complexData);
+  });
+});
+
+describe("isCriticalError", () => {
+  it("returns true for NetworkError", () => {
+    const error = new NetworkError({
+      message: "DNS resolution failed",
+      url: "http://example.com",
+    });
+    expect(isCriticalError(error)).toBe(true);
+  });
+
+  it("returns true for TimeoutError", () => {
+    const error = new TimeoutError({
+      message: "Request timed out",
+      url: "http://example.com",
+      timeoutMs: 5000,
+    });
+    expect(isCriticalError(error)).toBe(true);
+  });
+
+  it("returns true for RateLimitError", () => {
+    const error = new RateLimitError({
+      message: "Rate limit exceeded",
+      url: "http://example.com",
+      retryAfterMs: 60000,
+    });
+    expect(isCriticalError(error)).toBe(true);
+  });
+
+  it("returns true for HttpError with 5xx status", () => {
+    const error500 = new HttpError({
+      message: "Internal Server Error",
+      url: "http://example.com",
+      statusCode: 500,
+    });
+    const error502 = new HttpError({
+      message: "Bad Gateway",
+      url: "http://example.com",
+      statusCode: 502,
+    });
+    const error503 = new HttpError({
+      message: "Service Unavailable",
+      url: "http://example.com",
+      statusCode: 503,
+    });
+
+    expect(isCriticalError(error500)).toBe(true);
+    expect(isCriticalError(error502)).toBe(true);
+    expect(isCriticalError(error503)).toBe(true);
+  });
+
+  it("returns false for HttpError with 4xx status", () => {
+    const error400 = new HttpError({
+      message: "Bad Request",
+      url: "http://example.com",
+      statusCode: 400,
+    });
+    const error404 = new HttpError({
+      message: "Not Found",
+      url: "http://example.com",
+      statusCode: 404,
+    });
+    const error422 = new HttpError({
+      message: "Unprocessable Entity",
+      url: "http://example.com",
+      statusCode: 422,
+    });
+
+    expect(isCriticalError(error400)).toBe(false);
+    expect(isCriticalError(error404)).toBe(false);
+    expect(isCriticalError(error422)).toBe(false);
+  });
+
+  it("returns false for HttpError without statusCode", () => {
+    const error = new HttpError({
+      message: "Unknown error",
+      url: "http://example.com",
+    });
+    expect(isCriticalError(error)).toBe(false);
+  });
+
+  it("returns false for ParseError", () => {
+    const error = new ParseError({
+      message: "Schema validation failed",
+      url: "http://example.com",
+    });
+    expect(isCriticalError(error)).toBe(false);
+  });
+
+  it("returns false for ParseError without url", () => {
+    const error = new ParseError({
+      message: "Input validation failed",
+    });
+    expect(isCriticalError(error)).toBe(false);
+  });
+
+  it("returns false for GraphQLError", () => {
+    const error = new GraphQLError({
+      message: "GraphQL query failed",
+      errors: [{ message: "Field 'name' not found" }],
+    });
+    expect(isCriticalError(error)).toBe(false);
   });
 });
