@@ -1,24 +1,41 @@
-# Lax DB - Planning
+# Lax DB - Roadmap
 
 ## Overview
 
-Lax DB aims to better equip lacrosse players with modern tools and features to enhance their game performance and overall experience. The platform provides a comprehensive suite of tools for players, coaches, and teams to optimize gameplay, improve communication, and streamline administrative tasks.
+Lax DB equips lacrosse players with modern tools to enhance game performance. Comprehensive suite for players, coaches, and teams to optimize gameplay, improve communication, and streamline admin.
 
 ---
 
-## TODO
+## Immediate TODO
 
 - [ ] Individual player page
 - [ ] Move player individual pages away from teams
-- [ ] Filters - add apply button?
 - [ ] Root players page with team filter
 - [ ] Add fields - position etc when no field set for team
-- [ ] Select loading state
 - [ ] Games
 - [ ] Coaches
 - [ ] Teams page
 - [ ] Org + team invites/joins
 - [ ] Sidebar subpages/dropdown
+
+### Pipeline
+
+- [ ] Historical vs real time extraction
+- [ ] Game events -> structured data
+
+### Marketing
+
+- [ ] Update marketing page
+- [ ] Blog styling
+- [ ] Tool plans
+
+### Infrastructure
+
+- [ ] Fix http api
+- [ ] Build script (turbo not really working)
+- [ ] Tests
+- [ ] Contributing docs site
+- [ ] Consolidate ui components
 
 ---
 
@@ -44,15 +61,17 @@ Lax DB aims to better equip lacrosse players with modern tools and features to e
 
 ## Planned Features
 
-### Ready for Development (have planning docs)
+### Ready for Development
 
-- **Playbook Management**: Digital playbook with play creation, categorization, and assignments
-- **Scouting System**: Opponent team analysis, scouting reports, and strategic insights
-- **Practice Planning**: Drill bank, practice templates, session management, and scheduling
+Feature specs available in `plans/features/`:
+
+- **Playbook Management**: Digital playbook with play creation, categorization, assignments
+- **Scouting System**: Opponent team analysis, scouting reports, strategic insights
+- **Practice Planning**: Drill bank, practice templates, session management, scheduling
 - **Game Film Integration**: Upload/link game footage with timestamped events
 - **Advanced Statistics**: Shot charts, possession analytics, player performance metrics
 - **Game Reports**: Automated post-game analysis and player evaluations
-- **Calendar System**: Unified calendar for practices, games, and team events
+- **Calendar System**: Unified calendar for practices, games, team events
 
 ### Future
 
@@ -75,6 +94,9 @@ Lax DB aims to better equip lacrosse players with modern tools and features to e
 
 - [ ] Email sending: `sendInvitationEmail` in auth.ts is stubbed
 - [ ] Polar integration: Payment webhook handlers are commented out
+- [ ] KV Rate Limiting: Wire up `KVService` for better-auth rate limiting/session caching
+  - TODO in `packages/core/src/auth.ts`
+  - `packages/core/src/kv.ts` ready, needs KVNamespace injection
 
 ---
 
@@ -97,20 +119,17 @@ Lax DB aims to better equip lacrosse players with modern tools and features to e
 
 ---
 
-## Backlog
+## Considerations
 
-- [ ] **KV Rate Limiting**: Wire up `KVService` for better-auth rate limiting/session caching
-  - TODO in `packages/core/src/auth.ts`
-  - `packages/core/src/kv.ts` ready, needs KVNamespace injection
+- **Rate limiting**: Currently disabled. Security gap for production.
+- **Testing strategy**: Vitest is set up but no defined coverage goals.
+- **effect-cloudflare package**: Has type errors. Being used? Dead code?
+- **Observability**: No logging/monitoring story.
+- **Permissions**: How to handle teamId + org in core repo
 
 ---
 
-## Considerations
+## Notes
 
-- **Rate limiting**: Currently disabled (in backlog). Security gap for production - brute-force protection on auth endpoints matters if going live.
-
-- **Testing strategy**: Vitest is set up but no defined coverage goals. What needs tests?
-
-- **effect-cloudflare package**: Has type errors. Being used? Dead code? Needs attention or deletion.
-
-- **Observability**: No logging/monitoring story. Error tracking, structured logs, metrics - production typically needs these.
+- Take a closer look at AGENTS.md files
+- Blog some of the specific/unique technical challenges (http + rpc)

@@ -109,6 +109,23 @@ Learnings from MLL/MSL/WLA implementation (v0.0.2):
 - **Type filter callbacks**: Always annotate `.filter((x: Type) =>` to avoid implicit any errors
 - **Use safeString utils**: Import from `@laxdb/pipeline/util` for unknown-to-string conversions
 
+## PLANS DIRECTORY STRUCTURE
+
+All planning, tracking, and documentation lives in `plans/`:
+
+```
+plans/
+├── todos/           # Code review findings, tech debt (file-todos skill)
+├── features/        # Feature specs (comprehensive planning docs)
+├── archive/         # Completed PRD versions
+├── prd.json         # Ralph PRD active work items
+├── progress.txt     # Ralph session log
+├── ROADMAP.md       # High-level roadmap and backlog
+└── FEATURE_SPEC_TEMPLATE.md
+```
+
+**IMPORTANT**: This project uses `plans/todos/` instead of root `todos/`. When using `/triage`, `/workflows:review`, or `file-todos` skill, substitute `plans/todos/` for any `todos/` path references.
+
 ## CHILD INTENT NODES
 
 - `packages/core/AGENTS.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
