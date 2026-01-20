@@ -18,7 +18,9 @@ src/
 │   ├── mll/                    # MLL-specific extractors
 │   ├── msl/                    # MSL-specific extractors
 │   ├── wla/                    # WLA-specific extractors
-│   └── extract.schema.ts       # Shared extraction types
+│   ├── extract.schema.ts       # Shared extraction types
+│   ├── incremental.service.ts  # Incremental extraction logic
+│   └── season-config.ts        # Current vs historical season config
 ├── validate/                # Data validation
 │   ├── validate.service.ts     # Reusable validators
 │   ├── validate-pll.ts         # PLL validation script
