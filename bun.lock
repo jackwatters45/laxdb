@@ -7,7 +7,6 @@
       "dependencies": {
         "alchemy": "^0.82.2",
         "effect": "^3.19.13",
-        "use-sound": "4",
       },
       "devDependencies": {
         "@cloudflare/vitest-pool-workers": "^0.8.71",
