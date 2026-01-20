@@ -15,29 +15,15 @@ import {
 } from "./extract.schema";
 import { SeasonConfigService } from "./season-config";
 
-// ============================================================================
-// Extraction Mode
-// ============================================================================
-
-/**
- * Extraction modes for different use cases.
- */
 export type ExtractionMode =
   | "full" // Extract everything, ignoring existing data
   | "skip-existing" // Skip already extracted entities (default)
   | "incremental"; // Re-extract stale data based on age
 
-/**
- * Extended options for incremental extraction.
- */
 export interface IncrementalExtractOptions extends ExtractOptions {
   /** Extraction mode. Overrides skipExisting/maxAgeHours if set. */
   mode?: ExtractionMode;
 }
-
-// ============================================================================
-// Incremental Extraction Service
-// ============================================================================
 
 export class IncrementalExtractionService extends Effect.Service<IncrementalExtractionService>()(
   "IncrementalExtractionService",
