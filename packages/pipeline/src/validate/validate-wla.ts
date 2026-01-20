@@ -3,6 +3,13 @@ import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { ExtractConfigService } from "../extract/extract.config";
+import type {
+  WLATeam,
+  WLAPlayer,
+  WLAGoalie,
+  WLAStanding,
+  WLAGame,
+} from "../wla/wla.schema";
 
 import type {
   FileValidationResult,
@@ -16,97 +23,6 @@ import {
   buildReport,
   printReport,
 } from "./validate.service";
-
-// ============================================================================
-// WLA Validation Interfaces
-// ============================================================================
-
-/** WLA Team extracted data structure */
-interface WLATeam {
-  id: string;
-  code: string;
-  name: string;
-  city: string | null;
-  logo_url: string | null;
-  website_url: string | null;
-}
-
-/** WLA Player extracted data structure */
-interface WLAPlayer {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  full_name: string | null;
-  jersey_number: string | null;
-  position: string | null;
-  team_id: string | null;
-  team_code: string | null;
-  team_name: string | null;
-  stats?: {
-    games_played: number;
-    goals: number;
-    assists: number;
-    points: number;
-    penalty_minutes: number;
-    ppg: number | null;
-    shg: number | null;
-    gwg: number | null;
-    scoring_pct: number | null;
-  };
-}
-
-/** WLA Goalie extracted data structure */
-interface WLAGoalie {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  full_name: string | null;
-  jersey_number: string | null;
-  team_id: string | null;
-  team_code: string | null;
-  team_name: string | null;
-  stats?: {
-    games_played: number;
-    wins: number;
-    losses: number;
-    ties: number;
-    goals_against: number;
-    saves: number;
-    shots_against: number;
-    gaa: number;
-    save_pct: number;
-    shutouts: number;
-  };
-}
-
-/** WLA Standing extracted data structure */
-interface WLAStanding {
-  team_id: string;
-  team_name: string | null;
-  position: number;
-  wins: number;
-  losses: number;
-  ties: number;
-  games_played: number;
-  goals_for: number;
-  goals_against: number;
-  goal_diff: number;
-  win_pct: number;
-}
-
-/** WLA Game extracted data structure */
-interface WLAGame {
-  id: string;
-  date: string | null;
-  status: string | null;
-  home_team_id: string | null;
-  away_team_id: string | null;
-  home_team_name: string | null;
-  away_team_name: string | null;
-  home_score: number;
-  away_score: number;
-  venue: string | null;
-}
 
 // ============================================================================
 // WLA Season Configuration
