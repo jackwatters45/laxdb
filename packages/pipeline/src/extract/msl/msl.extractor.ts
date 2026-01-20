@@ -12,7 +12,11 @@ import type {
 } from "../../msl/msl.schema";
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
-import { emptyExtractResult, withTiming } from "../extract.schema";
+import {
+  type ExtractOptions,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
@@ -176,14 +180,9 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      const extractSeason = (
-        seasonId: number,
-        options: {
-          skipExisting?: boolean;
-        } = {},
-      ) =>
+      const extractSeason = (seasonId: number, options: ExtractOptions = {}) =>
         Effect.gen(function* () {
-          const { skipExisting = true } = options;
+          const { skipExisting = true, maxAgeHours = null } = options;
 
           // Find year for this seasonId
           const season = MSL_SEASONS.find((s) => s.seasonId === seasonId);
@@ -197,6 +196,15 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
 
           const shouldExtract = (entity: keyof MSLSeasonManifest): boolean => {
             if (!skipExisting) return true;
+            // Check staleness if maxAgeHours is specified
+            if (maxAgeHours !== null) {
+              return manifestService.isStale(
+                manifest,
+                seasonId,
+                entity,
+                maxAgeHours,
+              );
+            }
             return !manifestService.isExtracted(manifest, seasonId, entity);
           };
 
@@ -283,14 +291,14 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
         });
 
       const extractAll = (
-        options: {
-          skipExisting?: boolean;
+        options: ExtractOptions & {
           startYear?: number;
           endYear?: number;
         } = {},
       ) =>
         Effect.gen(function* () {
           const skipExisting = options.skipExisting ?? true;
+          const maxAgeHours = options.maxAgeHours ?? null;
           const startYear = options.startYear ?? 2023;
           const endYear = options.endYear ?? 2025;
 
@@ -315,6 +323,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             );
             lastManifest = yield* extractSeason(season.seasonId, {
               skipExisting,
+              maxAgeHours,
             });
           }
 

@@ -104,3 +104,55 @@ export const createEmptyManifest = (source: string): ExtractionManifest => ({
   lastRun: "",
   version: 1,
 });
+
+// ============================================================================
+// Staleness Helpers
+// ============================================================================
+
+/**
+ * Generic entity status interface for staleness checking.
+ * Compatible with all manifest entity status types.
+ */
+export interface EntityStatusLike {
+  extracted: boolean;
+  timestamp: string;
+}
+
+/**
+ * Check if an entity status is stale based on max age.
+ * Returns true if:
+ * - Entity has not been extracted
+ * - Timestamp is missing or empty
+ * - Age exceeds maxAgeHours
+ *
+ * If maxAgeHours is null, staleness is never triggered (for historical data).
+ */
+export const isEntityStale = (
+  status: EntityStatusLike | undefined,
+  maxAgeHours: number | null,
+): boolean => {
+  // Not extracted or no status = always stale
+  if (!status?.extracted) return true;
+  // No timestamp = always stale
+  if (!status.timestamp) return true;
+  // No max age = never stale (historical data)
+  if (maxAgeHours === null) return false;
+
+  const ageMs = Date.now() - new Date(status.timestamp).getTime();
+  const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
+  return ageMs > maxAgeMs;
+};
+
+// ============================================================================
+// Extract Options
+// ============================================================================
+
+/**
+ * Common options for extraction operations.
+ */
+export interface ExtractOptions {
+  /** Skip entities that have already been extracted. Default: true */
+  skipExisting?: boolean;
+  /** Maximum age in hours before data is considered stale and re-extracted. Null = never stale. */
+  maxAgeHours?: number | null;
+}

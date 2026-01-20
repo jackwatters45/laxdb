@@ -13,7 +13,11 @@ import {
   type MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
-import { emptyExtractResult, withTiming } from "../extract.schema";
+import {
+  type ExtractOptions,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
@@ -215,13 +219,14 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
 
       const extractSeason = (
         year: number,
-        options: {
-          skipExisting?: boolean;
-          includeSchedule?: boolean;
-        } = {},
+        options: ExtractOptions & { includeSchedule?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const { skipExisting = true, includeSchedule = false } = options;
+          const {
+            skipExisting = true,
+            includeSchedule = false,
+            maxAgeHours = null,
+          } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting MLL ${year}`);
@@ -231,6 +236,15 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
 
           const shouldExtract = (entity: keyof MLLSeasonManifest): boolean => {
             if (!skipExisting) return true;
+            // Check staleness if maxAgeHours is specified
+            if (maxAgeHours !== null) {
+              return manifestService.isStale(
+                manifest,
+                year,
+                entity,
+                maxAgeHours,
+              );
+            }
             return !manifestService.isExtracted(manifest, year, entity);
           };
 
@@ -336,8 +350,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         });
 
       const extractAll = (
-        options: {
-          skipExisting?: boolean;
+        options: ExtractOptions & {
           includeSchedule?: boolean;
           startYear?: number;
           endYear?: number;
@@ -346,6 +359,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         Effect.gen(function* () {
           const skipExisting = options.skipExisting ?? true;
           const includeSchedule = options.includeSchedule ?? false;
+          const maxAgeHours = options.maxAgeHours ?? null;
           const startYear = options.startYear ?? 2001;
           const endYear = options.endYear ?? 2020;
 
@@ -371,6 +385,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             lastManifest = yield* extractSeason(year, {
               skipExisting,
               includeSchedule,
+              maxAgeHours,
             });
           }
 

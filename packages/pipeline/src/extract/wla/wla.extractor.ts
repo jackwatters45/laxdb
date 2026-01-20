@@ -12,7 +12,11 @@ import type {
 } from "../../wla/wla.schema";
 import { WLASeasonId } from "../../wla/wla.schema";
 import { ExtractConfigService } from "../extract.config";
-import { emptyExtractResult, withTiming } from "../extract.schema";
+import {
+  type ExtractOptions,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { WLASeasonManifest } from "./wla.manifest";
@@ -176,13 +180,14 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
 
       const extractSeason = (
         seasonId: number,
-        options: {
-          skipExisting?: boolean;
-          includeSchedule?: boolean;
-        } = {},
+        options: ExtractOptions & { includeSchedule?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const { skipExisting = true, includeSchedule = false } = options;
+          const {
+            skipExisting = true,
+            includeSchedule = false,
+            maxAgeHours = null,
+          } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting WLA ${seasonId}`);
@@ -192,6 +197,15 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
 
           const shouldExtract = (entity: keyof WLASeasonManifest): boolean => {
             if (!skipExisting) return true;
+            // Check staleness if maxAgeHours is specified
+            if (maxAgeHours !== null) {
+              return manifestService.isStale(
+                manifest,
+                seasonId,
+                entity,
+                maxAgeHours,
+              );
+            }
             return !manifestService.isExtracted(manifest, seasonId, entity);
           };
 
@@ -280,8 +294,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         });
 
       const extractAll = (
-        options: {
-          skipExisting?: boolean;
+        options: ExtractOptions & {
           includeSchedule?: boolean;
           startYear?: number;
           endYear?: number;
@@ -290,6 +303,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         Effect.gen(function* () {
           const skipExisting = options.skipExisting ?? true;
           const includeSchedule = options.includeSchedule ?? false;
+          const maxAgeHours = options.maxAgeHours ?? null;
           const startYear = options.startYear ?? 2005;
           const endYear = options.endYear ?? 2025;
 
@@ -317,6 +331,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             lastManifest = yield* extractSeason(year, {
               skipExisting,
               includeSchedule,
+              maxAgeHours,
             });
           }
 

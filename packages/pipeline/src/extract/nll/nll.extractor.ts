@@ -11,7 +11,11 @@ import type {
   NLLTeam,
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
-import { emptyExtractResult, withTiming } from "../extract.schema";
+import {
+  type ExtractOptions,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
@@ -167,12 +171,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      const extractSeason = (
-        seasonId: number,
-        options: { skipExisting?: boolean } = {},
-      ) =>
+      const extractSeason = (seasonId: number, options: ExtractOptions = {}) =>
         Effect.gen(function* () {
-          const { skipExisting = true } = options;
+          const { skipExisting = true, maxAgeHours = null } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting NLL Season ${seasonId}`);
@@ -182,6 +183,15 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
 
           const shouldExtract = (entity: keyof NLLSeasonManifest): boolean => {
             if (!skipExisting) return true;
+            // Check staleness if maxAgeHours is specified
+            if (maxAgeHours !== null) {
+              return manifestService.isStale(
+                manifest,
+                seasonId,
+                entity,
+                maxAgeHours,
+              );
+            }
             return !manifestService.isExtracted(manifest, seasonId, entity);
           };
 
@@ -271,7 +281,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return manifest;
         });
 
-      const extractAll = (options: { skipExisting?: boolean } = {}) =>
+      const extractAll = (options: ExtractOptions = {}) =>
         Effect.gen(function* () {
           yield* Effect.log("🏈 NLL Full Extraction");
           yield* Effect.log(`Output directory: ${config.outputDir}`);

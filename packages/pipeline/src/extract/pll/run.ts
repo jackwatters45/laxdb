@@ -22,6 +22,7 @@ interface CliArgs {
   year: number | null;
   includeDetails: boolean;
   force: boolean;
+  maxAgeHours: number | null;
   help: boolean;
 }
 
@@ -31,11 +32,20 @@ const parseArgs = (): CliArgs => {
   const yearArg = args.find((a) => a.startsWith("--year="));
   const year = yearArg ? parseInt(yearArg.split("=")[1] ?? "", 10) : null;
 
+  const maxAgeArg = args.find((a) => a.startsWith("--max-age="));
+  let maxAgeHours: number | null = null;
+  if (maxAgeArg) {
+    maxAgeHours = parseInt(maxAgeArg.split("=")[1] ?? "", 10);
+  } else if (args.includes("--incremental")) {
+    maxAgeHours = 24; // Default: 24 hours for incremental
+  }
+
   return {
     all: args.includes("--all"),
     year,
     includeDetails: !args.includes("--no-details"),
     force: args.includes("--force"),
+    maxAgeHours,
     help: args.includes("--help") || args.includes("-h"),
   };
 };
@@ -48,17 +58,20 @@ Usage:
   bun src/extract/pll/run.ts [options]
 
 Options:
-  --all           Extract all years (2019-2025)
-  --year=YYYY     Extract specific year
-  --no-details    Skip detail endpoints (faster)
-  --force         Re-extract even if already done
-  --help, -h      Show this help
+  --all             Extract all years (2019-2025)
+  --year=YYYY       Extract specific year
+  --no-details      Skip detail endpoints (faster)
+  --force           Re-extract even if already done
+  --max-age=HOURS   Re-extract if data is older than N hours
+  --incremental     Alias for --max-age=24 (re-extract if older than 24h)
+  --help, -h        Show this help
 
 Examples:
   infisical run --env=dev -- bun src/extract/pll/run.ts --all
   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024
   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --no-details
   infisical run --env=dev -- bun src/extract/pll/run.ts --all --force
+  infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --incremental
 `);
 };
 
@@ -68,6 +81,7 @@ const runExtraction = (args: CliArgs) =>
     const options = {
       includeDetails: args.includeDetails,
       skipExisting: !args.force,
+      maxAgeHours: args.maxAgeHours,
     };
 
     if (args.all) {

@@ -19,6 +19,7 @@ interface CliArgs {
   all: boolean;
   force: boolean;
   schedule: boolean;
+  maxAgeHours: number | null;
   help: boolean;
 }
 
@@ -33,11 +34,20 @@ const parseArgs = (): CliArgs => {
     ? parseInt(seasonArg.split("=")[1] ?? "", 10)
     : DEFAULT_SEASON;
 
+  const maxAgeArg = args.find((a) => a.startsWith("--max-age="));
+  let maxAgeHours: number | null = null;
+  if (maxAgeArg) {
+    maxAgeHours = parseInt(maxAgeArg.split("=")[1] ?? "", 10);
+  } else if (args.includes("--incremental")) {
+    maxAgeHours = 24; // Default: 24 hours for incremental
+  }
+
   return {
     season,
     all: args.includes("--all"),
     force: args.includes("--force"),
     schedule: args.includes("--schedule"),
+    maxAgeHours,
     help: args.includes("--help") || args.includes("-h"),
   };
 };
@@ -50,11 +60,13 @@ Usage:
   bun src/extract/wla/run.ts [options]
 
 Options:
-  --season=YYYY   Extract specific season by year (default: ${DEFAULT_SEASON})
-  --all           Extract all seasons (2005-2025)
-  --force         Re-extract even if already done
-  --schedule      Include schedule extraction
-  --help, -h      Show this help
+  --season=YYYY     Extract specific season by year (default: ${DEFAULT_SEASON})
+  --all             Extract all seasons (2005-2025)
+  --force           Re-extract even if already done
+  --schedule        Include schedule extraction
+  --max-age=HOURS   Re-extract if data is older than N hours
+  --incremental     Alias for --max-age=24 (re-extract if older than 24h)
+  --help, -h        Show this help
 
 Available Seasons: 2005-2025
 
@@ -63,6 +75,7 @@ Examples:
   bun src/extract/wla/run.ts --season=2024
   bun src/extract/wla/run.ts --all
   bun src/extract/wla/run.ts --season=2024 --force --schedule
+  bun src/extract/wla/run.ts --all --incremental
 `);
 };
 
@@ -74,11 +87,13 @@ const runExtraction = (args: CliArgs) =>
       yield* extractor.extractAll({
         skipExisting: !args.force,
         includeSchedule: args.schedule,
+        maxAgeHours: args.maxAgeHours,
       });
     } else {
       yield* extractor.extractSeason(args.season, {
         skipExisting: !args.force,
         includeSchedule: args.schedule,
+        maxAgeHours: args.maxAgeHours,
       });
     }
   });

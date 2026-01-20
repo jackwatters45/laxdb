@@ -3,6 +3,7 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
 
 import { ExtractConfigService } from "../extract.config";
+import { isEntityStale } from "../extract.schema";
 
 // MLL Entity Status - same structure as NLL/PLL
 export const MLLEntityStatus = Schema.Struct({
@@ -165,6 +166,17 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
         return seasonManifest[entity].extracted;
       };
 
+      /** Check if an entity's data is stale based on max age. */
+      const isStale = (
+        manifest: MLLExtractionManifest,
+        year: number,
+        entity: keyof MLLSeasonManifest,
+        maxAgeHours: number | null,
+      ): boolean => {
+        const seasonManifest = getSeasonManifest(manifest, year);
+        return isEntityStale(seasonManifest[entity], maxAgeHours);
+      };
+
       return {
         load,
         save,
@@ -172,6 +184,7 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
         updateEntityStatus,
         markComplete,
         isExtracted,
+        isStale,
       };
     }),
     dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],

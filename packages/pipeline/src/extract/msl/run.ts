@@ -19,6 +19,7 @@ interface CliArgs {
   season: number;
   all: boolean;
   force: boolean;
+  maxAgeHours: number | null;
   help: boolean;
 }
 
@@ -33,10 +34,19 @@ const parseArgs = (): CliArgs => {
     ? parseInt(seasonArg.split("=")[1] ?? "", 10)
     : DEFAULT_SEASON_ID;
 
+  const maxAgeArg = args.find((a) => a.startsWith("--max-age="));
+  let maxAgeHours: number | null = null;
+  if (maxAgeArg) {
+    maxAgeHours = parseInt(maxAgeArg.split("=")[1] ?? "", 10);
+  } else if (args.includes("--incremental")) {
+    maxAgeHours = 24; // Default: 24 hours for incremental
+  }
+
   return {
     season,
     all: args.includes("--all"),
     force: args.includes("--force"),
+    maxAgeHours,
     help: args.includes("--help") || args.includes("-h"),
   };
 };
@@ -53,10 +63,12 @@ Usage:
   bun src/extract/msl/run.ts [options]
 
 Options:
-  --season=ID     Extract specific season by Gamesheet ID (default: ${DEFAULT_SEASON_ID})
-  --all           Extract all seasons (2023-2025)
-  --force         Re-extract even if already done
-  --help, -h      Show this help
+  --season=ID       Extract specific season by Gamesheet ID (default: ${DEFAULT_SEASON_ID})
+  --all             Extract all seasons (2023-2025)
+  --force           Re-extract even if already done
+  --max-age=HOURS   Re-extract if data is older than N hours
+  --incremental     Alias for --max-age=24 (re-extract if older than 24h)
+  --help, -h        Show this help
 
 Available Seasons:
 ${seasons}
@@ -66,6 +78,7 @@ Examples:
   bun src/extract/msl/run.ts --season=9567
   bun src/extract/msl/run.ts --all
   bun src/extract/msl/run.ts --season=9567 --force
+  bun src/extract/msl/run.ts --all --incremental
 `);
 };
 
@@ -76,10 +89,12 @@ const runExtraction = (args: CliArgs) =>
     if (args.all) {
       yield* extractor.extractAll({
         skipExisting: !args.force,
+        maxAgeHours: args.maxAgeHours,
       });
     } else {
       yield* extractor.extractSeason(args.season, {
         skipExisting: !args.force,
+        maxAgeHours: args.maxAgeHours,
       });
     }
   });

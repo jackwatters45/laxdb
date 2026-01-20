@@ -16,6 +16,7 @@ import {
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
 import {
+  type ExtractOptions,
   type SeasonManifest,
   emptyExtractResult,
   withTiming,
@@ -341,13 +342,14 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
       const extractYear = (
         year: number,
-        options: {
-          includeDetails?: boolean;
-          skipExisting?: boolean;
-        } = {},
+        options: ExtractOptions & { includeDetails?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const { includeDetails = true, skipExisting = true } = options;
+          const {
+            includeDetails = true,
+            skipExisting = true,
+            maxAgeHours = null,
+          } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting PLL ${year}`);
@@ -357,6 +359,15 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
           const shouldExtract = (entity: keyof SeasonManifest): boolean => {
             if (!skipExisting) return true;
+            // Check staleness if maxAgeHours is specified
+            if (maxAgeHours !== null) {
+              return manifestService.isStale(
+                manifest,
+                year,
+                entity,
+                maxAgeHours,
+              );
+            }
             return !manifestService.isExtracted(manifest, year, entity);
           };
 
@@ -571,7 +582,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
         });
 
       const extractAll = (
-        options: { includeDetails?: boolean; skipExisting?: boolean } = {},
+        options: ExtractOptions & { includeDetails?: boolean } = {},
       ) =>
         Effect.gen(function* () {
           yield* Effect.log("🏈 PLL Full Extraction");
