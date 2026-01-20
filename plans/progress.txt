@@ -23,3 +23,13 @@ Gotchas: None
 Summary: Already better than proposed - uses exhaustiveness check instead of default
 Files: None (already done)
 Gotchas: TypeScript exhaustiveness check (const _: never = error) is better than default case
+
+[pipeline-001-jsdoc] COMPLETE
+Summary: Already appropriate - extractors have minimal 1-line JSDoc
+Files: None (not needed)
+Gotchas: Original todo assumed excessive JSDoc that was never added
+
+[pipeline-004] COMPLETE
+Summary: Added GraphQLError to PipelineError union, simplified isCriticalError signature
+Files: error.ts, graphql.service.ts, extract/util.ts
+Gotchas: Re-export GraphQLError from graphql.service.ts for backwards compatibility

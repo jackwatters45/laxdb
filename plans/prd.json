@@ -129,22 +129,24 @@
     "id": "pipeline-001-jsdoc",
     "category": "simplicity",
     "description": "Remove excessive JSDoc duplication across extractors",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add single module-level doc in extract/util.ts",
       "Remove per-method JSDoc duplication from 5 extractors"
-    ]
+    ],
+    "notes": "Already appropriate: extractors have minimal 1-line JSDoc (@see isCriticalError). Not excessive."
   },
   {
     "id": "pipeline-004",
     "category": "architecture",
     "description": "Add GraphQLError to PipelineError union",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add GraphQLError to PipelineError type in error.ts",
       "Update isCriticalError signature",
       "Update any dependent code"
-    ]
+    ],
+    "notes": "Moved GraphQLError from graphql.service.ts to error.ts. Simplified isCriticalError signature."
   },
   {
     "id": "pipeline-005-url",

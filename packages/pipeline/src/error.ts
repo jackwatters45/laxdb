@@ -66,9 +66,28 @@ export class ParseError extends Schema.TaggedError<ParseError>("ParseError")(
   },
 ) {}
 
+/**
+ * GraphQL-level error (errors array in response).
+ * Distinct from HTTP errors - the request succeeded but the GraphQL operation failed.
+ */
+export class GraphQLError extends Schema.TaggedError<GraphQLError>(
+  "GraphQLError",
+)("GraphQLError", {
+  message: Schema.String,
+  errors: Schema.Array(
+    Schema.Struct({
+      message: Schema.String,
+      path: Schema.optional(
+        Schema.Array(Schema.Union(Schema.String, Schema.Number)),
+      ),
+    }),
+  ),
+}) {}
+
 export type PipelineError =
   | HttpError
   | NetworkError
   | TimeoutError
   | RateLimitError
-  | ParseError;
+  | ParseError
+  | GraphQLError;

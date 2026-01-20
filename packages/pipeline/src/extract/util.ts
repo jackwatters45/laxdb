@@ -4,7 +4,6 @@ import { FileSystem, Path } from "@effect/platform";
 import type { PlatformError } from "@effect/platform/Error";
 import { Duration, Effect, Either, Schema } from "effect";
 
-import type { GraphQLError } from "../api-client/graphql.service";
 import { type PipelineError, type RateLimitError } from "../error";
 
 /**
@@ -62,9 +61,7 @@ export const saveJson = <T>(filePath: string, data: T) =>
  *   return emptyExtractResult([]);
  * }
  */
-export const isCriticalError = (
-  error: PipelineError | GraphQLError,
-): boolean => {
+export const isCriticalError = (error: PipelineError): boolean => {
   switch (error._tag) {
     case "NetworkError":
     case "TimeoutError":

@@ -2,6 +2,7 @@ import { Duration, Effect, Schedule, Schema } from "effect";
 
 import { DEFAULT_PIPELINE_CONFIG } from "../config";
 import {
+  GraphQLError,
   HttpError,
   NetworkError,
   ParseError,
@@ -12,22 +13,11 @@ import {
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
 
-export class GraphQLError extends Schema.TaggedError<GraphQLError>(
-  "GraphQLError",
-)("GraphQLError", {
-  message: Schema.String,
-  errors: Schema.Array(
-    Schema.Struct({
-      message: Schema.String,
-      path: Schema.optional(
-        Schema.Array(Schema.Union(Schema.String, Schema.Number)),
-      ),
-    }),
-  ),
-}) {}
+// Re-export for backwards compatibility
+export { GraphQLError } from "../error";
 
 // RateLimitError handled separately - server provides retry-after delay
-const isTransientError = (error: PipelineError | GraphQLError): boolean =>
+const isTransientError = (error: PipelineError): boolean =>
   error._tag === "NetworkError" || error._tag === "TimeoutError";
 
 export const makeGraphQLClient = (config: GraphQLClientConfig) => {
@@ -54,7 +44,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     request: GraphQLRequest,
     dataSchema: Schema.Schema<A, I>,
     timeoutMs?: number,
-  ): Effect.Effect<A, PipelineError | GraphQLError> =>
+  ): Effect.Effect<A, PipelineError> =>
     Effect.gen(function* () {
       const timeout = timeoutMs ?? defaultTimeout;
       const url = config.endpoint;
@@ -171,7 +161,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     request: GraphQLRequest,
     dataSchema: Schema.Schema<A, I>,
     timeoutMs?: number,
-  ): Effect.Effect<A, PipelineError | GraphQLError> =>
+  ): Effect.Effect<A, PipelineError> =>
     execute(request, dataSchema, timeoutMs).pipe(
       Effect.retry(transientRetrySchedule),
       Effect.catchTag("RateLimitError", (error) =>
