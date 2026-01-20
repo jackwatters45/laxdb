@@ -43,10 +43,10 @@ export const makeRestClient = (config: RestClientConfig) => {
     return headers;
   };
 
-  const request = <T>(
+  const request = <T, I>(
     method: HttpMethod,
     endpoint: string,
-    schema: Schema.Schema<T>,
+    schema: Schema.Schema<T, I>,
     body?: unknown,
     options?: RestRequestOptions,
   ): Effect.Effect<T, PipelineError> =>
@@ -151,10 +151,10 @@ export const makeRestClient = (config: RestClientConfig) => {
     Duration.millis(retryDelayMs),
   ).pipe(Schedule.compose(Schedule.recurs(maxRetries)));
 
-  const requestWithRetry = <T>(
+  const requestWithRetry = <T, I>(
     method: HttpMethod,
     endpoint: string,
-    schema: Schema.Schema<T>,
+    schema: Schema.Schema<T, I>,
     body?: unknown,
     options?: RestRequestOptions,
   ): Effect.Effect<T, PipelineError> =>
@@ -172,43 +172,43 @@ export const makeRestClient = (config: RestClientConfig) => {
     );
 
   return {
-    get: <T>(
+    get: <T, I = T>(
       endpoint: string,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       options?: RestRequestOptions,
     ) => requestWithRetry("GET", endpoint, schema, undefined, options),
 
-    post: <T>(
+    post: <T, I = T>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       options?: RestRequestOptions,
     ) => requestWithRetry("POST", endpoint, schema, body, options),
 
-    put: <T>(
+    put: <T, I = T>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       options?: RestRequestOptions,
     ) => requestWithRetry("PUT", endpoint, schema, body, options),
 
-    patch: <T>(
+    patch: <T, I = T>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       options?: RestRequestOptions,
     ) => requestWithRetry("PATCH", endpoint, schema, body, options),
 
-    delete: <T>(
+    delete: <T, I = T>(
       endpoint: string,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       options?: RestRequestOptions,
     ) => requestWithRetry("DELETE", endpoint, schema, undefined, options),
 
-    requestOnce: <T>(
+    requestOnce: <T, I = T>(
       method: HttpMethod,
       endpoint: string,
-      schema: Schema.Schema<T>,
+      schema: Schema.Schema<T, I>,
       body?: unknown,
       options?: RestRequestOptions,
     ) => request(method, endpoint, schema, body, options),

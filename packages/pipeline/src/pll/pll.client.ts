@@ -1,9 +1,9 @@
-import { Effect, type ParseResult, Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import { makeGraphQLClient } from "../api-client/graphql.service";
 import { makeRestClient } from "../api-client/rest-client.service";
 import { PLLConfig } from "../config";
-import { ParseError } from "../error";
+import { mapParseError } from "../util";
 
 import {
   ADVANCED_PLAYERS_QUERY,
@@ -42,12 +42,6 @@ import {
   PLLTeamsRequest,
   PLLTeamsResponse,
 } from "./pll.schema";
-
-const mapParseError = (error: ParseResult.ParseError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
 
 export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
   effect: Effect.gen(function* () {
