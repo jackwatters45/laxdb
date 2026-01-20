@@ -3,6 +3,7 @@ import { BunContext } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
 
 import { ExtractConfigService } from "../extract.config";
+import { isEntityStale } from "../extract.schema";
 
 // NLL Entity Status - same structure as PLL
 export const NLLEntityStatus = Schema.Struct({
@@ -155,12 +156,24 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
         return entityStatus?.extracted ?? false;
       };
 
+      /** Check if an entity's data is stale based on max age. */
+      const isStale = (
+        manifest: NLLExtractionManifest,
+        seasonId: number,
+        entity: keyof NLLSeasonManifest,
+        maxAgeHours: number | null,
+      ): boolean => {
+        const seasonManifest = getSeasonManifest(manifest, seasonId);
+        return isEntityStale(seasonManifest[entity], maxAgeHours);
+      };
+
       return {
         load,
         save,
         getSeasonManifest,
         markComplete,
         isExtracted,
+        isStale,
       };
     }),
     dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],

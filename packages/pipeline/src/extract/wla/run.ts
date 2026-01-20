@@ -3,91 +3,101 @@
  *
  * Usage:
  *   bun src/extract/wla/run.ts
- *   bun src/extract/wla/run.ts --season=2024
+ *   bun src/extract/wla/run.ts --season 2024
  *   bun src/extract/wla/run.ts --all
  *   bun src/extract/wla/run.ts --force
  *   bun src/extract/wla/run.ts --schedule
  */
 
+import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
-import { WLAExtractorService } from "./wla.extractor";
+import type { ExtractionMode } from "../incremental.service";
 
-interface CliArgs {
-  season: number;
-  all: boolean;
-  force: boolean;
-  schedule: boolean;
-  help: boolean;
-}
+import { WLAExtractorService } from "./wla.extractor";
 
 // Default to current year
 const DEFAULT_SEASON = new Date().getFullYear();
 
-const parseArgs = (): CliArgs => {
-  const args = process.argv.slice(2);
+// CLI Options
+const seasonOption = Options.integer("season").pipe(
+  Options.withAlias("s"),
+  Options.withDescription(`Season year (default: ${DEFAULT_SEASON})`),
+  Options.withDefault(DEFAULT_SEASON),
+);
 
-  const seasonArg = args.find((a) => a.startsWith("--season="));
-  const season = seasonArg
-    ? parseInt(seasonArg.split("=")[1] ?? "", 10)
-    : DEFAULT_SEASON;
+const allOption = Options.boolean("all").pipe(
+  Options.withAlias("a"),
+  Options.withDescription("Extract all seasons (2005-2025)"),
+  Options.withDefault(false),
+);
 
-  return {
-    season,
-    all: args.includes("--all"),
-    force: args.includes("--force"),
-    schedule: args.includes("--schedule"),
-    help: args.includes("--help") || args.includes("-h"),
-  };
+const scheduleOption = Options.boolean("schedule").pipe(
+  Options.withDescription("Include schedule extraction"),
+  Options.withDefault(false),
+);
+
+const forceOption = Options.boolean("force").pipe(
+  Options.withAlias("f"),
+  Options.withDescription("Re-extract everything (mode: full)"),
+  Options.withDefault(false),
+);
+
+const incrementalOption = Options.boolean("incremental").pipe(
+  Options.withAlias("i"),
+  Options.withDescription(
+    "Re-extract stale data - 24h for current seasons (mode: incremental)",
+  ),
+  Options.withDefault(false),
+);
+
+// Derive extraction mode from options
+const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
+  if (force) return "full";
+  if (incremental) return "incremental";
+  return "skip-existing";
 };
 
-const printHelp = () => {
-  console.log(`
-WLA Data Extraction CLI
+// Main command
+const wlaCommand = Command.make(
+  "wla",
+  {
+    season: seasonOption,
+    all: allOption,
+    schedule: scheduleOption,
+    force: forceOption,
+    incremental: incrementalOption,
+  },
+  ({ season, all, schedule, force, incremental }) =>
+    Effect.gen(function* () {
+      const extractor = yield* WLAExtractorService;
+      const mode = getMode(force, incremental);
 
-Usage:
-  bun src/extract/wla/run.ts [options]
+      yield* Effect.log(`Extraction mode: ${mode}`);
 
-Options:
-  --season=YYYY   Extract specific season by year (default: ${DEFAULT_SEASON})
-  --all           Extract all seasons (2005-2025)
-  --force         Re-extract even if already done
-  --schedule      Include schedule extraction
-  --help, -h      Show this help
+      if (all) {
+        yield* extractor.extractAll({
+          mode,
+          includeSchedule: schedule,
+        });
+      } else {
+        yield* extractor.extractSeason(season, {
+          mode,
+          includeSchedule: schedule,
+        });
+      }
+    }),
+);
 
-Available Seasons: 2005-2025
+// CLI runner
+const cli = Command.run(wlaCommand, {
+  name: "WLA Extractor",
+  version: "1.0.0",
+});
 
-Examples:
-  bun src/extract/wla/run.ts
-  bun src/extract/wla/run.ts --season=2024
-  bun src/extract/wla/run.ts --all
-  bun src/extract/wla/run.ts --season=2024 --force --schedule
-`);
-};
-
-const runExtraction = (args: CliArgs) =>
-  Effect.gen(function* () {
-    const extractor = yield* WLAExtractorService;
-
-    if (args.all) {
-      yield* extractor.extractAll({
-        skipExisting: !args.force,
-        includeSchedule: args.schedule,
-      });
-    } else {
-      yield* extractor.extractSeason(args.season, {
-        skipExisting: !args.force,
-        includeSchedule: args.schedule,
-      });
-    }
-  });
-
-const args = parseArgs();
-
-if (args.help) {
-  printHelp();
-} else {
-  const MainLayer = Layer.merge(WLAExtractorService.Default, BunContext.layer);
-  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
-}
+// Run with dependencies
+cli(process.argv).pipe(
+  Effect.provide(Layer.merge(WLAExtractorService.Default, BunContext.layer)),
+  BunRuntime.runMain,
+);

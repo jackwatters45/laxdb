@@ -13,6 +13,10 @@ import type {
 import { WLASeasonId } from "../../wla/wla.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
+import {
+  IncrementalExtractionService,
+  type IncrementalExtractOptions,
+} from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { WLASeasonManifest } from "./wla.manifest";
@@ -32,6 +36,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
       const client = yield* WLAClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* WLAManifestService;
+      const incremental = yield* IncrementalExtractionService;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -176,13 +181,10 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
 
       const extractSeason = (
         seasonId: number,
-        options: {
-          skipExisting?: boolean;
-          includeSchedule?: boolean;
-        } = {},
+        options: IncrementalExtractOptions & { includeSchedule?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const { skipExisting = true, includeSchedule = false } = options;
+          const { includeSchedule = false } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting WLA ${seasonId}`);
@@ -191,8 +193,12 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           let manifest = yield* manifestService.load;
 
           const shouldExtract = (entity: keyof WLASeasonManifest): boolean => {
-            if (!skipExisting) return true;
-            return !manifestService.isExtracted(manifest, seasonId, entity);
+            const seasonManifest = manifestService.getSeasonManifest(
+              manifest,
+              seasonId,
+            );
+            const entityStatus = seasonManifest[entity];
+            return incremental.shouldExtract(entityStatus, seasonId, options);
           };
 
           // Extract teams
@@ -280,15 +286,13 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         });
 
       const extractAll = (
-        options: {
-          skipExisting?: boolean;
+        options: IncrementalExtractOptions & {
           includeSchedule?: boolean;
           startYear?: number;
           endYear?: number;
         } = {},
       ) =>
         Effect.gen(function* () {
-          const skipExisting = options.skipExisting ?? true;
           const includeSchedule = options.includeSchedule ?? false;
           const startYear = options.startYear ?? 2005;
           const endYear = options.endYear ?? 2025;
@@ -303,7 +307,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             `WLA EXTRACTION: ${totalSeasons} seasons (${startYear}-${endYear})`,
           );
           yield* Effect.log(
-            `Options: skipExisting=${skipExisting}, includeSchedule=${includeSchedule}`,
+            `Options: mode=${options.mode ?? "skip-existing"}, includeSchedule=${includeSchedule}`,
           );
           yield* Effect.log("#".repeat(60));
 
@@ -315,7 +319,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               `\n>>> Progress: ${i + 1}/${totalSeasons} seasons`,
             );
             lastManifest = yield* extractSeason(year, {
-              skipExisting,
+              ...options,
               includeSchedule,
             });
           }
@@ -356,6 +360,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         WLAClient.Default,
         ExtractConfigService.Default,
         WLAManifestService.Default,
+        IncrementalExtractionService.Default,
         BunContext.layer,
       ),
     ],

@@ -10,6 +10,7 @@ import {
   ExtractionManifest as ExtractionManifestSchema,
   createEmptyManifest,
   createEmptySeasonManifest,
+  isEntityStale,
 } from "../extract.schema";
 
 export class PLLManifestService extends Effect.Service<PLLManifestService>()(
@@ -120,6 +121,17 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         return seasonManifest[entity].extracted;
       };
 
+      /** Check if an entity's data is stale based on max age. */
+      const isStale = (
+        manifest: ExtractionManifest,
+        year: number,
+        entity: keyof SeasonManifest,
+        maxAgeHours: number | null,
+      ): boolean => {
+        const seasonManifest = getSeasonManifest(manifest, year);
+        return isEntityStale(seasonManifest[entity], maxAgeHours);
+      };
+
       return {
         load,
         save,
@@ -127,6 +139,7 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         updateEntityStatus,
         markComplete,
         isExtracted,
+        isStale,
       };
     }),
     dependencies: [Layer.merge(ExtractConfigService.Default, BunContext.layer)],

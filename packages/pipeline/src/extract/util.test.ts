@@ -1,5 +1,6 @@
 import { FileSystem } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
+import { SystemError } from "@effect/platform/Error";
 import { Effect, Exit, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -19,11 +20,11 @@ describe("saveJson", () => {
     makeDirectory?: (
       path: string,
       options?: FileSystem.MakeDirectoryOptions,
-    ) => Effect.Effect<void, Error>;
+    ) => Effect.Effect<void, SystemError>;
     writeFileString?: (
       path: string,
       data: string,
-    ) => Effect.Effect<void, Error>;
+    ) => Effect.Effect<void, SystemError>;
   }) => {
     const baseMock = {
       makeDirectory: () => Effect.void,
@@ -74,7 +75,15 @@ describe("saveJson", () => {
     const TestLayer = createTestLayer({
       makeDirectory: () => Effect.void,
       writeFileString: () =>
-        Effect.fail(new Error("Disk full")) as Effect.Effect<void, Error>,
+        Effect.fail(
+          new SystemError({
+            reason: "InvalidData",
+            module: "FileSystem",
+            method: "writeFileString",
+            description: "Disk full",
+            pathOrDescriptor: "/tmp/test.json",
+          }),
+        ),
     });
 
     const result = await Effect.runPromiseExit(
@@ -97,10 +106,15 @@ describe("saveJson", () => {
   it("fails with descriptive error when directory creation fails", async () => {
     const TestLayer = createTestLayer({
       makeDirectory: () =>
-        Effect.fail(new Error("Permission denied")) as Effect.Effect<
-          void,
-          Error
-        >,
+        Effect.fail(
+          new SystemError({
+            reason: "PermissionDenied",
+            module: "FileSystem",
+            method: "makeDirectory",
+            description: "Permission denied",
+            pathOrDescriptor: "/root/forbidden",
+          }),
+        ),
     });
 
     const result = await Effect.runPromiseExit(

@@ -3,102 +3,105 @@
  *
  * Usage:
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --all
- *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024
- *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --no-details
- *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --force
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --no-details
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --force
  */
 
+import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
-import { PLLClient } from "../../pll/pll.client";
-import { ExtractConfigService } from "../extract.config";
+import type { ExtractionMode } from "../incremental.service";
 
 import { PLLExtractorService } from "./pll.extractor";
-import { PLLManifestService } from "./pll.manifest";
 
-interface CliArgs {
-  all: boolean;
-  year: number | null;
-  includeDetails: boolean;
-  force: boolean;
-  help: boolean;
-}
-
-const parseArgs = (): CliArgs => {
-  const args = process.argv.slice(2);
-
-  const yearArg = args.find((a) => a.startsWith("--year="));
-  const year = yearArg ? parseInt(yearArg.split("=")[1] ?? "", 10) : null;
-
-  return {
-    all: args.includes("--all"),
-    year,
-    includeDetails: !args.includes("--no-details"),
-    force: args.includes("--force"),
-    help: args.includes("--help") || args.includes("-h"),
-  };
-};
-
-const printHelp = () => {
-  console.log(`
-PLL Data Extraction CLI
-
-Usage:
-  bun src/extract/pll/run.ts [options]
-
-Options:
-  --all           Extract all years (2019-2025)
-  --year=YYYY     Extract specific year
-  --no-details    Skip detail endpoints (faster)
-  --force         Re-extract even if already done
-  --help, -h      Show this help
-
-Examples:
-  infisical run --env=dev -- bun src/extract/pll/run.ts --all
-  infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024
-  infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --no-details
-  infisical run --env=dev -- bun src/extract/pll/run.ts --all --force
-`);
-};
-
-const runExtraction = (args: CliArgs) =>
-  Effect.gen(function* () {
-    const extractor = yield* PLLExtractorService;
-    const options = {
-      includeDetails: args.includeDetails,
-      skipExisting: !args.force,
-    };
-
-    if (args.all) {
-      yield* extractor.extractAll(options);
-    } else if (args.year) {
-      if (args.year < 2019 || args.year > 2030) {
-        return yield* Effect.fail(
-          `Invalid year ${args.year}. Must be 2019-2030.`,
-        );
-      }
-      yield* extractor.extractYear(args.year, options);
-    }
-  });
-
-const MainLive = Layer.mergeAll(
-  PLLClient.Default,
-  ExtractConfigService.Default,
-).pipe(
-  Layer.provideMerge(PLLManifestService.Default),
-  Layer.provideMerge(PLLExtractorService.Default),
+// CLI Options
+const yearOption = Options.integer("year").pipe(
+  Options.withAlias("y"),
+  Options.withDescription("Extract specific year (2019-2030)"),
+  Options.optional,
 );
 
-const args = parseArgs();
+const allOption = Options.boolean("all").pipe(
+  Options.withAlias("a"),
+  Options.withDescription("Extract all years (2019-2025)"),
+  Options.withDefault(false),
+);
 
-if (args.help) {
-  printHelp();
-} else if (!args.all && !args.year) {
-  console.error("Error: Must specify --all or --year=YYYY");
-  printHelp();
-  process.exit(1);
-} else {
-  const MainLayer = Layer.merge(MainLive, BunContext.layer);
-  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
-}
+const noDetailsOption = Options.boolean("no-details").pipe(
+  Options.withDescription("Skip detail endpoints (faster)"),
+  Options.withDefault(false),
+);
+
+const forceOption = Options.boolean("force").pipe(
+  Options.withAlias("f"),
+  Options.withDescription("Re-extract everything (mode: full)"),
+  Options.withDefault(false),
+);
+
+const incrementalOption = Options.boolean("incremental").pipe(
+  Options.withAlias("i"),
+  Options.withDescription(
+    "Re-extract stale data - 24h for current seasons (mode: incremental)",
+  ),
+  Options.withDefault(false),
+);
+
+// Derive extraction mode from options
+const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
+  if (force) return "full";
+  if (incremental) return "incremental";
+  return "skip-existing";
+};
+
+// Main command
+const pllCommand = Command.make(
+  "pll",
+  {
+    year: yearOption,
+    all: allOption,
+    noDetails: noDetailsOption,
+    force: forceOption,
+    incremental: incrementalOption,
+  },
+  ({ year, all, noDetails, force, incremental }) =>
+    Effect.gen(function* () {
+      const extractor = yield* PLLExtractorService;
+      const mode = getMode(force, incremental);
+      const includeDetails = !noDetails;
+
+      // Validate: must specify --all or --year
+      const yearValue = Option.getOrNull(year);
+      if (!all && yearValue === null) {
+        yield* Effect.logError("Error: Must specify --all or --year=YYYY");
+        return yield* Effect.fail("Missing required option");
+      }
+
+      // Validate year range
+      if (yearValue !== null && (yearValue < 2019 || yearValue > 2030)) {
+        yield* Effect.logError(`Invalid year ${yearValue}. Must be 2019-2030.`);
+        return yield* Effect.fail("Invalid year");
+      }
+
+      yield* Effect.log(`Extraction mode: ${mode}`);
+
+      if (all) {
+        yield* extractor.extractAll({ mode, includeDetails });
+      } else if (yearValue !== null) {
+        yield* extractor.extractYear(yearValue, { mode, includeDetails });
+      }
+    }),
+);
+
+// CLI runner
+const cli = Command.run(pllCommand, {
+  name: "PLL Extractor",
+  version: "1.0.0",
+});
+
+// Run with dependencies
+cli(process.argv).pipe(
+  Effect.provide(Layer.merge(PLLExtractorService.Default, BunContext.layer)),
+  BunRuntime.runMain,
+);

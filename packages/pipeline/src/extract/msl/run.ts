@@ -3,92 +3,106 @@
  *
  * Usage:
  *   bun src/extract/msl/run.ts
- *   bun src/extract/msl/run.ts --season=9567
+ *   bun src/extract/msl/run.ts --season 9567
  *   bun src/extract/msl/run.ts --all
  *   bun src/extract/msl/run.ts --force
  */
 
+import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Console, Effect, Layer } from "effect";
 
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
+import type { ExtractionMode } from "../incremental.service";
 
 import { MSLExtractorService } from "./msl.extractor";
-
-interface CliArgs {
-  season: number;
-  all: boolean;
-  force: boolean;
-  help: boolean;
-}
 
 // Get most recent season ID as default (2024-25 season)
 const DEFAULT_SEASON_ID = 9567;
 
-const parseArgs = (): CliArgs => {
-  const args = process.argv.slice(2);
+// CLI Options
+const seasonOption = Options.integer("season").pipe(
+  Options.withAlias("s"),
+  Options.withDescription(
+    `Gamesheet season ID (default: ${DEFAULT_SEASON_ID})`,
+  ),
+  Options.withDefault(DEFAULT_SEASON_ID),
+);
 
-  const seasonArg = args.find((a) => a.startsWith("--season="));
-  const season = seasonArg
-    ? parseInt(seasonArg.split("=")[1] ?? "", 10)
-    : DEFAULT_SEASON_ID;
+const allOption = Options.boolean("all").pipe(
+  Options.withAlias("a"),
+  Options.withDescription("Extract all seasons (2023-2025)"),
+  Options.withDefault(false),
+);
 
-  return {
-    season,
-    all: args.includes("--all"),
-    force: args.includes("--force"),
-    help: args.includes("--help") || args.includes("-h"),
-  };
+const forceOption = Options.boolean("force").pipe(
+  Options.withAlias("f"),
+  Options.withDescription("Re-extract everything (mode: full)"),
+  Options.withDefault(false),
+);
+
+const incrementalOption = Options.boolean("incremental").pipe(
+  Options.withAlias("i"),
+  Options.withDescription(
+    "Re-extract stale data - 24h for current seasons (mode: incremental)",
+  ),
+  Options.withDefault(false),
+);
+
+const listSeasonsOption = Options.boolean("list-seasons").pipe(
+  Options.withDescription("Show available Gamesheet season IDs"),
+  Options.withDefault(false),
+);
+
+// Derive extraction mode from options
+const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
+  if (force) return "full";
+  if (incremental) return "incremental";
+  return "skip-existing";
 };
 
-const printHelp = () => {
-  const seasons = Object.entries(MSL_GAMESHEET_SEASONS)
-    .map(([year, id]) => `  ${id} = ${year} season`)
-    .join("\n");
+// Main command
+const mslCommand = Command.make(
+  "msl",
+  {
+    season: seasonOption,
+    all: allOption,
+    force: forceOption,
+    incremental: incrementalOption,
+    listSeasons: listSeasonsOption,
+  },
+  ({ season, all, force, incremental, listSeasons }) =>
+    Effect.gen(function* () {
+      // Show available seasons if requested
+      if (listSeasons) {
+        yield* Console.log("Available MSL Gamesheet Seasons:");
+        for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
+          yield* Console.log(`  ${id} = ${year} season`);
+        }
+        return;
+      }
 
-  console.log(`
-MSL Data Extraction CLI
+      const extractor = yield* MSLExtractorService;
+      const mode = getMode(force, incremental);
 
-Usage:
-  bun src/extract/msl/run.ts [options]
+      yield* Effect.log(`Extraction mode: ${mode}`);
 
-Options:
-  --season=ID     Extract specific season by Gamesheet ID (default: ${DEFAULT_SEASON_ID})
-  --all           Extract all seasons (2023-2025)
-  --force         Re-extract even if already done
-  --help, -h      Show this help
+      if (all) {
+        yield* extractor.extractAll({ mode });
+      } else {
+        yield* extractor.extractSeason(season, { mode });
+      }
+    }),
+);
 
-Available Seasons:
-${seasons}
+// CLI runner
+const cli = Command.run(mslCommand, {
+  name: "MSL Extractor",
+  version: "1.0.0",
+});
 
-Examples:
-  bun src/extract/msl/run.ts
-  bun src/extract/msl/run.ts --season=9567
-  bun src/extract/msl/run.ts --all
-  bun src/extract/msl/run.ts --season=9567 --force
-`);
-};
-
-const runExtraction = (args: CliArgs) =>
-  Effect.gen(function* () {
-    const extractor = yield* MSLExtractorService;
-
-    if (args.all) {
-      yield* extractor.extractAll({
-        skipExisting: !args.force,
-      });
-    } else {
-      yield* extractor.extractSeason(args.season, {
-        skipExisting: !args.force,
-      });
-    }
-  });
-
-const args = parseArgs();
-
-if (args.help) {
-  printHelp();
-} else {
-  const MainLayer = Layer.merge(MSLExtractorService.Default, BunContext.layer);
-  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
-}
+// Run with dependencies
+cli(process.argv).pipe(
+  Effect.provide(Layer.merge(MSLExtractorService.Default, BunContext.layer)),
+  BunRuntime.runMain,
+);
