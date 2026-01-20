@@ -1,6 +1,6 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Layer } from "effect";
+import { Duration, Effect, Either, Layer } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
 import type {
@@ -11,28 +11,15 @@ import type {
   NLLTeam,
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
+import {
+  type ExtractResult,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
 
 const NLL_SEASONS = [225] as const;
-type _NLLSeason = (typeof NLL_SEASONS)[number];
-
-interface ExtractResult<T> {
-  data: T;
-  count: number;
-  durationMs: number;
-}
-
-const withTiming = <T, E, R>(
-  effect: Effect.Effect<T, E, R>,
-): Effect.Effect<ExtractResult<T>, E, R> =>
-  Effect.gen(function* () {
-    const start = Date.now();
-    const data = yield* effect;
-    const durationMs = Date.now() - start;
-    const count = Array.isArray(data) ? data.length : 1;
-    return { data, count, durationMs };
-  });
 
 export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
   "NLLExtractorService",
@@ -56,55 +43,52 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
         }).pipe(
           Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write file: ${String(e)}`)),
+            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
           ),
         );
 
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
-          const result = yield* withTiming(client.getTeams({ seasonId }));
-          yield* saveJson(getOutputPath(seasonId, "teams"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+          const result = yield* withTiming(client.getTeams({ seasonId })).pipe(
+            Effect.either,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly NLLTeam[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly NLLTeam[]);
+          }
+          yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
+          yield* Effect.log(
+            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  👥 Extracting players for season ${seasonId}...`,
           );
-          const result = yield* withTiming(client.getPlayers({ seasonId }));
-          yield* saveJson(getOutputPath(seasonId, "players"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} players (${result.durationMs}ms)`,
+          const result = yield* withTiming(
+            client.getPlayers({ seasonId }),
+          ).pipe(Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly NLLPlayer[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "players"),
+            result.right.data,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly NLLPlayer[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          yield* Effect.log(
+            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractPlayerStats = (seasonId: number) =>
         Effect.gen(function* () {
@@ -113,72 +97,70 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           );
           const result = yield* withTiming(
             client.getPlayerStats({ seasonId, phase: "REG" }),
+          ).pipe(Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly NLLPlayerStatsRow[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "player-stats"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(seasonId, "player-stats"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} player stats (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} player stats (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly NLLPlayerStatsRow[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📈 Extracting standings for season ${seasonId}...`,
           );
-          const result = yield* withTiming(client.getStandings({ seasonId }));
-          yield* saveJson(getOutputPath(seasonId, "standings"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} standings (${result.durationMs}ms)`,
+          const result = yield* withTiming(
+            client.getStandings({ seasonId }),
+          ).pipe(Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly NLLStanding[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "standings"),
+            result.right.data,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly NLLStanding[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          yield* Effect.log(
+            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🎮 Extracting schedule for season ${seasonId}...`,
           );
-          const result = yield* withTiming(client.getSchedule({ seasonId }));
-          yield* saveJson(getOutputPath(seasonId, "schedule"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} matches (${result.durationMs}ms)`,
+          const result = yield* withTiming(
+            client.getSchedule({ seasonId }),
+          ).pipe(Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly NLLMatch[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "schedule"),
+            result.right.data,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly NLLMatch[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          yield* Effect.log(
+            `     ✓ ${result.right.count} matches (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractSeason = (
         seasonId: number,
@@ -209,7 +191,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(500));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
           }
@@ -225,7 +207,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(500));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  👥 Players: skipped (already extracted)");
           }
@@ -241,7 +223,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(500));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📈 Standings: skipped (already extracted)");
           }
@@ -257,7 +239,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(500));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🎮 Schedule: skipped (already extracted)");
           }
@@ -284,21 +266,35 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return manifest;
         });
 
+      const extractAll = (options: { skipExisting?: boolean } = {}) =>
+        Effect.gen(function* () {
+          yield* Effect.log("🏈 NLL Full Extraction");
+          yield* Effect.log(`Output directory: ${config.outputDir}`);
+
+          for (const seasonId of NLL_SEASONS) {
+            yield* extractSeason(seasonId, options);
+            yield* Effect.sleep(Duration.millis(config.delayBetweenBatchesMs));
+          }
+
+          const manifest = yield* manifestService.load;
+          yield* Effect.log("\n" + "=".repeat(50));
+          yield* Effect.log("EXTRACTION COMPLETE");
+          yield* Effect.log("=".repeat(50));
+
+          return manifest;
+        });
+
       return {
-        client,
-        config,
-        manifestService,
-        fs,
-        path,
         NLL_SEASONS,
         getOutputPath,
         saveJson,
-        withTiming,
         extractTeams,
         extractPlayers,
+        extractPlayerStats,
         extractStandings,
         extractSchedule,
         extractSeason,
+        extractAll,
       };
     }),
     dependencies: [
