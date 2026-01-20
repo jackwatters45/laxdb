@@ -1,161 +1,103 @@
 [
   {
-    "id": "lint-001",
-    "category": "type-safety",
-    "description": "Fix readJsonFile import in validate.service.ts and validate-pll.ts",
+    "id": "fix-001",
+    "category": "missing-dep",
+    "description": "Install or remove use-sound dependency",
     "passes": true,
     "steps": [
-      "Check if readJsonFile is exported from @laxdb/core/util",
-      "If missing, create readJsonFile in packages/core/src/util.ts",
-      "Verify imports resolve in both files"
+      "Either: bun add use-sound in packages/ui",
+      "Or: Delete src/hooks/use-sound.ts if not needed",
+      "Errors: use-sound.ts lines 2, 3"
     ]
   },
   {
-    "id": "lint-002",
-    "category": "type-safety",
-    "description": "Fix implicit any types in validate-mll.ts",
+    "id": "fix-002",
+    "category": "typecheck",
+    "description": "Fix argument count error in line-graph/source.tsx:157",
     "passes": true,
     "steps": [
-      "Line 352: Add MLLGame type to filter callback (g: MLLGame)",
-      "Line 366: Add MLLGame type to filter callback (g: MLLGame)",
-      "Line 406: Add MLLPlayer type to filter callback (p: MLLPlayer)",
-      "Line 420: Add MLLGoalie type to filter callback (g: MLLGoalie)",
-      "Run bun run typecheck in packages/pipeline"
+      "Line 157: Expected 2 arguments, but got 3",
+      "Check function signature and fix call"
     ]
   },
   {
-    "id": "lint-003",
-    "category": "type-safety",
-    "description": "Fix implicit any types in validate-msl.ts",
+    "id": "fix-003",
+    "category": "typecheck",
+    "description": "Fix argument count error in line-minimap/source.tsx:50",
     "passes": true,
     "steps": [
-      "Line 298: Add MSLPlayer type to filter callback (p: MSLPlayer)",
-      "Line 312: Add MSLGoalie type to filter callback (g: MSLGoalie)",
-      "Line 339: Add MSLGame type to filter callback (g: MSLGame)",
-      "Line 353: Add MSLGame type to filter callback (g: MSLGame)",
-      "Run bun run typecheck in packages/pipeline"
+      "Line 50: Expected 1-3 arguments, but got 0",
+      "Check function signature and provide required args"
     ]
   },
   {
-    "id": "lint-004",
-    "category": "type-safety",
-    "description": "Fix implicit any types in validate-pll.ts",
+    "id": "fix-004",
+    "category": "typecheck",
+    "description": "Fix 'Object possibly undefined' in line-graph/source.tsx",
     "passes": true,
     "steps": [
-      "Line 148: Add type annotation to filter callback",
-      "Line 149: Add type annotation to filter callback",
-      "Line 172: Add types to reduce callback (sum: number, e: EventType)",
-      "Line 294: Add type annotation to filter callback",
-      "Run bun run typecheck in packages/pipeline"
+      "Line 346: Add null check or optional chaining",
+      "Line 350: Add null check or optional chaining"
     ]
   },
   {
-    "id": "lint-005",
-    "category": "type-safety",
-    "description": "Fix implicit any types in validate-wla.ts",
+    "id": "fix-005",
+    "category": "typecheck",
+    "description": "Fix setState undefined assignment in line-graph/source.tsx",
     "passes": true,
     "steps": [
-      "Line 460: Add WLAPlayer type to filter callback (p: WLAPlayer)",
-      "Line 474: Add WLAGoalie type to filter callback (g: WLAGoalie)",
-      "Line 501: Add WLAGame type to filter callback (g: WLAGame)",
-      "Line 515: Add WLAGame type to filter callback (g: WLAGame)",
-      "Run bun run typecheck in packages/pipeline"
+      "Lines 551, 554: string | undefined not assignable to SetStateAction<string>",
+      "Add fallback: setX(value ?? '') or use conditional"
     ]
   },
   {
-    "id": "lint-006",
-    "category": "type-safety",
-    "description": "Fix Effect.provide type errors in all validate-*.ts files",
+    "id": "fix-006",
+    "category": "lint-error",
+    "description": "Fix exhaustive-deps in line-minimap/source.tsx",
     "passes": true,
     "steps": [
-      "Add explicit return type annotation to program: Effect.Effect<void, never, ...>",
-      "Or use Effect.asVoid at end of program",
-      "Fix in: validate-mll.ts:511, validate-msl.ts:382, validate-nll.ts:281, validate-pll.ts:331, validate-wla.ts:544"
+      "Line 159: useEffect missing dependency 'value'",
+      "Add value to deps array or use ref pattern"
     ]
   },
   {
-    "id": "lint-007",
-    "category": "type-safety",
-    "description": "Fix Effect type errors in validate.service.ts",
+    "id": "fix-007",
+    "category": "lint-warning",
+    "description": "Fix no-non-null-assertion in line-minimap/source.tsx",
     "passes": true,
     "steps": [
-      "Line 117: Fix Effect type annotation for validateRequiredFields return",
-      "Ensure proper error type propagation"
+      "Line 162: ref.current! -> add null check",
+      "Line 166: initialValueRef.current! -> add null check",
+      "Line 171: initialValueRef.current! -> add null check"
     ]
   },
   {
-    "id": "lint-008",
-    "category": "type-safety",
-    "description": "Fix Effect type errors in validate.service.test.ts",
+    "id": "fix-008",
+    "category": "lint-warning",
+    "description": "Fix no-non-null-assertion in line-graph/source.tsx",
     "passes": true,
     "steps": [
-      "Lines 58, 81, 101, 120: Fix test callback types",
-      "Add proper type annotations to Effect.scoped callbacks",
-      "Or use Effect.asVoid/Effect.void pattern"
+      "Line 90: rootRef.current! -> add null check",
+      "Line 289: ref.current! -> add null check"
     ]
   },
   {
-    "id": "lint-009",
-    "category": "lint-warnings",
-    "description": "Fix expect.objectContaining lint warnings in test files",
+    "id": "fix-009",
+    "category": "lint-warning",
+    "description": "Remove useless return in line-graph/source.tsx",
     "passes": true,
     "steps": [
-      "graphql.service.test.ts: Lines 52, 103, 128 - Cast expect result or disable rule",
-      "rest-client.test.ts: Lines 48, 87 - Cast expect result or disable rule"
+      "Line 296: Remove unnecessary return statement"
     ]
   },
   {
-    "id": "lint-010",
-    "category": "unused-imports",
-    "description": "Remove unused validateFileExists imports",
+    "id": "fix-010",
+    "category": "lint-warning",
+    "description": "Fix no-array-index-key in line-graph/source.tsx",
     "passes": true,
     "steps": [
-      "validate-msl.ts:18 - Remove validateFileExists from import",
-      "validate-wla.ts:18 - Remove validateFileExists from import"
-    ]
-  },
-  {
-    "id": "lint-011",
-    "category": "unused-vars",
-    "description": "Prefix unused variables with underscore",
-    "passes": true,
-    "steps": [
-      "wla.client.ts:1422 - Rename hasScore to _hasScore",
-      "mll.client.ts:944 - Rename yearFromTimestamp to _yearFromTimestamp",
-      "mll.client.ts:1293 - Rename hasTeam to _hasTeam"
-    ]
-  },
-  {
-    "id": "lint-012",
-    "category": "eqeqeq",
-    "description": "Fix != to !== in nll.schema.ts",
-    "passes": true,
-    "steps": [
-      "Line 277: player.weight != null -> player.weight !== null",
-      "Line 280: player.team_id != null -> player.team_id !== null",
-      "Line 304: player.weight != null -> player.weight !== null",
-      "Line 307: player.team_id != null -> player.team_id !== null",
-      "Line 520: match.winningSquadId != null -> match.winningSquadId !== null",
-      "Line 597: match.winningSquadId != null -> match.winningSquadId !== null"
-    ]
-  },
-  {
-    "id": "lint-013",
-    "category": "eqeqeq",
-    "description": "Fix != to !== in wla.client.ts",
-    "passes": true,
-    "steps": [
-      "Line 989: != null -> !== null"
-    ]
-  },
-  {
-    "id": "lint-014",
-    "category": "no-lonely-if",
-    "description": "Combine nested if conditions",
-    "passes": true,
-    "steps": [
-      "validate-wla.ts:377-379 - Combine win_pct check into single if",
-      "mll.client.ts:1309 - Combine nested if conditions"
+      "Line 355: key={i} -> use unique data key",
+      "Line 370: key={index} -> use unique data key"
     ]
   }
 ]

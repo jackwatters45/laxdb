@@ -106,7 +106,10 @@ export const constructCategoryColors = (
 ): Map<string, AvailableChartColorsKeys> => {
   const categoryColors = new Map<string, AvailableChartColorsKeys>();
   categories.forEach((category, index) => {
-    categoryColors.set(category, colors[index % colors.length]!);
+    const color = colors[index % colors.length];
+    if (color) {
+      categoryColors.set(category, color);
+    }
   });
   return categoryColors;
 };
@@ -135,8 +138,11 @@ export const getYAxisDomain = (
 
 // Tremor hasOnlyOneValueForKey [v0.1.0]
 
-export function hasOnlyOneValueForKey(array: any[], keyToCheck: string): boolean {
-  const val: any[] = [];
+export function hasOnlyOneValueForKey(
+  array: Record<string, unknown>[],
+  keyToCheck: string,
+): boolean {
+  const val: unknown[] = [];
 
   for (const obj of array) {
     if (Object.hasOwn(obj, keyToCheck)) {

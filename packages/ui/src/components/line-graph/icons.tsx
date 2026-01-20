@@ -280,7 +280,7 @@ export function IconChevronRight() {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-       />
+      />
     </svg>
   );
 }
@@ -302,7 +302,7 @@ export function IconChevronLeft() {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-       />
+      />
     </svg>
   );
 }

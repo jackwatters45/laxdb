@@ -1,14 +1,7 @@
 "use client";
 
-import type {
-  MotionValue} from "motion/react";
-import {
-  motion,
-  useSpring,
-  useMotionValueEvent,
-  useScroll,
-  useMotionValue,
-} from "motion/react";
+import type { MotionValue } from "motion/react";
+import { motion, useSpring, useMotionValueEvent, useScroll, useMotionValue } from "motion/react";
 import * as React from "react";
 import { clamp } from "./clamp";
 
@@ -42,14 +35,14 @@ export default function LineMinimap() {
   return (
     <div className="relative" style={{ height: `calc(100vh + ${MAX}px)` }}>
       <motion.div
-        className="fixed translate-center"
+        className="translate-center fixed"
         onPointerMove={onMouseMove}
         onPointerLeave={onMouseLeave}
       >
         <div className="flex items-end" style={{ gap: LINE_GAP }}>
-          {[...Array(LINE_COUNT)].map((_, i) => (
+          {Array.from({ length: LINE_COUNT }).map((_, i) => (
             <Line
-              key={i}
+              key={`line-${i}`}
               index={i}
               scrollX={scrollX}
               mouseX={mouseX}
@@ -111,7 +104,7 @@ export function transformScale(
   distance: number,
   initialValue: number,
   baseValue: number,
-  intensity: number
+  intensity: number,
 ) {
   if (Math.abs(distance) > DISTANCE_LIMIT) {
     return initialValue;
@@ -133,7 +126,7 @@ export interface ProximityOptions {
     distance: number,
     initialValue: number,
     baseValue: number,
-    intensity: number
+    intensity: number,
   ) => number;
 }
 
@@ -148,7 +141,7 @@ export function useProximity(
     intensity = DEFAULT_INTENSITY,
     reset = true,
     transformer = transformScale,
-  }: ProximityOptions
+  }: ProximityOptions,
 ) {
   const initialValueRef = React.useRef<number>(null);
 
@@ -156,26 +149,22 @@ export function useProximity(
     if (!initialValueRef.current) {
       initialValueRef.current = value.get();
     }
-  }, []);
+  }, [value]);
 
   useMotionValueEvent(mouseX, "change", (latest) => {
-    const rect = ref.current!.getBoundingClientRect();
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const distance = latest - centerX;
-    value.set(
-      transformer(distance, initialValueRef.current!, baseValue, intensity)
-    );
+    const initialValue = initialValueRef.current ?? baseValue;
+    value.set(transformer(distance, initialValue, baseValue, intensity));
   });
 
   useMotionValueEvent(scrollX, "change", (latest) => {
-    const initialValue = initialValueRef.current!;
+    const initialValue = initialValueRef.current ?? baseValue;
     const distance = latest - centerX;
-    const targetScale = transformer(
-      distance,
-      initialValue,
-      baseValue,
-      intensity
-    );
+    const targetScale = transformer(distance, initialValue, baseValue, intensity);
 
     if (reset) {
       const currentVelocity = Math.abs(scrollX.getVelocity());
@@ -267,20 +256,11 @@ export function isActive(index: number, count: number): boolean {
 export function Indicator({ x }: { x: MotionValue<number> }) {
   return (
     <motion.div
-      className="flex flex-col bg-orange w-[1px] items-center absolute h-[100vh]! -top-8"
+      className="bg-orange absolute -top-8 flex h-screen! w-[1px] flex-col items-center"
       style={{ x }}
     >
-      <svg
-        width="7"
-        height="6"
-        viewBox="0 0 7 6"
-        fill="none"
-        className="-translate-y-3"
-      >
-        <path
-          d="M3.54688 6L0.515786 0.75L6.57796 0.75L3.54688 6Z"
-          fill="var(--color-orange)"
-        />
+      <svg width="7" height="6" viewBox="0 0 7 6" fill="none" className="-translate-y-3">
+        <path d="M3.54688 6L0.515786 0.75L6.57796 0.75L3.54688 6Z" fill="var(--color-orange)" />
       </svg>
     </motion.div>
   );

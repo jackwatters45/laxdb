@@ -1,8 +1,38 @@
-"use client";
+import { useState, useEffect } from "react";
+import useSound_ from "use-sound";
 
-import { useEffect, useState } from "react";
+interface HookOptions {
+  id?: string;
+  volume?: number;
+  playbackRate?: number;
+  interrupt?: boolean;
+  soundEnabled?: boolean;
+  sprite?: { [key: string]: [number, number] };
+  onload?: () => void;
+}
 
-export function useMediaQuery(query: string): boolean {
+interface PlayOptions {
+  id?: string;
+  forceSoundEnabled?: boolean;
+  playbackRate?: number;
+}
+
+type PlayFunction = (options?: PlayOptions) => void;
+
+export function useSound(path: string, options?: HookOptions): PlayFunction {
+  const isTouchDevice = useMediaQuery("(hover: none)");
+  const isTinyDevice = useMediaQuery("(max-width: 480px)");
+  const isMobile = isTouchDevice || isTinyDevice;
+
+  const [play] = useSound_(path, {
+    soundEnabled: !isMobile,
+    ...options,
+  });
+
+  return play;
+}
+
+function useMediaQuery(query: string): boolean {
   const getMatches = (query: string): boolean => {
     // Prevents SSR issues
     if (typeof window !== "undefined") {

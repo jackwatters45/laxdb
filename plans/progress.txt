@@ -68,3 +68,26 @@ Status: COMPLETE
 Summary: Combined nested if conditions
 Files: validate-wla.ts, mll.client.ts
 Commit: 0ec6329
+
+=== lint-ui-001 + lint-ui-002 ===
+Status: COMPLETE
+Summary: Fixed tw.ts - replaced any[] with Record<string,unknown>[], replaced ! with null check
+Files: packages/ui/src/lib/tw.ts
+
+=== fix-001 ===
+Status: COMPLETE
+Summary: Installed use-sound@4 and inlined types in use-sound.ts hook
+Files: packages/ui/src/hooks/use-sound.ts, package.json
+Gotchas: Module resolution for types from hoisted deps doesn't work in monorepo - inlined types instead
+
+=== fix-002 to fix-010 ===
+Status: COMPLETE
+Summary: Fixed all typecheck and lint errors in line-graph and line-minimap
+Files: 
+  - packages/ui/src/hooks/use-sound.ts (inlined types)
+  - packages/ui/src/hooks/use-scroll-end.ts (added deps param)
+  - packages/ui/src/components/line-graph/source.tsx (null checks, return type, keys)
+  - packages/ui/src/components/line-minimap/source.tsx (null checks, exhaustive-deps, keys)
+Gotchas: 
+  - use-sound@4 types at use-sound/dist/types don't resolve in monorepo - inlined instead
+  - Array(n).fill() needs argument, use Array.from({ length: n }) for clarity

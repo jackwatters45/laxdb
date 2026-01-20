@@ -1,24 +1,16 @@
 "use client";
 
 import * as React from "react";
-import type {
-  MotionValue,
-  TargetAndTransition} from "motion/react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useSpring,
-} from "motion/react";
+import type { MotionValue, TargetAndTransition } from "motion/react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { cx } from "class-variance-authority";
-import type { Activity} from "./data";
+import type { Activity } from "./data";
 import { data } from "./data";
 import * as Icons from "./icons";
-import { useScrollEnd } from "./use-scroll-end";
-import { useSound } from "./use-sound";
-import { useMediaQuery } from "./use-media-query";
-import { useIsHydrated } from "./use-is-hydrated";
+import { useScrollEnd } from "../../hooks/use-scroll-end";
+import { useSound } from "../../hooks/use-sound";
+import { useMediaQuery } from "../../hooks/use-media-query";
+import { useIsHydrated } from "../../hooks/use-is-hydrated";
 
 export const CURSOR_SIZE = 44;
 export const CURSOR_CENTER = CURSOR_SIZE / 2;
@@ -87,11 +79,12 @@ export default function LineGraph() {
     const offsetLeft = boundsRef.current?.offsetLeft ?? 0;
     const offset = scrollLeft - offsetLeft;
 
-    const rootRect = rootRef.current!.getBoundingClientRect();
+    const rootEl = rootRef.current;
+    if (!rootEl) return 0;
+    const rootRect = rootEl.getBoundingClientRect();
     const relativeX = clientX - rootRect.left + offset;
 
-    const snappedX =
-      Math.floor(relativeX / LINE_STEP) * LINE_STEP + offsetLeft - scrollLeft;
+    const snappedX = Math.floor(relativeX / LINE_STEP) * LINE_STEP + offsetLeft - scrollLeft;
 
     return snappedX;
   }
@@ -154,7 +147,7 @@ export default function LineGraph() {
       }
     },
     rootRef,
-    [morph, isTouch]
+    [morph, isTouch],
   );
 
   useMotionValueEvent(scrollX, "change", (latest) => {
@@ -188,7 +181,7 @@ export default function LineGraph() {
       pressed,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeIndex, x, y, morph, idle, pressed]
+    [activeIndex, x, y, morph, idle, pressed],
   );
 
   return (
@@ -216,7 +209,7 @@ export default function LineGraph() {
             <motion.div
               key="meta"
               {...blur}
-              className="absolute bottom-[100%] left-[50%] mb-[16px] flex translate-x-[-50%] flex-col"
+              className="absolute bottom-full left-[50%] mb-4 flex translate-x-[-50%] flex-col"
             >
               {activities.map((activity, index) => (
                 <Meta key={`activity-${index}`} activity={activity} />
@@ -253,8 +246,8 @@ export function Provider({
         }
       }}
       className={cx(
-        "flex min-h-[100vh] cursor-none items-center overflow-y-hidden px-48 max",
-        className
+        "flex min-h-screen cursor-none items-center overflow-y-hidden px-48 max",
+        className,
       )}
       {...props}
     >
@@ -286,14 +279,15 @@ export function Lines({
 
     popSnapIn?.();
     setMorph(true);
-    const bounds = ref.current!.getBoundingClientRect();
+    const el = ref.current;
+    if (!el) return;
+    const bounds = el.getBoundingClientRect();
     const yCenter = bounds.y + (bounds.height / 2 - CURSOR_LARGE_HEIGHT / 2);
 
     const unsubscribe = y.on("change", (latest) => {
       if (latest === yCenter) {
         unsubscribe();
         rubberband.current = true;
-        return;
       }
     });
 
@@ -312,10 +306,7 @@ export function Lines({
     });
   }
 
-  function onPointerMove({
-    movementY,
-    pointerType,
-  }: React.PointerEvent<HTMLDivElement>) {
+  function onPointerMove({ movementY, pointerType }: React.PointerEvent<HTMLDivElement>) {
     if (pointerType === "touch") return;
     if (rubberband.current) {
       movementY = movementY / 4;
@@ -343,31 +334,29 @@ export function Lines({
         let totalDaysPassed = 0;
 
         for (let month = 0; month < daysInMonth.length; month++) {
-          if (totalDaysPassed + daysInMonth[month] > i) {
+          const days = daysInMonth[month] ?? 0;
+          if (totalDaysPassed + days > i) {
             isNewMonth = totalDaysPassed === i;
             break;
           }
-          totalDaysPassed += daysInMonth[month];
+          totalDaysPassed += days;
         }
 
         return (
           <div
-            key={i}
+            key={`day-${i}`}
             className="[&>*[data-highlight=true]]:bg-orange relative flex flex-col gap-1 select-none"
             style={{
               width: LINE_WIDTH,
             }}
           >
             {activities.length === 0 ? (
-              <div
-                data-highlight={isNewMonth}
-                className="bg-gray8 h-8 w-full"
-              />
+              <div data-highlight={isNewMonth} className="bg-gray8 h-8 w-full" />
             ) : (
-              activities.map((activity, index) => {
+              activities.map((activity) => {
                 return (
                   <div
-                    key={index}
+                    key={activity.id}
                     data-highlight={isNewMonth}
                     className="bg-gray12 w-full"
                     style={{ height: getHeightFromMovingTime(activity) }}
@@ -404,7 +393,7 @@ export function Cursor({
       initial={false}
       className={cx(
         "bg-orange pointer-events-none fixed rounded-full [--label-offset:-36px]",
-        className
+        className,
       )}
       style={{ x, y, ...style }}
       animate={{
@@ -447,9 +436,9 @@ export function Label({
       className={cx(
         "text-gray11 pointer-events-none absolute left-[50%] w-fit translate-x-[-50%] font-mono text-[13px] whitespace-nowrap select-none",
         {
-          [`top-[var(--label-offset)]`]: position === "top",
-          [`bottom-[var(--label-offset)]`]: position === "bottom",
-        }
+          [`top-[--label-offset]`]: position === "top",
+          [`bottom-[--label-offset]`]: position === "bottom",
+        },
       )}
       {...blur}
       {...props}
@@ -466,8 +455,7 @@ export function Meta({ activity }: { activity: Activity }) {
   const isRun = activity?.type === "Run";
   const isWalk = activity?.type === "Walk";
   const isRow = activity?.type === "Rowing";
-  const isGym =
-    activity?.type === "Workout" || activity?.type === "WeightTraining";
+  const isGym = activity?.type === "Workout" || activity?.type === "WeightTraining";
   const isRide = activity?.type === "Ride" || activity?.type === "VirtualRide";
 
   const title = React.useMemo(() => {
@@ -512,13 +500,9 @@ export function Meta({ activity }: { activity: Activity }) {
   return (
     <div className="text-gray12 flex items-center justify-center gap-2">
       {icon}
-      <div className="font-mono text-sm whitespace-nowrap select-none">
-        {title}
-      </div>
-      {subtitle && <div className="bg-gray8 h-[2px] w-[2px] rounded-full" />}
-      <div className="font-mono text-sm whitespace-nowrap select-none">
-        {subtitle}
-      </div>
+      <div className="font-mono text-sm whitespace-nowrap select-none">{title}</div>
+      {subtitle && <div className="bg-gray8 h-.5 w-.5 rounded-full" />}
+      <div className="font-mono text-sm whitespace-nowrap select-none">{subtitle}</div>
     </div>
   );
 }
@@ -557,10 +541,10 @@ export function Time() {
     return () => clearInterval(id);
   }, []);
 
-  return <>{time}</>;
+  return time;
 }
 
-export function getTime() {
+export function getTime(): string {
   const date = new Date().toLocaleTimeString([], {
     timeZone: "Europe/Tallinn",
     year: "numeric",
@@ -571,7 +555,7 @@ export function getTime() {
     second: "numeric",
   });
   const [, time] = date.split(", ");
-  return time;
+  return time ?? date;
 }
 
 function clamp(val: number, [min, max]: [number, number]): number {
@@ -608,8 +592,7 @@ export const daysInMonth = Array.from({ length: 12 }, (_, month) => {
   if (month === 1) {
     return isLeapYear(new Date().getFullYear()) ? 29 : 28;
   }
-    return new Date(new Date().getFullYear(), month + 1, 0).getDate();
-  
+  return new Date(new Date().getFullYear(), month + 1, 0).getDate();
 });
 
 export function getFormattedDateByIndex(index: number | null) {
