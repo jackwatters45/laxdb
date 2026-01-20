@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "@effect/platform";
+import { Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
@@ -12,11 +12,8 @@ import type {
 } from "../../msl/msl.schema";
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
-import {
-  type ExtractResult,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+import { emptyExtractResult, withTiming } from "../extract.schema";
+import { saveJson } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
@@ -37,24 +34,12 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const client = yield* MSLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MSLManifestService;
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "msl", String(seasonId), `${entity}.json`);
-
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
-          ),
-        );
 
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
@@ -330,7 +315,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       return {
         MSL_SEASONS,
         getOutputPath,
-        saveJson,
         extractTeams,
         extractPlayers,
         extractGoalies,

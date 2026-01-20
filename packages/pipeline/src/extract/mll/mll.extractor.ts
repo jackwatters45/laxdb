@@ -12,11 +12,8 @@ import type {
   MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
-import {
-  type ExtractResult,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+import { emptyExtractResult, withTiming } from "../extract.schema";
+import { saveJson } from "../util";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
@@ -41,17 +38,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "mll", String(year), `${entity}.json`);
-
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
-          ),
-        );
 
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
@@ -390,7 +376,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
       return {
         MLL_YEARS,
         getOutputPath,
-        saveJson,
         extractTeams,
         extractPlayers,
         extractGoalies,

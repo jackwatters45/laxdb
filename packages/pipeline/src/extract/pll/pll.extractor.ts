@@ -1,18 +1,18 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Duration, Either, Layer, Schema } from "effect";
+import { Duration, Effect, Either, Layer, Schema } from "effect";
 
 import { PLLClient } from "../../pll/pll.client";
 import {
-  PLLTeam,
-  PLLPlayer,
   PLLEvent,
-  type PLLTeamDetail,
-  type PLLPlayerDetail,
-  type PLLEventDetail,
-  type PLLTeamStanding,
-  type PLLGraphQLStanding,
+  PLLPlayer,
+  PLLTeam,
   type PLLAdvancedPlayer,
+  type PLLEventDetail,
+  type PLLGraphQLStanding,
+  type PLLPlayerDetail,
+  type PLLTeamDetail,
+  type PLLTeamStanding,
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
 import {
@@ -20,6 +20,7 @@ import {
   emptyExtractResult,
   withTiming,
 } from "../extract.schema";
+import { saveJson } from "../util";
 
 import { PLLManifestService } from "./pll.manifest";
 
@@ -38,17 +39,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "pll", String(year), `${entity}.json`);
-
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
-          ),
-        );
 
       const readJsonFile = (filePath: string) =>
         fs

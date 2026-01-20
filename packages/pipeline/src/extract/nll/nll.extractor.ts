@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "@effect/platform";
+import { Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
@@ -11,11 +11,8 @@ import type {
   NLLTeam,
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
-import {
-  type ExtractResult,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+import { emptyExtractResult, withTiming } from "../extract.schema";
+import { saveJson } from "../util";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
 
@@ -28,24 +25,12 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
       const client = yield* NLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* NLLManifestService;
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "nll", String(seasonId), `${entity}.json`);
-
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
-          ),
-        );
 
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
@@ -287,7 +272,6 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
       return {
         NLL_SEASONS,
         getOutputPath,
-        saveJson,
         extractTeams,
         extractPlayers,
         extractPlayerStats,

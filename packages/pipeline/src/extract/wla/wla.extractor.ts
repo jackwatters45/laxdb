@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "@effect/platform";
+import { Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
@@ -13,6 +13,7 @@ import type {
 import { WLASeasonId } from "../../wla/wla.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
+import { saveJson } from "../util";
 
 import type { WLASeasonManifest } from "./wla.manifest";
 import { WLAManifestService } from "./wla.manifest";
@@ -31,24 +32,12 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
       const client = yield* WLAClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* WLAManifestService;
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "wla", String(seasonId), `${entity}.json`);
-
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
-          ),
-        );
 
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
@@ -331,7 +320,6 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
 
         // Helpers
         getOutputPath,
-        saveJson,
 
         // Extract methods
         extractTeams,
