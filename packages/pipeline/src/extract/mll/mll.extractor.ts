@@ -13,11 +13,11 @@ import {
   type MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
+import { emptyExtractResult, withTiming } from "../extract.schema";
 import {
-  type ExtractOptions,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+  IncrementalExtractionService,
+  type IncrementalExtractOptions,
+} from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
@@ -36,6 +36,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
       const client = yield* MLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MLLManifestService;
+      const incremental = yield* IncrementalExtractionService;
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
@@ -219,14 +220,10 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
 
       const extractSeason = (
         year: number,
-        options: ExtractOptions & { includeSchedule?: boolean } = {},
+        options: IncrementalExtractOptions & { includeSchedule?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const {
-            skipExisting = true,
-            includeSchedule = false,
-            maxAgeHours = null,
-          } = options;
+          const { includeSchedule = false } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting MLL ${year}`);
@@ -235,17 +232,12 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           let manifest = yield* manifestService.load;
 
           const shouldExtract = (entity: keyof MLLSeasonManifest): boolean => {
-            if (!skipExisting) return true;
-            // Check staleness if maxAgeHours is specified
-            if (maxAgeHours !== null) {
-              return manifestService.isStale(
-                manifest,
-                year,
-                entity,
-                maxAgeHours,
-              );
-            }
-            return !manifestService.isExtracted(manifest, year, entity);
+            const seasonManifest = manifestService.getSeasonManifest(
+              manifest,
+              year,
+            );
+            const entityStatus = seasonManifest[entity];
+            return incremental.shouldExtract(entityStatus, year, options);
           };
 
           // Extract teams
@@ -350,16 +342,14 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         });
 
       const extractAll = (
-        options: ExtractOptions & {
+        options: IncrementalExtractOptions & {
           includeSchedule?: boolean;
           startYear?: number;
           endYear?: number;
         } = {},
       ) =>
         Effect.gen(function* () {
-          const skipExisting = options.skipExisting ?? true;
           const includeSchedule = options.includeSchedule ?? false;
-          const maxAgeHours = options.maxAgeHours ?? null;
           const startYear = options.startYear ?? 2001;
           const endYear = options.endYear ?? 2020;
 
@@ -373,7 +363,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             `MLL EXTRACTION: ${totalYears} seasons (${startYear}-${endYear})`,
           );
           yield* Effect.log(
-            `Options: skipExisting=${skipExisting}, includeSchedule=${includeSchedule}`,
+            `Options: mode=${options.mode ?? "skip-existing"}, includeSchedule=${includeSchedule}`,
           );
           yield* Effect.log("#".repeat(60));
 
@@ -383,9 +373,8 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           for (const [i, year] of yearsToExtract.entries()) {
             yield* Effect.log(`\n>>> Progress: ${i + 1}/${totalYears} seasons`);
             lastManifest = yield* extractSeason(year, {
-              skipExisting,
+              ...options,
               includeSchedule,
-              maxAgeHours,
             });
           }
 
@@ -421,6 +410,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         MLLClient.Default,
         ExtractConfigService.Default,
         MLLManifestService.Default,
+        IncrementalExtractionService.Default,
         BunContext.layer,
       ),
     ],
