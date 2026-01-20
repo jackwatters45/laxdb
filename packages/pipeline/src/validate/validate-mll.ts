@@ -3,13 +3,14 @@ import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { ExtractConfigService } from "../extract/extract.config";
-import type {
-  MLLTeam,
-  MLLPlayer,
-  MLLGoalie,
-  MLLStanding,
-  MLLStatLeader,
-  MLLGame,
+import {
+  getExpectedGames,
+  type MLLTeam,
+  type MLLPlayer,
+  type MLLGoalie,
+  type MLLStanding,
+  type MLLStatLeader,
+  type MLLGame,
 } from "../mll/mll.schema";
 
 import type {
@@ -37,14 +38,6 @@ interface YearScheduleCoverage {
   actualGames: number;
   coveragePct: number;
 }
-
-/** Calculate expected games based on team count (MLL format) */
-const getExpectedGames = (teamCount: number): number => {
-  // MLL: ~12 reg season games per team + 3 playoff games
-  const regSeasonGames = Math.floor((teamCount * 12) / 2);
-  const playoffGames = 3;
-  return regSeasonGames + playoffGames;
-};
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;

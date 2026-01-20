@@ -212,3 +212,17 @@ export class WaybackCDXEntry extends Schema.Class<WaybackCDXEntry>(
 
 // CDX API returns an array of entries
 export const WaybackCDXResponse = Schema.Array(WaybackCDXEntry);
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+/**
+ * Estimate expected games based on team count.
+ * MLL had ~12 reg season games per team + 3 playoff games.
+ */
+export const getExpectedGames = (teamCount: number): number => {
+  const regSeasonGames = Math.floor((teamCount * 12) / 2); // Each game = 2 teams
+  const playoffGames = 3; // 2 semi + 1 final
+  return regSeasonGames + playoffGames;
+};
