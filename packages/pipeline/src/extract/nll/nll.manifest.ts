@@ -87,7 +87,14 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(NLLExtractionManifest)(parsed).pipe(
-          Effect.catchAll(() => Effect.succeed(createEmptyNLLManifest())),
+          Effect.catchAll((error) =>
+            Effect.zipRight(
+              Effect.logWarning(
+                `NLL manifest schema invalid, creating new: ${String(error)}`,
+              ),
+              Effect.succeed(createEmptyNLLManifest()),
+            ),
+          ),
         );
       });
 

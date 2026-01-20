@@ -87,7 +87,14 @@ export class MSLManifestService extends Effect.Service<MSLManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(MSLExtractionManifest)(parsed).pipe(
-          Effect.catchAll(() => Effect.succeed(createEmptyMSLManifest())),
+          Effect.catchAll((error) =>
+            Effect.zipRight(
+              Effect.logWarning(
+                `MSL manifest schema invalid, creating new: ${String(error)}`,
+              ),
+              Effect.succeed(createEmptyMSLManifest()),
+            ),
+          ),
         );
       });
 

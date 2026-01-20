@@ -89,7 +89,14 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(MLLExtractionManifest)(parsed).pipe(
-          Effect.catchAll(() => Effect.succeed(createEmptyMLLManifest())),
+          Effect.catchAll((error) =>
+            Effect.zipRight(
+              Effect.logWarning(
+                `MLL manifest schema invalid, creating new: ${String(error)}`,
+              ),
+              Effect.succeed(createEmptyMLLManifest()),
+            ),
+          ),
         );
       });
 
