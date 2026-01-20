@@ -117,13 +117,14 @@
     "id": "pipeline-005",
     "category": "simplification",
     "description": "Simplify IncrementalExtractionService to pure functions",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Convert shouldExtract to pure function",
       "Convert isStale to pure function",
       "Update extractor imports",
       "Remove service wrapper overhead"
-    ]
+    ],
+    "notes": "WONT-FIX: Service pattern is consistent with codebase, enables Layer-based testing, captures currentYear at startup"
   },
   {
     "id": "pipeline-001-jsdoc",

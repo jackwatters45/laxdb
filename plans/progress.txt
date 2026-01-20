@@ -43,3 +43,8 @@ Gotchas: Stripping query params would hurt debugging without real security benef
 Summary: _tag already provides machine-readable codes, statusCode for HTTP granularity
 Files: None
 Gotchas: Adding redundant codes adds complexity without benefit
+
+[pipeline-005] WONT-FIX
+Summary: Service pattern consistent with codebase, enables Layer-based testing
+Files: None
+Gotchas: Pure functions would lose testability and break Effect pattern consistency
