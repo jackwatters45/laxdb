@@ -1,6 +1,6 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Layer } from "effect";
+import { Duration, Effect, Either, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
 import type {
@@ -12,6 +12,11 @@ import type {
   MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
+import {
+  type ExtractResult,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
@@ -21,24 +26,6 @@ const MLL_YEARS = [
   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
   2014, 2015, 2016, 2017, 2018, 2019, 2020,
 ] as const;
-type _MLLYear = (typeof MLL_YEARS)[number];
-
-interface ExtractResult<T> {
-  data: T;
-  count: number;
-  durationMs: number;
-}
-
-const withTiming = <T, E, R>(
-  effect: Effect.Effect<T, E, R>,
-): Effect.Effect<ExtractResult<T>, E, R> =>
-  Effect.gen(function* () {
-    const start = Date.now();
-    const data = yield* effect;
-    const durationMs = Date.now() - start;
-    const count = Array.isArray(data) ? data.length : 1;
-    return { data, count, durationMs };
-  });
 
 export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
   "MLLExtractorService",
@@ -62,119 +49,107 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
         }).pipe(
           Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write file: ${String(e)}`)),
+            Effect.log(`     ⚠ Failed to save ${filePath}: ${String(e)}`),
           ),
         );
 
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for year ${year}...`);
-          const result = yield* withTiming(client.getTeams({ year }));
-          yield* saveJson(getOutputPath(year, "teams"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+          const result = yield* withTiming(client.getTeams({ year })).pipe(
+            Effect.either,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MLLTeam[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly MLLTeam[]);
+          }
+          yield* saveJson(getOutputPath(year, "teams"), result.right.data);
+          yield* Effect.log(
+            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏃 Extracting players for year ${year}...`);
-          const result = yield* withTiming(client.getPlayers({ year }));
-          yield* saveJson(getOutputPath(year, "players"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} players (${result.durationMs}ms)`,
+          const result = yield* withTiming(client.getPlayers({ year })).pipe(
+            Effect.either,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MLLPlayer[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly MLLPlayer[]);
+          }
+          yield* saveJson(getOutputPath(year, "players"), result.right.data);
+          yield* Effect.log(
+            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractGoalies = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🥅 Extracting goalies for year ${year}...`);
-          const result = yield* withTiming(client.getGoalies({ year }));
-          yield* saveJson(getOutputPath(year, "goalies"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} goalies (${result.durationMs}ms)`,
+          const result = yield* withTiming(client.getGoalies({ year })).pipe(
+            Effect.either,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MLLGoalie[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly MLLGoalie[]);
+          }
+          yield* saveJson(getOutputPath(year, "goalies"), result.right.data);
+          yield* Effect.log(
+            `     ✓ ${result.right.count} goalies (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏆 Extracting standings for year ${year}...`);
-          const result = yield* withTiming(client.getStandings({ year }));
-          yield* saveJson(getOutputPath(year, "standings"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} standings (${result.durationMs}ms)`,
+          const result = yield* withTiming(client.getStandings({ year })).pipe(
+            Effect.either,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MLLStanding[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly MLLStanding[]);
+          }
+          yield* saveJson(getOutputPath(year, "standings"), result.right.data);
+          yield* Effect.log(
+            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       const extractStatLeaders = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  ⭐ Extracting stat leaders for year ${year}...`);
-          const result = yield* withTiming(client.getStatLeaders({ year }));
-          yield* saveJson(getOutputPath(year, "stat-leaders"), result.data);
-          yield* Effect.log(
-            `     ✓ ${result.count} stat leaders (${result.durationMs}ms)`,
+          const result = yield* withTiming(
+            client.getStatLeaders({ year }),
+          ).pipe(Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            return emptyExtractResult([] as readonly MLLStatLeader[]);
+          }
+          yield* saveJson(
+            getOutputPath(year, "stat-leaders"),
+            result.right.data,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MLLStatLeader[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          yield* Effect.log(
+            `     ✓ ${result.right.count} stat leaders (${result.right.durationMs}ms)`,
+          );
+          return result.right;
+        });
 
       // Estimate expected games based on MLL team counts
       // MLL had ~12-14 reg season games per team + playoffs
@@ -191,8 +166,19 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(
             `  📅 Extracting schedule for year ${year} (via Wayback)...`,
           );
-          const result = yield* withTiming(client.getSchedule({ year }));
-          yield* saveJson(getOutputPath(year, "schedule"), result.data);
+          const result = yield* withTiming(client.getSchedule({ year })).pipe(
+            Effect.either,
+          );
+
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message} (schedule may be incomplete for this year)`,
+            );
+            yield* Effect.log(`     📊 Schedule coverage: 0%`);
+            return emptyExtractResult([] as readonly MLLGame[]);
+          }
+
+          yield* saveJson(getOutputPath(year, "schedule"), result.right.data);
 
           // Get team count for coverage calculation
           const teamsPath = getOutputPath(year, "teams");
@@ -205,10 +191,10 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           const expectedGames = getExpectedGames(teamCount);
           const coverage =
             expectedGames > 0
-              ? Math.round((result.count / expectedGames) * 100)
+              ? Math.round((result.right.count / expectedGames) * 100)
               : 0;
 
-          if (result.count === 0) {
+          if (result.right.count === 0) {
             yield* Effect.log(
               `     ⚠ No schedule data found (Wayback coverage may be incomplete)`,
             );
@@ -217,32 +203,14 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             );
           } else {
             yield* Effect.log(
-              `     ✓ ${result.count} games (${result.durationMs}ms)`,
+              `     ✓ ${result.right.count} games (${result.right.durationMs}ms)`,
             );
             yield* Effect.log(
-              `     📊 Schedule coverage: ${coverage}% (${result.count}/${expectedGames} expected games)`,
+              `     📊 Schedule coverage: ${coverage}% (${result.right.count}/${expectedGames} expected games)`,
             );
           }
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(
-                `     ✗ Failed: ${e} (schedule may be incomplete for this year)`,
-              );
-              yield* Effect.log(`     📊 Schedule coverage: 0%`);
-              return {
-                data: [] as readonly MLLGame[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
-
-      // Delay constants for rate limiting
-      const STATSCREW_DELAY_MS = 2000;
-      const WAYBACK_DELAY_MS = 5000;
+          return result.right;
+        });
 
       const extractSeason = (
         year: number,
@@ -276,7 +244,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
           }
@@ -292,7 +260,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏃 Players: skipped (already extracted)");
           }
@@ -308,7 +276,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🥅 Goalies: skipped (already extracted)");
           }
@@ -324,7 +292,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(STATSCREW_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏆 Standings: skipped (already extracted)");
           }
@@ -347,7 +315,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           // Optionally extract schedule (slower due to Wayback)
           if (includeSchedule && shouldExtract("schedule")) {
             yield* Effect.log("  ⏳ Waiting before Wayback request...");
-            yield* Effect.sleep(Duration.millis(WAYBACK_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenBatchesMs));
             const result = yield* extractSchedule(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -366,7 +334,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return manifest;
         });
 
-      const extractAllSeasons = (
+      const extractAll = (
         options: {
           skipExisting?: boolean;
           includeSchedule?: boolean;
@@ -423,7 +391,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         MLL_YEARS,
         getOutputPath,
         saveJson,
-        withTiming,
         extractTeams,
         extractPlayers,
         extractGoalies,
@@ -431,13 +398,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractStatLeaders,
         extractSchedule,
         extractSeason,
-        extractAllSeasons,
-        // Expose injected dependencies for use by extractor methods
-        client,
-        config,
-        manifestService,
-        fs,
-        path,
+        extractAll,
       };
     }),
     dependencies: [
