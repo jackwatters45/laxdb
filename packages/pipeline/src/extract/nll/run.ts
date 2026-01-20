@@ -3,84 +3,69 @@
  *
  * Usage:
  *   bun src/extract/nll/run.ts
- *   bun src/extract/nll/run.ts --season=225
+ *   bun src/extract/nll/run.ts --season 225
  *   bun src/extract/nll/run.ts --force
+ *   bun src/extract/nll/run.ts --incremental
  */
 
+import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
+import type { ExtractionMode } from "../incremental.service";
+
 import { NLLExtractorService } from "./nll.extractor";
 
-interface CliArgs {
-  seasonId: number;
-  force: boolean;
-  maxAgeHours: number | null;
-  help: boolean;
-}
+// CLI Options
+const seasonOption = Options.integer("season").pipe(
+  Options.withAlias("s"),
+  Options.withDescription("Season ID to extract"),
+  Options.withDefault(225),
+);
 
-const parseArgs = (): CliArgs => {
-  const args = process.argv.slice(2);
+const forceOption = Options.boolean("force").pipe(
+  Options.withAlias("f"),
+  Options.withDescription("Re-extract everything (mode: full)"),
+  Options.withDefault(false),
+);
 
-  const seasonArg = args.find((a) => a.startsWith("--season="));
-  const seasonId = seasonArg
-    ? parseInt(seasonArg.split("=")[1] ?? "", 10)
-    : 225;
+const incrementalOption = Options.boolean("incremental").pipe(
+  Options.withAlias("i"),
+  Options.withDescription(
+    "Re-extract stale data - 24h for current seasons (mode: incremental)",
+  ),
+  Options.withDefault(false),
+);
 
-  const maxAgeArg = args.find((a) => a.startsWith("--max-age="));
-  let maxAgeHours: number | null = null;
-  if (maxAgeArg) {
-    maxAgeHours = parseInt(maxAgeArg.split("=")[1] ?? "", 10);
-  } else if (args.includes("--incremental")) {
-    maxAgeHours = 24; // Default: 24 hours for incremental
-  }
-
-  return {
-    seasonId,
-    force: args.includes("--force"),
-    maxAgeHours,
-    help: args.includes("--help") || args.includes("-h"),
-  };
+// Derive extraction mode from options
+const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
+  if (force) return "full";
+  if (incremental) return "incremental";
+  return "skip-existing";
 };
 
-const printHelp = () => {
-  console.log(`
-NLL Data Extraction CLI
+// Main command
+const nllCommand = Command.make(
+  "nll",
+  { season: seasonOption, force: forceOption, incremental: incrementalOption },
+  ({ season, force, incremental }) =>
+    Effect.gen(function* () {
+      const extractor = yield* NLLExtractorService;
+      const mode = getMode(force, incremental);
 
-Usage:
-  bun src/extract/nll/run.ts [options]
+      yield* Effect.log(`Extraction mode: ${mode}`);
+      yield* extractor.extractSeason(season, { mode });
+    }),
+);
 
-Options:
-  --season=ID       Extract specific season (default: 225)
-  --force           Re-extract even if already done
-  --max-age=HOURS   Re-extract if data is older than N hours
-  --incremental     Alias for --max-age=24 (re-extract if older than 24h)
-  --help, -h        Show this help
+// CLI runner
+const cli = Command.run(nllCommand, {
+  name: "NLL Extractor",
+  version: "1.0.0",
+});
 
-Examples:
-  bun src/extract/nll/run.ts
-  bun src/extract/nll/run.ts --season=225
-  bun src/extract/nll/run.ts --force
-  bun src/extract/nll/run.ts --incremental
-  bun src/extract/nll/run.ts --max-age=12
-`);
-};
-
-const runExtraction = (args: CliArgs) =>
-  Effect.gen(function* () {
-    const extractor = yield* NLLExtractorService;
-
-    yield* extractor.extractSeason(args.seasonId, {
-      skipExisting: !args.force,
-      maxAgeHours: args.maxAgeHours,
-    });
-  });
-
-const args = parseArgs();
-
-if (args.help) {
-  printHelp();
-} else {
-  const MainLayer = Layer.merge(NLLExtractorService.Default, BunContext.layer);
-  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
-}
+// Run with dependencies
+cli(process.argv).pipe(
+  Effect.provide(Layer.merge(NLLExtractorService.Default, BunContext.layer)),
+  BunRuntime.runMain,
+);
