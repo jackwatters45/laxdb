@@ -1,6 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
+import { Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Layer } from "effect";
+import { Duration, Effect, Either, Layer } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
 import type {
@@ -12,6 +12,8 @@ import type {
 } from "../../msl/msl.schema";
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
+import { emptyExtractResult, withTiming } from "../extract.schema";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
@@ -24,24 +26,6 @@ const MSL_SEASONS = Object.entries(MSL_GAMESHEET_SEASONS).map(
     seasonId,
   }),
 );
-type _MSLSeason = (typeof MSL_SEASONS)[number];
-
-interface ExtractResult<T> {
-  data: T;
-  count: number;
-  durationMs: number;
-}
-
-const withTiming = <T, E, R>(
-  effect: Effect.Effect<T, E, R>,
-): Effect.Effect<ExtractResult<T>, E, R> =>
-  Effect.gen(function* () {
-    const start = Date.now();
-    const data = yield* effect;
-    const durationMs = Date.now() - start;
-    const count = Array.isArray(data) ? data.length : 1;
-    return { data, count, durationMs };
-  });
 
 export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
   "MSLExtractorService",
@@ -50,7 +34,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const client = yield* MSLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MSLManifestService;
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -58,147 +41,140 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "msl", String(seasonId), `${entity}.json`);
 
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write file: ${String(e)}`)),
-          ),
-        );
-
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
-          const result = yield* withTiming(
-            client.getTeams({ seasonId: MSLSeasonId.make(seasonId) }),
-          );
-          yield* saveJson(getOutputPath(seasonId, "teams"), result.data);
+          const result = yield* client
+            .getTeams({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly MSLTeam[]);
+          }
+          yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
           yield* Effect.log(
-            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MSLTeam[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🏃 Extracting players for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getPlayers({ seasonId: MSLSeasonId.make(seasonId) }),
+          const result = yield* client
+            .getPlayers({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly MSLPlayer[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "players"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(seasonId, "players"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} players (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MSLPlayer[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts goalies for a season. @see isCriticalError for error handling. */
       const extractGoalies = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🧤 Extracting goalies for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getGoalies({ seasonId: MSLSeasonId.make(seasonId) }),
+          const result = yield* client
+            .getGoalies({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly MSLGoalie[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "goalies"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(seasonId, "goalies"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} goalies (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} goalies (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MSLGoalie[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📋 Extracting standings for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getStandings({ seasonId: MSLSeasonId.make(seasonId) }),
+          const result = yield* client
+            .getStandings({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly MSLStanding[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "standings"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(seasonId, "standings"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} standings (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MSLStanding[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts schedule for a season. @see isCriticalError for error handling. */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📅 Extracting schedule for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getSchedule({ seasonId: MSLSeasonId.make(seasonId) }),
+          const result = yield* client
+            .getSchedule({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly MSLGame[]);
+          }
+          yield* saveJson(
+            getOutputPath(seasonId, "schedule"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(seasonId, "schedule"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} games (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} games (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly MSLGame[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
-
-      // Rate limiting delay between requests
-      const REQUEST_DELAY_MS = 1000;
+          return result.right;
+        });
 
       const extractSeason = (
         seasonId: number,
@@ -235,7 +211,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
           }
@@ -251,7 +227,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏃 Players: skipped (already extracted)");
           }
@@ -267,7 +243,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🧤 Goalies: skipped (already extracted)");
           }
@@ -283,7 +259,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.durationMs,
             );
             yield* manifestService.save(manifest);
-            yield* Effect.sleep(Duration.millis(REQUEST_DELAY_MS));
+            yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📋 Standings: skipped (already extracted)");
           }
@@ -306,7 +282,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return manifest;
         });
 
-      const extractAllSeasons = (
+      const extractAll = (
         options: {
           skipExisting?: boolean;
           startYear?: number;
@@ -359,21 +335,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       return {
         MSL_SEASONS,
         getOutputPath,
-        saveJson,
-        withTiming,
         extractTeams,
         extractPlayers,
         extractGoalies,
         extractStandings,
         extractSchedule,
         extractSeason,
-        extractAllSeasons,
-        // Expose injected dependencies for use by extractor methods
-        client,
-        config,
-        manifestService,
-        fs,
-        path,
+        extractAll,
       };
     }),
     dependencies: [

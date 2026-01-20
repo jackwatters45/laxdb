@@ -13,10 +13,12 @@ src/
 │   ├── graphql.service.ts      # makeGraphQLClient
 │   └── *.test.ts               # Client tests
 ├── extract/                 # Data extraction
-│   ├── pll/                    # PLL-specific extractors
+│   ├── pll/                    # PLL-specific extractors (run.ts, manifest, etc.)
 │   ├── nll/                    # NLL-specific extractors
-│   ├── run.ts                  # CLI entry point
-│   └── *.ts                    # Extraction scripts
+│   ├── mll/                    # MLL-specific extractors
+│   ├── msl/                    # MSL-specific extractors
+│   ├── wla/                    # WLA-specific extractors
+│   └── extract.schema.ts       # Shared extraction types
 ├── validate/                # Data validation
 │   ├── validate.service.ts     # Reusable validators
 │   ├── validate-pll.ts         # PLL validation script
@@ -57,7 +59,7 @@ bun run typecheck
 bun run fix
 
 # PLL data extraction (requires credentials)
-infisical run --env=dev -- bun src/extract/run.ts
+infisical run --env=dev -- bun src/extract/pll/run.ts
 
 # NLL data extraction (no credentials needed)
 bun src/extract/nll/run.ts

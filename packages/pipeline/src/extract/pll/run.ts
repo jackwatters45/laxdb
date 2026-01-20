@@ -2,19 +2,20 @@
  * PLL Data Extraction CLI
  *
  * Usage:
- *   infisical run --env=dev -- bun src/extract/run.ts --all
- *   infisical run --env=dev -- bun src/extract/run.ts --year=2024
- *   infisical run --env=dev -- bun src/extract/run.ts --year=2024 --no-details
- *   infisical run --env=dev -- bun src/extract/run.ts --year=2024 --force
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --all
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --no-details
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --force
  */
 
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
-import { PLLClient } from "../pll/pll.client";
+import { PLLClient } from "../../pll/pll.client";
+import { ExtractConfigService } from "../extract.config";
 
-import { ExtractConfigService } from "./extract.config";
-import { PLLExtractorService, PLLManifestService } from "./pll";
+import { PLLExtractorService } from "./pll.extractor";
+import { PLLManifestService } from "./pll.manifest";
 
 interface CliArgs {
   all: boolean;
@@ -44,7 +45,7 @@ const printHelp = () => {
 PLL Data Extraction CLI
 
 Usage:
-  bun src/extract/run.ts [options]
+  bun src/extract/pll/run.ts [options]
 
 Options:
   --all           Extract all years (2019-2025)
@@ -54,10 +55,10 @@ Options:
   --help, -h      Show this help
 
 Examples:
-  infisical run --env=dev -- bun src/extract/run.ts --all
-  infisical run --env=dev -- bun src/extract/run.ts --year=2024
-  infisical run --env=dev -- bun src/extract/run.ts --year=2024 --no-details
-  infisical run --env=dev -- bun src/extract/run.ts --all --force
+  infisical run --env=dev -- bun src/extract/pll/run.ts --all
+  infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024
+  infisical run --env=dev -- bun src/extract/pll/run.ts --year=2024 --no-details
+  infisical run --env=dev -- bun src/extract/pll/run.ts --all --force
 `);
 };
 

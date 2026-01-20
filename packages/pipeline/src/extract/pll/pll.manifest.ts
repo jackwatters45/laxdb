@@ -44,7 +44,14 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         return yield* Schema.decodeUnknown(ExtractionManifestSchema)(
           parsed,
         ).pipe(
-          Effect.catchAll(() => Effect.succeed(createEmptyManifest("pll"))),
+          Effect.catchAll((error) =>
+            Effect.zipRight(
+              Effect.logWarning(
+                `PLL manifest schema invalid, creating new: ${String(error)}`,
+              ),
+              Effect.succeed(createEmptyManifest("pll")),
+            ),
+          ),
         );
       });
 

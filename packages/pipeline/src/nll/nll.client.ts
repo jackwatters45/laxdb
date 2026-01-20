@@ -1,9 +1,10 @@
 import * as cheerio from "cheerio";
-import { Duration, Effect, type ParseResult, Schedule, Schema } from "effect";
+import { Duration, Effect, Schedule, Schema } from "effect";
 
 import { makeRestClient } from "../api-client/rest-client.service";
 import { NLLConfig, PipelineConfig } from "../config";
 import { ParseError, type PipelineError } from "../error";
+import { mapParseError } from "../util";
 
 import {
   type NLLMatch,
@@ -20,12 +21,6 @@ import {
   NLLTeamsRequest,
   NLLTeamsResponse,
 } from "./nll.schema";
-
-const mapParseError = (error: ParseResult.ParseError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
 
 export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
   effect: Effect.gen(function* () {
@@ -46,18 +41,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=teams&season_id=${request.seasonId}`;
-          const teams = yield* Schema.decodeUnknown(NLLTeamsResponse)(
-            yield* restClient.get(endpoint, Schema.Unknown),
-          ).pipe(
-            Effect.mapError(
-              (error) =>
-                new ParseError({
-                  message: `Failed to parse teams response: ${String(error)}`,
-                  cause: error,
-                }),
-            ),
-          );
-          return teams;
+          return yield* restClient.get(endpoint, NLLTeamsResponse);
         }).pipe(
           Effect.tap((teams) =>
             Effect.log(
@@ -74,18 +58,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=players&season_id=${request.seasonId}`;
-          const players = yield* Schema.decodeUnknown(NLLPlayersResponse)(
-            yield* restClient.get(endpoint, Schema.Unknown),
-          ).pipe(
-            Effect.mapError(
-              (error) =>
-                new ParseError({
-                  message: `Failed to parse players response: ${String(error)}`,
-                  cause: error,
-                }),
-            ),
-          );
-          return players;
+          return yield* restClient.get(endpoint, NLLPlayersResponse);
         }).pipe(
           Effect.tap((players) =>
             Effect.log(
@@ -102,18 +75,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=standings&season_id=${request.seasonId}`;
-          const standings = yield* Schema.decodeUnknown(NLLStandingsResponse)(
-            yield* restClient.get(endpoint, Schema.Unknown),
-          ).pipe(
-            Effect.mapError(
-              (error) =>
-                new ParseError({
-                  message: `Failed to parse standings response: ${String(error)}`,
-                  cause: error,
-                }),
-            ),
-          );
-          return standings;
+          return yield* restClient.get(endpoint, NLLStandingsResponse);
         }).pipe(
           Effect.tap((standings) =>
             Effect.log(
@@ -130,18 +92,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=schedule&season_id=${request.seasonId}`;
-          const matches = yield* Schema.decodeUnknown(NLLScheduleResponse)(
-            yield* restClient.get(endpoint, Schema.Unknown),
-          ).pipe(
-            Effect.mapError(
-              (error) =>
-                new ParseError({
-                  message: `Failed to parse schedule response: ${String(error)}`,
-                  cause: error,
-                }),
-            ),
-          );
-          return matches;
+          return yield* restClient.get(endpoint, NLLScheduleResponse);
         }).pipe(
           Effect.tap((matches) =>
             Effect.log(

@@ -74,7 +74,7 @@ const runExtraction = (args: CliArgs) =>
     const extractor = yield* MSLExtractorService;
 
     if (args.all) {
-      yield* extractor.extractAllSeasons({
+      yield* extractor.extractAll({
         skipExisting: !args.force,
       });
     } else {

@@ -1,43 +1,30 @@
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Duration, Layer, Schema } from "effect";
+import { Duration, Effect, Either, Layer, Schema } from "effect";
 
 import { PLLClient } from "../../pll/pll.client";
 import {
-  PLLTeam,
-  PLLPlayer,
   PLLEvent,
-  type PLLTeamDetail,
-  type PLLPlayerDetail,
-  type PLLEventDetail,
-  type PLLTeamStanding,
-  type PLLGraphQLStanding,
+  PLLPlayer,
+  PLLTeam,
   type PLLAdvancedPlayer,
+  type PLLEventDetail,
+  type PLLGraphQLStanding,
+  type PLLPlayerDetail,
+  type PLLTeamDetail,
+  type PLLTeamStanding,
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
-import type { SeasonManifest } from "../extract.schema";
+import {
+  type SeasonManifest,
+  emptyExtractResult,
+  withTiming,
+} from "../extract.schema";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { PLLManifestService } from "./pll.manifest";
 
 const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
-type _PLLYear = (typeof PLL_YEARS)[number];
-
-interface ExtractResult<T> {
-  data: T;
-  count: number;
-  durationMs: number;
-}
-
-const withTiming = <T, E, R>(
-  effect: Effect.Effect<T, E, R>,
-): Effect.Effect<ExtractResult<T>, E, R> =>
-  Effect.gen(function* () {
-    const start = Date.now();
-    const data = yield* effect;
-    const durationMs = Date.now() - start;
-    const count = Array.isArray(data) ? data.length : 1;
-    return { data, count, durationMs };
-  });
 
 export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
   "PLLExtractorService",
@@ -53,22 +40,11 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "pll", String(year), `${entity}.json`);
 
-      const saveJson = <T>(filePath: string, data: T) =>
-        Effect.gen(function* () {
-          const dir = path.dirname(filePath);
-          yield* fs.makeDirectory(dir, { recursive: true });
-          yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-        }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write file: ${String(e)}`)),
-          ),
-        );
-
       const readJsonFile = (filePath: string) =>
         fs
           .readFileString(filePath, "utf-8")
           .pipe(
-            Effect.catchAll((error) =>
+            Effect.catchTag("SystemError", (error) =>
               Effect.zipRight(
                 Effect.logWarning(
                   `Could not read file at ${filePath}, using empty array`,
@@ -79,55 +55,59 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             ),
           );
 
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for ${year}...`);
-          const result = yield* withTiming(
-            pll.getTeams({ year, includeChampSeries: true }),
-          );
-          yield* saveJson(getOutputPath(year, "teams"), result.data);
+          const result = yield* pll
+            .getTeams({ year, includeChampSeries: true })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLTeam[]);
+          }
+          yield* saveJson(getOutputPath(year, "teams"), result.right.data);
           yield* Effect.log(
-            `     ✓ ${result.count} teams (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLTeam[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
       const extractTeamDetails = (year: number, teams: readonly PLLTeam[]) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏟️ Extracting team details for ${year}...`);
           const start = Date.now();
 
-          const details: PLLTeamDetail[] = [];
-          for (const team of teams) {
-            const detail = yield* pll
-              .getTeamDetail({
-                id: team.officialId,
-                year,
-                statsYear: year,
-                eventsYear: year,
-                includeChampSeries: true,
-              })
-              .pipe(
-                Effect.catchAll(() => Effect.succeed(null)),
-                Effect.tap(() =>
-                  Effect.sleep(Duration.millis(config.delayBetweenRequestsMs)),
+          const results = yield* Effect.forEach(
+            teams,
+            (team) =>
+              pll
+                .getTeamDetail({
+                  id: team.officialId,
+                  year,
+                  statsYear: year,
+                  eventsYear: year,
+                  includeChampSeries: true,
+                })
+                .pipe(
+                  Effect.either,
+                  Effect.tap(() =>
+                    Effect.sleep(
+                      Duration.millis(config.delayBetweenRequestsMs),
+                    ),
+                  ),
                 ),
-              );
-            if (detail) {
-              details.push(detail);
-            }
-          }
+            { concurrency: config.concurrency },
+          );
+
+          const details = results
+            .filter((r) => Either.isRight(r))
+            .map((r) => r.right);
 
           const durationMs = Date.now() - start;
           yield* saveJson(getOutputPath(year, "team-details"), details);
@@ -136,72 +116,66 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           );
 
           return { data: details, count: details.length, durationMs };
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return { data: [] as PLLTeamDetail[], count: 0, durationMs: 0 };
-            });
-          }),
-        );
+        });
 
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  👥 Extracting players for ${year}...`);
-          const result = yield* withTiming(
-            pll.getPlayers({
+          const result = yield* pll
+            .getPlayers({
               season: year,
               includeReg: true,
               includePost: true,
               includeZPP: true,
               limit: 1000,
-            }),
-          );
-          yield* saveJson(getOutputPath(year, "players"), result.data);
+            })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLPlayer[]);
+          }
+          yield* saveJson(getOutputPath(year, "players"), result.right.data);
           yield* Effect.log(
-            `     ✓ ${result.count} players (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLPlayer[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts advanced players for a season. @see isCriticalError for error handling. */
       const extractAdvancedPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🔬 Extracting advanced players for ${year}...`);
-          const result = yield* withTiming(
-            pll.getAdvancedPlayers({
+          const result = yield* pll
+            .getAdvancedPlayers({
               year,
               limit: 500,
               league: "PLL",
-            }),
+            })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLAdvancedPlayer[]);
+          }
+          yield* saveJson(
+            getOutputPath(year, "advanced-players"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(year, "advanced-players"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} advanced players (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} advanced players (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLAdvancedPlayer[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
       const extractPlayerDetails = (
         year: number,
@@ -211,39 +185,37 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           yield* Effect.log(`  👤 Extracting player details for ${year}...`);
           const start = Date.now();
 
-          const playersWithSlug = players.filter((p) => p.slug !== null);
+          const playersWithSlug = players.filter(
+            (p): p is PLLPlayer & { slug: string } => p.slug !== null,
+          );
           yield* Effect.log(
             `     Processing ${playersWithSlug.length} players with slugs...`,
           );
 
-          const details: PLLPlayerDetail[] = [];
-          let processed = 0;
-
-          for (const player of playersWithSlug) {
-            if (!player.slug) continue;
-
-            const detail = yield* pll
-              .getPlayerDetail({
-                slug: player.slug,
-                year,
-                statsYear: year,
-              })
-              .pipe(
-                Effect.catchAll(() => Effect.succeed(null)),
-                Effect.tap(() =>
-                  Effect.sleep(Duration.millis(config.delayBetweenRequestsMs)),
+          const results = yield* Effect.forEach(
+            playersWithSlug,
+            (player) =>
+              pll
+                .getPlayerDetail({
+                  slug: player.slug,
+                  year,
+                  statsYear: year,
+                })
+                .pipe(
+                  Effect.either,
+                  Effect.tap(() =>
+                    Effect.sleep(
+                      Duration.millis(config.delayBetweenRequestsMs),
+                    ),
+                  ),
                 ),
-              );
-            if (detail) {
-              details.push(detail);
-            }
-            processed++;
-            if (processed % 50 === 0) {
-              yield* Effect.log(
-                `     ... ${processed}/${playersWithSlug.length} processed`,
-              );
-            }
-          }
+            { concurrency: config.concurrency },
+          );
+
+          const details = results
+            .filter(Either.isRight)
+            .map((r) => r.right)
+            .filter((d): d is PLLPlayerDetail => d !== null);
 
           const durationMs = Date.now() - start;
           yield* saveJson(getOutputPath(year, "player-details"), details);
@@ -252,36 +224,30 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           );
 
           return { data: details, count: details.length, durationMs };
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return { data: [] as PLLPlayerDetail[], count: 0, durationMs: 0 };
-            });
-          }),
-        );
+        });
 
+      /** Extracts events for a season. @see isCriticalError for error handling. */
       const extractEvents = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🎮 Extracting events for ${year}...`);
-          const result = yield* withTiming(pll.getEvents({ year }));
-          yield* saveJson(getOutputPath(year, "events"), result.data);
+          const result = yield* pll
+            .getEvents({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLEvent[]);
+          }
+          yield* saveJson(getOutputPath(year, "events"), result.right.data);
           yield* Effect.log(
-            `     ✓ ${result.count} events (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} events (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLEvent[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
       const extractEventDetails = (year: number, events: readonly PLLEvent[]) =>
         Effect.gen(function* () {
@@ -289,28 +255,29 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           const start = Date.now();
 
           const completedEvents = events.filter(
-            (e) => e.eventStatus === 3 && e.slugname,
+            (e): e is PLLEvent & { slugname: string } =>
+              e.eventStatus === 3 && e.slugname !== null,
           );
           yield* Effect.log(
             `     Processing ${completedEvents.length} completed events...`,
           );
 
-          const details: PLLEventDetail[] = [];
-          for (const event of completedEvents) {
-            if (!event.slugname) continue;
-
-            const detail = yield* pll
-              .getEventDetail({ slug: event.slugname })
-              .pipe(
-                Effect.catchAll(() => Effect.succeed(null)),
+          const results = yield* Effect.forEach(
+            completedEvents,
+            (event) =>
+              pll.getEventDetail({ slug: event.slugname }).pipe(
+                Effect.either,
                 Effect.tap(() =>
                   Effect.sleep(Duration.millis(config.delayBetweenRequestsMs)),
                 ),
-              );
-            if (detail) {
-              details.push(detail);
-            }
-          }
+              ),
+            { concurrency: config.concurrency },
+          );
+
+          const details = results
+            .filter(Either.isRight)
+            .map((r) => r.right)
+            .filter((d): d is PLLEventDetail => d !== null);
 
           const durationMs = Date.now() - start;
           yield* saveJson(getOutputPath(year, "event-details"), details);
@@ -319,64 +286,58 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           );
 
           return { data: details, count: details.length, durationMs };
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return { data: [] as PLLEventDetail[], count: 0, durationMs: 0 };
-            });
-          }),
-        );
+        });
 
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📈 Extracting standings for ${year}...`);
-          const result = yield* withTiming(
-            pll.getStandings({ year, champSeries: false }),
-          );
-          yield* saveJson(getOutputPath(year, "standings"), result.data);
+          const result = yield* pll
+            .getStandings({ year, champSeries: false })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLTeamStanding[]);
+          }
+          yield* saveJson(getOutputPath(year, "standings"), result.right.data);
           yield* Effect.log(
-            `     ✓ ${result.count} standings (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLTeamStanding[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
+      /** Extracts championship series standings for a season. @see isCriticalError for error handling. */
       const extractStandingsCS = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🏆 Extracting champ series standings for ${year}...`,
           );
-          const result = yield* withTiming(
-            pll.getStandingsGraphQL({ year, champSeries: true }),
+          const result = yield* pll
+            .getStandingsGraphQL({ year, champSeries: true })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+          if (Either.isLeft(result)) {
+            yield* Effect.log(
+              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+            );
+            if (isCriticalError(result.left)) {
+              return yield* Effect.fail(result.left);
+            }
+            return emptyExtractResult([] as readonly PLLGraphQLStanding[]);
+          }
+          yield* saveJson(
+            getOutputPath(year, "standings-cs"),
+            result.right.data,
           );
-          yield* saveJson(getOutputPath(year, "standings-cs"), result.data);
           yield* Effect.log(
-            `     ✓ ${result.count} CS standings (${result.durationMs}ms)`,
+            `     ✓ ${result.right.count} CS standings (${result.right.durationMs}ms)`,
           );
-          return result;
-        }).pipe(
-          Effect.catchAll((e) => {
-            return Effect.gen(function* () {
-              yield* Effect.log(`     ✗ Failed: ${e}`);
-              return {
-                data: [] as readonly PLLGraphQLStanding[],
-                count: 0,
-                durationMs: 0,
-              };
-            });
-          }),
-        );
+          return result.right;
+        });
 
       const extractYear = (
         year: number,

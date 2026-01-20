@@ -87,7 +87,14 @@ export class WLAManifestService extends Effect.Service<WLAManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(WLAExtractionManifest)(parsed).pipe(
-          Effect.catchAll(() => Effect.succeed(createEmptyWLAManifest())),
+          Effect.catchAll((error) =>
+            Effect.zipRight(
+              Effect.logWarning(
+                `WLA manifest schema invalid, creating new: ${String(error)}`,
+              ),
+              Effect.succeed(createEmptyWLAManifest()),
+            ),
+          ),
         );
       });
 
