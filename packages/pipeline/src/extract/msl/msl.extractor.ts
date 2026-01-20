@@ -13,7 +13,7 @@ import type {
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { isCriticalError, saveJson } from "../util";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
@@ -41,19 +41,13 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "msl", String(seasonId), `${entity}.json`);
 
-      /**
-       * Extracts teams for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
-          const result = yield* withTiming(
-            client.getTeams({ seasonId: MSLSeasonId.make(seasonId) }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getTeams({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -70,21 +64,15 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts players for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🏃 Extracting players for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getPlayers({ seasonId: MSLSeasonId.make(seasonId) }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getPlayers({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -104,21 +92,15 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts goalies for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts goalies for a season. @see isCriticalError for error handling. */
       const extractGoalies = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🧤 Extracting goalies for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getGoalies({ seasonId: MSLSeasonId.make(seasonId) }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getGoalies({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -138,21 +120,15 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts standings for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📋 Extracting standings for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getStandings({ seasonId: MSLSeasonId.make(seasonId) }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getStandings({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -172,21 +148,15 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts schedule for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts schedule for a season. @see isCriticalError for error handling. */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📅 Extracting schedule for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getSchedule({ seasonId: MSLSeasonId.make(seasonId) }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getSchedule({ seasonId: MSLSeasonId.make(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,

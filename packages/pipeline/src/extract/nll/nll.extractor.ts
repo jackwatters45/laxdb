@@ -12,7 +12,7 @@ import type {
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { isCriticalError, saveJson } from "../util";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
 
@@ -32,19 +32,13 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "nll", String(seasonId), `${entity}.json`);
 
-      /**
-       * Extracts teams for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
-          const result = yield* withTiming(client.getTeams({ seasonId })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getTeams({ seasonId })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -61,21 +55,15 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts players for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  👥 Extracting players for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getPlayers({ seasonId }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getPlayers({ seasonId })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -95,21 +83,15 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts player stats for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts player stats for a season. @see isCriticalError for error handling. */
       const extractPlayerStats = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📊 Extracting player stats for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getPlayerStats({ seasonId, phase: "REG" }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getPlayerStats({ seasonId, phase: "REG" })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -129,21 +111,15 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts standings for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📈 Extracting standings for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getStandings({ seasonId }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getStandings({ seasonId })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -163,21 +139,15 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts schedule for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts schedule for a season. @see isCriticalError for error handling. */
       const extractSchedule = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🎮 Extracting schedule for season ${seasonId}...`,
           );
-          const result = yield* withTiming(
-            client.getSchedule({ seasonId }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getSchedule({ seasonId })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,

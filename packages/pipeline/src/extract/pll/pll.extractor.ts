@@ -20,7 +20,7 @@ import {
   emptyExtractResult,
   withTiming,
 } from "../extract.schema";
-import { isCriticalError, saveJson } from "../util";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { PLLManifestService } from "./pll.manifest";
 
@@ -55,19 +55,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
             ),
           );
 
-      /**
-       * Extracts teams for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for ${year}...`);
-          const result = yield* withTiming(
-            pll.getTeams({ year, includeChampSeries: true }),
-          ).pipe(Effect.either);
+          const result = yield* pll
+            .getTeams({ year, includeChampSeries: true })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -124,25 +118,19 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
-      /**
-       * Extracts players for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  👥 Extracting players for ${year}...`);
-          const result = yield* withTiming(
-            pll.getPlayers({
+          const result = yield* pll
+            .getPlayers({
               season: year,
               includeReg: true,
               includePost: true,
               includeZPP: true,
               limit: 1000,
-            }),
-          ).pipe(Effect.either);
+            })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -159,23 +147,17 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts advanced players for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts advanced players for a season. @see isCriticalError for error handling. */
       const extractAdvancedPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🔬 Extracting advanced players for ${year}...`);
-          const result = yield* withTiming(
-            pll.getAdvancedPlayers({
+          const result = yield* pll
+            .getAdvancedPlayers({
               year,
               limit: 500,
               league: "PLL",
-            }),
-          ).pipe(Effect.either);
+            })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -244,19 +226,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
-      /**
-       * Extracts events for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts events for a season. @see isCriticalError for error handling. */
       const extractEvents = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🎮 Extracting events for ${year}...`);
-          const result = yield* withTiming(pll.getEvents({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* pll
+            .getEvents({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -312,19 +288,13 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return { data: details, count: details.length, durationMs };
         });
 
-      /**
-       * Extracts standings for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📈 Extracting standings for ${year}...`);
-          const result = yield* withTiming(
-            pll.getStandings({ year, champSeries: false }),
-          ).pipe(Effect.either);
+          const result = yield* pll
+            .getStandings({ year, champSeries: false })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -341,21 +311,15 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts championship series standings for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts championship series standings for a season. @see isCriticalError for error handling. */
       const extractStandingsCS = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  🏆 Extracting champ series standings for ${year}...`,
           );
-          const result = yield* withTiming(
-            pll.getStandingsGraphQL({ year, champSeries: true }),
-          ).pipe(Effect.either);
+          const result = yield* pll
+            .getStandingsGraphQL({ year, champSeries: true })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,

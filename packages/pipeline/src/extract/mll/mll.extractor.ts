@@ -3,17 +3,18 @@ import { BunContext } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
-import type {
-  MLLGame,
-  MLLGoalie,
-  MLLPlayer,
-  MLLStanding,
-  MLLStatLeader,
-  MLLTeam,
+import {
+  getExpectedGames,
+  type MLLGame,
+  type MLLGoalie,
+  type MLLPlayer,
+  type MLLStanding,
+  type MLLStatLeader,
+  type MLLTeam,
 } from "../../mll/mll.schema";
 import { ExtractConfigService } from "../extract.config";
 import { emptyExtractResult, withTiming } from "../extract.schema";
-import { isCriticalError, saveJson } from "../util";
+import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
@@ -39,19 +40,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "mll", String(year), `${entity}.json`);
 
-      /**
-       * Extracts teams for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for year ${year}...`);
-          const result = yield* withTiming(client.getTeams({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getTeams({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -68,19 +63,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts players for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts players for a season. @see isCriticalError for error handling. */
       const extractPlayers = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏃 Extracting players for year ${year}...`);
-          const result = yield* withTiming(client.getPlayers({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getPlayers({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -97,19 +86,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts goalies for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts goalies for a season. @see isCriticalError for error handling. */
       const extractGoalies = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🥅 Extracting goalies for year ${year}...`);
-          const result = yield* withTiming(client.getGoalies({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getGoalies({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -126,19 +109,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts standings for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts standings for a season. @see isCriticalError for error handling. */
       const extractStandings = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏆 Extracting standings for year ${year}...`);
-          const result = yield* withTiming(client.getStandings({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getStandings({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -155,19 +132,13 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
-      /**
-       * Extracts stat leaders for a season.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       */
+      /** Extracts stat leaders for a season. @see isCriticalError for error handling. */
       const extractStatLeaders = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  ⭐ Extracting stat leaders for year ${year}...`);
-          const result = yield* withTiming(
-            client.getStatLeaders({ year }),
-          ).pipe(Effect.either);
+          const result = yield* client
+            .getStatLeaders({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
           if (Either.isLeft(result)) {
             yield* Effect.log(
               `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
@@ -187,33 +158,15 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           return result.right;
         });
 
-      // Estimate expected games based on MLL team counts
-      // MLL had ~12-14 reg season games per team + playoffs
-      const getExpectedGames = (teamCount: number): number => {
-        // Regular season: each team plays ~12 games
-        // Playoffs: 4 teams, 3 games (2 semi + 1 final)
-        const regSeasonGames = Math.floor((teamCount * 12) / 2); // divide by 2 (each game has 2 teams)
-        const playoffGames = 3;
-        return regSeasonGames + playoffGames;
-      };
-
-      /**
-       * Extracts schedule for a season via Wayback Machine.
-       *
-       * Error handling:
-       * - Critical errors (network, timeout, 5xx): Fails fast, propagates error up
-       * - Non-critical errors (404, parse): Returns empty result, continues extraction
-       *
-       * Note: Wayback data may have gaps, especially for 2007-2019.
-       */
+      /** Extracts schedule via Wayback Machine. May have gaps for 2007-2019. @see isCriticalError for error handling. */
       const extractSchedule = (year: number) =>
         Effect.gen(function* () {
           yield* Effect.log(
             `  📅 Extracting schedule for year ${year} (via Wayback)...`,
           );
-          const result = yield* withTiming(client.getSchedule({ year })).pipe(
-            Effect.either,
-          );
+          const result = yield* client
+            .getSchedule({ year })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
 
           if (Either.isLeft(result)) {
             yield* Effect.log(
