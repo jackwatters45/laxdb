@@ -1,4 +1,50 @@
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
+
+import type { PipelineError } from "../error";
+
+// ============================================================================
+// Extract Result Types
+// ============================================================================
+
+/**
+ * Result of an extraction operation.
+ * Contains the extracted data, count, duration, and optional error info.
+ */
+export interface ExtractResult<T> {
+  data: T;
+  count: number;
+  durationMs: number;
+  error?: PipelineError;
+}
+
+/**
+ * Helper to create an ExtractResult with timing.
+ * Wraps an Effect and tracks execution duration.
+ */
+export const withTiming = <T, E, R>(
+  effect: Effect.Effect<T, E, R>,
+): Effect.Effect<ExtractResult<T>, E, R> =>
+  Effect.gen(function* () {
+    const start = Date.now();
+    const data = yield* effect;
+    const durationMs = Date.now() - start;
+    const count = Array.isArray(data) ? data.length : 1;
+    return { data, count, durationMs };
+  });
+
+/**
+ * Creates an empty ExtractResult for error cases.
+ * Used when extraction fails and we want to continue processing other entities.
+ */
+export const emptyExtractResult = <T>(emptyData: T): ExtractResult<T> => ({
+  data: emptyData,
+  count: 0,
+  durationMs: 0,
+});
+
+// ============================================================================
+// Manifest Types
+// ============================================================================
 
 export const EntityStatus = Schema.Struct({
   extracted: Schema.Boolean,
