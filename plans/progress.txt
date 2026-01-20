@@ -4,3 +4,22 @@ Previous: plans/archive/v0.0.3/
 
 --- Session History ---
 
+[pipeline-014] COMPLETE
+Summary: Added MAX_RETRY_WAIT_MS (5 min) cap to rest-client.service.ts
+Files: packages/pipeline/src/api-client/rest-client.service.ts
+Gotchas: util.ts already had the cap, rest-client did not
+
+[pipeline-006-path] COMPLETE
+Summary: Use relative paths in saveJson error messages
+Files: packages/pipeline/src/extract/util.ts, util.test.ts
+Gotchas: Had to update test expectations to match new relative path output
+
+[pipeline-011] COMPLETE
+Summary: Already exported - verified isCriticalError, saveJson, withRateLimitRetry in extract/index.ts
+Files: None (already done)
+Gotchas: None
+
+[pipeline-002-switch] COMPLETE
+Summary: Already better than proposed - uses exhaustiveness check instead of default
+Files: None (already done)
+Gotchas: TypeScript exhaustiveness check (const _: never = error) is better than default case

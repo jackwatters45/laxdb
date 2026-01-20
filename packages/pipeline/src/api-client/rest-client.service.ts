@@ -1,6 +1,8 @@
 import { Duration, Effect, Schedule, Schema } from "effect";
 
 import { DEFAULT_PIPELINE_CONFIG } from "../config";
+
+const MAX_RETRY_WAIT_MS = 300_000; // 5 minutes max to prevent DoS via large retry-after
 import {
   HttpError,
   NetworkError,
@@ -161,7 +163,11 @@ export const makeRestClient = (config: RestClientConfig) => {
     request(method, endpoint, schema, body, options).pipe(
       Effect.retry(transientRetrySchedule),
       Effect.catchTag("RateLimitError", (error) =>
-        Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
+        Effect.sleep(
+          Duration.millis(
+            Math.min(error.retryAfterMs ?? retryDelayMs, MAX_RETRY_WAIT_MS),
+          ),
+        ).pipe(
           Effect.andThen(
             request(method, endpoint, schema, body, options).pipe(
               Effect.retry(rateLimitRetrySchedule),
