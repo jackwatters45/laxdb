@@ -71,7 +71,7 @@ const runExtraction = (args: CliArgs) =>
     const extractor = yield* WLAExtractorService;
 
     if (args.all) {
-      yield* extractor.extractAllSeasons({
+      yield* extractor.extractAll({
         skipExisting: !args.force,
         includeSchedule: args.schedule,
       });
