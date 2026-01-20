@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 priority: p2
 issue_id: "017"
 tags: [code-review, effect-ts, observability]
@@ -51,6 +51,20 @@ Effect.catchAll((error) =>
 
 ## Acceptance Criteria
 
-- [ ] Warning logged when manifest fails schema validation
-- [ ] User can see that a new manifest is being created
-- [ ] Applied to all 5 manifest services
+- [x] Warning logged when manifest fails schema validation
+- [x] User can see that a new manifest is being created
+- [x] Applied to all 5 manifest services
+
+## Resolution
+
+**Completed:** 2026-01-21
+
+Implemented Option A with catchTag instead of catchAll. All 5 manifest services now use:
+```typescript
+Effect.catchTag("ParseError", (error) =>
+  Effect.zipRight(
+    Effect.logWarning(`{source} manifest schema invalid, creating new: ${error.message}`),
+    Effect.succeed(createEmpty{Source}Manifest()),
+  ),
+)
+```

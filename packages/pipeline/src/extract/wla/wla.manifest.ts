@@ -77,8 +77,8 @@ export class WLAManifestService extends Effect.Service<WLAManifestService>()(
         const content = yield* fs
           .readFileString(manifestPath, "utf-8")
           .pipe(
-            Effect.catchAll((e) =>
-              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            Effect.catchTag("SystemError", (e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${e.message}`)),
             ),
           );
 
@@ -88,10 +88,10 @@ export class WLAManifestService extends Effect.Service<WLAManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(WLAExtractionManifest)(parsed).pipe(
-          Effect.catchAll((error) =>
+          Effect.catchTag("ParseError", (error) =>
             Effect.zipRight(
               Effect.logWarning(
-                `WLA manifest schema invalid, creating new: ${String(error)}`,
+                `WLA manifest schema invalid, creating new: ${error.message}`,
               ),
               Effect.succeed(createEmptyWLAManifest()),
             ),
@@ -106,8 +106,8 @@ export class WLAManifestService extends Effect.Service<WLAManifestService>()(
           const content = JSON.stringify(manifest, null, 2);
           yield* fs.writeFileString(manifestPath, content);
         }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          Effect.catchTag("SystemError", (e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${e.message}`)),
           ),
         );
 

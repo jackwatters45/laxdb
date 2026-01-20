@@ -211,7 +211,6 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
@@ -227,7 +226,6 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏃 Players: skipped (already extracted)");
@@ -243,7 +241,6 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🥅 Goalies: skipped (already extracted)");
@@ -259,7 +256,6 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏆 Standings: skipped (already extracted)");
@@ -275,12 +271,14 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else if (includeSchedule) {
             yield* Effect.log("  📅 Schedule: skipped (already extracted)");
           } else {
             yield* Effect.log("  📅 Schedule: skipped (includeSchedule=false)");
           }
+
+          // Save manifest once at end of season
+          yield* manifestService.save(manifest);
 
           return manifest;
         });

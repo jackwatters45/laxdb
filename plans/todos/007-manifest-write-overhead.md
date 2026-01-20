@@ -1,6 +1,6 @@
 ---
 id: 007-manifest-write-overhead
-status: pending
+status: completed
 category: performance
 severity: low
 source: code-review-pr97
@@ -54,3 +54,9 @@ yield* manifestService.save(manifest);
 ```
 
 Trade-off: Less granular crash recovery.
+
+## Resolution
+
+**Completed:** 2026-01-21
+
+Implemented the recommended batched approach - manifest now saved once per season at the end of `extractSeason` in all 5 extractors. Duplicate of packages/pipeline/todos/003-pending-p2-manifest-io-bottleneck.md.

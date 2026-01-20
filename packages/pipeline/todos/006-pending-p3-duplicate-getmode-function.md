@@ -1,6 +1,6 @@
 # Duplicate getMode Function in All CLIs
 
-**Status:** pending
+**Status:** completed
 **Priority:** P3
 **Tags:** duplication, code-quality
 **Effort:** Small
@@ -61,15 +61,16 @@ _To be filled during triage_
 
 ## Acceptance Criteria
 
-- [ ] `getMode` defined in single location
-- [ ] All CLIs import shared function
-- [ ] No behavioral changes
+- [x] `getMode` defined in single location
+- [x] All CLIs import shared function
+- [x] No behavioral changes
 
 ## Work Log
 
 | Date | Action | Notes |
 |------|--------|-------|
 | 2026-01-21 | Created | From code review of PR #99 |
+| 2026-01-21 | Completed | Created cli-utils.ts with shared getMode, forceOption, incrementalOption |
 
 ## Resources
 

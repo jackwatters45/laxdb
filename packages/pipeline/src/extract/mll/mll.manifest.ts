@@ -79,8 +79,8 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
         const content = yield* fs
           .readFileString(manifestPath, "utf-8")
           .pipe(
-            Effect.catchAll((e) =>
-              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            Effect.catchTag("SystemError", (e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${e.message}`)),
             ),
           );
 
@@ -90,10 +90,10 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(MLLExtractionManifest)(parsed).pipe(
-          Effect.catchAll((error) =>
+          Effect.catchTag("ParseError", (error) =>
             Effect.zipRight(
               Effect.logWarning(
-                `MLL manifest schema invalid, creating new: ${String(error)}`,
+                `MLL manifest schema invalid, creating new: ${error.message}`,
               ),
               Effect.succeed(createEmptyMLLManifest()),
             ),
@@ -108,8 +108,8 @@ export class MLLManifestService extends Effect.Service<MLLManifestService>()(
           const content = JSON.stringify(manifest, null, 2);
           yield* fs.writeFileString(manifestPath, content);
         }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          Effect.catchTag("SystemError", (e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${e.message}`)),
           ),
         );
 

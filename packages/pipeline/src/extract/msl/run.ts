@@ -13,14 +13,12 @@ import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Console, Effect, Layer } from "effect";
 
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
-import type { ExtractionMode } from "../incremental.service";
+import { forceOption, getMode, incrementalOption } from "../cli-utils";
 
 import { MSLExtractorService } from "./msl.extractor";
 
-// Get most recent season ID as default (2024-25 season)
 const DEFAULT_SEASON_ID = 9567;
 
-// CLI Options
 const seasonOption = Options.integer("season").pipe(
   Options.withAlias("s"),
   Options.withDescription(
@@ -35,31 +33,10 @@ const allOption = Options.boolean("all").pipe(
   Options.withDefault(false),
 );
 
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
 const listSeasonsOption = Options.boolean("list-seasons").pipe(
   Options.withDescription("Show available Gamesheet season IDs"),
   Options.withDefault(false),
 );
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
 
 // Main command
 const mslCommand = Command.make(

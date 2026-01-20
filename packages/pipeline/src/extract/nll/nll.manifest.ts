@@ -77,8 +77,8 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
         const content = yield* fs
           .readFileString(manifestPath, "utf-8")
           .pipe(
-            Effect.catchAll((e) =>
-              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            Effect.catchTag("SystemError", (e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${e.message}`)),
             ),
           );
 
@@ -88,10 +88,10 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
             new Error(`Failed to parse manifest JSON: ${String(e)}`),
         });
         return yield* Schema.decodeUnknown(NLLExtractionManifest)(parsed).pipe(
-          Effect.catchAll((error) =>
+          Effect.catchTag("ParseError", (error) =>
             Effect.zipRight(
               Effect.logWarning(
-                `NLL manifest schema invalid, creating new: ${String(error)}`,
+                `NLL manifest schema invalid, creating new: ${error.message}`,
               ),
               Effect.succeed(createEmptyNLLManifest()),
             ),
@@ -106,8 +106,8 @@ export class NLLManifestService extends Effect.Service<NLLManifestService>()(
           const content = JSON.stringify(manifest, null, 2);
           yield* fs.writeFileString(manifestPath, content);
         }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          Effect.catchTag("SystemError", (e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${e.message}`)),
           ),
         );
 

@@ -13,14 +13,12 @@ import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import { forceOption, getMode, incrementalOption } from "../cli-utils";
 
 import { WLAExtractorService } from "./wla.extractor";
 
-// Default to current year
 const DEFAULT_SEASON = new Date().getFullYear();
 
-// CLI Options
 const seasonOption = Options.integer("season").pipe(
   Options.withAlias("s"),
   Options.withDescription(`Season year (default: ${DEFAULT_SEASON})`),
@@ -37,27 +35,6 @@ const scheduleOption = Options.boolean("schedule").pipe(
   Options.withDescription("Include schedule extraction"),
   Options.withDefault(false),
 );
-
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
 
 // Main command
 const wlaCommand = Command.make(

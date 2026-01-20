@@ -32,8 +32,8 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         const content = yield* fs
           .readFileString(manifestPath, "utf-8")
           .pipe(
-            Effect.catchAll((e) =>
-              Effect.fail(new Error(`Failed to read manifest: ${String(e)}`)),
+            Effect.catchTag("SystemError", (e) =>
+              Effect.fail(new Error(`Failed to read manifest: ${e.message}`)),
             ),
           );
 
@@ -45,10 +45,10 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
         return yield* Schema.decodeUnknown(ExtractionManifestSchema)(
           parsed,
         ).pipe(
-          Effect.catchAll((error) =>
+          Effect.catchTag("ParseError", (error) =>
             Effect.zipRight(
               Effect.logWarning(
-                `PLL manifest schema invalid, creating new: ${String(error)}`,
+                `PLL manifest schema invalid, creating new: ${error.message}`,
               ),
               Effect.succeed(createEmptyManifest("pll")),
             ),
@@ -63,8 +63,8 @@ export class PLLManifestService extends Effect.Service<PLLManifestService>()(
           const content = JSON.stringify(manifest, null, 2);
           yield* fs.writeFileString(manifestPath, content);
         }).pipe(
-          Effect.catchAll((e) =>
-            Effect.fail(new Error(`Failed to write manifest: ${String(e)}`)),
+          Effect.catchTag("SystemError", (e) =>
+            Effect.fail(new Error(`Failed to write manifest: ${e.message}`)),
           ),
         );
 

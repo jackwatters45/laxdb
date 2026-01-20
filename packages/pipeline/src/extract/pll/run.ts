@@ -12,11 +12,10 @@ import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer, Option } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import { forceOption, getMode, incrementalOption } from "../cli-utils";
 
 import { PLLExtractorService } from "./pll.extractor";
 
-// CLI Options
 const yearOption = Options.integer("year").pipe(
   Options.withAlias("y"),
   Options.withDescription("Extract specific year (2019-2030)"),
@@ -33,27 +32,6 @@ const noDetailsOption = Options.boolean("no-details").pipe(
   Options.withDescription("Skip detail endpoints (faster)"),
   Options.withDefault(false),
 );
-
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
 
 // Main command
 const pllCommand = Command.make(

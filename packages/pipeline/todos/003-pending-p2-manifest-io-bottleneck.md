@@ -1,6 +1,6 @@
 # Manifest I/O Bottleneck - Per-Entity Saves
 
-**Status:** pending
+**Status:** completed
 **Priority:** P2
 **Tags:** performance, io, optimization
 **Effort:** Small
@@ -67,15 +67,16 @@ _To be filled during triage_
 
 ## Acceptance Criteria
 
-- [ ] Manifest saved at most once per season extraction
-- [ ] All existing tests pass
-- [ ] Extraction behavior unchanged
+- [x] Manifest saved at most once per season extraction
+- [x] All existing tests pass
+- [x] Extraction behavior unchanged
 
 ## Work Log
 
 | Date | Action | Notes |
 |------|--------|-------|
 | 2026-01-21 | Created | From code review of PR #99 |
+| 2026-01-21 | Completed | Implemented Option A - save once at end of season in all 5 extractors |
 
 ## Resources
 

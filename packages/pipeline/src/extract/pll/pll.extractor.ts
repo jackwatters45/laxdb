@@ -375,7 +375,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
           }
@@ -412,7 +411,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
                 result.count,
                 result.durationMs,
               );
-              yield* manifestService.save(manifest);
             }
           } else if (includeDetails) {
             yield* Effect.log("  🏟️ Team details: skipped (already extracted)");
@@ -427,7 +425,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  👥 Players: skipped (already extracted)");
           }
@@ -441,7 +438,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log(
               "  🔬 Advanced players: skipped (already extracted)",
@@ -483,7 +479,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
                 result.count,
                 result.durationMs,
               );
-              yield* manifestService.save(manifest);
             }
           } else if (includeDetails) {
             yield* Effect.log(
@@ -500,7 +495,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  🎮 Events: skipped (already extracted)");
           }
@@ -537,7 +531,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
                 result.count,
                 result.durationMs,
               );
-              yield* manifestService.save(manifest);
             }
           } else if (includeDetails) {
             yield* Effect.log(
@@ -554,7 +547,6 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  📈 Standings: skipped (already extracted)");
           }
@@ -568,10 +560,12 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  🏆 CS Standings: skipped (already extracted)");
           }
+
+          // Save manifest once at end of season
+          yield* manifestService.save(manifest);
 
           return manifest;
         });

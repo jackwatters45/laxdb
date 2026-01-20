@@ -1,6 +1,6 @@
 ---
 id: 003-rate-limit-fail-fast
-status: pending
+status: wont-fix
 category: performance
 severity: medium
 source: code-review-pr97
@@ -35,3 +35,11 @@ Or better: handle RateLimitError separately in extractors with `Effect.retry` us
 ## Notes
 
 This was a design decision in the original plan. May want to discuss whether fail-fast is actually desired for rate limits (e.g., if extraction is time-sensitive and can't wait).
+
+## Resolution
+
+**Marked as wont-fix:** 2026-01-21
+
+This is working as designed. The `withRateLimitRetry` utility handles rate limit retries BEFORE `isCriticalError` is called. By the time `isCriticalError` evaluates `RateLimitError`, the configured retries have already been exhausted. The comment in util.ts:74 says "Handled by withRateLimitRetry - if we get here, retries exhausted".
+
+If we don't fail-fast after retries are exhausted, we'd silently return empty data, which is worse than failing loudly.

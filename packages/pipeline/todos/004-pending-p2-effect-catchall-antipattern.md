@@ -1,6 +1,6 @@
 # Effect.catchAll Anti-Pattern in Manifests
 
-**Status:** pending
+**Status:** completed
 **Priority:** P2
 **Tags:** architecture, effect-ts, error-handling
 **Effort:** Small
@@ -59,16 +59,17 @@ _To be filled during triage_
 
 ## Acceptance Criteria
 
-- [ ] No `Effect.catchAll` in manifest services
-- [ ] Only expected errors (NotFound) handled silently
-- [ ] Unexpected errors propagate up
-- [ ] All tests pass
+- [x] No `Effect.catchAll` in manifest services
+- [x] Only expected errors (NotFound) handled silently
+- [x] Unexpected errors propagate up
+- [x] All tests pass
 
 ## Work Log
 
 | Date | Action | Notes |
 |------|--------|-------|
 | 2026-01-21 | Created | From code review of PR #99 |
+| 2026-01-21 | Completed | Changed to catchTag("SystemError") and catchTag("ParseError") in all 5 manifests |
 
 ## Resources
 

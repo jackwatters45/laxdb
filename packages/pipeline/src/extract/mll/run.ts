@@ -13,11 +13,10 @@ import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import { forceOption, getMode, incrementalOption } from "../cli-utils";
 
 import { MLLExtractorService } from "./mll.extractor";
 
-// CLI Options
 const yearOption = Options.integer("year").pipe(
   Options.withAlias("y"),
   Options.withDescription("Extract specific year (default: 2019)"),
@@ -34,27 +33,6 @@ const withScheduleOption = Options.boolean("with-schedule").pipe(
   Options.withDescription("Include Wayback schedule extraction"),
   Options.withDefault(false),
 );
-
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
 
 // Main command
 const mllCommand = Command.make(
