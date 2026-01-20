@@ -11,11 +11,11 @@ import type {
   NLLTeam,
 } from "../../nll/nll.schema";
 import { ExtractConfigService } from "../extract.config";
+import { emptyExtractResult, withTiming } from "../extract.schema";
 import {
-  type ExtractOptions,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+  IncrementalExtractionService,
+  type IncrementalExtractOptions,
+} from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
@@ -29,6 +29,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
       const client = yield* NLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* NLLManifestService;
+      const incremental = yield* IncrementalExtractionService;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -171,10 +172,11 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return result.right;
         });
 
-      const extractSeason = (seasonId: number, options: ExtractOptions = {}) =>
+      const extractSeason = (
+        seasonId: number,
+        options: IncrementalExtractOptions = {},
+      ) =>
         Effect.gen(function* () {
-          const { skipExisting = true, maxAgeHours = null } = options;
-
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting NLL Season ${seasonId}`);
           yield* Effect.log("=".repeat(50));
@@ -182,17 +184,12 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           let manifest = yield* manifestService.load;
 
           const shouldExtract = (entity: keyof NLLSeasonManifest): boolean => {
-            if (!skipExisting) return true;
-            // Check staleness if maxAgeHours is specified
-            if (maxAgeHours !== null) {
-              return manifestService.isStale(
-                manifest,
-                seasonId,
-                entity,
-                maxAgeHours,
-              );
-            }
-            return !manifestService.isExtracted(manifest, seasonId, entity);
+            const seasonManifest = manifestService.getSeasonManifest(
+              manifest,
+              seasonId,
+            );
+            const entityStatus = seasonManifest[entity];
+            return incremental.shouldExtract(entityStatus, seasonId, options);
           };
 
           // Extract teams
@@ -281,7 +278,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return manifest;
         });
 
-      const extractAll = (options: ExtractOptions = {}) =>
+      const extractAll = (options: IncrementalExtractOptions = {}) =>
         Effect.gen(function* () {
           yield* Effect.log("🏈 NLL Full Extraction");
           yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -316,6 +313,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         NLLClient.Default,
         ExtractConfigService.Default,
         NLLManifestService.Default,
+        IncrementalExtractionService.Default,
         BunContext.layer,
       ),
     ],
