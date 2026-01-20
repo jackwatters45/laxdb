@@ -65,13 +65,14 @@
     "id": "pipeline-001",
     "category": "agent-native",
     "description": "Export services for programmatic API access",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Export extractor services from package index",
       "Export manifest services from package index",
       "Add programmatic entry points in extract/api.ts",
-      "Document API in AGENTS.md"
-    ]
+      "Document API in CLAUDE.md"
+    ],
+    "notes": "Created extract/api.ts with extractNLL/PLL/MLL/MSL/WLA functions. Documented in CLAUDE.md."
   },
   {
     "id": "pipeline-008",
