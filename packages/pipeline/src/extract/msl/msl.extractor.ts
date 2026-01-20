@@ -12,11 +12,11 @@ import type {
 } from "../../msl/msl.schema";
 import { MSL_GAMESHEET_SEASONS, MSLSeasonId } from "../../msl/msl.schema";
 import { ExtractConfigService } from "../extract.config";
+import { emptyExtractResult, withTiming } from "../extract.schema";
 import {
-  type ExtractOptions,
-  emptyExtractResult,
-  withTiming,
-} from "../extract.schema";
+  IncrementalExtractionService,
+  type IncrementalExtractOptions,
+} from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import type { MSLSeasonManifest } from "./msl.manifest";
@@ -38,6 +38,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
       const client = yield* MSLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MSLManifestService;
+      const incremental = yield* IncrementalExtractionService;
       const path = yield* Path.Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -180,10 +181,11 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           return result.right;
         });
 
-      const extractSeason = (seasonId: number, options: ExtractOptions = {}) =>
+      const extractSeason = (
+        seasonId: number,
+        options: IncrementalExtractOptions = {},
+      ) =>
         Effect.gen(function* () {
-          const { skipExisting = true, maxAgeHours = null } = options;
-
           // Find year for this seasonId
           const season = MSL_SEASONS.find((s) => s.seasonId === seasonId);
           const year = season?.year ?? "unknown";
@@ -195,17 +197,12 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           let manifest = yield* manifestService.load;
 
           const shouldExtract = (entity: keyof MSLSeasonManifest): boolean => {
-            if (!skipExisting) return true;
-            // Check staleness if maxAgeHours is specified
-            if (maxAgeHours !== null) {
-              return manifestService.isStale(
-                manifest,
-                seasonId,
-                entity,
-                maxAgeHours,
-              );
-            }
-            return !manifestService.isExtracted(manifest, seasonId, entity);
+            const seasonManifest = manifestService.getSeasonManifest(
+              manifest,
+              seasonId,
+            );
+            const entityStatus = seasonManifest[entity];
+            return incremental.shouldExtract(entityStatus, seasonId, options);
           };
 
           // Extract teams
@@ -291,14 +288,12 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
         });
 
       const extractAll = (
-        options: ExtractOptions & {
+        options: IncrementalExtractOptions & {
           startYear?: number;
           endYear?: number;
         } = {},
       ) =>
         Effect.gen(function* () {
-          const skipExisting = options.skipExisting ?? true;
-          const maxAgeHours = options.maxAgeHours ?? null;
           const startYear = options.startYear ?? 2023;
           const endYear = options.endYear ?? 2025;
 
@@ -311,7 +306,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           yield* Effect.log(
             `MSL EXTRACTION: ${totalSeasons} seasons (${startYear}-${endYear})`,
           );
-          yield* Effect.log(`Options: skipExisting=${skipExisting}`);
+          yield* Effect.log(`Options: mode=${options.mode ?? "skip-existing"}`);
           yield* Effect.log("#".repeat(60));
 
           const overallStart = Date.now();
@@ -321,10 +316,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             yield* Effect.log(
               `\n>>> Progress: ${i + 1}/${totalSeasons} seasons`,
             );
-            lastManifest = yield* extractSeason(season.seasonId, {
-              skipExisting,
-              maxAgeHours,
-            });
+            lastManifest = yield* extractSeason(season.seasonId, options);
           }
 
           const totalDurationMs = Date.now() - overallStart;
@@ -358,6 +350,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
         MSLClient.Default,
         ExtractConfigService.Default,
         MSLManifestService.Default,
+        IncrementalExtractionService.Default,
         BunContext.layer,
       ),
     ],
