@@ -3,99 +3,98 @@
  *
  * Usage:
  *   bun src/extract/mll/run.ts
- *   bun src/extract/mll/run.ts --year=2019
+ *   bun src/extract/mll/run.ts --year 2019
  *   bun src/extract/mll/run.ts --all
  *   bun src/extract/mll/run.ts --with-schedule
  *   bun src/extract/mll/run.ts --force
  */
 
+import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
+import type { ExtractionMode } from "../incremental.service";
+
 import { MLLExtractorService } from "./mll.extractor";
 
-interface CliArgs {
-  year: number;
-  all: boolean;
-  force: boolean;
-  withSchedule: boolean;
-  maxAgeHours: number | null;
-  help: boolean;
-}
+// CLI Options
+const yearOption = Options.integer("year").pipe(
+  Options.withAlias("y"),
+  Options.withDescription("Extract specific year (default: 2019)"),
+  Options.withDefault(2019),
+);
 
-const parseArgs = (): CliArgs => {
-  const args = process.argv.slice(2);
+const allOption = Options.boolean("all").pipe(
+  Options.withAlias("a"),
+  Options.withDescription("Extract all seasons (2001-2020)"),
+  Options.withDefault(false),
+);
 
-  const yearArg = args.find((a) => a.startsWith("--year="));
-  const year = yearArg ? parseInt(yearArg.split("=")[1] ?? "", 10) : 2019;
+const withScheduleOption = Options.boolean("with-schedule").pipe(
+  Options.withDescription("Include Wayback schedule extraction"),
+  Options.withDefault(false),
+);
 
-  const maxAgeArg = args.find((a) => a.startsWith("--max-age="));
-  let maxAgeHours: number | null = null;
-  if (maxAgeArg) {
-    maxAgeHours = parseInt(maxAgeArg.split("=")[1] ?? "", 10);
-  } else if (args.includes("--incremental")) {
-    maxAgeHours = 24; // Default: 24 hours for incremental
-  }
+const forceOption = Options.boolean("force").pipe(
+  Options.withAlias("f"),
+  Options.withDescription("Re-extract everything (mode: full)"),
+  Options.withDefault(false),
+);
 
-  return {
-    year,
-    all: args.includes("--all"),
-    force: args.includes("--force"),
-    withSchedule: args.includes("--with-schedule"),
-    maxAgeHours,
-    help: args.includes("--help") || args.includes("-h"),
-  };
+const incrementalOption = Options.boolean("incremental").pipe(
+  Options.withAlias("i"),
+  Options.withDescription(
+    "Re-extract stale data - 24h for current seasons (mode: incremental)",
+  ),
+  Options.withDefault(false),
+);
+
+// Derive extraction mode from options
+const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
+  if (force) return "full";
+  if (incremental) return "incremental";
+  return "skip-existing";
 };
 
-const printHelp = () => {
-  console.log(`
-MLL Data Extraction CLI
+// Main command
+const mllCommand = Command.make(
+  "mll",
+  {
+    year: yearOption,
+    all: allOption,
+    withSchedule: withScheduleOption,
+    force: forceOption,
+    incremental: incrementalOption,
+  },
+  ({ year, all, withSchedule, force, incremental }) =>
+    Effect.gen(function* () {
+      const extractor = yield* MLLExtractorService;
+      const mode = getMode(force, incremental);
 
-Usage:
-  bun src/extract/mll/run.ts [options]
+      yield* Effect.log(`Extraction mode: ${mode}`);
 
-Options:
-  --year=YYYY       Extract specific year (default: 2019)
-  --all             Extract all seasons (2001-2020)
-  --force           Re-extract even if already done
-  --with-schedule   Include Wayback schedule extraction
-  --max-age=HOURS   Re-extract if data is older than N hours
-  --incremental     Alias for --max-age=24 (re-extract if older than 24h)
-  --help, -h        Show this help
+      if (all) {
+        yield* extractor.extractAll({
+          mode,
+          includeSchedule: withSchedule,
+        });
+      } else {
+        yield* extractor.extractSeason(year, {
+          mode,
+          includeSchedule: withSchedule,
+        });
+      }
+    }),
+);
 
-Examples:
-  bun src/extract/mll/run.ts
-  bun src/extract/mll/run.ts --year=2006
-  bun src/extract/mll/run.ts --all --with-schedule
-  bun src/extract/mll/run.ts --year=2019 --force
-  bun src/extract/mll/run.ts --all --incremental
-`);
-};
+// CLI runner
+const cli = Command.run(mllCommand, {
+  name: "MLL Extractor",
+  version: "1.0.0",
+});
 
-const runExtraction = (args: CliArgs) =>
-  Effect.gen(function* () {
-    const extractor = yield* MLLExtractorService;
-
-    if (args.all) {
-      yield* extractor.extractAll({
-        skipExisting: !args.force,
-        includeSchedule: args.withSchedule,
-        maxAgeHours: args.maxAgeHours,
-      });
-    } else {
-      yield* extractor.extractSeason(args.year, {
-        skipExisting: !args.force,
-        includeSchedule: args.withSchedule,
-        maxAgeHours: args.maxAgeHours,
-      });
-    }
-  });
-
-const args = parseArgs();
-
-if (args.help) {
-  printHelp();
-} else {
-  const MainLayer = Layer.merge(MLLExtractorService.Default, BunContext.layer);
-  BunRuntime.runMain(runExtraction(args).pipe(Effect.provide(MainLayer)));
-}
+// Run with dependencies
+cli(process.argv).pipe(
+  Effect.provide(Layer.merge(MLLExtractorService.Default, BunContext.layer)),
+  BunRuntime.runMain,
+);
