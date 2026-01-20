@@ -16,11 +16,14 @@ import {
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
 import {
-  type ExtractOptions,
   type SeasonManifest,
   emptyExtractResult,
   withTiming,
 } from "../extract.schema";
+import {
+  IncrementalExtractionService,
+  type IncrementalExtractOptions,
+} from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
 import { PLLManifestService } from "./pll.manifest";
@@ -34,6 +37,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
       const pll = yield* PLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* PLLManifestService;
+      const incremental = yield* IncrementalExtractionService;
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -342,14 +346,10 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
 
       const extractYear = (
         year: number,
-        options: ExtractOptions & { includeDetails?: boolean } = {},
+        options: IncrementalExtractOptions & { includeDetails?: boolean } = {},
       ) =>
         Effect.gen(function* () {
-          const {
-            includeDetails = true,
-            skipExisting = true,
-            maxAgeHours = null,
-          } = options;
+          const { includeDetails = true } = options;
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting PLL ${year}`);
@@ -358,17 +358,12 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
           let manifest = yield* manifestService.load;
 
           const shouldExtract = (entity: keyof SeasonManifest): boolean => {
-            if (!skipExisting) return true;
-            // Check staleness if maxAgeHours is specified
-            if (maxAgeHours !== null) {
-              return manifestService.isStale(
-                manifest,
-                year,
-                entity,
-                maxAgeHours,
-              );
-            }
-            return !manifestService.isExtracted(manifest, year, entity);
+            const seasonManifest = manifestService.getSeasonManifest(
+              manifest,
+              year,
+            );
+            const entityStatus = seasonManifest[entity];
+            return incremental.shouldExtract(entityStatus, year, options);
           };
 
           if (shouldExtract("teams")) {
@@ -582,7 +577,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
         });
 
       const extractAll = (
-        options: ExtractOptions & { includeDetails?: boolean } = {},
+        options: IncrementalExtractOptions & { includeDetails?: boolean } = {},
       ) =>
         Effect.gen(function* () {
           yield* Effect.log("🏈 PLL Full Extraction");
@@ -621,6 +616,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
         PLLClient.Default,
         ExtractConfigService.Default,
         PLLManifestService.Default,
+        IncrementalExtractionService.Default,
         BunContext.layer,
       ),
     ],
