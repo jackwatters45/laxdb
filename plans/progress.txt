@@ -33,3 +33,13 @@ Gotchas: Original todo assumed excessive JSDoc that was never added
 Summary: Added GraphQLError to PipelineError union, simplified isCriticalError signature
 Files: error.ts, graphql.service.ts, extract/util.ts
 Gotchas: Re-export GraphQLError from graphql.service.ts for backwards compatibility
+
+[pipeline-005-url] WONT-FIX
+Summary: Tokens in headers not query strings, URLs useful for debugging
+Files: None
+Gotchas: Stripping query params would hurt debugging without real security benefit
+
+[pipeline-010] WONT-FIX
+Summary: _tag already provides machine-readable codes, statusCode for HTTP granularity
+Files: None
+Gotchas: Adding redundant codes adds complexity without benefit

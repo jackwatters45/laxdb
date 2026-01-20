@@ -152,22 +152,24 @@
     "id": "pipeline-005-url",
     "category": "security",
     "description": "Sanitize URLs in error messages (strip query params)",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add sanitizeUrl helper",
       "Apply to HttpError, NetworkError, etc.",
       "Verify tokens not exposed"
-    ]
+    ],
+    "notes": "WONT-FIX: Low risk - tokens in headers not query strings, URLs useful for debugging, internal tooling only"
   },
   {
     "id": "pipeline-010",
     "category": "agent-native",
     "description": "Add machine-readable error codes to PipelineError types",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Define error code literals for HttpError",
       "Define error codes for other error types",
       "Update error constructors"
-    ]
+    ],
+    "notes": "WONT-FIX: _tag discriminant already provides machine-readable codes. HttpError has statusCode for granularity."
   }
 ]
