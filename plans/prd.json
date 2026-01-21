@@ -177,7 +177,7 @@
     "id": "schema-011",
     "category": "schema",
     "description": "Create scrape_runs table for tracking extraction jobs",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/db/scrape-runs.sql.ts",
       "Fields: id, league_id (FK), season_id (FK), entity_type ('teams'|'players'|'stats'|'games'|'standings'), status ('running'|'success'|'failed'), started_at, completed_at, records_processed, error_message",
@@ -193,7 +193,7 @@
     "id": "backend-001",
     "category": "backend",
     "description": "Create StatsRepo with Effect pattern",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/service/stats.repo.ts",
       "Implement using Effect.Service pattern from packages/core",
