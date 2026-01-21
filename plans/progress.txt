@@ -68,3 +68,8 @@ Gotchas: Need Layer.mergeAll to include both ExtractorService.Default and Manife
 Summary: Create generic ManifestService factory to eliminate duplication
 Files: extract/manifest.factory.ts (new), nll/nll.manifest.ts, pll/pll.manifest.ts, mll/mll.manifest.ts, msl/msl.manifest.ts, wla/wla.manifest.ts
 Gotchas: EntityStatus requires all fields required (not optional) for Record<string, EntityStatus> constraint. Schema param needs `any` for input type.
+
+[pipeline-018] WONT-FIX
+Summary: Extract method factory not worth the complexity
+Files: None
+Gotchas: Each method has different client signatures, params, entity types. Factory would add generic type complexity without proportional benefit. "Boilerplate" is actually consistent error handling behavior - good duplication.
