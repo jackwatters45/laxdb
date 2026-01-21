@@ -141,3 +141,10 @@ Description: Create PlayersRepo with identity resolution
 Status: COMPLETE
 Commit: 7338f8b
 Timestamp: 2026-01-21T18:37:31+11:00
+
+=== Iteration 2 ===
+Story: backend-003
+Description: Create TeamsRepo
+Status: COMPLETE
+Commit: 53bb945
+Timestamp: 2026-01-21T18:41:19+11:00
