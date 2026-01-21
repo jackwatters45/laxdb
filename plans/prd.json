@@ -50,7 +50,7 @@
     "id": "pipeline-002",
     "category": "architecture",
     "description": "Create generic ManifestService factory to eliminate 900 LOC duplication",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create manifest.factory.ts with generic createManifestService",
       "Refactor nll.manifest.ts to use factory",
@@ -59,7 +59,8 @@
       "Refactor msl.manifest.ts to use factory",
       "Refactor wla.manifest.ts to use factory",
       "Verify all tests pass"
-    ]
+    ],
+    "notes": "Created manifest.factory.ts with createManifestServiceEffect. Each manifest reduced from ~180 to ~45 lines."
   },
   {
     "id": "pipeline-001",
