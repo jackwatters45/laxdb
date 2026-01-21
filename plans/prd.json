@@ -262,7 +262,7 @@
     "id": "backend-005",
     "category": "backend",
     "description": "Create PlayersService with identity linking",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/service/players.service.ts",
       "Inject PlayersRepo",

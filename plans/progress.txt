@@ -148,3 +148,10 @@ Description: Create TeamsRepo
 Status: COMPLETE
 Commit: 53bb945
 Timestamp: 2026-01-21T18:41:19+11:00
+
+=== Iteration 3 ===
+Story: backend-004
+Description: Create StatsService business logic layer
+Status: COMPLETE
+Commit: f7e7257
+Timestamp: 2026-01-21T18:46:31+11:00
