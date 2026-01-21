@@ -11,6 +11,7 @@
     "destroy": "alchemy destroy",
     "dev": "alchemy dev",
     "test": "turbo test",
+    "test:unit": "turbo test:unit",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "turbo format",
