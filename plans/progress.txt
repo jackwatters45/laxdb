@@ -162,3 +162,10 @@ Description: Create PlayersService with identity linking
 Status: COMPLETE
 Commit: a8280f5
 Timestamp: 2026-01-21T18:50:56+11:00
+
+=== Iteration 5 ===
+Story: backend-006
+Description: Create IdentityService for player matching
+Status: COMPLETE
+Commit: 9ce8d8b
+Timestamp: 2026-01-21T18:56:58+11:00

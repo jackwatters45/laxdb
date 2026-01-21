@@ -298,7 +298,7 @@
     "id": "backend-007",
     "category": "backend",
     "description": "Create data loader to populate DB from extracted JSON",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/load/loader.service.ts",
       "Methods: loadLeague, loadSeason, loadTeams, loadPlayers, loadStats, loadGames",
