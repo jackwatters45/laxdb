@@ -134,3 +134,10 @@ Description: Create StatsRepo with Effect pattern
 Status: COMPLETE
 Commit: 2d7006f
 Timestamp: 2026-01-21T17:50:08+11:00
+
+=== Iteration 1 ===
+Story: backend-002
+Description: Create PlayersRepo with identity resolution
+Status: COMPLETE
+Commit: 7338f8b
+Timestamp: 2026-01-21T18:37:31+11:00

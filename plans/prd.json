@@ -229,7 +229,7 @@
     "id": "backend-003",
     "category": "backend",
     "description": "Create TeamsRepo",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/service/teams.repo.ts",
       "Methods: getTeam, getTeamsBySeason, getTeamsByLeague, getTeamRoster",
