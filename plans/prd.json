@@ -127,7 +127,7 @@
     "id": "schema-008",
     "category": "schema",
     "description": "Create player_stats table for per-game statistics",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/db/player-stats.sql.ts",
       "Fields: id, source_player_id (FK), season_id (FK), team_id (FK), game_id (nullable), stat_type ('regular'|'playoff'|'career'), goals, assists, points, ground_balls, turnovers, caused_turnovers, faceoff_wins, faceoff_losses, shots, shots_on_goal, saves, goals_against, games_played, source_hash, created_at, updated_at",

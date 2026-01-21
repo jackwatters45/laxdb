@@ -99,3 +99,10 @@ Description: Create canonical_players table for unified player identity
 Status: COMPLETE
 Commit: 751b761
 Timestamp: 2026-01-21T16:06:06+11:00
+
+=== Iteration 1 ===
+Story: schema-007
+Description: Create player_identities linking table
+Status: COMPLETE
+Commit: 9e64333
+Timestamp: 2026-01-21T16:23:24+11:00
