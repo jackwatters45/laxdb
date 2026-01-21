@@ -155,6 +155,7 @@
         "@effect/platform-bun": "^0.87.0",
         "@laxdb/core": "*",
         "cheerio": "^1.1.2",
+        "drizzle-orm": "^0.44.7",
       },
     },
     "packages/scripts": {
