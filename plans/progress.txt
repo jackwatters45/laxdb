@@ -53,3 +53,8 @@ Gotchas: Pure functions would lose testability and break Effect pattern consiste
 Summary: Export services for programmatic API access
 Files: extract/api.ts (new), extract/index.ts, CLAUDE.md
 Gotchas: PLL uses extractYear not extractSeason. Use CLAUDE.md not AGENTS.md.
+
+[pipeline-008] COMPLETE
+Summary: Add --json flag for machine-readable CLI output
+Files: extract/cli-utils.ts, nll/run.ts, pll/run.ts, mll/run.ts, msl/run.ts, wla/run.ts
+Gotchas: Use Logger.withMinimumLogLevel(LogLevel.None) to suppress logs in json mode

@@ -18,6 +18,13 @@ export const incrementalOption = Options.boolean("incremental").pipe(
   Options.withDefault(false),
 );
 
+/** Shared CLI option for JSON output (machine-readable). */
+export const jsonOption = Options.boolean("json").pipe(
+  Options.withAlias("j"),
+  Options.withDescription("Output results as JSON (machine-readable)"),
+  Options.withDefault(false),
+);
+
 /** Derive extraction mode from CLI options. */
 export const getMode = (
   force: boolean,

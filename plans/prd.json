@@ -78,7 +78,7 @@
     "id": "pipeline-008",
     "category": "agent-native",
     "description": "Add --json flag for machine-readable CLI output",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add jsonOption to cli-utils.ts",
       "Update nll/run.ts to support --json",
@@ -86,7 +86,8 @@
       "Update mll/run.ts to support --json",
       "Update msl/run.ts to support --json",
       "Update wla/run.ts to support --json"
-    ]
+    ],
+    "notes": "All 5 CLIs support --json/-j flag. Suppresses logs, outputs manifest as JSON."
   },
   {
     "id": "pipeline-009",

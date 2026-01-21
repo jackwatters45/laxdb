@@ -6,14 +6,20 @@
  *   bun src/extract/msl/run.ts --season 9567
  *   bun src/extract/msl/run.ts --all
  *   bun src/extract/msl/run.ts --force
+ *   bun src/extract/msl/run.ts --json
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Console, Effect, Layer } from "effect";
+import { Console, Effect, Layer, LogLevel, Logger } from "effect";
 
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
-import { forceOption, getMode, incrementalOption } from "../cli-utils";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+} from "../cli-utils";
 
 import { MSLExtractorService } from "./msl.extractor";
 
@@ -47,14 +53,19 @@ const mslCommand = Command.make(
     force: forceOption,
     incremental: incrementalOption,
     listSeasons: listSeasonsOption,
+    json: jsonOption,
   },
-  ({ season, all, force, incremental, listSeasons }) =>
+  ({ season, all, force, incremental, listSeasons, json }) =>
     Effect.gen(function* () {
-      // Show available seasons if requested
+      // Show available seasons if requested (even in json mode)
       if (listSeasons) {
-        yield* Console.log("Available MSL Gamesheet Seasons:");
-        for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
-          yield* Console.log(`  ${id} = ${year} season`);
+        if (json) {
+          yield* Console.log(JSON.stringify(MSL_GAMESHEET_SEASONS, null, 2));
+        } else {
+          yield* Console.log("Available MSL Gamesheet Seasons:");
+          for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
+            yield* Console.log(`  ${id} = ${year} season`);
+          }
         }
         return;
       }
@@ -62,14 +73,22 @@ const mslCommand = Command.make(
       const extractor = yield* MSLExtractorService;
       const mode = getMode(force, incremental);
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
-
-      if (all) {
-        yield* extractor.extractAll({ mode });
-      } else {
-        yield* extractor.extractSeason(season, { mode });
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
       }
-    }),
+
+      let manifest;
+      if (all) {
+        manifest = yield* extractor.extractAll({ mode });
+      } else {
+        manifest = yield* extractor.extractSeason(season, { mode });
+      }
+      if (json) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner

@@ -6,13 +6,19 @@
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --no-details
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --force
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --json
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, Option } from "effect";
+import { Effect, Layer, LogLevel, Logger, Option } from "effect";
 
-import { forceOption, getMode, incrementalOption } from "../cli-utils";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+} from "../cli-utils";
 
 import { PLLExtractorService } from "./pll.extractor";
 
@@ -42,8 +48,9 @@ const pllCommand = Command.make(
     noDetails: noDetailsOption,
     force: forceOption,
     incremental: incrementalOption,
+    json: jsonOption,
   },
-  ({ year, all, noDetails, force, incremental }) =>
+  ({ year, all, noDetails, force, incremental, json }) =>
     Effect.gen(function* () {
       const extractor = yield* PLLExtractorService;
       const mode = getMode(force, incremental);
@@ -62,14 +69,25 @@ const pllCommand = Command.make(
         return yield* Effect.fail("Invalid year");
       }
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
-
-      if (all) {
-        yield* extractor.extractAll({ mode, includeDetails });
-      } else if (yearValue !== null) {
-        yield* extractor.extractYear(yearValue, { mode, includeDetails });
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
       }
-    }),
+
+      let manifest;
+      if (all) {
+        manifest = yield* extractor.extractAll({ mode, includeDetails });
+      } else if (yearValue !== null) {
+        manifest = yield* extractor.extractYear(yearValue, {
+          mode,
+          includeDetails,
+        });
+      }
+      if (json && manifest) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner

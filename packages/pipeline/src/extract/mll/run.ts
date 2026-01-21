@@ -7,13 +7,19 @@
  *   bun src/extract/mll/run.ts --all
  *   bun src/extract/mll/run.ts --with-schedule
  *   bun src/extract/mll/run.ts --force
+ *   bun src/extract/mll/run.ts --json
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, LogLevel, Logger } from "effect";
 
-import { forceOption, getMode, incrementalOption } from "../cli-utils";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+} from "../cli-utils";
 
 import { MLLExtractorService } from "./mll.extractor";
 
@@ -43,26 +49,35 @@ const mllCommand = Command.make(
     withSchedule: withScheduleOption,
     force: forceOption,
     incremental: incrementalOption,
+    json: jsonOption,
   },
-  ({ year, all, withSchedule, force, incremental }) =>
+  ({ year, all, withSchedule, force, incremental, json }) =>
     Effect.gen(function* () {
       const extractor = yield* MLLExtractorService;
       const mode = getMode(force, incremental);
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
+      }
 
+      let manifest;
       if (all) {
-        yield* extractor.extractAll({
+        manifest = yield* extractor.extractAll({
           mode,
           includeSchedule: withSchedule,
         });
       } else {
-        yield* extractor.extractSeason(year, {
+        manifest = yield* extractor.extractSeason(year, {
           mode,
           includeSchedule: withSchedule,
         });
       }
-    }),
+      if (json) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner
