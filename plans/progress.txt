@@ -155,3 +155,10 @@ Description: Create StatsService business logic layer
 Status: COMPLETE
 Commit: f7e7257
 Timestamp: 2026-01-21T18:46:31+11:00
+
+=== Iteration 4 ===
+Story: backend-005
+Description: Create PlayersService with identity linking
+Status: COMPLETE
+Commit: a8280f5
+Timestamp: 2026-01-21T18:50:56+11:00

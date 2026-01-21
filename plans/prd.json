@@ -280,7 +280,7 @@
     "id": "backend-006",
     "category": "backend",
     "description": "Create IdentityService for player matching",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/service/identity.service.ts",
       "Methods: normalizeName, findExactMatches, createCanonicalPlayer, linkSourcePlayer",
