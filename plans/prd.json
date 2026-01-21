@@ -93,12 +93,13 @@
     "id": "pipeline-009",
     "category": "agent-native",
     "description": "Add --status flag to query extraction status",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Add statusOption to cli-utils.ts",
       "Implement status query in each CLI",
       "Support both human and JSON output for status"
-    ]
+    ],
+    "notes": "All 5 CLIs support --status. Shows manifest with entity extraction status. Supports --json for machine output."
   },
   {
     "id": "pipeline-018",

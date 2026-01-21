@@ -7,6 +7,7 @@
  *   bun src/extract/msl/run.ts --all
  *   bun src/extract/msl/run.ts --force
  *   bun src/extract/msl/run.ts --json
+ *   bun src/extract/msl/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
@@ -19,9 +20,11 @@ import {
   getMode,
   incrementalOption,
   jsonOption,
+  statusOption,
 } from "../cli-utils";
 
 import { MSLExtractorService } from "./msl.extractor";
+import { MSLManifestService } from "./msl.manifest";
 
 const DEFAULT_SEASON_ID = 9567;
 
@@ -54,9 +57,40 @@ const mslCommand = Command.make(
     incremental: incrementalOption,
     listSeasons: listSeasonsOption,
     json: jsonOption,
+    status: statusOption,
   },
-  ({ season, all, force, incremental, listSeasons, json }) =>
+  ({ season, all, force, incremental, listSeasons, json, status }) =>
     Effect.gen(function* () {
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* MSLManifestService;
+        const manifest = yield* manifestService.load;
+        if (json) {
+          yield* Console.log(JSON.stringify(manifest, null, 2));
+        } else {
+          yield* Console.log(
+            `MSL Extraction Status (last run: ${manifest.lastRun || "never"})`,
+          );
+          for (const [seasonId, seasonManifest] of Object.entries(
+            manifest.seasons,
+          )) {
+            yield* Console.log(`\nSeason ${seasonId}:`);
+            for (const [entity, entityStatus] of Object.entries(
+              seasonManifest as Record<
+                string,
+                { extracted: boolean; count: number }
+              >,
+            )) {
+              const st = entityStatus?.extracted
+                ? `✓ ${entityStatus.count} items`
+                : "✗ not extracted";
+              yield* Console.log(`  ${entity}: ${st}`);
+            }
+          }
+        }
+        return;
+      }
+
       // Show available seasons if requested (even in json mode)
       if (listSeasons) {
         if (json) {
@@ -99,6 +133,12 @@ const cli = Command.run(mslCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(MSLExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      MSLExtractorService.Default,
+      MSLManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );

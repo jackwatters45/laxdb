@@ -7,20 +7,23 @@
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --no-details
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --force
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --json
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, LogLevel, Logger, Option } from "effect";
+import { Console, Effect, Layer, LogLevel, Logger, Option } from "effect";
 
 import {
   forceOption,
   getMode,
   incrementalOption,
   jsonOption,
+  statusOption,
 } from "../cli-utils";
 
 import { PLLExtractorService } from "./pll.extractor";
+import { PLLManifestService } from "./pll.manifest";
 
 const yearOption = Options.integer("year").pipe(
   Options.withAlias("y"),
@@ -49,9 +52,40 @@ const pllCommand = Command.make(
     force: forceOption,
     incremental: incrementalOption,
     json: jsonOption,
+    status: statusOption,
   },
-  ({ year, all, noDetails, force, incremental, json }) =>
+  ({ year, all, noDetails, force, incremental, json, status }) =>
     Effect.gen(function* () {
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* PLLManifestService;
+        const manifest = yield* manifestService.load;
+        if (json) {
+          yield* Console.log(JSON.stringify(manifest, null, 2));
+        } else {
+          yield* Console.log(
+            `PLL Extraction Status (last run: ${manifest.lastRun || "never"})`,
+          );
+          for (const [seasonId, seasonManifest] of Object.entries(
+            manifest.seasons,
+          )) {
+            yield* Console.log(`\nYear ${seasonId}:`);
+            for (const [entity, entityStatus] of Object.entries(
+              seasonManifest as Record<
+                string,
+                { extracted: boolean; count: number }
+              >,
+            )) {
+              const st = entityStatus?.extracted
+                ? `✓ ${entityStatus.count} items`
+                : "✗ not extracted";
+              yield* Console.log(`  ${entity}: ${st}`);
+            }
+          }
+        }
+        return;
+      }
+
       const extractor = yield* PLLExtractorService;
       const mode = getMode(force, incremental);
       const includeDetails = !noDetails;
@@ -98,6 +132,12 @@ const cli = Command.run(pllCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(PLLExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      PLLExtractorService.Default,
+      PLLManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );

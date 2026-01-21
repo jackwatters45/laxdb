@@ -25,6 +25,12 @@ export const jsonOption = Options.boolean("json").pipe(
   Options.withDefault(false),
 );
 
+/** Shared CLI option for status query. */
+export const statusOption = Options.boolean("status").pipe(
+  Options.withDescription("Show extraction status from manifest"),
+  Options.withDefault(false),
+);
+
 /** Derive extraction mode from CLI options. */
 export const getMode = (
   force: boolean,

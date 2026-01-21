@@ -58,3 +58,8 @@ Gotchas: PLL uses extractYear not extractSeason. Use CLAUDE.md not AGENTS.md.
 Summary: Add --json flag for machine-readable CLI output
 Files: extract/cli-utils.ts, nll/run.ts, pll/run.ts, mll/run.ts, msl/run.ts, wla/run.ts
 Gotchas: Use Logger.withMinimumLogLevel(LogLevel.None) to suppress logs in json mode
+
+[pipeline-009] COMPLETE
+Summary: Add --status flag to query extraction status
+Files: extract/cli-utils.ts, nll/run.ts, pll/run.ts, mll/run.ts, msl/run.ts, wla/run.ts
+Gotchas: Need Layer.mergeAll to include both ExtractorService.Default and ManifestService.Default
