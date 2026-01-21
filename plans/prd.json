@@ -212,7 +212,7 @@
     "id": "backend-002",
     "category": "backend",
     "description": "Create PlayersRepo with identity resolution",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/service/players.repo.ts",
       "Methods: getPlayer, searchPlayers, getPlayerBySourceId, getCanonicalPlayer",
