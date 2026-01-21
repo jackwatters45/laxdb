@@ -169,3 +169,24 @@ Description: Create IdentityService for player matching
 Status: COMPLETE
 Commit: 9ce8d8b
 Timestamp: 2026-01-21T18:56:58+11:00
+
+=== Iteration 6 ===
+Story: backend-007
+Description: Create data loader to populate DB from extracted JSON
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:03:36+11:00
+
+=== Iteration 7 ===
+Story: cache-001
+Description: Create KV cache service with TTL strategies
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:10:34+11:00
+
+=== Iteration 8 ===
+Story: cache-002
+Description: Integrate cache into StatsService
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:16:55+11:00

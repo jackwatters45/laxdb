@@ -1,5 +1,6 @@
 import { Effect, Schema, pipe } from "effect";
 
+import { CacheService, CacheKeys, DEFAULT_TTL_CONFIG } from "./cache.service";
 import { PlayersRepo, type SourcePlayerWithLeague } from "./players.repo";
 import {
   StatsRepo,
@@ -128,6 +129,7 @@ export class StatsService extends Effect.Service<StatsService>()(
     effect: Effect.gen(function* () {
       const statsRepo = yield* StatsRepo;
       const playersRepo = yield* PlayersRepo;
+      const cacheService = yield* CacheService;
 
       /**
        * Compute aggregated totals from stats array (on read, per YAGNI)
@@ -195,94 +197,119 @@ export class StatsService extends Effect.Service<StatsService>()(
         return Array.from(byLeague.values());
       };
 
+      /**
+       * Fetch player stats from DB (uncached computation)
+       */
+      const fetchPlayerStatsUncached = (
+        input: GetPlayerStatsInput,
+      ): Effect.Effect<PlayerStatsForCanonical, StatsServiceError> =>
+        Effect.gen(function* () {
+          // Get canonical player with all linked source players
+          const canonicalPlayer = yield* playersRepo
+            .getCanonicalPlayer({
+              canonicalPlayerId: input.canonicalPlayerId,
+            })
+            .pipe(
+              Effect.catchTag("NotFoundError", (e) =>
+                Effect.fail(
+                  new StatsServiceError({
+                    message: e.message,
+                    cause: e,
+                  }),
+                ),
+              ),
+              Effect.catchTag("DatabaseError", (e) =>
+                Effect.fail(
+                  new StatsServiceError({
+                    message: "Failed to fetch canonical player",
+                    cause: e,
+                  }),
+                ),
+              ),
+            );
+
+          // Fetch stats for each source player
+          const statsBySource: SourcePlayerStats[] = [];
+
+          for (const sourcePlayer of canonicalPlayer.sourcePlayers) {
+            const statsResult = yield* pipe(
+              input.seasonId !== undefined
+                ? statsRepo.getPlayerStatsBySeason({
+                    sourcePlayerId: sourcePlayer.id,
+                    seasonId: input.seasonId,
+                    limit: input.limit,
+                    cursor: input.cursor,
+                  })
+                : statsRepo.getPlayerStats({
+                    sourcePlayerId: sourcePlayer.id,
+                    limit: input.limit,
+                    cursor: input.cursor,
+                  }),
+              Effect.catchTag("DatabaseError", (e) =>
+                Effect.fail(
+                  new StatsServiceError({
+                    message: `Failed to fetch stats for source player ${sourcePlayer.id}`,
+                    cause: e,
+                  }),
+                ),
+              ),
+            );
+
+            statsBySource.push({
+              sourcePlayerId: sourcePlayer.id,
+              leagueAbbreviation: sourcePlayer.leagueAbbreviation,
+              leaguePriority: sourcePlayer.leaguePriority,
+              stats: statsResult,
+            });
+          }
+
+          // Sort by league priority (lower is better)
+          statsBySource.sort((a, b) => a.leaguePriority - b.leaguePriority);
+
+          // Compute aggregated totals across all sources
+          const allStats = statsBySource.flatMap((s) => s.stats);
+          const aggregatedTotals = computeAggregatedTotals(allStats);
+
+          return {
+            canonicalPlayerId: input.canonicalPlayerId,
+            displayName: canonicalPlayer.displayName,
+            statsBySource,
+            aggregatedTotals,
+          } as PlayerStatsForCanonical;
+        });
+
       return {
         /**
          * Get player stats with canonical resolution.
          * Returns stats from all linked source players, grouped by source.
          * Stats are displayed together but NEVER merged across leagues.
+         * Results are cached with 1h TTL (season) / 24h TTL (off-season).
          */
-        getPlayerStats: (input: GetPlayerStatsInput) =>
-          Effect.gen(function* () {
-            // Get canonical player with all linked source players
-            const canonicalPlayer = yield* playersRepo
-              .getCanonicalPlayer({
-                canonicalPlayerId: input.canonicalPlayerId,
-              })
-              .pipe(
-                Effect.catchTag("NotFoundError", (e) =>
-                  Effect.fail(
-                    new StatsServiceError({
-                      message: e.message,
-                      cause: e,
-                    }),
-                  ),
-                ),
-                Effect.catchTag("DatabaseError", (e) =>
-                  Effect.fail(
-                    new StatsServiceError({
-                      message: "Failed to fetch canonical player",
-                      cause: e,
-                    }),
-                  ),
-                ),
-              );
+        getPlayerStats: (input: GetPlayerStatsInput) => {
+          const cacheKey = CacheKeys.playerStats(
+            input.canonicalPlayerId,
+            input.seasonId,
+          );
 
-            // Fetch stats for each source player
-            const statsBySource: SourcePlayerStats[] = [];
-
-            for (const sourcePlayer of canonicalPlayer.sourcePlayers) {
-              const statsResult = yield* pipe(
-                input.seasonId !== undefined
-                  ? statsRepo.getPlayerStatsBySeason({
-                      sourcePlayerId: sourcePlayer.id,
-                      seasonId: input.seasonId,
-                      limit: input.limit,
-                      cursor: input.cursor,
-                    })
-                  : statsRepo.getPlayerStats({
-                      sourcePlayerId: sourcePlayer.id,
-                      limit: input.limit,
-                      cursor: input.cursor,
-                    }),
-                Effect.catchTag("DatabaseError", (e) =>
-                  Effect.fail(
-                    new StatsServiceError({
-                      message: `Failed to fetch stats for source player ${sourcePlayer.id}`,
-                      cause: e,
-                    }),
-                  ),
-                ),
-              );
-
-              statsBySource.push({
-                sourcePlayerId: sourcePlayer.id,
-                leagueAbbreviation: sourcePlayer.leagueAbbreviation,
-                leaguePriority: sourcePlayer.leaguePriority,
-                stats: statsResult,
-              });
-            }
-
-            // Sort by league priority (lower is better)
-            statsBySource.sort((a, b) => a.leaguePriority - b.leaguePriority);
-
-            // Compute aggregated totals across all sources
-            const allStats = statsBySource.flatMap((s) => s.stats);
-            const aggregatedTotals = computeAggregatedTotals(allStats);
-
-            return {
-              canonicalPlayerId: input.canonicalPlayerId,
-              displayName: canonicalPlayer.displayName,
-              statsBySource,
-              aggregatedTotals,
-            } as PlayerStatsForCanonical;
-          }),
+          return cacheService.getOrSet(
+            cacheKey,
+            fetchPlayerStatsUncached(input),
+          );
+        },
 
         /**
          * Get leaderboard with optional filters.
          * Supports filtering by multiple leagues (display together, don't merge).
+         * Results are cached with 5min TTL (leaderboards need fresh data).
          */
-        getLeaderboard: (input: GetLeaderboardInput) =>
-          Effect.gen(function* () {
+        getLeaderboard: (input: GetLeaderboardInput) => {
+          const cacheKey = CacheKeys.leaderboard(
+            input.leagueIds ?? [],
+            input.sortBy ?? "points",
+            input.seasonId,
+          );
+
+          const fetchLeaderboardUncached = Effect.gen(function* () {
             // If multiple leagues specified, fetch for each and combine
             // If no leagues specified, fetch all
             const leagueIds = input.leagueIds ?? [];
@@ -361,7 +388,13 @@ export class StatsService extends Effect.Service<StatsService>()(
             );
 
             return leaderboard;
-          }),
+          });
+
+          // Use 5min TTL for leaderboards (same as teamTotals)
+          return cacheService.getOrSet(cacheKey, fetchLeaderboardUncached, {
+            ttlSeconds: DEFAULT_TTL_CONFIG.teamTotals,
+          });
+        },
 
         /**
          * Compare stats for multiple canonical players.
@@ -438,6 +471,6 @@ export class StatsService extends Effect.Service<StatsService>()(
           }),
       } as const;
     }),
-    dependencies: [StatsRepo.Default, PlayersRepo.Default],
+    dependencies: [StatsRepo.Default, PlayersRepo.Default, CacheService.Default],
   },
 ) {}
