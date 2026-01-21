@@ -146,7 +146,7 @@
     "id": "schema-009",
     "category": "schema",
     "description": "Create games table for schedule/results",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/db/games.sql.ts",
       "Fields: id, season_id (FK), home_team_id (FK), away_team_id (FK), game_date, game_time, venue, home_score, away_score, status ('scheduled'|'in_progress'|'final'|'postponed'), source_id, source_hash, created_at, updated_at",

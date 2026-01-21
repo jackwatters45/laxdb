@@ -106,3 +106,10 @@ Description: Create player_identities linking table
 Status: COMPLETE
 Commit: 9e64333
 Timestamp: 2026-01-21T16:23:24+11:00
+
+=== Iteration 2 ===
+Story: schema-008
+Description: Create player_stats table for per-game statistics
+Status: COMPLETE
+Commit: dbb8b22
+Timestamp: 2026-01-21T16:29:45+11:00
