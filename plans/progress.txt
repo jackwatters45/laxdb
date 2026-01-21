@@ -113,3 +113,10 @@ Description: Create player_stats table for per-game statistics
 Status: COMPLETE
 Commit: dbb8b22
 Timestamp: 2026-01-21T16:29:45+11:00
+
+=== Iteration 3 ===
+Story: schema-009
+Description: Create games table for schedule/results
+Status: COMPLETE
+Commit: c98ee84
+Timestamp: 2026-01-21T16:37:28+11:00

@@ -162,7 +162,7 @@
     "id": "schema-010",
     "category": "schema",
     "description": "Create standings table",
-    "passes": false,
+    "passes": true,
     "steps": [
       "Create packages/pipeline/src/db/standings.sql.ts",
       "Fields: id, season_id (FK), team_id (FK), division, conference, wins, losses, ties, points, goals_for, goals_against, goal_diff, games_played, rank, source_hash, created_at, updated_at",
