@@ -328,6 +328,39 @@ Outputs `output/{source}/validation-report.json` with:
 | `TimeoutError` | Request timeout |
 | `RateLimitError` | HTTP 429 response |
 | `ParseError` | Schema validation failure |
+| `GraphQLError` | GraphQL-specific errors |
+
+## PROGRAMMATIC API
+
+Extract data without CLI using Effect-based functions:
+
+```typescript
+import { extractNLL, extractPLL, extractMLL, extractMSL, extractWLA } from "@laxdb/pipeline/extract";
+import { Effect } from "effect";
+
+// Run extraction with default options
+const result = await Effect.runPromise(extractNLL({ seasonId: 225 }));
+
+// With incremental mode
+const result = await Effect.runPromise(
+  extractPLL({ seasonId: 2024, mode: "incremental" })
+);
+
+// Force re-extraction
+const result = await Effect.runPromise(
+  extractMLL({ seasonId: 2019, mode: "force" })
+);
+```
+
+| Function | Parameter | Description |
+|----------|-----------|-------------|
+| `extractNLL` | `seasonId` | NLL season ID (e.g., 225) |
+| `extractPLL` | `seasonId` | Year (e.g., 2024) |
+| `extractMLL` | `seasonId` | Year (e.g., 2019) |
+| `extractMSL` | `seasonId` | Gamesheet season ID (e.g., 9567) |
+| `extractWLA` | `seasonId` | Year (e.g., 2024) |
+
+Options: `{ mode: "incremental" | "force" | "skip" }`
 
 ## ENVIRONMENT
 

@@ -1,8 +1,9 @@
+import { relative } from "node:path";
+
 import { FileSystem, Path } from "@effect/platform";
 import type { PlatformError } from "@effect/platform/Error";
 import { Duration, Effect, Either, Schema } from "effect";
 
-import type { GraphQLError } from "../api-client/graphql.service";
 import { type PipelineError, type RateLimitError } from "../error";
 
 /**
@@ -36,8 +37,8 @@ export const saveJson = <T>(filePath: string, data: T) =>
     Effect.catchTag("SystemError", (e: PlatformError) =>
       Effect.fail(
         new FileWriteError({
-          message: `Failed to write ${filePath}: ${e.message}`,
-          filePath,
+          message: `Failed to write ${relative(process.cwd(), filePath)}: ${e.message}`,
+          filePath: relative(process.cwd(), filePath),
           cause: e,
         }),
       ),
@@ -60,9 +61,7 @@ export const saveJson = <T>(filePath: string, data: T) =>
  *   return emptyExtractResult([]);
  * }
  */
-export const isCriticalError = (
-  error: PipelineError | GraphQLError,
-): boolean => {
+export const isCriticalError = (error: PipelineError): boolean => {
   switch (error._tag) {
     case "NetworkError":
     case "TimeoutError":

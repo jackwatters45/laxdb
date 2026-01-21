@@ -202,7 +202,6 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
@@ -218,7 +217,6 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  👥 Players: skipped (already extracted)");
@@ -234,7 +232,6 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📈 Standings: skipped (already extracted)");
@@ -250,7 +247,6 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🎮 Schedule: skipped (already extracted)");
@@ -266,10 +262,12 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  📊 Player Stats: skipped (already extracted)");
           }
+
+          // Save manifest once at end of season
+          yield* manifestService.save(manifest);
 
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`NLL Season ${seasonId} extraction complete`);

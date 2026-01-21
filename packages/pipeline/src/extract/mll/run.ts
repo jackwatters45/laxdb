@@ -7,17 +7,25 @@
  *   bun src/extract/mll/run.ts --all
  *   bun src/extract/mll/run.ts --with-schedule
  *   bun src/extract/mll/run.ts --force
+ *   bun src/extract/mll/run.ts --json
+ *   bun src/extract/mll/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, LogLevel, Logger } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+  statusOption,
+} from "../cli-utils";
 
 import { MLLExtractorService } from "./mll.extractor";
+import { MLLManifestService } from "./mll.manifest";
 
-// CLI Options
 const yearOption = Options.integer("year").pipe(
   Options.withAlias("y"),
   Options.withDescription("Extract specific year (default: 2019)"),
@@ -35,27 +43,6 @@ const withScheduleOption = Options.boolean("with-schedule").pipe(
   Options.withDefault(false),
 );
 
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
-
 // Main command
 const mllCommand = Command.make(
   "mll",
@@ -65,26 +52,44 @@ const mllCommand = Command.make(
     withSchedule: withScheduleOption,
     force: forceOption,
     incremental: incrementalOption,
+    json: jsonOption,
+    status: statusOption,
   },
-  ({ year, all, withSchedule, force, incremental }) =>
+  ({ year, all, withSchedule, force, incremental, json, status }) =>
     Effect.gen(function* () {
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* MLLManifestService;
+        const manifest = yield* manifestService.load;
+        yield* manifestService.displayStatus(manifest, json, "Year");
+        return;
+      }
+
       const extractor = yield* MLLExtractorService;
       const mode = getMode(force, incremental);
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
+      }
 
+      let manifest;
       if (all) {
-        yield* extractor.extractAll({
+        manifest = yield* extractor.extractAll({
           mode,
           includeSchedule: withSchedule,
         });
       } else {
-        yield* extractor.extractSeason(year, {
+        manifest = yield* extractor.extractSeason(year, {
           mode,
           includeSchedule: withSchedule,
         });
       }
-    }),
+      if (json) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner
@@ -95,6 +100,12 @@ const cli = Command.run(mllCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(MLLExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      MLLExtractorService.Default,
+      MLLManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );

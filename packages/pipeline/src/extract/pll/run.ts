@@ -6,17 +6,25 @@
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --no-details
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --force
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --year 2024 --json
+ *   infisical run --env=dev -- bun src/extract/pll/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, Option } from "effect";
+import { Effect, Layer, LogLevel, Logger, Option } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+  statusOption,
+} from "../cli-utils";
 
 import { PLLExtractorService } from "./pll.extractor";
+import { PLLManifestService } from "./pll.manifest";
 
-// CLI Options
 const yearOption = Options.integer("year").pipe(
   Options.withAlias("y"),
   Options.withDescription("Extract specific year (2019-2030)"),
@@ -34,27 +42,6 @@ const noDetailsOption = Options.boolean("no-details").pipe(
   Options.withDefault(false),
 );
 
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
-
 // Main command
 const pllCommand = Command.make(
   "pll",
@@ -64,9 +51,19 @@ const pllCommand = Command.make(
     noDetails: noDetailsOption,
     force: forceOption,
     incremental: incrementalOption,
+    json: jsonOption,
+    status: statusOption,
   },
-  ({ year, all, noDetails, force, incremental }) =>
+  ({ year, all, noDetails, force, incremental, json, status }) =>
     Effect.gen(function* () {
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* PLLManifestService;
+        const manifest = yield* manifestService.load;
+        yield* manifestService.displayStatus(manifest, json, "Year");
+        return;
+      }
+
       const extractor = yield* PLLExtractorService;
       const mode = getMode(force, incremental);
       const includeDetails = !noDetails;
@@ -84,14 +81,25 @@ const pllCommand = Command.make(
         return yield* Effect.fail("Invalid year");
       }
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
-
-      if (all) {
-        yield* extractor.extractAll({ mode, includeDetails });
-      } else if (yearValue !== null) {
-        yield* extractor.extractYear(yearValue, { mode, includeDetails });
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
       }
-    }),
+
+      let manifest;
+      if (all) {
+        manifest = yield* extractor.extractAll({ mode, includeDetails });
+      } else if (yearValue !== null) {
+        manifest = yield* extractor.extractYear(yearValue, {
+          mode,
+          includeDetails,
+        });
+      }
+      if (json && manifest) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner
@@ -102,6 +110,12 @@ const cli = Command.run(pllCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(PLLExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      PLLExtractorService.Default,
+      PLLManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );

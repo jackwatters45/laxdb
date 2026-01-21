@@ -98,7 +98,7 @@ describe("saveJson", () => {
       expect(error._tag).toBe("Fail");
       if (error._tag === "Fail") {
         expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain("Failed to write /tmp/test.json");
+        expect(error.error.message).toContain("Failed to write");
       }
     }
   });
@@ -129,9 +129,7 @@ describe("saveJson", () => {
       expect(error._tag).toBe("Fail");
       if (error._tag === "Fail") {
         expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain(
-          "Failed to write /root/forbidden/test.json",
-        );
+        expect(error.error.message).toContain("Failed to write");
       }
     }
   });

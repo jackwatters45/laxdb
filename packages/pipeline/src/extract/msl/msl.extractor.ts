@@ -215,7 +215,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
@@ -231,7 +230,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏃 Players: skipped (already extracted)");
@@ -247,7 +245,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🧤 Goalies: skipped (already extracted)");
@@ -263,7 +260,6 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📋 Standings: skipped (already extracted)");
@@ -279,10 +275,12 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  📅 Schedule: skipped (already extracted)");
           }
+
+          // Save manifest once at end of season
+          yield* manifestService.save(manifest);
 
           return manifest;
         });

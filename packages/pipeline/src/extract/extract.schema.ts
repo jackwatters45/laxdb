@@ -2,10 +2,6 @@ import { Effect, Schema } from "effect";
 
 import type { PipelineError } from "../error";
 
-// ============================================================================
-// Extract Result Types
-// ============================================================================
-
 /**
  * Result of an extraction operation.
  * Contains the extracted data, count, duration, and optional error info.
@@ -46,10 +42,6 @@ export const emptyExtractResult = <T>(emptyData: T): ExtractResult<T> => ({
   count: 0,
   durationMs: 0,
 });
-
-// ============================================================================
-// Manifest Types
-// ============================================================================
 
 export const EntityStatus = Schema.Struct({
   extracted: Schema.Boolean,
@@ -105,10 +97,6 @@ export const createEmptyManifest = (source: string): ExtractionManifest => ({
   version: 1,
 });
 
-// ============================================================================
-// Staleness Helpers
-// ============================================================================
-
 /**
  * Generic entity status interface for staleness checking.
  * Compatible with all manifest entity status types.
@@ -143,16 +131,8 @@ export const isEntityStale = (
   return ageMs > maxAgeMs;
 };
 
-// ============================================================================
-// Extract Options
-// ============================================================================
-
-/**
- * Common options for extraction operations.
- */
-export interface ExtractOptions {
-  /** Skip entities that have already been extracted. Default: true */
-  skipExisting?: boolean;
-  /** Maximum age in hours before data is considered stale and re-extracted. Null = never stale. */
-  maxAgeHours?: number | null;
-}
+export const ExtractOptions = Schema.Struct({
+  skipExisting: Schema.optional(Schema.Boolean),
+  maxAgeHours: Schema.optional(Schema.NullOr(Schema.Number)),
+});
+export type ExtractOptions = typeof ExtractOptions.Type;

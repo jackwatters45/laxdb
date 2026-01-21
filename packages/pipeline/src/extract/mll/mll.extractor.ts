@@ -190,7 +190,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           const teamsPath = getOutputPath(year, "teams");
           const teamsContent = yield* fs
             .readFileString(teamsPath)
-            .pipe(Effect.catchAll(() => Effect.succeed("[]")));
+            .pipe(Effect.catchTag("SystemError", () => Effect.succeed("[]")));
           const parsed: unknown = JSON.parse(teamsContent);
           const teams: unknown[] = Array.isArray(parsed) ? parsed : [];
           const teamCount = teams.length || 6; // Default to 6 if no teams file
@@ -250,7 +250,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
@@ -266,7 +265,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏃 Players: skipped (already extracted)");
@@ -282,7 +280,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🥅 Goalies: skipped (already extracted)");
@@ -298,7 +295,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
             yield* Effect.sleep(Duration.millis(config.delayBetweenRequestsMs));
           } else {
             yield* Effect.log("  🏆 Standings: skipped (already extracted)");
@@ -314,7 +310,6 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else {
             yield* Effect.log("  ⭐ Stat leaders: skipped (already extracted)");
           }
@@ -331,12 +326,14 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
               result.count,
               result.durationMs,
             );
-            yield* manifestService.save(manifest);
           } else if (includeSchedule) {
             yield* Effect.log("  📅 Schedule: skipped (already extracted)");
           } else {
             yield* Effect.log("  📅 Schedule: skipped (includeSchedule=false)");
           }
+
+          // Save manifest once at end of season
+          yield* manifestService.save(manifest);
 
           return manifest;
         });

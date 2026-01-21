@@ -7,20 +7,27 @@
  *   bun src/extract/wla/run.ts --all
  *   bun src/extract/wla/run.ts --force
  *   bun src/extract/wla/run.ts --schedule
+ *   bun src/extract/wla/run.ts --json
+ *   bun src/extract/wla/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, LogLevel, Logger } from "effect";
 
-import type { ExtractionMode } from "../incremental.service";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+  statusOption,
+} from "../cli-utils";
 
 import { WLAExtractorService } from "./wla.extractor";
+import { WLAManifestService } from "./wla.manifest";
 
-// Default to current year
 const DEFAULT_SEASON = new Date().getFullYear();
 
-// CLI Options
 const seasonOption = Options.integer("season").pipe(
   Options.withAlias("s"),
   Options.withDescription(`Season year (default: ${DEFAULT_SEASON})`),
@@ -38,27 +45,6 @@ const scheduleOption = Options.boolean("schedule").pipe(
   Options.withDefault(false),
 );
 
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
-
 // Main command
 const wlaCommand = Command.make(
   "wla",
@@ -68,26 +54,44 @@ const wlaCommand = Command.make(
     schedule: scheduleOption,
     force: forceOption,
     incremental: incrementalOption,
+    json: jsonOption,
+    status: statusOption,
   },
-  ({ season, all, schedule, force, incremental }) =>
+  ({ season, all, schedule, force, incremental, json, status }) =>
     Effect.gen(function* () {
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* WLAManifestService;
+        const manifest = yield* manifestService.load;
+        yield* manifestService.displayStatus(manifest, json, "Year");
+        return;
+      }
+
       const extractor = yield* WLAExtractorService;
       const mode = getMode(force, incremental);
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
+      }
 
+      let manifest;
       if (all) {
-        yield* extractor.extractAll({
+        manifest = yield* extractor.extractAll({
           mode,
           includeSchedule: schedule,
         });
       } else {
-        yield* extractor.extractSeason(season, {
+        manifest = yield* extractor.extractSeason(season, {
           mode,
           includeSchedule: schedule,
         });
       }
-    }),
+      if (json) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner
@@ -98,6 +102,12 @@ const cli = Command.run(wlaCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(WLAExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      WLAExtractorService.Default,
+      WLAManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );

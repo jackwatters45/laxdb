@@ -6,21 +6,28 @@
  *   bun src/extract/msl/run.ts --season 9567
  *   bun src/extract/msl/run.ts --all
  *   bun src/extract/msl/run.ts --force
+ *   bun src/extract/msl/run.ts --json
+ *   bun src/extract/msl/run.ts --status
  */
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Console, Effect, Layer } from "effect";
+import { Console, Effect, Layer, LogLevel, Logger } from "effect";
 
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
-import type { ExtractionMode } from "../incremental.service";
+import {
+  forceOption,
+  getMode,
+  incrementalOption,
+  jsonOption,
+  statusOption,
+} from "../cli-utils";
 
 import { MSLExtractorService } from "./msl.extractor";
+import { MSLManifestService } from "./msl.manifest";
 
-// Get most recent season ID as default (2024-25 season)
 const DEFAULT_SEASON_ID = 9567;
 
-// CLI Options
 const seasonOption = Options.integer("season").pipe(
   Options.withAlias("s"),
   Options.withDescription(
@@ -35,31 +42,10 @@ const allOption = Options.boolean("all").pipe(
   Options.withDefault(false),
 );
 
-const forceOption = Options.boolean("force").pipe(
-  Options.withAlias("f"),
-  Options.withDescription("Re-extract everything (mode: full)"),
-  Options.withDefault(false),
-);
-
-const incrementalOption = Options.boolean("incremental").pipe(
-  Options.withAlias("i"),
-  Options.withDescription(
-    "Re-extract stale data - 24h for current seasons (mode: incremental)",
-  ),
-  Options.withDefault(false),
-);
-
 const listSeasonsOption = Options.boolean("list-seasons").pipe(
   Options.withDescription("Show available Gamesheet season IDs"),
   Options.withDefault(false),
 );
-
-// Derive extraction mode from options
-const getMode = (force: boolean, incremental: boolean): ExtractionMode => {
-  if (force) return "full";
-  if (incremental) return "incremental";
-  return "skip-existing";
-};
 
 // Main command
 const mslCommand = Command.make(
@@ -70,14 +56,28 @@ const mslCommand = Command.make(
     force: forceOption,
     incremental: incrementalOption,
     listSeasons: listSeasonsOption,
+    json: jsonOption,
+    status: statusOption,
   },
-  ({ season, all, force, incremental, listSeasons }) =>
+  ({ season, all, force, incremental, listSeasons, json, status }) =>
     Effect.gen(function* () {
-      // Show available seasons if requested
+      // Handle --status flag
+      if (status) {
+        const manifestService = yield* MSLManifestService;
+        const manifest = yield* manifestService.load;
+        yield* manifestService.displayStatus(manifest, json);
+        return;
+      }
+
+      // Show available seasons if requested (even in json mode)
       if (listSeasons) {
-        yield* Console.log("Available MSL Gamesheet Seasons:");
-        for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
-          yield* Console.log(`  ${id} = ${year} season`);
+        if (json) {
+          yield* Console.log(JSON.stringify(MSL_GAMESHEET_SEASONS, null, 2));
+        } else {
+          yield* Console.log("Available MSL Gamesheet Seasons:");
+          for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
+            yield* Console.log(`  ${id} = ${year} season`);
+          }
         }
         return;
       }
@@ -85,14 +85,22 @@ const mslCommand = Command.make(
       const extractor = yield* MSLExtractorService;
       const mode = getMode(force, incremental);
 
-      yield* Effect.log(`Extraction mode: ${mode}`);
-
-      if (all) {
-        yield* extractor.extractAll({ mode });
-      } else {
-        yield* extractor.extractSeason(season, { mode });
+      if (!json) {
+        yield* Effect.log(`Extraction mode: ${mode}`);
       }
-    }),
+
+      let manifest;
+      if (all) {
+        manifest = yield* extractor.extractAll({ mode });
+      } else {
+        manifest = yield* extractor.extractSeason(season, { mode });
+      }
+      if (json) {
+        yield* Effect.sync(() => {
+          console.log(JSON.stringify(manifest, null, 2));
+        });
+      }
+    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
 );
 
 // CLI runner
@@ -103,6 +111,12 @@ const cli = Command.run(mslCommand, {
 
 // Run with dependencies
 cli(process.argv).pipe(
-  Effect.provide(Layer.merge(MSLExtractorService.Default, BunContext.layer)),
+  Effect.provide(
+    Layer.mergeAll(
+      MSLExtractorService.Default,
+      MSLManifestService.Default,
+      BunContext.layer,
+    ),
+  ),
   BunRuntime.runMain,
 );
