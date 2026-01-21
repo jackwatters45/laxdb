@@ -12,7 +12,7 @@
 
 import { Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Console, Effect, Layer, LogLevel, Logger } from "effect";
+import { Effect, Layer, LogLevel, Logger } from "effect";
 
 import {
   forceOption,
@@ -47,29 +47,7 @@ const nllCommand = Command.make(
       if (status) {
         const manifestService = yield* NLLManifestService;
         const manifest = yield* manifestService.load;
-        if (json) {
-          yield* Console.log(JSON.stringify(manifest, null, 2));
-        } else {
-          yield* Console.log(
-            `NLL Extraction Status (last run: ${manifest.lastRun || "never"})`,
-          );
-          for (const [seasonId, seasonManifest] of Object.entries(
-            manifest.seasons,
-          )) {
-            yield* Console.log(`\nSeason ${seasonId}:`);
-            for (const [entity, entityStatus] of Object.entries(
-              seasonManifest as Record<
-                string,
-                { extracted: boolean; count: number }
-              >,
-            )) {
-              const st = entityStatus?.extracted
-                ? `✓ ${entityStatus.count} items`
-                : "✗ not extracted";
-              yield* Console.log(`  ${entity}: ${st}`);
-            }
-          }
-        }
+        yield* manifestService.displayStatus(manifest, json);
         return;
       }
 

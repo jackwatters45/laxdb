@@ -7,7 +7,7 @@
 
 import { FileSystem, Path } from "@effect/platform";
 import { BunContext } from "@effect/platform-bun";
-import { Effect, Layer, Schema } from "effect";
+import { Console, Effect, Layer, Schema } from "effect";
 
 import { ExtractConfigService } from "./extract.config";
 import { isEntityStale } from "./extract.schema";
@@ -189,6 +189,34 @@ export const createManifestServiceEffect = <
       return isEntityStale(seasonManifest[entity], maxAgeHours);
     };
 
+    const displayStatus = (
+      manifest: Manifest,
+      json: boolean,
+      seasonLabel = "Season",
+    ) =>
+      Effect.gen(function* () {
+        if (json) {
+          yield* Console.log(JSON.stringify(manifest, null, 2));
+        } else {
+          yield* Console.log(
+            `${config.source.toUpperCase()} Extraction Status (last run: ${manifest.lastRun || "never"})`,
+          );
+          for (const [seasonId, seasonManifest] of Object.entries(
+            manifest.seasons,
+          )) {
+            yield* Console.log(`\n${seasonLabel} ${seasonId}:`);
+            for (const [entity, entityStatus] of Object.entries(
+              seasonManifest,
+            )) {
+              const st = entityStatus?.extracted
+                ? `✓ ${entityStatus.count} items`
+                : "✗ not extracted";
+              yield* Console.log(`  ${entity}: ${st}`);
+            }
+          }
+        }
+      });
+
     return {
       load,
       save,
@@ -196,6 +224,7 @@ export const createManifestServiceEffect = <
       markComplete,
       isExtracted,
       isStale,
+      displayStatus,
     };
   });
 };
