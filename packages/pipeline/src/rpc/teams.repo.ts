@@ -7,7 +7,7 @@ import type {
   TeamWithRoster,
 } from "@laxdb/core/pipeline/teams.schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import { leagueTable } from "../db/leagues.sql";
 import { seasonTable } from "../db/seasons.sql";
@@ -37,11 +37,11 @@ export class TeamsRepo extends Effect.Service<TeamsRepo>()("TeamsRepo", {
             .where(eq(teamTable.id, input.teamId))
             .limit(1);
 
-          if (teamResults.length === 0) {
+          const teamOption = Array.head(teamResults);
+          if (Option.isNone(teamOption)) {
             return null;
           }
-
-          const team = teamResults[0]!;
+          const team = teamOption.value;
 
           // Get roster (players linked to this team via team_season)
           // If seasonId provided, filter by that season

@@ -8,7 +8,7 @@ import type {
   SourcePlayer,
 } from "@laxdb/core/pipeline/players.schema";
 import { and, eq, ilike, inArray, isNull, sql } from "drizzle-orm";
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import { canonicalPlayerTable } from "../db/canonical-players.sql";
 import { leagueTable } from "../db/leagues.sql";
@@ -38,11 +38,11 @@ export class PlayersRepo extends Effect.Service<PlayersRepo>()("PlayersRepo", {
             .where(eq(canonicalPlayerTable.id, input.playerId))
             .limit(1);
 
-          if (canonicalResults.length === 0) {
+          const rowOption = Array.head(canonicalResults);
+          if (Option.isNone(rowOption)) {
             return null;
           }
-
-          const row = canonicalResults[0]!;
+          const row = rowOption.value;
 
           // Get all linked source records
           const sourceResults = yield* db

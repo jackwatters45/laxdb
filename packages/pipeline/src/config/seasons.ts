@@ -62,6 +62,9 @@ function isInSeason(date: Date, config: SeasonConfig): boolean {
   return true;
 }
 
+/** All league abbreviations for type-safe iteration */
+const LEAGUE_KEYS: readonly LeagueAbbreviation[] = ["PLL", "NLL", "MLL", "MSL", "WLA"];
+
 /**
  * Get list of leagues that are currently in-season
  *
@@ -71,9 +74,8 @@ function isInSeason(date: Date, config: SeasonConfig): boolean {
 export function getActiveLeagues(date: Date = new Date()): LeagueAbbreviation[] {
   const active: LeagueAbbreviation[] = [];
 
-  for (const [league, config] of Object.entries(LEAGUE_SEASONS) as Array<
-    [LeagueAbbreviation, SeasonConfig]
-  >) {
+  for (const league of LEAGUE_KEYS) {
+    const config = LEAGUE_SEASONS[league];
     // Skip historical leagues
     if (config.historical) {
       continue;
@@ -91,7 +93,5 @@ export function getActiveLeagues(date: Date = new Date()): LeagueAbbreviation[] 
  * Get all non-historical leagues
  */
 export function getAllActiveLeagues(): LeagueAbbreviation[] {
-  return (Object.entries(LEAGUE_SEASONS) as Array<[LeagueAbbreviation, SeasonConfig]>)
-    .filter(([_, config]) => !config.historical)
-    .map(([league]) => league);
+  return LEAGUE_KEYS.filter((league) => !LEAGUE_SEASONS[league].historical);
 }

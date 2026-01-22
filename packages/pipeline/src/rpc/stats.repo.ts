@@ -8,7 +8,6 @@ import type {
   GetPlayerStatsInput,
   GetTeamStatsInput,
   LeaderboardEntry,
-  PlayerStatWithDetails,
   TeamStatSummary,
 } from "@laxdb/core/pipeline/stats.schema";
 
@@ -34,10 +33,10 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
           const results = yield* db
             .select({
               statId: playerStatTable.id,
-              goals: playerStatTable.goals,
-              assists: playerStatTable.assists,
-              points: playerStatTable.points,
-              gamesPlayed: playerStatTable.gamesPlayed,
+              goals: sql<number>`COALESCE(${playerStatTable.goals}, 0)`,
+              assists: sql<number>`COALESCE(${playerStatTable.assists}, 0)`,
+              points: sql<number>`COALESCE(${playerStatTable.points}, 0)`,
+              gamesPlayed: sql<number>`COALESCE(${playerStatTable.gamesPlayed}, 0)`,
               playerId: sourcePlayerTable.id,
               playerName: sql<string>`COALESCE(${sourcePlayerTable.fullName}, CONCAT(${sourcePlayerTable.firstName}, ' ', ${sourcePlayerTable.lastName}))`,
               position: sourcePlayerTable.position,
@@ -60,7 +59,7 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
             .where(and(...conditions))
             .orderBy(desc(seasonTable.year));
 
-          return results as PlayerStatWithDetails[];
+          return results;
         }),
 
       getLeaderboard: (input: GetLeaderboardInput) =>
