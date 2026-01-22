@@ -13,58 +13,76 @@ import {
 } from "./cache.service";
 
 /**
- * Create a mock KVNamespace for testing
+ * Create a mock KVNamespace for testing.
+ * Returns separate mock function references to avoid unbound-method lint errors.
  */
-const createMockKV = (): {
-  kv: KVNamespace;
-  store: Map<string, { value: string; expiresAt: number }>;
-} => {
+const createMockKV = () => {
   const store = new Map<string, { value: string; expiresAt: number }>();
 
-  const kv: KVNamespace = {
-    get: vi.fn((key: string) => {
-      const entry = store.get(key);
-      if (!entry) return Promise.resolve(null);
-      // Check expiry
-      if (Date.now() > entry.expiresAt) {
-        store.delete(key);
-        return Promise.resolve(null);
-      }
-      return Promise.resolve(entry.value);
-    }),
-    put: vi.fn(
-      (key: string, value: string, options?: { expirationTtl?: number }) => {
-        const expiresAt = options?.expirationTtl
-          ? Date.now() + options.expirationTtl * 1000
-          : Date.now() + 60 * 60 * 1000; // Default 1 hour
-        store.set(key, { value, expiresAt });
-        return Promise.resolve();
-      },
-    ),
-    delete: vi.fn((key: string) => {
+  // Create mock functions separately to avoid unbound-method issues
+  const getMock = vi.fn((key: string) => {
+    const entry = store.get(key);
+    if (!entry) return Promise.resolve(null);
+    // Check expiry
+    if (Date.now() > entry.expiresAt) {
       store.delete(key);
+      return Promise.resolve(null);
+    }
+    return Promise.resolve(entry.value);
+  });
+
+  const putMock = vi.fn(
+    (key: string, value: string, options?: { expirationTtl?: number }) => {
+      const expiresAt = options?.expirationTtl
+        ? Date.now() + options.expirationTtl * 1000
+        : Date.now() + 60 * 60 * 1000; // Default 1 hour
+      store.set(key, { value, expiresAt });
       return Promise.resolve();
-    }),
-    list: vi.fn((options?: { prefix?: string }) => {
-      const keys: { name: string; expiration?: number; metadata?: unknown }[] =
-        [];
-      for (const [key, entry] of store.entries()) {
-        if (!options?.prefix || key.startsWith(options.prefix)) {
-          keys.push({ name: key, expiration: entry.expiresAt });
-        }
+    },
+  );
+
+  const deleteMock = vi.fn((key: string) => {
+    store.delete(key);
+    return Promise.resolve();
+  });
+
+  const listMock = vi.fn((options?: { prefix?: string }) => {
+    const keys: { name: string; expiration?: number; metadata?: unknown }[] =
+      [];
+    for (const [key, entry] of store.entries()) {
+      if (!options?.prefix || key.startsWith(options.prefix)) {
+        keys.push({ name: key, expiration: entry.expiresAt });
       }
-      return Promise.resolve({ keys, list_complete: true, cacheStatus: null });
-    }),
-    getWithMetadata: vi.fn((key: string) => {
-      const entry = store.get(key);
-      if (!entry || Date.now() > entry.expiresAt) {
-        return Promise.resolve({ value: null, metadata: null, cacheStatus: null });
-      }
-      return Promise.resolve({ value: entry.value, metadata: null, cacheStatus: null });
-    }),
+    }
+    return Promise.resolve({ keys, list_complete: true, cacheStatus: null });
+  });
+
+  const getWithMetadataMock = vi.fn((key: string) => {
+    const entry = store.get(key);
+    if (!entry || Date.now() > entry.expiresAt) {
+      return Promise.resolve({ value: null, metadata: null, cacheStatus: null });
+    }
+    return Promise.resolve({ value: entry.value, metadata: null, cacheStatus: null });
+  });
+
+  const kv = {
+    get: getMock,
+    put: putMock,
+    delete: deleteMock,
+    list: listMock,
+    getWithMetadata: getWithMetadataMock,
   } as unknown as KVNamespace;
 
-  return { kv, store };
+  return {
+    kv,
+    store,
+    // Expose mock functions directly for assertions
+    getMock,
+    putMock,
+    deleteMock,
+    listMock,
+    getWithMetadataMock,
+  };
 };
 
 describe("CacheService", () => {
@@ -172,7 +190,7 @@ describe("CacheService", () => {
 
       await Effect.runPromise(program);
 
-      expect(mockKV.kv.put).toHaveBeenCalledWith(
+      expect(mockKV.putMock).toHaveBeenCalledWith(
         "stats:player:123:all",
         expect.any(String),
         expect.objectContaining({
@@ -184,7 +202,7 @@ describe("CacheService", () => {
       const expectedTtl = Math.ceil(
         DEFAULT_TTL_CONFIG.playerStatsSeason * (1 + SWR_WINDOW_RATIO),
       );
-      expect(mockKV.kv.put).toHaveBeenCalledWith(
+      expect(mockKV.putMock).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(String),
         { expirationTtl: expectedTtl },
@@ -202,7 +220,7 @@ describe("CacheService", () => {
       await Effect.runPromise(program);
 
       const expectedKvTtl = Math.ceil(customTtl * (1 + SWR_WINDOW_RATIO));
-      expect(mockKV.kv.put).toHaveBeenCalledWith(
+      expect(mockKV.putMock).toHaveBeenCalledWith(
         "custom-key",
         expect.any(String),
         { expirationTtl: expectedKvTtl },
@@ -221,7 +239,7 @@ describe("CacheService", () => {
       const expectedTtl = Math.ceil(
         DEFAULT_TTL_CONFIG.playerStatsOffSeason * (1 + SWR_WINDOW_RATIO),
       );
-      expect(mockKV.kv.put).toHaveBeenCalledWith(
+      expect(mockKV.putMock).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(String),
         { expirationTtl: expectedTtl },
@@ -274,7 +292,7 @@ describe("CacheService", () => {
       const result = await Effect.runPromise(program);
       expect(result).toBe("computed-value");
       expect(computeWasCalled).toBe(true);
-      expect(mockKV.kv.put).toHaveBeenCalledWith(
+      expect(mockKV.putMock).toHaveBeenCalledWith(
         "new-key",
         expect.any(String),
         expect.any(Object),
@@ -331,7 +349,7 @@ describe("CacheService", () => {
       }).pipe(Effect.provide(testLayer));
 
       await Effect.runPromise(program);
-      expect(mockKV.kv.delete).toHaveBeenCalledWith("to-delete");
+      expect(mockKV.deleteMock).toHaveBeenCalledWith("to-delete");
       expect(mockKV.store.has("to-delete")).toBe(false);
     });
   });
@@ -358,7 +376,7 @@ describe("CacheService", () => {
 
       await Effect.runPromise(program);
 
-      expect(mockKV.kv.list).toHaveBeenCalledWith({ prefix: "stats:player:" });
+      expect(mockKV.listMock).toHaveBeenCalledWith({ prefix: "stats:player:" });
       expect(mockKV.store.has("stats:player:1:all")).toBe(false);
       expect(mockKV.store.has("stats:player:2:all")).toBe(false);
       expect(mockKV.store.has("stats:team:1:totals")).toBe(true);
