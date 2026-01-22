@@ -3,6 +3,7 @@ import { HttpApi } from "@effect/platform";
 import { AuthGroup } from "./auth/auth.api";
 import { GamesGroup } from "./game/game.api";
 import { OrganizationsGroup } from "./organization/organization.api";
+import { StatsApiGroup } from "./pipeline/stats.api";
 import { ContactInfoGroup } from "./player/contact-info/contact-info.api";
 import { PlayersGroup } from "./player/player.api";
 import { SeasonsGroup } from "./season/season.api";
@@ -16,4 +17,5 @@ export class LaxdbApi extends HttpApi.make("LaxdbApi")
   .add(ContactInfoGroup)
   .add(TeamsGroup)
   .add(OrganizationsGroup)
-  .add(AuthGroup) {}
+  .add(AuthGroup)
+  .add(StatsApiGroup) {}
