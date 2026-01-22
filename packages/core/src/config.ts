@@ -2,7 +2,7 @@ import { Config } from "effect";
 
 export const AppConfig = Config.all({
   databaseUrl: Config.redacted("DATABASE_URL"),
-  apiUrl: Config.string("API_URL"),
+  apiUrl: Config.string("API_URL").pipe(Config.withDefault("")),
 
   betterAuthSecret: Config.redacted("BETTER_AUTH_SECRET"),
   googleClientId: Config.string("GOOGLE_CLIENT_ID"),
@@ -52,5 +52,6 @@ const requireEnv = (name: string): string => {
  * - If you need a secret synchronously, refactor to defer the access into Effect context
  */
 export const Env = {
-  API_URL: () => requireEnv("API_URL"),
+  // Returns API_URL or empty string if not set (server-side doesn't need it)
+  API_URL: () => process.env.API_URL ?? "",
 } as const;

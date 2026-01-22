@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import {
+  DateSchema,
   NullableTeamIdSchema,
   OrganizationIdSchema,
   PublicIdSchema,
@@ -15,8 +16,8 @@ export class Season extends Schema.Class<Season>("Season")({
   ...OrganizationIdSchema,
   ...TeamIdSchema,
   name: Schema.String,
-  startDate: Schema.DateFromSelf,
-  endDate: Schema.NullOr(Schema.DateFromSelf),
+  startDate: DateSchema,
+  endDate: Schema.NullOr(DateSchema),
   status: Schema.Literal(...seasonStatusEnum.enumValues),
   division: Schema.NullOr(Schema.String),
   ...TimestampsSchema,
@@ -49,8 +50,8 @@ export class CreateSeasonInput extends Schema.Class<CreateSeasonInput>(
     }),
     Schema.trimmed(),
   ),
-  startDate: Schema.DateFromSelf,
-  endDate: Schema.NullOr(Schema.DateFromSelf),
+  startDate: DateSchema,
+  endDate: Schema.NullOr(DateSchema),
   status: Schema.Literal(...seasonStatusEnum.enumValues).pipe(Schema.optional),
   division: Schema.NullOr(Schema.String),
 }) {}
@@ -70,8 +71,8 @@ export class UpdateSeasonInput extends Schema.Class<UpdateSeasonInput>(
       Schema.trimmed(),
     ),
   ),
-  startDate: Schema.optional(Schema.DateFromSelf),
-  endDate: Schema.optional(Schema.NullOr(Schema.DateFromSelf)),
+  startDate: Schema.optional(DateSchema),
+  endDate: Schema.optional(Schema.NullOr(DateSchema)),
   status: Schema.optional(Schema.Literal(...seasonStatusEnum.enumValues)),
   division: Schema.optional(Schema.NullOr(Schema.String)),
 }) {}

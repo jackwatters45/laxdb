@@ -24,10 +24,31 @@ export const devStage = "dev";
 export const isPermanentStage = [prodStage, devStage].includes(stage);
 
 export const secrets = {
+  // Auth
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
   GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
   BETTER_AUTH_SECRET: alchemy.secret(process.env.BETTER_AUTH_SECRET!),
   POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
+
+  // Alchemy
+  ALCHEMY_PASSWORD: alchemy.secret(process.env.ALCHEMY_PASSWORD!),
+  ALCHEMY_STATE_TOKEN: alchemy.secret(process.env.ALCHEMY_STATE_TOKEN!),
+
+  // Cloudflare
+  CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID!,
+  CLOUDFLARE_API_TOKEN: alchemy.secret(process.env.CLOUDFLARE_API_TOKEN!),
+  CLOUDFLARE_EMAIL: process.env.CLOUDFLARE_EMAIL!,
+
+  // PlanetScale
+  PLANETSCALE_ORGANIZATION: process.env.PLANETSCALE_ORGANIZATION!,
+  PLANETSCALE_SERVICE_TOKEN: alchemy.secret(process.env.PLANETSCALE_SERVICE_TOKEN!),
+  PLANETSCALE_SERVICE_TOKEN_ID: process.env.PLANETSCALE_SERVICE_TOKEN_ID!,
+
+  // Pipeline
+  PLL_GRAPHQL_TOKEN: alchemy.secret(process.env.PLL_GRAPHQL_TOKEN!),
+  PLL_REST_TOKEN: alchemy.secret(process.env.PLL_REST_TOKEN!),
+
+  // Email
   AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
   EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
 };
@@ -121,15 +142,15 @@ await Exec("DrizzleMigrate", {
   },
 });
 
-// Start Drizzle Studio in local development
-if (app.local) {
-  Exec("DrizzleStudio", {
-    command: "cd packages/core && bun run db:studio",
-    env: {
-      DATABASE_URL: dbRole.connectionUrl,
-    },
-  });
-}
+// // Start Drizzle Studio in local development
+// if (app.local) {
+//   Exec("DrizzleStudio", {
+//     command: "cd packages/core && bun run db:studio",
+//     env: {
+//       DATABASE_URL: dbRole.connectionUrl,
+//     },
+//   });
+// }
 
 // KV
 export const kv = await KVNamespace("kv", {});
@@ -146,6 +167,7 @@ export const storage = await R2Bucket("storage", {});
 export const api = await Worker("api", {
   entrypoint: "packages/api/src/index.ts",
   url: true,
+  compatibility: "node", // Enable Node.js compat for pg, better-auth, etc.
   bindings: {
     DB: db,
     KV: kv,
@@ -166,6 +188,7 @@ export const web = await TanStackStart("web", {
     KV: kv,
     STORAGE: storage,
     DATABASE_URL: dbRole.connectionUrl,
+    API_URL: api.url ?? "http://localhost:1337", // Web app needs API URL to make RPC calls
     ...secrets,
   },
 });

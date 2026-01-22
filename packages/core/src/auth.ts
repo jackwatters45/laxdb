@@ -15,7 +15,6 @@ import {
   openAPI,
   organization,
 } from "better-auth/plugins";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { desc, eq } from "drizzle-orm";
 import { Array as Arr, Effect, ManagedRuntime, Redacted } from "effect";
 
@@ -237,7 +236,6 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
         }),
         openAPI(),
         lastLoginMethod(),
-        tanstackStartCookies(), // make sure this is the last plugin in the array
       ],
     });
 
@@ -311,9 +309,3 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
   }),
   dependencies: [DatabaseLive],
 }) {}
-
-const getClient = Effect.gen(function* () {
-  return (yield* AuthService).auth;
-}).pipe(Effect.provide(AuthService.Default));
-
-export const auth = await runtime.runPromise(getClient);

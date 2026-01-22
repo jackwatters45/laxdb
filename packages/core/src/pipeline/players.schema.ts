@@ -1,5 +1,7 @@
 import { Schema } from "effect";
 
+import { DateSchema } from "../schema";
+
 import { LeagueAbbreviation } from "./stats.schema";
 
 // Source player details (from pipeline_source_player)
@@ -14,7 +16,7 @@ export class SourcePlayer extends Schema.Class<SourcePlayer>("SourcePlayer")({
   normalizedName: Schema.NullOr(Schema.String),
   position: Schema.NullOr(Schema.String),
   jerseyNumber: Schema.NullOr(Schema.String),
-  dob: Schema.NullOr(Schema.DateFromSelf),
+  dob: Schema.NullOr(DateSchema),
   hometown: Schema.NullOr(Schema.String),
   college: Schema.NullOr(Schema.String),
   handedness: Schema.NullOr(Schema.String),
@@ -29,7 +31,7 @@ export class CanonicalPlayer extends Schema.Class<CanonicalPlayer>(
   id: Schema.Number,
   displayName: Schema.String,
   position: Schema.NullOr(Schema.String),
-  dob: Schema.NullOr(Schema.DateFromSelf),
+  dob: Schema.NullOr(DateSchema),
   hometown: Schema.NullOr(Schema.String),
   college: Schema.NullOr(Schema.String),
   // Related source players

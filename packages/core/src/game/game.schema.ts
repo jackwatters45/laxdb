@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import {
+  DateSchema,
   NullableTeamIdSchema,
   OrganizationIdSchema,
   PublicIdSchema,
@@ -14,7 +15,7 @@ export class Game extends Schema.Class<Game>("Game")({
   ...TeamIdSchema,
   seasonId: Schema.Number,
   opponentName: Schema.String,
-  gameDate: Schema.DateFromSelf,
+  gameDate: DateSchema,
   venue: Schema.String,
   isHomeGame: Schema.Boolean,
   gameType: Schema.String,
@@ -44,7 +45,7 @@ export class CreateGameInput extends Schema.Class<CreateGameInput>(
   ...TeamIdSchema,
   seasonId: Schema.Number.pipe(Schema.int()),
   opponentName: Schema.String.pipe(Schema.minLength(2), Schema.maxLength(100)),
-  gameDate: Schema.DateFromSelf,
+  gameDate: DateSchema,
   venue: Schema.String,
   isHomeGame: Schema.Boolean,
   gameType: Schema.optional(Schema.String),
@@ -60,7 +61,7 @@ export class UpdateGameInput extends Schema.Class<UpdateGameInput>(
   opponentName: Schema.optional(
     Schema.String.pipe(Schema.minLength(2), Schema.maxLength(100)),
   ),
-  gameDate: Schema.optional(Schema.DateFromSelf),
+  gameDate: Schema.optional(DateSchema),
   venue: Schema.optional(Schema.String),
   isHomeGame: Schema.optional(Schema.Boolean),
   gameType: Schema.optional(Schema.String),
@@ -70,7 +71,7 @@ export class UpdateGameInput extends Schema.Class<UpdateGameInput>(
   notes: Schema.optional(Schema.String),
   location: Schema.optional(Schema.String),
   uniformColor: Schema.optional(Schema.String),
-  arrivalTime: Schema.optional(Schema.DateFromSelf),
+  arrivalTime: Schema.optional(DateSchema),
   opponentLogoUrl: Schema.optional(Schema.String),
   externalGameId: Schema.optional(Schema.String),
 }) {}

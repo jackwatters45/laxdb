@@ -20,9 +20,15 @@ export const PublicIdSchema = {
   publicId: NanoidSchema,
 };
 
-export const CreatedAtSchema = Schema.DateFromSelf;
-export const UpdatedAtSchema = Schema.NullOr(Schema.DateFromSelf);
-export const DeletedAtSchema = Schema.NullOr(Schema.DateFromSelf);
+// Use DateFromSelf since Drizzle handles Date objects directly
+// Add JSON Schema annotation for OpenAPI compatibility
+export const DateSchema = Schema.DateFromSelf.annotations({
+  jsonSchema: { type: "string", format: "date-time" },
+});
+
+export const CreatedAtSchema = DateSchema;
+export const UpdatedAtSchema = Schema.NullOr(DateSchema);
+export const DeletedAtSchema = Schema.NullOr(DateSchema);
 
 export const TimestampsSchema = {
   createdAt: CreatedAtSchema,
