@@ -2,8 +2,13 @@ import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/naviga
 import { cn } from "@laxdb/ui/lib/utils";
 import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
+import type { ComponentProps } from "react";
 
-function NavigationMenu({ className, children, ...props }: NavigationMenuPrimitive.Root.Props) {
+function NavigationMenu({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.Root>) {
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
@@ -19,7 +24,10 @@ function NavigationMenu({ className, children, ...props }: NavigationMenuPrimiti
   );
 }
 
-function NavigationMenuList({ className, ...props }: NavigationMenuPrimitive.List.Props) {
+function NavigationMenuList({
+  className,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.List>) {
   return (
     <NavigationMenuPrimitive.List
       data-slot="navigation-menu-list"
@@ -29,7 +37,10 @@ function NavigationMenuList({ className, ...props }: NavigationMenuPrimitive.Lis
   );
 }
 
-function NavigationMenuItem({ className, ...props }: NavigationMenuPrimitive.Item.Props) {
+function NavigationMenuItem({
+  className,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.Item>) {
   return (
     <NavigationMenuPrimitive.Item
       data-slot="navigation-menu-item"
@@ -47,7 +58,7 @@ function NavigationMenuTrigger({
   className,
   children,
   ...props
-}: NavigationMenuPrimitive.Trigger.Props) {
+}: ComponentProps<typeof NavigationMenuPrimitive.Trigger>) {
   return (
     <NavigationMenuPrimitive.Trigger
       data-slot="navigation-menu-trigger"
@@ -63,7 +74,10 @@ function NavigationMenuTrigger({
   );
 }
 
-function NavigationMenuContent({ className, ...props }: NavigationMenuPrimitive.Content.Props) {
+function NavigationMenuContent({
+  className,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.Content>) {
   return (
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
@@ -83,7 +97,7 @@ function NavigationMenuPositioner({
   align = "start",
   alignOffset = 0,
   ...props
-}: NavigationMenuPrimitive.Positioner.Props) {
+}: ComponentProps<typeof NavigationMenuPrimitive.Positioner>) {
   return (
     <NavigationMenuPrimitive.Portal>
       <NavigationMenuPrimitive.Positioner
@@ -105,7 +119,10 @@ function NavigationMenuPositioner({
   );
 }
 
-function NavigationMenuLink({ className, ...props }: NavigationMenuPrimitive.Link.Props) {
+function NavigationMenuLink({
+  className,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.Link>) {
   return (
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
@@ -118,7 +135,10 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuPrimitive.Lin
   );
 }
 
-function NavigationMenuIndicator({ className, ...props }: NavigationMenuPrimitive.Icon.Props) {
+function NavigationMenuIndicator({
+  className,
+  ...props
+}: ComponentProps<typeof NavigationMenuPrimitive.Icon>) {
   return (
     <NavigationMenuPrimitive.Icon
       data-slot="navigation-menu-indicator"
