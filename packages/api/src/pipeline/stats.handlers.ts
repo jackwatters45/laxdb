@@ -13,8 +13,12 @@ export const StatsHandlersLive = HttpApiBuilder.group(
       const service = yield* StatsService;
 
       return handlers
-        .handle("getLeaderboard", ({ payload }) => service.getLeaderboard(payload))
-        .handle("getPlayerStats", ({ payload }) => service.getPlayerStats(payload))
+        .handle("getLeaderboard", ({ payload }) =>
+          service.getLeaderboard(payload),
+        )
+        .handle("getPlayerStats", ({ payload }) =>
+          service.getPlayerStats(payload),
+        )
         .handle("getTeamStats", ({ payload }) => service.getTeamStats(payload));
     }),
 ).pipe(Layer.provide(StatsService.Default));

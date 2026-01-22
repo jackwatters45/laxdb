@@ -25,7 +25,11 @@ interface SeasonConfig {
 export const LEAGUE_SEASONS: Record<LeagueAbbreviation, SeasonConfig> = {
   PLL: { start: { month: 6, day: 1 }, end: { month: 9, day: 15 } },
   NLL: { start: { month: 12, day: 1 }, end: { month: 5, day: 15 } },
-  MLL: { start: { month: 5, day: 1 }, end: { month: 8, day: 30 }, historical: true },
+  MLL: {
+    start: { month: 5, day: 1 },
+    end: { month: 8, day: 30 },
+    historical: true,
+  },
   MSL: { start: { month: 5, day: 1 }, end: { month: 9, day: 30 } },
   WLA: { start: { month: 5, day: 1 }, end: { month: 9, day: 30 } },
 };
@@ -63,7 +67,13 @@ function isInSeason(date: Date, config: SeasonConfig): boolean {
 }
 
 /** All league abbreviations for type-safe iteration */
-const LEAGUE_KEYS: readonly LeagueAbbreviation[] = ["PLL", "NLL", "MLL", "MSL", "WLA"];
+const LEAGUE_KEYS: readonly LeagueAbbreviation[] = [
+  "PLL",
+  "NLL",
+  "MLL",
+  "MSL",
+  "WLA",
+];
 
 /**
  * Get list of leagues that are currently in-season
@@ -71,7 +81,9 @@ const LEAGUE_KEYS: readonly LeagueAbbreviation[] = ["PLL", "NLL", "MLL", "MSL", 
  * @param date - The date to check (defaults to now)
  * @returns Array of league abbreviations that are currently active
  */
-export function getActiveLeagues(date: Date = new Date()): LeagueAbbreviation[] {
+export function getActiveLeagues(
+  date: Date = new Date(),
+): LeagueAbbreviation[] {
   const active: LeagueAbbreviation[] = [];
 
   for (const league of LEAGUE_KEYS) {

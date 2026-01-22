@@ -60,9 +60,17 @@ const createMockKV = () => {
   const getWithMetadataMock = vi.fn((key: string) => {
     const entry = store.get(key);
     if (!entry || Date.now() > entry.expiresAt) {
-      return Promise.resolve({ value: null, metadata: null, cacheStatus: null });
+      return Promise.resolve({
+        value: null,
+        metadata: null,
+        cacheStatus: null,
+      });
     }
-    return Promise.resolve({ value: entry.value, metadata: null, cacheStatus: null });
+    return Promise.resolve({
+      value: entry.value,
+      metadata: null,
+      cacheStatus: null,
+    });
   });
 
   const kv = {
@@ -230,7 +238,11 @@ describe("CacheService", () => {
     test("uses off-season TTL when specified", async () => {
       const program = Effect.gen(function* () {
         const cache = yield* CacheService;
-        yield* cache.set("stats:player:123:all", { goals: 10 }, { isActiveSeason: false });
+        yield* cache.set(
+          "stats:player:123:all",
+          { goals: 10 },
+          { isActiveSeason: false },
+        );
       }).pipe(Effect.provide(testLayer));
 
       await Effect.runPromise(program);
@@ -332,7 +344,9 @@ describe("CacheService", () => {
         return yield* cache.getOrSet("error-key", computeFn());
       }).pipe(Effect.provide(testLayer));
 
-      await expect(Effect.runPromise(program)).rejects.toThrow("compute failed");
+      await expect(Effect.runPromise(program)).rejects.toThrow(
+        "compute failed",
+      );
     });
   });
 
@@ -386,9 +400,7 @@ describe("CacheService", () => {
 
 describe("CacheKeys", () => {
   test("playerStats key with season", () => {
-    expect(CacheKeys.playerStats(123, 456)).toBe(
-      "stats:player:123:season:456",
-    );
+    expect(CacheKeys.playerStats(123, 456)).toBe("stats:player:123:season:456");
   });
 
   test("playerStats key without season", () => {

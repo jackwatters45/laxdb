@@ -42,13 +42,12 @@ export function StatsTable({ data, sort, order, onSort }: StatsTableProps) {
     );
   };
 
-  const sortableHeader = (
-    column: "points" | "goals" | "assists",
-    label: string,
-  ) => (
+  const sortableHeader = (column: "points" | "goals" | "assists", label: string) => (
     <button
       type="button"
-      onClick={() => onSort(column)}
+      onClick={() => {
+        onSort(column);
+      }}
       className="flex items-center font-medium hover:text-primary"
     >
       {label}
@@ -66,15 +65,9 @@ export function StatsTable({ data, sort, order, onSort }: StatsTableProps) {
             <TableHead>League</TableHead>
             <TableHead>Team</TableHead>
             <TableHead className="text-right">GP</TableHead>
-            <TableHead className="text-right">
-              {sortableHeader("goals", "G")}
-            </TableHead>
-            <TableHead className="text-right">
-              {sortableHeader("assists", "A")}
-            </TableHead>
-            <TableHead className="text-right">
-              {sortableHeader("points", "PTS")}
-            </TableHead>
+            <TableHead className="text-right">{sortableHeader("goals", "G")}</TableHead>
+            <TableHead className="text-right">{sortableHeader("assists", "A")}</TableHead>
+            <TableHead className="text-right">{sortableHeader("points", "PTS")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -96,17 +89,11 @@ export function StatsTable({ data, sort, order, onSort }: StatsTableProps) {
                     {entry.leagueAbbreviation}
                   </span>
                 </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {entry.teamName ?? "-"}
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {entry.gamesPlayed}
-                </TableCell>
+                <TableCell className="text-muted-foreground">{entry.teamName ?? "-"}</TableCell>
+                <TableCell className="text-right font-mono">{entry.gamesPlayed}</TableCell>
                 <TableCell className="text-right font-mono">{entry.goals}</TableCell>
                 <TableCell className="text-right font-mono">{entry.assists}</TableCell>
-                <TableCell className="text-right font-mono font-semibold">
-                  {entry.points}
-                </TableCell>
+                <TableCell className="text-right font-mono font-semibold">{entry.points}</TableCell>
               </TableRow>
             ))
           )}

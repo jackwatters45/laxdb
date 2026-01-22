@@ -15,24 +15,12 @@ export function Pagination({ hasMore, hasPrev, onNext, onPrev }: PaginationProps
 
   return (
     <div className="mt-4 flex items-center justify-between">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onPrev}
-        disabled={!hasPrev}
-        className="gap-1"
-      >
+      <Button variant="outline" size="sm" onClick={onPrev} disabled={!hasPrev} className="gap-1">
         <ChevronLeft className="h-4 w-4" />
         Previous
       </Button>
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onNext}
-        disabled={!hasMore}
-        className="gap-1"
-      >
+      <Button variant="outline" size="sm" onClick={onNext} disabled={!hasMore} className="gap-1">
         Next
         <ChevronRight className="h-4 w-4" />
       </Button>

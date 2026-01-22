@@ -470,6 +470,10 @@ export class StatsService extends Effect.Service<StatsService>()(
           }),
       } as const;
     }),
-    dependencies: [StatsRepo.Default, PlayersRepo.Default, CacheService.Default],
+    dependencies: [
+      StatsRepo.Default,
+      PlayersRepo.Default,
+      CacheService.Default,
+    ],
   },
 ) {}

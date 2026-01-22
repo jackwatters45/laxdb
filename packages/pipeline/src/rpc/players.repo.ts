@@ -14,8 +14,8 @@ import { canonicalPlayerTable } from "../db/canonical-players.sql";
 import { leagueTable } from "../db/leagues.sql";
 import { playerIdentityTable } from "../db/player-identities.sql";
 import { sourcePlayerTable } from "../db/source-players.sql";
-import { teamTable } from "../db/teams.sql";
 import { teamSeasonTable } from "../db/team-seasons.sql";
+import { teamTable } from "../db/teams.sql";
 
 export class PlayersRepo extends Effect.Service<PlayersRepo>()("PlayersRepo", {
   effect: Effect.gen(function* () {
@@ -69,7 +69,10 @@ export class PlayersRepo extends Effect.Service<PlayersRepo>()("PlayersRepo", {
               sourcePlayerTable,
               eq(playerIdentityTable.sourcePlayerId, sourcePlayerTable.id),
             )
-            .innerJoin(leagueTable, eq(sourcePlayerTable.leagueId, leagueTable.id))
+            .innerJoin(
+              leagueTable,
+              eq(sourcePlayerTable.leagueId, leagueTable.id),
+            )
             .where(
               and(
                 eq(playerIdentityTable.canonicalPlayerId, input.playerId),
@@ -114,7 +117,10 @@ export class PlayersRepo extends Effect.Service<PlayersRepo>()("PlayersRepo", {
               teamName: teamTable.name,
             })
             .from(sourcePlayerTable)
-            .innerJoin(leagueTable, eq(sourcePlayerTable.leagueId, leagueTable.id))
+            .innerJoin(
+              leagueTable,
+              eq(sourcePlayerTable.leagueId, leagueTable.id),
+            )
             .leftJoin(
               teamSeasonTable,
               eq(sourcePlayerTable.id, teamSeasonTable.teamId),

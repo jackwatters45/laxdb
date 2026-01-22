@@ -3,6 +3,7 @@ import { Layer } from "effect";
 import { RpcAuthClient } from "./auth/auth.client";
 import { RpcGameClient } from "./game/game.client";
 import { RpcOrganizationClient } from "./organization/organization.client";
+import { RpcStatsClient } from "./pipeline/stats.client";
 import { RpcContactInfoClient } from "./player/contact-info/contact-info.client";
 import { RpcPlayerClient } from "./player/player.client";
 import { RpcSeasonClient } from "./season/season.client";
@@ -16,4 +17,5 @@ export const RpcClientLive = Layer.mergeAll(
   RpcTeamClient.Default,
   RpcOrganizationClient.Default,
   RpcAuthClient.Default,
+  RpcStatsClient.Default,
 );

@@ -30,13 +30,12 @@ export function LeagueFilter({ selectedLeagues, onChange }: LeagueFilterProps) {
           <Checkbox
             id={`league-${league}`}
             checked={selectedLeagues.includes(league)}
-            onCheckedChange={() => handleToggle(league)}
+            onCheckedChange={() => {
+              handleToggle(league);
+            }}
             disabled={selectedLeagues.length === 1 && selectedLeagues.includes(league)}
           />
-          <Label
-            htmlFor={`league-${league}`}
-            className="cursor-pointer text-sm font-medium"
-          >
+          <Label htmlFor={`league-${league}`} className="cursor-pointer text-sm font-medium">
             {league}
           </Label>
         </div>

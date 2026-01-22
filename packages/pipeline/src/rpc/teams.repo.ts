@@ -12,8 +12,8 @@ import { Array, Effect, Option } from "effect";
 import { leagueTable } from "../db/leagues.sql";
 import { seasonTable } from "../db/seasons.sql";
 import { sourcePlayerTable } from "../db/source-players.sql";
-import { teamTable } from "../db/teams.sql";
 import { teamSeasonTable } from "../db/team-seasons.sql";
+import { teamTable } from "../db/teams.sql";
 
 export class TeamsRepo extends Effect.Service<TeamsRepo>()("TeamsRepo", {
   effect: Effect.gen(function* () {

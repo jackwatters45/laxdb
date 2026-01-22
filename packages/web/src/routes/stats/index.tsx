@@ -49,6 +49,12 @@ interface LeaderboardResponse {
   nextCursor: string | null;
 }
 
+// API response shape from the backend
+interface ApiLeaderboardResponse {
+  data: LeaderboardEntry[];
+  nextCursor: string | null;
+}
+
 // --- API Client ---
 async function fetchLeaderboard(params: {
   leagues: string[];
@@ -74,7 +80,7 @@ async function fetchLeaderboard(params: {
     throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
   }
   // API returns LeaderboardResponse with data and nextCursor
-  const result = await response.json() as { data: LeaderboardEntry[]; nextCursor: string | null };
+  const result: ApiLeaderboardResponse = await response.json();
   return {
     entries: result.data,
     nextCursor: result.nextCursor,
@@ -146,12 +152,13 @@ function StatsPage() {
 
   // Navigation helpers
   const updateSearch = (updates: Partial<typeof search>) => {
-    navigate({
+    void navigate({
       search: (prev) => ({
         ...prev,
         ...updates,
         // Reset cursor when filters change
-        after: updates.leagues !== undefined || updates.sort !== undefined ? undefined : updates.after,
+        after:
+          updates.leagues !== undefined || updates.sort !== undefined ? undefined : updates.after,
       }),
     });
   };
@@ -210,12 +217,7 @@ function StatsPage() {
         </div>
 
         {/* Stats Table */}
-        <StatsTable
-          data={data.entries}
-          sort={sort}
-          order={order}
-          onSort={handleSort}
-        />
+        <StatsTable data={data.entries} sort={sort} order={order} onSort={handleSort} />
 
         {/* Pagination */}
         <Pagination

@@ -1,8 +1,5 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import { DatabaseLive } from "@laxdb/core/drizzle/drizzle.service";
-import { and, desc, eq, gt, inArray, sql } from "drizzle-orm";
-import { Effect } from "effect";
-
 import type {
   GetLeaderboardInput,
   GetPlayerStatsInput,
@@ -10,6 +7,8 @@ import type {
   LeaderboardEntry,
   TeamStatSummary,
 } from "@laxdb/core/pipeline/stats.schema";
+import { and, desc, eq, gt, inArray, sql } from "drizzle-orm";
+import { Effect } from "effect";
 
 import { leagueTable } from "../db/leagues.sql";
 import { playerStatTable } from "../db/player-stats.sql";
@@ -24,7 +23,9 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
     return {
       getPlayerStats: (input: GetPlayerStatsInput) =>
         Effect.gen(function* () {
-          const conditions = [eq(playerStatTable.sourcePlayerId, input.playerId)];
+          const conditions = [
+            eq(playerStatTable.sourcePlayerId, input.playerId),
+          ];
 
           if (input.seasonId !== undefined) {
             conditions.push(eq(playerStatTable.seasonId, input.seasonId));
@@ -54,8 +55,14 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
               eq(playerStatTable.sourcePlayerId, sourcePlayerTable.id),
             )
             .innerJoin(teamTable, eq(playerStatTable.teamId, teamTable.id))
-            .innerJoin(leagueTable, eq(sourcePlayerTable.leagueId, leagueTable.id))
-            .innerJoin(seasonTable, eq(playerStatTable.seasonId, seasonTable.id))
+            .innerJoin(
+              leagueTable,
+              eq(sourcePlayerTable.leagueId, leagueTable.id),
+            )
+            .innerJoin(
+              seasonTable,
+              eq(playerStatTable.seasonId, seasonTable.id),
+            )
             .where(and(...conditions))
             .orderBy(desc(seasonTable.year));
 
@@ -71,9 +78,7 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
                 ? playerStatTable.assists
                 : playerStatTable.points;
 
-          const conditions = [
-            inArray(leagueTable.abbreviation, input.leagues),
-          ];
+          const conditions = [inArray(leagueTable.abbreviation, input.leagues)];
 
           // Cursor is the stat ID to start after
           if (input.cursor !== undefined) {
@@ -103,7 +108,10 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
               eq(playerStatTable.sourcePlayerId, sourcePlayerTable.id),
             )
             .innerJoin(teamTable, eq(playerStatTable.teamId, teamTable.id))
-            .innerJoin(leagueTable, eq(sourcePlayerTable.leagueId, leagueTable.id))
+            .innerJoin(
+              leagueTable,
+              eq(sourcePlayerTable.leagueId, leagueTable.id),
+            )
             .where(and(...conditions))
             .orderBy(desc(sortColumn), playerStatTable.id)
             .limit(input.limit + 1); // Fetch one extra to determine if there's a next page
@@ -128,7 +136,8 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
           }));
 
           const lastItem = data.at(-1);
-          const nextCursor = hasMore && lastItem ? String(lastItem.statId) : null;
+          const nextCursor =
+            hasMore && lastItem ? String(lastItem.statId) : null;
 
           return { data: rankedData, nextCursor };
         }),
@@ -156,7 +165,10 @@ export class StatsRepo extends Effect.Service<StatsRepo>()("StatsRepo", {
             .from(playerStatTable)
             .innerJoin(teamTable, eq(playerStatTable.teamId, teamTable.id))
             .innerJoin(leagueTable, eq(teamTable.leagueId, leagueTable.id))
-            .innerJoin(seasonTable, eq(playerStatTable.seasonId, seasonTable.id))
+            .innerJoin(
+              seasonTable,
+              eq(playerStatTable.seasonId, seasonTable.id),
+            )
             .where(and(...conditions))
             .groupBy(
               teamTable.id,

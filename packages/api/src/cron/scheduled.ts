@@ -5,7 +5,10 @@
  * Each league is processed independently - one failure doesn't stop others.
  */
 
-import { getActiveLeagues, type LeagueAbbreviation } from "@laxdb/pipeline/config/seasons";
+import {
+  getActiveLeagues,
+  type LeagueAbbreviation,
+} from "@laxdb/pipeline/config/seasons";
 
 /**
  * Cloudflare Worker environment bindings
@@ -21,7 +24,10 @@ interface Env {
  * @param league - The league abbreviation
  * @param env - Cloudflare Worker environment
  */
-async function extractLeague(league: LeagueAbbreviation, env: Env): Promise<void> {
+async function extractLeague(
+  league: LeagueAbbreviation,
+  env: Env,
+): Promise<void> {
   console.log(`[${league}] Starting extraction...`);
 
   // TODO: Implement actual extraction using @laxdb/pipeline extractors
@@ -52,7 +58,10 @@ async function loadLeague(league: LeagueAbbreviation, env: Env): Promise<void> {
  * @param league - The league abbreviation
  * @param env - Cloudflare Worker environment
  */
-async function invalidateCache(league: LeagueAbbreviation, env: Env): Promise<void> {
+async function invalidateCache(
+  league: LeagueAbbreviation,
+  env: Env,
+): Promise<void> {
   console.log(`[${league}] Invalidating cache...`);
 
   // Delete cached leaderboard data for this league
@@ -79,7 +88,9 @@ export async function scheduled(
   _ctx: ExecutionContext,
 ): Promise<void> {
   const startTime = Date.now();
-  console.log(`[Cron] Starting scheduled extraction at ${new Date().toISOString()}`);
+  console.log(
+    `[Cron] Starting scheduled extraction at ${new Date().toISOString()}`,
+  );
 
   // Get leagues that are currently in-season
   const activeLeagues = getActiveLeagues(new Date());

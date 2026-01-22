@@ -13,12 +13,13 @@ export interface CacheMetadata {
 /**
  * Cache service error
  */
-export class CacheError extends Schema.TaggedError<CacheError>(
+export class CacheError extends Schema.TaggedError<CacheError>("CacheError")(
   "CacheError",
-)("CacheError", {
-  message: Schema.String,
-  cause: Schema.optional(Schema.Unknown),
-}) {}
+  {
+    message: Schema.String,
+    cause: Schema.optional(Schema.Unknown),
+  },
+) {}
 
 /**
  * TTL configuration for different cache key types (in seconds)
@@ -148,7 +149,10 @@ export const CacheKeys = {
     sortBy: string,
     seasonId?: number,
   ): string => {
-    const leagues = leagueIds.slice().toSorted((a, b) => a - b).join(",");
+    const leagues = leagueIds
+      .slice()
+      .toSorted((a, b) => a - b)
+      .join(",");
     return seasonId
       ? `${CACHE_KEY_PREFIXES.leaderboard}${leagues}:${sortBy}:season:${seasonId}`
       : `${CACHE_KEY_PREFIXES.leaderboard}${leagues}:${sortBy}:all`;
@@ -303,7 +307,11 @@ export class CacheService extends Effect.Service<CacheService>()(
             const keyType = getCacheKeyType(key);
             const ttl =
               options?.ttlSeconds ??
-              getTTLForKeyType(keyType, config, options?.isActiveSeason ?? true);
+              getTTLForKeyType(
+                keyType,
+                config,
+                options?.isActiveSeason ?? true,
+              );
 
             const metadata = calculateMetadata(ttl);
             const serialized = serialize(value, metadata);
@@ -366,7 +374,11 @@ export class CacheService extends Effect.Service<CacheService>()(
             const keyType = getCacheKeyType(key);
             const ttl =
               options?.ttlSeconds ??
-              getTTLForKeyType(keyType, config, options?.isActiveSeason ?? true);
+              getTTLForKeyType(
+                keyType,
+                config,
+                options?.isActiveSeason ?? true,
+              );
 
             const metadata = calculateMetadata(ttl);
             const serialized = serialize(computed, metadata);
