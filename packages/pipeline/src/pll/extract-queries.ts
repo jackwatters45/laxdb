@@ -43,4 +43,4 @@ async function extractQueries() {
   }
 }
 
-await extractQueries().catch(console.error);
+extractQueries().catch(console.error);
