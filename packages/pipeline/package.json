@@ -29,7 +29,7 @@
     "@effect/sql-pg": "^0.50.0",
     "@laxdb/core": "*",
     "cheerio": "^1.1.2",
-    "drizzle-orm": "^0.44.7",
+    "drizzle-orm": "^1.0.0-beta.9-e89174b",
     "effect": "^3.19.13"
   },
   "devDependencies": {},
