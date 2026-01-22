@@ -8,6 +8,7 @@ import {
   KVNamespace,
   R2Bucket,
   TanStackStart,
+  Worker,
 } from "alchemy/cloudflare";
 
 export const app = await alchemy("laxdb", {
@@ -133,20 +134,29 @@ if (app.local) {
 // KV
 export const kv = await KVNamespace("kv", {});
 
+// Pipeline KV for cron worker caching
+export const pipelineKV = await KVNamespace("pipeline-kv", {
+  title: `laxdb-pipeline-${stage}`,
+});
+
 // Storage
 export const storage = await R2Bucket("storage", {});
 
-// export const worker = await Worker("api", {
-//   entrypoint: "packages/api/src/index.ts",
-//   url: true,
-//   bindings: {
-//     DB: db,
-//     KV: kv,
-//     STORAGE: storage,
-//     DATABASE_URL: dbRole.connectionUrl,
-//     ...secrets,
-//   },
-// });
+// API Worker with cron triggers for pipeline extraction
+export const api = await Worker("api", {
+  entrypoint: "packages/api/src/index.ts",
+  url: true,
+  bindings: {
+    DB: db,
+    KV: kv,
+    PIPELINE_KV: pipelineKV,
+    STORAGE: storage,
+    DATABASE_URL: dbRole.connectionUrl,
+    ...secrets,
+  },
+  // Hourly cron trigger for pipeline data extraction
+  crons: ["0 * * * *"],
+});
 
 export const web = await TanStackStart("web", {
   cwd: "./packages/web",
@@ -174,12 +184,13 @@ export const docs = await TanStackStart("docs", {
 
 console.log({
   domain,
-  // web: web.url,
+  web: web.url,
   marketing: marketing.url,
   docs: docs.url,
-  // api: api.url,
+  api: api.url,
   db: database.id,
   kv: kv.namespaceId,
+  pipelineKV: pipelineKV.namespaceId,
   r2: storage.name,
   stage,
 });
@@ -194,9 +205,10 @@ if (process.env.PULL_REQUEST) {
 
      Your changes have been deployed to a preview environment:
 
+     **🌐 Website:** ${web.url}
+     **🌐 API:** ${api.url}
      **🌐 Docs:** ${docs.url}
      **🌐 Marketing:** ${marketing.url}
-     **🌐 Website:** ${web.url}
 
      Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
 
