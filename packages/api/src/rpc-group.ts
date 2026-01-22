@@ -3,6 +3,9 @@ import { RpcGroup } from "@effect/rpc";
 import { AuthRpcs } from "./auth/auth.rpc";
 import { GameRpcs } from "./game/game.rpc";
 import { OrganizationRpcs } from "./organization/organization.rpc";
+import { PlayersRpcs } from "./pipeline/players.rpc";
+import { StatsRpcs } from "./pipeline/stats.rpc";
+import { TeamsRpcs } from "./pipeline/teams.rpc";
 import { ContactInfoRpcs } from "./player/contact-info/contact-info.rpc";
 import { PlayerRpcs } from "./player/player.rpc";
 import { SeasonRpcs } from "./season/season.rpc";
@@ -16,4 +19,7 @@ export class LaxdbRpc extends RpcGroup.make()
   .merge(ContactInfoRpcs)
   .merge(TeamRpcs)
   .merge(OrganizationRpcs)
-  .merge(AuthRpcs) {}
+  .merge(AuthRpcs)
+  .merge(StatsRpcs)
+  .merge(PlayersRpcs)
+  .merge(TeamsRpcs) {}
