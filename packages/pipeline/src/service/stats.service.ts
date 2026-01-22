@@ -1,7 +1,7 @@
 import { Effect, Schema, pipe } from "effect";
 
 import { CacheService, CacheKeys, DEFAULT_TTL_CONFIG } from "./cache.service";
-import { PlayersRepo, type SourcePlayerWithLeague } from "./players.repo";
+import { PlayersRepo } from "./players.repo";
 import {
   StatsRepo,
   type PlayerStatWithDetails,
@@ -123,6 +123,71 @@ export interface LeagueStats {
   readonly gamesPlayed: number;
 }
 
+/**
+ * Compute aggregated totals from stats array (on read, per YAGNI)
+ */
+const computeAggregatedTotals = (
+  stats: readonly PlayerStatWithDetails[],
+): AggregatedStats => {
+  return stats.reduce(
+    (acc, stat) => ({
+      totalGoals: acc.totalGoals + (stat.goals ?? 0),
+      totalAssists: acc.totalAssists + (stat.assists ?? 0),
+      totalPoints: acc.totalPoints + (stat.points ?? 0),
+      totalGamesPlayed: acc.totalGamesPlayed + (stat.gamesPlayed ?? 0),
+      totalGroundBalls: acc.totalGroundBalls + (stat.groundBalls ?? 0),
+      totalTurnovers: acc.totalTurnovers + (stat.turnovers ?? 0),
+      totalCausedTurnovers:
+        acc.totalCausedTurnovers + (stat.causedTurnovers ?? 0),
+      totalFaceoffWins: acc.totalFaceoffWins + (stat.faceoffWins ?? 0),
+      totalFaceoffLosses: acc.totalFaceoffLosses + (stat.faceoffLosses ?? 0),
+    }),
+    {
+      totalGoals: 0,
+      totalAssists: 0,
+      totalPoints: 0,
+      totalGamesPlayed: 0,
+      totalGroundBalls: 0,
+      totalTurnovers: 0,
+      totalCausedTurnovers: 0,
+      totalFaceoffWins: 0,
+      totalFaceoffLosses: 0,
+    },
+  );
+};
+
+/**
+ * Group stats by league for display (never merge cross-league stats)
+ */
+const groupStatsByLeague = (
+  stats: readonly PlayerStatWithDetails[],
+): readonly LeagueStats[] => {
+  const byLeague = new Map<string, LeagueStats>();
+
+  for (const stat of stats) {
+    const existing = byLeague.get(stat.leagueAbbreviation);
+    if (existing) {
+      byLeague.set(stat.leagueAbbreviation, {
+        leagueAbbreviation: stat.leagueAbbreviation,
+        goals: existing.goals + (stat.goals ?? 0),
+        assists: existing.assists + (stat.assists ?? 0),
+        points: existing.points + (stat.points ?? 0),
+        gamesPlayed: existing.gamesPlayed + (stat.gamesPlayed ?? 0),
+      });
+    } else {
+      byLeague.set(stat.leagueAbbreviation, {
+        leagueAbbreviation: stat.leagueAbbreviation,
+        goals: stat.goals ?? 0,
+        assists: stat.assists ?? 0,
+        points: stat.points ?? 0,
+        gamesPlayed: stat.gamesPlayed ?? 0,
+      });
+    }
+  }
+
+  return Array.from(byLeague.values());
+};
+
 export class StatsService extends Effect.Service<StatsService>()(
   "StatsService",
   {
@@ -130,72 +195,6 @@ export class StatsService extends Effect.Service<StatsService>()(
       const statsRepo = yield* StatsRepo;
       const playersRepo = yield* PlayersRepo;
       const cacheService = yield* CacheService;
-
-      /**
-       * Compute aggregated totals from stats array (on read, per YAGNI)
-       */
-      const computeAggregatedTotals = (
-        stats: readonly PlayerStatWithDetails[],
-      ): AggregatedStats => {
-        return stats.reduce(
-          (acc, stat) => ({
-            totalGoals: acc.totalGoals + (stat.goals ?? 0),
-            totalAssists: acc.totalAssists + (stat.assists ?? 0),
-            totalPoints: acc.totalPoints + (stat.points ?? 0),
-            totalGamesPlayed: acc.totalGamesPlayed + (stat.gamesPlayed ?? 0),
-            totalGroundBalls: acc.totalGroundBalls + (stat.groundBalls ?? 0),
-            totalTurnovers: acc.totalTurnovers + (stat.turnovers ?? 0),
-            totalCausedTurnovers:
-              acc.totalCausedTurnovers + (stat.causedTurnovers ?? 0),
-            totalFaceoffWins: acc.totalFaceoffWins + (stat.faceoffWins ?? 0),
-            totalFaceoffLosses:
-              acc.totalFaceoffLosses + (stat.faceoffLosses ?? 0),
-          }),
-          {
-            totalGoals: 0,
-            totalAssists: 0,
-            totalPoints: 0,
-            totalGamesPlayed: 0,
-            totalGroundBalls: 0,
-            totalTurnovers: 0,
-            totalCausedTurnovers: 0,
-            totalFaceoffWins: 0,
-            totalFaceoffLosses: 0,
-          },
-        );
-      };
-
-      /**
-       * Group stats by league for display (never merge cross-league stats)
-       */
-      const groupStatsByLeague = (
-        stats: readonly PlayerStatWithDetails[],
-      ): readonly LeagueStats[] => {
-        const byLeague = new Map<string, LeagueStats>();
-
-        for (const stat of stats) {
-          const existing = byLeague.get(stat.leagueAbbreviation);
-          if (existing) {
-            byLeague.set(stat.leagueAbbreviation, {
-              leagueAbbreviation: stat.leagueAbbreviation,
-              goals: existing.goals + (stat.goals ?? 0),
-              assists: existing.assists + (stat.assists ?? 0),
-              points: existing.points + (stat.points ?? 0),
-              gamesPlayed: existing.gamesPlayed + (stat.gamesPlayed ?? 0),
-            });
-          } else {
-            byLeague.set(stat.leagueAbbreviation, {
-              leagueAbbreviation: stat.leagueAbbreviation,
-              goals: stat.goals ?? 0,
-              assists: stat.assists ?? 0,
-              points: stat.points ?? 0,
-              gamesPlayed: stat.gamesPlayed ?? 0,
-            });
-          }
-        }
-
-        return Array.from(byLeague.values());
-      };
 
       /**
        * Fetch player stats from DB (uncached computation)
@@ -233,15 +232,15 @@ export class StatsService extends Effect.Service<StatsService>()(
 
           for (const sourcePlayer of canonicalPlayer.sourcePlayers) {
             const statsResult = yield* pipe(
-              input.seasonId !== undefined
-                ? statsRepo.getPlayerStatsBySeason({
+              input.seasonId === undefined
+                ? statsRepo.getPlayerStats({
                     sourcePlayerId: sourcePlayer.id,
-                    seasonId: input.seasonId,
                     limit: input.limit,
                     cursor: input.cursor,
                   })
-                : statsRepo.getPlayerStats({
+                : statsRepo.getPlayerStatsBySeason({
                     sourcePlayerId: sourcePlayer.id,
+                    seasonId: input.seasonId,
                     limit: input.limit,
                     cursor: input.cursor,
                   }),
@@ -434,15 +433,15 @@ export class StatsService extends Effect.Service<StatsService>()(
 
               for (const sourcePlayer of canonicalPlayer.sourcePlayers) {
                 const statsResult = yield* pipe(
-                  input.seasonId !== undefined
-                    ? statsRepo.getPlayerStatsBySeason({
+                  input.seasonId === undefined
+                    ? statsRepo.getPlayerStats({
+                        sourcePlayerId: sourcePlayer.id,
+                        limit: 1000,
+                      })
+                    : statsRepo.getPlayerStatsBySeason({
                         sourcePlayerId: sourcePlayer.id,
                         seasonId: input.seasonId,
                         limit: 1000, // Get all stats for comparison
-                      })
-                    : statsRepo.getPlayerStats({
-                        sourcePlayerId: sourcePlayer.id,
-                        limit: 1000,
                       }),
                   Effect.catchTag("DatabaseError", (e) =>
                     Effect.fail(

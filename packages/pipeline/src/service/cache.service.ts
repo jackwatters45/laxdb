@@ -114,7 +114,7 @@ export const getTTLForKeyType = (
       return config.game;
     case "identity":
       return config.identity;
-    default:
+    case "unknown":
       return config.default;
   }
 };
@@ -148,7 +148,7 @@ export const CacheKeys = {
     sortBy: string,
     seasonId?: number,
   ): string => {
-    const leagues = leagueIds.slice().toSorted().join(",");
+    const leagues = leagueIds.slice().toSorted((a, b) => a - b).join(",");
     return seasonId
       ? `${CACHE_KEY_PREFIXES.leaderboard}${leagues}:${sortBy}:season:${seasonId}`
       : `${CACHE_KEY_PREFIXES.leaderboard}${leagues}:${sortBy}:all`;
@@ -162,6 +162,13 @@ interface CachedValue<T> {
   readonly value: T;
   readonly metadata: CacheMetadata;
 }
+
+/**
+ * Serialize value with metadata for storage
+ */
+const serialize = <T>(value: T, metadata: CacheMetadata): string => {
+  return JSON.stringify({ value, metadata });
+};
 
 /**
  * Result of a cache get with stale-while-revalidate info
@@ -203,13 +210,6 @@ export class CacheService extends Effect.Service<CacheService>()(
           expiresAt: now + ttlSeconds * 1000,
           staleAt: now + (ttlSeconds - swrWindow) * 1000,
         };
-      };
-
-      /**
-       * Serialize value with metadata for storage
-       */
-      const serialize = <T>(value: T, metadata: CacheMetadata): string => {
-        return JSON.stringify({ value, metadata });
       };
 
       /**

@@ -21,6 +21,27 @@ export interface SeasonConfig {
 }
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Check if a timestamp is stale given a max age in hours.
+ */
+const isTimestampStale = (
+  timestamp: string | null | undefined,
+  maxAgeHours: number | null,
+): boolean => {
+  // No timestamp = always stale
+  if (!timestamp) return true;
+  // No max age = never stale (historical)
+  if (maxAgeHours === null) return false;
+
+  const ageMs = Date.now() - new Date(timestamp).getTime();
+  const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
+  return ageMs > maxAgeMs;
+};
+
+// ============================================================================
 // Season Config Service
 // ============================================================================
 
@@ -73,23 +94,6 @@ export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
           return config.currentSeasonMaxAgeHours;
         }
         return config.historicalSeasonMaxAgeHours;
-      };
-
-      /**
-       * Check if a timestamp is stale given a max age in hours.
-       */
-      const isTimestampStale = (
-        timestamp: string | null | undefined,
-        maxAgeHours: number | null,
-      ): boolean => {
-        // No timestamp = always stale
-        if (!timestamp) return true;
-        // No max age = never stale (historical)
-        if (maxAgeHours === null) return false;
-
-        const ageMs = Date.now() - new Date(timestamp).getTime();
-        const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
-        return ageMs > maxAgeMs;
       };
 
       return {

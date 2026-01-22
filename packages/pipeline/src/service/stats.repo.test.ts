@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@effect/vitest";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 
 import {
   StatsRepo,

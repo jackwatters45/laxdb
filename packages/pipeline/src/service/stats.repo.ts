@@ -1,6 +1,6 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import { DatabaseLive } from "@laxdb/core/drizzle/drizzle.service";
-import { and, desc, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
 import { Effect, Schema } from "effect";
 
 import { leagueTable } from "../db/leagues.sql";

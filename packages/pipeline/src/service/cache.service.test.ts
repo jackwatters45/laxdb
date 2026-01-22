@@ -8,10 +8,7 @@ import {
   CacheKeys,
   getCacheKeyType,
   DEFAULT_TTL_CONFIG,
-  CacheError,
-  type CacheGetResult,
   getTTLForKeyType,
-  CACHE_KEY_PREFIXES,
   SWR_WINDOW_RATIO,
 } from "./cache.service";
 
@@ -25,28 +22,30 @@ const createMockKV = (): {
   const store = new Map<string, { value: string; expiresAt: number }>();
 
   const kv: KVNamespace = {
-    get: vi.fn(async (key: string) => {
+    get: vi.fn((key: string) => {
       const entry = store.get(key);
-      if (!entry) return null;
+      if (!entry) return Promise.resolve(null);
       // Check expiry
       if (Date.now() > entry.expiresAt) {
         store.delete(key);
-        return null;
+        return Promise.resolve(null);
       }
-      return entry.value;
+      return Promise.resolve(entry.value);
     }),
     put: vi.fn(
-      async (key: string, value: string, options?: { expirationTtl?: number }) => {
+      (key: string, value: string, options?: { expirationTtl?: number }) => {
         const expiresAt = options?.expirationTtl
           ? Date.now() + options.expirationTtl * 1000
           : Date.now() + 60 * 60 * 1000; // Default 1 hour
         store.set(key, { value, expiresAt });
+        return Promise.resolve();
       },
     ),
-    delete: vi.fn(async (key: string) => {
+    delete: vi.fn((key: string) => {
       store.delete(key);
+      return Promise.resolve();
     }),
-    list: vi.fn(async (options?: { prefix?: string }) => {
+    list: vi.fn((options?: { prefix?: string }) => {
       const keys: { name: string; expiration?: number; metadata?: unknown }[] =
         [];
       for (const [key, entry] of store.entries()) {
@@ -54,14 +53,14 @@ const createMockKV = (): {
           keys.push({ name: key, expiration: entry.expiresAt });
         }
       }
-      return { keys, list_complete: true, cacheStatus: null };
+      return Promise.resolve({ keys, list_complete: true, cacheStatus: null });
     }),
-    getWithMetadata: vi.fn(async (key: string) => {
+    getWithMetadata: vi.fn((key: string) => {
       const entry = store.get(key);
       if (!entry || Date.now() > entry.expiresAt) {
-        return { value: null, metadata: null, cacheStatus: null };
+        return Promise.resolve({ value: null, metadata: null, cacheStatus: null });
       }
-      return { value: entry.value, metadata: null, cacheStatus: null };
+      return Promise.resolve({ value: entry.value, metadata: null, cacheStatus: null });
     }),
   } as unknown as KVNamespace;
 

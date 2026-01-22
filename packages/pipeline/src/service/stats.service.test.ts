@@ -244,8 +244,8 @@ describe("StatsService", () => {
       expect(mockComparison.players).toHaveLength(1);
       const firstPlayer = mockComparison.players[0];
       expect(firstPlayer).toBeDefined();
-      expect(firstPlayer!.statsByLeague).toHaveLength(2);
-      expect(firstPlayer!.totals.totalPoints).toBe(50);
+      expect(firstPlayer?.statsByLeague).toHaveLength(2);
+      expect(firstPlayer?.totals.totalPoints).toBe(50);
     });
 
     it("AggregatedStats includes all stat categories", () => {

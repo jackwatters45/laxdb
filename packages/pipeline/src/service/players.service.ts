@@ -13,11 +13,7 @@ import {
 } from "../db/player-identities.sql";
 import { sourcePlayerTable } from "../db/source-players.sql";
 
-import {
-  PlayersRepo,
-  type CanonicalPlayerWithSources,
-  type SourcePlayerWithLeague,
-} from "./players.repo";
+import { PlayersRepo, type SourcePlayerWithLeague } from "./players.repo";
 
 /**
  * Service-level error for business logic failures
