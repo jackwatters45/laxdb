@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as ProtectedRouteImport } from './routes/_protected'
+import { Route as StatsIndexRouteImport } from './routes/stats/index'
 import { Route as marketingIndexRouteImport } from './routes/(marketing)/index'
 import { Route as ProtectedRedirectRouteImport } from './routes/_protected/redirect'
 import { Route as ProtectedOrganizationSlugRouteImport } from './routes/_protected/$organizationSlug'
@@ -63,6 +64,11 @@ const TestRoute = TestRouteImport.update({
 } as any)
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatsIndexRoute = StatsIndexRouteImport.update({
+  id: '/stats/',
+  path: '/stats/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const marketingIndexRoute = marketingIndexRouteImport.update({
@@ -325,13 +331,14 @@ const ProtectedOrganizationSlugTeamIdPlayersPlayerIdContactInfoRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof marketingIndexRoute
   '/test': typeof TestRoute
   '/login': typeof authLoginRoute
   '/logout': typeof authLogoutRoute
   '/register': typeof authRegisterRoute
   '/$organizationSlug': typeof ProtectedOrganizationSlugRouteWithChildren
   '/redirect': typeof ProtectedRedirectRoute
-  '/': typeof marketingIndexRoute
+  '/stats/': typeof StatsIndexRoute
   '/$organizationSlug/$teamId': typeof ProtectedOrganizationSlugTeamIdRouteWithChildren
   '/$organizationSlug/feedback': typeof ProtectedOrganizationSlugFeedbackRoute
   '/organization/create': typeof ProtectedOrganizationCreateRoute
@@ -347,8 +354,8 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/settings/settings-old': typeof ProtectedOrganizationSlugSettingsSettingsOldRoute
   '/$organizationSlug/teams/create': typeof ProtectedOrganizationSlugTeamsCreateRoute
   '/$organizationSlug/$teamId/': typeof ProtectedOrganizationSlugTeamIdIndexRoute
-  '/$organizationSlug/games': typeof ProtectedOrganizationSlugGamesIndexRoute
-  '/$organizationSlug/players': typeof ProtectedOrganizationSlugPlayersIndexRoute
+  '/$organizationSlug/games/': typeof ProtectedOrganizationSlugGamesIndexRoute
+  '/$organizationSlug/players/': typeof ProtectedOrganizationSlugPlayersIndexRoute
   '/$organizationSlug/$teamId/players/$playerId': typeof ProtectedOrganizationSlugTeamIdPlayersPlayerIdRouteWithChildren
   '/$organizationSlug/games/$gameId/edit': typeof ProtectedOrganizationSlugGamesGameIdEditRoute
   '/$organizationSlug/games/$gameId/roster': typeof ProtectedOrganizationSlugGamesGameIdRosterRoute
@@ -361,23 +368,24 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/players/goals/create': typeof ProtectedOrganizationSlugPlayersGoalsCreateRoute
   '/$organizationSlug/players/notes/create': typeof ProtectedOrganizationSlugPlayersNotesCreateRoute
   '/$organizationSlug/players/resources/create': typeof ProtectedOrganizationSlugPlayersResourcesCreateRoute
-  '/$organizationSlug/$teamId/players': typeof ProtectedOrganizationSlugTeamIdPlayersIndexRoute
-  '/$organizationSlug/games/$gameId': typeof ProtectedOrganizationSlugGamesGameIdIndexRoute
-  '/$organizationSlug/players/$playerId': typeof ProtectedOrganizationSlugPlayersPlayerIdIndexRoute
-  '/$organizationSlug/settings/billing': typeof ProtectedOrganizationSlugSettingsBillingIndexRoute
-  '/$organizationSlug/settings/general': typeof ProtectedOrganizationSlugSettingsGeneralIndexRoute
-  '/$organizationSlug/settings/users': typeof ProtectedOrganizationSlugSettingsUsersIndexRoute
+  '/$organizationSlug/$teamId/players/': typeof ProtectedOrganizationSlugTeamIdPlayersIndexRoute
+  '/$organizationSlug/games/$gameId/': typeof ProtectedOrganizationSlugGamesGameIdIndexRoute
+  '/$organizationSlug/players/$playerId/': typeof ProtectedOrganizationSlugPlayersPlayerIdIndexRoute
+  '/$organizationSlug/settings/billing/': typeof ProtectedOrganizationSlugSettingsBillingIndexRoute
+  '/$organizationSlug/settings/general/': typeof ProtectedOrganizationSlugSettingsGeneralIndexRoute
+  '/$organizationSlug/settings/users/': typeof ProtectedOrganizationSlugSettingsUsersIndexRoute
   '/$organizationSlug/$teamId/players/$playerId/contact-info': typeof ProtectedOrganizationSlugTeamIdPlayersPlayerIdContactInfoRoute
   '/$organizationSlug/$teamId/players/$playerId/edit': typeof ProtectedOrganizationSlugTeamIdPlayersPlayerIdEditRoute
   '/$organizationSlug/$teamId/players/$playerId/': typeof ProtectedOrganizationSlugTeamIdPlayersPlayerIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof marketingIndexRoute
   '/test': typeof TestRoute
   '/login': typeof authLoginRoute
   '/logout': typeof authLogoutRoute
   '/register': typeof authRegisterRoute
   '/redirect': typeof ProtectedRedirectRoute
-  '/': typeof marketingIndexRoute
+  '/stats': typeof StatsIndexRoute
   '/$organizationSlug/feedback': typeof ProtectedOrganizationSlugFeedbackRoute
   '/organization/create': typeof ProtectedOrganizationCreateRoute
   '/organization/join': typeof ProtectedOrganizationJoinRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/_protected/$organizationSlug': typeof ProtectedOrganizationSlugRouteWithChildren
   '/_protected/redirect': typeof ProtectedRedirectRoute
   '/(marketing)/': typeof marketingIndexRoute
+  '/stats/': typeof StatsIndexRoute
   '/_protected/$organizationSlug/$teamId': typeof ProtectedOrganizationSlugTeamIdRouteWithChildren
   '/_protected/$organizationSlug/feedback': typeof ProtectedOrganizationSlugFeedbackRoute
   '/_protected/organization/create': typeof ProtectedOrganizationCreateRoute
@@ -467,13 +476,14 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/test'
     | '/login'
     | '/logout'
     | '/register'
     | '/$organizationSlug'
     | '/redirect'
-    | '/'
+    | '/stats/'
     | '/$organizationSlug/$teamId'
     | '/$organizationSlug/feedback'
     | '/organization/create'
@@ -489,8 +499,8 @@ export interface FileRouteTypes {
     | '/$organizationSlug/settings/settings-old'
     | '/$organizationSlug/teams/create'
     | '/$organizationSlug/$teamId/'
-    | '/$organizationSlug/games'
-    | '/$organizationSlug/players'
+    | '/$organizationSlug/games/'
+    | '/$organizationSlug/players/'
     | '/$organizationSlug/$teamId/players/$playerId'
     | '/$organizationSlug/games/$gameId/edit'
     | '/$organizationSlug/games/$gameId/roster'
@@ -503,23 +513,24 @@ export interface FileRouteTypes {
     | '/$organizationSlug/players/goals/create'
     | '/$organizationSlug/players/notes/create'
     | '/$organizationSlug/players/resources/create'
-    | '/$organizationSlug/$teamId/players'
-    | '/$organizationSlug/games/$gameId'
-    | '/$organizationSlug/players/$playerId'
-    | '/$organizationSlug/settings/billing'
-    | '/$organizationSlug/settings/general'
-    | '/$organizationSlug/settings/users'
+    | '/$organizationSlug/$teamId/players/'
+    | '/$organizationSlug/games/$gameId/'
+    | '/$organizationSlug/players/$playerId/'
+    | '/$organizationSlug/settings/billing/'
+    | '/$organizationSlug/settings/general/'
+    | '/$organizationSlug/settings/users/'
     | '/$organizationSlug/$teamId/players/$playerId/contact-info'
     | '/$organizationSlug/$teamId/players/$playerId/edit'
     | '/$organizationSlug/$teamId/players/$playerId/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/test'
     | '/login'
     | '/logout'
     | '/register'
     | '/redirect'
-    | '/'
+    | '/stats'
     | '/$organizationSlug/feedback'
     | '/organization/create'
     | '/organization/join'
@@ -566,6 +577,7 @@ export interface FileRouteTypes {
     | '/_protected/$organizationSlug'
     | '/_protected/redirect'
     | '/(marketing)/'
+    | '/stats/'
     | '/_protected/$organizationSlug/$teamId'
     | '/_protected/$organizationSlug/feedback'
     | '/_protected/organization/create'
@@ -613,6 +625,7 @@ export interface RootRouteChildren {
   authLogoutRoute: typeof authLogoutRoute
   authRegisterRoute: typeof authRegisterRoute
   marketingIndexRoute: typeof marketingIndexRoute
+  StatsIndexRoute: typeof StatsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -628,8 +641,15 @@ declare module '@tanstack/react-router' {
     '/_protected': {
       id: '/_protected'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof ProtectedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stats/': {
+      id: '/stats/'
+      path: '/stats'
+      fullPath: '/stats/'
+      preLoaderRoute: typeof StatsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(marketing)/': {
@@ -719,14 +739,14 @@ declare module '@tanstack/react-router' {
     '/_protected/$organizationSlug/players/': {
       id: '/_protected/$organizationSlug/players/'
       path: '/players'
-      fullPath: '/$organizationSlug/players'
+      fullPath: '/$organizationSlug/players/'
       preLoaderRoute: typeof ProtectedOrganizationSlugPlayersIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/games/': {
       id: '/_protected/$organizationSlug/games/'
       path: '/games'
-      fullPath: '/$organizationSlug/games'
+      fullPath: '/$organizationSlug/games/'
       preLoaderRoute: typeof ProtectedOrganizationSlugGamesIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
@@ -796,42 +816,42 @@ declare module '@tanstack/react-router' {
     '/_protected/$organizationSlug/settings/users/': {
       id: '/_protected/$organizationSlug/settings/users/'
       path: '/settings/users'
-      fullPath: '/$organizationSlug/settings/users'
+      fullPath: '/$organizationSlug/settings/users/'
       preLoaderRoute: typeof ProtectedOrganizationSlugSettingsUsersIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/settings/general/': {
       id: '/_protected/$organizationSlug/settings/general/'
       path: '/settings/general'
-      fullPath: '/$organizationSlug/settings/general'
+      fullPath: '/$organizationSlug/settings/general/'
       preLoaderRoute: typeof ProtectedOrganizationSlugSettingsGeneralIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/settings/billing/': {
       id: '/_protected/$organizationSlug/settings/billing/'
       path: '/settings/billing'
-      fullPath: '/$organizationSlug/settings/billing'
+      fullPath: '/$organizationSlug/settings/billing/'
       preLoaderRoute: typeof ProtectedOrganizationSlugSettingsBillingIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/players/$playerId/': {
       id: '/_protected/$organizationSlug/players/$playerId/'
       path: '/players/$playerId'
-      fullPath: '/$organizationSlug/players/$playerId'
+      fullPath: '/$organizationSlug/players/$playerId/'
       preLoaderRoute: typeof ProtectedOrganizationSlugPlayersPlayerIdIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/games/$gameId/': {
       id: '/_protected/$organizationSlug/games/$gameId/'
       path: '/games/$gameId'
-      fullPath: '/$organizationSlug/games/$gameId'
+      fullPath: '/$organizationSlug/games/$gameId/'
       preLoaderRoute: typeof ProtectedOrganizationSlugGamesGameIdIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugRoute
     }
     '/_protected/$organizationSlug/$teamId/players/': {
       id: '/_protected/$organizationSlug/$teamId/players/'
       path: '/players'
-      fullPath: '/$organizationSlug/$teamId/players'
+      fullPath: '/$organizationSlug/$teamId/players/'
       preLoaderRoute: typeof ProtectedOrganizationSlugTeamIdPlayersIndexRouteImport
       parentRoute: typeof ProtectedOrganizationSlugTeamIdRoute
     }
@@ -1108,6 +1128,7 @@ const rootRouteChildren: RootRouteChildren = {
   authLogoutRoute: authLogoutRoute,
   authRegisterRoute: authRegisterRoute,
   marketingIndexRoute: marketingIndexRoute,
+  StatsIndexRoute: StatsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
