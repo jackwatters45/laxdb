@@ -28,6 +28,91 @@ const mapParseError = (error: ParseResult.ParseError): ParseError =>
     cause: error,
   });
 
+// ============================================================================
+// Schedule Parsing Helpers (module-level to avoid recreating in loops)
+// ============================================================================
+
+/** Normalize team name for ID generation */
+const normalizeTeamName = (name: string): string =>
+  name
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "")
+    .slice(0, 10);
+
+/** Extract team ID from href pattern: ?team={ID} or /schedule/?team={ID} */
+const extractTeamId = (href: string): string | null => {
+  const teamIdMatch = href.match(/[?&]team=(\d+)/);
+  return teamIdMatch?.[1] ?? null;
+};
+
+/** Parse date strings in various formats */
+const parseDate = (dateStr: string): string | null => {
+  const cleaned = dateStr.trim();
+  if (!cleaned) return null;
+
+  // Format: MM/DD/YY
+  const shortMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  if (shortMatch) {
+    const [, month, day, year] = shortMatch;
+    // Assume 2000s for MLL era
+    const fullYear = Number.parseInt(year ?? "0", 10);
+    const century = fullYear > 50 ? 1900 : 2000;
+    return `${century + fullYear}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+  }
+
+  // Format: MM/DD/YYYY
+  const longMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (longMatch) {
+    const [, month, day, year] = longMatch;
+    return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+  }
+
+  // Format: Month D, YYYY (e.g., "July 1, 2006")
+  const textMatch = cleaned.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (textMatch) {
+    const [, monthName, day, year] = textMatch;
+    const months: Record<string, string> = {
+      january: "01",
+      february: "02",
+      march: "03",
+      april: "04",
+      may: "05",
+      june: "06",
+      july: "07",
+      august: "08",
+      september: "09",
+      october: "10",
+      november: "11",
+      december: "12",
+    };
+    const month = months[(monthName ?? "").toLowerCase()];
+    if (month) {
+      return `${year}-${month}-${day?.padStart(2, "0")}`;
+    }
+  }
+
+  return null;
+};
+
+/** Parse score (may be empty, "&nbsp;", or number) */
+const parseScore = (text: string): number | null => {
+  const cleaned = text.trim().replaceAll(/[&]nbsp;?/gi, "");
+  if (!cleaned) return null;
+  const num = Number.parseInt(cleaned, 10);
+  return Number.isNaN(num) ? null : num;
+};
+
+/** Get priority for schedule URL sorting */
+const getScheduleUrlPriority = (url: string): number => {
+  if (url.includes("/schedule/league")) return 0;
+  if (url.includes("/schedule.html")) return 1;
+  if (url.endsWith("/schedule/") || url.endsWith("/schedule")) return 2;
+  if (url.includes("/schedule.aspx")) return 3;
+  if (url.includes("?team=")) return 4;
+  if (url.includes("/events")) return 5;
+  return 6;
+};
+
 export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
   effect: Effect.gen(function* () {
     const mllConfig = yield* MLLConfig;
@@ -890,19 +975,9 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         // Filter to prioritize main schedule pages over team-specific or event pages
         // Priority: /schedule/league/ > /schedule/ > /schedule?team= > /schedule/events
         const prioritized = sortedEntries.toSorted((a, b) => {
-          const getPriority = (url: string): number => {
-            if (url.includes("/schedule/league")) return 0;
-            if (url.includes("/schedule.html")) return 1;
-            if (url.endsWith("/schedule/") || url.endsWith("/schedule"))
-              return 2;
-            if (url.includes("/schedule.aspx")) return 3;
-            if (url.includes("?team=")) return 4;
-            if (url.includes("/events")) return 5;
-            return 6;
-          };
-
           const priorityDiff =
-            getPriority(a.original) - getPriority(b.original);
+            getScheduleUrlPriority(a.original) -
+            getScheduleUrlPriority(b.original);
           if (priorityDiff !== 0) return priorityDiff;
 
           // For same priority, prefer more recent timestamp
@@ -942,79 +1017,6 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       // Timestamp format: 20060701160324
       const timestampMatch = sourceUrl.match(/\/web\/(\d{4})/);
       const _yearFromTimestamp = timestampMatch?.[1] ?? "";
-
-      // Helper to normalize team name for ID generation
-      const normalizeTeamName = (name: string): string =>
-        name
-          .toLowerCase()
-          .replaceAll(/[^a-z0-9]+/g, "")
-          .slice(0, 10);
-
-      // Helper to extract team ID from href
-      const extractTeamId = (href: string): string | null => {
-        // Pattern: ?team={ID} or /schedule/?team={ID}
-        const teamIdMatch = href.match(/[?&]team=(\d+)/);
-        return teamIdMatch?.[1] ?? null;
-      };
-
-      // Helper to parse date strings
-      const parseDate = (dateStr: string): string | null => {
-        const cleaned = dateStr.trim();
-        if (!cleaned) return null;
-
-        // Format: MM/DD/YY
-        const shortMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
-        if (shortMatch) {
-          const [, month, day, year] = shortMatch;
-          // Assume 2000s for MLL era
-          const fullYear = Number.parseInt(year ?? "0", 10);
-          const century = fullYear > 50 ? 1900 : 2000;
-          return `${century + fullYear}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
-        }
-
-        // Format: MM/DD/YYYY
-        const longMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if (longMatch) {
-          const [, month, day, year] = longMatch;
-          return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
-        }
-
-        // Format: Month D, YYYY (e.g., "July 1, 2006")
-        const textMatch = cleaned.match(
-          /^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/,
-        );
-        if (textMatch) {
-          const [, monthName, day, year] = textMatch;
-          const months: Record<string, string> = {
-            january: "01",
-            february: "02",
-            march: "03",
-            april: "04",
-            may: "05",
-            june: "06",
-            july: "07",
-            august: "08",
-            september: "09",
-            october: "10",
-            november: "11",
-            december: "12",
-          };
-          const month = months[(monthName ?? "").toLowerCase()];
-          if (month) {
-            return `${year}-${month}-${day?.padStart(2, "0")}`;
-          }
-        }
-
-        return null;
-      };
-
-      // Helper to parse score (may be empty, "&nbsp;", or number)
-      const parseScore = (text: string): number | null => {
-        const cleaned = text.trim().replaceAll(/[&]nbsp;?/gi, "");
-        if (!cleaned) return null;
-        const num = Number.parseInt(cleaned, 10);
-        return Number.isNaN(num) ? null : num;
-      };
 
       // Generate unique game ID
       const generateGameId = (
@@ -1672,22 +1674,22 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
             if (!seenGameIds.has(game.id)) {
               seenGameIds.add(game.id);
               allGames.push(game);
-            } else {
-              // If we already have this game, update with better data if available
-              const existingIdx = allGames.findIndex((g) => g.id === game.id);
-              if (existingIdx >= 0) {
-                const existing = allGames[existingIdx];
-                // Prefer games with scores over those without
-                if (
-                  existing &&
-                  (existing.home_score === null ||
-                    existing.away_score === null) &&
-                  game.home_score !== null &&
-                  game.away_score !== null
-                ) {
-                  allGames[existingIdx] = game;
-                }
-              }
+              continue;
+            }
+            // If we already have this game, update with better data if available
+            const existingIdx = allGames.findIndex((g) => g.id === game.id);
+            if (existingIdx < 0) continue;
+
+            const existing = allGames[existingIdx];
+            // Prefer games with scores over those without
+            const existingMissingScores =
+              existing &&
+              (existing.home_score === null || existing.away_score === null);
+            const gameHasScores =
+              game.home_score !== null && game.away_score !== null;
+
+            if (existingMissingScores && gameHasScores) {
+              allGames[existingIdx] = game;
             }
           }
         }

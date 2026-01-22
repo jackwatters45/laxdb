@@ -58,4 +58,7 @@ const { handler } = HttpLayerRouter.toWebHandler(AllRoutes, {
   middleware: HttpMiddleware.logger,
 });
 
+// Re-export scheduled handler for cron triggers
+export { scheduled } from "./cron/scheduled";
+
 export default { fetch: handler };

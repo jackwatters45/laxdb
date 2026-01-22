@@ -1,1 +1,765 @@
-[]
+[
+  {
+    "id": "schema-001",
+    "category": "schema",
+    "description": "Create leagues table with source priority ranking",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/leagues.sql.ts",
+      "Fields: id, name, abbreviation (PLL/NLL/MLL/MSL/WLA), priority (1-6), active",
+      "Priority reflects source reliability: PLL=1, NLL=2, Gamesheet=3, StatsCrew=4, Pointstreak=5, Wayback=6",
+      "Run db:generate and db:migrate",
+      "Verify table exists in Drizzle Studio"
+    ],
+    "context": {
+      "spec_ref": "Source Priority & Conflict Resolution table",
+      "pattern": "Follow existing sql.ts patterns from packages/core",
+      "note": "Keep schemas in packages/pipeline per resolved Q1"
+    }
+  },
+  {
+    "id": "schema-002",
+    "category": "schema",
+    "description": "Create seasons table with league foreign key",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/seasons.sql.ts",
+      "Fields: id, league_id (FK), year, name, source_season_id, start_date, end_date, active",
+      "source_season_id stores external IDs (e.g., Gamesheet season IDs: 9567, 6007, 3246)",
+      "Composite unique constraint on (league_id, year)",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Season Management config from Cron section",
+      "existing_data": "Season IDs in packages/pipeline/src/extract/season-config.ts"
+    }
+  },
+  {
+    "id": "schema-003",
+    "category": "schema",
+    "description": "Create teams table with league/season relationship",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/teams.sql.ts",
+      "Fields: id, league_id, name, abbreviation, city, source_id, source_hash",
+      "source_id is the external team ID from source API",
+      "source_hash for change detection (idempotent upserts)",
+      "Index on (league_id, source_id) for lookups",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Data Integrity: source_hash for upstream change detection",
+      "conflict_resolution": "Team identity uses ID mapping table, no auto-merge"
+    }
+  },
+  {
+    "id": "schema-004",
+    "category": "schema",
+    "description": "Create team_seasons junction table",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/team-seasons.sql.ts",
+      "Fields: id, team_id (FK), season_id (FK), division, conference",
+      "Composite unique on (team_id, season_id)",
+      "This links teams to seasons they participated in",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "note": "Teams can exist across multiple seasons, need junction table"
+    }
+  },
+  {
+    "id": "schema-005",
+    "category": "schema",
+    "description": "Create source_players table for raw player data per source",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/source-players.sql.ts",
+      "Fields: id, league_id, source_id, first_name, last_name, full_name, normalized_name, position, jersey_number, dob, hometown, college, handedness, height_inches, weight_lbs, source_hash, created_at, updated_at, deleted_at",
+      "normalized_name is lowercase, no special chars, for matching",
+      "Soft deletes with deleted_at for audit trail",
+      "Unique constraint on (league_id, source_id)",
+      "Index on normalized_name for identity matching",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Player Identity: keep originals in source table",
+      "note": "Store raw data per source, canonical_players links them"
+    }
+  },
+  {
+    "id": "schema-006",
+    "category": "schema",
+    "description": "Create canonical_players table for unified player identity",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/canonical-players.sql.ts",
+      "Fields: id (canonical_player_id), primary_source_player_id (FK), display_name, position, dob, hometown, college, created_at, updated_at",
+      "primary_source_player_id points to most reliable source (by league priority)",
+      "This is the 'golden record' for each player",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Player Identity Resolution schema",
+      "pattern": "Biographical data uses source priority: PLL > NLL > MLL"
+    }
+  },
+  {
+    "id": "schema-007",
+    "category": "schema",
+    "description": "Create player_identities linking table",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/player-identities.sql.ts",
+      "Fields: id, canonical_player_id (FK), source_player_id (FK), confidence_score, match_method, created_at",
+      "match_method: 'exact' | 'fuzzy' | 'manual'",
+      "confidence_score: 0.0-1.0 (MVP uses 1.0 for exact match only)",
+      "Unique constraint on source_player_id (each source player maps to one canonical)",
+      "Index on canonical_player_id for reverse lookups",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Player Identity Confidence Thresholds",
+      "mvp_note": "Start with exact-match only (confidence = 1.0)"
+    }
+  },
+  {
+    "id": "schema-008",
+    "category": "schema",
+    "description": "Create player_stats table for per-game statistics",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/player-stats.sql.ts",
+      "Fields: id, source_player_id (FK), season_id (FK), team_id (FK), game_id (nullable), stat_type ('regular'|'playoff'|'career'), goals, assists, points, ground_balls, turnovers, caused_turnovers, faceoff_wins, faceoff_losses, shots, shots_on_goal, saves, goals_against, games_played, source_hash, created_at, updated_at",
+      "game_id nullable for season totals from sources without per-game data",
+      "Composite index on (source_player_id, season_id)",
+      "Composite index on (team_id, game_id) for team queries",
+      "ON CONFLICT (source_player_id, season_id, game_id) DO UPDATE for idempotent upserts",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Store stats per game where possible, use source totals as fallback",
+      "note": "Stats NOT comparable across leagues - different rules/categories"
+    }
+  },
+  {
+    "id": "schema-009",
+    "category": "schema",
+    "description": "Create games table for schedule/results",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/games.sql.ts",
+      "Fields: id, season_id (FK), home_team_id (FK), away_team_id (FK), game_date, game_time, venue, home_score, away_score, status ('scheduled'|'in_progress'|'final'|'postponed'), source_id, source_hash, created_at, updated_at",
+      "Index on (season_id, game_date)",
+      "Index on home_team_id, away_team_id for team schedule queries",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "KV caching: stats:game:{id} → TTL: 24 hours (immutable after final)"
+    }
+  },
+  {
+    "id": "schema-010",
+    "category": "schema",
+    "description": "Create standings table",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/standings.sql.ts",
+      "Fields: id, season_id (FK), team_id (FK), division, conference, wins, losses, ties, points, goals_for, goals_against, goal_diff, games_played, rank, source_hash, created_at, updated_at",
+      "Composite unique on (season_id, team_id)",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "KV caching: stats:team:{id}:totals → TTL: 5 minutes (leaderboards)"
+    }
+  },
+  {
+    "id": "schema-011",
+    "category": "schema",
+    "description": "Create scrape_runs table for tracking extraction jobs",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/db/scrape-runs.sql.ts",
+      "Fields: id, league_id (FK), season_id (FK), entity_type ('teams'|'players'|'stats'|'games'|'standings'), status ('running'|'success'|'failed'), started_at, completed_at, records_processed, error_message",
+      "Stores last successful scrape timestamp per source (spec requirement)",
+      "Index on (league_id, entity_type, started_at DESC)",
+      "Run db:generate and db:migrate"
+    ],
+    "context": {
+      "spec_ref": "Rate Limiting & Resilience: Store last successful scrape timestamp"
+    }
+  },
+  {
+    "id": "backend-001",
+    "category": "backend",
+    "description": "Create StatsRepo with Effect pattern",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/stats.repo.ts",
+      "Implement using Effect.Service pattern from packages/core",
+      "Methods: getPlayerStats, getPlayerStatsBySeason, getTeamStats, getLeaderboard",
+      "Use Drizzle for queries",
+      "Use cursor pagination (not offset) per spec",
+      "Return typed errors (NotFoundError, DatabaseError)",
+      "Add unit tests"
+    ],
+    "context": {
+      "spec_ref": "Repository pattern: StatsRepo → StatsService → StatsRpc",
+      "pattern": "See packages/core for Effect.Service patterns"
+    }
+  },
+  {
+    "id": "backend-002",
+    "category": "backend",
+    "description": "Create PlayersRepo with identity resolution",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/players.repo.ts",
+      "Methods: getPlayer, searchPlayers, getPlayerBySourceId, getCanonicalPlayer",
+      "searchPlayers uses normalized_name for matching",
+      "Include league filter support",
+      "Return typed errors",
+      "Add unit tests"
+    ],
+    "context": {
+      "spec_ref": "Player Identity Resolution with normalized names"
+    }
+  },
+  {
+    "id": "backend-003",
+    "category": "backend",
+    "description": "Create TeamsRepo",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/teams.repo.ts",
+      "Methods: getTeam, getTeamsBySeason, getTeamsByLeague, getTeamRoster",
+      "Include season filter support",
+      "Return typed errors",
+      "Add unit tests"
+    ],
+    "context": {}
+  },
+  {
+    "id": "backend-004",
+    "category": "backend",
+    "description": "Create StatsService business logic layer",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/stats.service.ts",
+      "Inject StatsRepo, PlayersRepo",
+      "Methods: getPlayerStats (with canonical resolution), getLeaderboard, comparePlayerStats",
+      "Compute totals on read (no materialized views per YAGNI)",
+      "Handle cross-league queries (display together, don't merge)",
+      "Use Effect.catchTag for typed error handling (never catchAll)",
+      "Add unit tests"
+    ],
+    "context": {
+      "spec_ref": "MVP: Compute totals on read, cache aggressively",
+      "anti_pattern": "Effect.catchAll swallows typed errors"
+    }
+  },
+  {
+    "id": "backend-005",
+    "category": "backend",
+    "description": "Create PlayersService with identity linking",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/players.service.ts",
+      "Inject PlayersRepo",
+      "Methods: getPlayer (canonical), searchPlayers, linkPlayerIdentity (exact match only)",
+      "linkPlayerIdentity: match on normalized_name + DOB (confidence = 1.0)",
+      "Return all source records for a canonical player",
+      "Add unit tests"
+    ],
+    "context": {
+      "spec_ref": "MVP: Exact-match identity only (confidence = 1.0)",
+      "scoring": "Name 40% + DOB 30% + Position 15% + Same team-season 15% (future)"
+    }
+  },
+  {
+    "id": "backend-006",
+    "category": "backend",
+    "description": "Create IdentityService for player matching",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/identity.service.ts",
+      "Methods: normalizeName, findExactMatches, createCanonicalPlayer, linkSourcePlayer",
+      "normalizeName: lowercase, remove accents, trim whitespace",
+      "findExactMatches: match on normalized_name AND dob (where available)",
+      "Store confidence_score = 1.0 for exact matches",
+      "Add unit tests with edge cases (common names, name variations)"
+    ],
+    "context": {
+      "spec_ref": "Player Identity Resolution",
+      "future": "Jaro-Winkler similarity for fuzzy matching (Phase 2)"
+    }
+  },
+  {
+    "id": "backend-007",
+    "category": "backend",
+    "description": "Create data loader to populate DB from extracted JSON",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/load/loader.service.ts",
+      "Methods: loadLeague, loadSeason, loadTeams, loadPlayers, loadStats, loadGames",
+      "Read from output/{league}/{season}/*.json files",
+      "Use idempotent upserts with source_hash for change detection",
+      "Use transactions for multi-table inserts",
+      "Run identity linking after player load",
+      "Add CLI command: bun src/load/run.ts --league=pll --season=2024"
+    ],
+    "context": {
+      "spec_ref": "Data Integrity: transactions, idempotent upserts",
+      "existing": "JSON output in output/{source}/{season}/"
+    }
+  },
+  {
+    "id": "cache-001",
+    "category": "cache",
+    "description": "Create KV cache service with TTL strategies",
+    "passes": true,
+    "steps": [
+      "Create packages/pipeline/src/service/cache.service.ts",
+      "Inject Cloudflare KV namespace",
+      "Methods: get, set, getOrSet (read-through), invalidate",
+      "Key structure: stats:player:{id}:season:{seasonId}, stats:team:{id}:totals, etc.",
+      "TTL config: player stats 1h (season)/24h (off-season), team totals 5min, game 24h, identity 7d",
+      "Implement stale-while-revalidate pattern",
+      "Add unit tests with mock KV"
+    ],
+    "context": {
+      "spec_ref": "KV Caching Strategy with key structure and TTLs",
+      "pattern": "Read-through cache with stale-while-revalidate"
+    }
+  },
+  {
+    "id": "cache-002",
+    "category": "cache",
+    "description": "Integrate cache into StatsService",
+    "passes": true,
+    "steps": [
+      "Modify StatsService to inject CacheService",
+      "Wrap getPlayerStats with cache.getOrSet",
+      "Wrap getLeaderboard with cache.getOrSet (5min TTL)",
+      "Add cache key generation helpers",
+      "Test cache hit/miss behavior"
+    ],
+    "context": {
+      "spec_ref": "Performance: >90% cache hit rate target"
+    }
+  },
+  {
+    "id": "api-001",
+    "category": "api",
+    "description": "Create stats RPC endpoints",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/rpc/stats.rpc.ts",
+      "Endpoints: getPlayerStats, getLeaderboard, getTeamStats",
+      "Use Effect RPC pattern from packages/api",
+      "Input validation with Effect Schema",
+      "Support league filter, season filter, pagination",
+      "Return typed errors",
+      "Add integration tests"
+    ],
+    "context": {
+      "spec_ref": "StatsRepo → StatsService → StatsRpc",
+      "pattern": "See packages/api/AGENTS.md for RPC patterns"
+    }
+  },
+  {
+    "id": "api-002",
+    "category": "api",
+    "description": "Create players RPC endpoints",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/rpc/players.rpc.ts",
+      "Endpoints: getPlayer, searchPlayers, getPlayerStats (all leagues)",
+      "searchPlayers supports query string, league filter",
+      "getPlayer returns canonical player with all source records",
+      "Add integration tests"
+    ],
+    "context": {}
+  },
+  {
+    "id": "api-003",
+    "category": "api",
+    "description": "Create teams RPC endpoints",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/rpc/teams.rpc.ts",
+      "Endpoints: getTeam, getTeams, getTeamRoster, getTeamSchedule",
+      "Support season and league filters",
+      "Add integration tests"
+    ],
+    "context": {}
+  },
+  {
+    "id": "api-004",
+    "category": "api",
+    "description": "Add rate limiting middleware",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/middleware/rate-limit.ts",
+      "Use KV for counters: ratelimit:{ip}:{date}",
+      "Limit: 100 req/min per IP (anonymous)",
+      "Return 429 with Retry-After header",
+      "Add to all RPC endpoints",
+      "Add tests"
+    ],
+    "context": {
+      "spec_ref": "Security: Rate limit API 100 req/min anonymous"
+    }
+  },
+  {
+    "id": "api-005",
+    "category": "api",
+    "description": "Add input sanitization for external data",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/middleware/sanitize.ts",
+      "Sanitize search queries (XSS prevention)",
+      "Validate player names, team names on input",
+      "Use in all RPC endpoints that accept user input",
+      "Add tests with malicious input examples"
+    ],
+    "context": {
+      "spec_ref": "Security: Sanitize all external data inputs (XSS in player names, injection in search)"
+    }
+  },
+  {
+    "id": "api-006",
+    "category": "api",
+    "description": "Create client SDK for frontend",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/client/stats.client.ts",
+      "Type-safe client for all RPC endpoints",
+      "Export from package for use in packages/web",
+      "Match pattern from packages/api client exports"
+    ],
+    "context": {
+      "pattern": "See packages/api for client SDK pattern"
+    }
+  },
+  {
+    "id": "frontend-001",
+    "category": "frontend",
+    "description": "Create /stats route with URL state",
+    "passes": false,
+    "steps": [
+      "Create packages/web/src/routes/_public/stats/index.tsx",
+      "Use TanStack Router validateSearch for URL params",
+      "Params: leagues (comma-separated), sort, page",
+      "Defaults: leagues=['PLL','NLL'], sort='points', page=1",
+      "Add to navigation",
+      "Verify URL updates on filter changes"
+    ],
+    "context": {
+      "spec_ref": "URL State pattern from TanStack research",
+      "code_example": "validateSearch: (search) => ({ leagues: search.leagues?.split(',') ?? ['PLL', 'NLL'], ... })"
+    }
+  },
+  {
+    "id": "frontend-002",
+    "category": "frontend",
+    "description": "Create StatsTable component with TanStack Query",
+    "passes": false,
+    "steps": [
+      "Create packages/web/src/components/stats-table.tsx",
+      "Use @tanstack/react-table",
+      "Columns: Player, Team, League, GP, G, A, PTS (sortable)",
+      "Use TanStack Query with queryKey including filters",
+      "staleTime: 5 min",
+      "Add loading skeleton",
+      "Memoize columns for performance"
+    ],
+    "context": {
+      "spec_ref": "Data Table Performance patterns",
+      "pattern": "Use existing data table UI from packages/ui"
+    }
+  },
+  {
+    "id": "frontend-003",
+    "category": "frontend",
+    "description": "Add league filter checkboxes",
+    "passes": false,
+    "steps": [
+      "Create packages/web/src/components/league-filter.tsx",
+      "Simple checkboxes: PLL, NLL, MLL, MSL, WLA",
+      "Sync with URL state",
+      "Optimistic UI with rollback on error",
+      "Debounce changes (300ms)"
+    ],
+    "context": {
+      "spec_ref": "MVP: League filter as simple checkboxes, not complex config UI",
+      "spec_ref_2": "Race Conditions: Debounce filter inputs 300ms"
+    }
+  },
+  {
+    "id": "frontend-004",
+    "category": "frontend",
+    "description": "Add table virtualization for large datasets",
+    "passes": false,
+    "steps": [
+      "Install @tanstack/react-virtual",
+      "Add virtualization to StatsTable for >100 rows",
+      "Maintain scroll position on filter changes",
+      "Test with 500+ rows"
+    ],
+    "context": {
+      "spec_ref": "Data Table Performance: virtualization for >100 rows"
+    }
+  },
+  {
+    "id": "frontend-005",
+    "category": "frontend",
+    "description": "Add cursor pagination",
+    "passes": false,
+    "steps": [
+      "Add pagination controls to StatsTable",
+      "Use cursor-based pagination from API",
+      "Prefetch next page on hover",
+      "Show page info (showing 1-50 of 500)",
+      "Sync page with URL state"
+    ],
+    "context": {
+      "spec_ref": "Performance: cursor pagination (not offset)",
+      "spec_ref_2": "Prefetch next page on hover: queryClient.prefetchQuery"
+    }
+  },
+  {
+    "id": "frontend-006",
+    "category": "frontend",
+    "description": "Add sort functionality",
+    "passes": false,
+    "steps": [
+      "Add clickable column headers for sorting",
+      "Sort columns: GP, G, A, PTS, Team",
+      "Sync sort with URL state",
+      "Show sort indicator (arrow up/down)"
+    ],
+    "context": {
+      "spec_ref": "URL State: sort param"
+    }
+  },
+  {
+    "id": "frontend-007",
+    "category": "frontend",
+    "description": "Add search functionality",
+    "passes": false,
+    "steps": [
+      "Add search input above table",
+      "Debounce input (300ms)",
+      "Cancel in-flight requests on new query (AbortController)",
+      "Sync search with URL state",
+      "Clear button to reset search"
+    ],
+    "context": {
+      "spec_ref": "Race Conditions: Debounce search 300ms, cancel in-flight requests"
+    }
+  },
+  {
+    "id": "frontend-008",
+    "category": "frontend",
+    "description": "Apply Data Platform design direction",
+    "passes": false,
+    "steps": [
+      "Light/minimal theme",
+      "Dense table layout",
+      "Monospace font for numbers",
+      "High scannability, minimal chrome",
+      "Verify in browser using visual-feedback"
+    ],
+    "context": {
+      "spec_ref": "Design Direction: Option 2 (Data Platform) - Bloomberg-terminal aesthetic",
+      "goal": "Prioritize data density and scannability over flashy visuals"
+    }
+  },
+  {
+    "id": "frontend-009",
+    "category": "frontend",
+    "description": "Add TypeScript discriminated unions for player stats",
+    "passes": false,
+    "steps": [
+      "Create packages/web/src/types/stats.ts",
+      "Define PlayerStats union: { league: 'PLL'; stats: PLLStats } | ...",
+      "Define branded types: PlayerId, CanonicalPlayerId",
+      "Use in components for type safety"
+    ],
+    "context": {
+      "spec_ref": "TypeScript Patterns from kieran-typescript-reviewer"
+    }
+  },
+  {
+    "id": "cron-001",
+    "category": "cron",
+    "description": "Create cron worker for hourly data refresh",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/cron/worker.ts",
+      "Export scheduled handler for Cloudflare Workers",
+      "Check active leagues before scraping",
+      "Call extraction pipeline for each active league",
+      "Log to scrape_runs table",
+      "Add to wrangler.toml: crons = ['0 * * * *']"
+    ],
+    "context": {
+      "spec_ref": "MVP: Single hourly cron for all data types",
+      "cloudflare": "Cron Triggers pattern from spec"
+    }
+  },
+  {
+    "id": "cron-002",
+    "category": "cron",
+    "description": "Add manual season configuration",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/config/seasons.ts",
+      "Define LEAGUE_SEASONS with start/end dates",
+      "PLL: June 1 - September 15",
+      "NLL: December 1 - May 15",
+      "MLL: May 1 - August 30 (historical)",
+      "MSL/WLA: May 1 - September 30",
+      "getActiveLeagues(date) function to check if scraping needed",
+      "Add tests"
+    ],
+    "context": {
+      "spec_ref": "MVP: Manual season config, not auto-detection"
+    }
+  },
+  {
+    "id": "cron-003",
+    "category": "cron",
+    "description": "Add exponential backoff and circuit breaker",
+    "passes": false,
+    "steps": [
+      "Add retry logic to extraction with backoff: 1s, 2s, 4s, 8s (max 5 retries)",
+      "Track consecutive failures per league in KV",
+      "Circuit breaker: disable scraping after 10 consecutive failures",
+      "Log failures to scrape_runs table",
+      "Add alerting hook (future: integrate with monitoring)"
+    ],
+    "context": {
+      "spec_ref": "Rate Limiting & Resilience: exponential backoff, circuit breaker"
+    }
+  },
+  {
+    "id": "cron-004",
+    "category": "cron",
+    "description": "Integrate loader into cron pipeline",
+    "passes": false,
+    "steps": [
+      "After successful extraction, run loader.loadSeason",
+      "Run identity linking after player load",
+      "Invalidate relevant cache keys after load",
+      "Update scrape_runs with records_processed count"
+    ],
+    "context": {
+      "flow": "Extract → Validate → Load → Link Identity → Invalidate Cache"
+    }
+  },
+  {
+    "id": "integration-001",
+    "category": "integration",
+    "description": "End-to-end test: Extract → Load → Query",
+    "passes": false,
+    "steps": [
+      "Create packages/pipeline/src/e2e/pipeline.test.ts",
+      "Run PLL extraction for single season",
+      "Load into test database",
+      "Query via RPC endpoints",
+      "Verify player stats returned correctly",
+      "Verify cache behavior"
+    ],
+    "context": {
+      "note": "Validates full pipeline flow"
+    }
+  },
+  {
+    "id": "integration-002",
+    "category": "integration",
+    "description": "End-to-end test: Identity linking",
+    "passes": false,
+    "steps": [
+      "Load player from PLL and NLL with same name + DOB",
+      "Run identity linking",
+      "Verify canonical_player created",
+      "Verify both source_players linked",
+      "Query canonical player and verify both sources returned"
+    ],
+    "context": {
+      "spec_ref": "Player Identity exact-match linking"
+    }
+  },
+  {
+    "id": "integration-003",
+    "category": "integration",
+    "description": "End-to-end test: Frontend stats table",
+    "passes": false,
+    "steps": [
+      "Navigate to /stats",
+      "Verify table loads with data",
+      "Toggle league filters, verify URL updates",
+      "Sort by column, verify URL updates",
+      "Search for player, verify results filtered",
+      "Verify in browser using visual-feedback"
+    ],
+    "context": {
+      "note": "Validates frontend integration"
+    }
+  },
+  {
+    "id": "integration-004",
+    "category": "integration",
+    "description": "Performance benchmark: API latency",
+    "passes": false,
+    "steps": [
+      "Create benchmark script",
+      "Measure getPlayerStats P95 latency (target: <50ms)",
+      "Measure getLeaderboard P95 latency (target: <200ms)",
+      "Measure with cold cache vs warm cache",
+      "Document results and cache hit rate"
+    ],
+    "context": {
+      "spec_ref": "Performance Targets: P95 <50ms player, <200ms leaderboards, >90% cache hit"
+    }
+  },
+  {
+    "id": "deploy-001",
+    "category": "deploy",
+    "description": "Add pipeline worker to Alchemy deployment",
+    "passes": false,
+    "steps": [
+      "Update alchemy.run.ts to include pipeline worker",
+      "Configure KV namespace for cache",
+      "Configure KV namespace for rate limiting",
+      "Configure Hyperdrive connection for DB",
+      "Configure cron trigger",
+      "Test deployment to dev environment"
+    ],
+    "context": {
+      "spec_ref": "Infrastructure via alchemy.run.ts",
+      "pattern": "See references/ALCHEMY.md"
+    }
+  },
+  {
+    "id": "deploy-002",
+    "category": "deploy",
+    "description": "Seed initial data from existing extractions",
+    "passes": false,
+    "steps": [
+      "Run loader for all existing extracted data in output/",
+      "PLL: All available seasons",
+      "NLL: All available seasons",
+      "MLL: 2001-2020",
+      "MSL: 2023-2025",
+      "WLA: 2005-2025",
+      "Run identity linking",
+      "Verify data in Drizzle Studio"
+    ],
+    "context": {
+      "existing_data": "JSON files in output/{source}/{season}/"
+    }
+  }
+]

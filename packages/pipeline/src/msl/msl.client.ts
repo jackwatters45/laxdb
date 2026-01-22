@@ -456,7 +456,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
               jersey_number:
                 jersey !== null && jersey !== undefined ? String(jersey) : null,
               position,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLPlayerStats({
                 games_played: gamesPlayed,
@@ -614,7 +614,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
               last_name: lastName,
               jersey_number:
                 jersey !== null && jersey !== undefined ? String(jersey) : null,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLGoalieStats({
                 games_played: gamesPlayed,
@@ -754,7 +754,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
             const streak = streaks[i] ?? null;
 
             const standing = new MSLStanding({
-              team_id: teamId !== undefined ? String(teamId) : String(i),
+              team_id: teamId === undefined ? String(i) : String(teamId),
               team_name: teamName,
               position,
               wins: w,

@@ -1,5 +1,192 @@
 Ralph Progress Log
-Started: 2026-01-21T14:45:00+11:00
-Previous: plans/archive/v0.0.53/
+Started: 2026-01-21T10:45:00+11:00
+Previous: plans/archive/v0.0.3/
+PRD: Phase 1 MVP - LaxDB Stats Pipeline
 
 --- Session History ---
+
+## 2026-01-21: PRD Created from pipeline.spec.md
+
+### Overview
+Translated pipeline.spec.md Phase 1 (MVP) into comprehensive PRD with 38 features.
+
+### Feature Breakdown by Category
+
+| Category    | Count | Description |
+|-------------|-------|-------------|
+| schema      | 11    | DB tables (leagues, seasons, teams, players, stats, games, standings) |
+| backend     | 7     | Repos and services (Stats, Players, Teams, Identity, Loader) |
+| cache       | 2     | KV cache service with TTL strategies |
+| api         | 6     | RPC endpoints + rate limiting + sanitization + client SDK |
+| frontend    | 9     | Stats table, league filter, pagination, search, design |
+| cron        | 4     | Hourly refresh, season config, resilience |
+| integration | 4     | E2E tests, performance benchmarks |
+| deploy      | 2     | Alchemy config, data seeding |
+
+### Key Decisions Embedded in PRD
+
+1. **Schema Location**: packages/pipeline (not core) per resolved Q1
+2. **Identity MVP**: Exact-match only (confidence = 1.0), fuzzy deferred to Phase 2
+3. **Stats**: Never merge cross-league (different rules), store separately, display together
+4. **Source Priority**: PLL(1) > NLL(2) > Gamesheet(3) > StatsCrew(4) > Pointstreak(5) > Wayback(6)
+5. **Caching**: KV with variable TTLs (5min leaderboards, 1h player stats, 24h games)
+6. **Performance**: P95 <50ms player, <200ms leaderboards, >90% cache hit
+7. **Design**: Data Platform aesthetic (dense, monospace numbers, minimal chrome)
+
+### Existing Infrastructure Leveraged
+
+- Extract layer: PLL, NLL, MLL, MSL, WLA extractors (DONE)
+- Validation layer: Per-source validators (DONE)
+- API clients: REST + GraphQL for all sources (DONE)
+- JSON output: output/{source}/{season}/*.json (DONE)
+- Manifest tracking: Incremental extraction (DONE)
+
+### Dependencies to Watch
+
+- packages/core: Effect.Service patterns for repos
+- packages/api: RPC patterns, client SDK patterns
+- packages/web: TanStack Router/Query patterns
+- packages/ui: Base UI components (not Radix)
+
+### Anti-Patterns to Avoid (from spec)
+
+- Effect.catchAll (swallows typed errors) → use Effect.catchTag
+- Offset pagination → use cursor pagination
+- Materialized views → compute on read, cache aggressively
+- Complex identity matching → start with exact match only
+
+---
+
+
+=== Iteration 1 ===
+Story: schema-001
+Description: Create leagues table with source priority ranking
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T15:46:05+11:00
+
+=== Iteration 2 ===
+Story: schema-002
+Description: Create seasons table with league foreign key
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T15:51:00+11:00
+
+=== Iteration 3 ===
+Story: schema-003
+Description: Create teams table with league/season relationship
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T15:54:14+11:00
+
+=== Iteration 4 ===
+Story: schema-004
+Description: Create team_seasons junction table
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T15:59:02+11:00
+
+=== Iteration 5 ===
+Story: schema-005
+Description: Create source_players table for raw player data per source
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T16:02:49+11:00
+
+=== Iteration 6 ===
+Story: schema-006
+Description: Create canonical_players table for unified player identity
+Status: COMPLETE
+Commit: 751b761
+Timestamp: 2026-01-21T16:06:06+11:00
+
+=== Iteration 1 ===
+Story: schema-007
+Description: Create player_identities linking table
+Status: COMPLETE
+Commit: 9e64333
+Timestamp: 2026-01-21T16:23:24+11:00
+
+=== Iteration 2 ===
+Story: schema-008
+Description: Create player_stats table for per-game statistics
+Status: COMPLETE
+Commit: dbb8b22
+Timestamp: 2026-01-21T16:29:45+11:00
+
+=== Iteration 3 ===
+Story: schema-009
+Description: Create games table for schedule/results
+Status: COMPLETE
+Commit: c98ee84
+Timestamp: 2026-01-21T16:37:28+11:00
+
+=== Iteration 4 ===
+Story: schema-010
+Description: Create standings table
+Status: COMPLETE
+Commit: ac6fa09
+Timestamp: 2026-01-21T16:50:31+11:00
+
+=== Iteration 1 ===
+Story: backend-001
+Description: Create StatsRepo with Effect pattern
+Status: COMPLETE
+Commit: 2d7006f
+Timestamp: 2026-01-21T17:50:08+11:00
+
+=== Iteration 1 ===
+Story: backend-002
+Description: Create PlayersRepo with identity resolution
+Status: COMPLETE
+Commit: 7338f8b
+Timestamp: 2026-01-21T18:37:31+11:00
+
+=== Iteration 2 ===
+Story: backend-003
+Description: Create TeamsRepo
+Status: COMPLETE
+Commit: 53bb945
+Timestamp: 2026-01-21T18:41:19+11:00
+
+=== Iteration 3 ===
+Story: backend-004
+Description: Create StatsService business logic layer
+Status: COMPLETE
+Commit: f7e7257
+Timestamp: 2026-01-21T18:46:31+11:00
+
+=== Iteration 4 ===
+Story: backend-005
+Description: Create PlayersService with identity linking
+Status: COMPLETE
+Commit: a8280f5
+Timestamp: 2026-01-21T18:50:56+11:00
+
+=== Iteration 5 ===
+Story: backend-006
+Description: Create IdentityService for player matching
+Status: COMPLETE
+Commit: 9ce8d8b
+Timestamp: 2026-01-21T18:56:58+11:00
+
+=== Iteration 6 ===
+Story: backend-007
+Description: Create data loader to populate DB from extracted JSON
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:03:36+11:00
+
+=== Iteration 7 ===
+Story: cache-001
+Description: Create KV cache service with TTL strategies
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:10:34+11:00
+
+=== Iteration 8 ===
+Story: cache-002
+Description: Integrate cache into StatsService
+Status: COMPLETE
+Commit: 63120f7
+Timestamp: 2026-01-21T19:16:55+11:00

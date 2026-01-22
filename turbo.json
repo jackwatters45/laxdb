@@ -38,6 +38,11 @@
       "outputs": ["coverage/**"],
       "env": ["DATABASE_URL", "TEST_*"]
     },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.test.ts", "vitest.config.ts"],
+      "outputs": []
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,

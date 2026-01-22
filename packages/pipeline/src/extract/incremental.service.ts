@@ -25,6 +25,28 @@ export interface IncrementalExtractOptions extends ExtractOptions {
   mode?: ExtractionMode;
 }
 
+/**
+ * Convert legacy ExtractOptions to IncrementalExtractOptions.
+ * Handles the --force and --incremental CLI flag patterns.
+ */
+const normalizeOptions = (options: {
+  force?: boolean;
+  incremental?: boolean;
+  maxAgeHours?: number | null;
+  skipExisting?: boolean;
+}): IncrementalExtractOptions => {
+  if (options.force) {
+    return { mode: "full" };
+  }
+  if (options.incremental) {
+    return { mode: "incremental" };
+  }
+  if (options.maxAgeHours !== undefined && options.maxAgeHours !== null) {
+    return { maxAgeHours: options.maxAgeHours, skipExisting: true };
+  }
+  return { skipExisting: options.skipExisting ?? true };
+};
+
 export class IncrementalExtractionService extends Effect.Service<IncrementalExtractionService>()(
   "IncrementalExtractionService",
   {
@@ -95,28 +117,6 @@ export class IncrementalExtractionService extends Effect.Service<IncrementalExtr
        */
       const getCurrentSeasons = (): number[] => {
         return seasonConfig.getCurrentSeasonYears();
-      };
-
-      /**
-       * Convert legacy ExtractOptions to IncrementalExtractOptions.
-       * Handles the --force and --incremental CLI flag patterns.
-       */
-      const normalizeOptions = (options: {
-        force?: boolean;
-        incremental?: boolean;
-        maxAgeHours?: number | null;
-        skipExisting?: boolean;
-      }): IncrementalExtractOptions => {
-        if (options.force) {
-          return { mode: "full" };
-        }
-        if (options.incremental) {
-          return { mode: "incremental" };
-        }
-        if (options.maxAgeHours !== undefined && options.maxAgeHours !== null) {
-          return { maxAgeHours: options.maxAgeHours, skipExisting: true };
-        }
-        return { skipExisting: options.skipExisting ?? true };
       };
 
       return {

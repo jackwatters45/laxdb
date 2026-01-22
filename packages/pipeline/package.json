@@ -7,6 +7,8 @@
   },
   "scripts": {
     "test": "vitest",
+    "test:unit": "vitest run --exclude='**/*.integration.test.ts'",
+    "test:integration": "vitest run integration",
     "test:coverage": "vitest run --coverage",
     "test:pll": "vitest run src/pll/",
     "test:nll": "vitest run src/nll/",
@@ -22,10 +24,17 @@
     "@effect/cli": "^0.73.0",
     "@effect/platform": "^0.94.1",
     "@effect/platform-bun": "^0.87.0",
+    "@effect/sql": "^0.49.0",
+    "@effect/sql-drizzle": "^0.48.0",
+    "@effect/sql-pg": "^0.50.0",
     "@laxdb/core": "*",
-    "cheerio": "^1.1.2"
+    "cheerio": "^1.1.2",
+    "drizzle-orm": "^1.0.0-beta.9-e89174b",
+    "effect": "^3.19.13"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "drizzle-kit": "^1.0.0-beta.9-e89174b"
+  },
   "effect": {
     "generateExports": {
       "include": [

@@ -3,6 +3,7 @@ import { Layer } from "effect";
 import { AuthHandlersLive } from "../auth/auth.handlers";
 import { GamesHandlersLive } from "../game/game.handlers";
 import { OrganizationsHandlersLive } from "../organization/organization.handlers";
+import { StatsHandlersLive } from "../pipeline/stats.handlers";
 import { ContactInfoHandlersLive } from "../player/contact-info/contact-info.handlers";
 import { PlayersHandlersLive } from "../player/player.handlers";
 import { SeasonsHandlersLive } from "../season/season.handlers";
@@ -17,4 +18,5 @@ export const HttpGroupsLive = Layer.mergeAll(
   TeamsHandlersLive,
   OrganizationsHandlersLive,
   AuthHandlersLive,
+  StatsHandlersLive,
 );
