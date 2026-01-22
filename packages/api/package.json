@@ -15,7 +15,8 @@
     "@effect-atom/atom-react": "^0.4.4",
     "@effect/platform": "0.94.1",
     "@effect/rpc": "^0.73.0",
-    "@laxdb/core": "workspace:*"
+    "@laxdb/core": "workspace:*",
+    "@laxdb/pipeline": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0"

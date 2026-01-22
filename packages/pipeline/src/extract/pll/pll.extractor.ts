@@ -11,7 +11,6 @@ import {
   type PLLEventDetail,
   type PLLGraphQLStanding,
   type PLLPlayerDetail,
-  type PLLTeamDetail,
   type PLLTeamStanding,
 } from "../../pll/pll.schema";
 import { ExtractConfigService } from "../extract.config";
