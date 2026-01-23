@@ -32,20 +32,17 @@ export function NavBar() {
           </Link>
           <nav className="hidden sm:block md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:transform">
             <div className="flex items-center gap-10 font-medium">
-              <a className="px-2 py-1 text-gray-900" href="#solutions">
-                Solutions
-              </a>
-              <a className="px-2 py-1 text-gray-900" href="#farm-management">
-                Farm Management
-              </a>
-              <a className="px-2 py-1 text-gray-900" href="#solar-analytics">
-                Analytics
-              </a>
+              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/blog">
+                Blog
+              </Link>
+              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/wiki">
+                Wiki
+              </Link>
+              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/graph">
+                Graph
+              </Link>
             </div>
           </nav>
-          <Button className="hidden h-10 font-semibold sm:block" variant="secondary">
-            Get a quote
-          </Button>
           <Button
             aria-label={open ? "CloseNavigation Menu" : "Open Navigation Menu"}
             className="p-1.5 sm:hidden"
@@ -78,7 +75,7 @@ export function NavBar() {
                 }
               }}
             >
-              <a href="#solutions">Solutions</a>
+              <Link to="/blog">Blog</Link>
             </li>
             <li
               onClick={() => {
@@ -90,7 +87,7 @@ export function NavBar() {
                 }
               }}
             >
-              <a href="#farm-management">Farm Management</a>
+              <Link to="/wiki">Wiki</Link>
             </li>
             <li
               onClick={() => {
@@ -102,12 +99,9 @@ export function NavBar() {
                 }
               }}
             >
-              <a href="#solar-analytics">Analytics</a>
+              <Link to="/graph">Graph</Link>
             </li>
           </ul>
-          <Button className="text-lg" variant="secondary">
-            Get a quote
-          </Button>
         </nav>
       </div>
     </header>
