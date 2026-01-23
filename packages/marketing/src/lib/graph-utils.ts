@@ -100,7 +100,8 @@ export function buildGraphData(posts: Post[]): GraphData {
 }
 
 export function getContentByTag(posts: Post[], tag: string): Post[] {
-  return posts.filter((p) => p.tags?.includes(tag));
+  const normalizedTag = tag.toLowerCase();
+  return posts.filter((p) => p.tags?.some((t) => t.toLowerCase() === normalizedTag));
 }
 
 export function getContentByTags(

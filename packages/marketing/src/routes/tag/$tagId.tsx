@@ -1,31 +1,45 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { allPosts } from "content-collections";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag } from "@/lib/graph-utils";
+import { ROUTING_TAGS, ROUTING_TAG_REDIRECTS } from "@/lib/tags";
 
-export const Route = createFileRoute("/blog/")({
-  component: BlogIndex,
+export const Route = createFileRoute("/tag/$tagId")({
+  beforeLoad: ({ params }) => {
+    const tagId = params.tagId.toLowerCase();
+    const redirectTo = ROUTING_TAG_REDIRECTS[tagId];
+    if (redirectTo) {
+      throw redirect({ to: redirectTo });
+    }
+  },
+  loader: ({ params }: { params: { tagId: string } }) => {
+    const tagId = params.tagId.toLowerCase();
+    const posts = getContentByTag(allPosts, tagId);
+    if (posts.length === 0) {
+      throw notFound();
+    }
+    return { tagId, posts };
+  },
+  component: TagPage,
 });
 
-function BlogIndex() {
-  const blogPosts = getContentByTag(allPosts, "blog");
-  const sortedPosts = [...blogPosts].toSorted(
+function TagPage() {
+  const { tagId, posts } = Route.useLoaderData();
+  const sortedPosts = [...posts].toSorted(
     (a, b) => new Date(b.published).getTime() - new Date(a.published).getTime(),
   );
 
   return (
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <header className="mb-8">
-        <h1 className="font-serif text-2xl text-blog-fg italic">Blog</h1>
-        <nav className="mt-4 flex gap-4 text-sm">
-          <Link to="/blog/opinion" className="text-blog-muted transition-colors hover:text-blog-fg">
-            Opinion
-          </Link>
-          <Link to="/blog/wiki" className="text-blog-muted transition-colors hover:text-blog-fg">
-            Wiki Crossover
-          </Link>
-        </nav>
+        <Link to="/blog" className="text-sm text-blog-muted hover:text-blog-fg">
+          ← Back
+        </Link>
+        <h1 className="mt-2 font-serif text-2xl text-blog-fg italic">#{tagId}</h1>
+        <p className="mt-2 text-sm text-blog-muted">
+          {sortedPosts.length} {sortedPosts.length === 1 ? "post" : "posts"} tagged with {tagId}
+        </p>
       </header>
       <ul className="space-y-6">
         {sortedPosts.map((post) => (
@@ -40,9 +54,9 @@ function BlogIndex() {
                   <span className="text-xs text-blog-subtle">
                     {formatPublishedDate(post.published)}
                   </span>
-                  {post.tags && post.tags.some((t) => t !== "blog") && (
+                  {post.tags && post.tags.some((t) => t !== tagId) && (
                     <span className="text-xs text-blog-subtle">
-                      · {post.tags.filter((t) => t !== "blog").join(", ")}
+                      · {post.tags.filter((t) => t !== tagId && !ROUTING_TAGS.has(t)).join(", ")}
                     </span>
                   )}
                 </div>
