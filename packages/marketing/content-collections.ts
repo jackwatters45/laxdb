@@ -6,6 +6,8 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { z } from "zod";
 
+import { toSlug } from "./src/lib/slug";
+
 /**
  * Extract [[wiki-links]] from content
  */
@@ -24,8 +26,7 @@ function extractWikiLinks(content: string): string[] {
  */
 function transformWikiLinks(content: string): string {
   return content.replaceAll(/\[\[([^\]]+)\]\]/g, (_, label: string) => {
-    const slug = label.toLowerCase().replaceAll(/\s+/g, "-");
-    return `[${label}](/content/${slug})`;
+    return `[${label}](/content/${toSlug(label)})`;
   });
 }
 

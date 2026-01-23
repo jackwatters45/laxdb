@@ -1,5 +1,7 @@
 import type { Post } from "content-collections";
 
+import { toSlug } from "./slug";
+
 export type NodeType = "blog" | "wiki" | "entity" | "tag";
 
 export interface GraphNode {
@@ -54,8 +56,7 @@ export function buildGraphData(posts: Post[]): GraphData {
     // Track wiki links for entity nodes
     if (post.wikiLinks) {
       for (const link of post.wikiLinks) {
-        const slug = link.toLowerCase().replaceAll(/\s+/g, "-");
-        entityNodes.set(slug, link);
+        entityNodes.set(toSlug(link), link);
       }
     }
   }
@@ -67,7 +68,7 @@ export function buildGraphData(posts: Post[]): GraphData {
     const sourceId = `content:${post.slug}`;
 
     for (const link of post.wikiLinks) {
-      const targetSlug = link.toLowerCase().replaceAll(/\s+/g, "-");
+      const targetSlug = toSlug(link);
       const targetPost = posts.find((p) => p.slug === targetSlug);
 
       if (targetPost) {
