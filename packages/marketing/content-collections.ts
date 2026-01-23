@@ -6,6 +6,29 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { z } from "zod";
 
+/**
+ * Extract [[wiki-links]] from content
+ */
+function extractWikiLinks(content: string): string[] {
+  const wikiLinkRegex = /\[\[([^\]]+)\]\]/g;
+  const links: string[] = [];
+  let match;
+  while ((match = wikiLinkRegex.exec(content)) !== null) {
+    if (match[1]) links.push(match[1]);
+  }
+  return [...new Set(links)];
+}
+
+/**
+ * Transform [[wiki-links]] to markdown links in content
+ */
+function transformWikiLinks(content: string): string {
+  return content.replaceAll(/\[\[([^\]]+)\]\]/g, (_, label: string) => {
+    const slug = label.toLowerCase().replaceAll(/\s+/g, "-");
+    return `[${label}](/content/${slug})`;
+  });
+}
+
 const posts = defineCollection({
   name: "posts",
   directory: "./src/content",
@@ -14,11 +37,19 @@ const posts = defineCollection({
     title: z.string(),
     published: z.iso.date(),
     description: z.string().optional(),
-    authors: z.array(z.string()),
+    authors: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional(),
     content: z.string(),
   }),
   transform: async (document, context) => {
-    const mdx = await compileMDX(context, document, {
+    // Extract wiki links before transformation
+    const wikiLinks = extractWikiLinks(document.content);
+
+    // Transform wiki links in content before MDX compilation
+    const transformedContent = transformWikiLinks(document.content);
+    const transformedDocument = { ...document, content: transformedContent };
+
+    const mdx = await compileMDX(context, transformedDocument, {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [
         rehypeSlug,
@@ -42,6 +73,7 @@ const posts = defineCollection({
       slug: document._meta.path,
       excerpt,
       headerImage,
+      wikiLinks, // Links for graph view
       mdx,
     };
   },
