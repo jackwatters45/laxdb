@@ -1,6 +1,7 @@
 import type { Post } from "content-collections";
 
 import { toSlug } from "./slug";
+import { ROUTING_TAGS } from "./tags";
 
 export type NodeType = "blog" | "wiki" | "entity" | "tag";
 
@@ -29,8 +30,8 @@ export const NODE_COLORS: Record<NodeType, string> = {
   tag: "#f472b6", // pink - tag nodes
 };
 
-/** Tags that have dedicated routes (/blog, /wiki, /blog/opinion) */
-export const ROUTING_TAGS = new Set(["blog", "wiki", "opinion"]);
+// Re-export for backwards compatibility
+export { ROUTING_TAGS } from "./tags";
 
 function getNodeType(post: Post): NodeType {
   if (post.tags?.includes("blog")) return "blog";
