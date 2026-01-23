@@ -101,12 +101,18 @@ const Footer = () => {
           <h3 className="mb-4 font-medium text-foreground sm:text-sm">Data</h3>
           <ul className="space-y-4">
             <li className="text-sm">
-              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/wiki">
+              <Link
+                className="text-muted transition-colors duration-200 hover:text-foreground"
+                to="/wiki"
+              >
                 Wiki
               </Link>
             </li>
             <li className="text-sm">
-              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/graph">
+              <Link
+                className="text-muted transition-colors duration-200 hover:text-foreground"
+                to="/graph"
+              >
                 Graph
               </Link>
             </li>
@@ -117,7 +123,10 @@ const Footer = () => {
           <h3 className="mb-4 font-medium text-foreground sm:text-sm">Resources</h3>
           <ul className="space-y-4">
             <li className="text-sm">
-              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/blog">
+              <Link
+                className="text-muted transition-colors duration-200 hover:text-foreground"
+                to="/blog"
+              >
                 Blog
               </Link>
             </li>

@@ -10,11 +10,7 @@ export function Hero() {
     <section aria-label="hero">
       <FadeContainer className="relative flex flex-col items-center justify-center">
         <FadeDiv className="mx-auto">
-          <Link
-            aria-label="View the wiki"
-            className="mx-auto w-full"
-            to="/wiki"
-          >
+          <Link aria-label="View the wiki" className="mx-auto w-full" to="/wiki">
             <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-white/5 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-foreground shadow-lg ring-1 shadow-gray-400/20 ring-black/10 filter backdrop-blur-[1px] transition-colors hover:bg-gray-500/[2.5%] focus:outline-hidden sm:text-sm">
               <span className="shrink-0 truncate rounded-full border bg-gray-50 px-2.5 py-1 text-sm text-muted sm:text-xs">
                 New

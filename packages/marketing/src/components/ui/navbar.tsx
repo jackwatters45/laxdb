@@ -29,22 +29,13 @@ export function NavBar() {
             LaxDB
           </Link>
           <nav className="hidden items-center gap-6 text-sm sm:flex">
-            <Link
-              className="text-foreground hover:underline"
-              to="/blog"
-            >
+            <Link className="text-foreground hover:underline" to="/blog">
               Blog
             </Link>
-            <Link
-              className="text-foreground hover:underline"
-              to="/wiki"
-            >
+            <Link className="text-foreground hover:underline" to="/wiki">
               Wiki
             </Link>
-            <Link
-              className="text-foreground hover:underline"
-              to="/graph"
-            >
+            <Link className="text-foreground hover:underline" to="/graph">
               Graph
             </Link>
           </nav>
@@ -57,15 +48,9 @@ export function NavBar() {
             type="button"
           >
             {open ? (
-              <RiCloseFill
-                aria-hidden
-                className="size-6 shrink-0 text-foreground"
-              />
+              <RiCloseFill aria-hidden className="size-6 shrink-0 text-foreground" />
             ) : (
-              <RiMenuFill
-                aria-hidden
-                className="size-6 shrink-0 text-foreground"
-              />
+              <RiMenuFill aria-hidden className="size-6 shrink-0 text-foreground" />
             )}
           </button>
         </div>
