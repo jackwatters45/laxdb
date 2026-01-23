@@ -6,6 +6,7 @@ import { GameService } from "./game/game.service";
 import { OrganizationService } from "./organization/organization.service";
 import { PlayerContactInfoService } from "./player/contact-info/contact-info.service";
 import { PlayerService } from "./player/player.service";
+import { ProLeagueService } from "./pro-league/pro-league.service";
 import { SeasonService } from "./season/season.service";
 import { TeamService } from "./team/team.service";
 
@@ -18,6 +19,7 @@ const MainLayer = Layer.mergeAll(
   PlayerService.Default,
   PlayerContactInfoService.Default,
   FeedbackService.Default,
+  ProLeagueService.Default,
 );
 
 export const RuntimeServer = ManagedRuntime.make(MainLayer);
