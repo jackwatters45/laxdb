@@ -30,7 +30,6 @@ export const NODE_COLORS: Record<NodeType, string> = {
   tag: "#f472b6", // pink - tag nodes
 };
 
-// Re-export for backwards compatibility
 export { ROUTING_TAGS } from "./tags";
 
 function getNodeType(post: Post): NodeType {
@@ -104,7 +103,8 @@ export function buildGraphData(posts: Post[]): GraphData {
 }
 
 export function getContentByTag(posts: Post[], tag: string): Post[] {
-  return posts.filter((p) => p.tags?.includes(tag));
+  const normalizedTag = tag.toLowerCase();
+  return posts.filter((p) => p.tags?.some((t) => t.toLowerCase() === normalizedTag));
 }
 
 export function getContentByTags(

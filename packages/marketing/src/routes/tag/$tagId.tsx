@@ -7,17 +7,19 @@ import { ROUTING_TAGS, ROUTING_TAG_REDIRECTS } from "@/lib/tags";
 
 export const Route = createFileRoute("/tag/$tagId")({
   beforeLoad: ({ params }) => {
-    const redirectTo = ROUTING_TAG_REDIRECTS[params.tagId];
+    const tagId = params.tagId.toLowerCase();
+    const redirectTo = ROUTING_TAG_REDIRECTS[tagId];
     if (redirectTo) {
       throw redirect({ to: redirectTo });
     }
   },
   loader: ({ params }: { params: { tagId: string } }) => {
-    const posts = getContentByTag(allPosts, params.tagId);
+    const tagId = params.tagId.toLowerCase();
+    const posts = getContentByTag(allPosts, tagId);
     if (posts.length === 0) {
       throw notFound();
     }
-    return { tagId: params.tagId, posts };
+    return { tagId, posts };
   },
   component: TagPage,
 });
