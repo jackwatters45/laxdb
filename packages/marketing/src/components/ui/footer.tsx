@@ -1,61 +1,9 @@
-import { RiGithubFill, RiSlackFill, RiTwitterXFill, RiYoutubeFill } from "@remixicon/react";
+import { RiGithubFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-
-import { SolarLogo } from "../../../public/solar-logo";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 const Footer = () => {
-  const sections = {
-    solutions: {
-      title: "Solutions",
-      items: [
-        { label: "Crop Monitoring", href: "#" },
-        { label: "Irrigation Control", href: "#" },
-        { label: "Soil Analytics", href: "#" },
-        { label: "Weather Integration", href: "#" },
-        { label: "Documentation", href: "#" },
-        { label: "Smart Farming Guide", href: "#" },
-        { label: "Equipment", href: "#" },
-      ],
-    },
-    company: {
-      title: "Company",
-      items: [
-        { label: "About us", href: "#" },
-        { label: "Blog", href: "#" },
-        { label: "Careers", href: "#" },
-        { label: "Success Stories", href: "#" },
-        { label: "Sustainability", href: "#" },
-      ],
-    },
-    resources: {
-      title: "Resources",
-      items: [
-        { label: "Farmer Network", href: "#" },
-        {
-          label: "Community",
-          href: "#",
-          external: true,
-        },
-        { label: "Contact", href: "#" },
-        { label: "Support", href: "#" },
-        { label: "Privacy Policy", href: "#" },
-        { label: "Terms of Service", href: "#" },
-        { label: "Report an Issue", href: "#" },
-      ],
-    },
-    partners: {
-      title: "Partners",
-      items: [
-        { label: "Dealer Network", href: "#", external: true },
-        { label: "System Status", href: "#", external: true },
-        { label: "Research Partners", href: "#", external: true },
-        { label: "Integration Guide", href: "#" },
-      ],
-    },
-  };
-
   return (
     <div className="px-4 xl:px-0">
       <footer className="relative mx-auto flex max-w-6xl flex-wrap pt-4" id="footer">
@@ -68,7 +16,7 @@ const Footer = () => {
           >
             <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
               <line
-                className="stroke-gray-300"
+                className="stroke-border"
                 strokeDasharray="3 3"
                 strokeWidth="2"
                 x1="0"
@@ -87,7 +35,7 @@ const Footer = () => {
           >
             <svg aria-hidden="true" className="h-full w-full" preserveAspectRatio="none">
               <line
-                className="stroke-gray-300"
+                className="stroke-border"
                 strokeDasharray="3 3"
                 strokeWidth="2"
                 x1="0"
@@ -100,7 +48,7 @@ const Footer = () => {
         </div>
         <svg
           aria-hidden="true"
-          className="mb-10 h-20 w-full border-y border-dashed border-gray-300 stroke-gray-300"
+          className="mb-10 h-20 w-full border-y border-dashed border-border stroke-border"
         >
           <defs>
             <pattern
@@ -126,72 +74,65 @@ const Footer = () => {
         </svg>
         <div className="mr-auto flex w-full justify-between lg:w-fit lg:flex-col">
           <Link
-            className="flex items-center font-medium text-gray-700 select-none sm:text-sm"
+            className="flex items-center text-lg font-medium text-foreground select-none"
             to="/"
           >
-            <SolarLogo className="ml-2 w-20" />
-
-            <span className="sr-only">Solar Logo (go home)</span>
+            LaxDB
           </Link>
 
           <div>
             <div className="mt-4 flex items-center">
               <a
-                className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
-                href="#"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <RiTwitterXFill className="size-5" />
-              </a>
-              <a
-                className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
-                href="#"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <RiYoutubeFill className="size-5" />
-              </a>
-              <a
-                className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
-                href="#"
+                className="rounded-sm p-2 text-muted transition-colors duration-200 hover:bg-gray-200 hover:text-foreground"
+                href="https://github.com/jackwatters45/laxdb"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <RiGithubFill className="size-5" />
               </a>
-              <a
-                className="rounded-sm p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900"
-                href="#"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <RiSlackFill className="size-5" />
-              </a>
             </div>
-            <div className="ml-2 hidden text-sm text-gray-700 lg:inline">
-              &copy; {CURRENT_YEAR} Solar Technologies, Inc.
+            <div className="ml-2 hidden text-sm text-muted lg:inline">
+              &copy; {CURRENT_YEAR} LaxDB
             </div>
           </div>
         </div>
 
-        {Object.entries(sections).map(([key, section]) => (
-          <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0" key={key}>
-            <h3 className="mb-4 font-medium text-gray-900 sm:text-sm">{section.title}</h3>
-            <ul className="space-y-4">
-              {section.items.map((item) => (
-                <li className="text-sm" key={item.label}>
-                  <a
-                    className="text-gray-600 transition-colors duration-200 hover:text-gray-900"
-                    href={item.href}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
+          <h3 className="mb-4 font-medium text-foreground sm:text-sm">Data</h3>
+          <ul className="space-y-4">
+            <li className="text-sm">
+              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/wiki">
+                Wiki
+              </Link>
+            </li>
+            <li className="text-sm">
+              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/graph">
+                Graph
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
+          <h3 className="mb-4 font-medium text-foreground sm:text-sm">Resources</h3>
+          <ul className="space-y-4">
+            <li className="text-sm">
+              <Link className="text-muted transition-colors duration-200 hover:text-foreground" to="/blog">
+                Blog
+              </Link>
+            </li>
+            <li className="text-sm">
+              <a
+                className="text-muted transition-colors duration-200 hover:text-foreground"
+                href="https://github.com/jackwatters45/laxdb"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                GitHub
+              </a>
+            </li>
+          </ul>
+        </div>
       </footer>
     </div>
   );
