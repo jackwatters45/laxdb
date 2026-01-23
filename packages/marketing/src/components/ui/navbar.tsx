@@ -43,9 +43,6 @@ export function NavBar() {
               </Link>
             </div>
           </nav>
-          <Button className="hidden h-10 font-semibold sm:block" variant="secondary">
-            Get a quote
-          </Button>
           <Button
             aria-label={open ? "CloseNavigation Menu" : "Open Navigation Menu"}
             className="p-1.5 sm:hidden"
@@ -105,9 +102,6 @@ export function NavBar() {
               <Link to="/graph">Graph</Link>
             </li>
           </ul>
-          <Button className="text-lg" variant="secondary">
-            Get a quote
-          </Button>
         </nav>
       </div>
     </header>
