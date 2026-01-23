@@ -43,12 +43,14 @@ function ContentPage() {
           {post.tags && post.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <span
+                <Link
                   key={tag}
-                  className="rounded-full bg-blog-border/50 px-2 py-0.5 text-xs text-blog-subtle"
+                  to="/tag/$tagId"
+                  params={{ tagId: tag }}
+                  className="rounded-full bg-blog-border/50 px-2 py-0.5 text-xs text-blog-subtle transition-colors hover:bg-blog-border hover:text-blog-fg"
                 >
                   {tag}
-                </span>
+                </Link>
               ))}
             </div>
           )}

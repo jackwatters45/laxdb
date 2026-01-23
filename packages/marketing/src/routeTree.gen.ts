@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WikiIndexRouteImport } from './routes/wiki/index'
 import { Route as GraphIndexRouteImport } from './routes/graph/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as TagTagIdRouteImport } from './routes/tag/$tagId'
 import { Route as ContentSlugRouteImport } from './routes/content/$slug'
 import { Route as BlogWikiRouteImport } from './routes/blog/wiki'
 import { Route as BlogOpinionRouteImport } from './routes/blog/opinion'
@@ -36,6 +37,11 @@ const GraphIndexRoute = GraphIndexRouteImport.update({
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TagTagIdRoute = TagTagIdRouteImport.update({
+  id: '/tag/$tagId',
+  path: '/tag/$tagId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContentSlugRoute = ContentSlugRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
   '/content/$slug': typeof ContentSlugRoute
+  '/tag/$tagId': typeof TagTagIdRoute
   '/blog/': typeof BlogIndexRoute
   '/graph/': typeof GraphIndexRoute
   '/wiki/': typeof WikiIndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
   '/content/$slug': typeof ContentSlugRoute
+  '/tag/$tagId': typeof TagTagIdRoute
   '/blog': typeof BlogIndexRoute
   '/graph': typeof GraphIndexRoute
   '/wiki': typeof WikiIndexRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
   '/content/$slug': typeof ContentSlugRoute
+  '/tag/$tagId': typeof TagTagIdRoute
   '/blog/': typeof BlogIndexRoute
   '/graph/': typeof GraphIndexRoute
   '/wiki/': typeof WikiIndexRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/blog/opinion'
     | '/blog/wiki'
     | '/content/$slug'
+    | '/tag/$tagId'
     | '/blog/'
     | '/graph/'
     | '/wiki/'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/blog/opinion'
     | '/blog/wiki'
     | '/content/$slug'
+    | '/tag/$tagId'
     | '/blog'
     | '/graph'
     | '/wiki'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/blog/opinion'
     | '/blog/wiki'
     | '/content/$slug'
+    | '/tag/$tagId'
     | '/blog/'
     | '/graph/'
     | '/wiki/'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   BlogOpinionRoute: typeof BlogOpinionRoute
   BlogWikiRoute: typeof BlogWikiRoute
   ContentSlugRoute: typeof ContentSlugRoute
+  TagTagIdRoute: typeof TagTagIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
   GraphIndexRoute: typeof GraphIndexRoute
   WikiIndexRoute: typeof WikiIndexRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tag/$tagId': {
+      id: '/tag/$tagId'
+      path: '/tag/$tagId'
+      fullPath: '/tag/$tagId'
+      preLoaderRoute: typeof TagTagIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/content/$slug': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogOpinionRoute: BlogOpinionRoute,
   BlogWikiRoute: BlogWikiRoute,
   ContentSlugRoute: ContentSlugRoute,
+  TagTagIdRoute: TagTagIdRoute,
   BlogIndexRoute: BlogIndexRoute,
   GraphIndexRoute: GraphIndexRoute,
   WikiIndexRoute: WikiIndexRoute,
