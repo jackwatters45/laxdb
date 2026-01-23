@@ -8,9 +8,6 @@ import useScroll from "@/lib/use-scroll";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/site";
 
-import { SolarLogo } from "../../../public/solar-logo";
-import { Button } from "../button";
-
 export function NavBar() {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(15);
@@ -18,45 +15,44 @@ export function NavBar() {
   return (
     <header
       className={cn(
-        "fixed inset-x-4 top-4 z-50 mx-auto flex max-w-6xl justify-center rounded-lg border border-transparent px-3 py-3 transition duration-300",
-        scrolled || open
-          ? "border-gray-200/50 bg-white/80 shadow-2xl shadow-black/5 backdrop-blur-sm"
-          : "bg-white/0",
+        "fixed inset-x-0 top-0 z-50 mx-auto flex max-w-6xl justify-center px-4 py-3 transition duration-300",
+        scrolled || open ? "bg-background" : "bg-transparent",
       )}
     >
-      <div className="w-full md:my-auto">
+      <div className="w-full">
         <div className="relative flex items-center justify-between">
-          <Link aria-label="Home" to={siteConfig.baseLinks.home}>
-            <span className="sr-only">Solar Tech Logo</span>
-            <SolarLogo className="w-22" />
+          <Link
+            aria-label="Home"
+            to={siteConfig.baseLinks.home}
+            className="text-lg font-medium text-foreground"
+          >
+            LaxDB
           </Link>
-          <nav className="hidden sm:block md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:transform">
-            <div className="flex items-center gap-10 font-medium">
-              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/blog">
-                Blog
-              </Link>
-              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/wiki">
-                Wiki
-              </Link>
-              <Link className="px-2 py-1 text-gray-900 hover:text-gray-600" to="/graph">
-                Graph
-              </Link>
-            </div>
+          <nav className="hidden items-center gap-6 text-sm sm:flex">
+            <Link className="text-foreground hover:underline" to="/blog">
+              Blog
+            </Link>
+            <Link className="text-foreground hover:underline" to="/wiki">
+              Wiki
+            </Link>
+            <Link className="text-foreground hover:underline" to="/graph">
+              Graph
+            </Link>
           </nav>
-          <Button
-            aria-label={open ? "CloseNavigation Menu" : "Open Navigation Menu"}
+          <button
+            aria-label={open ? "Close Navigation Menu" : "Open Navigation Menu"}
             className="p-1.5 sm:hidden"
             onClick={() => {
               setOpen(!open);
             }}
-            variant="secondary"
+            type="button"
           >
             {open ? (
-              <RiCloseFill aria-hidden className="size-6 shrink-0 text-gray-900" />
+              <RiCloseFill aria-hidden className="size-6 shrink-0 text-foreground" />
             ) : (
-              <RiMenuFill aria-hidden className="size-6 shrink-0 text-gray-900" />
+              <RiMenuFill aria-hidden className="size-6 shrink-0 text-foreground" />
             )}
-          </Button>
+          </button>
         </div>
         <nav
           className={cn(
@@ -64,7 +60,7 @@ export function NavBar() {
             open ? "" : "hidden",
           )}
         >
-          <ul className="space-y-4 font-medium">
+          <ul className="space-y-4">
             <li
               onClick={() => {
                 setOpen(false);
@@ -75,7 +71,9 @@ export function NavBar() {
                 }
               }}
             >
-              <Link to="/blog">Blog</Link>
+              <Link className="hover:underline" to="/blog">
+                Blog
+              </Link>
             </li>
             <li
               onClick={() => {
@@ -87,7 +85,9 @@ export function NavBar() {
                 }
               }}
             >
-              <Link to="/wiki">Wiki</Link>
+              <Link className="hover:underline" to="/wiki">
+                Wiki
+              </Link>
             </li>
             <li
               onClick={() => {
@@ -99,7 +99,9 @@ export function NavBar() {
                 }
               }}
             >
-              <Link to="/graph">Graph</Link>
+              <Link className="hover:underline" to="/graph">
+                Graph
+              </Link>
             </li>
           </ul>
         </nav>

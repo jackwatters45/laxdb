@@ -1,0 +1,13 @@
+<svg viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lacrosse stick head with database stripes -->
+  <path
+    d="M2 8C2 4.68629 4.68629 2 8 2H20C23.3137 2 26 4.68629 26 8V22C26 29.1797 20.1797 35 14 35C7.82029 35 2 29.1797 2 22V8Z"
+    stroke="#1a1a1a"
+    stroke-width="2.5"
+    fill="none"
+  />
+  <!-- Database stripes -->
+  <line x1="5" y1="11" x2="23" y2="11" stroke="#1a1a1a" stroke-width="2" />
+  <line x1="5" y1="18" x2="23" y2="18" stroke="#1a1a1a" stroke-width="2" />
+  <line x1="6" y1="25" x2="22" y2="25" stroke="#1a1a1a" stroke-width="2" />
+</svg>

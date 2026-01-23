@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: siteConfig.name },
       { name: "description", content: siteConfig.description },
-      { name: "keywords", content: "Marketing, Database, Software" },
+      { name: "keywords", content: "Lacrosse, Statistics, PLL, NLL, Analytics, Database" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_US" },
       { property: "og:url", content: siteConfig.url },
@@ -27,7 +27,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: globalsCss },
-      { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
   component: RootComponent,
@@ -50,7 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen overflow-x-hidden scroll-auto bg-gray-50 antialiased selection:bg-orange-100 selection:text-orange-600">
+      <body className="min-h-screen overflow-x-hidden scroll-auto bg-background antialiased selection:bg-gray-200 selection:text-gray-900">
         {children}
         <Scripts />
       </body>
@@ -62,9 +62,9 @@ function NotFoundComponent() {
   return (
     <RootDocument>
       <div className="flex h-screen flex-col items-center justify-center">
-        <p className="mt-6 text-4xl font-semibold text-amber-600 sm:text-5xl">Error 404</p>
-        <h1 className="mt-4 text-2xl font-semibold text-gray-900">Page not found</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-6 text-4xl font-semibold text-foreground sm:text-5xl">Error 404</p>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Page not found</h1>
+        <p className="mt-2 text-sm text-muted">
           Sorry, we couldn&apos;t find the page you&apos;re looking for.
         </p>
       </div>

@@ -15,6 +15,14 @@
 @theme {
   /* Font families */
   --font-serif: "Newsreader", "Times", serif;
+  --font-ui: "Inter", -apple-system, sans-serif;
+
+  /* LaxTalk-inspired monochrome palette */
+  --color-background: #f2f2f2;
+  --color-foreground: #1a1a1a;
+  --color-muted: #707070;
+  --color-accent: #e0e0e0;
+  --color-border: #e8e8e8;
 
   /* Blog color scheme (neutral grayscale from LaxTalk) */
   --color-blog-bg: #f8f8f8;
@@ -175,7 +183,34 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-border, currentColor);
+  }
+
+  html {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 16px;
+    line-height: 28px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
+
+  em,
+  i {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: calc(1rem + 1px);
   }
 }
 
