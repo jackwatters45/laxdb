@@ -1,18 +1,16 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { allPosts } from "content-collections";
 
-import { getContentByTag } from "@/lib/graph-utils";
-
-// Routing tags have dedicated pages - exclude from /tag/ routes
-const ROUTING_TAGS = new Set(["blog", "wiki", "opinion"]);
+import { getContentByTag, ROUTING_TAGS } from "@/lib/graph-utils";
 
 export const Route = createFileRoute("/tag/$tagId")({
   loader: ({ params }: { params: { tagId: string } }) => {
     const { tagId } = params;
 
-    if (ROUTING_TAGS.has(tagId)) {
-      throw notFound();
-    }
+    // Redirect routing tags to their dedicated pages
+    if (tagId === "blog") throw redirect({ to: "/blog" });
+    if (tagId === "wiki") throw redirect({ to: "/wiki" });
+    if (tagId === "opinion") throw redirect({ to: "/blog/opinion" });
 
     const posts = getContentByTag(allPosts, tagId);
     if (posts.length === 0) {

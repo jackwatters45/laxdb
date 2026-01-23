@@ -29,6 +29,9 @@ export const NODE_COLORS: Record<NodeType, string> = {
   tag: "#f472b6", // pink - tag nodes
 };
 
+/** Tags that have dedicated routes (/blog, /wiki, /blog/opinion) */
+export const ROUTING_TAGS = new Set(["blog", "wiki", "opinion"]);
+
 function getNodeType(post: Post): NodeType {
   if (post.tags?.includes("blog")) return "blog";
   if (post.tags?.includes("wiki")) return "wiki";
