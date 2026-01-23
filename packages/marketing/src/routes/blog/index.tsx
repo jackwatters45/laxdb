@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { allPosts } from "content-collections";
 
+import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag } from "@/lib/graph-utils";
 
 export const Route = createFileRoute("/blog/")({
@@ -37,11 +38,7 @@ function BlogIndex() {
                 {post.excerpt && <p className="mt-2 text-sm text-blog-muted">{post.excerpt}</p>}
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-xs text-blog-subtle">
-                    {new Date(post.published).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {formatPublishedDate(post.published)}
                   </span>
                   {post.tags && post.tags.some((t) => t !== "blog") && (
                     <span className="text-xs text-blog-subtle">

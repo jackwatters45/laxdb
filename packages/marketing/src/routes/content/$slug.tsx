@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { allPosts, type Post } from "content-collections";
 
+import { formatPublishedDate } from "@/lib/date";
 import { MDXContent } from "@/components/mdx-content";
 
 export const Route = createFileRoute("/content/$slug")({
@@ -17,10 +18,6 @@ export const Route = createFileRoute("/content/$slug")({
 function ContentPage() {
   const post = Route.useLoaderData();
 
-  if (!post) {
-    throw notFound();
-  }
-
   // Determine content type based on tags
   const isWiki = post.tags?.includes("wiki");
   const isBlog = post.tags?.includes("blog");
@@ -32,13 +29,7 @@ function ContentPage() {
           <h1 className="font-serif text-2xl text-blog-fg italic">{post.title}</h1>
           <div className="mt-4 flex items-center gap-4 text-sm text-blog-muted">
             {post.authors && post.authors.length > 0 && <span>{post.authors.join(", ")}</span>}
-            <span>
-              {new Date(post.published).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            <span>{formatPublishedDate(post.published)}</span>
           </div>
           {post.tags && post.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
