@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "@laxdb/ui/components/theme-toggle";
 
 const Footer = () => {
   return (
