@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { CallToAction } from "@/components/ui/call-to-action";
-import FeatureDivider from "@/components/ui/feature-divider";
+// import { CallToAction } from "@/components/ui/call-to-action";
+// import FeatureDivider from "@/components/ui/feature-divider";
 import Features from "@/components/ui/features";
 import { Hero } from "@/components/ui/hero";
-import { MapComponent } from "@/components/ui/map/map";
-import { SolarAnalytics } from "@/components/ui/solar-analytics";
-import Testimonial from "@/components/ui/testimonial";
+// import { MapComponent } from "@/components/ui/map/map";
+// import { SolarAnalytics } from "@/components/ui/solar-analytics";
+// import Testimonial from "@/components/ui/testimonial";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -18,9 +18,10 @@ function Home() {
       <div className="pt-56">
         <Hero />
       </div>
-      <div className="mt-52 px-4 xl:px-0">
+      <div className="mt-52 mb-40 px-4 xl:px-0">
         <Features />
       </div>
+      {/* Original Solar template sections - uncomment to see structure:
       <div className="mt-32 px-4 xl:px-0">
         <Testimonial />
       </div>
@@ -35,6 +36,7 @@ function Home() {
       <div className="mt-10 mb-40 px-4 xl:px-0">
         <CallToAction />
       </div>
+      */}
     </main>
   );
 }
