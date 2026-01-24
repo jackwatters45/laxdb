@@ -1,7 +1,6 @@
-import { RiGithubFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 
-const CURRENT_YEAR = new Date().getFullYear();
+import { ThemeToggle } from "./theme-toggle";
 
 const Footer = () => {
   return (
@@ -72,29 +71,8 @@ const Footer = () => {
           </defs>
           <rect fill="url(#diagonal-footer-pattern)" height="100%" stroke="none" width="100%" />
         </svg>
-        <div className="mr-auto flex w-full justify-between lg:w-fit lg:flex-col">
-          <Link
-            className="flex items-center text-lg font-medium text-foreground select-none"
-            to="/"
-          >
-            LaxDB
-          </Link>
-
-          <div>
-            <div className="mt-4 flex items-center">
-              <a
-                className="rounded-sm p-2 text-muted transition-colors duration-200 hover:bg-gray-200 hover:text-foreground"
-                href="https://github.com/jackwatters45/laxdb"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <RiGithubFill className="size-5" />
-              </a>
-            </div>
-            <div className="ml-2 hidden text-sm text-muted lg:inline">
-              &copy; {CURRENT_YEAR} LaxDB
-            </div>
-          </div>
+        <div className="mr-auto flex w-full justify-between pl-2 lg:w-fit lg:flex-col">
+          <ThemeToggle />
         </div>
 
         <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
