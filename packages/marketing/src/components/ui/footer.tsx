@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
-
+import { Logo } from "@laxdb/ui/components/logo";
 import { ThemeToggle } from "@laxdb/ui/components/theme-toggle";
+import { Link } from "@tanstack/react-router";
 
 const Footer = () => {
   return (
@@ -71,8 +71,9 @@ const Footer = () => {
           </defs>
           <rect fill="url(#diagonal-footer-pattern)" height="100%" stroke="none" width="100%" />
         </svg>
-        <div className="mr-auto flex w-full justify-between pl-2 lg:w-fit lg:flex-col">
-          <ThemeToggle />
+        <div className="mr-auto flex w-full flex-col justify-between pl-2 lg:w-fit">
+          <Logo className="size-8" />
+          <ThemeToggle className="mt-auto" />
         </div>
 
         <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
