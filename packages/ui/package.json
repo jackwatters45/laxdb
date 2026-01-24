@@ -19,7 +19,8 @@
     "./hooks/*": {
       "types": "./dist/hooks/*.d.ts",
       "default": "./src/hooks/*.ts"
-    }
+    },
+    "./assets/*": "./src/assets/*"
   },
   "scripts": {
     "typecheck": "tsgo --build",
