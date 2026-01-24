@@ -148,17 +148,17 @@ export const storage = await R2Bucket("storage", {});
 //   },
 // });
 
-export const web = await TanStackStart("web", {
-  cwd: "./packages/web",
-  domains: [getDomain("app")],
-  bindings: {
-    DB: db,
-    KV: kv,
-    STORAGE: storage,
-    DATABASE_URL: dbRole.connectionUrl,
-    ...secrets,
-  },
-});
+// export const web = await TanStackStart("web", {
+//   cwd: "./packages/web",
+//   domains: [getDomain("app")],
+//   bindings: {
+//     DB: db,
+//     KV: kv,
+//     STORAGE: storage,
+//     DATABASE_URL: dbRole.connectionUrl,
+//     ...secrets,
+//   },
+// });
 
 export const marketing = await TanStackStart("marketing", {
   bindings: {},
@@ -166,17 +166,17 @@ export const marketing = await TanStackStart("marketing", {
   domains: [domain],
 });
 
-export const docs = await TanStackStart("docs", {
-  bindings: {},
-  cwd: "./packages/docs",
-  domains: [getDomain("docs")],
-});
+// export const docs = await TanStackStart("docs", {
+//   bindings: {},
+//   cwd: "./packages/docs",
+//   domains: [getDomain("docs")],
+// });
 
 console.log({
   domain,
   // web: web.url,
   marketing: marketing.url,
-  docs: docs.url,
+  // docs: docs.url,
   // api: api.url,
   db: database.id,
   kv: kv.namespaceId,
@@ -194,9 +194,9 @@ if (process.env.PULL_REQUEST) {
 
      Your changes have been deployed to a preview environment:
 
-     **🌐 Docs:** ${docs.url}
+     // **🌐 Docs:** {docs.url}
      **🌐 Marketing:** ${marketing.url}
-     **🌐 Website:** ${web.url}
+     // **🌐 Website:** {web.url}
 
      Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
 
