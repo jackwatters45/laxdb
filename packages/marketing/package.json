@@ -15,11 +15,11 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@laxdb/ui": "workspace:*",
     "@cloudflare/vite-plugin": "^1.19.0",
     "@content-collections/core": "^0.13.0",
     "@content-collections/mdx": "^0.2.2",
     "@content-collections/vite": "^0.2.8",
+    "@laxdb/ui": "workspace:*",
     "@mdx-js/react": "^3.1.1",
     "@radix-ui/react-slot": "^1.1.2",
     "@remixicon/react": "^4.6.0",
