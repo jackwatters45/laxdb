@@ -71,7 +71,7 @@ const Footer = () => {
           </defs>
           <rect fill="url(#diagonal-footer-pattern)" height="100%" stroke="none" width="100%" />
         </svg>
-        <div className="mr-auto flex w-full flex-col justify-between pl-2 lg:w-fit">
+        <div className="mr-auto hidden w-full flex-col justify-between pl-2 lg:flex lg:w-fit">
           <Logo className="size-8" />
           <ThemeToggle className="mt-auto" />
         </div>
