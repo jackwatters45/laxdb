@@ -11,8 +11,8 @@ export function Hero() {
       <FadeContainer className="relative flex flex-col items-center justify-center">
         <FadeDiv className="mx-auto">
           <Link aria-label="View the wiki" className="mx-auto w-full" to="/wiki">
-            <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-white/5 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-foreground shadow-lg ring-1 shadow-gray-400/20 ring-black/10 filter backdrop-blur-[1px] transition-colors hover:bg-gray-500/[2.5%] focus:outline-hidden sm:text-sm">
-              <span className="shrink-0 truncate rounded-full border bg-gray-50 px-2.5 py-1 text-sm text-muted sm:text-xs">
+            <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-accent/50 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-foreground shadow-lg ring-1 shadow-black/10 ring-border filter backdrop-blur-[1px] transition-colors hover:bg-accent/70 focus:outline-hidden sm:text-sm">
+              <span className="shrink-0 truncate rounded-full border border-border bg-background px-2.5 py-1 text-sm text-muted sm:text-xs">
                 New
               </span>
               <span className="flex items-center gap-1 truncate">
@@ -35,7 +35,7 @@ export function Hero() {
         </p>
         <FadeDiv>
           <Link
-            className="mt-6 inline-flex cursor-pointer flex-row items-center justify-center gap-1 rounded-md border-b-[1.5px] border-gray-700 bg-linear-to-b from-gray-700 to-gray-900 px-5 py-3 leading-4 font-medium tracking-wide whitespace-nowrap text-white shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 ease-in-out hover:shadow-gray-400"
+            className="mt-6 inline-flex cursor-pointer flex-row items-center justify-center gap-1 rounded-md border-b-[1.5px] border-foreground/20 bg-foreground px-5 py-3 leading-4 font-medium tracking-wide whitespace-nowrap text-background shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 ease-in-out hover:opacity-90"
             to="/wiki"
           >
             Explore Data
