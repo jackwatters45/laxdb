@@ -17,27 +17,27 @@ function BlogWiki() {
   return (
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <header className="mb-8">
-        <Link to="/blog" className="text-sm text-blog-muted hover:text-blog-fg">
+        <Link to="/blog" className="text-sm text-muted hover:text-foreground">
           ← Blog
         </Link>
-        <h1 className="mt-2 font-serif text-2xl text-blog-fg italic">Wiki Crossover</h1>
-        <p className="mt-2 text-sm text-blog-muted">
+        <h1 className="mt-2 font-serif text-2xl text-foreground italic">Wiki Crossover</h1>
+        <p className="mt-2 text-sm text-muted">
           In-depth articles that bridge blog content and wiki knowledge.
         </p>
       </header>
       {sortedPosts.length === 0 ? (
-        <p className="text-blog-muted">No crossover articles yet.</p>
+        <p className="text-muted">No crossover articles yet.</p>
       ) : (
         <ul className="space-y-6">
           {sortedPosts.map((post) => (
             <li key={post.slug}>
               <Link to="/content/$slug" params={{ slug: post.slug }} className="group block">
-                <article className="border-b border-blog-border pb-6 transition-colors">
-                  <h2 className="font-serif text-lg text-blog-fg italic group-hover:text-blog-muted">
+                <article className="border-b border-border pb-6 transition-colors">
+                  <h2 className="font-serif text-lg text-foreground italic group-hover:text-muted">
                     {post.title}
                   </h2>
-                  {post.excerpt && <p className="mt-2 text-sm text-blog-muted">{post.excerpt}</p>}
-                  <span className="mt-2 block text-xs text-blog-subtle">
+                  {post.excerpt && <p className="mt-2 text-sm text-muted">{post.excerpt}</p>}
+                  <span className="mt-2 block text-xs text-subtle">
                     {new Date(post.published).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
