@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 
 import Footer from "@/components/ui/footer";
@@ -46,12 +47,14 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen overflow-x-hidden scroll-auto bg-background antialiased selection:bg-gray-200 selection:text-gray-900">
-        {children}
+      <body className="min-h-screen overflow-x-hidden scroll-auto bg-background text-foreground antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>
