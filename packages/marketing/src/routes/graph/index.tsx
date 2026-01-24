@@ -292,19 +292,19 @@ function GraphPage() {
 
   return (
     <main className="flex h-screen flex-col">
-      <header className="border-b border-blog-border bg-white/80 px-4 py-4 backdrop-blur">
+      <header className="border-b border-border bg-white/80 px-4 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-screen-lg items-center justify-between">
           <div>
-            <h1 className="font-serif text-xl text-blog-fg italic">Knowledge Graph</h1>
-            <p className="text-sm text-blog-muted">
+            <h1 className="font-serif text-xl text-foreground italic">Knowledge Graph</h1>
+            <p className="text-sm text-muted">
               {graphData.nodes.length} nodes · {graphData.edges.length} connections
             </p>
           </div>
           <nav className="flex gap-4 text-sm">
-            <Link to="/blog" className="text-blog-muted hover:text-blog-fg">
+            <Link to="/blog" className="text-muted hover:text-foreground">
               Blog
             </Link>
-            <Link to="/wiki" className="text-blog-muted hover:text-blog-fg">
+            <Link to="/wiki" className="text-muted hover:text-foreground">
               Wiki
             </Link>
           </nav>
@@ -329,21 +329,21 @@ function GraphPage() {
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.blog }}
               />
-              <span className="text-blog-muted">Blog</span>
+              <span className="text-muted">Blog</span>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.wiki }}
               />
-              <span className="text-blog-muted">Wiki</span>
+              <span className="text-muted">Wiki</span>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.entity }}
               />
-              <span className="text-blog-muted">Entity (no page)</span>
+              <span className="text-muted">Entity (no page)</span>
             </div>
           </div>
         </div>
@@ -351,21 +351,21 @@ function GraphPage() {
         {/* Hovered node info */}
         {hoveredNode && (
           <div className="absolute top-4 right-4 max-w-xs rounded-lg bg-white/90 p-3 shadow-sm backdrop-blur">
-            <h3 className="font-serif text-sm font-medium text-blog-fg">{hoveredNode.label}</h3>
-            <p className="mt-1 text-xs text-blog-muted capitalize">{hoveredNode.type}</p>
+            <h3 className="font-serif text-sm font-medium text-foreground">{hoveredNode.label}</h3>
+            <p className="mt-1 text-xs text-muted capitalize">{hoveredNode.type}</p>
             {hoveredNode.tags && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {hoveredNode.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded bg-blog-border/50 px-1.5 py-0.5 text-xs text-blog-subtle"
+                    className="rounded bg-border/50 px-1.5 py-0.5 text-xs text-subtle"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
             )}
-            {hoveredNode.url && <p className="mt-2 text-xs text-blog-subtle">Click to open</p>}
+            {hoveredNode.url && <p className="mt-2 text-xs text-subtle">Click to open</p>}
           </div>
         )}
       </div>

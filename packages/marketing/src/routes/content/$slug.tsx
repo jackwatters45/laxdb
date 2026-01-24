@@ -26,8 +26,8 @@ function ContentPage() {
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <article>
         <header className="mb-8">
-          <h1 className="font-serif text-2xl text-blog-fg italic">{post.title}</h1>
-          <div className="mt-4 flex items-center gap-4 text-sm text-blog-muted">
+          <h1 className="font-serif text-2xl text-foreground italic">{post.title}</h1>
+          <div className="mt-4 flex items-center gap-4 text-sm text-muted">
             {post.authors && post.authors.length > 0 && <span>{post.authors.join(", ")}</span>}
             <span>{formatPublishedDate(post.published)}</span>
           </div>
@@ -38,7 +38,7 @@ function ContentPage() {
                   key={tag}
                   to="/tag/$tagId"
                   params={{ tagId: tag }}
-                  className="rounded-full bg-blog-border/50 px-2 py-0.5 text-xs text-blog-subtle transition-colors hover:bg-blog-border hover:text-blog-fg"
+                  className="rounded-full bg-border/50 px-2 py-0.5 text-xs text-subtle transition-colors hover:bg-border hover:text-foreground"
                 >
                   {tag}
                 </Link>
@@ -47,19 +47,19 @@ function ContentPage() {
           )}
         </header>
         <MDXContent code={post.mdx} className="prose-blog prose max-w-none" />
-        <footer className="mt-12 border-t border-blog-border pt-6">
+        <footer className="mt-12 border-t border-border pt-6">
           <nav className="flex gap-4 text-sm">
             {isBlog && (
-              <Link to="/blog" className="text-blog-muted hover:text-blog-fg">
+              <Link to="/blog" className="text-muted hover:text-foreground">
                 ← All Blog Posts
               </Link>
             )}
             {isWiki && (
-              <Link to="/wiki" className="text-blog-muted hover:text-blog-fg">
+              <Link to="/wiki" className="text-muted hover:text-foreground">
                 ← Wiki Index
               </Link>
             )}
-            <Link to="/graph" className="text-blog-muted hover:text-blog-fg">
+            <Link to="/graph" className="text-muted hover:text-foreground">
               View Graph
             </Link>
           </nav>
