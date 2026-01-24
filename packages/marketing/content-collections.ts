@@ -30,6 +30,33 @@ function transformWikiLinks(content: string): string {
   });
 }
 
+const pages = defineCollection({
+  name: "pages",
+  directory: "./src/pages",
+  include: "**/*.mdx",
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    content: z.string(),
+  }),
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document, {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypeAutolinkHeadings, { behavior: "wrap" }],
+        [rehypePrettyCode, { theme: "github-dark" }],
+      ],
+    });
+
+    return {
+      ...document,
+      slug: document._meta.path,
+      mdx,
+    };
+  },
+});
+
 const posts = defineCollection({
   name: "posts",
   directory: "./src/content",
@@ -81,5 +108,5 @@ const posts = defineCollection({
 });
 
 export default defineConfig({
-  collections: [posts],
+  collections: [pages, posts],
 });

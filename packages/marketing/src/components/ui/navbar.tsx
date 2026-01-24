@@ -24,6 +24,9 @@ export function NavBar() {
             LaxDB
           </Link>
           <nav className="hidden items-center gap-6 text-sm sm:flex">
+            <Link className="text-foreground hover:underline" to="/about">
+              About
+            </Link>
             <Link className="text-foreground hover:underline" to="/blog">
               Blog
             </Link>
@@ -56,6 +59,20 @@ export function NavBar() {
           )}
         >
           <ul className="space-y-4">
+            <li
+              onClick={() => {
+                setOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setOpen(false);
+                }
+              }}
+            >
+              <Link className="hover:underline" to="/about">
+                About
+              </Link>
+            </li>
             <li
               onClick={() => {
                 setOpen(false);
