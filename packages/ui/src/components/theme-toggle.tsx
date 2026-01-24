@@ -1,26 +1,35 @@
-import { useTheme } from "@laxdb/ui/components/theme-provider";
-import { Switch } from "@laxdb/ui/components/ui/switch";
-import { Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
+
+import { useTheme } from "./theme-provider";
+
+type Theme = "light" | "dark" | "system";
+
+const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
+  { value: "light", icon: Sun, label: "Light" },
+  { value: "dark", icon: Moon, label: "Dark" },
+  { value: "system", icon: Monitor, label: "System" },
+];
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
 
   return (
-    <div className="flex items-center gap-2">
-      <Sun
-        className={`h-4 w-4 transition-colors ${isDark ? "text-muted-foreground" : "text-foreground"}`}
-      />
-      <Switch
-        checked={isDark}
-        className="data-[state=checked]:bg-primary"
-        onCheckedChange={(checked) => {
-          setTheme(checked ? "dark" : "light");
-        }}
-      />
-      <Moon
-        className={`h-4 w-4 transition-colors ${isDark ? "text-foreground" : "text-muted-foreground"}`}
-      />
+    <div className="inline-flex items-center rounded-md border border-border bg-accent/50 p-0.5">
+      {themes.map(({ value, icon: Icon, label }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => setTheme(value)}
+          aria-label={label}
+          className={`relative rounded-sm p-1.5 transition-colors duration-150 ${
+            theme === value
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted hover:text-foreground"
+          }`}
+        >
+          <Icon className="size-4" />
+        </button>
+      ))}
     </div>
   );
 }
