@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as BrandRouteImport } from './routes/brand'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WikiIndexRouteImport } from './routes/wiki/index'
 import { Route as GraphIndexRouteImport } from './routes/graph/index'
@@ -19,6 +21,16 @@ import { Route as BlogWikiRouteImport } from './routes/blog/wiki'
 import { Route as BlogOpinionRouteImport } from './routes/blog/opinion'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
+const BrandRoute = BrandRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +79,8 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/brand': typeof BrandRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -78,6 +92,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/brand': typeof BrandRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -90,6 +106,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/brand': typeof BrandRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -103,6 +121,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/brand'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -114,6 +134,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/brand'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -125,6 +147,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/brand'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -137,6 +161,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  BrandRoute: typeof BrandRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogOpinionRoute: typeof BlogOpinionRoute
   BlogWikiRoute: typeof BlogWikiRoute
@@ -149,6 +175,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/brand': {
+      id: '/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof BrandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,6 +257,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  BrandRoute: BrandRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogOpinionRoute: BlogOpinionRoute,
   BlogWikiRoute: BlogWikiRoute,
