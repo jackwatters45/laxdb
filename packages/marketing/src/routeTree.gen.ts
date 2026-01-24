@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LogoRouteImport } from './routes/logo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WikiIndexRouteImport } from './routes/wiki/index'
 import { Route as GraphIndexRouteImport } from './routes/graph/index'
@@ -20,11 +19,6 @@ import { Route as BlogWikiRouteImport } from './routes/blog/wiki'
 import { Route as BlogOpinionRouteImport } from './routes/blog/opinion'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
-const LogoRoute = LogoRouteImport.update({
-  id: '/logo',
-  path: '/logo',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,7 +67,6 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/logo': typeof LogoRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -85,7 +78,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/logo': typeof LogoRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -98,7 +90,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/logo': typeof LogoRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/opinion': typeof BlogOpinionRoute
   '/blog/wiki': typeof BlogWikiRoute
@@ -112,7 +103,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/logo'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -124,7 +114,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/logo'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -136,7 +125,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/logo'
     | '/blog/$slug'
     | '/blog/opinion'
     | '/blog/wiki'
@@ -149,7 +137,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LogoRoute: typeof LogoRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogOpinionRoute: typeof BlogOpinionRoute
   BlogWikiRoute: typeof BlogWikiRoute
@@ -162,13 +149,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/logo': {
-      id: '/logo'
-      path: '/logo'
-      fullPath: '/logo'
-      preLoaderRoute: typeof LogoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -237,7 +217,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LogoRoute: LogoRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogOpinionRoute: BlogOpinionRoute,
   BlogWikiRoute: BlogWikiRoute,
