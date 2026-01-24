@@ -1,5 +1,6 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 
+import { cn } from "../lib/utils";
 import { useTheme } from "./theme-provider";
 
 type Theme = "light" | "dark" | "system";
@@ -10,11 +11,16 @@ const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
   { value: "system", icon: Monitor, label: "System" },
 ];
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="inline-flex items-center rounded-md border border-border bg-accent/50 p-0.5">
+    <div
+      className={cn(
+        "inline-flex items-center rounded-md border border-border bg-accent/50 p-0.5",
+        className,
+      )}
+    >
       {themes.map(({ value, icon: Icon, label }) => (
         <button
           key={value}

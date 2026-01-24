@@ -1,31 +1,26 @@
 "use client";
 
+import { Logo } from "@laxdb/ui/components/logo";
 import { RiCloseFill, RiMenuFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 
-import useScroll from "@/lib/use-scroll";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/site";
 
 export function NavBar() {
   const [open, setOpen] = React.useState(false);
-  const scrolled = useScroll(15);
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 mx-auto flex max-w-6xl justify-center px-4 py-3 transition duration-300",
-        scrolled || open ? "bg-background" : "bg-transparent",
-      )}
-    >
-      <div className="w-full">
+    <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-md">
+      <div className="mx-auto w-full max-w-6xl px-4 py-3">
         <div className="relative flex items-center justify-between">
           <Link
             aria-label="Home"
             to={siteConfig.baseLinks.home}
-            className="text-lg font-medium text-foreground"
+            className="flex items-center gap-2 text-lg font-medium text-foreground"
           >
+            <Logo />
             LaxDB
           </Link>
           <nav className="hidden items-center gap-6 text-sm sm:flex">
