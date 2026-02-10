@@ -24,7 +24,11 @@ export function NavBar() {
             LaxDB
           </Link>
           <nav className="hidden items-center gap-6 text-sm sm:flex">
-            <Link className="text-foreground hover:underline" to="/blog">
+            <Link
+              className="text-foreground hover:underline"
+              to="/blog"
+              search={{ filter: undefined }}
+            >
               Blog
             </Link>
             <Link className="text-foreground hover:underline" to="/wiki">
@@ -66,7 +70,7 @@ export function NavBar() {
                 }
               }}
             >
-              <Link className="hover:underline" to="/blog">
+              <Link className="hover:underline" to="/blog" search={{ filter: undefined }}>
                 Blog
               </Link>
             </li>

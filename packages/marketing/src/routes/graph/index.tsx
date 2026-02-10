@@ -301,7 +301,11 @@ function GraphPage() {
             </p>
           </div>
           <nav className="flex gap-4 text-sm">
-            <Link to="/blog" className="text-muted hover:text-foreground">
+            <Link
+              to="/blog"
+              search={{ filter: undefined }}
+              className="text-muted hover:text-foreground"
+            >
               Blog
             </Link>
             <Link to="/wiki" className="text-muted hover:text-foreground">

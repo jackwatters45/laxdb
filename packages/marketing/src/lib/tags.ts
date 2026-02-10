@@ -2,7 +2,7 @@
 export const ROUTING_TAG_REDIRECTS: Record<string, string> = {
   blog: "/blog",
   wiki: "/wiki",
-  opinion: "/blog/opinion",
+  opinion: "/blog?filter=opinion",
 };
 
 /** Set of routing tags for quick lookup */

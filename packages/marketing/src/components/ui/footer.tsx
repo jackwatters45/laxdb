@@ -105,6 +105,7 @@ const Footer = () => {
               <Link
                 className="text-muted transition-colors duration-200 hover:text-foreground"
                 to="/blog"
+                search={{ filter: undefined }}
               >
                 Blog
               </Link>
