@@ -1,0 +1,23 @@
+packages/marketing/content-collections.ts
+  d94c7ed80c4875ed 70-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "0c8218151c488ff9c29d4cbb31306b8c03d25009",
+  "prompts": {
+    "d94c7ed80c4875ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c320e307-d33c-47e5-87a1-349cf9f556da",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
