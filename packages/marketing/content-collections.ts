@@ -67,7 +67,8 @@ const posts = defineCollection({
         .replace(/^---[\s\S]*?---\s*/, "")
         .replace(/^!\[[^\]]*]\([^)]+\)\s*/, "")
         .split("\n\n")[0]
-        ?.trim() ?? undefined;
+        ?.replaceAll(/\[\[([^\]]+)\]\]/g, "$1")
+        .trim() ?? undefined;
 
     return {
       ...document,
