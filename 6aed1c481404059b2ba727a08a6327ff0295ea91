@@ -1,0 +1,35 @@
+packages/marketing/src/lib/tags.ts
+  d94c7ed80c4875ed 5
+packages/marketing/src/routes/tag/$tagId.tsx
+  d94c7ed80c4875ed 36
+packages/marketing/src/routes/graph/index.tsx
+  d94c7ed80c4875ed 304
+packages/marketing/src/components/ui/navbar.tsx
+  d94c7ed80c4875ed 27
+packages/marketing/src/routes/content/$slug.tsx
+  d94c7ed80c4875ed 53
+packages/marketing/src/components/ui/footer.tsx
+  d94c7ed80c4875ed 108
+packages/marketing/src/routes/blog/index.tsx
+  d94c7ed80c4875ed 1,5,7-13,16-20,24-34,36-41,47,49-64,66-70,75-77,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "6aed1c481404059b2ba727a08a6327ff0295ea91",
+  "prompts": {
+    "d94c7ed80c4875ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c320e307-d33c-47e5-87a1-349cf9f556da",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 115,
+      "total_deletions": 65,
+      "accepted_lines": 67,
+      "overriden_lines": 0
+    }
+  }
+}
