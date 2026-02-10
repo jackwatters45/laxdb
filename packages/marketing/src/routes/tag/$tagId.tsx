@@ -33,7 +33,11 @@ function TagPage() {
   return (
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <header className="mb-8">
-        <Link to="/blog" className="text-sm text-muted hover:text-foreground">
+        <Link
+          to="/blog"
+          search={{ filter: undefined }}
+          className="text-sm text-muted hover:text-foreground"
+        >
           ← Back
         </Link>
         <h1 className="mt-2 font-serif text-2xl text-foreground italic">#{tagId}</h1>

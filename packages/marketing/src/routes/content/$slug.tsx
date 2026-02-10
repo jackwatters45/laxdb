@@ -50,7 +50,11 @@ function ContentPage() {
         <footer className="mt-12 border-t border-border pt-6">
           <nav className="flex gap-4 text-sm">
             {isBlog && (
-              <Link to="/blog" className="text-muted hover:text-foreground">
+              <Link
+                to="/blog"
+                search={{ filter: undefined }}
+                className="text-muted hover:text-foreground"
+              >
                 ← All Blog Posts
               </Link>
             )}
