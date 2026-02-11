@@ -91,7 +91,7 @@
 }
 
 :root {
-  --background: 0.98 0 0;
+  --background: 0.96 0.007 70;
   --foreground: 0.17 0 0;
   --card: 1 0 0;
   --card-foreground: 0.145 0 0;
