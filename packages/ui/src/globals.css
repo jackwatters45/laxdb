@@ -142,8 +142,8 @@
 }
 
 .dark {
-  --background: 0.11 0 0;
-  --foreground: 0.95 0 0;
+  --background: 0.21 0.006 70;
+  --foreground: 0.985 0 0;
   --card: 0.205 0 0;
   --card-foreground: 0.985 0 0;
   --popover: 0.205 0 0;
@@ -157,9 +157,9 @@
   --secondary: 0.269 0 0;
   --secondary-foreground: 0.985 0 0;
   --muted: 0.269 0 0;
-  --muted-foreground: 0.63 0 0;
-  --accent: 0.22 0 0;
-  --accent-foreground: 0.95 0 0;
+  --muted-foreground: 0.73 0 0;
+  --accent: 0.3 0 0;
+  --accent-foreground: 0.985 0 0;
   --subtle: 0.51 0 0;
   --destructive: 0.704 0.191 22.216;
   --destructive-foreground: 0.98 0 0;
@@ -169,10 +169,10 @@
   --warning-foreground: 0.15 0 0;
   --orange: 0.65 0.14 50;
   --orange-foreground: 0.15 0 0;
-  --border: 0.24 0 0;
-  --border-strong: 0.3 0 0;
-  --bullet: 0.37 0 0;
-  --input: 0.24 0 0;
+  --border: 0.32 0 0;
+  --border-strong: 0.4 0 0;
+  --bullet: 0.4 0 0;
+  --input: 0.32 0 0;
   --ring: 0.556 0 0;
   --hover: var(--primary-20);
   --chart-1: 0.809 0.105 251.813;
