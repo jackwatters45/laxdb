@@ -345,7 +345,7 @@ export function Lines({
         return (
           <div
             key={`day-${i}`}
-            className="[&>*[data-highlight=true]]:bg-orange relative flex flex-col gap-1 select-none"
+            className="relative flex flex-col gap-1 select-none [&>*[data-highlight=true]]:bg-orange"
             style={{
               width: LINE_WIDTH,
             }}
