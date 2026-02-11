@@ -4,9 +4,9 @@ import { Link } from "@tanstack/react-router";
 
 const Footer = () => {
   return (
-    <div className="px-4 xl:px-0">
+    <div className="px-4 pb-16 xl:px-0">
       <footer className="relative mx-auto flex max-w-6xl flex-wrap pt-4" id="footer">
-        <div className="pointer-events-none inset-0">
+        <div className="pointer-events-none absolute inset-0">
           <div
             className="absolute inset-y-0 my-[-5rem] w-px"
             style={{
@@ -81,7 +81,7 @@ const Footer = () => {
           <ul className="space-y-4">
             <li className="text-sm">
               <Link
-                className="text-muted transition-colors duration-200 hover:text-foreground"
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
                 to="/wiki"
               >
                 Wiki
@@ -89,7 +89,7 @@ const Footer = () => {
             </li>
             <li className="text-sm">
               <Link
-                className="text-muted transition-colors duration-200 hover:text-foreground"
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
                 to="/graph"
               >
                 Graph
@@ -103,7 +103,7 @@ const Footer = () => {
           <ul className="space-y-4">
             <li className="text-sm">
               <Link
-                className="text-muted transition-colors duration-200 hover:text-foreground"
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
                 to="/blog"
                 search={{ filter: undefined }}
               >
@@ -112,13 +112,35 @@ const Footer = () => {
             </li>
             <li className="text-sm">
               <a
-                className="text-muted transition-colors duration-200 hover:text-foreground"
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
                 href="https://github.com/jackwatters45/laxdb"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 GitHub
               </a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
+          <h3 className="mb-4 font-medium text-foreground sm:text-sm">Company</h3>
+          <ul className="space-y-4">
+            <li className="text-sm">
+              <Link
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
+                to="/about"
+              >
+                About
+              </Link>
+            </li>
+            <li className="text-sm">
+              <Link
+                className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
+                to="/brand"
+              >
+                Brand
+              </Link>
             </li>
           </ul>
         </div>
