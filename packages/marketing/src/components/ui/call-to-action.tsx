@@ -8,12 +8,12 @@ export function CallToAction() {
       <div className="grid items-center gap-8 sm:grid-cols-6">
         <div className="sm:col-span-2">
           <h2
-            className="scroll-my-60 text-3xl font-semibold tracking-tighter text-balance text-gray-900 md:text-4xl"
+            className="scroll-my-60 text-3xl font-semibold tracking-tighter text-balance text-foreground md:text-4xl"
             id="cta-title"
           >
             Ready to get started?
           </h2>
-          <p className="mt-3 mb-8 text-lg text-gray-600">
+          <p className="mt-3 mb-8 text-lg text-muted-foreground">
             Begin your smart farming journey today or talk to our agronomists about your specific
             needs.
           </p>

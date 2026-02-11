@@ -49,11 +49,11 @@ export default function FieldPerformance() {
   return (
     <div className="h-150 shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] perspective-[4000px] perspective-origin-center">
       <div className="-translate-y-10 -translate-z-10 rotate-x-10 rotate-y-20 -rotate-z-10 transform-3d">
-        <h3 className="text-sm text-gray-500">Field Yield Performance</h3>
-        <p className="mt-1 text-3xl font-semibold text-gray-900">32,227 bushels</p>
+        <h3 className="text-sm text-subtle">Field Yield Performance</h3>
+        <p className="mt-1 text-3xl font-semibold text-foreground">32,227 bushels</p>
         <p className="mt-1 text-sm font-medium">
           <span className="text-emerald-700">+430 bushels (4.1%)</span>{" "}
-          <span className="font-normal text-gray-500">Past growing season</span>
+          <span className="font-normal text-subtle">Past growing season</span>
         </p>
         <LineChartIllustration className="mt-8 w-full min-w-200 shrink-0" />
 
@@ -73,7 +73,7 @@ export default function FieldPerformance() {
             <TableBody>
               {summary.map((item) => (
                 <TableRow key={item.name}>
-                  <TableCell className="font-medium text-gray-900">
+                  <TableCell className="font-medium text-foreground">
                     <div className="flex space-x-3">
                       <span aria-hidden="true" className={`${item.bgColor} w-1 shrink-0 rounded`} />
                       <span>{item.name}</span>

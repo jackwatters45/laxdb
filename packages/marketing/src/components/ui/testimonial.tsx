@@ -20,12 +20,12 @@ export default function Testimonial() {
       </div>
       <div className="relative z-20 mb-20 p-8 sm:p-14 lg:p-24">
         <div className="">
-          <blockquote className="relative max-w-2xl text-xl leading-relaxed tracking-tight text-gray-900 md:text-2xl lg:text-3xl">
-            <p className="before:absolute before:top-0 before:right-full before:content-['“'] after:text-gray-900/70 after:content-['”']">
+          <blockquote className="relative max-w-2xl text-xl leading-relaxed tracking-tight text-foreground md:text-2xl lg:text-3xl">
+            <p className="before:absolute before:top-0 before:right-full before:content-['“'] after:text-muted-foreground after:content-['”']">
               <strong className="font-semibold">
                 Solar transformed our environmental monitoring capabilities.
               </strong>{" "}
-              <span className="text-gray-900/70">
+              <span className="text-muted-foreground">
                 Their autonomous network provides real-time data on forest health, wildlife
                 patterns, and ecosystem changes with unprecedented precision and efficiency.
               </span>
@@ -33,7 +33,7 @@ export default function Testimonial() {
           </blockquote>
         </div>
         <div className="mt-14 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-          <div className="relative shrink-0 rounded-full bg-white/15 p-0.5 ring-1 ring-white/20">
+          <div className="relative shrink-0 rounded-full bg-background/15 p-0.5 ring-1 ring-background/20">
             <img
               alt="Dr. Sarah Miller"
               className="rounded-full border object-contain"
@@ -43,7 +43,7 @@ export default function Testimonial() {
             />
           </div>
           <div>
-            <div className="text-base font-medium text-gray-900">Dr. Sarah Miller</div>
+            <div className="text-base font-medium text-foreground">Dr. Sarah Miller</div>
             <div className="text-sm text-[#C33621]/80">Director of Conservation Technologies</div>
           </div>
         </div>

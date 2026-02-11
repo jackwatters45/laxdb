@@ -19,7 +19,7 @@ export function SolarAnalytics() {
           Solar Analytics
           <div className="absolute top-1 -left-[8px] h-5 w-[3px] rounded-r-sm bg-orange-500" />
         </h2>
-        <p className="mt-2 max-w-lg text-3xl font-semibold tracking-tighter text-balance text-gray-900 md:text-4xl">
+        <p className="mt-2 max-w-lg text-3xl font-semibold tracking-tighter text-balance text-foreground md:text-4xl">
           Turn field data into profitable harvests with real-time insights
         </p>
       </div>

@@ -17,7 +17,7 @@ const Divider = ({
       // base
       "mx-auto my-6 flex w-full items-center justify-between gap-3 text-sm",
       // text color
-      "text-gray-500",
+      "text-subtle",
       className,
     )}
     ref={forwardedRef}
@@ -31,7 +31,7 @@ const Divider = ({
             // base
             "h-[1px] w-full",
             // background color
-            "bg-linear-to-r from-transparent to-gray-200",
+            "bg-linear-to-r from-transparent to-border",
           )}
         />
         <div className="whitespace-nowrap text-inherit">{children}</div>
@@ -40,7 +40,7 @@ const Divider = ({
             // base
             "h-[1px] w-full",
             // background color
-            "bg-linear-to-l from-transparent to-gray-200",
+            "bg-linear-to-l from-transparent to-border",
           )}
         />
       </>
@@ -50,7 +50,7 @@ const Divider = ({
           // base
           "h-[1px] w-full",
           // background color
-          "bg-linear-to-l from-transparent via-gray-200 to-transparent",
+          "bg-linear-to-l from-transparent via-border to-transparent",
         )}
       />
     )}
