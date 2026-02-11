@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "1afb896a355b",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "packages/marketing/src/routes/__root.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/1a/fb896a355b/0/metadata.json",
+      "transcript": "/1a/fb896a355b/0/full.jsonl",
+      "context": "/1a/fb896a355b/0/context.md",
+      "content_hash": "/1a/fb896a355b/0/content_hash.txt",
+      "prompt": "/1a/fb896a355b/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 21,
+    "cache_creation_tokens": 30524,
+    "cache_read_tokens": 1471580,
+    "output_tokens": 1288,
+    "api_call_count": 15
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "1afb896a355b",
+  "session_id": "a54625ce-9197-4c6c-a6b0-90e1891f725e",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-11T22:25:06.745342Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "packages/marketing/src/routes/__root.tsx"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "cdc64d85-5c3a-442f-baf1-5966c9ff60e2",
+  "checkpoint_transcript_start": 1232,
+  "transcript_lines_at_start": 1232,
+  "token_usage": {
+    "input_tokens": 21,
+    "cache_creation_tokens": 30524,
+    "cache_read_tokens": 1471580,
+    "output_tokens": 1288,
+    "api_call_count": 15
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-11T22:25:06.279553Z",
+    "agent_lines": 15,
+    "human_added": 31129,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 31145,
+    "agent_percentage": 0.04816182372772516
+  }
+}
