@@ -1,0 +1,150 @@
+packages/marketing/src/components/ui/footer.tsx
+  98e32e61fbbb026e 7,9
+  d94c7ed80c4875ed 108,125-130,132-138,140-146
+packages/ui/src/components/theme-toggle.tsx
+  98e32e61fbbb026e 33
+packages/marketing/src/routes/blog/index.tsx
+  d94c7ed80c4875ed 1-2,5,7-13,16-20,24-34,36-41,47,49-62,64,66-70,75-77,100
+packages/marketing/src/components/ui/chip-viz.tsx
+  ea6005f66482b74f 34,58
+packages/marketing/src/routes/brand.tsx
+  d94c7ed80c4875ed 1-4,14-24,26-45,47-50,52-63,65-67,69-73,75,77-81,83-92,94-96,98-113,118-148,150-151,154-160,163-169,171-181,183-184,186-190,192-197,199-209
+  98e32e61fbbb026e 64,74,82,152,161
+  ea6005f66482b74f 5-13,46,93,114-117,149,153,182
+packages/marketing/src/components/button.tsx
+  ea6005f66482b74f 35,37,39,41,43,51,53,55,57,65,67,69
+packages/marketing/src/routes/content/$slug.tsx
+  d94c7ed80c4875ed 2-4,11,55
+packages/marketing/src/components/ui/map/map.tsx
+  ea6005f66482b74f 10,87,96-97,111-112,126-127,141,147-148,157
+packages/marketing/src/routes/wiki/index.tsx
+  d94c7ed80c4875ed 2,23
+packages/marketing/src/components/ui/feature-divider.tsx
+  ea6005f66482b74f 8,15,22,29,36,43
+packages/marketing/src/components/divider.tsx
+  ea6005f66482b74f 20,34,43,53
+packages/marketing/src/routes/design-system.tsx
+  d94c7ed80c4875ed 1-8,20-21,23-25,43-44,51-61,63,75-87,90-96,103-110,114,118,123,126,130,135-136,139,142,149-154,156,163,172-177,179,194,196-200,202,216-222,224-225,231-232,234,236-240,242,244,257-263
+  98e32e61fbbb026e 9-19,22,26-42,45-50,62,64-74,89,97-102,111-113,115-117,119-122,124-125,127-129,131-134,137-138,140-141,143-148,155,157-162,164-171,178,180-193,195,201,203-215,223,226-230,233,235,241,243,245-256
+packages/marketing/src/components/ui/analytics-illustration.tsx
+  ea6005f66482b74f 52-53,56,76
+packages/marketing/src/components/ui/testimonial.tsx
+  ea6005f66482b74f 23,36,46
+packages/marketing/src/routes/graph/index.tsx
+  ea6005f66482b74f 295,329,357
+  d94c7ed80c4875ed 2,20,49,304
+packages/marketing/src/components/ui/call-to-action.tsx
+  ea6005f66482b74f 11
+packages/marketing/src/routes/about.tsx
+  d94c7ed80c4875ed 1-11,13-14,16-113
+  ea6005f66482b74f 15
+packages/marketing/src/routes/tag/$tagId.tsx
+  d94c7ed80c4875ed 2,18,36
+packages/marketing/src/components/table.tsx
+  ea6005f66482b74f 44,77,79,101,166,168,191
+packages/ui/src/components/theme-provider.tsx
+  64d9f6be7e0aa788 36
+  2624dcef2ff066cd 26-29,164-168
+packages/marketing/src/components/ui/features.tsx
+  ea6005f66482b74f 161,180,183,186,192,201,204,207,213,222,224,232,235,238,245,253,255,265-266,269,303,330,336-337,345-346,354-355,363-364,372-373,381-382,419,433-434,440-441,447-448,454-455,471
+  98e32e61fbbb026e 27
+packages/marketing/content-collections.ts
+  d94c7ed80c4875ed 40,71-72
+packages/marketing/src/lib/posts.ts
+  d94c7ed80c4875ed 1-5
+packages/marketing/src/globals.css
+  98e32e61fbbb026e 1
+packages/ui/src/globals.css
+  98e32e61fbbb026e 3,6-13,15-16,46,48-51,69-90,94-95,109-112,119-124,145-146,160-163,170-172,174-175,207-209,213-220,223-240,273-320,322-339,355-359
+packages/marketing/src/components/ui/sticker-card.tsx
+  ea6005f66482b74f 17,25
+packages/marketing/src/components/ui/solar-analytics.tsx
+  ea6005f66482b74f 22
+packages/marketing/src/components/orbit.tsx
+  ea6005f66482b74f 80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "aef812f8f126c1cb8f391183b5aff80ce5493653",
+  "prompts": {
+    "1aa988812d2435ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3b2a2b7-8858-47ce-974b-bfe7ff28e9f4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "2624dcef2ff066cd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d3f7c9d-de6d-46aa-9a17-502f076d152a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 4,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    },
+    "64d9f6be7e0aa788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a54625ce-9197-4c6c-a6b0-90e1891f725e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "98e32e61fbbb026e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ede1aa3-cd02-4e1b-a728-b43afd0f1b34",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 321,
+      "overriden_lines": 0
+    },
+    "d94c7ed80c4875ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c320e307-d33c-47e5-87a1-349cf9f556da",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 499,
+      "overriden_lines": 0
+    },
+    "ea6005f66482b74f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79ff011-fdbf-4690-8d4f-03e64d83366a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 121,
+      "overriden_lines": 0
+    }
+  }
+}
