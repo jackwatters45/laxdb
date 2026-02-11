@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "b0ceb74147a4",
+  "strategy": "manual-commit",
+  "branch": "refactor/blog-filter-tabs",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "packages/marketing/src/content/college-lacrosse-guide-2026.mdx",
+    "packages/marketing/src/routes/blog/index.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/b0/ceb74147a4/0/metadata.json",
+      "transcript": "/b0/ceb74147a4/0/full.jsonl",
+      "context": "/b0/ceb74147a4/0/context.md",
+      "content_hash": "/b0/ceb74147a4/0/content_hash.txt",
+      "prompt": "/b0/ceb74147a4/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 65566,
+    "cache_read_tokens": 538278,
+    "output_tokens": 2887,
+    "api_call_count": 10
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "b0ceb74147a4",
+  "session_id": "c3b2a2b7-8858-47ce-974b-bfe7ff28e9f4",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-11T06:24:30.997394Z",
+  "branch": "refactor/blog-filter-tabs",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "packages/marketing/src/content/college-lacrosse-guide-2026.mdx",
+    "packages/marketing/src/routes/blog/index.tsx"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 65566,
+    "cache_read_tokens": 538278,
+    "output_tokens": 2887,
+    "api_call_count": 10
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-11T06:24:30.98395Z",
+    "agent_lines": 0,
+    "human_added": 31638,
+    "human_modified": 140,
+    "human_removed": 0,
+    "total_committed": 31778,
+    "agent_percentage": 0
+  }
+}
