@@ -6,6 +6,7 @@ import { getContentByTag, getContentByTags } from "@/lib/graph-utils";
 
 const FILTERS = [
   { key: "all", label: "All" },
+  { key: "guide", label: "Guides" },
   { key: "opinion", label: "Opinion" },
   { key: "wiki", label: "Wiki" },
 ] as const;
@@ -23,6 +24,8 @@ export const Route = createFileRoute("/blog/")({
 
 function getFilteredPosts(filter: FilterKey) {
   switch (filter) {
+    case "guide":
+      return getContentByTags(publishedPosts, ["blog", "guide"]);
     case "opinion":
       return getContentByTags(publishedPosts, ["blog", "opinion"]);
     case "wiki":
@@ -60,7 +63,7 @@ function BlogIndex() {
                   })
                 }
                 className={`relative pb-2.5 text-sm tracking-wide transition-colors ${
-                  active ? "text-foreground" : "text-subtle hover:text-muted"
+                  active ? "text-foreground" : "text-subtle hover:text-muted-foreground"
                 }`}
               >
                 {f.label}
@@ -71,17 +74,19 @@ function BlogIndex() {
         </nav>
       </header>
       {sortedPosts.length === 0 ? (
-        <p className="text-muted">No posts yet.</p>
+        <p className="text-muted-foreground">No posts yet.</p>
       ) : (
         <ul className="space-y-6">
           {sortedPosts.map((post) => (
             <li key={post.slug}>
               <Link to="/content/$slug" params={{ slug: post.slug }} className="group block">
                 <article className="border-b border-border pb-6 transition-colors">
-                  <h2 className="font-serif text-lg text-foreground italic group-hover:text-muted">
+                  <h2 className="font-serif text-lg text-foreground italic group-hover:text-muted-foreground">
                     {post.title}
                   </h2>
-                  {post.excerpt && <p className="mt-2 text-sm text-muted">{post.excerpt}</p>}
+                  {post.excerpt && (
+                    <p className="mt-2 text-sm text-muted-foreground">{post.excerpt}</p>
+                  )}
                   <div className="mt-2 flex items-center gap-2">
                     <span className="text-xs text-subtle">
                       {formatPublishedDate(post.published)}

@@ -34,18 +34,21 @@ function WikiIndex() {
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <header className="mb-8">
         <h1 className="font-serif text-2xl text-foreground italic">Wiki</h1>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           Knowledge base for lacrosse players, teams, leagues, and more.
         </p>
         <nav className="mt-4 flex gap-4 text-sm">
-          <Link to="/graph" className="text-muted transition-colors hover:text-foreground">
+          <Link
+            to="/graph"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             View Graph →
           </Link>
         </nav>
       </header>
 
       {sortedGroups.length === 0 ? (
-        <p className="text-muted">No wiki content yet.</p>
+        <p className="text-muted-foreground">No wiki content yet.</p>
       ) : (
         <div className="space-y-12">
           {sortedGroups.map(({ key, label, posts }) => (
@@ -61,7 +64,7 @@ function WikiIndex() {
                         params={{ slug: post.slug }}
                         className="group flex items-baseline justify-between border-b border-border/50 pb-2"
                       >
-                        <span className="font-serif text-foreground group-hover:text-muted">
+                        <span className="font-serif text-foreground group-hover:text-muted-foreground">
                           {post.title}
                         </span>
                         {post.tags && post.tags.some((t) => !["wiki", key].includes(t)) && (
