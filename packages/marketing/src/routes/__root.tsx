@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 
+import { NotFound } from "@laxdb/ui/components/not-found";
 import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
-import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 
 import Footer from "@/components/ui/footer";
 import { NavBar } from "@/components/ui/navbar";
@@ -64,13 +65,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function NotFoundComponent() {
   return (
     <RootDocument>
-      <div className="flex h-screen flex-col items-center justify-center">
-        <p className="mt-6 text-4xl font-semibold text-foreground sm:text-5xl">Error 404</p>
-        <h1 className="mt-4 text-2xl font-semibold text-foreground">Page not found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sorry, we couldn&apos;t find the page you&apos;re looking for.
-        </p>
-      </div>
+      <NavBar />
+      <NotFound>
+        <Link
+          className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border-b-[1.5px] border-foreground/20 bg-foreground px-5 py-3 text-sm leading-4 font-medium tracking-wide text-background shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 hover:opacity-90"
+          to="/"
+        >
+          Go Home
+        </Link>
+      </NotFound>
+      <Footer />
     </RootDocument>
   );
 }
