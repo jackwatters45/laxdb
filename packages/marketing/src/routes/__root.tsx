@@ -27,12 +27,6 @@ export const Route = createRootRoute({
       { name: "twitter:description", content: siteConfig.description },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-      },
       { rel: "stylesheet", href: globalsCss },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
@@ -73,7 +67,7 @@ function NotFoundComponent() {
       <div className="flex h-screen flex-col items-center justify-center">
         <p className="mt-6 text-4xl font-semibold text-foreground sm:text-5xl">Error 404</p>
         <h1 className="mt-4 text-2xl font-semibold text-foreground">Page not found</h1>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           Sorry, we couldn&apos;t find the page you&apos;re looking for.
         </p>
       </div>
