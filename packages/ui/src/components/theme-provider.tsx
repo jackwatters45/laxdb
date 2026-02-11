@@ -161,6 +161,11 @@ export function ThemeProvider({
     [theme, enableSystem, applyTheme],
   );
 
+  // Hydrate theme from localStorage on mount (SSR renders with fallback)
+  useEffect(() => {
+    setThemeState(getTheme(storageKey, defaultTheme) as Theme);
+  }, [storageKey, defaultTheme]);
+
   // Listen to system preference changes
   useEffect(() => {
     const media = window.matchMedia(MEDIA);
