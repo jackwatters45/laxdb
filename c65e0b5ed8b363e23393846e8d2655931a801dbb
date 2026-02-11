@@ -1,0 +1,23 @@
+packages/marketing/src/components/ui/footer.tsx
+  64d9f6be7e0aa788 130,132,135,138,140,143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "c65e0b5ed8b363e23393846e8d2655931a801dbb",
+  "prompts": {
+    "64d9f6be7e0aa788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a54625ce-9197-4c6c-a6b0-90e1891f725e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 6,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
