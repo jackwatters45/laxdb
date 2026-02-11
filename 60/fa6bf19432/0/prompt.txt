@@ -1,0 +1,81 @@
+we are getting this error beacuase the mode toggle is trying to access the window: 
+  statusText: undefined,
+  headers: undefined,
+  data: undefined,
+  body: undefined,
+  unhandled: true
+}
+ReferenceError: window is not defined
+    at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+    at /Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:108:26
+    at useReducer (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3016:86)
+    at Object.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7356:18)
+    at exports.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/chunk-XZX37B7A.js:959:36)
+    at ThemeProvider (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:107:45)
+    at Object.react_stack_bottom_frame (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7435:18)
+    at renderWithHooks (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3975:24)
+    at renderElement (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4235:25)
+    at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43)
+ReferenceError: window is not defined
+    at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+    ... 8 lines matching cause stack trace ...
+    at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43) {
+  cause: ReferenceError: window is not defined
+      at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+      at /Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:108:26
+      at useReducer (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3016:86)
+      at Object.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7356:18)
+      at exports.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/chunk-XZX37B7A.js:959:36)
+      at ThemeProvider (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:107:45)
+      at Object.react_stack_bottom_frame (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7435:18)
+      at renderWithHooks (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3975:24)
+      at renderElement (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4235:25)
+      at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43),
+  status: 500,
+  statusText: undefined,
+  headers: undefined,
+  data: undefined,
+  body: undefined,
+  unhandled: true
+}
+ReferenceError: window is not defined
+    at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+    at /Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:108:26
+    at useReducer (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3016:86)
+    at Object.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7356:18)
+    at exports.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/chunk-XZX37B7A.js:959:36)
+    at ThemeProvider (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:107:45)
+    at Object.react_stack_bottom_frame (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7435:18)
+    at renderWithHooks (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3975:24)
+    at renderElement (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4235:25)
+    at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43)
+ReferenceError: window is not defined
+    at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+    ... 8 lines matching cause stack trace ...
+    at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43) {
+  cause: ReferenceError: window is not defined
+      at getSystemTheme (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:27:22)
+      at /Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:108:26
+      at useReducer (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3016:86)
+      at Object.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7356:18)
+      at exports.useState (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/chunk-XZX37B7A.js:959:36)
+      at ThemeProvider (/Users/jw/Desktop/repos/laxdb/packages/ui/src/components/theme-provider.tsx:107:45)
+      at Object.react_stack_bottom_frame (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:7435:18)
+      at renderWithHooks (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:3975:24)
+      at renderElement (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4235:25)
+      at retryNode (/Users/jw/Desktop/repos/laxdb/packages/marketing/node_modules/.vite/deps_ssr/react-dom_server.js:4946:43),
+  status: 500,
+  statusText: undefined,
+  headers: undefined,
+  data: undefined,
+  body: undefined,
+  unhandled: true
+}
+
+---
+
+still broken. now system is alwauys selected. how can we fix this!!!
+
+---
+
+okay wonderful. make atomic commits

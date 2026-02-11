@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "60fa6bf19432",
+  "strategy": "manual-commit",
+  "branch": "fix/theme-toggle-and-dark-mode-contrast",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "packages/marketing/src/lib/posts.ts",
+    "packages/marketing/src/routes/about.tsx",
+    "packages/marketing/src/routes/brand.tsx",
+    "packages/marketing/src/routes/design-system.tsx",
+    "packages/ui/src/components/theme-provider.tsx",
+    "packages/ui/src/fonts/Newsreader.ttf"
+  ],
+  "sessions": [
+    {
+      "metadata": "/60/fa6bf19432/0/metadata.json",
+      "transcript": "/60/fa6bf19432/0/full.jsonl",
+      "context": "/60/fa6bf19432/0/context.md",
+      "content_hash": "/60/fa6bf19432/0/content_hash.txt",
+      "prompt": "/60/fa6bf19432/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 22,
+    "cache_creation_tokens": 73352,
+    "cache_read_tokens": 969352,
+    "output_tokens": 1544,
+    "api_call_count": 16
+  }
+}
