@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 
 import { getContentByTag, groupBySubjectTag } from "@/lib/graph-utils";
 
@@ -20,7 +20,7 @@ const SUBJECT_LABELS: Record<string, string> = {
 const SUBJECT_ORDER = ["league", "team", "player", "skill", "media", "event", "other"];
 
 function WikiIndex() {
-  const wikiPosts = getContentByTag(allPosts, "wiki");
+  const wikiPosts = getContentByTag(publishedPosts, "wiki");
   const grouped = groupBySubjectTag(wikiPosts);
 
   // Sort groups by predefined order

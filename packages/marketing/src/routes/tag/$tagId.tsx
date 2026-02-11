@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag } from "@/lib/graph-utils";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/tag/$tagId")({
   },
   loader: ({ params }: { params: { tagId: string } }) => {
     const tagId = params.tagId.toLowerCase();
-    const posts = getContentByTag(allPosts, tagId);
+    const posts = getContentByTag(publishedPosts, tagId);
     if (posts.length === 0) {
       throw notFound();
     }

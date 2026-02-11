@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { buildGraphData, NODE_COLORS, type GraphNode } from "@/lib/graph-utils";
@@ -17,7 +17,7 @@ interface NodePosition {
 
 function GraphPage() {
   const navigate = useNavigate();
-  const graphData = buildGraphData(allPosts);
+  const graphData = buildGraphData(publishedPosts);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -46,7 +46,7 @@ function GraphPage() {
     });
 
     setPositions(newPositions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- graphData is derived from static allPosts
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- graphData is derived from static publishedPosts
   }, [graphData.nodes.length, dimensions]);
 
   // Update dimensions on resize

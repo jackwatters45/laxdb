@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag, getContentByTags } from "@/lib/graph-utils";
@@ -24,11 +24,11 @@ export const Route = createFileRoute("/blog/")({
 function getFilteredPosts(filter: FilterKey) {
   switch (filter) {
     case "opinion":
-      return getContentByTags(allPosts, ["blog", "opinion"]);
+      return getContentByTags(publishedPosts, ["blog", "opinion"]);
     case "wiki":
-      return getContentByTags(allPosts, ["blog", "wiki"], ["opinion"]);
+      return getContentByTags(publishedPosts, ["blog", "wiki"], ["opinion"]);
     default:
-      return getContentByTag(allPosts, "blog");
+      return getContentByTag(publishedPosts, "blog");
   }
 }
 

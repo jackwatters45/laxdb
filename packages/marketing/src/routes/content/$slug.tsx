@@ -1,12 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { allPosts, type Post } from "content-collections";
+import type { Post } from "content-collections";
+
+import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { MDXContent } from "@/components/mdx-content";
 
 export const Route = createFileRoute("/content/$slug")({
   loader: ({ params }: { params: { slug: string } }): Post => {
-    const post = allPosts.find((p) => p.slug === params.slug);
+    const post = publishedPosts.find((p) => p.slug === params.slug);
     if (!post) {
       throw notFound();
     }
