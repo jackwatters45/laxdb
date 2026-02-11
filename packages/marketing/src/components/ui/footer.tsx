@@ -127,20 +127,20 @@ const Footer = () => {
           <h3 className="mb-4 font-medium text-foreground sm:text-sm">Company</h3>
           <ul className="space-y-4">
             <li className="text-sm">
-              <a
+              <Link
                 className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
-                href="/about"
+                to="/about"
               >
                 About
-              </a>
+              </Link>
             </li>
             <li className="text-sm">
-              <a
+              <Link
                 className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
-                href="/brand"
+                to="/brand"
               >
                 Brand
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
