@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { NotFound } from "@laxdb/ui/components/not-found";
+import { NotFound, NotFoundSecondaryAction } from "@laxdb/ui/components/not-found";
 import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 
@@ -64,17 +64,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 function NotFoundComponent() {
   return (
-    <RootDocument>
-      <NavBar />
-      <NotFound>
-        <Link
-          className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border-b-[1.5px] border-foreground/20 bg-foreground px-5 py-3 text-sm leading-4 font-medium tracking-wide text-background shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 hover:opacity-90"
-          to="/"
-        >
-          Go Home
-        </Link>
-      </NotFound>
-      <Footer />
-    </RootDocument>
+    <NotFound>
+      <NotFoundSecondaryAction
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        Go Back
+      </NotFoundSecondaryAction>
+      <Link
+        className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border-b-[1.5px] border-foreground/20 bg-foreground px-5 py-3 text-sm leading-4 font-medium tracking-wide text-background shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 hover:opacity-90"
+        to="/"
+      >
+        Go Home
+      </Link>
+    </NotFound>
   );
 }
