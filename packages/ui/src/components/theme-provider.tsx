@@ -23,14 +23,17 @@ type ThemeProviderState = {
 const MEDIA = "(prefers-color-scheme: dark)";
 const colorSchemes = new Set(["light", "dark"]);
 
-const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
+const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent): "dark" | "light" => {
+  if (typeof window === "undefined") {
+    return "light";
+  }
   const media = e ?? window.matchMedia(MEDIA);
   return media.matches ? "dark" : "light";
 };
 
 const getTheme = (key: string, fallback?: string) => {
   if (typeof window === "undefined") {
-    return;
+    return fallback;
   }
   try {
     return localStorage.getItem(key) ?? fallback;
