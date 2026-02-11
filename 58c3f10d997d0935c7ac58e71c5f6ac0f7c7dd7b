@@ -1,0 +1,40 @@
+packages/marketing/src/routes/__root.tsx
+  64d9f6be7e0aa788 3,5,68-77
+packages/ui/src/components/not-found.tsx
+  64d9f6be7e0aa788 1-87
+packages/web/src/components/not-found.tsx
+  64d9f6be7e0aa788 1,9-12,15,17-18,20,23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "58c3f10d997d0935c7ac58e71c5f6ac0f7c7dd7b",
+  "prompts": {
+    "64d9f6be7e0aa788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a54625ce-9197-4c6c-a6b0-90e1891f725e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 730,
+      "total_deletions": 78,
+      "accepted_lines": 675,
+      "overriden_lines": 0
+    },
+    "cf860422098d393c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6eee7ca3-110b-4f4e-a19e-2609cb9d5b16",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}
