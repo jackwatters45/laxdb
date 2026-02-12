@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "412e958431ac",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "packages/marketing/public/images/clouds.png",
+    "packages/marketing/public/images/drone.png",
+    "packages/marketing/public/images/droneold.png",
+    "packages/marketing/public/images/farm-footer.webp",
+    "packages/marketing/public/images/field.png",
+    "packages/marketing/public/images/line-chart-illustration.tsx",
+    "packages/marketing/public/images/smiller.jpeg",
+    "packages/marketing/public/laxdb-logo.tsx",
+    "packages/marketing/public/solar-logo.tsx",
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx",
+    "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/41/2e958431ac/0/metadata.json",
+      "transcript": "/41/2e958431ac/0/full.jsonl",
+      "context": "/41/2e958431ac/0/context.md",
+      "content_hash": "/41/2e958431ac/0/content_hash.txt",
+      "prompt": "/41/2e958431ac/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 31,
+    "cache_creation_tokens": 34793,
+    "cache_read_tokens": 1518418,
+    "output_tokens": 2582,
+    "api_call_count": 21
+  }
+}

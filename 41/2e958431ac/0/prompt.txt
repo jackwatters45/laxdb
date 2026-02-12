@@ -1,0 +1,116 @@
+Implement the following plan:
+
+# Cleanup: unused marketing components + web feedback type error
+
+## Context
+The design system consolidation moved components from `components/ui/` to `components/`, creating duplicates. Many components (Solar template leftovers) are commented out in routes. Three have broken imports causing typecheck failures. One web feedback form is missing a required field.
+
+## Dependency trace from routes
+
+**Used (keep):**
+- `components/footer.tsx` ← __root.tsx
+- `components/navbar.tsx` ← __root.tsx
+- `components/fade.tsx` ← changelog, changelog-entry, ui/hero
+- `components/changelog-entry.tsx` ← changelog
+- `components/mdx-content.tsx` ← content/$slug
+- `components/icons.tsx` ← ui/features
+- `components/orbit.tsx` ← ui/features
+- `components/ui/features.tsx` ← index.tsx
+- `components/ui/hero.tsx` ← index.tsx
+- `components/ui/chip-viz.tsx` ← ui/features
+- `components/ui/hero-background.tsx` ← ui/hero
+- `public/solar-mark.tsx` ← ui/chip-viz
+
+## Delete: unused components (14 files)
+
+`src/components/`:
+- `analytics-illustration.tsx` — broken import, unused
+- `button.tsx` — only dep of call-to-action (unused)
+- `call-to-action.tsx` — commented out in index.tsx
+- `chip-viz.tsx` — duplicate of ui/chip-viz
+- `divider.tsx` — only dep of feature-divider (unused)
+- `feature-divider.tsx` — commented out in index.tsx
+- `features.tsx` — duplicate of ui/features
+- `hero-background.tsx` — duplicate of ui/hero-background
+- `hero.tsx` — duplicate of ui/hero
+- `map/map.tsx` + `map/svg-map.tsx` — commented out in index.tsx
+- `sticker-card.tsx` — only used by ui/solar-analytics (unused)
+- `table.tsx` — only dep of analytics-illustration (unused)
+- `testimonial.tsx` — commented out in index.tsx
+
+## Delete: unused ui/ components (10 files)
+
+`src/components/ui/`:
+- `analytics-illustration.tsx` — unused
+- `call-to-action.tsx` — commented out
+- `feature-divider.tsx` — commented out
+- `footer.tsx` — superseded by root-level footer
+- `map/map.tsx` + `map/svg-map.tsx` — commented out
+- `navbar.tsx` — superseded by root-level navbar
+- `solar-analytics.tsx` — commented out
+- `sticker-card.tsx` — only dep of solar-analytics (unused)
+- `testimonial.tsx` — commented out
+
+## Delete: unused public assets (8 files)
+
+- `public/laxdb-logo.tsx` — zero references in src/
+- `public/solar-logo.tsx` — zero references in src/
+- `public/images/line-chart-illustration.tsx` — only dep of analytics-illustration (unused)
+- `public/images/clouds.png` — only in unused components
+- `public/images/drone.png` — only in unused components
+- `public/images/droneold.png` — only in unused components
+- `public/images/farm-footer.webp` — only in unused components
+- `public/images/field.png` — only in unused components
+- `public/images/smiller.jpeg` — only in unused components
+
+## Fix: clean up index.tsx
+
+Remove 5 commented-out imports in `src/routes/index.tsx` (lines 3-4, 7-9).
+
+## Fix: web feedback type error
+
+`packages/web/src/routes/_protected/$organizationSlug/feedback.tsx:38` — add `attachments` field to match `CreateFeedbackInput` schema.
+
+## Verification
+
+1. `trash` all files listed above
+2. Remove commented imports from index.tsx
+3. Fix feedback.tsx type error
+4. Run `bun run typecheck` — should pass clean
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+- Fixed feedback.tsx — added attachments: [] to the feedbackService.create() call to match CreateFeedbackInput schema. wait, what this seems completely wrong. What if there are attachments? Why would we hard code an empty array? i thought we resolved this
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+i swear this is a really stupid way to resolve this. Can you check that the fucking can you just confirm you're right when you s said that we hard coded attachments
+
+---
+
+why would the field be omitted? I don't understand why we're not actually attaching attachments
+
+---
+
+[Request interrupted by user]
+
+---
+
+oh, oh got it. We're in the app. so we're in the web package. Yeah, I don't give a shit about that. That's fine
+
+---
+
+okay, so even if even if it is currently hard coded or wait, are only unstage changes the attachments as far as what we just worked on? we can just undo the change if it I mean it's gonna act the same, so I don't really care. I'd rather not add another commit
+
+---
+
+please push all changes and update the PR description or and or title to match the state of the PR
