@@ -1,0 +1,9 @@
+add design system to the company section of the footer
+
+---
+
+update the kitchen sink page with our changes? if applicable? same with brand. also why is there a purple color for sidebar. fix this so it is what it is in main
+
+---
+
+okay, please make commits for this
