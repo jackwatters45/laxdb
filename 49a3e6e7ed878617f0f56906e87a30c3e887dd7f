@@ -1,0 +1,29 @@
+packages/marketing/src/routes/blog/index.tsx
+  6568c4647ce28c60 33
+packages/marketing/src/routes/design-system.tsx
+  6568c4647ce28c60 390,398
+packages/marketing/src/routes/about.tsx
+  6568c4647ce28c60 25-26,36-38,42
+packages/marketing/src/routes/brand.tsx
+  6568c4647ce28c60 187,192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.2",
+  "base_commit_sha": "49a3e6e7ed878617f0f56906e87a30c3e887dd7f",
+  "prompts": {
+    "6568c4647ce28c60": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4fc8c384-28bc-4d89-9fde-747d4831e404",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}
