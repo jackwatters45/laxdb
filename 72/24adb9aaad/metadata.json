@@ -3,7 +3,7 @@
   "checkpoint_id": "7224adb9aaad",
   "strategy": "manual-commit",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 0,
+  "checkpoints_count": 2,
   "files_touched": [
     "alchemy.run.ts",
     "packages/core/src/email/email.schema.ts",
@@ -13,6 +13,11 @@
     "packages/core/src/feedback/feedback.service.ts",
     "packages/core/src/feedback/feedback.sql.ts",
     "packages/marketing/package.json",
+    "packages/marketing/src/content/changelog/knowledge-graph-explorer.mdx",
+    "packages/marketing/src/content/changelog/nll-historical-stats.mdx",
+    "packages/marketing/src/content/changelog/open-source-launch.mdx",
+    "packages/marketing/src/content/changelog/pll-2025-season-data.mdx",
+    "packages/marketing/src/lib/changelog-posts.ts",
     "packages/marketing/src/routes/feedback.tsx",
     "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
   ],
@@ -23,13 +28,20 @@
       "context": "/72/24adb9aaad/0/context.md",
       "content_hash": "/72/24adb9aaad/0/content_hash.txt",
       "prompt": "/72/24adb9aaad/0/prompt.txt"
+    },
+    {
+      "metadata": "/72/24adb9aaad/1/metadata.json",
+      "transcript": "/72/24adb9aaad/1/full.jsonl",
+      "context": "/72/24adb9aaad/1/context.md",
+      "content_hash": "/72/24adb9aaad/1/content_hash.txt",
+      "prompt": "/72/24adb9aaad/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 285,
-    "cache_creation_tokens": 196430,
-    "cache_read_tokens": 15444948,
-    "output_tokens": 22050,
-    "api_call_count": 146
+    "input_tokens": 302,
+    "cache_creation_tokens": 228950,
+    "cache_read_tokens": 16296948,
+    "output_tokens": 22706,
+    "api_call_count": 159
   }
 }

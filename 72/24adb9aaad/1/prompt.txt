@@ -1,0 +1,46 @@
+Implement the following plan:
+
+# Fix: CreateFeedbackInput type error for optional attachments
+
+## Context
+
+Most of the feedback backend plan is implemented (steps 1–5, 9 done). The remaining typecheck failure is in `packages/web/.../feedback.tsx`:
+
+```
+Property 'attachments' is missing in type '{ feedback: string; source: string; userId: string; userEmail: string; }' but required in type 'CreateFeedbackInput'
+```
+
+Root cause: `Schema.optionalWith(Schema.Array(AttachmentSchema), { default: () => [] })` makes `attachments` **optional in the encoded type** but **required in the decoded type** (`.Type`). Since the service method is typed as `create: (input: CreateFeedbackInput)`, callers must pass `attachments` even though the schema provides a default.
+
+Marketing form was detached from the backend (steps 6–8 deferred) — it's a client-only stub with a TODO.
+
+## Fix
+
+**`packages/core/src/feedback/feedback.schema.ts`** — Change `attachments` from `Schema.optionalWith` to `Schema.optional`:
+
+```typescript
+// Before
+attachments: Schema.optionalWith(Schema.Array(AttachmentSchema), {
+  default: () => [],
+}),
+
+// After
+attachments: Schema.optional(Schema.Array(AttachmentSchema)),
+```
+
+This makes `attachments` optional in both encoded and decoded types. The repo already handles the missing case: `attachments: input.attachments ? [...input.attachments] : []`.
+
+No other files need changes.
+
+## Verification
+
+1. `bun run typecheck` — core + web pass (marketing has pre-existing unrelated errors)
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.claude/projects/-Users-jw-Desktop-repos-laxdb/2aa5ab59-a227-49c2-8de7-8ea88a920057.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+alright, make a make commits for this fix and anything directly related to it
