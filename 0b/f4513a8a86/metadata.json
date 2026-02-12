@@ -3,7 +3,7 @@
   "checkpoint_id": "0bf4513a8a86",
   "strategy": "manual-commit",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 47,
+  "checkpoints_count": 49,
   "files_touched": [
     "CLAUDE.md",
     "alchemy.run.ts",
@@ -39,9 +39,12 @@
     "packages/marketing/src/components/ui/sticker-card.tsx",
     "packages/marketing/src/components/ui/testimonial.tsx",
     "packages/marketing/src/globals.css",
+    "packages/marketing/src/routes/__root.tsx",
     "packages/marketing/src/routes/compare.tsx",
+    "packages/marketing/src/routes/kitchen-sink.tsx",
     "packages/ui/.storybook/main.ts",
     "packages/ui/package.json",
+    "packages/ui/src/components/not-found.tsx",
     "packages/ui/src/components/ui/accordion.stories.tsx",
     "packages/ui/src/components/ui/alert-dialog.stories.tsx",
     "packages/ui/src/components/ui/alert.stories.tsx",
@@ -127,7 +130,8 @@
     "packages/ui/src/stories/textarea.stories.tsx",
     "packages/ui/src/stories/toggle-group.stories.tsx",
     "packages/ui/src/stories/toggle.stories.tsx",
-    "packages/ui/src/stories/tooltip.stories.tsx"
+    "packages/ui/src/stories/tooltip.stories.tsx",
+    "packages/web/src/components/not-found.tsx"
   ],
   "sessions": [
     {
@@ -150,13 +154,20 @@
       "context": "/0b/f4513a8a86/2/context.md",
       "content_hash": "/0b/f4513a8a86/2/content_hash.txt",
       "prompt": "/0b/f4513a8a86/2/prompt.txt"
+    },
+    {
+      "metadata": "/0b/f4513a8a86/3/metadata.json",
+      "transcript": "/0b/f4513a8a86/3/full.jsonl",
+      "context": "/0b/f4513a8a86/3/context.md",
+      "content_hash": "/0b/f4513a8a86/3/content_hash.txt",
+      "prompt": "/0b/f4513a8a86/3/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 5532,
-    "cache_creation_tokens": 460186,
-    "cache_read_tokens": 31117822,
-    "output_tokens": 59565,
-    "api_call_count": 274
+    "input_tokens": 5633,
+    "cache_creation_tokens": 593191,
+    "cache_read_tokens": 38901298,
+    "output_tokens": 68990,
+    "api_call_count": 349
   }
 }
