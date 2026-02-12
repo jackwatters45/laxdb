@@ -9,7 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as KitchenSinkRouteImport } from './routes/kitchen-sink'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as BrandRouteImport } from './routes/brand'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,9 +23,24 @@ import { Route as TagTagIdRouteImport } from './routes/tag/$tagId'
 import { Route as ContentSlugRouteImport } from './routes/content/$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
+const KitchenSinkRoute = KitchenSinkRouteImport.update({
+  id: '/kitchen-sink',
+  path: '/kitchen-sink',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
   id: '/design-system',
   path: '/design-system',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrandRoute = BrandRouteImport.update({
@@ -75,7 +93,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/brand': typeof BrandRoute
+  '/changelog': typeof ChangelogRoute
   '/design-system': typeof DesignSystemRoute
+  '/feedback': typeof FeedbackRoute
+  '/kitchen-sink': typeof KitchenSinkRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/content/$slug': typeof ContentSlugRoute
   '/tag/$tagId': typeof TagTagIdRoute
@@ -87,7 +108,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/brand': typeof BrandRoute
+  '/changelog': typeof ChangelogRoute
   '/design-system': typeof DesignSystemRoute
+  '/feedback': typeof FeedbackRoute
+  '/kitchen-sink': typeof KitchenSinkRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/content/$slug': typeof ContentSlugRoute
   '/tag/$tagId': typeof TagTagIdRoute
@@ -100,7 +124,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/brand': typeof BrandRoute
+  '/changelog': typeof ChangelogRoute
   '/design-system': typeof DesignSystemRoute
+  '/feedback': typeof FeedbackRoute
+  '/kitchen-sink': typeof KitchenSinkRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/content/$slug': typeof ContentSlugRoute
   '/tag/$tagId': typeof TagTagIdRoute
@@ -114,7 +141,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/brand'
+    | '/changelog'
     | '/design-system'
+    | '/feedback'
+    | '/kitchen-sink'
     | '/blog/$slug'
     | '/content/$slug'
     | '/tag/$tagId'
@@ -126,7 +156,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/brand'
+    | '/changelog'
     | '/design-system'
+    | '/feedback'
+    | '/kitchen-sink'
     | '/blog/$slug'
     | '/content/$slug'
     | '/tag/$tagId'
@@ -138,7 +171,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/brand'
+    | '/changelog'
     | '/design-system'
+    | '/feedback'
+    | '/kitchen-sink'
     | '/blog/$slug'
     | '/content/$slug'
     | '/tag/$tagId'
@@ -151,7 +187,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BrandRoute: typeof BrandRoute
+  ChangelogRoute: typeof ChangelogRoute
   DesignSystemRoute: typeof DesignSystemRoute
+  FeedbackRoute: typeof FeedbackRoute
+  KitchenSinkRoute: typeof KitchenSinkRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ContentSlugRoute: typeof ContentSlugRoute
   TagTagIdRoute: typeof TagTagIdRoute
@@ -162,11 +201,32 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/kitchen-sink': {
+      id: '/kitchen-sink'
+      path: '/kitchen-sink'
+      fullPath: '/kitchen-sink'
+      preLoaderRoute: typeof KitchenSinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/design-system': {
       id: '/design-system'
       path: '/design-system'
       fullPath: '/design-system'
       preLoaderRoute: typeof DesignSystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/brand': {
@@ -239,7 +299,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BrandRoute: BrandRoute,
+  ChangelogRoute: ChangelogRoute,
   DesignSystemRoute: DesignSystemRoute,
+  FeedbackRoute: FeedbackRoute,
+  KitchenSinkRoute: KitchenSinkRoute,
   BlogSlugRoute: BlogSlugRoute,
   ContentSlugRoute: ContentSlugRoute,
   TagTagIdRoute: TagTagIdRoute,
