@@ -34,6 +34,7 @@ const posts = defineCollection({
   name: "posts",
   directory: "./src/content",
   include: "**/*.mdx",
+  exclude: "changelog/**",
   schema: z.object({
     title: z.string(),
     published: z.iso.date(),
@@ -82,6 +83,30 @@ const posts = defineCollection({
   },
 });
 
+const changelog = defineCollection({
+  name: "changelog",
+  directory: "./src/content/changelog",
+  include: "**/*.mdx",
+  schema: z.object({
+    title: z.string(),
+    published: z.iso.date(),
+    draft: z.boolean().default(false),
+    category: z.enum(["data", "feature", "improvement", "community"]),
+    summary: z.string(),
+    content: z.string(),
+  }),
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document, {
+      remarkPlugins: [remarkGfm],
+    });
+    return {
+      ...document,
+      slug: document._meta.path,
+      mdx,
+    };
+  },
+});
+
 export default defineConfig({
-  collections: [posts],
+  collections: [posts, changelog],
 });
