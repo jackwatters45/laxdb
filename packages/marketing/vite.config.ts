@@ -21,6 +21,11 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  server: {
+    watch: {
+      ignored: ["**/routeTree.gen.ts", "**/.tanstack/**"],
+    },
+  },
   css: {
     modules: {
       localsConvention: "camelCase",

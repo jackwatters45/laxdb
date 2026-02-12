@@ -44,4 +44,9 @@ export default defineConfig({
     }),
     react(),
   ],
+  server: {
+    watch: {
+      ignored: ["**/routeTree.gen.ts", "**/.tanstack/**"],
+    },
+  },
 });
