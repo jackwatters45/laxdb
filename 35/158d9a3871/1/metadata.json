@@ -1,9 +1,11 @@
 {
   "cli_version": "0.4.2",
   "checkpoint_id": "35158d9a3871",
+  "session_id": "2906a8c1-408b-4d6e-ba98-52612fb624db",
   "strategy": "manual-commit",
+  "created_at": "2026-02-12T03:25:05.516601Z",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 2,
+  "checkpoints_count": 1,
   "files_touched": [
     "packages/marketing/public/images/clouds.png",
     "packages/marketing/public/images/drone.png",
@@ -26,31 +28,26 @@
     "packages/marketing/src/components/ui/navbar.tsx",
     "packages/marketing/src/components/ui/solar-analytics.tsx",
     "packages/marketing/src/components/ui/sticker-card.tsx",
-    "packages/marketing/src/components/ui/testimonial.tsx",
-    "packages/marketing/src/routes/index.tsx",
-    "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
+    "packages/marketing/src/components/ui/testimonial.tsx"
   ],
-  "sessions": [
-    {
-      "metadata": "/35/158d9a3871/0/metadata.json",
-      "transcript": "/35/158d9a3871/0/full.jsonl",
-      "context": "/35/158d9a3871/0/context.md",
-      "content_hash": "/35/158d9a3871/0/content_hash.txt",
-      "prompt": "/35/158d9a3871/0/prompt.txt"
-    },
-    {
-      "metadata": "/35/158d9a3871/1/metadata.json",
-      "transcript": "/35/158d9a3871/1/full.jsonl",
-      "context": "/35/158d9a3871/1/context.md",
-      "content_hash": "/35/158d9a3871/1/content_hash.txt",
-      "prompt": "/35/158d9a3871/1/prompt.txt"
-    }
-  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "da3f56b6-8bce-4846-a7a5-9d0286729824",
+  "checkpoint_transcript_start": 149,
+  "transcript_lines_at_start": 149,
   "token_usage": {
-    "input_tokens": 15,
-    "cache_creation_tokens": 25780,
-    "cache_read_tokens": 733062,
-    "output_tokens": 476,
-    "api_call_count": 11
+    "input_tokens": 7,
+    "cache_creation_tokens": 3052,
+    "cache_read_tokens": 375009,
+    "output_tokens": 41,
+    "api_call_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T03:25:05.491725Z",
+    "agent_lines": 0,
+    "human_added": 30832,
+    "human_modified": 1911,
+    "human_removed": 0,
+    "total_committed": 30832,
+    "agent_percentage": 0
   }
 }

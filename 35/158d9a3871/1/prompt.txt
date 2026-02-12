@@ -1,0 +1,116 @@
+Implement the following plan:
+
+# Changelog Page — Content Collections Data Source
+
+## Context
+
+Changelog page UI is mostly built (timeline, entry component, route, footer link). Currently uses a hardcoded array in `lib/changelog.ts`. Need to swap to Content Collections so entries are authored as MDX files — same pattern as the blog. This decouples changelog from GitHub releases (which are auto-tagged per PR, too granular).
+
+## Files
+
+### Create
+
+| File | Purpose |
+|------|---------|
+| `src/content/changelog/*.mdx` | Changelog entries (4 seed files) |
+| `src/lib/changelog-posts.ts` | Export `allChangelogs` from content-collections, filter drafts |
+
+### Modify
+
+| File | Change |
+|------|--------|
+| `content-collections.ts` | Add `changelog` collection with its own schema |
+| `src/lib/changelog.ts` | Remove hardcoded entries array, keep types + `CATEGORY_LABELS` |
+| `src/routes/changelog.tsx` | Import from `changelog-posts.ts` instead of `changelog.ts` |
+| `src/components/changelog-entry.tsx` | Adapt to content-collections shape (minor field mapping) |
+
+## Content Collections Setup
+
+Add a `changelog` collection in `content-collections.ts` alongside `posts`:
+
+```ts
+const changelog = defineCollection({
+  name: "changelog",
+  directory: "./src/content/changelog",
+  include: "**/*.mdx",
+  schema: z.object({
+    title: z.string(),
+    published: z.iso.date(),
+    draft: z.boolean().default(false),
+    category: z.enum(["data", "feature", "improvement", "community"]),
+    summary: z.string(),
+    content: z.string(),
+  }),
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document, {
+      remarkPlugins: [remarkGfm],
+    });
+    return {
+      ...document,
+      slug: document._meta.path,
+      mdx,
+    };
+  },
+});
+```
+
+Register: `collections: [posts, changelog]`
+
+## MDX File Format
+
+```mdx
+---
+title: PLL 2025 Season Data
+published: 2026-01-15
+category: data
+summary: Complete game-by-game statistics for the 2025 PLL season.
+---
+
+Body content here as markdown. Supports **bold**, lists, etc.
+
+- 156 games across 8 teams
+- Player stats: goals, assists, points, ground balls
+```
+
+Key difference from hardcoded model: `body[]` and `highlights[]` merge into a single MDX body. Simpler to author, richer formatting.
+
+## Entry Component Adaptation
+
+The `ChangelogEntryCard` currently renders `body[]` as paragraphs and `highlights[]` as bullet list. With MDX, the component renders compiled MDX directly using the existing `prose-blog` styles (or a lighter variant). The `summary` stays in frontmatter for the timeline preview text.
+
+## Data Flow
+
+```
+src/content/changelog/*.mdx
+  → content-collections build (bun run gen:content-collections)
+  → allChangelogs (typed array)
+  → changelog-posts.ts (filter drafts, sort by date)
+  → route imports sorted array
+  → ChangelogEntryCard renders each entry
+```
+
+## Implementation Order
+
+1. Add `changelog` collection to `content-collections.ts`
+2. Create `src/content/changelog/` with 4 seed MDX files
+3. Create `src/lib/changelog-posts.ts`
+4. Update `changelog-entry.tsx` to render MDX body
+5. Update `routes/changelog.tsx` to use new data source
+6. Clean up `lib/changelog.ts` (remove entries array, keep types)
+7. Run `bun run gen:content-collections` + typecheck
+
+## Verification
+
+1. `bun run gen:content-collections`
+2. `bun run dev` → `localhost:3002/changelog`
+3. Verify entries render with formatted MDX body
+4. `bun run typecheck` passes
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+wonderful. Please make commits for this stuff. feel free to switch to No verify if the typechecking or linting issues are completely unrelated to this
