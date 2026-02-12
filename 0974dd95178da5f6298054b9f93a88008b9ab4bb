@@ -1,0 +1,99 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.2",
+  "base_commit_sha": "0974dd95178da5f6298054b9f93a88008b9ab4bb",
+  "prompts": {
+    "3ddbb6b6556358c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b42fa303-ad71-4e25-86c8-c45f29808622",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "484e46dd610f1a9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2a7bd6cf-152f-4600-812e-4b230e9b5754",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 34,
+      "total_deletions": 30,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "6568c4647ce28c60": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4fc8c384-28bc-4d89-9fde-747d4831e404",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "7c51ecbdef5d4c92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4e27a951-231e-4c6b-8365-a8443e09e7ce",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "a30b86bb7aed1c3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81fc893c-eb31-4c4c-b559-bf4191417f42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "cf860422098d393c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6eee7ca3-110b-4f4e-a19e-2609cb9d5b16",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "f1a4a0ed005ee81b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9e9beade-9379-4601-b72e-af139184aeab",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
