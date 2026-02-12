@@ -1,0 +1,75 @@
+Implement the following plan:
+
+# Plan: Add NotFound button size + variant to Button component
+
+## Context
+
+The NotFound page has two custom-styled buttons ("Go Home" primary, "Go Back" secondary) that bypass the `Button` component entirely. We want to bring them into the design system by:
+1. Adding a larger size to handle the NotFound button scale
+2. Using the existing `default` variant for the primary "Go Home" button
+3. Adding a new variant for the subtle "Go Back" button style
+
+## Current State
+
+**NotFound buttons** (`packages/ui/src/components/not-found.tsx`):
+- Primary: `px-5 py-3 text-sm leading-4 tracking-wide` — bg-foreground, border-b shadow
+- Secondary: `px-5 py-3 text-sm leading-4 tracking-wide` — no bg, text-muted-foreground → hover:text-foreground
+
+**Button sizes** (`packages/ui/src/components/ui/button.tsx`):
+- `sm`: h-5, text-[0.6875rem]
+- `default`: h-6, text-xs
+- `lg`: h-7, text-xs
+
+The NotFound buttons are significantly larger than any existing size. Need an `xl` size.
+
+## Changes
+
+### 1. Add `xl` size to Button (`packages/ui/src/components/ui/button.tsx`)
+
+```
+xl: "h-10 gap-1.5 px-5 text-sm/4 tracking-wide has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&_svg:not([class*='size-'])]:size-4"
+```
+
+Also add `icon-xl: "size-10 [&_svg:not([class*='size-'])]:size-4"` for consistency.
+
+### 2. Add `ghost-muted` variant to Button
+
+For the "Go Back" style — no bg, muted text, hover just changes text color:
+
+```
+"ghost-muted": "rounded-md text-muted-foreground hover:text-foreground"
+```
+
+### 3. Refactor NotFound actions (`packages/ui/src/components/not-found.tsx`)
+
+- Replace `NotFoundAction` with a thin wrapper around `Button` using `size="xl"` variant `default`
+- Replace `NotFoundSecondaryAction` with `Button` using `size="xl"` variant `ghost-muted`
+- Keep them as `<a>` and `<button>` respectively (Base UI Button renders as button by default, use `render` prop for anchor)
+
+### 4. Update consumers
+
+**`packages/marketing/src/routes/__root.tsx`** — Replace inline styles on `<Link>` with `Button` props via `NotFoundAction`
+
+**`packages/web/src/components/not-found.tsx`** — Same cleanup
+
+## Files to modify
+
+1. `packages/ui/src/components/ui/button.tsx` — add `xl` size + `ghost-muted` variant
+2. `packages/ui/src/components/not-found.tsx` — use Button internally
+3. `packages/marketing/src/routes/__root.tsx` — use NotFoundAction instead of raw Link styles
+4. `packages/web/src/components/not-found.tsx` — same cleanup
+
+## Verification
+
+- `bun run typecheck` passes
+- View marketing 404 page in browser — buttons should look identical to current
+- View web app 404 page — same
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.claude/projects/-Users-jw-Desktop-repos-laxdb/a868f9da-9c9f-494f-8843-5caa9d462cec.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+MAKE COMMIUT PLS
