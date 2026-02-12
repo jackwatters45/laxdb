@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "66062f440d4f",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 7,
+  "files_touched": [
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/chip-viz.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/features.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/hero-background.tsx",
+    "packages/marketing/src/components/ui/hero.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx",
+    "packages/marketing/src/routes/feedback.tsx",
+    "packages/ui/src/components/ui/dropzone.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/66/062f440d4f/0/metadata.json",
+      "transcript": "/66/062f440d4f/0/full.jsonl",
+      "context": "/66/062f440d4f/0/context.md",
+      "content_hash": "/66/062f440d4f/0/content_hash.txt",
+      "prompt": "/66/062f440d4f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 7136,
+    "cache_creation_tokens": 151053,
+    "cache_read_tokens": 11146823,
+    "output_tokens": 5622,
+    "api_call_count": 97
+  }
+}
