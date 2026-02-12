@@ -3,7 +3,7 @@
   "checkpoint_id": "7224adb9aaad",
   "strategy": "manual-commit",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 2,
+  "checkpoints_count": 3,
   "files_touched": [
     "alchemy.run.ts",
     "packages/core/src/email/email.schema.ts",
@@ -35,13 +35,20 @@
       "context": "/72/24adb9aaad/1/context.md",
       "content_hash": "/72/24adb9aaad/1/content_hash.txt",
       "prompt": "/72/24adb9aaad/1/prompt.txt"
+    },
+    {
+      "metadata": "/72/24adb9aaad/2/metadata.json",
+      "transcript": "/72/24adb9aaad/2/full.jsonl",
+      "context": "/72/24adb9aaad/2/context.md",
+      "content_hash": "/72/24adb9aaad/2/content_hash.txt",
+      "prompt": "/72/24adb9aaad/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 302,
-    "cache_creation_tokens": 228950,
-    "cache_read_tokens": 16296948,
-    "output_tokens": 22706,
-    "api_call_count": 159
+    "input_tokens": 312,
+    "cache_creation_tokens": 241213,
+    "cache_read_tokens": 16930071,
+    "output_tokens": 23040,
+    "api_call_count": 167
   }
 }
