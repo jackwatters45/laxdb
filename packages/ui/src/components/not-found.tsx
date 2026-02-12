@@ -1,5 +1,7 @@
 import { cn } from "@laxdb/ui/lib/utils";
 
+import { Button } from "./ui/button";
+
 function DashedLine({ className }: { className?: string }) {
   return (
     <div
@@ -46,42 +48,25 @@ function NotFound({
         <DashedLine className="right-0" />
       </div>
 
-      <p className="text-label text-xs">{code}</p>
-      <h1 className="mt-4 text-center font-serif text-5xl text-foreground italic sm:text-7xl">
+      <p className="text-[11px] tracking-[0.2em] text-subtle uppercase">{code}</p>
+      <h1 className="mt-3 text-center font-serif text-5xl text-foreground italic sm:text-7xl">
         {title}
       </h1>
-      <p className="mt-6 max-w-md text-center text-base text-balance text-muted-foreground">
+      <p className="mt-4 max-w-md text-center text-base text-balance text-muted-foreground">
         {description}
       </p>
 
-      {children && <div className="mt-8 flex items-center gap-3">{children}</div>}
+      {children && <div className="mt-8 flex items-center gap-4">{children}</div>}
     </main>
   );
 }
 
-function NotFoundAction({ className, ...props }: React.ComponentProps<"a">) {
-  return (
-    <a
-      className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border-b-[1.5px] border-foreground/20 bg-foreground px-5 py-3 text-sm leading-4 font-medium tracking-wide text-background shadow-[0_0_0_2px_rgba(0,0,0,0.04),0_0_14px_0_rgba(255,255,255,0.19)] transition-all duration-200 hover:opacity-90",
-        className,
-      )}
-      {...props}
-    />
-  );
+function NotFoundAction({ className, ...props }: React.ComponentProps<typeof Button>) {
+  return <Button size="xl" variant="default" className={className} render={<a />} {...props} />;
 }
 
-function NotFoundSecondaryAction({ className, ...props }: React.ComponentProps<"button">) {
-  return (
-    <button
-      className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border border-border bg-background px-5 py-3 text-sm leading-4 font-medium tracking-wide text-foreground transition-all duration-200 hover:bg-accent",
-        className,
-      )}
-      type="button"
-      {...props}
-    />
-  );
+function NotFoundSecondaryAction({ className, ...props }: React.ComponentProps<typeof Button>) {
+  return <Button size="xl" variant="ghost-muted" className={className} {...props} />;
 }
 
 export { NotFound, NotFoundAction, NotFoundSecondaryAction };
