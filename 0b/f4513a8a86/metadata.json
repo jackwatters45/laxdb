@@ -3,7 +3,7 @@
   "checkpoint_id": "0bf4513a8a86",
   "strategy": "manual-commit",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 12,
+  "checkpoints_count": 47,
   "files_touched": [
     "CLAUDE.md",
     "alchemy.run.ts",
@@ -51,6 +51,7 @@
     "packages/ui/src/components/ui/breadcrumb.stories.tsx",
     "packages/ui/src/components/ui/button-group.stories.tsx",
     "packages/ui/src/components/ui/button.stories.tsx",
+    "packages/ui/src/components/ui/button.tsx",
     "packages/ui/src/components/ui/card.stories.tsx",
     "packages/ui/src/components/ui/checkbox.stories.tsx",
     "packages/ui/src/components/ui/collapsible.stories.tsx",
@@ -84,6 +85,7 @@
     "packages/ui/src/components/ui/toggle-group.stories.tsx",
     "packages/ui/src/components/ui/toggle.stories.tsx",
     "packages/ui/src/components/ui/tooltip.stories.tsx",
+    "packages/ui/src/globals.css",
     "packages/ui/src/stories/accordion.stories.tsx",
     "packages/ui/src/stories/alert-dialog.stories.tsx",
     "packages/ui/src/stories/alert.stories.tsx",
@@ -141,13 +143,20 @@
       "context": "/0b/f4513a8a86/1/context.md",
       "content_hash": "/0b/f4513a8a86/1/content_hash.txt",
       "prompt": "/0b/f4513a8a86/1/prompt.txt"
+    },
+    {
+      "metadata": "/0b/f4513a8a86/2/metadata.json",
+      "transcript": "/0b/f4513a8a86/2/full.jsonl",
+      "context": "/0b/f4513a8a86/2/context.md",
+      "content_hash": "/0b/f4513a8a86/2/content_hash.txt",
+      "prompt": "/0b/f4513a8a86/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 4195,
-    "cache_creation_tokens": 240204,
-    "cache_read_tokens": 12380282,
-    "output_tokens": 22331,
-    "api_call_count": 107
+    "input_tokens": 5532,
+    "cache_creation_tokens": 460186,
+    "cache_read_tokens": 31117822,
+    "output_tokens": 59565,
+    "api_call_count": 274
   }
 }

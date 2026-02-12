@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0bf4513a8a86",
+  "session_id": "29f82fa1-146a-4846-ae38-2aa4e3c91b86",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-12T01:52:55.716514Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 35,
+  "files_touched": [
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/chip-viz.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/features.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/hero-background.tsx",
+    "packages/marketing/src/components/ui/hero.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx",
+    "packages/ui/src/components/ui/button.tsx",
+    "packages/ui/src/globals.css",
+    "packages/ui/src/stories/button.stories.tsx"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "52a68dbd-2ae9-4fd1-af48-6cae6c00b861",
+  "token_usage": {
+    "input_tokens": 1337,
+    "cache_creation_tokens": 219982,
+    "cache_read_tokens": 18737540,
+    "output_tokens": 37234,
+    "api_call_count": 167
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T01:52:55.470665Z",
+    "agent_lines": 0,
+    "human_added": 1073594,
+    "human_modified": 189,
+    "human_removed": 0,
+    "total_committed": 1073733,
+    "agent_percentage": 0
+  }
+}
