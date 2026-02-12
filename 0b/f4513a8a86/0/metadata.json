@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0bf4513a8a86",
+  "session_id": "105f7a67-22c3-46f5-b66d-113ba0562b47",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-12T01:52:54.69926Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CLAUDE.md",
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/chip-viz.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/features.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/hero-background.tsx",
+    "packages/marketing/src/components/ui/hero.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "9be77c29-8d51-495d-b58c-74845ae49f0c",
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 12978,
+    "cache_read_tokens": 160902,
+    "output_tokens": 351,
+    "api_call_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T01:52:54.688964Z",
+    "agent_lines": 0,
+    "human_added": 33611,
+    "human_modified": 2,
+    "human_removed": 0,
+    "total_committed": 33612,
+    "agent_percentage": 0
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0bf4513a8a86",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CLAUDE.md",
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/chip-viz.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/features.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/hero-background.tsx",
+    "packages/marketing/src/components/ui/hero.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0b/f4513a8a86/0/metadata.json",
+      "transcript": "/0b/f4513a8a86/0/full.jsonl",
+      "context": "/0b/f4513a8a86/0/context.md",
+      "content_hash": "/0b/f4513a8a86/0/content_hash.txt",
+      "prompt": "/0b/f4513a8a86/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 12978,
+    "cache_read_tokens": 160902,
+    "output_tokens": 351,
+    "api_call_count": 3
+  }
+}

@@ -1,0 +1,1 @@
+will you add a note in the Claude.md that Claude does not need to regenerate the route tree and then it will be regenerated automatically using by the dev server. So just if you have an error for it just fucking ignore it
