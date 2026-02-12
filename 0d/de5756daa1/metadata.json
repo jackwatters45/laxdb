@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0dde5756daa1",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "packages/web/src/lib/runtime.atom.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0d/de5756daa1/0/metadata.json",
+      "transcript": "/0d/de5756daa1/0/full.jsonl",
+      "context": "/0d/de5756daa1/0/context.md",
+      "content_hash": "/0d/de5756daa1/0/content_hash.txt",
+      "prompt": "/0d/de5756daa1/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 2758,
+    "cache_read_tokens": 488357,
+    "output_tokens": 102,
+    "api_call_count": 6
+  }
+}

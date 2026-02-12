@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "0dde5756daa1",
+  "session_id": "8159bc85-3f67-410a-b86e-31fe15599270",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-12T03:34:40.477604Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "packages/web/src/lib/runtime.atom.ts"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "b68fa481-95ce-4d9e-a135-5614750e015a",
+  "checkpoint_transcript_start": 194,
+  "transcript_lines_at_start": 194,
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 2758,
+    "cache_read_tokens": 488357,
+    "output_tokens": 102,
+    "api_call_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T03:34:40.448589Z",
+    "agent_lines": 0,
+    "human_added": 61998,
+    "human_modified": 44,
+    "human_removed": 0,
+    "total_committed": 61998,
+    "agent_percentage": 0
+  }
+}
