@@ -1,0 +1,31 @@
+packages/core/src/season/season.repo.ts
+  6568c4647ce28c60 2,20
+packages/core/src/player/contact-info/contact-info.repo.ts
+  6568c4647ce28c60 3,22
+packages/core/src/player/player.repo.ts
+  6568c4647ce28c60 2,27
+packages/core/src/game/game.repo.ts
+  6568c4647ce28c60 2,20
+packages/core/src/feedback/feedback.repo.ts
+  6568c4647ce28c60 2,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.2",
+  "base_commit_sha": "5ac5d58bf4b58a33ef25154b2f4de854712d567e",
+  "prompts": {
+    "6568c4647ce28c60": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4fc8c384-28bc-4d89-9fde-747d4831e404",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 34,
+      "accepted_lines": 26,
+      "overriden_lines": 0
+    }
+  }
+}
