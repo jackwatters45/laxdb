@@ -1,0 +1,52 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "35158d9a3871",
+  "session_id": "8159bc85-3f67-410a-b86e-31fe15599270",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-12T03:24:56.837311Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "packages/marketing/public/images/clouds.png",
+    "packages/marketing/public/images/drone.png",
+    "packages/marketing/public/images/droneold.png",
+    "packages/marketing/public/images/farm-footer.webp",
+    "packages/marketing/public/images/field.png",
+    "packages/marketing/public/images/line-chart-illustration.tsx",
+    "packages/marketing/public/images/smiller.jpeg",
+    "packages/marketing/public/laxdb-logo.tsx",
+    "packages/marketing/public/solar-logo.tsx",
+    "packages/marketing/src/components/button.tsx",
+    "packages/marketing/src/components/divider.tsx",
+    "packages/marketing/src/components/table.tsx",
+    "packages/marketing/src/components/ui/analytics-illustration.tsx",
+    "packages/marketing/src/components/ui/call-to-action.tsx",
+    "packages/marketing/src/components/ui/feature-divider.tsx",
+    "packages/marketing/src/components/ui/footer.tsx",
+    "packages/marketing/src/components/ui/map/map.tsx",
+    "packages/marketing/src/components/ui/map/svg-map.tsx",
+    "packages/marketing/src/components/ui/navbar.tsx",
+    "packages/marketing/src/components/ui/solar-analytics.tsx",
+    "packages/marketing/src/components/ui/sticker-card.tsx",
+    "packages/marketing/src/components/ui/testimonial.tsx",
+    "packages/marketing/src/routes/index.tsx",
+    "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 8,
+    "cache_creation_tokens": 22728,
+    "cache_read_tokens": 358053,
+    "output_tokens": 435,
+    "api_call_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T03:24:56.825496Z",
+    "agent_lines": 0,
+    "human_added": 2357,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 2358,
+    "agent_percentage": 0
+  }
+}
