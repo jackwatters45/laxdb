@@ -1,0 +1,103 @@
+packages/ui/package.json
+  b8821a1974003aad 26-27
+packages/ui/src/components/ui/dropzone.tsx
+  82b5f16b6b3ed55d 1-144,146-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "f4d519c6dfd2435995a37d5790c76fb000b057d0",
+  "prompts": {
+    "3ddbb6b6556358c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b42fa303-ad71-4e25-86c8-c45f29808622",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "64d9f6be7e0aa788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a54625ce-9197-4c6c-a6b0-90e1891f725e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 504,
+      "total_deletions": 28,
+      "accepted_lines": 497,
+      "overriden_lines": 2
+    },
+    "7526e17e9c32f773": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "105f7a67-22c3-46f5-b66d-113ba0562b47",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "82b5f16b6b3ed55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79dd72b2-fc23-4798-b8f6-815095a8bf4c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 878,
+      "total_deletions": 345,
+      "accepted_lines": 515,
+      "overriden_lines": 15
+    },
+    "a20382e7ef3c3985": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29f82fa1-146a-4846-ae38-2aa4e3c91b86",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 214,
+      "total_deletions": 165,
+      "accepted_lines": 84,
+      "overriden_lines": 0
+    },
+    "b8821a1974003aad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25b67fab-175c-44c3-b380-523effc24d49",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 2042,
+      "total_deletions": 2,
+      "accepted_lines": 2040,
+      "overriden_lines": 0
+    },
+    "cf860422098d393c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6eee7ca3-110b-4f4e-a19e-2609cb9d5b16",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
