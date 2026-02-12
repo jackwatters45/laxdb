@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "7224adb9aaad",
+  "session_id": "2aa5ab59-a227-49c2-8de7-8ea88a920057",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-12T03:21:54.508825Z",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "alchemy.run.ts",
+    "packages/core/src/email/email.schema.ts",
+    "packages/core/src/email/email.service.ts",
+    "packages/core/src/feedback/feedback.repo.ts",
+    "packages/core/src/feedback/feedback.schema.ts",
+    "packages/core/src/feedback/feedback.service.ts",
+    "packages/core/src/feedback/feedback.sql.ts",
+    "packages/marketing/package.json",
+    "packages/marketing/src/routes/feedback.tsx",
+    "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 285,
+    "cache_creation_tokens": 196430,
+    "cache_read_tokens": 15444948,
+    "output_tokens": 22050,
+    "api_call_count": 146
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-12T03:21:54.366027Z",
+    "agent_lines": 121,
+    "human_added": 2706,
+    "human_modified": 31,
+    "human_removed": 0,
+    "total_committed": 2858,
+    "agent_percentage": 4.233729881035689
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "7224adb9aaad",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "alchemy.run.ts",
+    "packages/core/src/email/email.schema.ts",
+    "packages/core/src/email/email.service.ts",
+    "packages/core/src/feedback/feedback.repo.ts",
+    "packages/core/src/feedback/feedback.schema.ts",
+    "packages/core/src/feedback/feedback.service.ts",
+    "packages/core/src/feedback/feedback.sql.ts",
+    "packages/marketing/package.json",
+    "packages/marketing/src/routes/feedback.tsx",
+    "packages/web/src/routes/_protected/$organizationSlug/feedback.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/72/24adb9aaad/0/metadata.json",
+      "transcript": "/72/24adb9aaad/0/full.jsonl",
+      "context": "/72/24adb9aaad/0/context.md",
+      "content_hash": "/72/24adb9aaad/0/content_hash.txt",
+      "prompt": "/72/24adb9aaad/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 285,
+    "cache_creation_tokens": 196430,
+    "cache_read_tokens": 15444948,
+    "output_tokens": 22050,
+    "api_call_count": 146
+  }
+}
