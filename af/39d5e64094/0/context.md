@@ -1,0 +1,12 @@
+# Session Context
+
+## User Prompts
+
+### Prompt 1
+
+create a changelog page similar to this. plan out how to implement, and come up with a good design for it that is similar to the existing but not an exact rip: https://linear.app/changelog /frontend-design /rams
+
+### Prompt 2
+
+[Request interrupted by user for tool use]
+

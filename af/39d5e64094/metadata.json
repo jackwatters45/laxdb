@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "af39d5e64094",
+  "strategy": "manual-commit",
+  "branch": "refactor/design-system-consolidation",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "packages/core/src/feedback/feedback.repo.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/af/39d5e64094/0/metadata.json",
+      "transcript": "/af/39d5e64094/0/full.jsonl",
+      "context": "/af/39d5e64094/0/context.md",
+      "content_hash": "/af/39d5e64094/0/content_hash.txt",
+      "prompt": "/af/39d5e64094/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 25,
+    "cache_creation_tokens": 58885,
+    "cache_read_tokens": 1260754,
+    "output_tokens": 1682,
+    "api_call_count": 15
+  }
+}
