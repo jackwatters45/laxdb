@@ -1,0 +1,76 @@
+Implement the following plan:
+
+# Lint Cleanup Plan
+
+## Context
+All packages pass with 0 errors and clean typecheck. There are warnings across packages. Focusing on easily fixable ones — skipping `effect-cloudflare` (internal CF bindings, `any` from CF runtime) and most `pipeline` warnings (scraping code, type assertions on `JSON.parse`, negated conditions that are more readable as-is).
+
+## Summary: 116 total warnings, 0 errors
+
+| Package | Warnings | Fixable Now |
+|---------|----------|-------------|
+| effect-cloudflare | 35 | 0 (CF runtime types) |
+| @laxdb/pipeline | 53 | 2 (unused imports) |
+| @laxdb/marketing | 19 | 16 |
+| @laxdb/core | 6 | 5 |
+| @laxdb/web | 3 | 2 |
+| @laxdb/ui | 2 | 1 |
+| @laxdb/api | 0 | - |
+| @laxdb/docs | 0 | - |
+| @laxdb/scripts | 0 | - |
+
+## Fixes
+
+### 1. @laxdb/core — `getTableColumns` → `getColumns` (5 files)
+Drizzle deprecated `getTableColumns`, replacement is `getColumns`.
+- `src/game/game.repo.ts:20`
+- `src/player/contact-info/contact-info.repo.ts:22`
+- `src/feedback/feedback.repo.ts:16`
+- `src/player/player.repo.ts:27`
+- `src/season/season.repo.ts:20`
+
+### 2. @laxdb/marketing — unescaped entities (14 instances)
+Replace `'` with `&apos;` and `"` with `&quot;` in JSX text:
+- `src/routes/brand.tsx:187,192` — apostrophes
+- `src/routes/about.tsx:25,26,36,37,38,41,42` — apostrophes
+- `src/routes/design-system.tsx:390,398` — quotes around import path
+
+### 3. @laxdb/marketing — unused import
+- `src/components/ui/features.tsx:4` — remove `RiCircleLine`
+
+### 4. @laxdb/marketing — switch exhaustiveness
+- `src/routes/blog/index.tsx:26` — add missing case to switch
+
+### 5. @laxdb/pipeline — unused imports
+- `src/extract/pll/pll.manifest.ts:1` — remove `Schema`
+- `src/extract/pll/pll.extractor.ts:14` — remove `PLLTeamDetail`
+
+### 6. @laxdb/web — empty file
+- Delete `src/lib/runtime.atom.ts` (only contains comments)
+
+### 7. @laxdb/ui — function scoping
+- `src/hooks/use-sound.ts:36` — move `getMatches` outside `useMediaQuery`
+
+## Not fixing (intentional or low-value)
+- `effect-cloudflare` — all 35 warnings are CF runtime type mismatches
+- `pipeline` — `no-negated-condition`, `max-depth`, `consistent-function-scoping`, type assertions on `JSON.parse` in scraping code
+- `@laxdb/ui` `.storybook/preview.ts` — CSS side-effect import, intentional
+- `@laxdb/marketing` `feedback.tsx:85` — `no-promise-executor-return` on `setTimeout` in a TODO stub
+- `@laxdb/marketing` `kitchen-sink.tsx:242` — Base UI `SelectValue` render prop type
+- `@laxdb/marketing` `blog/index.tsx:18` — validated search type narrowing
+- `@laxdb/web` type assertions — runtime workarounds for API types
+- `@laxdb/core` `util.ts:16` — `JSON.parse` cast, common pattern
+
+## Verification
+```bash
+bun run lint && bun run typecheck
+```
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+please make commits for all of these changes
