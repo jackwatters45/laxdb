@@ -1,5 +1,5 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
-import { getTableColumns } from "drizzle-orm";
+import { getColumns } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
 
 import { DatabaseLive } from "../drizzle/drizzle.service";
@@ -13,7 +13,7 @@ export class FeedbackRepo extends Effect.Service<FeedbackRepo>()(
     effect: Effect.gen(function* () {
       const db = yield* PgDrizzle;
 
-      const { id: _, ...rest } = getTableColumns(feedbackTable);
+      const { id: _, ...rest } = getColumns(feedbackTable);
 
       return {
         insert: (input: CreateFeedbackInput) =>
