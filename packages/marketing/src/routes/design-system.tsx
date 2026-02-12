@@ -9,46 +9,46 @@ export const Route = createFileRoute("/design-system")({
 const CORE_COLORS = [
   {
     name: "background",
-    light: "oklch(0.98 0 0)",
-    dark: "oklch(0.11 0 0)",
+    light: "oklch(0.96 0.007 70)",
+    dark: "oklch(0.21 0.006 70)",
     variable: "--background",
   },
   {
     name: "foreground",
     light: "oklch(0.17 0 0)",
-    dark: "oklch(0.95 0 0)",
+    dark: "oklch(0.985 0 0)",
     variable: "--foreground",
   },
   { name: "muted", light: "oklch(0.97 0 0)", dark: "oklch(0.269 0 0)", variable: "--muted" },
   {
     name: "muted-foreground",
     light: "oklch(0.51 0 0)",
-    dark: "oklch(0.63 0 0)",
+    dark: "oklch(0.73 0 0)",
     variable: "--muted-foreground",
   },
-  { name: "accent", light: "oklch(0.91 0 0)", dark: "oklch(0.22 0 0)", variable: "--accent" },
+  { name: "accent", light: "oklch(0.91 0 0)", dark: "oklch(0.3 0 0)", variable: "--accent" },
   {
     name: "accent-foreground",
     light: "oklch(0.17 0 0)",
-    dark: "oklch(0.95 0 0)",
+    dark: "oklch(0.985 0 0)",
     variable: "--accent-foreground",
   },
   { name: "subtle", light: "oklch(0.63 0 0)", dark: "oklch(0.51 0 0)", variable: "--subtle" },
-  { name: "border", light: "oklch(0.93 0 0)", dark: "oklch(0.24 0 0)", variable: "--border" },
+  { name: "border", light: "oklch(0.93 0 0)", dark: "oklch(0.32 0 0)", variable: "--border" },
   {
     name: "border-strong",
     light: "oklch(0.89 0 0)",
-    dark: "oklch(0.30 0 0)",
+    dark: "oklch(0.4 0 0)",
     variable: "--border-strong",
   },
-  { name: "bullet", light: "oklch(0.82 0 0)", dark: "oklch(0.37 0 0)", variable: "--bullet" },
+  { name: "bullet", light: "oklch(0.82 0 0)", dark: "oklch(0.4 0 0)", variable: "--bullet" },
 ] as const;
 
 const STATUS_COLORS = [
   {
     name: "destructive",
     light: "oklch(0.58 0.22 27)",
-    dark: "oklch(0.704 0.191 22)",
+    dark: "oklch(0.704 0.191 22.216)",
     variable: "--destructive",
   },
   {
@@ -74,14 +74,19 @@ const STATUS_COLORS = [
 const APP_COLORS = [
   { name: "card", light: "oklch(1 0 0)", dark: "oklch(0.205 0 0)", variable: "--card" },
   { name: "popover", light: "oklch(1 0 0)", dark: "oklch(0.205 0 0)", variable: "--popover" },
-  { name: "primary", light: "oklch(0.205 0 0)", dark: "oklch(0.87 0 0)", variable: "--primary" },
+  {
+    name: "primary",
+    light: "oklch(0.205 0 0)",
+    dark: "oklch(0.87 0 0)",
+    variable: "--primary",
+  },
   {
     name: "secondary",
     light: "oklch(0.97 0 0)",
     dark: "oklch(0.269 0 0)",
     variable: "--secondary",
   },
-  { name: "input", light: "oklch(0.93 0 0)", dark: "oklch(0.24 0 0)", variable: "--input" },
+  { name: "input", light: "oklch(0.93 0 0)", dark: "oklch(0.32 0 0)", variable: "--input" },
   { name: "ring", light: "oklch(0.708 0 0)", dark: "oklch(0.556 0 0)", variable: "--ring" },
 ] as const;
 
@@ -90,7 +95,7 @@ const SIDEBAR_COLORS = [
   {
     name: "sidebar-primary",
     light: "oklch(0.205 0 0)",
-    dark: "oklch(0.488 0.243 264)",
+    dark: "oklch(0.985 0 0)",
     variable: "--sidebar-primary",
   },
   {

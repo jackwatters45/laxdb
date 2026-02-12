@@ -5,26 +5,37 @@ const PALETTE = [
   {
     name: "Background",
     variable: "--color-background",
-    light: "oklch(0.98 0 0)",
-    dark: "oklch(0.11 0 0)",
+    light: "oklch(0.96 0.007 70)",
+    dark: "oklch(0.21 0.006 70)",
   },
   {
     name: "Foreground",
     variable: "--color-foreground",
     light: "oklch(0.17 0 0)",
-    dark: "oklch(0.95 0 0)",
+    dark: "oklch(0.985 0 0)",
   },
-  { name: "Muted", variable: "--color-muted", light: "oklch(0.51 0 0)", dark: "oklch(0.63 0 0)" },
+  {
+    name: "Primary",
+    variable: "--color-primary",
+    light: "oklch(0.205 0 0)",
+    dark: "oklch(0.87 0 0)",
+  },
+  {
+    name: "Muted",
+    variable: "--color-muted-foreground",
+    light: "oklch(0.51 0 0)",
+    dark: "oklch(0.73 0 0)",
+  },
   { name: "Subtle", variable: "--color-subtle", light: "oklch(0.63 0 0)", dark: "oklch(0.51 0 0)" },
-  { name: "Accent", variable: "--color-accent", light: "oklch(0.91 0 0)", dark: "oklch(0.22 0 0)" },
-  { name: "Border", variable: "--color-border", light: "oklch(0.93 0 0)", dark: "oklch(0.24 0 0)" },
+  { name: "Accent", variable: "--color-accent", light: "oklch(0.91 0 0)", dark: "oklch(0.3 0 0)" },
+  { name: "Border", variable: "--color-border", light: "oklch(0.93 0 0)", dark: "oklch(0.32 0 0)" },
   {
     name: "Border Strong",
     variable: "--color-border-strong",
     light: "oklch(0.89 0 0)",
-    dark: "oklch(0.30 0 0)",
+    dark: "oklch(0.4 0 0)",
   },
-  { name: "Bullet", variable: "--color-bullet", light: "oklch(0.82 0 0)", dark: "oklch(0.37 0 0)" },
+  { name: "Bullet", variable: "--color-bullet", light: "oklch(0.82 0 0)", dark: "oklch(0.4 0 0)" },
   {
     name: "Orange",
     variable: "--color-orange",
@@ -132,9 +143,9 @@ function BrandGuidelines() {
         <section>
           <h2 className="mb-6 font-serif text-lg text-foreground italic">Color</h2>
           <p className="mb-6 text-sm text-foreground">
-            Monochrome core in OKLCH for perceptual uniformity. Each value has a defined role. Dark
-            mode inverts the scale. The single accent color — a burnt orange inspired by the
-            lacrosse goal — is the only chromatic exception.
+            Near-monochrome core in OKLCH for perceptual uniformity. Background carries a subtle
+            warm tint (hue 70). Dark mode inverts the scale. Orange is the only saturated chromatic
+            accent.
           </p>
           <div className="space-y-3">
             {PALETTE.map((color) => (
