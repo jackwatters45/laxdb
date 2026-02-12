@@ -84,9 +84,13 @@ import { Controller } from "react-hook-form";
 
 ```bash
 bunx --bun shadcn@latest add <component>  # Add new component
+bun run storybook                          # Run Storybook (port 6006)
+bun run build-storybook                    # Build static Storybook
 bun run typecheck                          # Type check
 bun run fix                                # Lint + format
 ```
+
+Stories live in `src/stories/*.stories.tsx`.
 
 ## KEY COMPONENTS
 
