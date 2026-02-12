@@ -1,0 +1,36 @@
+help me debug this endlessly occuring:
+
+irtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+[vite] hot updated: virtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+File /Users/jw/Desktop/repos/laxdb/packages/marketing/src/routeTree.gen.ts was modified by another process during processing.
+File /Users/jw/Desktop/repos/laxdb/packages/marketing/src/routeTree.gen.ts was modified by another process during processing.
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:46 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:46 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+File /Users/jw/Desktop/repos/laxdb/packages/marketing/src/routeTree.gen.ts was modified by another process during processing.
+9:41:47 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:47 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:47 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:47 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:47 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:47 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+9:41:47 am [vite] (client) page reload src/routeTree.gen.ts
+9:41:47 am [vite] (ssr) hmr update /@id/virtual:cloudflare/worker-entry
+^Cfailed to wait for command termination: signal: interrupt
+Exiting...
+ ✘ jw@Jacks-MacBook-Air-3  ~/Desktop/repos/laxdb   refactor/design-syst
+
+---
+
+this wont cause any errors?

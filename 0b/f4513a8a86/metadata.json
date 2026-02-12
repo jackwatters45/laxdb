@@ -3,7 +3,7 @@
   "checkpoint_id": "0bf4513a8a86",
   "strategy": "manual-commit",
   "branch": "refactor/design-system-consolidation",
-  "checkpoints_count": 49,
+  "checkpoints_count": 50,
   "files_touched": [
     "CLAUDE.md",
     "alchemy.run.ts",
@@ -42,6 +42,7 @@
     "packages/marketing/src/routes/__root.tsx",
     "packages/marketing/src/routes/compare.tsx",
     "packages/marketing/src/routes/kitchen-sink.tsx",
+    "packages/marketing/vite.config.ts",
     "packages/ui/.storybook/main.ts",
     "packages/ui/package.json",
     "packages/ui/src/components/not-found.tsx",
@@ -161,13 +162,20 @@
       "context": "/0b/f4513a8a86/3/context.md",
       "content_hash": "/0b/f4513a8a86/3/content_hash.txt",
       "prompt": "/0b/f4513a8a86/3/prompt.txt"
+    },
+    {
+      "metadata": "/0b/f4513a8a86/4/metadata.json",
+      "transcript": "/0b/f4513a8a86/4/full.jsonl",
+      "context": "/0b/f4513a8a86/4/context.md",
+      "content_hash": "/0b/f4513a8a86/4/content_hash.txt",
+      "prompt": "/0b/f4513a8a86/4/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 5633,
-    "cache_creation_tokens": 593191,
-    "cache_read_tokens": 38901298,
-    "output_tokens": 68990,
-    "api_call_count": 349
+    "input_tokens": 5642,
+    "cache_creation_tokens": 637870,
+    "cache_read_tokens": 39165829,
+    "output_tokens": 69460,
+    "api_call_count": 354
   }
 }
