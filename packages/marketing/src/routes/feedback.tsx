@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CloudUpload, Paperclip, X } from "lucide-react";
+import { CloudUpload, Loader2, Paperclip, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 
@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/feedback")({
   component: FeedbackPage,
 });
+
+// --- Client ---
 
 interface FileWithPreview extends File {
   preview: string;
@@ -29,6 +31,7 @@ function FeedbackPage() {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const removeFile = useCallback((name: string) => {
@@ -73,17 +76,28 @@ function FeedbackPage() {
     noKeyboard: true,
   });
 
-  function handleSubmit() {
-    setSubmitted(true);
-    setMessage("");
-    setFiles((prev) => {
-      for (const f of prev) URL.revokeObjectURL(f.preview);
-      return [];
-    });
+  async function handleSubmit() {
     setError(null);
+    setSubmitting(true);
+
+    try {
+      // TODO: Wire up to backend when marketing worker has core bindings
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setSubmitted(true);
+      setMessage("");
+      setFiles((prev) => {
+        for (const f of prev) URL.revokeObjectURL(f.preview);
+        return [];
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  const canSubmit = message.trim().length > 0;
+  const canSubmit = message.trim().length > 0 && !submitting;
 
   if (submitted) {
     return (
@@ -126,7 +140,7 @@ function FeedbackPage() {
       >
         <input {...getInputProps()} />
 
-        {/* Drag overlay -- sits on top of card content, same dimensions */}
+        {/* Drag overlay */}
         {isDragActive && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-foreground/25 bg-background/90 backdrop-blur-xs">
             <CloudUpload className="size-10 text-muted-foreground/60" />
@@ -246,12 +260,13 @@ function FeedbackPage() {
           </span>
 
           <button
-            className="inline-flex cursor-pointer items-center rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!canSubmit}
             onClick={handleSubmit}
             type="button"
           >
-            Send message
+            {submitting && <Loader2 className="size-3.5 animate-spin" />}
+            {submitting ? "Sending..." : "Send message"}
           </button>
         </div>
       </div>
