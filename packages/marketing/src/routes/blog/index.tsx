@@ -30,7 +30,7 @@ function getFilteredPosts(filter: FilterKey) {
       return getContentByTags(publishedPosts, ["blog", "opinion"]);
     case "wiki":
       return getContentByTags(publishedPosts, ["blog", "wiki"], ["opinion"]);
-    default:
+    case "all":
       return getContentByTag(publishedPosts, "blog");
   }
 }

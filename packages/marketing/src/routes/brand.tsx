@@ -184,12 +184,12 @@ function BrandGuidelines() {
                 <ul className="space-y-1.5 text-sm text-foreground">
                   <li>State facts plainly</li>
                   <li>Be specific over general</li>
-                  <li>Respect the reader's time</li>
+                  <li>Respect the reader&apos;s time</li>
                   <li>Let data speak</li>
                 </ul>
               </div>
               <div>
-                <p className="text-label mb-2 text-xs">Don't</p>
+                <p className="text-label mb-2 text-xs">Don&apos;t</p>
                 <ul className="space-y-1.5 text-sm text-muted-foreground">
                   <li>Hype or exaggerate</li>
                   <li>Use jargon for its own sake</li>

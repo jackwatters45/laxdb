@@ -22,8 +22,8 @@ function About() {
           </p>
           <p className="mt-3">
             The result is a single platform where player careers can be traced across leagues and
-            eras, where game data is structured and queryable, and where the sport's history is
-            preserved in a format that's actually useful.
+            eras, where game data is structured and queryable, and where the sport&apos;s history is
+            preserved in a format that&apos;s actually useful.
           </p>
         </section>
 
@@ -33,13 +33,14 @@ function About() {
           <h2 className="mb-4 font-serif text-lg text-foreground italic">Why it matters</h2>
           <p>
             Lacrosse is the fastest-growing sport in North America but its data infrastructure
-            hasn't kept pace. Box scores disappear when league websites shut down. Career stats are
-            scattered across PDFs, spreadsheets, and defunct websites. Comparing a PLL attackman's
-            production to an NLL forward's requires manual work that almost nobody does.
+            hasn&apos;t kept pace. Box scores disappear when league websites shut down. Career stats
+            are scattered across PDFs, spreadsheets, and defunct websites. Comparing a PLL
+            attackman&apos;s production to an NLL forward&apos;s requires manual work that almost
+            nobody does.
           </p>
           <p className="mt-3">
-            We think the sport deserves better. Good data doesn't just serve analysts — it deepens
-            every fan's understanding of what they're watching.
+            We think the sport deserves better. Good data doesn&apos;t just serve analysts — it
+            deepens every fan&apos;s understanding of what they&apos;re watching.
           </p>
         </section>
 

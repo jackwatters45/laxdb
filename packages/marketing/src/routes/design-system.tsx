@@ -387,7 +387,7 @@ color: var(--color-subtle);`}
                 packages/marketing/src/globals.css
               </code>
               <span className="text-xs text-muted-foreground">
-                One-line import: @import "@laxdb/ui/globals.css"
+                One-line import: @import &quot;@laxdb/ui/globals.css&quot;
               </span>
             </div>
             <div className="flex items-start gap-3">
@@ -395,7 +395,7 @@ color: var(--color-subtle);`}
                 packages/web/src/globals.css
               </code>
               <span className="text-xs text-muted-foreground">
-                One-line import: @import "@laxdb/ui/globals.css"
+                One-line import: @import &quot;@laxdb/ui/globals.css&quot;
               </span>
             </div>
           </div>

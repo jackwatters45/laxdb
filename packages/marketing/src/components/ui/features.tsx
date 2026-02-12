@@ -1,7 +1,6 @@
 import {
   RiBarChartFill,
   RiCheckLine,
-  RiCircleLine,
   RiCodepenLine,
   RiContrast2Line,
   RiDatabase2Fill,
