@@ -32,15 +32,15 @@ export function useSound(path: string, options?: HookOptions): PlayFunction {
   return play;
 }
 
-function useMediaQuery(query: string): boolean {
-  const getMatches = (query: string): boolean => {
-    // Prevents SSR issues
-    if (typeof window !== "undefined") {
-      return window.matchMedia(query).matches;
-    }
-    return false;
-  };
+function getMatches(query: string): boolean {
+  // Prevents SSR issues
+  if (typeof window !== "undefined") {
+    return window.matchMedia(query).matches;
+  }
+  return false;
+}
 
+function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState<boolean>(getMatches(query));
 
   function handleChange() {
