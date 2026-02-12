@@ -1,0 +1,156 @@
+Implement the following plan:
+
+# Changelog Page for Marketing Site
+
+## Context
+
+LaxDB needs a changelog page to communicate platform updates — new league data, features, improvements. Inspired by [linear.app/changelog](https://linear.app/changelog) but adapted to LaxDB's existing design language (dashed SVG lines, serif italic headings, orange accents, staggered fade animations).
+
+## Files
+
+### Create
+
+| File | Purpose |
+|------|---------|
+| `packages/marketing/src/lib/changelog.ts` | Types, categories, seed entries, filter helper |
+| `packages/marketing/src/components/changelog-entry.tsx` | Individual entry component |
+| `packages/marketing/src/routes/changelog.tsx` | Route + page layout (timeline, header, filter tabs) |
+
+### Modify
+
+| File | Change |
+|------|--------|
+| `packages/marketing/src/components/navbar.tsx` | Add "Changelog" link (desktop + mobile) between Blog and Wiki |
+| `packages/marketing/src/components/footer.tsx` | Add "Changelog" link under Resources column |
+
+## Data Model (`lib/changelog.ts`)
+
+```ts
+type ChangelogCategory = "data" | "feature" | "improvement" | "community"
+
+interface ChangelogEntry {
+  id: string
+  title: string
+  date: string              // ISO YYYY-MM-DD
+  category: ChangelogCategory
+  summary: string           // 1-2 sentences below title
+  body: string[]            // Paragraphs
+  highlights?: string[]     // Optional bullet points
+}
+```
+
+Static array of entries. No content-collections / MDX — overkill for a changelog v1.
+
+Filter categories: All | Data | Features | Improvements | Community (same tab pattern as `blog/index.tsx` lines 7-12, 52-74).
+
+## Layout Design
+
+### Page Header
+- `max-w-4xl mx-auto px-4 py-16 md:py-32` (wider than blog's `max-w-screen-sm`, narrower than homepage's `max-w-6xl`)
+- Title: `h1.font-serif.text-2xl.italic` (matches blog index and about page h1 patterns)
+- Filter tabs: Exact same `border-b border-border` + active underline pattern from blog index
+
+### Timeline (the core design element)
+
+Desktop (md+) — asymmetric two-column:
+
+```
+  Jan 15, 2026    ●─── PLL 2025 Season Data
+                  ┆    DATA
+                  ┆
+                  ┆    Complete game-by-game statistics...
+                  ┆
+                  ┆    • 156 games across 8 teams
+                  ┆    • Player stats: G, A, P, GB, CT
+                  ┆
+  Dec 2, 2025     ●─── Knowledge Graph Explorer
+                  ┆    FEATURE
+```
+
+- **Timeline spine**: Dashed SVG vertical line reused from `features.tsx` lines 29-47 (`<line strokeDasharray="3 3" strokeWidth="2" className="stroke-border">` with gradient mask at top/bottom)
+- **Orange dot markers**: `size-2.5 rounded-full bg-orange ring-4 ring-background` — punches through the dashed line
+- **Date column**: `w-[140px] shrink-0 text-right` — `text-xs text-subtle whitespace-nowrap` using `formatPublishedDate` from `@/lib/date`
+- **Content column**: `flex-1 min-w-0 pb-16`
+
+Mobile (<md): Single column. Timeline line at left edge, date above content.
+
+### Entry Design
+
+- **Title**: `font-serif text-xl md:text-2xl text-foreground italic` (LaxDB's serif signature)
+- **Category**: `.text-label text-xs` (uppercase, spaced — existing utility in globals.css)
+- **Summary**: `mt-3 text-[15px] leading-relaxed text-muted-foreground`
+- **Body**: `mt-4 space-y-3 text-[15px] leading-relaxed text-foreground` (matches about.tsx)
+- **Highlights**: Bullet list using about.tsx's pattern — `<span className="mt-1.5 block size-1.5 shrink-0 rounded-full bg-bullet" />` (line 52)
+
+### How It Differs from Linear
+
+| Linear | LaxDB |
+|--------|-------|
+| Solid timeline line | Dashed SVG line (site signature) |
+| Sans-serif titles | Serif italic (Newsreader) |
+| Multi-colored category dots | Orange dots + uppercase text labels |
+| Dark-only | Light + dark via CSS variables |
+| Collapsible sections | All content visible |
+| "Now" title | "Changelog" |
+
+## Reusable Utilities
+
+| Utility | Source | Usage |
+|---------|--------|-------|
+| `FadeContainer`, `FadeDiv` | `@/components/fade` | Page entrance animations |
+| `formatPublishedDate` | `@/lib/date` | Date formatting |
+| `cn()` | `@/lib/utils` | Class merging |
+| `.text-label` | `globals.css` | Category label styling |
+| Dashed SVG line | `features.tsx` lines 29-47 | Timeline spine |
+| Bullet pattern | `about.tsx` lines 51-72 | Highlights list |
+
+## Seed Content (4 entries)
+
+1. **PLL 2025 Season Data** (data, Jan 15 2026) — 156 games, player/goalie stats, two-point tracking
+2. **Knowledge Graph Explorer** (feature, Dec 2 2025) — Interactive force-directed graph, color-coded nodes
+3. **NLL Historical Stats 1987-2024** (data, Nov 10 2025) — 37 seasons, franchise history tracking
+4. **LaxDB Goes Open Source** (community, Oct 20 2025) — Full stack open-sourced on GitHub
+
+## Animation
+
+- Entire page in `FadeContainer` (staggered children: 50ms gaps, 200ms delay)
+- Title, filter tabs, and each entry wrapped in `FadeDiv`
+- Spring physics: stiffness 150, damping 19, mass 1.2 (existing config)
+- No scroll-triggered animations — entrance only
+
+## Implementation Order
+
+1. `lib/changelog.ts` — data model + seed content (zero deps)
+2. `components/changelog-entry.tsx` — entry component
+3. `routes/changelog.tsx` — route + timeline layout + filter tabs
+4. Modify `navbar.tsx` — add link (Blog | **Changelog** | Wiki | Graph)
+5. Modify `footer.tsx` — add link under Resources
+
+## Verification
+
+1. `bun run dev` from `packages/marketing` (port 3002)
+2. Navigate to `localhost:3002/changelog`
+3. Verify: filter tabs switch categories, timeline renders on desktop + mobile, fade animations play, dark/light mode both work
+4. Verify: navbar link works on desktop and mobile hamburger menu
+5. `bun run typecheck` passes
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/jw/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+getting not found for changelog?
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+remove the filters? we dont need its just a single topic (changelog) - the linear page is their entire blog
+
+---
+
+Oh, actually, most important thing, how how are we getting these entries? Where are they coming from? Cause I obviously I don't want to just hard code them. I wanna like fetch them from I don't know, GitHub or something. I haven't haven't started on the change log yet. I'm just trying to figure out the UI and then actually fetching
