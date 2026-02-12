@@ -1,0 +1,25 @@
+.gitignore
+  a30b86bb7aed1c3f 81-83
+CLAUDE.md
+  a30b86bb7aed1c3f 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.2",
+  "base_commit_sha": "6e25ff5cc662745d4eaf9085a0b46c10dbb5e21d",
+  "prompts": {
+    "a30b86bb7aed1c3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81fc893c-eb31-4c4c-b559-bf4191417f42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 1,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
