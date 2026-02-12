@@ -12,13 +12,13 @@ export function Hero() {
         <FadeDiv className="mx-auto">
           <Link aria-label="View the wiki" className="mx-auto w-full" to="/wiki">
             <div className="inline-flex max-w-full items-center gap-3 rounded-full bg-accent/50 px-2.5 py-0.5 pr-3 pl-0.5 font-medium text-foreground shadow-lg ring-1 shadow-black/10 ring-border filter backdrop-blur-[1px] transition-colors hover:bg-accent/70 focus:outline-hidden sm:text-sm">
-              <span className="shrink-0 truncate rounded-full border border-border bg-background px-2.5 py-1 text-sm text-muted sm:text-xs">
+              <span className="shrink-0 truncate rounded-full border border-border bg-background px-2.5 py-1 text-sm text-muted-foreground sm:text-xs">
                 New
               </span>
               <span className="flex items-center gap-1 truncate">
                 <span className="w-full truncate">Pro League Data Now Available</span>
 
-                <RiArrowRightUpLine className="size-4 shrink-0 text-muted" />
+                <RiArrowRightUpLine className="size-4 shrink-0 text-muted-foreground" />
               </span>
             </div>
           </Link>
@@ -28,7 +28,7 @@ export function Hero() {
           <br />
           <FadeSpan>Data</FadeSpan> <FadeSpan>Platform</FadeSpan>
         </h1>
-        <p className="mt-5 max-w-xl text-center text-base text-balance text-muted sm:mt-8 sm:text-xl">
+        <p className="mt-5 max-w-xl text-center text-base text-balance text-muted-foreground sm:mt-8 sm:text-xl">
           <FadeSpan>Comprehensive statistics and analytics</FadeSpan>{" "}
           <FadeSpan>for professional lacrosse. PLL, NLL, MLL,</FadeSpan>{" "}
           <FadeSpan>MSL, WLA - all in one place.</FadeSpan>

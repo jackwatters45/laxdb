@@ -1,5 +1,5 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
-import { and, eq, getTableColumns, isNull } from "drizzle-orm";
+import { and, eq, getColumns, isNull } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
 
 import { DatabaseLive } from "../drizzle/drizzle.service";
@@ -17,7 +17,7 @@ export class SeasonRepo extends Effect.Service<SeasonRepo>()("SeasonRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
-    const { id: _, ...rest } = getTableColumns(seasonTable);
+    const { id: _, ...rest } = getColumns(seasonTable);
 
     return {
       list: (input: GetAllSeasonsInput) =>

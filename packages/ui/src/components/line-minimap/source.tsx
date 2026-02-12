@@ -256,7 +256,7 @@ export function isActive(index: number, count: number): boolean {
 export function Indicator({ x }: { x: MotionValue<number> }) {
   return (
     <motion.div
-      className="bg-orange absolute -top-8 flex h-screen! w-[1px] flex-col items-center"
+      className="absolute -top-8 flex h-screen! w-[1px] flex-col items-center bg-orange"
       style={{ x }}
     >
       <svg width="7" height="6" viewBox="0 0 7 6" fill="none" className="-translate-y-3">

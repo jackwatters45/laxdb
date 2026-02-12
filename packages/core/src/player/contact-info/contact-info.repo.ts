@@ -1,6 +1,6 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import type { SqlError } from "@effect/sql/SqlError";
-import { eq, getTableColumns } from "drizzle-orm";
+import { eq, getColumns } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
 import type { NoSuchElementException } from "effect/Cause";
 
@@ -19,7 +19,7 @@ export class ContactInfoRepo extends Effect.Service<ContactInfoRepo>()(
     effect: Effect.gen(function* () {
       const db = yield* PgDrizzle;
 
-      const { id: _id, ...rest } = getTableColumns(playerContactInfoTable);
+      const { id: _id, ...rest } = getColumns(playerContactInfoTable);
 
       return {
         getPlayerWithContactInfo: (

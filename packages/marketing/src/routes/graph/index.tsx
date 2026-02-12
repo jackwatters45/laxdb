@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { buildGraphData, NODE_COLORS, type GraphNode } from "@/lib/graph-utils";
@@ -17,7 +17,7 @@ interface NodePosition {
 
 function GraphPage() {
   const navigate = useNavigate();
-  const graphData = buildGraphData(allPosts);
+  const graphData = buildGraphData(publishedPosts);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -46,7 +46,7 @@ function GraphPage() {
     });
 
     setPositions(newPositions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- graphData is derived from static allPosts
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- graphData is derived from static publishedPosts
   }, [graphData.nodes.length, dimensions]);
 
   // Update dimensions on resize
@@ -292,11 +292,11 @@ function GraphPage() {
 
   return (
     <main className="flex h-screen flex-col">
-      <header className="border-b border-border bg-white/80 px-4 py-4 backdrop-blur">
+      <header className="border-b border-border bg-background/80 px-4 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-screen-lg items-center justify-between">
           <div>
             <h1 className="font-serif text-xl text-foreground italic">Knowledge Graph</h1>
-            <p className="text-sm text-muted">
+            <p className="text-sm text-muted-foreground">
               {graphData.nodes.length} nodes · {graphData.edges.length} connections
             </p>
           </div>
@@ -304,11 +304,11 @@ function GraphPage() {
             <Link
               to="/blog"
               search={{ filter: undefined }}
-              className="text-muted hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
             >
               Blog
             </Link>
-            <Link to="/wiki" className="text-muted hover:text-foreground">
+            <Link to="/wiki" className="text-muted-foreground hover:text-foreground">
               Wiki
             </Link>
           </nav>
@@ -326,37 +326,37 @@ function GraphPage() {
         />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 p-3 shadow-sm backdrop-blur">
+        <div className="absolute bottom-4 left-4 rounded-lg bg-background/90 p-3 shadow-sm backdrop-blur">
           <div className="space-y-1.5 text-xs">
             <div className="flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.blog }}
               />
-              <span className="text-muted">Blog</span>
+              <span className="text-muted-foreground">Blog</span>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.wiki }}
               />
-              <span className="text-muted">Wiki</span>
+              <span className="text-muted-foreground">Wiki</span>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: NODE_COLORS.entity }}
               />
-              <span className="text-muted">Entity (no page)</span>
+              <span className="text-muted-foreground">Entity (no page)</span>
             </div>
           </div>
         </div>
 
         {/* Hovered node info */}
         {hoveredNode && (
-          <div className="absolute top-4 right-4 max-w-xs rounded-lg bg-white/90 p-3 shadow-sm backdrop-blur">
+          <div className="absolute top-4 right-4 max-w-xs rounded-lg bg-background/90 p-3 shadow-sm backdrop-blur">
             <h3 className="font-serif text-sm font-medium text-foreground">{hoveredNode.label}</h3>
-            <p className="mt-1 text-xs text-muted capitalize">{hoveredNode.type}</p>
+            <p className="mt-1 text-xs text-muted-foreground capitalize">{hoveredNode.type}</p>
             {hoveredNode.tags && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {hoveredNode.tags.map((tag) => (

@@ -30,7 +30,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           className={`relative rounded-sm p-1.5 transition-colors duration-150 ${
             theme === value
               ? "bg-background text-foreground shadow-sm"
-              : "text-muted hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <Icon className="size-4" />

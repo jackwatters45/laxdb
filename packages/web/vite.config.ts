@@ -25,6 +25,11 @@ const config = defineConfig({
       },
     }),
   ],
+  server: {
+    watch: {
+      ignored: ["**/routeTree.gen.ts", "**/.tanstack/**"],
+    },
+  },
   css: {
     modules: {
       localsConvention: "camelCase",

@@ -66,30 +66,30 @@ export class EmailService extends Effect.Service<EmailService>()(
               input,
             );
 
-            const ratingEmoji =
-              {
-                positive: "😊",
-                neutral: "😐",
-                negative: "😞",
-              }[validated.rating] ?? "❓";
+            const sourceLabel =
+              validated.source === "marketing" ? "Marketing Site" : "Web App";
+            const subject = `New Feedback from ${sourceLabel}`;
 
-            const subject = `New Feedback: ${validated.topic} (${validated.rating})`;
+            const attachmentLine =
+              validated.attachmentCount > 0
+                ? `<p><strong>Attachments:</strong> ${validated.attachmentCount} file${validated.attachmentCount > 1 ? "s" : ""}</p>`
+                : "";
 
             const htmlBody = `
           <html>
             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
               <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-                  New Feedback Received ${ratingEmoji}
+                  New Feedback Received
                 </h2>
 
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                  <h3 style="margin-top: 0; color: #374151;">Feedback Details</h3>
-                  <p><strong>Topic:</strong> ${validated.topic.replace("-", " ").toUpperCase()}</p>
-                  <p><strong>Rating:</strong> ${validated.rating.toUpperCase()} ${ratingEmoji}</p>
+                  <h3 style="margin-top: 0; color: #374151;">Details</h3>
+                  <p><strong>Source:</strong> ${sourceLabel}</p>
                   <p><strong>Feedback ID:</strong> <code>${validated.feedbackId}</code></p>
                   ${validated.userEmail ? `<p><strong>User Email:</strong> ${validated.userEmail}</p>` : ""}
                   ${validated.userId ? `<p><strong>User ID:</strong> ${validated.userId}</p>` : "<p><em>Anonymous feedback</em></p>"}
+                  ${attachmentLine}
                 </div>
 
                 <div style="background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
@@ -108,13 +108,18 @@ export class EmailService extends Effect.Service<EmailService>()(
           </html>
         `;
 
+            const attachmentText =
+              validated.attachmentCount > 0
+                ? `Attachments: ${validated.attachmentCount} file${validated.attachmentCount > 1 ? "s" : ""}`
+                : "";
+
             const textBody = `
         New Feedback Received
 
-        Topic: ${validated.topic.replace("-", " ").toUpperCase()}
-        Rating: ${validated.rating.toUpperCase()}
+        Source: ${sourceLabel}
         Feedback ID: ${validated.feedbackId}
         ${validated.userEmail ? `User Email: ${validated.userEmail}` : "Anonymous feedback"}
+        ${attachmentText}
 
         Message:
         ${validated.feedback}
@@ -122,7 +127,6 @@ export class EmailService extends Effect.Service<EmailService>()(
         Submitted: ${new Date().toISOString()}
         `.trim();
 
-            // Use direct SES implementation to avoid circular dependency
             const sesClient = new SESv2Client({
               region: process.env.AWS_REGION ?? "us-west-2",
             });

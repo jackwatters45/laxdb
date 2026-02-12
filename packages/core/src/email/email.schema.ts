@@ -23,10 +23,10 @@ export class SendEmailInput extends Schema.Class<SendEmailInput>(
 export class SendFeedbackEmailInput extends Schema.Class<SendFeedbackEmailInput>(
   "SendFeedbackEmailInput",
 )({
-  feedbackId: Schema.Number,
-  topic: Schema.String,
-  rating: Schema.String,
+  feedbackId: Schema.String,
   feedback: Schema.String,
+  source: Schema.optionalWith(Schema.String, { default: () => "app" }),
+  attachmentCount: Schema.optionalWith(Schema.Number, { default: () => 0 }),
   userEmail: Schema.optional(EmailSchema),
   userId: Schema.optional(Schema.String),
 }) {}

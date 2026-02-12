@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { allPosts } from "content-collections";
+import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag } from "@/lib/graph-utils";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/tag/$tagId")({
   },
   loader: ({ params }: { params: { tagId: string } }) => {
     const tagId = params.tagId.toLowerCase();
-    const posts = getContentByTag(allPosts, tagId);
+    const posts = getContentByTag(publishedPosts, tagId);
     if (posts.length === 0) {
       throw notFound();
     }
@@ -36,12 +36,12 @@ function TagPage() {
         <Link
           to="/blog"
           search={{ filter: undefined }}
-          className="text-sm text-muted hover:text-foreground"
+          className="text-sm text-muted-foreground hover:text-foreground"
         >
           ← Back
         </Link>
         <h1 className="mt-2 font-serif text-2xl text-foreground italic">#{tagId}</h1>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           {sortedPosts.length} {sortedPosts.length === 1 ? "post" : "posts"} tagged with {tagId}
         </p>
       </header>
@@ -50,10 +50,12 @@ function TagPage() {
           <li key={post.slug}>
             <Link to="/content/$slug" params={{ slug: post.slug }} className="group block">
               <article className="border-b border-border pb-6 transition-colors">
-                <h2 className="font-serif text-lg text-foreground italic group-hover:text-muted">
+                <h2 className="font-serif text-lg text-foreground italic group-hover:text-muted-foreground">
                   {post.title}
                 </h2>
-                {post.excerpt && <p className="mt-2 text-sm text-muted">{post.excerpt}</p>}
+                {post.excerpt && (
+                  <p className="mt-2 text-sm text-muted-foreground">{post.excerpt}</p>
+                )}
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-xs text-subtle">{formatPublishedDate(post.published)}</span>
                   {post.tags && post.tags.some((t) => t !== tagId) && (

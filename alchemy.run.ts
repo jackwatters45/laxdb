@@ -128,6 +128,10 @@ if (app.local) {
       DATABASE_URL: dbRole.connectionUrl,
     },
   });
+
+  Exec("Storybook", {
+    command: "cd packages/ui && bun run storybook",
+  });
 }
 
 // KV

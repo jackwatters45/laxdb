@@ -31,7 +31,7 @@ const ChipViz = () => {
         />
         <motion.div
           animate="animate"
-          className="relative z-0 min-h-[80px] min-w-[80px] rounded-full border bg-linear-to-b from-white to-orange-50 shadow-xl shadow-orange-500/20"
+          className="relative z-0 min-h-[80px] min-w-[80px] rounded-full border bg-linear-to-b from-background to-orange-50 shadow-xl shadow-orange-500/20"
           initial="initial"
           variants={createVariants({ scale: 1.08, delay: 0.1 })}
         >
@@ -55,7 +55,7 @@ const ChipViz = () => {
                 initial="initial"
                 variants={createVariants({ scale: 1.02, delay: 0.4 })}
               >
-                <div className="relative flex h-full w-full items-center justify-center rounded-full bg-linear-to-br from-white to-gray-300 shadow-lg shadow-black/40">
+                <div className="relative flex h-full w-full items-center justify-center rounded-full bg-linear-to-br from-background to-border-strong shadow-lg shadow-black/40">
                   <SolarMark className="w-6" />
                 </div>
               </motion.div>

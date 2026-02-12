@@ -1,18 +1,23 @@
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text } from "drizzle-orm/pg-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
+export interface Attachment {
+  key: string;
+  name: string;
+  size: number;
+  type: string;
+}
+
 export const feedbackTable = pgTable("feedback", {
   ...ids,
-  topic: text("topic").notNull(),
-  rating: text("rating").notNull(),
   feedback: text("feedback").notNull(),
+  source: text("source").notNull().default("app"),
+  attachments: jsonb("attachments").$type<Attachment[]>().default([]),
   userId: text("user_id"),
   userEmail: text("user_email"),
   ...timestamps,
 });
 
-type FeedbackInternal = typeof feedbackTable.$inferSelect;
-export type Feedback = Omit<FeedbackInternal, "id">;
-
-export type FeedbackInstert = typeof feedbackTable.$inferSelect;
+export type FeedbackRow = Omit<typeof feedbackTable.$inferSelect, "id">;
+export type FeedbackInsert = typeof feedbackTable.$inferInsert;

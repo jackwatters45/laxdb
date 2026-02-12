@@ -1,12 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { allPosts, type Post } from "content-collections";
+import type { Post } from "content-collections";
+
+import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { MDXContent } from "@/components/mdx-content";
 
 export const Route = createFileRoute("/content/$slug")({
   loader: ({ params }: { params: { slug: string } }): Post => {
-    const post = allPosts.find((p) => p.slug === params.slug);
+    const post = publishedPosts.find((p) => p.slug === params.slug);
     if (!post) {
       throw notFound();
     }
@@ -27,7 +29,7 @@ function ContentPage() {
       <article>
         <header className="mb-8">
           <h1 className="font-serif text-2xl text-foreground italic">{post.title}</h1>
-          <div className="mt-4 flex items-center gap-4 text-sm text-muted">
+          <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
             {post.authors && post.authors.length > 0 && <span>{post.authors.join(", ")}</span>}
             <span>{formatPublishedDate(post.published)}</span>
           </div>
@@ -53,17 +55,17 @@ function ContentPage() {
               <Link
                 to="/blog"
                 search={{ filter: undefined }}
-                className="text-muted hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
               >
                 ← All Blog Posts
               </Link>
             )}
             {isWiki && (
-              <Link to="/wiki" className="text-muted hover:text-foreground">
+              <Link to="/wiki" className="text-muted-foreground hover:text-foreground">
                 ← Wiki Index
               </Link>
             )}
-            <Link to="/graph" className="text-muted hover:text-foreground">
+            <Link to="/graph" className="text-muted-foreground hover:text-foreground">
               View Graph
             </Link>
           </nav>

@@ -2,25 +2,18 @@ import { Schema } from "effect";
 
 import { TimestampsSchema } from "../schema";
 
-export const TOPIC_ENUM = [
-  "feature-request",
-  "bug-report",
-  "user-interface",
-  "performance",
-  "documentation",
-  "other",
-] as const;
-
-export const RATING_ENUM = ["positive", "neutral", "negative"] as const;
-
-export const TopicSchema = Schema.Literal(...TOPIC_ENUM);
-export const RatingSchema = Schema.Literal(...RATING_ENUM);
+export const AttachmentSchema = Schema.Struct({
+  key: Schema.String,
+  name: Schema.String,
+  size: Schema.Number,
+  type: Schema.String,
+});
 
 export class Feedback extends Schema.Class<Feedback>("Feedback")({
   publicId: Schema.String,
-  topic: TopicSchema,
-  rating: RatingSchema,
   feedback: Schema.String,
+  source: Schema.String,
+  attachments: Schema.Array(AttachmentSchema),
   userId: Schema.NullOr(Schema.String),
   userEmail: Schema.NullOr(Schema.String),
   ...TimestampsSchema,
@@ -29,9 +22,9 @@ export class Feedback extends Schema.Class<Feedback>("Feedback")({
 export class CreateFeedbackInput extends Schema.Class<CreateFeedbackInput>(
   "CreateFeedbackInput",
 )({
-  topic: TopicSchema,
-  rating: RatingSchema,
   feedback: Schema.String.pipe(Schema.minLength(10)),
-  userId: Schema.NullOr(Schema.String),
-  userEmail: Schema.NullOr(Schema.String),
+  source: Schema.optionalWith(Schema.String, { default: () => "app" }),
+  attachments: Schema.optional(Schema.Array(AttachmentSchema)),
+  userId: Schema.optional(Schema.String),
+  userEmail: Schema.optional(Schema.String),
 }) {}
