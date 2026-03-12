@@ -1,0 +1,79 @@
+packages/core-v2/src/player/player.schema.ts
+  81bf1e60a2dda630 5-6,8,17-39
+packages/core-v2/src/player/player.repo.ts
+  81bf1e60a2dda630 1-5,7-39,41-62
+packages/core-v2/src/player/player.service.ts
+  81bf1e60a2dda630 1-4,6-42,44-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "6ecd0d8aeaad0f5d3cec23206f6a432d67265734",
+  "prompts": {
+    "2b3a58ef372d1c01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c5ab976-0956-4971-87fb-fc068f1e5c06",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "64064cefb9b68f35": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f6c9e5-c5c6-4dde-91d1-1dee18b6a0c4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 214,
+      "overriden_lines": 0
+    },
+    "652f70a7475aa071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b0d2d55-8f90-4e2e-9839-1b628f3280b8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1263,
+      "overriden_lines": 0
+    },
+    "81bf1e60a2dda630": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c702fd85-8eba-460e-9547-6372a1d74c4c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 190,
+      "overriden_lines": 0
+    },
+    "f0632b795e5a78ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49ef8689-c11e-4eb7-a0a4-2d29718eb7b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 645,
+      "overriden_lines": 0
+    }
+  }
+}
