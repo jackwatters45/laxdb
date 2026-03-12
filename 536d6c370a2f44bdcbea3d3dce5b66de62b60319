@@ -1,0 +1,42 @@
+packages/core-v2/src/practice/practice.schema.ts
+  652f70a7475aa071 1-188
+packages/core-v2/src/practice/practice.service.ts
+  652f70a7475aa071 1-74,76-96,98-118,120-136,138-147,150-167,170-187,190-227,229-274
+packages/core-v2/src/practice/practice.sql.ts
+  652f70a7475aa071 1-64,66-78
+packages/core-v2/src/practice/practice.repo.ts
+  652f70a7475aa071 1-167,169-181,183-210,212-219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "536d6c370a2f44bdcbea3d3dce5b66de62b60319",
+  "prompts": {
+    "652f70a7475aa071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b0d2d55-8f90-4e2e-9839-1b628f3280b8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1263,
+      "overriden_lines": 0
+    },
+    "f0632b795e5a78ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49ef8689-c11e-4eb7-a0a4-2d29718eb7b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 626,
+      "overriden_lines": 0
+    }
+  }
+}
