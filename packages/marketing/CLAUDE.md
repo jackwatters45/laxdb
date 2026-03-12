@@ -36,20 +36,21 @@ src/
 
 ## WHERE TO LOOK
 
-| Task                  | Location                                |
-| --------------------- | --------------------------------------- |
-| Edit homepage         | `src/routes/index.tsx`                  |
-| Add blog post         | `src/content/{slug}.mdx`               |
-| Add changelog entry   | `src/content/changelog/{slug}.mdx`      |
-| Modify navbar/footer  | `src/components/navbar.tsx`, `footer.tsx`|
-| Add marketing section | `src/components/ui/`                    |
-| Change site metadata  | `src/site.ts`                           |
+| Task                  | Location                                  |
+| --------------------- | ----------------------------------------- |
+| Edit homepage         | `src/routes/index.tsx`                    |
+| Add blog post         | `src/content/{slug}.mdx`                  |
+| Add changelog entry   | `src/content/changelog/{slug}.mdx`        |
+| Modify navbar/footer  | `src/components/navbar.tsx`, `footer.tsx` |
+| Add marketing section | `src/components/ui/`                      |
+| Change site metadata  | `src/site.ts`                             |
 
 ## CONTENT COLLECTIONS
 
 Two collections using `@content-collections/core` with MDX:
 
 **Blog posts** (`src/content/*.mdx`):
+
 ```yaml
 ---
 title: "Post Title"
@@ -60,6 +61,7 @@ authors: ["Author Name"]
 ```
 
 **Changelog entries** (`src/content/changelog/*.mdx`):
+
 ```yaml
 ---
 title: "Entry Title"
@@ -79,10 +81,10 @@ Uses Tailwind CSS v4 beta with `@tailwindcss/postcss`. Syntax differs from v3:
 
 ## ANTI-PATTERNS
 
-| Pattern                  | Why Bad                | Do Instead             |
-| ------------------------ | ---------------------- | ---------------------- |
-| Edit routeTree.gen.ts    | Auto-generated         | Let router generate it |
-| Skip content-collections | MDX won't compile      | Run after changes      |
+| Pattern                  | Why Bad           | Do Instead             |
+| ------------------------ | ----------------- | ---------------------- |
+| Edit routeTree.gen.ts    | Auto-generated    | Let router generate it |
+| Skip content-collections | MDX won't compile | Run after changes      |
 
 ## COMMANDS
 
