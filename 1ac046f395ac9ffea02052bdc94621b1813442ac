@@ -1,0 +1,112 @@
+packages/api-v2/src/practice/practice.client.ts
+  0daccf37ee963dc7 1-14
+packages/api-v2/src/practice/practice.rpc.ts
+  0daccf37ee963dc7 1-104
+packages/cli/src/player.ts
+  529d10dcbb0a3147 47-48
+packages/cli/src/drill.ts
+  529d10dcbb0a3147 62,64,329-330
+packages/api-v2/src/index.ts
+  0daccf37ee963dc7 1-61
+packages/api-v2/src/groups/index.ts
+  0daccf37ee963dc7 1-11
+packages/api-v2/src/player/player.client.ts
+  0daccf37ee963dc7 1-14
+packages/api-v2/src/player/player.api.ts
+  0daccf37ee963dc7 1-54
+packages/api-v2/tsconfig.json
+  0daccf37ee963dc7 1-4
+packages/core-v2/src/practice/practice.repo.ts
+  529d10dcbb0a3147 2,33-36,44,50,67,87,94,103,125,150,157,169,183,199,217
+packages/api-v2/src/protocol.ts
+  0daccf37ee963dc7 1-11
+packages/core-v2/src/util.ts
+  529d10dcbb0a3147 31,38-41,43
+packages/cli/src/practice.ts
+  529d10dcbb0a3147 43-44,156
+packages/api-v2/src/drill/drill.api.ts
+  0daccf37ee963dc7 1-54
+packages/core-v2/src/drill/drill.service.ts
+  529d10dcbb0a3147 4,26-27,32,43-44,49,52,54,58,63,74-75,80,91-92
+packages/core-v2/src/drill/drill.repo.ts
+  529d10dcbb0a3147 2,20
+packages/core-v2/src/practice/practice.service.ts
+  529d10dcbb0a3147 4,38-39,44,58-59,64,67-74,78-79,84,98-99,104,118-119,128,134-135,140,143-150,154-155,160,174-175,180,194-195,200,206-207,216,230-231,236,239-246,250-251,256,270-271
+packages/api-v2/package.json
+  0daccf37ee963dc7 1-35
+packages/api-v2/src/drill/drill.rpc.ts
+  0daccf37ee963dc7 1-46
+packages/core-v2/src/user/user.repo.ts
+  e09105e50ddc78b2 21
+packages/api-v2/src/drill/drill.client.ts
+  0daccf37ee963dc7 1-14
+packages/api-v2/src/player/player.handlers.ts
+  529d10dcbb0a3147 3,15-19
+  0daccf37ee963dc7 1-2,4-14,20-21
+packages/api-v2/src/rpc-handlers.ts
+  0daccf37ee963dc7 1-11
+packages/api-v2/src/rpc-group.ts
+  0daccf37ee963dc7 1-10
+packages/api-v2/src/drill/drill.handlers.ts
+  0daccf37ee963dc7 1-2,4-14,20-21
+  529d10dcbb0a3147 3,15-19
+packages/api-v2/src/definition.ts
+  0daccf37ee963dc7 1-10
+packages/core-v2/drizzle.config.ts
+  529d10dcbb0a3147 10
+packages/api-v2/src/practice/practice.api.ts
+  0daccf37ee963dc7 1-131
+packages/api-v2/src/player/player.rpc.ts
+  0daccf37ee963dc7 1-46
+packages/api-v2/src/practice/practice.handlers.ts
+  529d10dcbb0a3147 3,16-20,23,25,27,30,33,37,40,43
+  0daccf37ee963dc7 1-2,4-15,21-22,24,26,28-29,31-32,34-36,38-39,41-42,44-46
+packages/api-v2/src/client.ts
+  0daccf37ee963dc7 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "1ac046f395ac9ffea02052bdc94621b1813442ac",
+  "prompts": {
+    "0daccf37ee963dc7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02bb818e-b156-4b92-849e-9ad1a6c9b9fc",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 819,
+      "total_deletions": 26,
+      "accepted_lines": 713,
+      "overriden_lines": 0
+    },
+    "529d10dcbb0a3147": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa17f48d-8584-463e-ae2d-8a6e365ad308",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 444,
+      "total_deletions": 496,
+      "accepted_lines": 269,
+      "overriden_lines": 2
+    },
+    "e09105e50ddc78b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b81f2ab-aa4d-4102-8e0a-9af0450b9af9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 19,
+      "total_deletions": 19,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
