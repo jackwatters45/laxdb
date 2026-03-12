@@ -133,6 +133,7 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
 | Import from `drizzle-kit` | Wrong package | Use `drizzle-orm` |
 | Direct pool access | Bypasses layer | Use DrizzleService |
 | Import from `effect/internal` | Unstable APIs | Use public exports |
+| `getTableColumns` | Deprecated in Drizzle | Use `getColumns` from `drizzle-orm` |
 
 ## COMMANDS
 
