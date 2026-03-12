@@ -1,0 +1,44 @@
+packages/cli/src/drill.ts
+  f0632b795e5a78ac 1-56,58-61,63-393
+packages/cli/tsconfig.json
+  f0632b795e5a78ac 1-9
+packages/cli/src/player.ts
+  f0632b795e5a78ac 1-208
+packages/cli/src/practice.ts
+  652f70a7475aa071 1-161,163-520
+packages/cli/package.json
+  f0632b795e5a78ac 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "e26ebb2ebc1bb56197a6f8b7ab540d221c1d6337",
+  "prompts": {
+    "652f70a7475aa071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b0d2d55-8f90-4e2e-9839-1b628f3280b8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 519,
+      "overriden_lines": 0
+    },
+    "f0632b795e5a78ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49ef8689-c11e-4eb7-a0a4-2d29718eb7b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 626,
+      "overriden_lines": 0
+    }
+  }
+}
