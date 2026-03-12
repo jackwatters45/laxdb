@@ -78,6 +78,3 @@ dist-ssr
 
 # pipeline extraction output
 packages/pipeline/output
-
-# entire
-.entire
