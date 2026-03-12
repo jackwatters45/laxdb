@@ -10,18 +10,18 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
-    const { id: _, ...rest } = getColumns(playerTable);
+    const { id: _, ...publicColumns } = getColumns(playerTable);
 
     return {
       list: () =>
         db
-          .select(rest)
+          .select(publicColumns)
           .from(playerTable)
           .pipe(Effect.tapError(Effect.logError)),
 
       getByPublicId: (publicId: string) =>
         db
-          .select(rest)
+          .select(publicColumns)
           .from(playerTable)
           .where(eq(playerTable.publicId, publicId))
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
@@ -30,7 +30,7 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
         db
           .insert(playerTable)
           .values({ name: input.name, email: input.email })
-          .returning(rest)
+          .returning(publicColumns)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
 
       update: (
@@ -47,14 +47,14 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
             ...(input.email !== undefined && { email: input.email }),
           })
           .where(eq(playerTable.publicId, publicId))
-          .returning(rest)
+          .returning(publicColumns)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
 
       delete: (publicId: string) =>
         db
           .delete(playerTable)
           .where(eq(playerTable.publicId, publicId))
-          .returning(rest)
+          .returning(publicColumns)
           .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
     } as const;
   }),

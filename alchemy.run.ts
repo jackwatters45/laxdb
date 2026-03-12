@@ -8,6 +8,7 @@ import {
   KVNamespace,
   R2Bucket,
   TanStackStart,
+  Worker,
 } from "alchemy/cloudflare";
 
 export const app = await alchemy("laxdb", {
@@ -140,17 +141,17 @@ export const kv = await KVNamespace("kv", {});
 // Storage
 export const storage = await R2Bucket("storage", {});
 
-// export const worker = await Worker("api", {
-//   entrypoint: "packages/api/src/index.ts",
-//   url: true,
-//   bindings: {
-//     DB: db,
-//     KV: kv,
-//     STORAGE: storage,
-//     DATABASE_URL: dbRole.connectionUrl,
-//     ...secrets,
-//   },
-// });
+export const api2 = await Worker("api-v2", {
+  entrypoint: "packages/api-v2/src/index.ts",
+  url: true,
+  bindings: {
+    DB: db,
+    KV: kv,
+    STORAGE: storage,
+    DATABASE_URL: dbRole.connectionUrl,
+    ...secrets,
+  },
+});
 
 // export const web = await TanStackStart("web", {
 //   cwd: "./packages/web",
@@ -181,7 +182,7 @@ console.log({
   // web: web.url,
   marketing: marketing.url,
   // docs: docs.url,
-  // api: api.url,
+  api2: api2.url,
   db: database.id,
   kv: kv.namespaceId,
   r2: storage.name,

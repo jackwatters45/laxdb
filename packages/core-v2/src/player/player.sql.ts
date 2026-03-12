@@ -6,8 +6,8 @@ export const playerTable = pgTable(
   "player",
   {
     ...ids,
-    name: text("name"),
-    email: text("email"),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
     ...timestamps,
   },
   (table) => [

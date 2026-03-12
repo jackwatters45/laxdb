@@ -15,13 +15,12 @@
 
 import { Args, Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, Option, Schema } from "effect";
-
-import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import {
   CreatePlayerInput,
   UpdatePlayerInput,
 } from "@laxdb/core-v2/player/player.schema";
+import { PlayerService } from "@laxdb/core-v2/player/player.service";
+import { Effect, Layer, Option, Schema } from "effect";
 
 // ---------------------------------------------------------------------------
 // Shared
@@ -45,7 +44,8 @@ const readStdin = Effect.tryPromise({
     }
     return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
   },
-  catch: (e) => new Error(`Failed to read JSON from stdin: ${e}`),
+  catch: (e: unknown) =>
+    new Error(`Failed to read JSON from stdin: ${String(e)}`),
 });
 
 // ---------------------------------------------------------------------------
@@ -137,7 +137,9 @@ const bulkCreateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* PlayerService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(CreatePlayerInput))(raw);
+      const items = yield* Schema.decodeUnknown(
+        Schema.Array(CreatePlayerInput),
+      )(raw);
       const results = [];
       for (const item of items) {
         const player = yield* svc.create(item);
@@ -154,7 +156,9 @@ const bulkUpdateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* PlayerService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(UpdatePlayerInput))(raw);
+      const items = yield* Schema.decodeUnknown(
+        Schema.Array(UpdatePlayerInput),
+      )(raw);
       const results = [];
       for (const item of items) {
         const player = yield* svc.update(item);

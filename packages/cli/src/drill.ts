@@ -13,15 +13,14 @@
 
 import { Args, Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, Option, Schema } from "effect";
-
-import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import {
   Category,
   CreateDrillInput,
   PositionGroup,
   UpdateDrillInput,
 } from "@laxdb/core-v2/drill/drill.schema";
+import { DrillService } from "@laxdb/core-v2/drill/drill.service";
+import { Effect, Layer, Option, Schema } from "effect";
 
 // ---------------------------------------------------------------------------
 // Shared options
@@ -45,7 +44,10 @@ const output = (data: unknown, pretty: boolean) =>
 const decodeCsv = <A, I, R>(schema: Schema.Schema<A, I, R>) => {
   const arraySchema = Schema.Array(schema);
   return (csv: string) => {
-    const values = csv.split(",").map((s) => s.trim()).filter((s) => s.length > 0);
+    const values = csv
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
     return Schema.decodeUnknown(arraySchema)(values);
   };
 };
@@ -57,9 +59,9 @@ const decodePositionGroups = decodeCsv(PositionGroup);
 const optionalCsv = <A, _I, R>(
   opt: Option.Option<string>,
   decode: (csv: string) => Effect.Effect<ReadonlyArray<A>, unknown, R>,
-) =>
+): Effect.Effect<ReadonlyArray<A> | undefined, unknown, R> =>
   Option.match(opt, {
-    onNone: () => Effect.succeed(),
+    onNone: () => Effect.succeed(undefined as ReadonlyArray<A> | undefined),
     onSome: decode,
   });
 
@@ -79,10 +81,7 @@ const difficultyOption = Options.choice("difficulty", [
   "beginner",
   "intermediate",
   "advanced",
-] as const).pipe(
-  Options.withDescription("Difficulty level"),
-  Options.optional,
-);
+] as const).pipe(Options.withDescription("Difficulty level"), Options.optional);
 const categoryOption = Options.text("category").pipe(
   Options.withDescription("Categories (comma-separated)"),
   Options.optional,
@@ -95,10 +94,7 @@ const intensityOption = Options.choice("intensity", [
   "low",
   "medium",
   "high",
-] as const).pipe(
-  Options.withDescription("Intensity level"),
-  Options.optional,
-);
+] as const).pipe(Options.withDescription("Intensity level"), Options.optional);
 const contactOption = Options.boolean("contact").pipe(
   Options.withDescription("Contact drill"),
   Options.optional,
@@ -196,12 +192,21 @@ const createCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const category = yield* optionalCsv(opts.category, decodeCategories);
-      const positionGroup = yield* optionalCsv(opts.positionGroup, decodePositionGroups);
+      const positionGroup = yield* optionalCsv(
+        opts.positionGroup,
+        decodePositionGroups,
+      );
       const equipmentValues = Option.map(opts.equipment, (csv) =>
-        csv.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        csv
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0),
       );
       const tagValues = Option.map(opts.tags, (csv) =>
-        csv.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        csv
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0),
       );
 
       const drill = yield* svc.create({
@@ -257,12 +262,21 @@ const updateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const category = yield* optionalCsv(opts.category, decodeCategories);
-      const positionGroup = yield* optionalCsv(opts.positionGroup, decodePositionGroups);
+      const positionGroup = yield* optionalCsv(
+        opts.positionGroup,
+        decodePositionGroups,
+      );
       const equipmentValues = Option.map(opts.equipment, (csv) =>
-        csv.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        csv
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0),
       );
       const tagValues = Option.map(opts.tags, (csv) =>
-        csv.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        csv
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0),
       );
 
       const drill = yield* svc.update({
@@ -312,7 +326,8 @@ const readStdin = Effect.tryPromise({
     }
     return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
   },
-  catch: (e) => new Error(`Failed to read JSON from stdin: ${e}`),
+  catch: (e: unknown) =>
+    new Error(`Failed to read JSON from stdin: ${String(e)}`),
 });
 
 const bulkCreateCommand = Command.make(
@@ -322,7 +337,9 @@ const bulkCreateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(CreateDrillInput))(raw);
+      const items = yield* Schema.decodeUnknown(Schema.Array(CreateDrillInput))(
+        raw,
+      );
       const results = [];
       for (const item of items) {
         const drill = yield* svc.create(item);
@@ -355,7 +372,9 @@ const bulkUpdateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(UpdateDrillInput))(raw);
+      const items = yield* Schema.decodeUnknown(Schema.Array(UpdateDrillInput))(
+        raw,
+      );
       const results = [];
       for (const item of items) {
         const drill = yield* svc.update(item);

@@ -1,5 +1,5 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
-import { eq } from "drizzle-orm";
+import { eq, getColumns } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
 
 import { DatabaseLive } from "../drizzle/drizzle.service";
@@ -16,16 +16,21 @@ export class DrillRepo extends Effect.Service<DrillRepo>()("DrillRepo", {
   effect: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
+    const { id: _, ...publicColumns } = getColumns(drillTable);
+
     return {
       list: () =>
-        db.select().from(drillTable).pipe(Effect.tapError(Effect.logError)),
+        db
+          .select(publicColumns)
+          .from(drillTable)
+          .pipe(Effect.tapError(Effect.logError)),
 
       get: (input: GetDrillInput) =>
         db
-          .select()
+          .select(publicColumns)
           .from(drillTable)
           .where(eq(drillTable.publicId, input.publicId))
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+          .pipe(Effect.flatMap(Arr.head)),
 
       create: (input: CreateDrillInput) =>
         db
@@ -49,8 +54,8 @@ export class DrillRepo extends Effect.Service<DrillRepo>()("DrillRepo", {
             coachNotes: input.coachNotes,
             tags: [...(input.tags ?? [])],
           })
-          .returning()
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+          .returning(publicColumns)
+          .pipe(Effect.flatMap(Arr.head)),
 
       update: (input: UpdateDrillInput) =>
         db
@@ -99,15 +104,15 @@ export class DrillRepo extends Effect.Service<DrillRepo>()("DrillRepo", {
             ...(input.tags !== undefined && { tags: [...input.tags] }),
           })
           .where(eq(drillTable.publicId, input.publicId))
-          .returning()
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+          .returning(publicColumns)
+          .pipe(Effect.flatMap(Arr.head)),
 
       delete: (input: DeleteDrillInput) =>
         db
           .delete(drillTable)
           .where(eq(drillTable.publicId, input.publicId))
-          .returning()
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+          .returning(publicColumns)
+          .pipe(Effect.flatMap(Arr.head)),
     } as const;
   }),
   dependencies: [DatabaseLive],

@@ -1,5 +1,4 @@
 import { FileSystem } from "@effect/platform";
-import type { SqlError } from "@effect/sql/SqlError";
 import { Effect, Schema } from "effect";
 
 import {
@@ -29,16 +28,19 @@ export const decodeArguments = <A, I, R>(
     Effect.mapError((error) => new ValidationError({ cause: error })),
   );
 
-type Cause = {
+type PgCause = {
   constraint?: string;
   code?: string;
   detail?: string;
   message?: string;
 };
 
-export const parsePostgresError = (error: SqlError) => {
+export const parsePostgresError = (error: {
+  readonly cause?: unknown;
+  readonly message?: string;
+}) => {
   // oxlint-disable-next-line no-unsafe-type-assertion
-  const pgError = error.cause as Cause;
+  const pgError = error.cause as PgCause;
   const pgCode = pgError?.code;
 
   // oxlint-disable-next-line switch-exhaustiveness-check -- code is string|undefined, default handles unknown

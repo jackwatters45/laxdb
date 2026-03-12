@@ -13,24 +13,42 @@ export const drillTable = pgTable(
     description: text("description"),
 
     // Classification
-    difficulty: text("difficulty").notNull().default("intermediate"),
-    // Values: 'beginner' | 'intermediate' | 'advanced'
-    category: text("category").array().notNull().default([]),
-    // Values: passing, shooting, defense, ground balls, face-offs, clearing, riding, transition, man-up, man-down, conditioning
-    positionGroup: text("position_group").array().notNull().default([]),
-    // Values: attack, midfield, defense, goalie, all
-    intensity: text("intensity"),
-    // Values: low, medium, high
+    difficulty: text("difficulty")
+      .notNull()
+      .default("intermediate")
+      .$type<"beginner" | "intermediate" | "advanced">(),
+    category: text("category")
+      .$type<
+        | "passing"
+        | "shooting"
+        | "defense"
+        | "ground-balls"
+        | "face-offs"
+        | "clearing"
+        | "riding"
+        | "transition"
+        | "man-up"
+        | "man-down"
+        | "conditioning"
+      >()
+      .array()
+      .notNull()
+      .default([]),
+    positionGroup: text("position_group")
+      .$type<"attack" | "midfield" | "defense" | "goalie" | "all">()
+      .array()
+      .notNull()
+      .default([]),
+    intensity: text("intensity").$type<"low" | "medium" | "high">(),
     contact: boolean("contact"),
-    // true = pads/contact, false = no contact
     competitive: boolean("competitive"),
-    // true = game-like/competitive, false = skill rep
 
     // Logistics
-    playerCount: integer("player_count"), // minimum players needed
-    durationMinutes: integer("duration_minutes"), // estimated time
-    fieldSpace: text("field_space"),
-    // Values: full-field, half-field, box
+    playerCount: integer("player_count"),
+    durationMinutes: integer("duration_minutes"),
+    fieldSpace: text("field_space").$type<
+      "full-field" | "half-field" | "box"
+    >(),
     equipment: text("equipment").array(),
 
     // Media

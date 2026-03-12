@@ -18,7 +18,7 @@ export class UserRepo extends Effect.Service<UserRepo>()("UserRepo", {
             .select()
             .from(userTable)
             .where(eq(userTable.email, input.email))
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError));
+            .pipe(Effect.flatMap(Arr.head));
 
           return user;
         }),

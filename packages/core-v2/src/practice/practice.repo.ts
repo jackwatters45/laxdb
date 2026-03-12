@@ -1,5 +1,5 @@
 import { PgDrizzle } from "@effect/sql-drizzle/Pg";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, getColumns } from "drizzle-orm";
 import { Array as Arr, Effect } from "effect";
 
 import { DatabaseLive } from "../drizzle/drizzle.service";
@@ -30,6 +30,10 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
     effect: Effect.gen(function* () {
       const db = yield* PgDrizzle;
 
+      const { id: _pid, ...practiceCols } = getColumns(practiceTable);
+      const { id: _iid, ...itemCols } = getColumns(practiceItemTable);
+      const { id: _rid, ...reviewCols } = getColumns(practiceReviewTable);
+
       return {
         // -----------------------------------------------------------------
         // Practice CRUD
@@ -37,16 +41,16 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
 
         list: () =>
           db
-            .select()
+            .select(practiceCols)
             .from(practiceTable)
             .pipe(Effect.tapError(Effect.logError)),
 
         get: (input: GetPracticeInput) =>
           db
-            .select()
+            .select(practiceCols)
             .from(practiceTable)
             .where(eq(practiceTable.publicId, input.publicId))
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .pipe(Effect.flatMap(Arr.head)),
 
         create: (input: CreatePracticeInput) =>
           db
@@ -60,8 +64,8 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
               location: input.location,
               status: input.status,
             })
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(practiceCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         update: (input: UpdatePracticeInput) =>
           db
@@ -80,15 +84,15 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
               ...(input.status !== undefined && { status: input.status }),
             })
             .where(eq(practiceTable.publicId, input.publicId))
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(practiceCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         delete: (input: DeletePracticeInput) =>
           db
             .delete(practiceTable)
             .where(eq(practiceTable.publicId, input.publicId))
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(practiceCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         // -----------------------------------------------------------------
         // Practice items
@@ -96,7 +100,7 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
 
         listItems: (input: ListItemsInput) =>
           db
-            .select()
+            .select(itemCols)
             .from(practiceItemTable)
             .where(
               eq(practiceItemTable.practicePublicId, input.practicePublicId),
@@ -118,8 +122,8 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
               orderIndex: input.orderIndex ?? 0,
               priority: input.priority ?? "required",
             })
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(itemCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         updateItem: (input: UpdateItemInput) =>
           db
@@ -143,15 +147,15 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
               ...(input.priority !== undefined && { priority: input.priority }),
             })
             .where(eq(practiceItemTable.publicId, input.publicId))
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(itemCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         removeItem: (input: RemoveItemInput) =>
           db
             .delete(practiceItemTable)
             .where(eq(practiceItemTable.publicId, input.publicId))
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(itemCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         reorderItems: (input: ReorderItemsInput) =>
           Effect.gen(function* () {
@@ -162,7 +166,7 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
                 .where(eq(practiceItemTable.publicId, id));
             }
             return yield* db
-              .select()
+              .select(itemCols)
               .from(practiceItemTable)
               .where(
                 eq(practiceItemTable.practicePublicId, input.practicePublicId),
@@ -176,12 +180,12 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
 
         getReview: (input: GetReviewInput) =>
           db
-            .select()
+            .select(reviewCols)
             .from(practiceReviewTable)
             .where(
               eq(practiceReviewTable.practicePublicId, input.practicePublicId),
             )
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .pipe(Effect.flatMap(Arr.head)),
 
         createReview: (input: CreateReviewInput) =>
           db
@@ -192,8 +196,8 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
               needsImprovement: input.needsImprovement,
               notes: input.notes,
             })
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(reviewCols)
+            .pipe(Effect.flatMap(Arr.head)),
 
         updateReview: (input: UpdateReviewInput) =>
           db
@@ -210,8 +214,8 @@ export class PracticeRepo extends Effect.Service<PracticeRepo>()(
             .where(
               eq(practiceReviewTable.practicePublicId, input.practicePublicId),
             )
-            .returning()
-            .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+            .returning(reviewCols)
+            .pipe(Effect.flatMap(Arr.head)),
       } as const;
     }),
     dependencies: [DatabaseLive],

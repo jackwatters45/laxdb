@@ -14,13 +14,9 @@
 
 import { Args, Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Layer, Option, Schema } from "effect";
-
+import { CreatePracticeInput } from "@laxdb/core-v2/practice/practice.schema";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
-import {
-  CreatePracticeInput,
-  UpdatePracticeInput,
-} from "@laxdb/core-v2/practice/practice.schema";
+import { Effect, Layer, Option, Schema } from "effect";
 
 // ---------------------------------------------------------------------------
 // Shared
@@ -44,7 +40,8 @@ const readStdin = Effect.tryPromise({
     }
     return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
   },
-  catch: (e) => new Error(`Failed to read JSON from stdin: ${e}`),
+  catch: (e: unknown) =>
+    new Error(`Failed to read JSON from stdin: ${String(e)}`),
 });
 
 // ---------------------------------------------------------------------------
@@ -95,10 +92,7 @@ const statusOption = Options.choice("status", [
   "in-progress",
   "completed",
   "cancelled",
-] as const).pipe(
-  Options.withDescription("Practice status"),
-  Options.optional,
-);
+] as const).pipe(Options.withDescription("Practice status"), Options.optional);
 const descriptionOption = Options.text("description").pipe(
   Options.withDescription("Practice description"),
   Options.optional,
@@ -159,7 +153,7 @@ const updateCommand = Command.make(
         publicId: opts.publicId,
         name: Option.getOrUndefined(opts.name),
         date: Option.match(opts.date, {
-          onNone: () => {},
+          onNone: (): Date | undefined => undefined,
           onSome: (d) => new Date(d),
         }),
         description: Option.getOrUndefined(opts.description),
@@ -267,10 +261,7 @@ const updateItemCommand = Command.make(
       "cooldown",
       "water-break",
       "activity",
-    ] as const).pipe(
-      Options.withDescription("Item type"),
-      Options.optional,
-    ),
+    ] as const).pipe(Options.withDescription("Item type"), Options.optional),
     drill: Options.text("drill").pipe(
       Options.withDescription("Drill publicId"),
       Options.optional,

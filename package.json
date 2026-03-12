@@ -32,6 +32,7 @@
     "@typescript/native-preview": "^7.0.0-dev.20260122.3",
     "@vitest/coverage-v8": "^4.0.17",
     "@vitest/ui": "^4.0.17",
+    "agentation": "^2.3.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "lefthook": "^2.0.15",
     "miniflare": "^4.20260116.0",

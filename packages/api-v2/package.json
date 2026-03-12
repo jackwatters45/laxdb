@@ -1,0 +1,35 @@
+{
+  "name": "@laxdb/api-v2",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint --type-aware --fix",
+    "format": "oxfmt",
+    "fix": "bun run lint && bun run format"
+  },
+  "dependencies": {
+    "@effect/platform": "0.94.1",
+    "@effect/rpc": "^0.73.0",
+    "@laxdb/core-v2": "workspace:*",
+    "effect": "^3.19.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0"
+  },
+  "effect": {
+    "generateExports": {
+      "include": [
+        "**/*.ts"
+      ]
+    },
+    "generateIndex": {
+      "include": [
+        "**/*.ts"
+      ]
+    }
+  }
+}

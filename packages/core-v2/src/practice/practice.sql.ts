@@ -13,7 +13,12 @@ export const practiceTable = pgTable(
     notes: text("notes"),
     durationMinutes: integer("duration_minutes"),
     location: text("location"),
-    status: text("status").notNull().default("draft"),
+    status: text("status")
+      .notNull()
+      .default("draft")
+      .$type<
+        "draft" | "scheduled" | "in-progress" | "completed" | "cancelled"
+      >(),
 
     ...timestamps,
   },
@@ -29,14 +34,19 @@ export const practiceItemTable = pgTable(
     ...ids,
 
     practicePublicId: text("practice_public_id").notNull(),
-    type: text("type").notNull(),
+    type: text("type")
+      .notNull()
+      .$type<"warmup" | "drill" | "cooldown" | "water-break" | "activity">(),
     drillPublicId: text("drill_public_id"),
     label: text("label"),
     durationMinutes: integer("duration_minutes"),
     notes: text("notes"),
     groups: text("groups").array().notNull().default(["all"]),
     orderIndex: integer("order_index").notNull().default(0),
-    priority: text("priority").notNull().default("required"),
+    priority: text("priority")
+      .notNull()
+      .default("required")
+      .$type<"required" | "optional" | "if-time">(),
 
     ...timestamps,
   },

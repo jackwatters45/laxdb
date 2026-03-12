@@ -1,7 +1,7 @@
-import { Effect, Schema } from "effect";
+import { Effect } from "effect";
 
 import { NotFoundError } from "../error";
-import { parsePostgresError } from "../util";
+import { decodeArguments, parsePostgresError } from "../util";
 
 import { DrillRepo } from "./drill.repo";
 import {
@@ -23,15 +23,13 @@ export class DrillService extends Effect.Service<DrillService>()(
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
-            Effect.tap((drills) =>
-              Effect.log(`Listed ${drills.length} drills`),
-            ),
-            Effect.tapError((e) => Effect.logError("Failed to list drills", e)),
+
+            Effect.tapError(Effect.logError),
           ),
 
         get: (input: GetDrillInput) =>
           Effect.gen(function* () {
-            const decoded = yield* Schema.decode(GetDrillInput)(input);
+            const decoded = yield* decodeArguments(GetDrillInput, input);
             return yield* repo.get(decoded);
           }).pipe(
             Effect.catchTag("NoSuchElementException", () =>
@@ -42,28 +40,27 @@ export class DrillService extends Effect.Service<DrillService>()(
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
-            Effect.tapError((e) => Effect.logError("Failed to get drill", e)),
+
+            Effect.tapError(Effect.logError),
           ),
 
         create: (input: CreateDrillInput) =>
           Effect.gen(function* () {
-            const decoded = yield* Schema.decode(CreateDrillInput)(input);
+            const decoded = yield* decodeArguments(CreateDrillInput, input);
             return yield* repo.create(decoded);
           }).pipe(
+            Effect.catchTag("NoSuchElementException", () =>
+              Effect.fail(new NotFoundError({ domain: "Drill", id: "new" })),
+            ),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
-            Effect.tap((drill) =>
-              Effect.log(`Created drill: ${drill.publicId}`),
-            ),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to create drill", e),
-            ),
+            Effect.tapError(Effect.logError),
           ),
 
         update: (input: UpdateDrillInput) =>
           Effect.gen(function* () {
-            const decoded = yield* Schema.decode(UpdateDrillInput)(input);
+            const decoded = yield* decodeArguments(UpdateDrillInput, input);
             return yield* repo.update(decoded);
           }).pipe(
             Effect.catchTag("NoSuchElementException", () =>
@@ -74,17 +71,13 @@ export class DrillService extends Effect.Service<DrillService>()(
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
-            Effect.tap((drill) =>
-              Effect.log(`Updated drill: ${drill.publicId}`),
-            ),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to update drill", e),
-            ),
+
+            Effect.tapError(Effect.logError),
           ),
 
         delete: (input: DeleteDrillInput) =>
           Effect.gen(function* () {
-            const decoded = yield* Schema.decode(DeleteDrillInput)(input);
+            const decoded = yield* decodeArguments(DeleteDrillInput, input);
             return yield* repo.delete(decoded);
           }).pipe(
             Effect.catchTag("NoSuchElementException", () =>
@@ -95,12 +88,8 @@ export class DrillService extends Effect.Service<DrillService>()(
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
-            Effect.tap((drill) =>
-              Effect.log(`Deleted drill: ${drill.publicId}`),
-            ),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to delete drill", e),
-            ),
+
+            Effect.tapError(Effect.logError),
           ),
       } as const;
     }),
