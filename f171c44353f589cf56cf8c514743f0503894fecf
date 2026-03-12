@@ -1,0 +1,70 @@
+packages/core-v2/src/drill/drill.repo.ts
+  2b3a58ef372d1c01 85,89,92,95,99
+  64064cefb9b68f35 1-32,62,65,68,71,74,97-98,100-114
+  f0632b795e5a78ac 39,56-58,77-84,86-88,90-91,93-94
+packages/core-v2/src/drill/drill.schema.ts
+  2b3a58ef372d1c01 5-44,50-55,58-59,63,73-78,81-82,102-107,110-111
+  64064cefb9b68f35 1-2,4,45-49,56-57,60-62,64-72,79-80,83-88,90-91,93-101,108-109,112-122
+packages/core-v2/src/drill/drill.service.ts
+  64064cefb9b68f35 1-34,36-50,52-66,68-109
+  2b3a58ef372d1c01 35,51,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "f171c44353f589cf56cf8c514743f0503894fecf",
+  "prompts": {
+    "2b3a58ef372d1c01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c5ab976-0956-4971-87fb-fc068f1e5c06",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "64064cefb9b68f35": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f6c9e5-c5c6-4dde-91d1-1dee18b6a0c4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 214,
+      "overriden_lines": 0
+    },
+    "652f70a7475aa071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b0d2d55-8f90-4e2e-9839-1b628f3280b8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1263,
+      "overriden_lines": 0
+    },
+    "f0632b795e5a78ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49ef8689-c11e-4eb7-a0a4-2d29718eb7b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 645,
+      "overriden_lines": 0
+    }
+  }
+}
