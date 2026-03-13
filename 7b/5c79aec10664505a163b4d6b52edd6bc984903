@@ -1,0 +1,38 @@
+packages/api-v2/src/player/player.rpc.ts
+  a5f2961b5dfdaed0 2,35-36,43,45,47,49,51
+packages/api-v2/src/drill/drill.rpc.ts
+  a5f2961b5dfdaed0 2,35-36,43-44,46,48,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "7b5c79aec10664505a163b4d6b52edd6bc984903",
+  "prompts": {
+    "0415ac2e4a07e884": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "739fc164-228b-475a-a8a4-b8189a547718",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 228,
+      "overriden_lines": 0
+    },
+    "a5f2961b5dfdaed0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0c3b434-78cb-446b-a204-14ede1d81611",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 414,
+      "overriden_lines": 0
+    }
+  }
+}
