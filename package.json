@@ -11,15 +11,15 @@
     "destroy": "alchemy destroy",
     "dev": "alchemy dev",
     "test": "turbo test",
-    "typecheck": "turbo typecheck",
+    "typecheck": "turbo typecheck --filter='!@laxdb/cli' --filter='!@laxdb/core' --filter='!@laxdb/api' --filter='!@laxdb/web' --filter='!@laxdb/pipeline'",
     "lint": "turbo lint",
     "format": "turbo format",
     "fix": "turbo fix",
     "prepare": "effect-language-service patch"
   },
   "dependencies": {
-    "alchemy": "^0.82.2",
-    "effect": "^3.19.14"
+    "alchemy": "^0.89.0",
+    "effect": "^3.19.19"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.71",

@@ -10,7 +10,6 @@ export default defineConfig({
     url: `${process.env.DATABASE_URL!}?sslmode=require`,
   },
   migrations: {
-    schema: "public",
   },
   verbose: true,
   strict: true,
