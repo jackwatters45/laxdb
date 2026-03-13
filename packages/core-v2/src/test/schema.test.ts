@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   Base64IdSchema,
+  DateFromString,
   EmailSchema,
   JerseyNumberSchema,
   NanoidSchema,
@@ -99,6 +100,42 @@ describe("JerseyNumberSchema", () => {
   });
   it("rejects float", () => {
     expect(() => Schema.decodeUnknownSync(JerseyNumberSchema)(1.5)).toThrow();
+  });
+});
+
+describe("DateFromString", () => {
+  // Schema.decodeTo produces unknown DecodingServices in v4 — safe to bypass for tests
+  const decode = Schema.decodeUnknownSync(DateFromString as any) as (
+    u: unknown,
+  ) => Date;
+  const encode = Schema.encodeUnknownSync(DateFromString as any) as (
+    u: unknown,
+  ) => string;
+
+  it("decodes ISO string → Date", () => {
+    const result = decode("2026-03-12T23:03:56.780Z");
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe("2026-03-12T23:03:56.780Z");
+  });
+
+  it("encodes Date → ISO string", () => {
+    const date = new Date("2026-03-12T23:03:56.780Z");
+    expect(encode(date)).toBe("2026-03-12T23:03:56.780Z");
+  });
+
+  it("roundtrips through encode/decode", () => {
+    const iso = "2026-01-15T10:30:00.000Z";
+    const date = decode(iso);
+    const back = encode(date);
+    expect(back).toBe(iso);
+  });
+
+  it("rejects non-string input", () => {
+    expect(() => decode(12345)).toThrow();
+  });
+
+  it("rejects non-Date for encode", () => {
+    expect(() => encode("not-a-date")).toThrow();
   });
 });
 
