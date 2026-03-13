@@ -2,69 +2,65 @@
  * Practice CLI
  *
  * Usage:
- *   infisical run --env=dev -- bun src/practice.ts list
- *   infisical run --env=dev -- bun src/practice.ts get <publicId>
- *   infisical run --env=dev -- bun src/practice.ts create --duration 120 --location "Main Field"
- *   infisical run --env=dev -- bun src/practice.ts add-item <practiceId> --type drill --drill <drillId>
- *   infisical run --env=dev -- bun src/practice.ts list-items <practiceId>
- *   infisical run --env=dev -- bun src/practice.ts review <practiceId> --went-well "Good energy"
+ *   bun src/practice.ts list --pretty
+ *   bun src/practice.ts get <publicId>
+ *   bun src/practice.ts create --duration 120 --location "Main Field"
+ *   bun src/practice.ts add-item <practiceId> --type drill --drill <drillId>
+ *   bun src/practice.ts list-items <practiceId>
+ *   bun src/practice.ts review <practiceId> --went-well "Good energy"
+ *   bun src/practice.ts --base-url https://api.laxdb.io list
+ *   LAXDB_API_URL=https://api.laxdb.io bun src/practice.ts list
  *
  * Add --pretty for formatted JSON output.
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { CreatePracticeInput } from "@laxdb/core-v2/practice/practice.schema";
-import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
+import { RpcPracticeClient } from "@laxdb/api-v2/practice/practice.client";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import {
+  CreatePracticeInput,
+  UpdatePracticeInput,
+} from "@laxdb/core-v2/practice/practice.schema";
 import { Effect, Layer, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
+import { baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
+
 // ---------------------------------------------------------------------------
-// Shared
+// Helpers
 // ---------------------------------------------------------------------------
 
-const prettyFlag = Flag.boolean("pretty").pipe(
-  Flag.withDescription("Pretty-print JSON output"),
-  Flag.withDefault(false),
-);
-
-const output = (data: unknown, pretty: boolean) =>
-  Effect.sync(() => {
-    console.log(pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data));
-  });
-
-const readStdin = Effect.tryPromise({
-  try: async () => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of process.stdin) {
-      chunks.push(chunk);
-    }
-    return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
-  },
-  catch: (e: unknown) =>
-    new Error(`Failed to read JSON from stdin: ${String(e)}`),
-});
+const practiceLayer = (baseUrl: string) =>
+  RpcPracticeClient.layer.pipe(Layer.provide(makeRpcProtocol(baseUrl)));
 
 // ---------------------------------------------------------------------------
 // Practice CRUD
 // ---------------------------------------------------------------------------
 
-const listCommand = Command.make("list", { pretty: prettyFlag }, ({ pretty }) =>
-  Effect.gen(function* () {
-    const svc = yield* PracticeService;
-    const practices = yield* svc.list();
-    yield* output(practices, pretty);
-  }),
+const listCommand = Command.make(
+  "list",
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcPracticeClient;
+      const practices = yield* client.PracticeList();
+      yield* output(practices, pretty);
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 const getCommand = Command.make(
   "get",
-  { publicId: Argument.string("publicId"), pretty: prettyFlag },
-  ({ publicId, pretty }) =>
+  {
+    publicId: Argument.string("publicId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const practice = yield* svc.get({ publicId });
+      const client = yield* RpcPracticeClient;
+      const practice = yield* client.PracticeGet({ publicId });
       yield* output(practice, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 const nameFlag = Flag.string("name").pipe(
@@ -110,11 +106,12 @@ const createCommand = Command.make(
     description: descriptionFlag,
     notes: notesFlag,
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const practice = yield* svc.create({
+      const client = yield* RpcPracticeClient;
+      const practice = yield* client.PracticeCreate({
         name: Option.getOrNull(opts.name),
         date: Option.match(opts.date, {
           onNone: () => null,
@@ -127,7 +124,7 @@ const createCommand = Command.make(
         status: Option.getOrUndefined(opts.status),
       });
       yield* output(practice, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 const updateCommand = Command.make(
@@ -142,11 +139,12 @@ const updateCommand = Command.make(
     description: descriptionFlag,
     notes: notesFlag,
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const practice = yield* svc.update({
+      const client = yield* RpcPracticeClient;
+      const practice = yield* client.PracticeUpdate({
         publicId: opts.publicId,
         name: Option.getOrUndefined(opts.name),
         date: Option.match(opts.date, {
@@ -160,18 +158,22 @@ const updateCommand = Command.make(
         status: Option.getOrUndefined(opts.status),
       });
       yield* output(practice, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 const deleteCommand = Command.make(
   "delete",
-  { publicId: Argument.string("publicId"), pretty: prettyFlag },
-  ({ publicId, pretty }) =>
+  {
+    publicId: Argument.string("publicId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const practice = yield* svc.delete({ publicId });
+      const client = yield* RpcPracticeClient;
+      const practice = yield* client.PracticeDelete({ publicId });
       yield* output(practice, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -219,10 +221,11 @@ const addItemCommand = Command.make(
       "if-time",
     ] as const).pipe(Flag.withDescription("Item priority"), Flag.optional),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
+      const client = yield* RpcPracticeClient;
       const groupValues = Option.map(opts.groups, (csv) =>
         csv
           .split(",")
@@ -230,7 +233,7 @@ const addItemCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const item = yield* svc.addItem({
+      const item = yield* client.PracticeAddItem({
         practicePublicId: opts.practiceId,
         type: opts.type,
         drillPublicId: Option.getOrUndefined(opts.drill),
@@ -242,7 +245,7 @@ const addItemCommand = Command.make(
         priority: Option.getOrUndefined(opts.priority),
       });
       yield* output(item, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 const updateItemCommand = Command.make(
@@ -286,10 +289,11 @@ const updateItemCommand = Command.make(
       "if-time",
     ] as const).pipe(Flag.withDescription("Item priority"), Flag.optional),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
+      const client = yield* RpcPracticeClient;
       const groupValues = Option.map(opts.groups, (csv) =>
         csv
           .split(",")
@@ -297,7 +301,7 @@ const updateItemCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const item = yield* svc.updateItem({
+      const item = yield* client.PracticeUpdateItem({
         publicId: opts.itemId,
         type: Option.getOrUndefined(opts.type),
         drillPublicId: Option.getOrUndefined(opts.drill),
@@ -309,18 +313,22 @@ const updateItemCommand = Command.make(
         priority: Option.getOrUndefined(opts.priority),
       });
       yield* output(item, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 const removeItemCommand = Command.make(
   "remove-item",
-  { itemId: Argument.string("itemId"), pretty: prettyFlag },
-  ({ itemId, pretty }) =>
+  {
+    itemId: Argument.string("itemId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ itemId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const item = yield* svc.removeItem({ publicId: itemId });
+      const client = yield* RpcPracticeClient;
+      const item = yield* client.PracticeRemoveItem({ publicId: itemId });
       yield* output(item, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 const listItemsCommand = Command.make(
@@ -328,13 +336,16 @@ const listItemsCommand = Command.make(
   {
     practiceId: Argument.string("practiceId"),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
-  ({ practiceId, pretty }) =>
+  ({ practiceId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const items = yield* svc.listItems({ practicePublicId: practiceId });
+      const client = yield* RpcPracticeClient;
+      const items = yield* client.PracticeListItems({
+        practicePublicId: practiceId,
+      });
       yield* output(items, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 const reorderItemsCommand = Command.make(
@@ -345,20 +356,21 @@ const reorderItemsCommand = Command.make(
       Flag.withDescription("Comma-separated item publicIds in new order"),
     ),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
+      const client = yield* RpcPracticeClient;
       const orderedIds = opts.order
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
-      const items = yield* svc.reorderItems({
+      const items = yield* client.PracticeReorderItems({
         practicePublicId: opts.practiceId,
         orderedIds,
       });
       yield* output(items, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -382,26 +394,27 @@ const reviewCommand = Command.make(
       Flag.optional,
     ),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
+      const client = yield* RpcPracticeClient;
 
       // Try to get existing review first; create if not found
-      const existing = yield* svc
-        .getReview({ practicePublicId: opts.practiceId })
+      const existing = yield* client
+        .PracticeGetReview({ practicePublicId: opts.practiceId })
         .pipe(Effect.option);
 
       const review = yield* Option.match(existing, {
         onNone: () =>
-          svc.createReview({
+          client.PracticeCreateReview({
             practicePublicId: opts.practiceId,
             wentWell: Option.getOrNull(opts.wentWell),
             needsImprovement: Option.getOrNull(opts.needsImprovement),
             notes: Option.getOrNull(opts.reviewNotes),
           }),
         onSome: () =>
-          svc.updateReview({
+          client.PracticeUpdateReview({
             practicePublicId: opts.practiceId,
             wentWell: Option.getOrUndefined(opts.wentWell),
             needsImprovement: Option.getOrUndefined(opts.needsImprovement),
@@ -410,7 +423,7 @@ const reviewCommand = Command.make(
       });
 
       yield* output(review, opts.pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(opts.baseUrl))),
 );
 
 const getReviewCommand = Command.make(
@@ -418,15 +431,16 @@ const getReviewCommand = Command.make(
   {
     practiceId: Argument.string("practiceId"),
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
-  ({ practiceId, pretty }) =>
+  ({ practiceId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const review = yield* svc.getReview({
+      const client = yield* RpcPracticeClient;
+      const review = yield* client.PracticeGetReview({
         practicePublicId: practiceId,
       });
       yield* output(review, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -435,37 +449,59 @@ const getReviewCommand = Command.make(
 
 const bulkCreateCommand = Command.make(
   "bulk-create",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
+      const client = yield* RpcPracticeClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePracticeInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const practice = yield* svc.create(item);
+        const practice = yield* client.PracticeCreate(item);
         results.push(practice);
       }
       yield* output(results, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
+);
+
+const bulkUpdateCommand = Command.make(
+  "bulk-update",
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcPracticeClient;
+      const raw = yield* readStdin;
+      const items = yield* Schema.decodeUnknownEffect(
+        Schema.Array(UpdatePracticeInput),
+      )(raw);
+      const results = [];
+      for (const item of items) {
+        const practice = yield* client.PracticeUpdate(item);
+        results.push(practice);
+      }
+      yield* output(results, pretty);
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 const bulkDeleteCommand = Command.make(
   "bulk-delete",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const ids = (yield* readStdin) as ReadonlyArray<string>;
+      const client = yield* RpcPracticeClient;
+      const raw = yield* readStdin;
+      const ids = yield* Schema.decodeUnknownEffect(
+        Schema.Array(Schema.String),
+      )(raw);
       const results = [];
       for (const publicId of ids) {
-        const practice = yield* svc.delete({ publicId });
+        const practice = yield* client.PracticeDelete({ publicId });
         results.push(practice);
       }
       yield* output(results, pretty);
-    }),
+    }).pipe(Effect.provide(practiceLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -487,11 +523,12 @@ const practiceCommand = Command.make("practice").pipe(
     reviewCommand,
     getReviewCommand,
     bulkCreateCommand,
+    bulkUpdateCommand,
     bulkDeleteCommand,
   ]),
 );
 
 Command.run(practiceCommand, { version: "0.1.0" }).pipe(
-  Effect.provide(Layer.mergeAll(PracticeService.layer, BunServices.layer)),
+  Effect.provide(BunServices.layer),
   BunRuntime.runMain,
 );
