@@ -1,0 +1,51 @@
+packages/practice-planner/src/components/workflow-node.tsx
+  1afd96eae1e095f5 1-175
+packages/practice-planner/src/components/quick-plan-modal.tsx
+  1afd96eae1e095f5 1-193
+packages/practice-planner/src/components/add-node-button.tsx
+  1afd96eae1e095f5 1-60
+packages/practice-planner/src/data/sample-practice.ts
+  1afd96eae1e095f5 1-162
+packages/practice-planner/src/components/canvas-controls.tsx
+  1afd96eae1e095f5 1-108
+packages/practice-planner/src/routes/index.tsx
+  1afd96eae1e095f5 3-21,27-28,34-39,41-343,345-347,349-377,379,381-433,435-438,440-456
+packages/practice-planner/src/lib/node-geometry.ts
+  1afd96eae1e095f5 1-46
+packages/practice-planner/src/components/drill-sidebar.tsx
+  1afd96eae1e095f5 1-176
+packages/practice-planner/src/components/split-node.tsx
+  1afd96eae1e095f5 1-126
+packages/practice-planner/src/globals.css
+  1afd96eae1e095f5 2-17
+packages/practice-planner/src/components/workflow-edge.tsx
+  1afd96eae1e095f5 1-60
+packages/practice-planner/src/lib/quick-plan.ts
+  1afd96eae1e095f5 1-160
+packages/practice-planner/src/lib/layout.ts
+  1afd96eae1e095f5 1-115
+packages/practice-planner/src/components/config-panel.tsx
+  1afd96eae1e095f5 1-261
+packages/practice-planner/src/components/canvas.tsx
+  1afd96eae1e095f5 1-275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "137001cfe40350acbc3b9564349054ae1d5bf89e",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 2476,
+      "total_deletions": 99,
+      "accepted_lines": 2381,
+      "overriden_lines": 0
+    }
+  }
+}
