@@ -1,0 +1,62 @@
+alchemy.run.ts
+  529d10dcbb0a3147 99,110-122,124,164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "44b16be5180d9a2f354e2fdd6de4d71fbbed6f8e",
+  "prompts": {
+    "3cd724e6890a6500": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8bf039af-c6ea-4880-bd96-35073769fa8f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 1232,
+      "total_deletions": 1116,
+      "accepted_lines": 795,
+      "overriden_lines": 14
+    },
+    "529d10dcbb0a3147": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa17f48d-8584-463e-ae2d-8a6e365ad308",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 110,
+      "total_deletions": 80,
+      "accepted_lines": 46,
+      "overriden_lines": 15
+    },
+    "d608762669f96e66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9877ba7b-db76-44d5-92e3-eebf51568022",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 1286,
+      "total_deletions": 46,
+      "accepted_lines": 978,
+      "overriden_lines": 32
+    },
+    "db4a41b1a293df6d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db184e1b-8852-4163-adac-639f565ced69",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
