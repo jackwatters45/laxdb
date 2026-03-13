@@ -1,0 +1,29 @@
+packages/cli/src/practice.ts
+  d608762669f96e66 15,19,25-27,73-75,77-79,81,87,89,100-102,139,187-188,195-197,199-201,203-205,207-209,211,215,257-258,265-267,269-271,273-275,277,282,338-339
+packages/cli/src/drill.ts
+  d608762669f96e66 14,23,29-31,43,49-51,55,58-60,62-64,66,70-73,75-77,79,83-86,88-90,92-94,96-98,100,105-106,108-110,112-114,116-118,120-122,146,158-163,168-173,225-228,230-234,239-244,328
+packages/cli/package.json
+  d608762669f96e66 12-13
+packages/cli/src/player.ts
+  d608762669f96e66 16,23,29-31,96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "9f53cd9d62739c6a90c48cc2ad6d8d24eed4aaf1",
+  "prompts": {
+    "d608762669f96e66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9877ba7b-db76-44d5-92e3-eebf51568022",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 327,
+      "total_deletions": 353,
+      "accepted_lines": 257,
+      "overriden_lines": 0
+    }
+  }
+}
