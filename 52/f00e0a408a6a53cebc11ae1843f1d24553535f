@@ -1,0 +1,25 @@
+packages/core-v2/src/test/schema.test.ts
+  1afd96eae1e095f5 107-108
+packages/core-v2/src/schema.ts
+  1afd96eae1e095f5 22-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "52f00e0a408a6a53cebc11ae1843f1d24553535f",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 9,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
