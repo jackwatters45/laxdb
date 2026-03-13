@@ -104,13 +104,8 @@ describe("JerseyNumberSchema", () => {
 });
 
 describe("DateFromString", () => {
-  // Schema.decodeTo produces unknown DecodingServices in v4 — safe to bypass for tests
-  const decode = Schema.decodeUnknownSync(DateFromString as any) as (
-    u: unknown,
-  ) => Date;
-  const encode = Schema.encodeUnknownSync(DateFromString as any) as (
-    u: unknown,
-  ) => string;
+  const decode = Schema.decodeUnknownSync(DateFromString);
+  const encode = Schema.encodeUnknownSync(DateFromString);
 
   it("decodes ISO string → Date", () => {
     const result = decode("2026-03-12T23:03:56.780Z");

@@ -19,10 +19,15 @@ export const PublicIdSchema = {
 };
 
 /** Date that serializes as an ISO string over the wire (JSON/NDJSON) */
-export const DateFromString = Schema.decodeTo(Schema.Date, {
+// Interface declaration matches Effect's own NumberFromString pattern.
+// TypeScript evaluates interface extends lazily, avoiding the `unknown`
+// pollution from declareConstructor's empty TypeParameters.
+interface DateFromString extends Schema.decodeTo<Schema.Date, Schema.String> {}
+
+export const DateFromString: DateFromString = Schema.decodeTo(Schema.Date, {
   decode: SchemaGetter.transform((s) => new Date(s as string)),
   encode: SchemaGetter.transform((d) => d.toISOString()),
-})(Schema.String);
+})(Schema.String) as DateFromString;
 
 /** Date schema — string ↔ Date, annotated for OpenAPI */
 export const DateSchema = DateFromString.annotate({
