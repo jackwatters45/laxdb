@@ -9,8 +9,7 @@ export default defineConfig({
     // oxlint-disable-next-line no-non-null-assertion - derived from alchemy
     url: `${process.env.DATABASE_URL!}?sslmode=require`,
   },
-  migrations: {
-  },
+  migrations: {},
   verbose: true,
   strict: true,
 }) satisfies Config;
