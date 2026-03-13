@@ -1,0 +1,40 @@
+packages/api-v2/src/drill/drill.client.ts
+  0415ac2e4a07e884 12
+packages/api-v2/src/player/player.client.ts
+  0415ac2e4a07e884 12
+packages/api-v2/src/practice/practice.client.ts
+  0415ac2e4a07e884 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "3632e644bcc3b8a8722ec300f570ef25284d4fad",
+  "prompts": {
+    "0415ac2e4a07e884": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "739fc164-228b-475a-a8a4-b8189a547718",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 231,
+      "overriden_lines": 0
+    },
+    "a5f2961b5dfdaed0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0c3b434-78cb-446b-a204-14ede1d81611",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 414,
+      "overriden_lines": 0
+    }
+  }
+}
