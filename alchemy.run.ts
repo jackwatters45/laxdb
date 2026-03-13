@@ -8,6 +8,7 @@ import {
   KVNamespace,
   R2Bucket,
   TanStackStart,
+  Worker,
 } from "alchemy/cloudflare";
 
 export const app = await alchemy("laxdb", {
@@ -50,7 +51,7 @@ const database = await Database("Database", {
   clusterSize: "PS_5",
   kind: "postgresql",
   organization: "johnwatt",
-  allowDataBranching: true,
+  // allowDataBranching: true,
   adopt: true,
 });
 
@@ -69,7 +70,7 @@ const personalBranch = await Branch("personal-branch", {
   name: "personal",
   organization: "johnwatt",
   database,
-  parentBranch: "development",
+  parentBranch: "main",
   isProduction: false,
   adopt: true,
 });
@@ -95,7 +96,7 @@ const db = await Hyperdrive("hyperdrive", {
   adopt: true,
 });
 
-// Generate Drizzle migrations
+// Generate Drizzle migrations (v1 — disabled while developing v2)
 await Exec("DrizzleGenerate", {
   command: "cd packages/core && bun run db:generate",
   env: {
@@ -106,33 +107,50 @@ await Exec("DrizzleGenerate", {
   },
 });
 
-// Apply migrations to the database
-await Exec("DrizzleMigrate", {
-  command:
-    process.platform === "win32"
-      ? `cmd /C "cd packages/core && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
-      : `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
-  env: {
-    DATABASE_URL: dbRole.connectionUrl,
-  },
-  memoize: {
-    patterns: ["drizzle.config.ts", "drizzle/*.sql"],
-  },
-});
+// // Apply migrations to the database (v1 — disabled while developing v2)
+// await Exec("DrizzleMigrate", {
+//   command:
+//     process.platform === "win32"
+//       ? `cmd /C "cd packages/core && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
+//       : `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
+//   env: {
+//     DATABASE_URL: dbRole.connectionUrl,
+//   },
+//   memoize: {
+//     patterns: ["drizzle.config.ts", "drizzle/*.sql"],
+//   },
+// });
+
+// Apply core-v2 migrations
+// await Exec("DrizzleMigrateV2", {
+//   command:
+//     process.platform === "win32"
+//       ? `cmd /C "cd packages/core-v2 && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
+//       : `sh -c 'cd packages/core-v2 && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
+//   env: {
+//     DATABASE_URL: dbRole.connectionUrl,
+//   },
+//   memoize: {
+//     patterns: [
+//       "packages/core-v2/drizzle.config.ts",
+//       "packages/core-v2/migrations/**/*.sql",
+//     ],
+//   },
+// });
 
 // Start Drizzle Studio in local development
-if (app.local) {
-  Exec("DrizzleStudio", {
-    command: "cd packages/core && bun run db:studio",
-    env: {
-      DATABASE_URL: dbRole.connectionUrl,
-    },
-  });
+// if (app.local) {
+//   Exec("DrizzleStudio", {
+//     command: "cd packages/core-v2 && bun run db:studio",
+//     env: {
+//       DATABASE_URL: dbRole.connectionUrl,
+//     },
+//   });
 
-  Exec("Storybook", {
-    command: "cd packages/ui && bun run storybook",
-  });
-}
+//   Exec("Storybook", {
+//     command: "cd packages/ui && bun run storybook",
+//   });
+// }
 
 // KV
 export const kv = await KVNamespace("kv", {});
@@ -140,17 +158,18 @@ export const kv = await KVNamespace("kv", {});
 // Storage
 export const storage = await R2Bucket("storage", {});
 
-// export const worker = await Worker("api", {
-//   entrypoint: "packages/api/src/index.ts",
-//   url: true,
-//   bindings: {
-//     DB: db,
-//     KV: kv,
-//     STORAGE: storage,
-//     DATABASE_URL: dbRole.connectionUrl,
-//     ...secrets,
-//   },
-// });
+export const api2 = await Worker("api-v2", {
+  entrypoint: "packages/api-v2/src/index.ts",
+  url: true,
+  compatibility: "node",
+  bindings: {
+    DB: db,
+    KV: kv,
+    STORAGE: storage,
+    DATABASE_URL: dbRole.connectionUrl,
+    ...secrets,
+  },
+});
 
 // export const web = await TanStackStart("web", {
 //   cwd: "./packages/web",
@@ -181,7 +200,7 @@ console.log({
   // web: web.url,
   marketing: marketing.url,
   // docs: docs.url,
-  // api: api.url,
+  api2: api2.url,
   db: database.id,
   kv: kv.namespaceId,
   r2: storage.name,
