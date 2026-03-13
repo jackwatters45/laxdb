@@ -574,9 +574,7 @@ layer(TestLayer)("PracticeService integration", (it) => {
     Effect.gen(function* () {
       const svc = yield* PracticeService;
 
-      const exit = yield* svc
-        .removeItem({ publicId: "bad" })
-        .pipe(Effect.exit);
+      const exit = yield* svc.removeItem({ publicId: "bad" }).pipe(Effect.exit);
 
       expect(exit._tag).toBe("Failure");
     }),

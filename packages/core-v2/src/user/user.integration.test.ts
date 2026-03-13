@@ -84,9 +84,7 @@ layer(TestLayer)("UserService integration", (it) => {
     Effect.gen(function* () {
       const svc = yield* UserService;
 
-      const exit = yield* svc
-        .fromEmail({ email: "" })
-        .pipe(Effect.exit);
+      const exit = yield* svc.fromEmail({ email: "" }).pipe(Effect.exit);
 
       expect(exit._tag).toBe("Failure");
     }),

@@ -44,7 +44,7 @@ export function OrganizationSwitcher() {
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">
-                {activeOrganization?.name || "No Organization"}
+                {activeOrganization?.name ?? "No Organization"}
               </span>
             </div>
             <ChevronsUpDown className="ml-auto" />
