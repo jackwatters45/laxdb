@@ -1,0 +1,49 @@
+packages/practice-planner/src/components/quick-plan-dialog.tsx
+  1afd96eae1e095f5 1-389
+packages/practice-planner/src/routes/index.tsx
+  1afd96eae1e095f5 3-9,21-85,87-88,90-102,104-113,115-116,118-183,186-198
+packages/practice-planner/src/components/canvas-toolbar.tsx
+  1afd96eae1e095f5 1-117
+packages/practice-planner/src/lib/quick-plan.ts
+  1afd96eae1e095f5 1-170
+packages/practice-planner/src/data/sample-practice.ts
+  1afd96eae1e095f5 1-183
+packages/practice-planner/src/components/split-node.tsx
+  1afd96eae1e095f5 1-145
+packages/practice-planner/src/components/command-palette.tsx
+  1afd96eae1e095f5 1-354
+packages/practice-planner/src/components/canvas.tsx
+  1afd96eae1e095f5 1-384
+packages/practice-planner/src/components/workflow-edge.tsx
+  1afd96eae1e095f5 1-49
+packages/practice-planner/src/components/minimap.tsx
+  1afd96eae1e095f5 1-131
+packages/practice-planner/src/components/swimlane.tsx
+  1afd96eae1e095f5 1-66
+packages/practice-planner/src/components/time-ruler.tsx
+  1afd96eae1e095f5 1-64
+packages/practice-planner/src/lib/layout.ts
+  1afd96eae1e095f5 1-412
+packages/practice-planner/src/components/workflow-node.tsx
+  1afd96eae1e095f5 1-338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "0256354b08e3480ee55732ebe1adb028adcbe9af",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 3059,
+      "total_deletions": 72,
+      "accepted_lines": 2990,
+      "overriden_lines": 0
+    }
+  }
+}
