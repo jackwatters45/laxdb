@@ -1,0 +1,29 @@
+packages/core-v2/src/drill/drill.integration.test.ts
+  3cd724e6890a6500 148-169,211-213,236-310
+packages/core-v2/src/user/user.integration.test.ts
+  3cd724e6890a6500 64-93
+packages/core-v2/src/practice/practice.integration.test.ts
+  3cd724e6890a6500 118-130,144-153,221-231,256-265,285-294,335-351,381-393,441-456,475-493,509-579
+packages/core-v2/src/player/player.integration.test.ts
+  3cd724e6890a6500 74,90-122,164-168,181-186,204-213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "c4328a79bb2729d2bee690970545490ef878d38f",
+  "prompts": {
+    "3cd724e6890a6500": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8bf039af-c6ea-4880-bd96-35073769fa8f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 424,
+      "total_deletions": 11,
+      "accepted_lines": 415,
+      "overriden_lines": 0
+    }
+  }
+}
