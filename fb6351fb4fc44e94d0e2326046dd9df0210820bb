@@ -1,0 +1,38 @@
+packages/core-v2/src/schema.ts
+  a5f2961b5dfdaed0 1,21-23,25-28,32-33
+packages/core-v2/src/test/schema.test.ts
+  a5f2961b5dfdaed0 6,106-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "fb6351fb4fc44e94d0e2326046dd9df0210820bb",
+  "prompts": {
+    "0415ac2e4a07e884": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "739fc164-228b-475a-a8a4-b8189a547718",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 322,
+      "total_deletions": 290,
+      "accepted_lines": 239,
+      "overriden_lines": 0
+    },
+    "a5f2961b5dfdaed0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0c3b434-78cb-446b-a204-14ede1d81611",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 696,
+      "total_deletions": 575,
+      "accepted_lines": 486,
+      "overriden_lines": 1
+    }
+  }
+}
