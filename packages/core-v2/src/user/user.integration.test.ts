@@ -61,4 +61,34 @@ layer(TestLayer)("UserService integration", (it) => {
       expect(exit._tag).toBe("Failure");
     }),
   );
+
+  it.effect("email lookup is case-sensitive", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      yield* seedUser("alice@test.com", "Alice");
+
+      const svc = yield* UserService;
+
+      // NOTE: PostgreSQL WHERE = is case-sensitive by default.
+      // If this test fails, it means the DB or query has been changed to
+      // case-insensitive matching, and we should update expectations.
+      const exit = yield* svc
+        .fromEmail({ email: "Alice@Test.com" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("empty string email → fails", () =>
+    Effect.gen(function* () {
+      const svc = yield* UserService;
+
+      const exit = yield* svc
+        .fromEmail({ email: "" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
 });

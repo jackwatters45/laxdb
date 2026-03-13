@@ -71,7 +71,7 @@ layer(TestLayer)("PlayerService integration", (it) => {
     }),
   );
 
-  it.effect("updates a player", () =>
+  it.effect("updates a player name only", () =>
     Effect.gen(function* () {
       yield* truncateAll;
       const svc = yield* PlayerService;
@@ -84,6 +84,39 @@ layer(TestLayer)("PlayerService integration", (it) => {
 
       expect(updated.name).toBe("Updated Name");
       expect(updated.email).toBe(created.email);
+    }),
+  );
+
+  it.effect("updates a player email only", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PlayerService;
+
+      const created = yield* svc.create(validCreatePlayer());
+      const updated = yield* svc.update({
+        publicId: created.publicId,
+        email: "new@test.com",
+      });
+
+      expect(updated.email).toBe("new@test.com");
+      expect(updated.name).toBe(created.name);
+    }),
+  );
+
+  it.effect("updates both name and email", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PlayerService;
+
+      const created = yield* svc.create(validCreatePlayer());
+      const updated = yield* svc.update({
+        publicId: created.publicId,
+        name: "New Name",
+        email: "new@test.com",
+      });
+
+      expect(updated.name).toBe("New Name");
+      expect(updated.email).toBe("new@test.com");
     }),
   );
 
@@ -128,7 +161,11 @@ layer(TestLayer)("PlayerService integration", (it) => {
     }),
   );
 
-  it.effect("create with invalid input → ValidationError", () =>
+  // -----------------------------------------------------------------------
+  // Validation
+  // -----------------------------------------------------------------------
+
+  it.effect("create with empty name → ValidationError", () =>
     Effect.gen(function* () {
       yield* truncateAll;
       const svc = yield* PlayerService;
@@ -141,12 +178,39 @@ layer(TestLayer)("PlayerService integration", (it) => {
     }),
   );
 
+  it.effect("create with name > 100 chars → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* PlayerService;
+
+      const exit = yield* svc
+        .create({ name: "A".repeat(101), email: "a@b.com" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
   it.effect("get with invalid nanoid → ValidationError", () =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
 
       const exit = yield* svc
         .getByPublicId({ publicId: "bad" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("update with empty name → ValidationError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PlayerService;
+
+      const created = yield* svc.create(validCreatePlayer());
+
+      const exit = yield* svc
+        .update({ publicId: created.publicId, name: "" })
         .pipe(Effect.exit);
 
       expect(exit._tag).toBe("Failure");

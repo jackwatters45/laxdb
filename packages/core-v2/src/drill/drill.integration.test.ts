@@ -145,6 +145,28 @@ layer(TestLayer)("DrillService integration", (it) => {
     }),
   );
 
+  it.effect("updates array fields to empty arrays", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* DrillService;
+
+      const created = yield* svc.create(
+        validCreateDrill({
+          category: ["shooting"],
+          tags: ["existing"],
+        }),
+      );
+      const updated = yield* svc.update({
+        publicId: created.publicId,
+        category: [],
+        tags: [],
+      });
+
+      expect(updated.category).toEqual([]);
+      expect(updated.tags).toEqual([]);
+    }),
+  );
+
   it.effect("update nonexistent → NotFoundError", () =>
     Effect.gen(function* () {
       yield* truncateAll;
@@ -186,6 +208,10 @@ layer(TestLayer)("DrillService integration", (it) => {
     }),
   );
 
+  // -----------------------------------------------------------------------
+  // Validation
+  // -----------------------------------------------------------------------
+
   it.effect("create with empty name → ValidationError", () =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
@@ -203,6 +229,85 @@ layer(TestLayer)("DrillService integration", (it) => {
       const svc = yield* DrillService;
 
       const exit = yield* svc.get({ publicId: "bad" }).pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("create with invalid difficulty → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* DrillService;
+
+      const exit = yield* svc
+        .create(
+          // @ts-expect-error -- intentionally invalid enum
+          validCreateDrill({ difficulty: "impossible" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("create with invalid intensity → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* DrillService;
+
+      const exit = yield* svc
+        .create(
+          // @ts-expect-error -- intentionally invalid enum
+          validCreateDrill({ intensity: "extreme" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("create with invalid category → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* DrillService;
+
+      const exit = yield* svc
+        .create(
+          // @ts-expect-error -- intentionally invalid enum
+          validCreateDrill({ category: ["invalid-category"] }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("create with invalid fieldSpace → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* DrillService;
+
+      const exit = yield* svc
+        .create(
+          // @ts-expect-error -- intentionally invalid enum
+          validCreateDrill({ fieldSpace: "parking-lot" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("update with invalid difficulty → ValidationError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* DrillService;
+
+      const created = yield* svc.create(validCreateDrill());
+
+      const exit = yield* svc
+        .update({
+          publicId: created.publicId,
+          // @ts-expect-error -- intentionally invalid enum
+          difficulty: "impossible",
+        })
+        .pipe(Effect.exit);
 
       expect(exit._tag).toBe("Failure");
     }),

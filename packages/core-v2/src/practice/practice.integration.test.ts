@@ -115,6 +115,19 @@ layer(TestLayer)("PracticeService integration", (it) => {
     }),
   );
 
+  it.effect("update nonexistent → NotFoundError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .update({ publicId: "AbCdEfGhIjKl", name: "X" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
   it.effect("deletes a practice", () =>
     Effect.gen(function* () {
       yield* truncateAll;
@@ -125,6 +138,19 @@ layer(TestLayer)("PracticeService integration", (it) => {
 
       const list = yield* svc.list();
       expect(list).toHaveLength(0);
+    }),
+  );
+
+  it.effect("delete nonexistent → NotFoundError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .delete({ publicId: "AbCdEfGhIjKl" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
     }),
   );
 
@@ -192,6 +218,20 @@ layer(TestLayer)("PracticeService integration", (it) => {
     }),
   );
 
+  it.effect("listItems returns empty for practice with no items", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+      const items = yield* svc.listItems({
+        practicePublicId: practice.publicId,
+      });
+
+      expect(items).toHaveLength(0);
+    }),
+  );
+
   it.effect("updates an item", () =>
     Effect.gen(function* () {
       yield* truncateAll;
@@ -213,6 +253,19 @@ layer(TestLayer)("PracticeService integration", (it) => {
     }),
   );
 
+  it.effect("updateItem nonexistent → NotFoundError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .updateItem({ publicId: "AbCdEfGhIjKl", label: "X" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
   it.effect("removes an item", () =>
     Effect.gen(function* () {
       yield* truncateAll;
@@ -226,6 +279,19 @@ layer(TestLayer)("PracticeService integration", (it) => {
         practicePublicId: practice.publicId,
       });
       expect(items).toHaveLength(0);
+    }),
+  );
+
+  it.effect("removeItem nonexistent → NotFoundError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .removeItem({ publicId: "AbCdEfGhIjKl" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
     }),
   );
 
@@ -266,6 +332,26 @@ layer(TestLayer)("PracticeService integration", (it) => {
     }),
   );
 
+  // NOTE: No FK cascade — deleting a practice does NOT auto-remove its items.
+  // Items are orphaned. Consider adding ON DELETE CASCADE to the FK constraint
+  // or implementing application-level cleanup in PracticeService.delete.
+  it.effect("deleting a practice orphans its items (no cascade)", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+      yield* svc.addItem(validAddItem(practice.publicId));
+      yield* svc.addItem(validAddItem(practice.publicId));
+      yield* svc.delete({ publicId: practice.publicId });
+
+      const items = yield* svc.listItems({
+        practicePublicId: practice.publicId,
+      });
+      expect(items).toHaveLength(2);
+    }),
+  );
+
   // -----------------------------------------------------------------------
   // Practice review
   // -----------------------------------------------------------------------
@@ -289,6 +375,22 @@ layer(TestLayer)("PracticeService integration", (it) => {
       expect(review.wentWell).toBe("Passing was sharp");
       expect(review.needsImprovement).toBe("Ground balls");
       expect(review.notes).toBe("Good energy");
+    }),
+  );
+
+  it.effect("creates a review with all null fields", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+      const review = yield* svc.createReview(
+        validCreateReview(practice.publicId),
+      );
+
+      expect(review.wentWell).toBeNull();
+      expect(review.needsImprovement).toBeNull();
+      expect(review.notes).toBeNull();
     }),
   );
 
@@ -336,6 +438,22 @@ layer(TestLayer)("PracticeService integration", (it) => {
     }),
   );
 
+  it.effect("updateReview nonexistent → NotFoundError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .updateReview({
+          practicePublicId: "AbCdEfGhIjKl",
+          wentWell: "X",
+        })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
   it.effect(
     "duplicate review for same practice → ConstraintViolationError",
     () =>
@@ -354,6 +472,27 @@ layer(TestLayer)("PracticeService integration", (it) => {
       }),
   );
 
+  // NOTE: No FK cascade — deleting a practice does NOT auto-remove its review.
+  // The review is orphaned. Consider adding ON DELETE CASCADE or app-level cleanup.
+  it.effect("deleting a practice orphans its review (no cascade)", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+      yield* svc.createReview(
+        validCreateReview(practice.publicId, { wentWell: "Great" }),
+      );
+      yield* svc.delete({ publicId: practice.publicId });
+
+      // Review is still accessible — it was not cascaded
+      const review = yield* svc.getReview({
+        practicePublicId: practice.publicId,
+      });
+      expect(review.practicePublicId).toBe(practice.publicId);
+    }),
+  );
+
   // -----------------------------------------------------------------------
   // Validation
   // -----------------------------------------------------------------------
@@ -363,6 +502,81 @@ layer(TestLayer)("PracticeService integration", (it) => {
       const svc = yield* PracticeService;
 
       const exit = yield* svc.get({ publicId: "bad" }).pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("create with invalid status → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .create(
+          // @ts-expect-error -- intentionally invalid enum
+          validCreatePractice({ status: "invalid-status" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("addItem with invalid type → ValidationError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+
+      const exit = yield* svc
+        .addItem(
+          // @ts-expect-error -- intentionally invalid enum
+          validAddItem(practice.publicId, { type: "invalid-type" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("addItem with invalid priority → ValidationError", () =>
+    Effect.gen(function* () {
+      yield* truncateAll;
+      const svc = yield* PracticeService;
+
+      const practice = yield* svc.create(validCreatePractice());
+
+      const exit = yield* svc
+        .addItem(
+          // @ts-expect-error -- intentionally invalid enum
+          validAddItem(practice.publicId, { priority: "invalid" }),
+        )
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("updateItem with invalid nanoid → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .updateItem({ publicId: "bad", label: "X" })
+        .pipe(Effect.exit);
+
+      expect(exit._tag).toBe("Failure");
+    }),
+  );
+
+  it.effect("removeItem with invalid nanoid → ValidationError", () =>
+    Effect.gen(function* () {
+      const svc = yield* PracticeService;
+
+      const exit = yield* svc
+        .removeItem({ publicId: "bad" })
+        .pipe(Effect.exit);
 
       expect(exit._tag).toBe("Failure");
     }),
