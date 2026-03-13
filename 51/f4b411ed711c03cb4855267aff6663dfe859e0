@@ -1,0 +1,47 @@
+packages/practice-planner/src/components/quick-plan-modal.tsx
+  1afd96eae1e095f5 1,5-24,26-40,42-109,113-127,129,133-155,159-182,186-227
+packages/practice-planner/src/lib/time.ts
+  1afd96eae1e095f5 1-20
+packages/practice-planner/src/components/drill-card.tsx
+  1afd96eae1e095f5 11,13-103,107-135,137-140,142,145-158,160-162,165-182,186-198,200-202,205-220,224-245
+packages/practice-planner/src/components/phase-header.tsx
+  1afd96eae1e095f5 1,4-5,8-114,118-130,134-187
+packages/practice-planner/src/globals.css
+  1afd96eae1e095f5 2-12
+packages/practice-planner/src/lib/quick-plan.ts
+  1afd96eae1e095f5 1-2,5-41,43-120
+packages/practice-planner/src/data/sample-practice.ts
+  1afd96eae1e095f5 1-24,26-211
+packages/practice-planner/src/routes/index.tsx
+  1afd96eae1e095f5 2,6-17,23-29,31-46,48-111,113-162,164-167,169-174,178,182-189,199-206,208-210,212-225,229-230
+packages/practice-planner/src/components/group-split.tsx
+  1afd96eae1e095f5 1,10-27,29-73,89-166,170-182,186-212,219-242
+packages/practice-planner/src/components/phase-column.tsx
+  1afd96eae1e095f5 1,5-6,8-19,21-106,110-133,140-153,157-168
+packages/practice-planner/src/components/duration-display.tsx
+  1afd96eae1e095f5 1-27
+packages/practice-planner/src/components/header-bar.tsx
+  1afd96eae1e095f5 1,4-5,8-42,44-91,95-107,111-123,127-170,174-194
+packages/practice-planner/src/components/drill-drawer.tsx
+  1afd96eae1e095f5 1-97,99-104,106-116,118-135,137-174,176-236
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "51f4b411ed711c03cb4855267aff6663dfe859e0",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 1972,
+      "total_deletions": 20,
+      "accepted_lines": 1947,
+      "overriden_lines": 126
+    }
+  }
+}
