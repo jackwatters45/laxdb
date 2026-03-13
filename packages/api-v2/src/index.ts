@@ -1,31 +1,20 @@
+import { DateTime, Effect, Layer } from "effect";
 import {
-  HttpApiScalar,
-  HttpLayerRouter,
-  HttpMiddleware,
+  HttpRouter,
   HttpServer,
   HttpServerResponse,
-  OpenApi,
-} from "@effect/platform";
-import { RpcSerialization, RpcServer } from "@effect/rpc";
-import { DateTime, Layer } from "effect";
+} from "effect/unstable/http";
+import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
+import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
 import { LaxdbRpcV2 } from "./rpc-group";
 import { LaxdbRpcV2Handlers } from "./rpc-handlers";
 
-const DocsRoute = HttpApiScalar.layerHttpLayerRouter({
-  api: LaxdbApiV2,
-  path: "/docs",
-});
+const DocsRoute = HttpApiScalar.layer(LaxdbApiV2);
 
-const OpenApiJsonRoute = HttpLayerRouter.add(
-  "GET",
-  "/docs/openapi.json",
-  HttpServerResponse.json(OpenApi.fromApi(LaxdbApiV2)),
-).pipe(Layer.provide(HttpLayerRouter.layer));
-
-const RpcRouter = RpcServer.layerHttpRouter({
+const RpcRouter = RpcServer.layerHttp({
   group: LaxdbRpcV2,
   path: "/rpc",
   protocol: "http",
@@ -35,13 +24,13 @@ const RpcRouter = RpcServer.layerHttpRouter({
   Layer.provide(RpcSerialization.layerNdjson),
 );
 
-const HttpApiRouter = HttpLayerRouter.addHttpApi(LaxdbApiV2).pipe(
+const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
   Layer.provide(HttpGroupsLive),
-  Layer.provide(HttpServer.layerContext),
+  Layer.provide(HttpServer.layerServices),
 );
 
 // oxlint-disable-next-line react-hooks/rules-of-hooks -- Not a React hook
-const HealthCheckRoute = HttpLayerRouter.use((router) =>
+const HealthCheckRoute = HttpRouter.use((router) =>
   router.add("GET", "/health", HttpServerResponse.text("OK")),
 );
 
@@ -49,13 +38,23 @@ const AllRoutes = Layer.mergeAll(
   RpcRouter,
   HttpApiRouter,
   DocsRoute,
-  OpenApiJsonRoute,
   HealthCheckRoute,
-  HttpLayerRouter.cors(),
 ).pipe(Layer.provide(DateTime.layerCurrentZoneLocal));
 
-const { handler } = HttpLayerRouter.toWebHandler(AllRoutes, {
-  middleware: HttpMiddleware.logger,
-});
-
-export default { fetch: handler };
+/**
+ * Build handler fresh per request.
+ *
+ * Workerd invalidates TCP sockets between request contexts. A cached handler
+ * holds a pg Pool whose connections die after each request. Rebuilding per
+ * request creates a fresh Pool each time. The actual perf cost is negligible —
+ * Layer wiring is sub-ms; the DB round-trip (AU → US East) dominates.
+ *
+ * In production, Hyperdrive handles connection pooling at the network level,
+ * so a fresh Pool per request just means a fresh Hyperdrive session.
+ */
+export default {
+  fetch: (request: Request) => {
+    const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
+    return handler(request).finally(dispose);
+  },
+};
