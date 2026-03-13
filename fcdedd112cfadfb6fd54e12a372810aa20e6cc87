@@ -1,0 +1,60 @@
+packages/core-v2/src/practice/practice.integration.test.ts
+  3cd724e6890a6500 14-15
+  d608762669f96e66 1-13,16-23,25-28,30,32-37,39-42,44-53,55-61,63-66,68-69,71-74,76-79,81-82,84-86,88-91,93-95,97-99,101-104,106-111,113-116,118-121,123-124,126-129,131-133,135-138,140-147,149-157,159-162,164-182,184-186,188-193,195-198,200-208,210-214,216-219,221-223,225-230,232-235,237-255,257-261,263-267,269-271,273-276,278-285,287-293,295,342-349,351-354,356-370
+packages/core-v2/src/user/user.integration.test.ts
+  d608762669f96e66 1-9,12-30,32-33,35-38,40-43,45-47,49-51,53-55,57-59,61-64
+  3cd724e6890a6500 10-11
+packages/core-v2/src/test/setup.ts
+  3cd724e6890a6500 1,14,16,26-29,38,53,62
+  d608762669f96e66 2-11,13,15,17-25,30-37,39-42,44-46,48-52,54-61,63-81
+packages/core-v2/src/test/util.test.ts
+  3cd724e6890a6500 24-26,33-35,42-44,56-58,66,68
+packages/core-v2/src/drill/drill.integration.test.ts
+  d608762669f96e66 1-9,12-20,22,24-31,33-36,38-55,57-69,71-74,79-82,84-87,92-95,97-100,102-104,106-108,110-113,115-120,122,124-129,131-134,136-141,143-146,148-151,153-155,157-159,161-164,166-167,169,171-174,176-179,181-183,185-187,189-191,193-195,197-199,201-203,205,207-210
+  3cd724e6890a6500 10-11
+packages/core-v2/src/player/player.integration.test.ts
+  3cd724e6890a6500 10-11
+  d608762669f96e66 1-9,12-20,22-24,26-31,33-36,41-44,46-49,51-54,56-59,61-64,66-68,70-72,74-77,79-83,85-88,90-93,95-97,99-101,103-106,108-109,111,113-116,118-121,123-125,127-129,131-134,136-138,140-142,144-146,148-150,152-155
+docker-compose.test.yml
+  d608762669f96e66 1-11
+packages/core-v2/src/test/fixtures.ts
+  d608762669f96e66 1,3-66
+packages/core-v2/vitest.config.ts
+  d608762669f96e66 1-12,25-27
+packages/core-v2/src/test/db.ts
+  d608762669f96e66 1,5,8-12,14-16,21,23-27
+  3cd724e6890a6500 2,4,6-7,13,17-20,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "fcdedd112cfadfb6fd54e12a372810aa20e6cc87",
+  "prompts": {
+    "3cd724e6890a6500": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8bf039af-c6ea-4880-bd96-35073769fa8f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    },
+    "d608762669f96e66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9877ba7b-db76-44d5-92e3-eebf51568022",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 793,
+      "overriden_lines": 0
+    }
+  }
+}
