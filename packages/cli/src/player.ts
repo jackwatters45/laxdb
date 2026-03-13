@@ -52,15 +52,12 @@ const readStdin = Effect.tryPromise({
 // Subcommands
 // ---------------------------------------------------------------------------
 
-const listCommand = Command.make(
-  "list",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
-    Effect.gen(function* () {
-      const svc = yield* PlayerService;
-      const players = yield* svc.list();
-      yield* output(players, pretty);
-    }),
+const listCommand = Command.make("list", { pretty: prettyFlag }, ({ pretty }) =>
+  Effect.gen(function* () {
+    const svc = yield* PlayerService;
+    const players = yield* svc.list();
+    yield* output(players, pretty);
+  }),
 );
 
 const getCommand = Command.make(

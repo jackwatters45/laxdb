@@ -101,10 +101,7 @@ const fieldSpaceFlag = Flag.choice("field-space", [
   "full-field",
   "half-field",
   "box",
-] as const).pipe(
-  Flag.withDescription("Field space required"),
-  Flag.optional,
-);
+] as const).pipe(Flag.withDescription("Field space required"), Flag.optional);
 const equipmentFlag = Flag.string("equipment").pipe(
   Flag.withDescription("Equipment (comma-separated)"),
   Flag.optional,
@@ -130,15 +127,12 @@ const tagsFlag = Flag.string("tags").pipe(
 // Subcommands
 // ---------------------------------------------------------------------------
 
-const listCommand = Command.make(
-  "list",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
-    Effect.gen(function* () {
-      const svc = yield* DrillService;
-      const drills = yield* svc.list();
-      yield* output(drills, pretty);
-    }),
+const listCommand = Command.make("list", { pretty: prettyFlag }, ({ pretty }) =>
+  Effect.gen(function* () {
+    const svc = yield* DrillService;
+    const drills = yield* svc.list();
+    yield* output(drills, pretty);
+  }),
 );
 
 const getCommand = Command.make(
@@ -325,9 +319,9 @@ const bulkCreateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknownEffect(Schema.Array(CreateDrillInput))(
-        raw,
-      );
+      const items = yield* Schema.decodeUnknownEffect(
+        Schema.Array(CreateDrillInput),
+      )(raw);
       const results = [];
       for (const item of items) {
         const drill = yield* svc.create(item);
@@ -360,9 +354,9 @@ const bulkUpdateCommand = Command.make(
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknownEffect(Schema.Array(UpdateDrillInput))(
-        raw,
-      );
+      const items = yield* Schema.decodeUnknownEffect(
+        Schema.Array(UpdateDrillInput),
+      )(raw);
       const results = [];
       for (const item of items) {
         const drill = yield* svc.update(item);

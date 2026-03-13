@@ -11,7 +11,7 @@
     "destroy": "alchemy destroy",
     "dev": "alchemy dev",
     "test": "turbo test",
-    "typecheck": "turbo typecheck --filter='!@laxdb/cli' --filter='!@laxdb/core' --filter='!@laxdb/api' --filter='!@laxdb/web' --filter='!@laxdb/pipeline'",
+    "typecheck": "turbo typecheck --filter='!@laxdb/core' --filter='!@laxdb/api' --filter='!@laxdb/web' --filter='!@laxdb/pipeline'",
     "lint": "turbo lint",
     "format": "turbo format",
     "fix": "turbo fix",

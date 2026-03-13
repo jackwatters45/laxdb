@@ -48,15 +48,12 @@ const readStdin = Effect.tryPromise({
 // Practice CRUD
 // ---------------------------------------------------------------------------
 
-const listCommand = Command.make(
-  "list",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
-    Effect.gen(function* () {
-      const svc = yield* PracticeService;
-      const practices = yield* svc.list();
-      yield* output(practices, pretty);
-    }),
+const listCommand = Command.make("list", { pretty: prettyFlag }, ({ pretty }) =>
+  Effect.gen(function* () {
+    const svc = yield* PracticeService;
+    const practices = yield* svc.list();
+    yield* output(practices, pretty);
+  }),
 );
 
 const getCommand = Command.make(
@@ -220,10 +217,7 @@ const addItemCommand = Command.make(
       "required",
       "optional",
       "if-time",
-    ] as const).pipe(
-      Flag.withDescription("Item priority"),
-      Flag.optional,
-    ),
+    ] as const).pipe(Flag.withDescription("Item priority"), Flag.optional),
     pretty: prettyFlag,
   },
   (opts) =>
@@ -290,10 +284,7 @@ const updateItemCommand = Command.make(
       "required",
       "optional",
       "if-time",
-    ] as const).pipe(
-      Flag.withDescription("Item priority"),
-      Flag.optional,
-    ),
+    ] as const).pipe(Flag.withDescription("Item priority"), Flag.optional),
     pretty: prettyFlag,
   },
   (opts) =>
