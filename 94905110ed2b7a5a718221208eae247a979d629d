@@ -1,0 +1,36 @@
+packages/api-v2/src/index.ts
+  3cd724e6890a6500 1,3,6-8,15,17,27,29,33,44-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "94905110ed2b7a5a718221208eae247a979d629d",
+  "prompts": {
+    "3cd724e6890a6500": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8bf039af-c6ea-4880-bd96-35073769fa8f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 69,
+      "overriden_lines": 0
+    },
+    "d608762669f96e66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9877ba7b-db76-44d5-92e3-eebf51568022",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 793,
+      "overriden_lines": 0
+    }
+  }
+}
