@@ -2,43 +2,34 @@
  * Drill CLI
  *
  * Usage:
- *   infisical run --env=dev -- bun src/drill.ts list
- *   infisical run --env=dev -- bun src/drill.ts get <publicId>
- *   infisical run --env=dev -- bun src/drill.ts create --name "Box Passing" --category passing
- *   infisical run --env=dev -- bun src/drill.ts update <publicId> --name "New Name"
- *   infisical run --env=dev -- bun src/drill.ts delete <publicId>
+ *   bun src/drill.ts list --pretty
+ *   bun src/drill.ts get <publicId>
+ *   bun src/drill.ts create --name "Box Passing" --category passing
+ *   bun src/drill.ts update <publicId> --name "New Name"
+ *   bun src/drill.ts delete <publicId>
+ *   bun src/drill.ts --base-url https://api.laxdb.io list
+ *   LAXDB_API_URL=https://api.laxdb.io bun src/drill.ts list
  *
  * Add --pretty for formatted JSON output.
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
+import { RpcDrillClient } from "@laxdb/api-v2/drill/drill.client";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
 import {
   Category,
   CreateDrillInput,
   PositionGroup,
   UpdateDrillInput,
 } from "@laxdb/core-v2/drill/drill.schema";
-import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
-// ---------------------------------------------------------------------------
-// Shared options
-// ---------------------------------------------------------------------------
-
-const prettyFlag = Flag.boolean("pretty").pipe(
-  Flag.withDescription("Pretty-print JSON output"),
-  Flag.withDefault(false),
-);
+import { baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-const output = (data: unknown, pretty: boolean) =>
-  Effect.sync(() => {
-    console.log(pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data));
-  });
 
 const parseCsv = (csv: string) =>
   csv
@@ -50,6 +41,9 @@ const decodeCategories = Schema.decodeUnknownSync(Schema.Array(Category));
 const decodePositionGroups = Schema.decodeUnknownSync(
   Schema.Array(PositionGroup),
 );
+
+const drillLayer = (baseUrl: string) =>
+  RpcDrillClient.layer.pipe(Layer.provide(makeRpcProtocol(baseUrl)));
 
 // ---------------------------------------------------------------------------
 // Shared field flags
@@ -127,23 +121,30 @@ const tagsFlag = Flag.string("tags").pipe(
 // Subcommands
 // ---------------------------------------------------------------------------
 
-const listCommand = Command.make("list", { pretty: prettyFlag }, ({ pretty }) =>
-  Effect.gen(function* () {
-    const svc = yield* DrillService;
-    const drills = yield* svc.list();
-    yield* output(drills, pretty);
-  }),
+const listCommand = Command.make(
+  "list",
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcDrillClient;
+      const drills = yield* client.DrillList();
+      yield* output(drills, pretty);
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 const getCommand = Command.make(
   "get",
-  { publicId: Argument.string("publicId"), pretty: prettyFlag },
-  ({ publicId, pretty }) =>
+  {
+    publicId: Argument.string("publicId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
-      const drill = yield* svc.get({ publicId });
+      const client = yield* RpcDrillClient;
+      const drill = yield* client.DrillGet({ publicId });
       yield* output(drill, pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 const createCommand = Command.make(
@@ -167,10 +168,11 @@ const createCommand = Command.make(
     coachNotes: coachNotesFlag,
     tags: tagsFlag,
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
+      const client = yield* RpcDrillClient;
       const category = Option.isSome(opts.category)
         ? decodeCategories(parseCsv(opts.category.value))
         : undefined;
@@ -190,7 +192,7 @@ const createCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const drill = yield* svc.create({
+      const drill = yield* client.DrillCreate({
         name: opts.name,
         subtitle: Option.getOrNull(opts.subtitle),
         description: Option.getOrNull(opts.description),
@@ -210,7 +212,7 @@ const createCommand = Command.make(
         tags: Option.getOrUndefined(tagValues),
       });
       yield* output(drill, opts.pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(opts.baseUrl))),
 );
 
 const updateCommand = Command.make(
@@ -238,10 +240,11 @@ const updateCommand = Command.make(
     coachNotes: coachNotesFlag,
     tags: tagsFlag,
     pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
   },
   (opts) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
+      const client = yield* RpcDrillClient;
       const category = Option.isSome(opts.category)
         ? decodeCategories(parseCsv(opts.category.value))
         : undefined;
@@ -261,7 +264,7 @@ const updateCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const drill = yield* svc.update({
+      const drill = yield* client.DrillUpdate({
         publicId: opts.publicId,
         name: Option.getOrUndefined(opts.name),
         subtitle: Option.getOrUndefined(opts.subtitle),
@@ -282,88 +285,83 @@ const updateCommand = Command.make(
         tags: Option.getOrUndefined(tagValues),
       });
       yield* output(drill, opts.pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(opts.baseUrl))),
 );
 
 const deleteCommand = Command.make(
   "delete",
-  { publicId: Argument.string("publicId"), pretty: prettyFlag },
-  ({ publicId, pretty }) =>
+  {
+    publicId: Argument.string("publicId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
-      const drill = yield* svc.delete({ publicId });
+      const client = yield* RpcDrillClient;
+      const drill = yield* client.DrillDelete({ publicId });
       yield* output(drill, pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
 // Bulk subcommands (read JSON from stdin)
 // ---------------------------------------------------------------------------
 
-const readStdin = Effect.tryPromise({
-  try: async () => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of process.stdin) {
-      chunks.push(chunk);
-    }
-    return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
-  },
-  catch: (e: unknown) =>
-    new Error(`Failed to read JSON from stdin: ${String(e)}`),
-});
-
 const bulkCreateCommand = Command.make(
   "bulk-create",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
+      const client = yield* RpcDrillClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreateDrillInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const drill = yield* svc.create(item);
+        const drill = yield* client.DrillCreate(item);
         results.push(drill);
       }
       yield* output(results, pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 const bulkDeleteCommand = Command.make(
   "bulk-delete",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
-      const ids = (yield* readStdin) as ReadonlyArray<string>;
+      const client = yield* RpcDrillClient;
+      const raw = yield* readStdin;
+      const ids = yield* Schema.decodeUnknownEffect(
+        Schema.Array(Schema.String),
+      )(raw);
       const results = [];
       for (const publicId of ids) {
-        const drill = yield* svc.delete({ publicId });
+        const drill = yield* client.DrillDelete({ publicId });
         results.push(drill);
       }
       yield* output(results, pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 const bulkUpdateCommand = Command.make(
   "bulk-update",
-  { pretty: prettyFlag },
-  ({ pretty }) =>
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const svc = yield* DrillService;
+      const client = yield* RpcDrillClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdateDrillInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const drill = yield* svc.update(item);
+        const drill = yield* client.DrillUpdate(item);
         results.push(drill);
       }
       yield* output(results, pretty);
-    }),
+    }).pipe(Effect.provide(drillLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -384,6 +382,6 @@ const drillCommand = Command.make("drill").pipe(
 );
 
 Command.run(drillCommand, { version: "0.1.0" }).pipe(
-  Effect.provide(Layer.mergeAll(DrillService.layer, BunServices.layer)),
+  Effect.provide(BunServices.layer),
   BunRuntime.runMain,
 );
