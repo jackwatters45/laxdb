@@ -1,14 +1,17 @@
-import { RpcClient } from "@effect/rpc";
-import { Effect } from "effect";
+import { Layer, ServiceMap } from "effect";
+import { RpcClient } from "effect/unstable/rpc";
 
 import { RpcProtocolLive } from "../protocol";
 
 import { PracticeRpcs } from "./practice.rpc";
 
-export class RpcPracticeClient extends Effect.Service<RpcPracticeClient>()(
+export class RpcPracticeClient extends ServiceMap.Service<RpcPracticeClient>()(
   "RpcPracticeClient",
   {
-    dependencies: [RpcProtocolLive],
-    scoped: RpcClient.make(PracticeRpcs),
+    make: RpcClient.make(PracticeRpcs),
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(RpcProtocolLive),
+  );
+}

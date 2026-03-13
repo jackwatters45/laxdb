@@ -14,12 +14,12 @@ import {
   UpdatePlayerInput,
 } from "./player.schema";
 
-export const PlayerErrors = Schema.Union(
+export const PlayerErrors = Schema.Union([
   NotFoundError,
   ValidationError,
   DatabaseError,
   ConstraintViolationError,
-);
+]);
 
 export const PlayerContract = {
   list: {

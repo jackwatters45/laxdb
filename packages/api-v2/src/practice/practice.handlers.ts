@@ -1,6 +1,6 @@
-import { HttpApiBuilder } from "@effect/platform";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
+import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
 
@@ -45,4 +45,4 @@ export const PracticesHandlersLive = HttpApiBuilder.group(
           )
       );
     }),
-).pipe(Layer.provide(PracticeService.Default));
+).pipe(Layer.provide(PracticeService.layer));

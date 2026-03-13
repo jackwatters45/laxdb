@@ -1,4 +1,4 @@
-import { HttpApi } from "@effect/platform";
+import { HttpApi } from "effect/unstable/httpapi";
 
 import { DrillsGroup } from "./drill/drill.api";
 import { PlayersGroup } from "./player/player.api";

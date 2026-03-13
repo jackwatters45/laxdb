@@ -12,10 +12,8 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@effect/platform": "0.94.1",
-    "@effect/rpc": "^0.73.0",
     "@laxdb/core-v2": "workspace:*",
-    "effect": "^3.19.14"
+    "effect": "^4.0.0-beta.31"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0"

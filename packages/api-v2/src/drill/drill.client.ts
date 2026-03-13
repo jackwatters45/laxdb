@@ -1,14 +1,17 @@
-import { RpcClient } from "@effect/rpc";
-import { Effect } from "effect";
+import { Layer, ServiceMap } from "effect";
+import { RpcClient } from "effect/unstable/rpc";
 
 import { RpcProtocolLive } from "../protocol";
 
 import { DrillRpcs } from "./drill.rpc";
 
-export class RpcDrillClient extends Effect.Service<RpcDrillClient>()(
+export class RpcDrillClient extends ServiceMap.Service<RpcDrillClient>()(
   "RpcDrillClient",
   {
-    dependencies: [RpcProtocolLive],
-    scoped: RpcClient.make(DrillRpcs),
+    make: RpcClient.make(DrillRpcs),
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(RpcProtocolLive),
+  );
+}

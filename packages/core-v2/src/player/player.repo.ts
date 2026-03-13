@@ -1,37 +1,42 @@
-import { PgDrizzle } from "@effect/sql-drizzle/Pg";
 import { eq, getColumns } from "drizzle-orm";
-import { Array as Arr, Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
-import { DatabaseLive } from "../drizzle/drizzle.service";
+import {
+  DatabaseLive,
+  headOrFail,
+  PgDrizzle,
+  query,
+} from "../drizzle/drizzle.service";
 
 import { playerTable } from "./player.sql";
 
-export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
-  effect: Effect.gen(function* () {
+export class PlayerRepo extends ServiceMap.Service<PlayerRepo>()("PlayerRepo", {
+  make: Effect.gen(function* () {
     const db = yield* PgDrizzle;
 
     const { id: _, ...publicColumns } = getColumns(playerTable);
 
     return {
       list: () =>
-        db
-          .select(publicColumns)
-          .from(playerTable)
-          .pipe(Effect.tapError(Effect.logError)),
+        query(db.select(publicColumns).from(playerTable)).pipe(
+          Effect.tapError(Effect.logError),
+        ),
 
       getByPublicId: (publicId: string) =>
-        db
-          .select(publicColumns)
-          .from(playerTable)
-          .where(eq(playerTable.publicId, publicId))
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+        query(
+          db
+            .select(publicColumns)
+            .from(playerTable)
+            .where(eq(playerTable.publicId, publicId)),
+        ).pipe(Effect.flatMap(headOrFail), Effect.tapError(Effect.logError)),
 
       create: (input: { name: string; email: string }) =>
-        db
-          .insert(playerTable)
-          .values({ name: input.name, email: input.email })
-          .returning(publicColumns)
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+        query(
+          db
+            .insert(playerTable)
+            .values({ name: input.name, email: input.email })
+            .returning(publicColumns),
+        ).pipe(Effect.flatMap(headOrFail), Effect.tapError(Effect.logError)),
 
       update: (
         publicId: string,
@@ -40,23 +45,28 @@ export class PlayerRepo extends Effect.Service<PlayerRepo>()("PlayerRepo", {
           readonly email?: string | undefined;
         },
       ) =>
-        db
-          .update(playerTable)
-          .set({
-            ...(input.name !== undefined && { name: input.name }),
-            ...(input.email !== undefined && { email: input.email }),
-          })
-          .where(eq(playerTable.publicId, publicId))
-          .returning(publicColumns)
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+        query(
+          db
+            .update(playerTable)
+            .set({
+              ...(input.name !== undefined && { name: input.name }),
+              ...(input.email !== undefined && { email: input.email }),
+            })
+            .where(eq(playerTable.publicId, publicId))
+            .returning(publicColumns),
+        ).pipe(Effect.flatMap(headOrFail), Effect.tapError(Effect.logError)),
 
       delete: (publicId: string) =>
-        db
-          .delete(playerTable)
-          .where(eq(playerTable.publicId, publicId))
-          .returning(publicColumns)
-          .pipe(Effect.flatMap(Arr.head), Effect.tapError(Effect.logError)),
+        query(
+          db
+            .delete(playerTable)
+            .where(eq(playerTable.publicId, publicId))
+            .returning(publicColumns),
+        ).pipe(Effect.flatMap(headOrFail), Effect.tapError(Effect.logError)),
     } as const;
   }),
-  dependencies: [DatabaseLive],
-}) {}
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(DatabaseLive),
+  );
+}

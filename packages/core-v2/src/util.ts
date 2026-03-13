@@ -1,4 +1,3 @@
-import { FileSystem } from "@effect/platform";
 import { Effect, Schema } from "effect";
 
 import {
@@ -7,23 +6,11 @@ import {
   ValidationError,
 } from "./error";
 
-export const readJsonFile = <T>(filePath: string) =>
-  Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem;
-    const content = yield* fs.readFileString(filePath, "utf-8");
-    const parsed: unknown = JSON.parse(content);
-    return parsed as T;
-  }).pipe(
-    Effect.catchAll((e) =>
-      Effect.fail(new Error(`Failed to read ${filePath}: ${String(e)}`)),
-    ),
-  );
-
-export const decodeArguments = <A, I, R>(
-  schema: Schema.Schema<A, I, R>,
-  input: I,
+export const decodeArguments = <S extends Schema.Top>(
+  schema: S,
+  input: unknown,
 ) =>
-  Schema.decode(schema)(input).pipe(
+  Schema.decodeUnknownEffect(schema)(input).pipe(
     Effect.tapError(Effect.logError),
     Effect.mapError((error) => new ValidationError({ cause: error })),
   );

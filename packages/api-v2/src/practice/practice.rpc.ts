@@ -1,7 +1,7 @@
-import { Rpc, RpcGroup } from "@effect/rpc";
 import { PracticeContract } from "@laxdb/core-v2/practice/practice.contract";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
+import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
 export class PracticeRpcs extends RpcGroup.make(
   // Practice CRUD
@@ -101,4 +101,4 @@ export const PracticeHandlers = PracticeRpcs.toLayer(
       PracticeUpdateReview: (payload) => service.updateReview(payload),
     };
   }),
-).pipe(Layer.provide(PracticeService.Default));
+).pipe(Layer.provide(PracticeService.layer));

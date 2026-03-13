@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parsePostgresError } from "../util";
@@ -10,10 +10,10 @@ import {
   UpdatePlayerInput,
 } from "./player.schema";
 
-export class PlayerService extends Effect.Service<PlayerService>()(
+export class PlayerService extends ServiceMap.Service<PlayerService>()(
   "PlayerService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const repo = yield* PlayerRepo;
 
       return {
@@ -32,7 +32,7 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.getByPublicId(decoded.publicId);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
@@ -48,7 +48,7 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(CreatePlayerInput, input);
             return yield* repo.create(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: "create" }),
               ),
@@ -67,7 +67,7 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(UpdatePlayerInput, input);
             return yield* repo.update(decoded.publicId, decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
@@ -86,7 +86,7 @@ export class PlayerService extends Effect.Service<PlayerService>()(
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.delete(decoded.publicId);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
@@ -101,6 +101,9 @@ export class PlayerService extends Effect.Service<PlayerService>()(
           ),
       } as const;
     }),
-    dependencies: [PlayerRepo.Default],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(PlayerRepo.layer),
+  );
+}

@@ -15,12 +15,12 @@ import {
   UpdateDrillInput,
 } from "./drill.schema";
 
-export const DrillErrors = Schema.Union(
+export const DrillErrors = Schema.Union([
   NotFoundError,
   ValidationError,
   DatabaseError,
   ConstraintViolationError,
-);
+]);
 
 export const DrillContract = {
   list: {

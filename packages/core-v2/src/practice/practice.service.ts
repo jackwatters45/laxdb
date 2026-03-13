@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parsePostgresError } from "../util";
@@ -19,10 +19,10 @@ import {
   UpdateReviewInput,
 } from "./practice.schema";
 
-export class PracticeService extends Effect.Service<PracticeService>()(
+export class PracticeService extends ServiceMap.Service<PracticeService>()(
   "PracticeService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const repo = yield* PracticeRepo;
 
       return {
@@ -44,7 +44,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(GetPracticeInput, input);
             return yield* repo.get(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "Practice",
@@ -64,7 +64,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(CreatePracticeInput, input);
             return yield* repo.create(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "Practice",
@@ -84,7 +84,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdatePracticeInput, input);
             return yield* repo.update(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "Practice",
@@ -104,7 +104,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(DeletePracticeInput, input);
             return yield* repo.delete(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "Practice",
@@ -140,7 +140,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(AddItemInput, input);
             return yield* repo.addItem(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeItem",
@@ -160,7 +160,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdateItemInput, input);
             return yield* repo.updateItem(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeItem",
@@ -180,7 +180,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(RemoveItemInput, input);
             return yield* repo.removeItem(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeItem",
@@ -216,7 +216,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(GetReviewInput, input);
             return yield* repo.getReview(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeReview",
@@ -236,7 +236,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(CreateReviewInput, input);
             return yield* repo.createReview(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeReview",
@@ -256,7 +256,7 @@ export class PracticeService extends Effect.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdateReviewInput, input);
             return yield* repo.updateReview(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
                   domain: "PracticeReview",
@@ -272,6 +272,9 @@ export class PracticeService extends Effect.Service<PracticeService>()(
           ),
       } as const;
     }),
-    dependencies: [PracticeRepo.Default],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(PracticeRepo.layer),
+  );
+}

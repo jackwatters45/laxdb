@@ -1,4 +1,3 @@
-import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -6,126 +5,120 @@ import {
   ValidationError,
 } from "@laxdb/core-v2/error";
 import { PracticeContract } from "@laxdb/core-v2/practice/practice.contract";
+import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
+
+const errors = [
+  NotFoundError,
+  ValidationError,
+  DatabaseError,
+  ConstraintViolationError,
+] as const;
 
 export const PracticesGroup = HttpApiGroup.make("Practices")
   // Practice CRUD
   .add(
-    HttpApiEndpoint.post("listPractices", "/api/practices")
-      .addSuccess(PracticeContract.list.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError),
+    HttpApiEndpoint.post("listPractices", "/api/practices", {
+      success: PracticeContract.list.success,
+      error: errors,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("getPractice", "/api/practices/get")
-      .addSuccess(PracticeContract.get.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.get.payload),
+    HttpApiEndpoint.post("getPractice", "/api/practices/get", {
+      success: PracticeContract.get.success,
+      error: errors,
+      payload: PracticeContract.get.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("createPractice", "/api/practices/create")
-      .addSuccess(PracticeContract.create.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.create.payload),
+    HttpApiEndpoint.post("createPractice", "/api/practices/create", {
+      success: PracticeContract.create.success,
+      error: errors,
+      payload: PracticeContract.create.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("updatePractice", "/api/practices/update")
-      .addSuccess(PracticeContract.update.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.update.payload),
+    HttpApiEndpoint.post("updatePractice", "/api/practices/update", {
+      success: PracticeContract.update.success,
+      error: errors,
+      payload: PracticeContract.update.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("deletePractice", "/api/practices/delete")
-      .addSuccess(PracticeContract.delete.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.delete.payload),
+    HttpApiEndpoint.post("deletePractice", "/api/practices/delete", {
+      success: PracticeContract.delete.success,
+      error: errors,
+      payload: PracticeContract.delete.payload,
+    }),
   )
 
   // Practice items
   .add(
-    HttpApiEndpoint.post("listPracticeItems", "/api/practices/items")
-      .addSuccess(PracticeContract.listItems.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.listItems.payload),
+    HttpApiEndpoint.post("listPracticeItems", "/api/practices/items", {
+      success: PracticeContract.listItems.success,
+      error: errors,
+      payload: PracticeContract.listItems.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("addPracticeItem", "/api/practices/items/add")
-      .addSuccess(PracticeContract.addItem.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.addItem.payload),
+    HttpApiEndpoint.post("addPracticeItem", "/api/practices/items/add", {
+      success: PracticeContract.addItem.success,
+      error: errors,
+      payload: PracticeContract.addItem.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("updatePracticeItem", "/api/practices/items/update")
-      .addSuccess(PracticeContract.updateItem.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.updateItem.payload),
+    HttpApiEndpoint.post("updatePracticeItem", "/api/practices/items/update", {
+      success: PracticeContract.updateItem.success,
+      error: errors,
+      payload: PracticeContract.updateItem.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("removePracticeItem", "/api/practices/items/remove")
-      .addSuccess(PracticeContract.removeItem.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.removeItem.payload),
+    HttpApiEndpoint.post("removePracticeItem", "/api/practices/items/remove", {
+      success: PracticeContract.removeItem.success,
+      error: errors,
+      payload: PracticeContract.removeItem.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("reorderPracticeItems", "/api/practices/items/reorder")
-      .addSuccess(PracticeContract.reorderItems.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.reorderItems.payload),
+    HttpApiEndpoint.post(
+      "reorderPracticeItems",
+      "/api/practices/items/reorder",
+      {
+        success: PracticeContract.reorderItems.success,
+        error: errors,
+        payload: PracticeContract.reorderItems.payload,
+      },
+    ),
   )
 
   // Practice review
   .add(
-    HttpApiEndpoint.post("getPracticeReview", "/api/practices/review/get")
-      .addSuccess(PracticeContract.getReview.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.getReview.payload),
+    HttpApiEndpoint.post("getPracticeReview", "/api/practices/review/get", {
+      success: PracticeContract.getReview.success,
+      error: errors,
+      payload: PracticeContract.getReview.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("createPracticeReview", "/api/practices/review/create")
-      .addSuccess(PracticeContract.createReview.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.createReview.payload),
+    HttpApiEndpoint.post(
+      "createPracticeReview",
+      "/api/practices/review/create",
+      {
+        success: PracticeContract.createReview.success,
+        error: errors,
+        payload: PracticeContract.createReview.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("updatePracticeReview", "/api/practices/review/update")
-      .addSuccess(PracticeContract.updateReview.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PracticeContract.updateReview.payload),
+    HttpApiEndpoint.post(
+      "updatePracticeReview",
+      "/api/practices/review/update",
+      {
+        success: PracticeContract.updateReview.success,
+        error: errors,
+        payload: PracticeContract.updateReview.payload,
+      },
+    ),
   );

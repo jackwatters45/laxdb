@@ -25,12 +25,12 @@ import {
   UpdateReviewInput,
 } from "./practice.schema";
 
-export const PracticeErrors = Schema.Union(
+export const PracticeErrors = Schema.Union([
   NotFoundError,
   ValidationError,
   DatabaseError,
   ConstraintViolationError,
-);
+]);
 
 export const PracticeContract = {
   // Practice CRUD

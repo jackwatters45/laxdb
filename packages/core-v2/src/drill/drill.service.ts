@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parsePostgresError } from "../util";
@@ -11,10 +11,10 @@ import {
   UpdateDrillInput,
 } from "./drill.schema";
 
-export class DrillService extends Effect.Service<DrillService>()(
+export class DrillService extends ServiceMap.Service<DrillService>()(
   "DrillService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const repo = yield* DrillRepo;
 
       return {
@@ -32,7 +32,7 @@ export class DrillService extends Effect.Service<DrillService>()(
             const decoded = yield* decodeArguments(GetDrillInput, input);
             return yield* repo.get(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),
               ),
@@ -49,7 +49,7 @@ export class DrillService extends Effect.Service<DrillService>()(
             const decoded = yield* decodeArguments(CreateDrillInput, input);
             return yield* repo.create(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(new NotFoundError({ domain: "Drill", id: "new" })),
             ),
             Effect.catchTag("SqlError", (e) =>
@@ -63,7 +63,7 @@ export class DrillService extends Effect.Service<DrillService>()(
             const decoded = yield* decodeArguments(UpdateDrillInput, input);
             return yield* repo.update(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),
               ),
@@ -80,7 +80,7 @@ export class DrillService extends Effect.Service<DrillService>()(
             const decoded = yield* decodeArguments(DeleteDrillInput, input);
             return yield* repo.delete(decoded);
           }).pipe(
-            Effect.catchTag("NoSuchElementException", () =>
+            Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),
               ),
@@ -93,6 +93,9 @@ export class DrillService extends Effect.Service<DrillService>()(
           ),
       } as const;
     }),
-    dependencies: [DrillRepo.Default],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(DrillRepo.layer),
+  );
+}

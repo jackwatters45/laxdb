@@ -1,4 +1,4 @@
-import { RpcGroup } from "@effect/rpc";
+import { RpcGroup } from "effect/unstable/rpc";
 
 import { DrillRpcs } from "./drill/drill.rpc";
 import { PlayerRpcs } from "./player/player.rpc";

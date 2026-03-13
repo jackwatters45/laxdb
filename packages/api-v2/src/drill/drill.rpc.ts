@@ -1,7 +1,7 @@
-import { Rpc, RpcGroup } from "@effect/rpc";
 import { DrillContract } from "@laxdb/core-v2/drill/drill.contract";
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer } from "effect";
+import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
 export class DrillRpcs extends RpcGroup.make(
   Rpc.make("DrillList", {
@@ -43,4 +43,4 @@ export const DrillHandlers = DrillRpcs.toLayer(
       DrillDelete: (payload) => service.delete(payload),
     };
   }),
-).pipe(Layer.provide(DrillService.Default));
+).pipe(Layer.provide(DrillService.layer));

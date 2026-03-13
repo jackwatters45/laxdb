@@ -6,13 +6,13 @@ import { NanoidSchema, PublicIdSchema, TimestampsSchema } from "../schema";
 // Enums — enforced at the Effect layer, stored as text in PG for flexibility
 // ---------------------------------------------------------------------------
 
-export const Difficulty = Schema.Literal(
+export const Difficulty = Schema.Literals([
   "beginner",
   "intermediate",
   "advanced",
-);
+]);
 
-export const Category = Schema.Literal(
+export const Category = Schema.Literals([
   "passing",
   "shooting",
   "defense",
@@ -24,19 +24,19 @@ export const Category = Schema.Literal(
   "man-up",
   "man-down",
   "conditioning",
-);
+]);
 
-export const PositionGroup = Schema.Literal(
+export const PositionGroup = Schema.Literals([
   "attack",
   "midfield",
   "defense",
   "goalie",
   "all",
-);
+]);
 
-export const Intensity = Schema.Literal("low", "medium", "high");
+export const Intensity = Schema.Literals(["low", "medium", "high"]);
 
-export const FieldSpace = Schema.Literal("full-field", "half-field", "box");
+export const FieldSpace = Schema.Literals(["full-field", "half-field", "box"]);
 
 // ---------------------------------------------------------------------------
 // Domain schemas
@@ -67,7 +67,7 @@ export class Drill extends Schema.Class<Drill>("Drill")({
 export class CreateDrillInput extends Schema.Class<CreateDrillInput>(
   "CreateDrillInput",
 )({
-  name: Schema.String.pipe(Schema.minLength(1)),
+  name: Schema.String.check(Schema.isMinLength(1)),
   subtitle: Schema.NullOr(Schema.String),
   description: Schema.NullOr(Schema.String),
   difficulty: Schema.optional(Difficulty),
@@ -96,7 +96,7 @@ export class UpdateDrillInput extends Schema.Class<UpdateDrillInput>(
   "UpdateDrillInput",
 )({
   publicId: NanoidSchema,
-  name: Schema.optional(Schema.String.pipe(Schema.minLength(1))),
+  name: Schema.optional(Schema.String.check(Schema.isMinLength(1))),
   subtitle: Schema.optional(Schema.NullOr(Schema.String)),
   description: Schema.optional(Schema.NullOr(Schema.String)),
   difficulty: Schema.optional(Difficulty),

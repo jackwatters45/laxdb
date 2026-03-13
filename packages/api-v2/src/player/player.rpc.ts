@@ -1,7 +1,7 @@
-import { Rpc, RpcGroup } from "@effect/rpc";
 import { PlayerContract } from "@laxdb/core-v2/player/player.contract";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer } from "effect";
+import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
 export class PlayerRpcs extends RpcGroup.make(
   Rpc.make("PlayerList", {
@@ -43,4 +43,4 @@ export const PlayerHandlers = PlayerRpcs.toLayer(
       PlayerDelete: (payload) => service.delete(payload),
     };
   }),
-).pipe(Layer.provide(PlayerService.Default));
+).pipe(Layer.provide(PlayerService.layer));

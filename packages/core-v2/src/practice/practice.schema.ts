@@ -1,32 +1,37 @@
 import { Schema } from "effect";
 
-import { NanoidSchema, PublicIdSchema, TimestampsSchema } from "../schema";
+import {
+  DateSchema,
+  NanoidSchema,
+  PublicIdSchema,
+  TimestampsSchema,
+} from "../schema";
 
 // ---------------------------------------------------------------------------
 // Enums — enforced at the Effect layer, stored as text in PG for flexibility
 // ---------------------------------------------------------------------------
 
-export const PracticeStatus = Schema.Literal(
+export const PracticeStatus = Schema.Literals([
   "draft",
   "scheduled",
   "in-progress",
   "completed",
   "cancelled",
-);
+]);
 
-export const PracticeItemType = Schema.Literal(
+export const PracticeItemType = Schema.Literals([
   "warmup",
   "drill",
   "cooldown",
   "water-break",
   "activity",
-);
+]);
 
-export const PracticeItemPriority = Schema.Literal(
+export const PracticeItemPriority = Schema.Literals([
   "required",
   "optional",
   "if-time",
-);
+]);
 
 // ---------------------------------------------------------------------------
 // Domain schemas
@@ -35,7 +40,7 @@ export const PracticeItemPriority = Schema.Literal(
 export class Practice extends Schema.Class<Practice>("Practice")({
   ...PublicIdSchema,
   name: Schema.NullOr(Schema.String),
-  date: Schema.NullOr(Schema.DateFromSelf),
+  date: Schema.NullOr(DateSchema),
   description: Schema.NullOr(Schema.String),
   notes: Schema.NullOr(Schema.String),
   durationMinutes: Schema.NullOr(Schema.Number),
@@ -77,7 +82,7 @@ export class CreatePracticeInput extends Schema.Class<CreatePracticeInput>(
   "CreatePracticeInput",
 )({
   name: Schema.NullOr(Schema.String),
-  date: Schema.NullOr(Schema.DateFromSelf),
+  date: Schema.NullOr(DateSchema),
   description: Schema.NullOr(Schema.String),
   notes: Schema.NullOr(Schema.String),
   durationMinutes: Schema.NullOr(Schema.Number),
@@ -96,7 +101,7 @@ export class UpdatePracticeInput extends Schema.Class<UpdatePracticeInput>(
 )({
   publicId: NanoidSchema,
   name: Schema.optional(Schema.NullOr(Schema.String)),
-  date: Schema.optional(Schema.NullOr(Schema.DateFromSelf)),
+  date: Schema.optional(Schema.NullOr(DateSchema)),
   description: Schema.optional(Schema.NullOr(Schema.String)),
   notes: Schema.optional(Schema.NullOr(Schema.String)),
   durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),

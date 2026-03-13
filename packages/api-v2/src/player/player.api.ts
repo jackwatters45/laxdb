@@ -1,4 +1,3 @@
-import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import {
   ConstraintViolationError,
   DatabaseError,
@@ -6,49 +5,65 @@ import {
   ValidationError,
 } from "@laxdb/core-v2/error";
 import { PlayerContract } from "@laxdb/core-v2/player/player.contract";
+import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
 export const PlayersGroup = HttpApiGroup.make("Players")
   .add(
-    HttpApiEndpoint.post("listPlayers", "/api/players")
-      .addSuccess(PlayerContract.list.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError),
+    HttpApiEndpoint.post("listPlayers", "/api/players", {
+      success: PlayerContract.list.success,
+      error: [
+        NotFoundError,
+        ValidationError,
+        DatabaseError,
+        ConstraintViolationError,
+      ],
+    }),
   )
   .add(
-    HttpApiEndpoint.post("getPlayer", "/api/players/get")
-      .addSuccess(PlayerContract.get.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PlayerContract.get.payload),
+    HttpApiEndpoint.post("getPlayer", "/api/players/get", {
+      success: PlayerContract.get.success,
+      error: [
+        NotFoundError,
+        ValidationError,
+        DatabaseError,
+        ConstraintViolationError,
+      ],
+      payload: PlayerContract.get.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("createPlayer", "/api/players/create")
-      .addSuccess(PlayerContract.create.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PlayerContract.create.payload),
+    HttpApiEndpoint.post("createPlayer", "/api/players/create", {
+      success: PlayerContract.create.success,
+      error: [
+        NotFoundError,
+        ValidationError,
+        DatabaseError,
+        ConstraintViolationError,
+      ],
+      payload: PlayerContract.create.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("updatePlayer", "/api/players/update")
-      .addSuccess(PlayerContract.update.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PlayerContract.update.payload),
+    HttpApiEndpoint.post("updatePlayer", "/api/players/update", {
+      success: PlayerContract.update.success,
+      error: [
+        NotFoundError,
+        ValidationError,
+        DatabaseError,
+        ConstraintViolationError,
+      ],
+      payload: PlayerContract.update.payload,
+    }),
   )
   .add(
-    HttpApiEndpoint.post("deletePlayer", "/api/players/delete")
-      .addSuccess(PlayerContract.delete.success)
-      .addError(NotFoundError)
-      .addError(ValidationError)
-      .addError(DatabaseError)
-      .addError(ConstraintViolationError)
-      .setPayload(PlayerContract.delete.payload),
+    HttpApiEndpoint.post("deletePlayer", "/api/players/delete", {
+      success: PlayerContract.delete.success,
+      error: [
+        NotFoundError,
+        ValidationError,
+        DatabaseError,
+        ConstraintViolationError,
+      ],
+      payload: PlayerContract.delete.payload,
+    }),
   );
