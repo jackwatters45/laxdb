@@ -12,19 +12,19 @@
  * Add --pretty for formatted JSON output.
  */
 
-import { Args, Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { CreatePracticeInput } from "@laxdb/core-v2/practice/practice.schema";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer, Option, Schema } from "effect";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 
 // ---------------------------------------------------------------------------
 // Shared
 // ---------------------------------------------------------------------------
 
-const prettyOption = Options.boolean("pretty").pipe(
-  Options.withDescription("Pretty-print JSON output"),
-  Options.withDefault(false),
+const prettyFlag = Flag.boolean("pretty").pipe(
+  Flag.withDescription("Pretty-print JSON output"),
+  Flag.withDefault(false),
 );
 
 const output = (data: unknown, pretty: boolean) =>
@@ -50,7 +50,7 @@ const readStdin = Effect.tryPromise({
 
 const listCommand = Command.make(
   "list",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
@@ -61,7 +61,7 @@ const listCommand = Command.make(
 
 const getCommand = Command.make(
   "get",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
@@ -70,49 +70,49 @@ const getCommand = Command.make(
     }),
 );
 
-const nameOption = Options.text("name").pipe(
-  Options.withDescription("Practice name"),
-  Options.optional,
+const nameFlag = Flag.string("name").pipe(
+  Flag.withDescription("Practice name"),
+  Flag.optional,
 );
-const dateOption = Options.text("date").pipe(
-  Options.withDescription("Practice date (ISO 8601)"),
-  Options.optional,
+const dateFlag = Flag.string("date").pipe(
+  Flag.withDescription("Practice date (ISO 8601)"),
+  Flag.optional,
 );
-const durationOption = Options.integer("duration").pipe(
-  Options.withDescription("Duration in minutes"),
-  Options.optional,
+const durationFlag = Flag.integer("duration").pipe(
+  Flag.withDescription("Duration in minutes"),
+  Flag.optional,
 );
-const locationOption = Options.text("location").pipe(
-  Options.withDescription("Field/facility name"),
-  Options.optional,
+const locationFlag = Flag.string("location").pipe(
+  Flag.withDescription("Field/facility name"),
+  Flag.optional,
 );
-const statusOption = Options.choice("status", [
+const statusFlag = Flag.choice("status", [
   "draft",
   "scheduled",
   "in-progress",
   "completed",
   "cancelled",
-] as const).pipe(Options.withDescription("Practice status"), Options.optional);
-const descriptionOption = Options.text("description").pipe(
-  Options.withDescription("Practice description"),
-  Options.optional,
+] as const).pipe(Flag.withDescription("Practice status"), Flag.optional);
+const descriptionFlag = Flag.string("description").pipe(
+  Flag.withDescription("Practice description"),
+  Flag.optional,
 );
-const notesOption = Options.text("notes").pipe(
-  Options.withDescription("Coach notes"),
-  Options.optional,
+const notesFlag = Flag.string("notes").pipe(
+  Flag.withDescription("Coach notes"),
+  Flag.optional,
 );
 
 const createCommand = Command.make(
   "create",
   {
-    name: nameOption,
-    date: dateOption,
-    duration: durationOption,
-    location: locationOption,
-    status: statusOption,
-    description: descriptionOption,
-    notes: notesOption,
-    pretty: prettyOption,
+    name: nameFlag,
+    date: dateFlag,
+    duration: durationFlag,
+    location: locationFlag,
+    status: statusFlag,
+    description: descriptionFlag,
+    notes: notesFlag,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -136,15 +136,15 @@ const createCommand = Command.make(
 const updateCommand = Command.make(
   "update",
   {
-    publicId: Args.text({ name: "publicId" }),
-    name: nameOption,
-    date: dateOption,
-    duration: durationOption,
-    location: locationOption,
-    status: statusOption,
-    description: descriptionOption,
-    notes: notesOption,
-    pretty: prettyOption,
+    publicId: Argument.string("publicId"),
+    name: nameFlag,
+    date: dateFlag,
+    duration: durationFlag,
+    location: locationFlag,
+    status: statusFlag,
+    description: descriptionFlag,
+    notes: notesFlag,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -168,7 +168,7 @@ const updateCommand = Command.make(
 
 const deleteCommand = Command.make(
   "delete",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
@@ -184,47 +184,47 @@ const deleteCommand = Command.make(
 const addItemCommand = Command.make(
   "add-item",
   {
-    practiceId: Args.text({ name: "practiceId" }),
-    type: Options.choice("type", [
+    practiceId: Argument.string("practiceId"),
+    type: Flag.choice("type", [
       "warmup",
       "drill",
       "cooldown",
       "water-break",
       "activity",
-    ] as const).pipe(Options.withDescription("Item type")),
-    drill: Options.text("drill").pipe(
-      Options.withDescription("Drill publicId (for type=drill)"),
-      Options.optional,
+    ] as const).pipe(Flag.withDescription("Item type")),
+    drill: Flag.string("drill").pipe(
+      Flag.withDescription("Drill publicId (for type=drill)"),
+      Flag.optional,
     ),
-    label: Options.text("label").pipe(
-      Options.withDescription("Label for non-drill items"),
-      Options.optional,
+    label: Flag.string("label").pipe(
+      Flag.withDescription("Label for non-drill items"),
+      Flag.optional,
     ),
-    duration: Options.integer("duration").pipe(
-      Options.withDescription("Duration in minutes"),
-      Options.optional,
+    duration: Flag.integer("duration").pipe(
+      Flag.withDescription("Duration in minutes"),
+      Flag.optional,
     ),
-    itemNotes: Options.text("notes").pipe(
-      Options.withDescription("Item notes"),
-      Options.optional,
+    itemNotes: Flag.string("notes").pipe(
+      Flag.withDescription("Item notes"),
+      Flag.optional,
     ),
-    groups: Options.text("groups").pipe(
-      Options.withDescription("Groups (comma-separated, e.g. attack,midfield)"),
-      Options.optional,
+    groups: Flag.string("groups").pipe(
+      Flag.withDescription("Groups (comma-separated, e.g. attack,midfield)"),
+      Flag.optional,
     ),
-    order: Options.integer("order").pipe(
-      Options.withDescription("Order index"),
-      Options.optional,
+    order: Flag.integer("order").pipe(
+      Flag.withDescription("Order index"),
+      Flag.optional,
     ),
-    priority: Options.choice("priority", [
+    priority: Flag.choice("priority", [
       "required",
       "optional",
       "if-time",
     ] as const).pipe(
-      Options.withDescription("Item priority"),
-      Options.optional,
+      Flag.withDescription("Item priority"),
+      Flag.optional,
     ),
-    pretty: prettyOption,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -254,47 +254,47 @@ const addItemCommand = Command.make(
 const updateItemCommand = Command.make(
   "update-item",
   {
-    itemId: Args.text({ name: "itemId" }),
-    type: Options.choice("type", [
+    itemId: Argument.string("itemId"),
+    type: Flag.choice("type", [
       "warmup",
       "drill",
       "cooldown",
       "water-break",
       "activity",
-    ] as const).pipe(Options.withDescription("Item type"), Options.optional),
-    drill: Options.text("drill").pipe(
-      Options.withDescription("Drill publicId"),
-      Options.optional,
+    ] as const).pipe(Flag.withDescription("Item type"), Flag.optional),
+    drill: Flag.string("drill").pipe(
+      Flag.withDescription("Drill publicId"),
+      Flag.optional,
     ),
-    label: Options.text("label").pipe(
-      Options.withDescription("Item label"),
-      Options.optional,
+    label: Flag.string("label").pipe(
+      Flag.withDescription("Item label"),
+      Flag.optional,
     ),
-    duration: Options.integer("duration").pipe(
-      Options.withDescription("Duration in minutes"),
-      Options.optional,
+    duration: Flag.integer("duration").pipe(
+      Flag.withDescription("Duration in minutes"),
+      Flag.optional,
     ),
-    itemNotes: Options.text("notes").pipe(
-      Options.withDescription("Item notes"),
-      Options.optional,
+    itemNotes: Flag.string("notes").pipe(
+      Flag.withDescription("Item notes"),
+      Flag.optional,
     ),
-    groups: Options.text("groups").pipe(
-      Options.withDescription("Groups (comma-separated)"),
-      Options.optional,
+    groups: Flag.string("groups").pipe(
+      Flag.withDescription("Groups (comma-separated)"),
+      Flag.optional,
     ),
-    order: Options.integer("order").pipe(
-      Options.withDescription("Order index"),
-      Options.optional,
+    order: Flag.integer("order").pipe(
+      Flag.withDescription("Order index"),
+      Flag.optional,
     ),
-    priority: Options.choice("priority", [
+    priority: Flag.choice("priority", [
       "required",
       "optional",
       "if-time",
     ] as const).pipe(
-      Options.withDescription("Item priority"),
-      Options.optional,
+      Flag.withDescription("Item priority"),
+      Flag.optional,
     ),
-    pretty: prettyOption,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -323,7 +323,7 @@ const updateItemCommand = Command.make(
 
 const removeItemCommand = Command.make(
   "remove-item",
-  { itemId: Args.text({ name: "itemId" }), pretty: prettyOption },
+  { itemId: Argument.string("itemId"), pretty: prettyFlag },
   ({ itemId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
@@ -335,8 +335,8 @@ const removeItemCommand = Command.make(
 const listItemsCommand = Command.make(
   "list-items",
   {
-    practiceId: Args.text({ name: "practiceId" }),
-    pretty: prettyOption,
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
   },
   ({ practiceId, pretty }) =>
     Effect.gen(function* () {
@@ -349,11 +349,11 @@ const listItemsCommand = Command.make(
 const reorderItemsCommand = Command.make(
   "reorder-items",
   {
-    practiceId: Args.text({ name: "practiceId" }),
-    order: Options.text("order").pipe(
-      Options.withDescription("Comma-separated item publicIds in new order"),
+    practiceId: Argument.string("practiceId"),
+    order: Flag.string("order").pipe(
+      Flag.withDescription("Comma-separated item publicIds in new order"),
     ),
-    pretty: prettyOption,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -377,20 +377,20 @@ const reorderItemsCommand = Command.make(
 const reviewCommand = Command.make(
   "review",
   {
-    practiceId: Args.text({ name: "practiceId" }),
-    wentWell: Options.text("went-well").pipe(
-      Options.withDescription("What went well"),
-      Options.optional,
+    practiceId: Argument.string("practiceId"),
+    wentWell: Flag.string("went-well").pipe(
+      Flag.withDescription("What went well"),
+      Flag.optional,
     ),
-    needsImprovement: Options.text("needs-improvement").pipe(
-      Options.withDescription("What needs improvement"),
-      Options.optional,
+    needsImprovement: Flag.string("needs-improvement").pipe(
+      Flag.withDescription("What needs improvement"),
+      Flag.optional,
     ),
-    reviewNotes: Options.text("notes").pipe(
-      Options.withDescription("Review notes"),
-      Options.optional,
+    reviewNotes: Flag.string("notes").pipe(
+      Flag.withDescription("Review notes"),
+      Flag.optional,
     ),
-    pretty: prettyOption,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -425,8 +425,8 @@ const reviewCommand = Command.make(
 const getReviewCommand = Command.make(
   "get-review",
   {
-    practiceId: Args.text({ name: "practiceId" }),
-    pretty: prettyOption,
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
   },
   ({ practiceId, pretty }) =>
     Effect.gen(function* () {
@@ -444,12 +444,12 @@ const getReviewCommand = Command.make(
 
 const bulkCreateCommand = Command.make(
   "bulk-create",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(
+      const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePracticeInput),
       )(raw);
       const results = [];
@@ -463,7 +463,7 @@ const bulkCreateCommand = Command.make(
 
 const bulkDeleteCommand = Command.make(
   "bulk-delete",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PracticeService;
@@ -500,12 +500,7 @@ const practiceCommand = Command.make("practice").pipe(
   ]),
 );
 
-const cli = Command.run(practiceCommand, {
-  name: "practice",
-  version: "0.1.0",
-});
-
-cli(process.argv).pipe(
-  Effect.provide(Layer.mergeAll(PracticeService.Default, BunContext.layer)),
+Command.run(practiceCommand, { version: "0.1.0" }).pipe(
+  Effect.provide(Layer.mergeAll(PracticeService.layer, BunServices.layer)),
   BunRuntime.runMain,
 );

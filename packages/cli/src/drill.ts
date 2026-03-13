@@ -11,8 +11,7 @@
  * Add --pretty for formatted JSON output.
  */
 
-import { Args, Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import {
   Category,
   CreateDrillInput,
@@ -21,14 +20,15 @@ import {
 } from "@laxdb/core-v2/drill/drill.schema";
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer, Option, Schema } from "effect";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 
 // ---------------------------------------------------------------------------
 // Shared options
 // ---------------------------------------------------------------------------
 
-const prettyOption = Options.boolean("pretty").pipe(
-  Options.withDescription("Pretty-print JSON output"),
-  Options.withDefault(false),
+const prettyFlag = Flag.boolean("pretty").pipe(
+  Flag.withDescription("Pretty-print JSON output"),
+  Flag.withDefault(false),
 );
 
 // ---------------------------------------------------------------------------
@@ -40,104 +40,90 @@ const output = (data: unknown, pretty: boolean) =>
     console.log(pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data));
   });
 
-/** Split comma-separated string and decode through a Schema.Literal array */
-const decodeCsv = <A, I, R>(schema: Schema.Schema<A, I, R>) => {
-  const arraySchema = Schema.Array(schema);
-  return (csv: string) => {
-    const values = csv
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    return Schema.decodeUnknown(arraySchema)(values);
-  };
-};
+const parseCsv = (csv: string) =>
+  csv
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 
-const decodeCategories = decodeCsv(Category);
-const decodePositionGroups = decodeCsv(PositionGroup);
-
-/** Decode an optional CSV option through a schema */
-const optionalCsv = <A, _I, R>(
-  opt: Option.Option<string>,
-  decode: (csv: string) => Effect.Effect<ReadonlyArray<A>, unknown, R>,
-): Effect.Effect<ReadonlyArray<A> | undefined, unknown, R> =>
-  Option.match(opt, {
-    onNone: () => Effect.succeed(undefined as ReadonlyArray<A> | undefined),
-    onSome: decode,
-  });
+const decodeCategories = Schema.decodeUnknownSync(Schema.Array(Category));
+const decodePositionGroups = Schema.decodeUnknownSync(
+  Schema.Array(PositionGroup),
+);
 
 // ---------------------------------------------------------------------------
-// Shared field options
+// Shared field flags
 // ---------------------------------------------------------------------------
 
-const subtitleOption = Options.text("subtitle").pipe(
-  Options.withDescription("Drill subtitle"),
-  Options.optional,
+const subtitleFlag = Flag.string("subtitle").pipe(
+  Flag.withDescription("Drill subtitle"),
+  Flag.optional,
 );
-const descriptionOption = Options.text("description").pipe(
-  Options.withDescription("Drill description"),
-  Options.optional,
+const descriptionFlag = Flag.string("description").pipe(
+  Flag.withDescription("Drill description"),
+  Flag.optional,
 );
-const difficultyOption = Options.choice("difficulty", [
+const difficultyFlag = Flag.choice("difficulty", [
   "beginner",
   "intermediate",
   "advanced",
-] as const).pipe(Options.withDescription("Difficulty level"), Options.optional);
-const categoryOption = Options.text("category").pipe(
-  Options.withDescription("Categories (comma-separated)"),
-  Options.optional,
+] as const).pipe(Flag.withDescription("Difficulty level"), Flag.optional);
+const categoryFlag = Flag.string("category").pipe(
+  Flag.withDescription("Categories (comma-separated)"),
+  Flag.optional,
 );
-const positionGroupOption = Options.text("position-group").pipe(
-  Options.withDescription("Position groups (comma-separated)"),
-  Options.optional,
+const positionGroupFlag = Flag.string("position-group").pipe(
+  Flag.withDescription("Position groups (comma-separated)"),
+  Flag.optional,
 );
-const intensityOption = Options.choice("intensity", [
+const intensityFlag = Flag.choice("intensity", [
   "low",
   "medium",
   "high",
-] as const).pipe(Options.withDescription("Intensity level"), Options.optional);
-const contactOption = Options.boolean("contact").pipe(
-  Options.withDescription("Contact drill"),
-  Options.optional,
+] as const).pipe(Flag.withDescription("Intensity level"), Flag.optional);
+const contactFlag = Flag.boolean("contact").pipe(
+  Flag.withDescription("Contact drill"),
+  Flag.optional,
 );
-const competitiveOption = Options.boolean("competitive").pipe(
-  Options.withDescription("Competitive drill"),
-  Options.optional,
+const competitiveFlag = Flag.boolean("competitive").pipe(
+  Flag.withDescription("Competitive drill"),
+  Flag.optional,
 );
-const playerCountOption = Options.integer("player-count").pipe(
-  Options.withDescription("Number of players"),
-  Options.optional,
+const playerCountFlag = Flag.integer("player-count").pipe(
+  Flag.withDescription("Number of players"),
+  Flag.optional,
 );
-const durationOption = Options.integer("duration").pipe(
-  Options.withDescription("Duration in minutes"),
-  Options.optional,
+const durationFlag = Flag.integer("duration").pipe(
+  Flag.withDescription("Duration in minutes"),
+  Flag.optional,
 );
-const fieldSpaceOption = Options.choice("field-space", [
+const fieldSpaceFlag = Flag.choice("field-space", [
   "full-field",
   "half-field",
   "box",
 ] as const).pipe(
-  Options.withDescription("Field space required"),
-  Options.optional,
+  Flag.withDescription("Field space required"),
+  Flag.optional,
 );
-const equipmentOption = Options.text("equipment").pipe(
-  Options.withDescription("Equipment (comma-separated)"),
-  Options.optional,
+const equipmentFlag = Flag.string("equipment").pipe(
+  Flag.withDescription("Equipment (comma-separated)"),
+  Flag.optional,
 );
-const diagramUrlOption = Options.text("diagram-url").pipe(
-  Options.withDescription("Diagram URL"),
-  Options.optional,
+const diagramUrlFlag = Flag.string("diagram-url").pipe(
+  Flag.withDescription("Diagram URL"),
+  Flag.optional,
 );
-const videoUrlOption = Options.text("video-url").pipe(
-  Options.withDescription("Video URL"),
-  Options.optional,
+const videoUrlFlag = Flag.string("video-url").pipe(
+  Flag.withDescription("Video URL"),
+  Flag.optional,
 );
-const coachNotesOption = Options.text("coach-notes").pipe(
-  Options.withDescription("Coach notes"),
-  Options.optional,
+const coachNotesFlag = Flag.string("coach-notes").pipe(
+  Flag.withDescription("Coach notes"),
+  Flag.optional,
 );
-const tagsOption = Options.text("tags").pipe(
-  Options.withDescription("Tags (comma-separated)"),
-  Options.optional,
+const tagsFlag = Flag.string("tags").pipe(
+  Flag.withDescription("Tags (comma-separated)"),
+  Flag.optional,
 );
 
 // ---------------------------------------------------------------------------
@@ -146,7 +132,7 @@ const tagsOption = Options.text("tags").pipe(
 
 const listCommand = Command.make(
   "list",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
@@ -157,7 +143,7 @@ const listCommand = Command.make(
 
 const getCommand = Command.make(
   "get",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
@@ -169,33 +155,34 @@ const getCommand = Command.make(
 const createCommand = Command.make(
   "create",
   {
-    name: Options.text("name").pipe(Options.withDescription("Drill name")),
-    subtitle: subtitleOption,
-    description: descriptionOption,
-    difficulty: difficultyOption,
-    category: categoryOption,
-    positionGroup: positionGroupOption,
-    intensity: intensityOption,
-    contact: contactOption,
-    competitive: competitiveOption,
-    playerCount: playerCountOption,
-    duration: durationOption,
-    fieldSpace: fieldSpaceOption,
-    equipment: equipmentOption,
-    diagramUrl: diagramUrlOption,
-    videoUrl: videoUrlOption,
-    coachNotes: coachNotesOption,
-    tags: tagsOption,
-    pretty: prettyOption,
+    name: Flag.string("name").pipe(Flag.withDescription("Drill name")),
+    subtitle: subtitleFlag,
+    description: descriptionFlag,
+    difficulty: difficultyFlag,
+    category: categoryFlag,
+    positionGroup: positionGroupFlag,
+    intensity: intensityFlag,
+    contact: contactFlag,
+    competitive: competitiveFlag,
+    playerCount: playerCountFlag,
+    duration: durationFlag,
+    fieldSpace: fieldSpaceFlag,
+    equipment: equipmentFlag,
+    diagramUrl: diagramUrlFlag,
+    videoUrl: videoUrlFlag,
+    coachNotes: coachNotesFlag,
+    tags: tagsFlag,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
-      const category = yield* optionalCsv(opts.category, decodeCategories);
-      const positionGroup = yield* optionalCsv(
-        opts.positionGroup,
-        decodePositionGroups,
-      );
+      const category = Option.isSome(opts.category)
+        ? decodeCategories(parseCsv(opts.category.value))
+        : undefined;
+      const positionGroup = Option.isSome(opts.positionGroup)
+        ? decodePositionGroups(parseCsv(opts.positionGroup.value))
+        : undefined;
       const equipmentValues = Option.map(opts.equipment, (csv) =>
         csv
           .split(",")
@@ -235,37 +222,38 @@ const createCommand = Command.make(
 const updateCommand = Command.make(
   "update",
   {
-    publicId: Args.text({ name: "publicId" }),
-    name: Options.text("name").pipe(
-      Options.withDescription("Drill name"),
-      Options.optional,
+    publicId: Argument.string("publicId"),
+    name: Flag.string("name").pipe(
+      Flag.withDescription("Drill name"),
+      Flag.optional,
     ),
-    subtitle: subtitleOption,
-    description: descriptionOption,
-    difficulty: difficultyOption,
-    category: categoryOption,
-    positionGroup: positionGroupOption,
-    intensity: intensityOption,
-    contact: contactOption,
-    competitive: competitiveOption,
-    playerCount: playerCountOption,
-    duration: durationOption,
-    fieldSpace: fieldSpaceOption,
-    equipment: equipmentOption,
-    diagramUrl: diagramUrlOption,
-    videoUrl: videoUrlOption,
-    coachNotes: coachNotesOption,
-    tags: tagsOption,
-    pretty: prettyOption,
+    subtitle: subtitleFlag,
+    description: descriptionFlag,
+    difficulty: difficultyFlag,
+    category: categoryFlag,
+    positionGroup: positionGroupFlag,
+    intensity: intensityFlag,
+    contact: contactFlag,
+    competitive: competitiveFlag,
+    playerCount: playerCountFlag,
+    duration: durationFlag,
+    fieldSpace: fieldSpaceFlag,
+    equipment: equipmentFlag,
+    diagramUrl: diagramUrlFlag,
+    videoUrl: videoUrlFlag,
+    coachNotes: coachNotesFlag,
+    tags: tagsFlag,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
-      const category = yield* optionalCsv(opts.category, decodeCategories);
-      const positionGroup = yield* optionalCsv(
-        opts.positionGroup,
-        decodePositionGroups,
-      );
+      const category = Option.isSome(opts.category)
+        ? decodeCategories(parseCsv(opts.category.value))
+        : undefined;
+      const positionGroup = Option.isSome(opts.positionGroup)
+        ? decodePositionGroups(parseCsv(opts.positionGroup.value))
+        : undefined;
       const equipmentValues = Option.map(opts.equipment, (csv) =>
         csv
           .split(",")
@@ -305,7 +293,7 @@ const updateCommand = Command.make(
 
 const deleteCommand = Command.make(
   "delete",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
@@ -332,12 +320,12 @@ const readStdin = Effect.tryPromise({
 
 const bulkCreateCommand = Command.make(
   "bulk-create",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(CreateDrillInput))(
+      const items = yield* Schema.decodeUnknownEffect(Schema.Array(CreateDrillInput))(
         raw,
       );
       const results = [];
@@ -351,7 +339,7 @@ const bulkCreateCommand = Command.make(
 
 const bulkDeleteCommand = Command.make(
   "bulk-delete",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
@@ -367,12 +355,12 @@ const bulkDeleteCommand = Command.make(
 
 const bulkUpdateCommand = Command.make(
   "bulk-update",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* DrillService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(Schema.Array(UpdateDrillInput))(
+      const items = yield* Schema.decodeUnknownEffect(Schema.Array(UpdateDrillInput))(
         raw,
       );
       const results = [];
@@ -401,12 +389,7 @@ const drillCommand = Command.make("drill").pipe(
   ]),
 );
 
-const cli = Command.run(drillCommand, {
-  name: "drill",
-  version: "0.1.0",
-});
-
-cli(process.argv).pipe(
-  Effect.provide(Layer.mergeAll(DrillService.Default, BunContext.layer)),
+Command.run(drillCommand, { version: "0.1.0" }).pipe(
+  Effect.provide(Layer.mergeAll(DrillService.layer, BunServices.layer)),
   BunRuntime.runMain,
 );

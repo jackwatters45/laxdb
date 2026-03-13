@@ -13,22 +13,22 @@
  * Add --pretty for formatted JSON output.
  */
 
-import { Args, Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import {
   CreatePlayerInput,
   UpdatePlayerInput,
 } from "@laxdb/core-v2/player/player.schema";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer, Option, Schema } from "effect";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 
 // ---------------------------------------------------------------------------
 // Shared
 // ---------------------------------------------------------------------------
 
-const prettyOption = Options.boolean("pretty").pipe(
-  Options.withDescription("Pretty-print JSON output"),
-  Options.withDefault(false),
+const prettyFlag = Flag.boolean("pretty").pipe(
+  Flag.withDescription("Pretty-print JSON output"),
+  Flag.withDefault(false),
 );
 
 const output = (data: unknown, pretty: boolean) =>
@@ -54,7 +54,7 @@ const readStdin = Effect.tryPromise({
 
 const listCommand = Command.make(
   "list",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
@@ -65,7 +65,7 @@ const listCommand = Command.make(
 
 const getCommand = Command.make(
   "get",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
@@ -77,9 +77,9 @@ const getCommand = Command.make(
 const createCommand = Command.make(
   "create",
   {
-    name: Options.text("name").pipe(Options.withDescription("Player name")),
-    email: Options.text("email").pipe(Options.withDescription("Player email")),
-    pretty: prettyOption,
+    name: Flag.string("name").pipe(Flag.withDescription("Player name")),
+    email: Flag.string("email").pipe(Flag.withDescription("Player email")),
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -92,16 +92,16 @@ const createCommand = Command.make(
 const updateCommand = Command.make(
   "update",
   {
-    publicId: Args.text({ name: "publicId" }),
-    name: Options.text("name").pipe(
-      Options.withDescription("Player name"),
-      Options.optional,
+    publicId: Argument.string("publicId"),
+    name: Flag.string("name").pipe(
+      Flag.withDescription("Player name"),
+      Flag.optional,
     ),
-    email: Options.text("email").pipe(
-      Options.withDescription("Player email"),
-      Options.optional,
+    email: Flag.string("email").pipe(
+      Flag.withDescription("Player email"),
+      Flag.optional,
     ),
-    pretty: prettyOption,
+    pretty: prettyFlag,
   },
   (opts) =>
     Effect.gen(function* () {
@@ -117,7 +117,7 @@ const updateCommand = Command.make(
 
 const deleteCommand = Command.make(
   "delete",
-  { publicId: Args.text({ name: "publicId" }), pretty: prettyOption },
+  { publicId: Argument.string("publicId"), pretty: prettyFlag },
   ({ publicId, pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
@@ -132,12 +132,12 @@ const deleteCommand = Command.make(
 
 const bulkCreateCommand = Command.make(
   "bulk-create",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(
+      const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePlayerInput),
       )(raw);
       const results = [];
@@ -151,12 +151,12 @@ const bulkCreateCommand = Command.make(
 
 const bulkUpdateCommand = Command.make(
   "bulk-update",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
       const raw = yield* readStdin;
-      const items = yield* Schema.decodeUnknown(
+      const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePlayerInput),
       )(raw);
       const results = [];
@@ -170,7 +170,7 @@ const bulkUpdateCommand = Command.make(
 
 const bulkDeleteCommand = Command.make(
   "bulk-delete",
-  { pretty: prettyOption },
+  { pretty: prettyFlag },
   ({ pretty }) =>
     Effect.gen(function* () {
       const svc = yield* PlayerService;
@@ -201,12 +201,7 @@ const playerCommand = Command.make("player").pipe(
   ]),
 );
 
-const cli = Command.run(playerCommand, {
-  name: "player",
-  version: "0.1.0",
-});
-
-cli(process.argv).pipe(
-  Effect.provide(Layer.mergeAll(PlayerService.Default, BunContext.layer)),
+Command.run(playerCommand, { version: "0.1.0" }).pipe(
+  Effect.provide(Layer.mergeAll(PlayerService.layer, BunServices.layer)),
   BunRuntime.runMain,
 );
