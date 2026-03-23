@@ -91,8 +91,9 @@ export function WorkflowNode({
           w-[100px] h-[100px] rounded-full
           bg-foreground text-background
           shadow-md
+          transition-all duration-200 ease-out
           cursor-pointer select-none
-          ${isSelected ? "ring-2 ring-foreground/50 ring-offset-2 ring-offset-background" : "hover:shadow-lg"}
+          ${isSelected ? "ring-2 ring-foreground/50 ring-offset-2 ring-offset-background scale-105" : "hover:scale-[1.03] hover:shadow-lg"}
         `}
         style={{ fontSize: `${Math.max(11, 14 / Math.max(scale, 0.5))}px` }}
       >
@@ -119,8 +120,9 @@ export function WorkflowNode({
           border-2 border-dashed border-violet-300 dark:border-violet-700
           bg-violet-50/80 dark:bg-violet-950/40
           shadow-sm
+          transition-all duration-200 ease-out
           cursor-pointer select-none
-          ${isSelected ? "ring-2 ring-violet-400/50 ring-offset-2 ring-offset-background border-solid" : "hover:shadow-md hover:border-violet-400"}
+          ${isSelected ? "ring-2 ring-violet-400/50 ring-offset-2 ring-offset-background scale-105 border-solid" : "hover:scale-[1.02] hover:shadow-md hover:border-violet-400"}
         `}
       >
         <GitBranch size={16} className="text-violet-500 mr-2" />
@@ -141,8 +143,9 @@ export function WorkflowNode({
         w-[260px] rounded-xl border
         ${config.bg} ${config.border}
         shadow-sm
+        transition-all duration-200 ease-out
         cursor-pointer select-none text-left
-        ${isSelected ? "ring-2 ring-foreground/20 ring-offset-2 ring-offset-background shadow-md" : "hover:shadow-md"}
+        ${isSelected ? "ring-2 ring-foreground/20 ring-offset-2 ring-offset-background scale-[1.02] shadow-md" : "hover:scale-[1.01] hover:shadow-md"}
       `}
     >
       <div className="p-3.5">

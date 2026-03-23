@@ -1,7 +1,5 @@
-import { Button } from "@laxdb/ui/components/ui/button";
-import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Library, GitBranch } from "lucide-react";
+import { Sparkles, Library, GitBranch, Clock } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import { Canvas } from "@/components/canvas";
@@ -352,49 +350,71 @@ function HomePage() {
   // (Delete is handled via onKeyDown in parent — but we'll also catch it here)
 
   return (
-    <div className="flex h-dvh w-screen overflow-hidden bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
       {/* Drill Sidebar (left) */}
       <DrillSidebar
         isOpen={drillSidebarOpen}
-        onClose={() => { setDrillSidebarOpen(false); }}
+        onClose={() => {
+          setDrillSidebarOpen(false);
+        }}
         onAddDrill={addDrillFromSidebar}
       />
 
       {/* Main canvas area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="flex items-center justify-between h-12 px-4 border-b border-border bg-card flex-shrink-0 z-10">
+        <header className="flex items-center justify-between h-13 px-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 z-20">
           <div className="flex items-center gap-3">
-            <Button
-              variant={drillSidebarOpen ? "default" : "outline"}
-              onClick={() => { setDrillSidebarOpen((v) => !v); }}
+            <button
+              onClick={() => {
+                setDrillSidebarOpen((v) => !v);
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                drillSidebarOpen
+                  ? "bg-foreground text-background border-foreground"
+                  : "text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
+              }`}
             >
-              <Library />
+              <Library size={14} />
               Drills
-            </Button>
+            </button>
 
-            <Separator orientation="vertical" className="h-5" />
+            <div className="w-px h-5 bg-border" />
 
-            <h1 className="text-sm font-semibold text-foreground text-balance">
+            <h1
+              className="text-sm font-semibold text-foreground"
+              style={{ fontFamily: "var(--font-sans)", fontStyle: "normal" }}
+            >
               {practice.name}
             </h1>
-            <span className="text-xs text-muted-foreground tabular-nums">
+            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Clock size={11} />
               {totalMinutes} min
             </span>
-            <span className="text-xs text-muted-foreground/50 tabular-nums">
+            <span className="text-[11px] text-muted-foreground/50">
               {nodes.length} blocks
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => { setSplitModalOpen(true); }}>
-              <GitBranch />
+            <button
+              onClick={() => {
+                setSplitModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:border-foreground/30 hover:text-foreground transition-all"
+            >
+              <GitBranch size={13} />
               Split
-            </Button>
-            <Button onClick={() => { setQuickPlanOpen(true); }}>
-              <Sparkles />
+            </button>
+            <button
+              onClick={() => {
+                setQuickPlanOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <Sparkles size={13} />
               Quick Plan
-            </Button>
+            </button>
           </div>
         </header>
 
@@ -413,7 +433,7 @@ function HomePage() {
         </div>
 
         {/* Bottom Controls */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20">
           <CanvasControls
             mode={canvasMode}
             scale={transform.scale}
@@ -432,19 +452,25 @@ function HomePage() {
           node={selectedNode}
           onUpdate={updateNode}
           onDelete={deleteNode}
-          onClose={() => { setSelectedNodeId(null); }}
+          onClose={() => {
+            setSelectedNodeId(null);
+          }}
         />
       )}
 
       {/* Modals */}
       <SplitNodeModal
         isOpen={splitModalOpen}
-        onClose={() => { setSplitModalOpen(false); }}
+        onClose={() => {
+          setSplitModalOpen(false);
+        }}
         onConfirm={handleSplitCreate}
       />
       <QuickPlanModal
         isOpen={quickPlanOpen}
-        onClose={() => { setQuickPlanOpen(false); }}
+        onClose={() => {
+          setQuickPlanOpen(false);
+        }}
         onGenerate={handleQuickGenerate}
       />
     </div>

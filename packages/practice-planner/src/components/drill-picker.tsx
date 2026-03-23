@@ -65,34 +65,20 @@ function DrillPickerList({ onSelect }: DrillPickerListProps) {
         <CommandEmpty>No drills found.</CommandEmpty>
         <CommandGroup heading="Warm-ups">
           {MOCK_DRILLS.filter((d) => d.tags.includes("warmup")).map((drill) => (
-            <DrillOption
-              key={drill.id}
-              drill={drill}
-              onSelect={onSelect}
-            />
+            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
           ))}
         </CommandGroup>
         <CommandGroup heading="Drills">
           {MOCK_DRILLS.filter(
             (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
           ).map((drill) => (
-            <DrillOption
-              key={drill.id}
-              drill={drill}
-              onSelect={onSelect}
-            />
+            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
           ))}
         </CommandGroup>
         <CommandGroup heading="Cool-downs">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map(
-            (drill) => (
-              <DrillOption
-                key={drill.id}
-                drill={drill}
-                onSelect={onSelect}
-              />
-            ),
-          )}
+          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map((drill) => (
+            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+          ))}
         </CommandGroup>
       </CommandList>
     </Command>
@@ -115,9 +101,7 @@ function DrillOption({
   return (
     <CommandItem
       value={`${drill.name} ${drill.tags.join(" ")}`}
-      onSelect={() => {
-        onSelect(drill);
-      }}
+      onSelect={() => { onSelect(drill); }}
     >
       <Icon className="text-muted-foreground" />
       <div className="flex flex-col gap-0.5 min-w-0">
@@ -125,7 +109,8 @@ function DrillOption({
         {drill.durationMinutes && (
           <span className="text-muted-foreground flex items-center gap-1">
             <Clock className="size-2.5" />
-            {drill.durationMinutes} min · {drill.difficulty}
+            <span className="tabular-nums">{drill.durationMinutes} min</span>
+            <span>· {drill.difficulty}</span>
           </span>
         )}
       </div>

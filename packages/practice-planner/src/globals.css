@@ -1,5 +1,4 @@
 @import "@laxdb/ui/globals.css";
-@source "../../ui/src";
 
 /* Override the base div relative positioning for the canvas */
 @layer base {
@@ -10,4 +9,12 @@
   }
 }
 
-
+/* Smooth canvas interactions */
+@layer utilities {
+  .canvas-node-transition {
+    transition:
+      left 0.3s ease,
+      top 0.3s ease,
+      transform 0.2s ease;
+  }
+}

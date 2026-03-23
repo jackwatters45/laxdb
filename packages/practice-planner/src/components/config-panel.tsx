@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@laxdb/ui/components/ui/alert-dialog";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -19,7 +30,6 @@ import {
   Snowflake,
   Target,
 } from "lucide-react";
-import { useState } from "react";
 
 import { MOCK_DRILLS } from "@/data/mock-drills";
 import type {
@@ -78,21 +88,17 @@ export function ConfigPanel({
     <div className="w-[340px] h-full border-l border-border bg-card flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
-        <h3 className="text-sm font-semibold text-foreground truncate pr-2">
+        <h3 className="text-sm font-semibold text-foreground truncate pr-2 text-balance">
           {node.label}
         </h3>
-        <Button variant="ghost" size="icon-sm" onClick={onClose}>
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel" className="-mr-1">
           <X />
-          <span className="sr-only">Close</span>
         </Button>
       </div>
 
       {/* Drill identity — top of panel */}
       {linkedDrill && (
-        <DrillIdentity
-          drill={linkedDrill}
-          onSwap={handleSwapDrill}
-        />
+        <DrillIdentity drill={linkedDrill} onSwap={handleSwapDrill} />
       )}
 
       {/* No drill linked — prompt to pick one */}
@@ -114,9 +120,7 @@ export function ConfigPanel({
           <Field label="Label" icon={<FileText className="size-3.5" />}>
             <Input
               value={node.label}
-              onChange={(e) => {
-                onUpdate(node.id, { label: e.target.value });
-              }}
+              onChange={(e) => { onUpdate(node.id, { label: e.target.value }); }}
               disabled={isStart}
             />
           </Field>
@@ -159,7 +163,7 @@ export function ConfigPanel({
               }}
               placeholder="all"
             />
-            <p className="text-[10px] text-muted-foreground/60 mt-1">
+            <p className="text-[10px] text-muted-foreground/60 mt-1 text-pretty">
               Comma-separated: all, Offense, Defense, Goalies
             </p>
           </Field>
@@ -190,9 +194,7 @@ export function ConfigPanel({
           <Field label="Notes" icon={<FileText className="size-3.5" />}>
             <Textarea
               value={node.notes ?? ""}
-              onChange={(e) => {
-                onUpdate(node.id, { notes: e.target.value || null });
-              }}
+              onChange={(e) => { onUpdate(node.id, { notes: e.target.value || null }); }}
               placeholder="Add coaching notes..."
               className="min-h-[60px]"
             />
@@ -200,22 +202,39 @@ export function ConfigPanel({
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer — destructive action behind AlertDialog */}
       {!isStart && (
         <>
           <Separator />
           <div className="p-4">
-            <Button
-              variant="destructive"
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                onDelete(node.id);
-              }}
-            >
-              <Trash2 />
-              Delete Block
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={
+                  <Button variant="destructive" size="lg" className="w-full">
+                    <Trash2 />
+                    Delete Block
+                  </Button>
+                }
+              />
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete "{node.label}"?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-pretty">
+                    This block will be removed from the practice plan.
+                    Connected blocks will be re-linked automatically.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    render={<Button variant="destructive" />}
+                    onClick={() => { onDelete(node.id); }}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </>
       )}
@@ -253,15 +272,14 @@ function DrillIdentity({
           </div>
         </div>
         <DrillPickerPopover onSelect={onSwap}>
-          <Button variant="ghost" size="icon-sm" title="Swap drill">
+          <Button variant="ghost" size="icon-sm" aria-label="Swap drill">
             <ArrowRightLeft />
-            <span className="sr-only">Swap drill</span>
           </Button>
         </DrillPickerPopover>
       </div>
 
       {drill.description && (
-        <p className="text-xs text-muted-foreground/80 leading-relaxed">
+        <p className="text-xs text-muted-foreground/80 leading-relaxed text-pretty">
           {drill.description}
         </p>
       )}
