@@ -1,8 +1,11 @@
+import { Player } from "@laxdb/core-v2/player/player.schema";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
+
+const asPlayer = (row: typeof Player.Type) => new Player(row);
 
 export const PlayersHandlersLive = HttpApiBuilder.group(
   LaxdbApiV2,
@@ -12,10 +15,20 @@ export const PlayersHandlersLive = HttpApiBuilder.group(
       const service = yield* PlayerService;
 
       return handlers
-        .handle("listPlayers", () => service.list())
-        .handle("getPlayer", ({ payload }) => service.getByPublicId(payload))
-        .handle("createPlayer", ({ payload }) => service.create(payload))
-        .handle("updatePlayer", ({ payload }) => service.update(payload))
-        .handle("deletePlayer", ({ payload }) => service.delete(payload));
+        .handle("listPlayers", () =>
+          service.list().pipe(Effect.map((rows) => rows.map(asPlayer))),
+        )
+        .handle("getPlayer", ({ payload }) =>
+          service.getByPublicId(payload).pipe(Effect.map(asPlayer)),
+        )
+        .handle("createPlayer", ({ payload }) =>
+          service.create(payload).pipe(Effect.map(asPlayer)),
+        )
+        .handle("updatePlayer", ({ payload }) =>
+          service.update(payload).pipe(Effect.map(asPlayer)),
+        )
+        .handle("deletePlayer", ({ payload }) =>
+          service.delete(payload).pipe(Effect.map(asPlayer)),
+        );
     }),
 ).pipe(Layer.provide(PlayerService.layer));
