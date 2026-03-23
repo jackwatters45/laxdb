@@ -25,13 +25,11 @@ export function WorkflowEdge({
         fill="none"
         stroke="oklch(var(--border-strong))"
         strokeWidth={1.5}
-        className="transition-all duration-200"
       />
       {/* Arrow head */}
       <polygon
         points={`${tx},${ty} ${tx - 4},${ty - 8} ${tx + 4},${ty - 8}`}
         fill="oklch(var(--border-strong))"
-        className="transition-all duration-200"
       />
       {/* Edge label */}
       {edge.label && (
