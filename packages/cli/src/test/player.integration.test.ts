@@ -5,22 +5,26 @@
  */
 
 import { RpcPlayerClient } from "@laxdb/api-v2/player/player.client";
-import { Effect } from "effect";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { Effect, Layer } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import {
-  makeRun,
-  startTestServer,
-  truncateAllTables,
-  type TestServer,
-} from "./server";
+import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
-let run: ReturnType<ReturnType<typeof makeRun<RpcPlayerClient>>>;
+
+const run = <A, E>(effect: Effect.Effect<A, E, RpcPlayerClient>) =>
+  effect.pipe(
+    Effect.provide(
+      RpcPlayerClient.layer.pipe(
+        Layer.provide(makeRpcProtocol(testServer.url)),
+      ),
+    ),
+    Effect.runPromise,
+  );
 
 beforeAll(async () => {
   testServer = await startTestServer();
-  run = makeRun(RpcPlayerClient.layer)(testServer);
 });
 
 afterAll(async () => {

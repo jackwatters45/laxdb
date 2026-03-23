@@ -4,16 +4,10 @@ import { Input } from "@laxdb/ui/components/ui/input";
 import { ScrollArea } from "@laxdb/ui/components/ui/scroll-area";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@laxdb/ui/components/ui/sheet";
-import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@laxdb/ui/components/ui/toggle-group";
-import { Search, Clock, Flame, Target, Snowflake } from "lucide-react";
+import { Search, Clock, Flame, Target, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 
 import { MOCK_DRILLS } from "@/data/mock-drills";
@@ -71,78 +65,77 @@ export function DrillSidebar({
     return matchesSearch && matchesCategory;
   });
 
+  if (!isOpen) return null;
+
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
-      <SheetContent
-        side="left"
-        className="w-[320px] sm:max-w-[320px] p-0 flex flex-col"
-        showCloseButton
-      >
-        <SheetHeader className="px-4 pt-4 pb-3">
-          <SheetTitle>Drill Library</SheetTitle>
-        </SheetHeader>
+    <div className="w-[320px] h-full border-r border-border bg-card flex flex-col flex-shrink-0">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <h3 className="text-sm font-medium text-foreground">Drill Library</h3>
+        <Button variant="ghost" size="icon-sm" onClick={onClose}>
+          <X />
+          <span className="sr-only">Close</span>
+        </Button>
+      </div>
 
-        <div className="px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              placeholder="Search drills..."
-              className="pl-7"
-            />
-          </div>
-        </div>
-
-        <div className="px-4 pb-3">
-          <ToggleGroup
-            value={[activeCategory]}
-            onValueChange={(values) => {
-              const next = values[0] as string | undefined;
-              if (next) setActiveCategory(next);
+      {/* Search */}
+      <div className="px-4 pb-3">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
             }}
-            variant="outline"
-            size="sm"
-            spacing={1}
-            className="flex-wrap"
-          >
-            {CATEGORIES.map((cat) => (
-              <ToggleGroupItem key={cat.value} value={cat.value}>
-                {cat.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            placeholder="Search drills..."
+            className="pl-7"
+          />
         </div>
+      </div>
 
-        <Separator />
+      {/* Category filter */}
+      <div className="px-4 pb-3">
+        <ToggleGroup
+          value={[activeCategory]}
+          onValueChange={(values) => {
+            const next = values[0] as string | undefined;
+            if (next) setActiveCategory(next);
+          }}
+          variant="outline"
+          size="sm"
+          spacing={1}
+          className="flex-wrap"
+        >
+          {CATEGORIES.map((cat) => (
+            <ToggleGroupItem key={cat.value} value={cat.value}>
+              {cat.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </div>
 
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-3 space-y-1">
-            {filtered.map((drill) => (
-              <DrillCard
-                key={drill.id}
-                drill={drill}
-                onAdd={() => {
-                  onAddDrill(drill, drillToType(drill));
-                }}
-              />
-            ))}
-            {filtered.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-8">
-                No drills match your search.
-              </p>
-            )}
-          </div>
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+      <Separator />
+
+      {/* Drill list */}
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-3 space-y-1">
+          {filtered.map((drill) => (
+            <DrillCard
+              key={drill.id}
+              drill={drill}
+              onAdd={() => {
+                onAddDrill(drill, drillToType(drill));
+              }}
+            />
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-xs text-muted-foreground text-center py-8">
+              No drills match your search.
+            </p>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
 
@@ -172,7 +165,10 @@ function DrillCard({ drill, onAdd }: { drill: Drill; onAdd: () => void }) {
         )}
         <div className="flex items-center gap-2 pl-5">
           {drill.durationMinutes && (
-            <Badge variant="outline" className="h-4 text-[10px] px-1.5 gap-0.5">
+            <Badge
+              variant="outline"
+              className="h-4 text-[10px] px-1.5 gap-0.5"
+            >
               <Clock className="size-2.5" />
               {drill.durationMinutes}m
             </Badge>

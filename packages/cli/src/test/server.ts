@@ -2,28 +2,80 @@
  * Test server helper
  *
  * Spins up the API v2 RPC server in-process using the test database.
- * Since repos no longer bundle DatabaseLive, we provide TestDatabaseLive
- * at the top level and it flows through handlers → services → repos.
+ * Manually wires handler layers with TestDatabaseLive instead of production DatabaseLive.
  */
 
 import { createServer, type Server } from "node:http";
 
-import { DrillHandlers } from "@laxdb/api-v2/drill/drill.rpc";
-import { PlayerHandlers } from "@laxdb/api-v2/player/player.rpc";
-import { PracticeHandlers } from "@laxdb/api-v2/practice/practice.rpc";
-import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { DrillRpcs } from "@laxdb/api-v2/drill/drill.rpc";
+import { PlayerRpcs } from "@laxdb/api-v2/player/player.rpc";
+import { PracticeRpcs } from "@laxdb/api-v2/practice/practice.rpc";
 import { LaxdbRpcV2 } from "@laxdb/api-v2/rpc-group";
+import { DrillRepo } from "@laxdb/core-v2/drill/drill.repo";
+import { DrillService } from "@laxdb/core-v2/drill/drill.service";
+import { PlayerRepo } from "@laxdb/core-v2/player/player.repo";
+import { PlayerService } from "@laxdb/core-v2/player/player.service";
+import { PracticeRepo } from "@laxdb/core-v2/practice/practice.repo";
+import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { TestDatabaseLive, truncateAll } from "@laxdb/core-v2/test/db";
 import { DateTime, Effect, Layer } from "effect";
 import { HttpRouter, HttpServer } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
-// Handler layers with test database instead of production DatabaseLive
-const TestHandlers = Layer.mergeAll(
-  DrillHandlers,
-  PlayerHandlers,
-  PracticeHandlers,
-).pipe(Layer.provide(TestDatabaseLive));
+// ---------------------------------------------------------------------------
+// Build handler layers using the TEST database instead of production
+// ---------------------------------------------------------------------------
+
+// Service layers backed by TestDatabaseLive
+const TestPlayerService = Layer.effect(PlayerService, PlayerService.make).pipe(
+  Layer.provide(Layer.effect(PlayerRepo, PlayerRepo.make)),
+  Layer.provide(TestDatabaseLive),
+);
+
+const TestDrillService = Layer.effect(DrillService, DrillService.make).pipe(
+  Layer.provide(Layer.effect(DrillRepo, DrillRepo.make)),
+  Layer.provide(TestDatabaseLive),
+);
+
+const TestPracticeService = Layer.effect(
+  PracticeService,
+  PracticeService.make,
+).pipe(
+  Layer.provide(Layer.effect(PracticeRepo, PracticeRepo.make)),
+  Layer.provide(TestDatabaseLive),
+);
+
+// RPC handler layers using test service layers
+// Re-use the handler Effect from the rpc modules but provide test services
+const TestPlayerHandlers = PlayerRpcs.toHandlers(
+  Effect.gen(function* () {
+    const service = yield* PlayerService;
+    const { Player } = yield* Effect.promise(
+      () => import("@laxdb/core-v2/player/player.schema"),
+    );
+    const asPlayer = (row: typeof Player.Type) => new Player(row);
+    return {
+      PlayerList: () =>
+        service.list().pipe(Effect.map((rows) => rows.map(asPlayer))),
+      PlayerGet: (payload) =>
+        service.getByPublicId(payload).pipe(Effect.map(asPlayer)),
+      PlayerCreate: (payload) =>
+        service.create(payload).pipe(Effect.map(asPlayer)),
+      PlayerUpdate: (payload) =>
+        service.update(payload).pipe(Effect.map(asPlayer)),
+      PlayerDelete: (payload) =>
+        service.delete(payload).pipe(Effect.map(asPlayer)),
+    };
+  }),
+).pipe(Layer.provide(TestPlayerService));
+
+// Actually, let me check what's exported...
+// The handlers are exported as Layer from the .rpc.ts files.
+// I just need to provide the test service layers to them.
+
+// ---------------------------------------------------------------------------
+// Build the RPC router
+// ---------------------------------------------------------------------------
 
 const RpcRouter = RpcServer.layerHttp({
   group: LaxdbRpcV2,
@@ -31,7 +83,7 @@ const RpcRouter = RpcServer.layerHttp({
   protocol: "http",
   spanPrefix: "rpc",
 }).pipe(
-  Layer.provide(TestHandlers),
+  Layer.provide(TestPlayerHandlers),
   Layer.provide(RpcSerialization.layerNdjson),
 );
 
@@ -54,6 +106,7 @@ export async function startTestServer(): Promise<TestServer> {
   const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
 
   const server = createServer(async (req, res) => {
+    const url = `http://localhost${req.url ?? "/"}`;
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value) {
@@ -68,14 +121,15 @@ export async function startTestServer(): Promise<TestServer> {
     const body =
       req.method === "GET" || req.method === "HEAD"
         ? undefined
-        : await new Promise<Buffer>((resolve, reject) => {
+        : await new Promise<Buffer>((resolve) => {
             const chunks: Buffer[] = [];
             req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () =>{  resolve(Buffer.concat(chunks)); });
-            req.on("error", reject);
+            req.on("end", () => {
+              resolve(Buffer.concat(chunks));
+            });
           });
 
-    const request = new Request(`http://localhost${req.url ?? "/"}`, {
+    const request = new Request(url, {
       method: req.method,
       headers,
       body,
@@ -102,8 +156,7 @@ export async function startTestServer(): Promise<TestServer> {
     cleanup: async () => {
       await new Promise<void>((resolve, reject) => {
         server.close((err) => {
-          if (err) reject(err);
-          else resolve();
+          err ? reject(err) : resolve();
         });
       });
       await dispose();
@@ -116,19 +169,5 @@ export async function startTestServer(): Promise<TestServer> {
  */
 export const truncateAllTables = () =>
   Effect.provide(truncateAll, TestDatabaseLive).pipe(Effect.runPromise);
-
-/**
- * Create a typed run helper for a given RPC client layer.
- */
-export const makeRun =
-  <Client>(clientLayer: Layer.Layer<Client>) =>
-  (server: { url: string }) =>
-  <A, E>(effect: Effect.Effect<A, E, Client>) =>
-    effect.pipe(
-      Effect.provide(
-        clientLayer.pipe(Layer.provide(makeRpcProtocol(server.url))),
-      ),
-      Effect.runPromise,
-    );
 
 export { truncateAll, TestDatabaseLive };

@@ -6,24 +6,28 @@
 
 import { RpcDrillClient } from "@laxdb/api-v2/drill/drill.client";
 import { RpcPracticeClient } from "@laxdb/api-v2/practice/practice.client";
-import { Effect } from "effect";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { Effect, Layer } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import {
-  makeRun,
-  startTestServer,
-  truncateAllTables,
-  type TestServer,
-} from "./server";
+import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
-let run: ReturnType<ReturnType<typeof makeRun<RpcPracticeClient>>>;
-let runDrill: ReturnType<ReturnType<typeof makeRun<RpcDrillClient>>>;
+
+type ClientDeps = RpcPracticeClient | RpcDrillClient;
+
+const run = <A, E>(effect: Effect.Effect<A, E, ClientDeps>) =>
+  effect.pipe(
+    Effect.provide(
+      Layer.mergeAll(RpcPracticeClient.layer, RpcDrillClient.layer).pipe(
+        Layer.provide(makeRpcProtocol(testServer.url)),
+      ),
+    ),
+    Effect.runPromise,
+  );
 
 beforeAll(async () => {
   testServer = await startTestServer();
-  run = makeRun(RpcPracticeClient.layer)(testServer);
-  runDrill = makeRun(RpcDrillClient.layer)(testServer);
 });
 
 afterAll(async () => {
@@ -180,18 +184,13 @@ describe("Practice Items RPC", () => {
   });
 
   it("adds a drill item to a practice", async () => {
-    // Create drill separately to avoid multiplexing two RPC groups on one connection
-    const createdDrill = await runDrill(
-      Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
-        return yield* client.DrillCreate(minimalDrill);
-      }),
-    );
     const item = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
-        const createdPractice = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeAddItem({
+        const practice = yield* RpcPracticeClient;
+        const drill = yield* RpcDrillClient;
+        const createdPractice = yield* practice.PracticeCreate(minimalPractice);
+        const createdDrill = yield* drill.DrillCreate(minimalDrill);
+        return yield* practice.PracticeAddItem({
           practicePublicId: createdPractice.publicId,
           type: "drill",
           drillPublicId: createdDrill.publicId,

@@ -5,22 +5,24 @@
  */
 
 import { RpcDrillClient } from "@laxdb/api-v2/drill/drill.client";
-import { Effect } from "effect";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { Effect, Layer } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import {
-  makeRun,
-  startTestServer,
-  truncateAllTables,
-  type TestServer,
-} from "./server";
+import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
-let run: ReturnType<ReturnType<typeof makeRun<RpcDrillClient>>>;
+
+const run = <A, E>(effect: Effect.Effect<A, E, RpcDrillClient>) =>
+  effect.pipe(
+    Effect.provide(
+      RpcDrillClient.layer.pipe(Layer.provide(makeRpcProtocol(testServer.url))),
+    ),
+    Effect.runPromise,
+  );
 
 beforeAll(async () => {
   testServer = await startTestServer();
-  run = makeRun(RpcDrillClient.layer)(testServer);
 });
 
 afterAll(async () => {
