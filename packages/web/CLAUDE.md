@@ -4,36 +4,6 @@
 
 Main web application. TanStack Router (file-based routing) + React 19 + TanStack Query.
 
-## STRUCTURE
-
-```
-src/
-├── routes/
-│   ├── __root.tsx              # Root layout (ThemeProvider, Toaster)
-│   ├── (auth)/                 # Auth routes (login, register, logout)
-│   ├── (marketing)/            # Public marketing pages
-│   └── _protected/             # Authenticated routes (see ROUTE HIERARCHY)
-│       ├── _protected.tsx      # Auth guard layout
-│       ├── redirect.tsx        # Post-login redirect logic
-│       ├── organization/       # Org creation/join (no org selected)
-│       └── $organizationSlug/  # Org-scoped routes (sidebar layout)
-├── components/
-│   ├── auth/                   # Login/register forms
-│   ├── nav/                    # Navigation (switchers, search)
-│   ├── sidebar/                # App sidebar, header
-│   ├── players/                # Player-specific components
-│   ├── organizations/          # Org forms
-│   └── layout/                 # Page layout components
-├── lib/
-│   ├── auth-client.ts          # better-auth client instance
-│   ├── middleware.ts           # Auth middleware for server fns
-│   ├── seo.ts                  # SEO utilities
-│   └── formatters.ts           # Date/string formatters
-├── hooks/                      # React hooks
-├── query/                      # TanStack Query definitions
-└── mutations/                  # Mutation hooks
-```
-
 ## ROUTE HIERARCHY (CRITICAL)
 
 ```
@@ -57,18 +27,6 @@ src/
               ├── /index        # Team player list
               └── /$playerId/   # Team player detail
 ```
-
-## WHERE TO LOOK
-
-| Task                     | Location                                           |
-| ------------------------ | -------------------------------------------------- |
-| Add protected route      | `src/routes/_protected/$organizationSlug/`         |
-| Add team route           | `src/routes/_protected/$organizationSlug/$teamId/` |
-| Route-specific component | `src/routes/.../-components/` (dash prefix)        |
-| Shared component         | `src/components/{category}/`                       |
-| Add query                | `src/query/`                                       |
-| Add mutation             | `src/mutations/`                                   |
-| Auth middleware          | `src/lib/middleware.ts`                            |
 
 ## FILE-BASED ROUTING
 

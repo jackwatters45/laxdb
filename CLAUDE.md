@@ -56,13 +56,6 @@ User Request → TanStack Start (web) → Effect RPC (api) → Effect Services (
 | `useState` for server data | Missing cache/sync     | TanStack Query         |
 | Radix API patterns         | We use Base UI         | Check component source |
 
-## COMMANDS
-
-```bash
-# Development
-infisical run --env=dev -- bun run dev  # With secrets
-```
-
 ## INFRASTRUCTURE
 
 Managed via `alchemy.run.ts`:

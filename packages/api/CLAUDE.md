@@ -4,30 +4,6 @@
 
 Cloudflare Worker exposing Effect RPC and REST endpoints. Consumes @laxdb/core services.
 
-## STRUCTURE
-
-```
-src/
-├── {domain}/
-│   ├── {domain}.rpc.ts      # RpcGroup + handlers
-│   ├── {domain}.api.ts      # HttpApi routes (OpenAPI)
-│   └── {domain}.client.ts   # Client exports
-├── index.ts                 # Worker entry, composes all layers
-├── client.ts                # RPC client factory
-├── protocol.ts              # RPC protocol definition
-└── middleware.ts            # Shared middleware
-```
-
-## WHERE TO LOOK
-
-| Task | Location |
-|------|----------|
-| Add RPC endpoint | `src/{domain}/{domain}.rpc.ts` |
-| Add REST endpoint | `src/{domain}/{domain}.api.ts` |
-| Export client | `src/{domain}/{domain}.client.ts` |
-| Modify CORS/middleware | `src/index.ts` |
-| Register new domain | Add to `AllRpcs` and `AllApis` in `src/index.ts` |
-
 ## ADDING NEW DOMAIN (Checklist)
 
 1. Create contract in `@laxdb/core` first (`{domain}.contract.ts`)

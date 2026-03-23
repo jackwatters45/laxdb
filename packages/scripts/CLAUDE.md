@@ -16,13 +16,6 @@ This package will house:
 - One-off cleanup tasks
 - Development helper scripts
 
-## RUNNING SCRIPTS
-
-```bash
-cd packages/scripts
-infisical run --env=dev -- bun src/{script-name}.ts
-```
-
 ## NOTES
 
 - Scripts should use Effect for error handling

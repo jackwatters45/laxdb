@@ -14,28 +14,6 @@ This package uses **Base UI**, not Radix. APIs differ significantly. Check compo
 | Dialog trigger     | Implicit via context              | Often explicit `open` prop                       |
 | Checkbox state     | `checked={bool}`                  | `checked={bool}` (same)                          |
 
-## STRUCTURE
-
-```
-src/
-├── components/
-│   ├── ui/           # shadcn components (53+ files)
-│   └── data-table/   # TanStack Table components (9 files)
-├── hooks/            # React hooks (use-mobile, use-toast, etc.)
-├── lib/              # Utilities (cn, utils)
-└── globals.css       # Tailwind styles
-```
-
-## WHERE TO LOOK
-
-| Task                   | Location                              |
-| ---------------------- | ------------------------------------- |
-| Add shadcn component   | `bunx --bun shadcn@latest add <name>` |
-| Modify component       | `src/components/ui/{component}.tsx`   |
-| Add data table feature | `src/components/data-table/`          |
-| Add hook               | `src/hooks/`                          |
-| Modify styles          | `src/globals.css`                     |
-
 ## IMPORT PATTERN
 
 ```tsx
@@ -79,28 +57,6 @@ import { Controller } from "react-hook-form";
 | Radix API patterns      | APIs differ   | Check component source              |
 | Direct Tailwind in apps | Inconsistent  | Use cn() utility, extend components |
 | Copy-paste components   | Loses updates | Import from @laxdb/ui               |
-
-## COMMANDS
-
-```bash
-bunx --bun shadcn@latest add <component>  # Add new component
-bun run storybook                          # Run Storybook (port 6006)
-bun run build-storybook                    # Build static Storybook
-bun run typecheck                          # Type check
-bun run fix                                # Lint + format
-```
-
-Stories live in `src/stories/*.stories.tsx`.
-
-## KEY COMPONENTS
-
-| Component            | Notes                             |
-| -------------------- | --------------------------------- |
-| `theme-provider.tsx` | ThemeProvider for dark/light mode |
-| `sonner.tsx`         | Toast notifications               |
-| `data-table/`        | Full TanStack Table integration   |
-| `field.tsx`          | Form field wrapper components     |
-| `sidebar.tsx`        | App sidebar layout                |
 
 ## NOTES
 
