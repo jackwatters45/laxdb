@@ -12,6 +12,10 @@ import {
 } from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@laxdb/ui/components/ui/toggle-group";
 import { X, Clock, Users, FileText, Tag, Trash2, Target } from "lucide-react";
 
 import { MOCK_DRILLS } from "@/data/mock-drills";
@@ -150,22 +154,22 @@ export function ConfigPanel({
           {/* Priority */}
           {!isStart && (
             <Field label="Priority" icon={<Target className="size-3.5" />}>
-              <div className="flex gap-1">
+              <ToggleGroup
+                value={[node.priority]}
+                onValueChange={(values) => {
+                  const next = values[0] as PracticeItemPriority | undefined;
+                  if (next) onUpdate(node.id, { priority: next });
+                }}
+                variant="outline"
+                size="sm"
+                spacing={1}
+              >
                 {PRIORITY_OPTIONS.map((opt) => (
-                  <Button
-                    key={opt.value}
-                    variant={
-                      node.priority === opt.value ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => {
-                      onUpdate(node.id, { priority: opt.value });
-                    }}
-                  >
+                  <ToggleGroupItem key={opt.value} value={opt.value}>
                     {opt.label}
-                  </Button>
+                  </ToggleGroupItem>
                 ))}
-              </div>
+              </ToggleGroup>
             </Field>
           )}
 

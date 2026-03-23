@@ -10,6 +10,10 @@ import {
 } from "@laxdb/ui/components/ui/dialog";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@laxdb/ui/components/ui/toggle-group";
 import { Sparkles, Clock } from "lucide-react";
 import { useState } from "react";
 
@@ -86,18 +90,21 @@ export function QuickPlanModal({
               Practice Duration
             </Label>
             <div className="flex items-center gap-2">
-              {DURATION_PRESETS.map((preset) => (
-                <Button
-                  key={preset}
-                  variant={duration === preset ? "default" : "outline"}
-                  size="default"
-                  onClick={() => {
-                    setDuration(preset);
-                  }}
-                >
-                  {preset} min
-                </Button>
-              ))}
+              <ToggleGroup
+                value={[String(duration)]}
+                onValueChange={(values) => {
+                  const next = values[0] as string | undefined;
+                  if (next) setDuration(parseInt(next, 10));
+                }}
+                variant="outline"
+                spacing={1}
+              >
+                {DURATION_PRESETS.map((preset) => (
+                  <ToggleGroupItem key={preset} value={String(preset)}>
+                    {preset} min
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
               <Input
                 type="number"
                 value={duration}
