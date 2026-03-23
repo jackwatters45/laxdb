@@ -3,7 +3,7 @@ import { Sparkles, Library, GitBranch, Clock } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import { Canvas } from "@/components/canvas";
-import { CanvasControls, type CanvasMode } from "@/components/canvas-controls";
+import { CanvasControls } from "@/components/canvas-controls";
 import { ConfigPanel } from "@/components/config-panel";
 import { DrillSidebar } from "@/components/drill-sidebar";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
@@ -35,7 +35,7 @@ function HomePage() {
 
   // UI state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [canvasMode, setCanvasMode] = useState<CanvasMode>("pointer");
+
   const [transform, setTransform] = useState({ x: 500, y: 40, scale: 0.75 });
   const [drillSidebarOpen, setDrillSidebarOpen] = useState(false);
   const [splitModalOpen, setSplitModalOpen] = useState(false);
@@ -470,7 +470,6 @@ function HomePage() {
             nodes={nodes}
             edges={edges}
             selectedNodeId={selectedNodeId}
-            mode={canvasMode}
             transform={transform}
             onTransformChange={setTransform}
             onSelectNode={setSelectedNodeId}
@@ -482,9 +481,7 @@ function HomePage() {
         {/* Bottom Controls */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20">
           <CanvasControls
-            mode={canvasMode}
             scale={transform.scale}
-            onModeChange={setCanvasMode}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onZoomToFit={handleZoomToFit}
