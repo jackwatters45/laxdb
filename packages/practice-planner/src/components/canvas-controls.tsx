@@ -31,42 +31,42 @@ export function CanvasControls({
   onOrganize,
 }: CanvasControlsProps) {
   return (
-    <div className="flex items-center gap-0.5 bg-card border border-border rounded-xl shadow-lg px-1.5 py-1">
+    <div className="flex items-center gap-0.5 bg-card border border-border rounded-xl shadow-md px-1.5 py-1">
       <Button
         variant={mode === "pointer" ? "secondary" : "ghost"}
         size="icon-sm"
+        aria-label="Select mode"
         onClick={() => { onModeChange("pointer"); }}
-        title="Select (V)"
       >
         <MousePointer2 />
       </Button>
       <Button
         variant={mode === "pan" ? "secondary" : "ghost"}
         size="icon-sm"
+        aria-label="Pan mode"
         onClick={() => { onModeChange("pan"); }}
-        title="Pan (Space)"
       >
         <Hand />
       </Button>
 
       <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      <Button variant="ghost" size="icon-sm" onClick={onZoomOut} title="Zoom Out">
+      <Button variant="ghost" size="icon-sm" aria-label="Zoom out" onClick={onZoomOut}>
         <ZoomOut />
       </Button>
-      <span className="px-1 text-[11px] font-medium text-muted-foreground tabular-nums min-w-[40px] text-center select-none">
+      <span className="px-1 text-xs text-muted-foreground tabular-nums min-w-10 text-center select-none">
         {Math.round(scale * 100)}%
       </span>
-      <Button variant="ghost" size="icon-sm" onClick={onZoomIn} title="Zoom In">
+      <Button variant="ghost" size="icon-sm" aria-label="Zoom in" onClick={onZoomIn}>
         <ZoomIn />
       </Button>
 
       <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      <Button variant="ghost" size="icon-sm" onClick={onZoomToFit} title="Zoom to Fit">
+      <Button variant="ghost" size="icon-sm" aria-label="Zoom to fit" onClick={onZoomToFit}>
         <Maximize />
       </Button>
-      <Button variant="ghost" size="icon-sm" onClick={onOrganize} title="Auto-Organize">
+      <Button variant="ghost" size="icon-sm" aria-label="Auto-organize" onClick={onOrganize}>
         <LayoutGrid />
       </Button>
     </div>

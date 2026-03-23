@@ -1,8 +1,7 @@
-import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Library, GitBranch, Clock } from "lucide-react";
+import { Sparkles, Library, GitBranch } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import { Canvas } from "@/components/canvas";
@@ -353,27 +352,22 @@ function HomePage() {
   // (Delete is handled via onKeyDown in parent — but we'll also catch it here)
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-dvh w-screen overflow-hidden bg-background">
       {/* Drill Sidebar (left) */}
       <DrillSidebar
         isOpen={drillSidebarOpen}
-        onClose={() => {
-          setDrillSidebarOpen(false);
-        }}
+        onClose={() => { setDrillSidebarOpen(false); }}
         onAddDrill={addDrillFromSidebar}
       />
 
       {/* Main canvas area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="flex items-center justify-between h-13 px-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 z-20">
+        <header className="flex items-center justify-between h-12 px-4 border-b border-border bg-card flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
             <Button
               variant={drillSidebarOpen ? "default" : "outline"}
-              size="default"
-              onClick={() => {
-                setDrillSidebarOpen((v) => !v);
-              }}
+              onClick={() => { setDrillSidebarOpen((v) => !v); }}
             >
               <Library />
               Drills
@@ -381,34 +375,23 @@ function HomePage() {
 
             <Separator orientation="vertical" className="h-5" />
 
-            <h1 className="text-sm font-semibold text-foreground">
+            <h1 className="text-sm font-semibold text-foreground text-balance">
               {practice.name}
             </h1>
-            <Badge variant="outline" className="gap-1">
-              <Clock className="size-2.5" />
+            <span className="text-xs text-muted-foreground tabular-nums">
               {totalMinutes} min
-            </Badge>
-            <span className="text-[11px] text-muted-foreground/50">
+            </span>
+            <span className="text-xs text-muted-foreground/50 tabular-nums">
               {nodes.length} blocks
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => {
-                setSplitModalOpen(true);
-              }}
-            >
+            <Button variant="outline" onClick={() => { setSplitModalOpen(true); }}>
               <GitBranch />
               Split
             </Button>
-            <Button
-              onClick={() => {
-                setQuickPlanOpen(true);
-              }}
-            >
+            <Button onClick={() => { setQuickPlanOpen(true); }}>
               <Sparkles />
               Quick Plan
             </Button>
@@ -430,7 +413,7 @@ function HomePage() {
         </div>
 
         {/* Bottom Controls */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
           <CanvasControls
             mode={canvasMode}
             scale={transform.scale}
@@ -449,25 +432,19 @@ function HomePage() {
           node={selectedNode}
           onUpdate={updateNode}
           onDelete={deleteNode}
-          onClose={() => {
-            setSelectedNodeId(null);
-          }}
+          onClose={() => { setSelectedNodeId(null); }}
         />
       )}
 
       {/* Modals */}
       <SplitNodeModal
         isOpen={splitModalOpen}
-        onClose={() => {
-          setSplitModalOpen(false);
-        }}
+        onClose={() => { setSplitModalOpen(false); }}
         onConfirm={handleSplitCreate}
       />
       <QuickPlanModal
         isOpen={quickPlanOpen}
-        onClose={() => {
-          setQuickPlanOpen(false);
-        }}
+        onClose={() => { setQuickPlanOpen(false); }}
         onGenerate={handleQuickGenerate}
       />
     </div>

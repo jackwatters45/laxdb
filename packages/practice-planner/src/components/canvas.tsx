@@ -197,7 +197,6 @@ export function Canvas({
         className="origin-top-left"
         style={{
           transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
-          willChange: "transform",
         }}
         onClick={handleCanvasClick}
       >
@@ -251,13 +250,12 @@ export function Canvas({
           return (
             <div
               key={node.id}
-              className="absolute"
+              className="absolute left-0 top-0"
               style={{
-                left: geo.left,
-                top: geo.top,
+                transform: `translate(${geo.left}px, ${geo.top}px)`,
                 transition: isPanning
                   ? "none"
-                  : "left 0.3s ease, top 0.3s ease",
+                  : "transform 0.2s ease-out",
               }}
             >
               <WorkflowNode
