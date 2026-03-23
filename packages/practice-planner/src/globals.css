@@ -10,12 +10,4 @@
   }
 }
 
-/* Smooth canvas interactions */
-@layer utilities {
-  .canvas-node-transition {
-    transition:
-      left 0.3s ease,
-      top 0.3s ease,
-      transform 0.2s ease;
-  }
-}
+
