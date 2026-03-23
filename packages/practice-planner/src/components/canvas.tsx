@@ -2,7 +2,6 @@ import {
   useState,
   useRef,
   useCallback,
-  useEffect,
   useMemo,
   type MouseEvent as ReactMouseEvent,
   type WheelEvent as ReactWheelEvent,
@@ -12,7 +11,6 @@ import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
 import { getNodeGeometry } from "@/lib/node-geometry";
 
 import { AddNodeButton } from "./add-node-button";
-import type { CanvasMode } from "./canvas-controls";
 import { WorkflowEdge } from "./workflow-edge";
 import { WorkflowNode } from "./workflow-node";
 
@@ -26,7 +24,6 @@ interface CanvasProps {
   nodes: PracticeNode[];
   edges: PracticeEdge[];
   selectedNodeId: string | null;
-  mode: CanvasMode;
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
@@ -43,7 +40,6 @@ export function Canvas({
   nodes,
   edges,
   selectedNodeId,
-  mode,
   transform,
   onTransformChange,
   onSelectNode,
@@ -51,45 +47,23 @@ export function Canvas({
   onAddDrill,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Pan state (dragging empty canvas)
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [spaceHeld, setSpaceHeld] = useState(false);
 
-  // Drag state
+  // Node drag state
   const [dragNodeId, setDragNodeId] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  // Build node map for edge lookup
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
-  // Keyboard: space to temporarily enable pan
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space" && !e.repeat) {
-        e.preventDefault();
-        setSpaceHeld(true);
-      }
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
-        setSpaceHeld(false);
-        setIsPanning(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-    };
-  }, []);
-
-  const shouldPan = mode === "pan" || spaceHeld;
+  // --- Node interactions: click to select, drag to reposition ---
 
   const handleNodeMouseDown = useCallback(
     (nodeId: string, e: ReactMouseEvent) => {
-      if (shouldPan || e.button !== 0) return;
+      if (e.button !== 0) return;
       e.stopPropagation();
 
       const node = nodeMap.get(nodeId);
@@ -104,22 +78,24 @@ export function Canvas({
       });
       setIsDragging(false);
     },
-    [shouldPan, nodeMap],
+    [nodeMap],
   );
+
+  // --- Canvas interactions: click to deselect, drag to pan ---
 
   const handleMouseDown = useCallback(
     (e: ReactMouseEvent) => {
-      if (shouldPan && e.button === 0) {
+      if (e.button === 0) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
-        e.preventDefault();
       }
     },
-    [shouldPan, transform.x, transform.y],
+    [transform.x, transform.y],
   );
 
   const handleMouseMove = useCallback(
     (e: ReactMouseEvent) => {
+      // Node drag takes priority
       if (dragNodeId) {
         const dx = e.clientX - dragStart.mouseX;
         const dy = e.clientY - dragStart.mouseY;
@@ -133,6 +109,7 @@ export function Canvas({
         return;
       }
 
+      // Canvas pan
       if (isPanning) {
         onTransformChange({
           ...transform,
@@ -220,13 +197,7 @@ export function Canvas({
     <div
       ref={containerRef}
       className={`w-full h-full overflow-hidden ${
-        isNodeBeingDragged
-          ? "cursor-grabbing"
-          : shouldPan
-            ? isPanning
-              ? "cursor-grabbing"
-              : "cursor-grab"
-            : "cursor-default"
+        isNodeBeingDragged || isPanning ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
