@@ -1,7 +1,6 @@
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
-import { ScrollArea } from "@laxdb/ui/components/ui/scroll-area";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import {
   ToggleGroup,
@@ -117,7 +116,7 @@ export function DrillSidebar({
       <Separator />
 
       {/* Drill list */}
-      <ScrollArea className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-3 space-y-1">
           {filtered.map((drill) => (
             <DrillCard
@@ -134,7 +133,7 @@ export function DrillSidebar({
             </p>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
