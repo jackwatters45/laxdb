@@ -1,11 +1,14 @@
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Library, GitBranch, Clock } from "lucide-react";
+import { Sparkles, Library, GitBranch } from "lucide-react";
 import { useState, useCallback } from "react";
 
 import { Canvas } from "@/components/canvas";
 import { CanvasControls } from "@/components/canvas-controls";
 import { ConfigPanel } from "@/components/config-panel";
 import { DrillSidebar } from "@/components/drill-sidebar";
+import { PracticeSettings } from "@/components/practice-settings";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
 import { SplitNodeModal } from "@/components/split-node";
 import { SAMPLE_PRACTICE } from "@/data/sample-practice";
@@ -40,7 +43,19 @@ function HomePage() {
   const [drillSidebarOpen, setDrillSidebarOpen] = useState(false);
   const [splitModalOpen, setSplitModalOpen] = useState(false);
   const [quickPlanOpen, setQuickPlanOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
+
+  // Deselect node when opening settings, close settings when selecting a node
+  const openSettings = useCallback(() => {
+    setSelectedNodeId(null);
+    setSettingsOpen(true);
+  }, []);
+
+  const selectNode = useCallback((nodeId: string | null) => {
+    setSelectedNodeId(nodeId);
+    if (nodeId) setSettingsOpen(false);
+  }, []);
 
   // Total duration
   const totalMinutes = nodes.reduce(
@@ -58,6 +73,13 @@ function HomePage() {
           n.id === nodeId ? { ...n, ...updates } : n,
         ),
       }));
+    },
+    [],
+  );
+
+  const updatePractice = useCallback(
+    (updates: Partial<Practice>) => {
+      setPractice((prev) => ({ ...prev, ...updates }));
     },
     [],
   );
@@ -395,91 +417,82 @@ function HomePage() {
   // Keyboard shortcuts
   // (Delete is handled via onKeyDown in parent — but we'll also catch it here)
 
+  // Filter out Start node from canvas — practice details are in the settings panel
+  const canvasNodes = nodes.filter((n) => n.variant !== "start");
+  const canvasEdges = edges.filter((e) => {
+    const startNode = nodes.find((n) => n.variant === "start");
+    if (!startNode) return true;
+    return e.source !== startNode.id && e.target !== startNode.id;
+  });
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-dvh w-screen overflow-hidden bg-background">
       {/* Drill Sidebar (left) */}
       <DrillSidebar
         isOpen={drillSidebarOpen}
-        onClose={() => {
-          setDrillSidebarOpen(false);
-        }}
+        onClose={() => { setDrillSidebarOpen(false); }}
         onAddDrill={addDrillFromSidebar}
       />
 
       {/* Main canvas area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="flex items-center justify-between h-13 px-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 z-20">
+        <header className="flex items-center justify-between h-12 px-4 border-b border-border bg-card flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                setDrillSidebarOpen((v) => !v);
-              }}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
-                drillSidebarOpen
-                  ? "bg-foreground text-background border-foreground"
-                  : "text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
-              }`}
+            <Button
+              variant={drillSidebarOpen ? "default" : "outline"}
+              onClick={() => { setDrillSidebarOpen((v) => !v); }}
             >
-              <Library size={14} />
+              <Library />
               Drills
-            </button>
+            </Button>
 
-            <div className="w-px h-5 bg-border" />
+            <Separator orientation="vertical" className="h-5" />
 
-            <h1
-              className="text-sm font-semibold text-foreground"
-              style={{ fontFamily: "var(--font-sans)", fontStyle: "normal" }}
+            <button
+              onClick={openSettings}
+              className="flex items-center gap-2 hover:opacity-70 transition-opacity"
             >
-              {practice.name}
-            </h1>
-            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Clock size={11} />
+              <h1 className="text-sm font-semibold text-foreground text-balance">
+                {practice.name}
+              </h1>
+            </button>
+            <span className="text-xs text-muted-foreground tabular-nums">
               {totalMinutes} min
             </span>
-            <span className="text-[11px] text-muted-foreground/50">
-              {nodes.length} blocks
+            <span className="text-xs text-muted-foreground/50 tabular-nums">
+              {canvasNodes.length} blocks
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setSplitModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:border-foreground/30 hover:text-foreground transition-all"
-            >
-              <GitBranch size={13} />
+            <Button variant="outline" onClick={() => { setSplitModalOpen(true); }}>
+              <GitBranch />
               Split
-            </button>
-            <button
-              onClick={() => {
-                setQuickPlanOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
-            >
-              <Sparkles size={13} />
+            </Button>
+            <Button onClick={() => { setQuickPlanOpen(true); }}>
+              <Sparkles />
               Quick Plan
-            </button>
+            </Button>
           </div>
         </header>
 
         {/* Canvas */}
         <div className="flex-1 overflow-hidden">
           <Canvas
-            nodes={nodes}
-            edges={edges}
+            nodes={canvasNodes}
+            edges={canvasEdges}
             selectedNodeId={selectedNodeId}
             transform={transform}
             onTransformChange={setTransform}
-            onSelectNode={setSelectedNodeId}
+            onSelectNode={selectNode}
             onUpdateNode={updateNode}
             onAddDrill={addDrillBetween}
           />
         </div>
 
         {/* Bottom Controls */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
           <CanvasControls
             scale={transform.scale}
             onZoomIn={handleZoomIn}
@@ -490,7 +503,7 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Config Panel (right) */}
+      {/* Right panel — node config or practice settings */}
       {selectedNode && (
         <ConfigPanel
           node={selectedNode}
@@ -498,29 +511,32 @@ function HomePage() {
           onDelete={deleteNode}
           onMove={moveNodeInFlow}
           canMoveUp={(() => {
-            const incoming = edges.find((e) => e.target === selectedNode.id);
-            if (!incoming) return false;
-            const parent = nodes.find((n) => n.id === incoming.source);
-            return !!parent && parent.variant !== "start";
+            const incoming = canvasEdges.find((e) => e.target === selectedNode.id);
+            return !!incoming;
           })()}
-          canMoveDown={edges.some((e) => e.source === selectedNode.id)}
-          onClose={() => { setSelectedNodeId(null); }}
+          canMoveDown={canvasEdges.some((e) => e.source === selectedNode.id)}
+          onClose={() => { selectNode(null); }}
+        />
+      )}
+      {!selectedNode && settingsOpen && (
+        <PracticeSettings
+          practice={practice}
+          totalMinutes={totalMinutes}
+          blockCount={canvasNodes.length}
+          onUpdate={updatePractice}
+          onClose={() => { setSettingsOpen(false); }}
         />
       )}
 
       {/* Modals */}
       <SplitNodeModal
         isOpen={splitModalOpen}
-        onClose={() => {
-          setSplitModalOpen(false);
-        }}
+        onClose={() => { setSplitModalOpen(false); }}
         onConfirm={handleSplitCreate}
       />
       <QuickPlanModal
         isOpen={quickPlanOpen}
-        onClose={() => {
-          setQuickPlanOpen(false);
-        }}
+        onClose={() => { setQuickPlanOpen(false); }}
         onGenerate={handleQuickGenerate}
       />
     </div>
