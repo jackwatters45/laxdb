@@ -9,6 +9,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@laxdb/ui/components/ui/sheet";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@laxdb/ui/components/ui/toggle-group";
 import { Search, Clock, Flame, Target, Snowflake } from "lucide-react";
 import { useState } from "react";
 
@@ -97,19 +101,24 @@ export function DrillSidebar({
           </div>
         </div>
 
-        <div className="px-4 pb-3 flex flex-wrap gap-1">
-          {CATEGORIES.map((cat) => (
-            <Button
-              key={cat.value}
-              variant={activeCategory === cat.value ? "default" : "ghost"}
-              size="sm"
-              onClick={() => {
-                setActiveCategory(cat.value);
-              }}
-            >
-              {cat.label}
-            </Button>
-          ))}
+        <div className="px-4 pb-3">
+          <ToggleGroup
+            value={[activeCategory]}
+            onValueChange={(values) => {
+              const next = values[0] as string | undefined;
+              if (next) setActiveCategory(next);
+            }}
+            variant="outline"
+            size="sm"
+            spacing={1}
+            className="flex-wrap"
+          >
+            {CATEGORIES.map((cat) => (
+              <ToggleGroupItem key={cat.value} value={cat.value}>
+                {cat.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
 
         <Separator />
