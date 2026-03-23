@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
-import { getNodeGeometry } from "@/lib/node-geometry";
+import { getNodeGeometry, getEdgeAnchors } from "@/lib/node-geometry";
 
 import { AddNodeButton } from "./add-node-button";
 import type { CanvasMode } from "./canvas-controls";
@@ -31,6 +31,7 @@ interface CanvasProps {
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
   onUpdateNode: (nodeId: string, updates: Partial<PracticeNode>) => void;
+  onMoveNodeToEdge: (nodeId: string, edgeId: string | null) => void;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
 }
 
@@ -38,6 +39,17 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 2;
 const ZOOM_SENSITIVITY = 0.001;
 const DRAG_THRESHOLD = 4;
+const EDGE_SNAP_DISTANCE = 40;
+
+/** Distance from point (px,py) to line segment (ax,ay)-(bx,by) */
+function distToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(px - ax, py - ay);
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
 
 export function Canvas({
   nodes,
@@ -48,6 +60,7 @@ export function Canvas({
   onTransformChange,
   onSelectNode,
   onUpdateNode,
+  onMoveNodeToEdge,
   onAddDrill,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -59,6 +72,7 @@ export function Canvas({
   const [dragNodeId, setDragNodeId] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [hoverEdgeId, setHoverEdgeId] = useState<string | null>(null);
 
   // Build node map for edge lookup
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
@@ -87,6 +101,34 @@ export function Canvas({
 
   const shouldPan = mode === "pan" || spaceHeld;
 
+  /** Find the nearest edge to a canvas-space point, excluding edges connected to nodeId */
+  const findNearestEdge = useCallback(
+    (canvasX: number, canvasY: number, excludeNodeId: string): string | null => {
+      let bestDist = EDGE_SNAP_DISTANCE;
+      let bestEdgeId: string | null = null;
+
+      for (const edge of edges) {
+        // Skip edges connected to the dragged node
+        if (edge.source === excludeNodeId || edge.target === excludeNodeId) continue;
+
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        if (!source || !target) continue;
+
+        const { sx, sy, tx, ty } = getEdgeAnchors(source, target);
+        const dist = distToSegment(canvasX, canvasY, sx, sy, tx, ty);
+
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestEdgeId = edge.id;
+        }
+      }
+
+      return bestEdgeId;
+    },
+    [edges, nodeMap],
+  );
+
   // --- Node drag handlers ---
 
   const handleNodeMouseDown = useCallback(
@@ -105,6 +147,7 @@ export function Canvas({
         nodeY: node.position.y,
       });
       setIsDragging(false);
+      setHoverEdgeId(null);
     },
     [shouldPan, nodeMap],
   );
@@ -138,6 +181,13 @@ export function Canvas({
         const newY = dragStart.nodeY + dy / transform.scale;
 
         onUpdateNode(dragNodeId, { position: { x: newX, y: newY } });
+
+        // Find nearest edge for drop target highlight
+        const geo = getNodeGeometry({ position: { x: newX, y: newY }, variant: "default" } as PracticeNode);
+        const nodeCenterX = geo.left + geo.width / 2;
+        const nodeCenterY = geo.top + geo.height / 2;
+        setHoverEdgeId(findNearestEdge(nodeCenterX, nodeCenterY, dragNodeId));
+
         return;
       }
 
@@ -149,7 +199,7 @@ export function Canvas({
         });
       }
     },
-    [dragNodeId, dragStart, isDragging, isPanning, panStart, transform, onTransformChange, onUpdateNode],
+    [dragNodeId, dragStart, isDragging, isPanning, panStart, transform, onTransformChange, onUpdateNode, findNearestEdge],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -157,12 +207,16 @@ export function Canvas({
       if (!isDragging) {
         // Was a click, not a drag — select the node
         onSelectNode(dragNodeId);
+      } else {
+        // Was a drag — move node to hovered edge (or leave detached)
+        onMoveNodeToEdge(dragNodeId, hoverEdgeId);
       }
       setDragNodeId(null);
       setIsDragging(false);
+      setHoverEdgeId(null);
     }
     setIsPanning(false);
-  }, [dragNodeId, isDragging, onSelectNode]);
+  }, [dragNodeId, isDragging, hoverEdgeId, onSelectNode, onMoveNodeToEdge]);
 
   const handleWheel = useCallback(
     (e: ReactWheelEvent) => {
@@ -283,6 +337,7 @@ export function Canvas({
                   edge={edge}
                   sourceNode={source}
                   targetNode={target}
+                  isDropTarget={hoverEdgeId === edge.id}
                 />
               );
             })}

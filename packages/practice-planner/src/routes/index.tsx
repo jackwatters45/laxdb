@@ -98,6 +98,57 @@ function HomePage() {
     [selectedNodeId],
   );
 
+  const moveNodeToEdge = useCallback(
+    (nodeId: string, edgeId: string | null) => {
+      setPractice((prev) => {
+        // 1. Detach: remove all edges connected to this node, reconnect neighbors
+        const incomingEdges = prev.edges.filter((e) => e.target === nodeId);
+        const outgoingEdges = prev.edges.filter((e) => e.source === nodeId);
+
+        let newEdges = prev.edges.filter(
+          (e) => e.source !== nodeId && e.target !== nodeId,
+        );
+
+        // Reconnect old neighbors
+        for (const ie of incomingEdges) {
+          for (const oe of outgoingEdges) {
+            // Don't create self-loops or duplicate the target edge
+            if (ie.source !== oe.target) {
+              newEdges.push({
+                id: nextId("edge"),
+                source: ie.source,
+                target: oe.target,
+              });
+            }
+          }
+        }
+
+        // 2. If dropped on an edge, splice in
+        if (edgeId) {
+          const targetEdge = newEdges.find((e) => e.id === edgeId);
+          if (targetEdge) {
+            // Remove the target edge
+            newEdges = newEdges.filter((e) => e.id !== edgeId);
+            // Insert: source -> node -> target
+            newEdges.push({
+              id: nextId("edge"),
+              source: targetEdge.source,
+              target: nodeId,
+            });
+            newEdges.push({
+              id: nextId("edge"),
+              source: nodeId,
+              target: targetEdge.target,
+            });
+          }
+        }
+
+        return { ...prev, edges: newEdges };
+      });
+    },
+    [],
+  );
+
   const addDrillBetween = useCallback(
     (afterId: string, beforeId: string, drill: Drill) => {
       const afterNode = nodes.find((n) => n.id === afterId);
@@ -429,6 +480,7 @@ function HomePage() {
             onTransformChange={setTransform}
             onSelectNode={setSelectedNodeId}
             onUpdateNode={updateNode}
+            onMoveNodeToEdge={moveNodeToEdge}
             onAddDrill={addDrillBetween}
           />
         </div>
