@@ -33,7 +33,7 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-dvh overflow-x-hidden bg-background text-foreground antialiased">
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <Outlet />
         </ThemeProvider>
