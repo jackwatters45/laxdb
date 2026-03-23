@@ -98,52 +98,47 @@ function HomePage() {
     [selectedNodeId],
   );
 
-  const moveNodeToEdge = useCallback(
-    (nodeId: string, edgeId: string | null) => {
+  const moveNodeInFlow = useCallback(
+    (nodeId: string, direction: "up" | "down") => {
       setPractice((prev) => {
-        // 1. Detach: remove all edges connected to this node, reconnect neighbors
-        const incomingEdges = prev.edges.filter((e) => e.target === nodeId);
-        const outgoingEdges = prev.edges.filter((e) => e.source === nodeId);
+        // Find the sibling to swap with
+        const siblingEdge = direction === "up"
+          ? prev.edges.find((e) => e.target === nodeId)
+          : prev.edges.find((e) => e.source === nodeId);
+        if (!siblingEdge) return prev;
 
-        let newEdges = prev.edges.filter(
-          (e) => e.source !== nodeId && e.target !== nodeId,
-        );
+        const siblingId = direction === "up" ? siblingEdge.source : siblingEdge.target;
+        // Don't swap with Start node
+        const sibling = prev.nodes.find((n) => n.id === siblingId);
+        if (!sibling || sibling.variant === "start") return prev;
 
-        // Reconnect old neighbors
-        for (const ie of incomingEdges) {
-          for (const oe of outgoingEdges) {
-            // Don't create self-loops or duplicate the target edge
-            if (ie.source !== oe.target) {
-              newEdges.push({
-                id: nextId("edge"),
-                source: ie.source,
-                target: oe.target,
-              });
-            }
-          }
-        }
+        // Swap positions
+        const node = prev.nodes.find((n) => n.id === nodeId);
+        if (!node) return prev;
 
-        // 2. If dropped on an edge, splice in
-        if (edgeId) {
-          const targetEdge = newEdges.find((e) => e.id === edgeId);
-          if (targetEdge) {
-            // Remove the target edge
-            newEdges = newEdges.filter((e) => e.id !== edgeId);
-            // Insert: source -> node -> target
-            newEdges.push({
-              id: nextId("edge"),
-              source: targetEdge.source,
-              target: nodeId,
-            });
-            newEdges.push({
-              id: nextId("edge"),
-              source: nodeId,
-              target: targetEdge.target,
-            });
-          }
-        }
+        const newNodes = prev.nodes.map((n) => {
+          if (n.id === nodeId) return { ...n, position: sibling.position };
+          if (n.id === siblingId) return { ...n, position: node.position };
+          return n;
+        });
 
-        return { ...prev, edges: newEdges };
+        // Swap edges: rewire so graph order matches visual order
+        // Before (up): ...→ sibling → node → ...
+        // After (up):  ...→ node → sibling → ...
+        const newEdges = prev.edges.map((e) => {
+          let source = e.source;
+          let target = e.target;
+          // Swap all references between the two nodes
+          if (source === nodeId) source = siblingId;
+          else if (source === siblingId) source = nodeId;
+          if (target === nodeId) target = siblingId;
+          else if (target === siblingId) target = nodeId;
+          return source === e.source && target === e.target
+            ? e
+            : { ...e, source, target };
+        });
+
+        return { ...prev, nodes: newNodes, edges: newEdges };
       });
     },
     [],
@@ -480,7 +475,6 @@ function HomePage() {
             onTransformChange={setTransform}
             onSelectNode={setSelectedNodeId}
             onUpdateNode={updateNode}
-            onMoveNodeToEdge={moveNodeToEdge}
             onAddDrill={addDrillBetween}
           />
         </div>
@@ -505,9 +499,15 @@ function HomePage() {
           node={selectedNode}
           onUpdate={updateNode}
           onDelete={deleteNode}
-          onClose={() => {
-            setSelectedNodeId(null);
-          }}
+          onMove={moveNodeInFlow}
+          canMoveUp={(() => {
+            const incoming = edges.find((e) => e.target === selectedNode.id);
+            if (!incoming) return false;
+            const parent = nodes.find((n) => n.id === incoming.source);
+            return !!parent && parent.variant !== "start";
+          })()}
+          canMoveDown={edges.some((e) => e.source === selectedNode.id)}
+          onClose={() => { setSelectedNodeId(null); }}
         />
       )}
 

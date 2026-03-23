@@ -26,6 +26,8 @@ import {
   FileText,
   Trash2,
   ArrowRightLeft,
+  ArrowUp,
+  ArrowDown,
   Flame,
   Snowflake,
   Target,
@@ -45,6 +47,9 @@ interface ConfigPanelProps {
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
   onDelete: (nodeId: string) => void;
+  onMove: (nodeId: string, direction: "up" | "down") => void;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
   onClose: () => void;
 }
 
@@ -64,6 +69,9 @@ export function ConfigPanel({
   node,
   onUpdate,
   onDelete,
+  onMove,
+  canMoveUp,
+  canMoveDown,
   onClose,
 }: ConfigPanelProps) {
   const linkedDrill = node.drillId
@@ -91,9 +99,33 @@ export function ConfigPanel({
         <h3 className="text-sm font-semibold text-foreground truncate pr-2 text-balance">
           {node.label}
         </h3>
-        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel" className="-mr-1">
-          <X />
-        </Button>
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {!isStart && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => { onMove(node.id, "up"); }}
+                disabled={!canMoveUp}
+                aria-label="Move up"
+              >
+                <ArrowUp />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => { onMove(node.id, "down"); }}
+                disabled={!canMoveDown}
+                aria-label="Move down"
+              >
+                <ArrowDown />
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close panel">
+            <X />
+          </Button>
+        </div>
       </div>
 
       {/* Drill identity — top of panel */}
