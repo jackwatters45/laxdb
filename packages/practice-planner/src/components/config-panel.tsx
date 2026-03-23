@@ -2,7 +2,7 @@ import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
-import { ScrollArea } from "@laxdb/ui/components/ui/scroll-area";
+
 import {
   Select,
   SelectTrigger,
@@ -84,7 +84,7 @@ export function ConfigPanel({
       </div>
 
       {/* Body */}
-      <ScrollArea className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 space-y-5">
           {/* Label */}
           <Field label="Label" icon={<Tag className="size-3.5" />}>
@@ -277,7 +277,7 @@ export function ConfigPanel({
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Footer */}
       {!isStart && (
