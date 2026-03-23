@@ -1,13 +1,18 @@
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Label } from "@laxdb/ui/components/ui/label";
+import { ScrollArea } from "@laxdb/ui/components/ui/scroll-area";
 import {
-  X,
-  Clock,
-  Users,
-  FileText,
-  Tag,
-  AlertCircle,
-  Trash2,
-  Target,
-} from "lucide-react";
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@laxdb/ui/components/ui/select";
+import { Separator } from "@laxdb/ui/components/ui/separator";
+import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import { X, Clock, Users, FileText, Tag, Trash2, Target } from "lucide-react";
 
 import { MOCK_DRILLS } from "@/data/mock-drills";
 import type {
@@ -15,18 +20,6 @@ import type {
   PracticeItemType,
   PracticeItemPriority,
 } from "@/data/types";
-
-const PRACTICE_ITEM_TYPES = new Set<string>([
-  "warmup",
-  "drill",
-  "cooldown",
-  "water-break",
-  "activity",
-]);
-
-function isPracticeItemType(value: string): value is PracticeItemType {
-  return PRACTICE_ITEM_TYPES.has(value);
-}
 
 interface ConfigPanelProps {
   node: PracticeNode;
@@ -68,204 +61,202 @@ export function ConfigPanel({
         <h3 className="text-sm font-semibold text-foreground truncate pr-2">
           {node.label}
         </h3>
-        <button
-          aria-label="Close"
-          onClick={onClose}
-          className="flex-shrink-0 p-1 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-        >
-          <X size={16} />
-        </button>
+        <Button variant="ghost" size="icon-sm" onClick={onClose}>
+          <X />
+          <span className="sr-only">Close</span>
+        </Button>
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-5">
-        {/* Label */}
-        <Field label="Label" icon={<Tag size={14} />}>
-          <input
-            type="text"
-            value={node.label}
-            onChange={(e) => {
-              onUpdate(node.id, { label: e.target.value });
-            }}
-            className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow"
-            disabled={isStart}
-          />
-        </Field>
-
-        {/* Type */}
-        {!isStart && (
-          <Field label="Type" icon={<AlertCircle size={14} />}>
-            <select
-              value={node.type}
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-4 space-y-5">
+          {/* Label */}
+          <Field label="Label" icon={<Tag className="size-3.5" />}>
+            <Input
+              value={node.label}
               onChange={(e) => {
-                if (isPracticeItemType(e.target.value)) {
-                  onUpdate(node.id, { type: e.target.value });
-                }
+                onUpdate(node.id, { label: e.target.value });
               }}
-              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow appearance-none"
-            >
-              {TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              disabled={isStart}
+            />
           </Field>
-        )}
 
-        {/* Duration */}
-        {!isStart && (
-          <Field label="Duration" icon={<Clock size={14} />}>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={node.durationMinutes ?? ""}
-                onChange={(e) => {
-                  onUpdate(node.id, {
-                    durationMinutes: e.target.value
-                      ? parseInt(e.target.value, 10)
-                      : null,
-                  });
+          {/* Type */}
+          {!isStart && (
+            <Field label="Type" icon={<Target className="size-3.5" />}>
+              <Select
+                value={node.type}
+                onValueChange={(v) => {
+                  if (v) onUpdate(node.id, { type: v as PracticeItemType });
                 }}
-                placeholder="—"
-                className="w-20 px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow"
-                min={1}
-                max={120}
-              />
-              <span className="text-xs text-muted-foreground">min</span>
-            </div>
-          </Field>
-        )}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TYPE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
 
-        {/* Groups */}
-        <Field label="Groups" icon={<Users size={14} />}>
-          <input
-            type="text"
-            value={node.groups.join(", ")}
-            onChange={(e) => {
-              onUpdate(node.id, {
-                groups: e.target.value
-                  .split(",")
-                  .map((g) => g.trim())
-                  .filter(Boolean),
-              });
-            }}
-            placeholder="all"
-            className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow"
-          />
-          <p className="text-[10px] text-muted-foreground/60 mt-1">
-            Comma-separated: all, Offense, Defense, Goalies
-          </p>
-        </Field>
-
-        {/* Priority */}
-        {!isStart && (
-          <Field label="Priority" icon={<AlertCircle size={14} />}>
-            <div className="flex gap-1.5">
-              {PRIORITY_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    onUpdate(node.id, { priority: opt.value });
+          {/* Duration */}
+          {!isStart && (
+            <Field label="Duration" icon={<Clock className="size-3.5" />}>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={node.durationMinutes ?? ""}
+                  onChange={(e) => {
+                    onUpdate(node.id, {
+                      durationMinutes: e.target.value
+                        ? parseInt(e.target.value, 10)
+                        : null,
+                    });
                   }}
-                  className={`px-3 py-1 text-xs rounded-lg border transition-all ${
-                    node.priority === opt.value
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-muted-foreground border-border hover:border-foreground/30"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </Field>
-        )}
+                  placeholder="—"
+                  className="w-20"
+                  min={1}
+                  max={120}
+                />
+                <span className="text-xs text-muted-foreground">min</span>
+              </div>
+            </Field>
+          )}
 
-        {/* Notes */}
-        <Field label="Notes" icon={<FileText size={14} />}>
-          <textarea
-            value={node.notes ?? ""}
-            onChange={(e) => {
-              onUpdate(node.id, {
-                notes: e.target.value || null,
-              });
-            }}
-            placeholder="Add coaching notes..."
-            className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow min-h-[60px] leading-relaxed"
-          />
-        </Field>
-
-        {/* Drill Picker */}
-        {!isStart && node.type !== "water-break" && (
-          <Field label="Linked Drill" icon={<Target size={14} />}>
-            <select
-              value={node.drillId ?? ""}
+          {/* Groups */}
+          <Field label="Groups" icon={<Users className="size-3.5" />}>
+            <Input
+              value={node.groups.join(", ")}
               onChange={(e) => {
                 onUpdate(node.id, {
-                  drillId: e.target.value || null,
-                  label:
-                    MOCK_DRILLS.find((d) => d.id === e.target.value)?.name ??
-                    node.label,
-                  durationMinutes:
-                    MOCK_DRILLS.find((d) => d.id === e.target.value)
-                      ?.durationMinutes ?? node.durationMinutes,
+                  groups: e.target.value
+                    .split(",")
+                    .map((g) => g.trim())
+                    .filter(Boolean),
                 });
               }}
-              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow appearance-none"
-            >
-              <option value="">None</option>
-              {MOCK_DRILLS.map((drill) => (
-                <option key={drill.id} value={drill.id}>
-                  {drill.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
-
-        {/* Linked Drill Details */}
-        {linkedDrill && (
-          <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
-            <p className="text-xs font-semibold text-foreground">
-              {linkedDrill.name}
+              placeholder="all"
+            />
+            <p className="text-[10px] text-muted-foreground/60 mt-1">
+              Comma-separated: all, Offense, Defense, Goalies
             </p>
-            {linkedDrill.subtitle && (
-              <p className="text-xs text-muted-foreground">
-                {linkedDrill.subtitle}
+          </Field>
+
+          {/* Priority */}
+          {!isStart && (
+            <Field label="Priority" icon={<Target className="size-3.5" />}>
+              <div className="flex gap-1">
+                {PRIORITY_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt.value}
+                    variant={
+                      node.priority === opt.value ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => {
+                      onUpdate(node.id, { priority: opt.value });
+                    }}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </Field>
+          )}
+
+          {/* Notes */}
+          <Field label="Notes" icon={<FileText className="size-3.5" />}>
+            <Textarea
+              value={node.notes ?? ""}
+              onChange={(e) => {
+                onUpdate(node.id, { notes: e.target.value || null });
+              }}
+              placeholder="Add coaching notes..."
+              className="min-h-[60px]"
+            />
+          </Field>
+
+          {/* Drill Picker */}
+          {!isStart && node.type !== "water-break" && (
+            <Field label="Linked Drill" icon={<Target className="size-3.5" />}>
+              <Select
+                value={node.drillId ?? ""}
+                onValueChange={(v) => {
+                  const drill = v ? MOCK_DRILLS.find((d) => d.id === v) : null;
+                  onUpdate(node.id, {
+                    drillId: v ?? null,
+                    label: drill?.name ?? node.label,
+                    durationMinutes:
+                      drill?.durationMinutes ?? node.durationMinutes,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {MOCK_DRILLS.map((drill) => (
+                    <SelectItem key={drill.id} value={drill.id}>
+                      {drill.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+
+          {/* Linked Drill Details */}
+          {linkedDrill && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+              <p className="text-xs font-semibold text-foreground">
+                {linkedDrill.name}
               </p>
-            )}
-            {linkedDrill.description && (
-              <p className="text-xs text-muted-foreground/80 leading-relaxed">
-                {linkedDrill.description}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-1 pt-1">
-              {linkedDrill.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-1.5 py-0.5 text-[10px] bg-accent rounded text-accent-foreground"
-                >
-                  {tag}
-                </span>
-              ))}
+              {linkedDrill.subtitle && (
+                <p className="text-xs text-muted-foreground">
+                  {linkedDrill.subtitle}
+                </p>
+              )}
+              {linkedDrill.description && (
+                <p className="text-xs text-muted-foreground/80 leading-relaxed">
+                  {linkedDrill.description}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-1 pt-1">
+                {linkedDrill.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-[10px]">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </ScrollArea>
 
       {/* Footer */}
       {!isStart && (
-        <div className="p-4 border-t border-border">
-          <button
-            onClick={() => {
-              onDelete(node.id);
-            }}
-            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors w-full justify-center"
-          >
-            <Trash2 size={14} />
-            Delete Block
-          </button>
-        </div>
+        <>
+          <Separator />
+          <div className="p-4">
+            <Button
+              variant="destructive"
+              size="lg"
+              className="w-full"
+              onClick={() => {
+                onDelete(node.id);
+              }}
+            >
+              <Trash2 />
+              Delete Block
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
@@ -282,10 +273,10 @@ function Field({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5 gap-1.5">
         {icon}
         {label}
-      </label>
+      </Label>
       {children}
     </div>
   );
