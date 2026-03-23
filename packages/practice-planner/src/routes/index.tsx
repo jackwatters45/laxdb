@@ -32,35 +32,51 @@ function nextId(prefix: string): string {
 }
 
 function HomePage() {
-  // Practice state with undo
+  // Practice state with undo/redo
   const [practice, setPracticeRaw] = useState<Practice>(SAMPLE_PRACTICE);
-  const historyRef = useRef<Practice[]>([]);
+  const undoStack = useRef<Practice[]>([]);
+  const redoStack = useRef<Practice[]>([]);
   const { nodes, edges } = practice;
 
   const setPractice = useCallback((updater: Practice | ((prev: Practice) => Practice)) => {
     setPracticeRaw((prev) => {
-      historyRef.current.push(prev);
-      // Cap history at 50 entries
-      if (historyRef.current.length > 50) historyRef.current.shift();
+      undoStack.current.push(prev);
+      if (undoStack.current.length > 50) undoStack.current.shift();
+      redoStack.current = [];
       return typeof updater === "function" ? updater(prev) : updater;
     });
   }, []);
 
   const undo = useCallback(() => {
-    const prev = historyRef.current.pop();
-    if (prev) setPracticeRaw(prev);
+    const prev = undoStack.current.pop();
+    if (prev) {
+      setPracticeRaw((current) => {
+        redoStack.current.push(current);
+        return prev;
+      });
+    }
+  }, []);
+
+  const redo = useCallback(() => {
+    const next = redoStack.current.pop();
+    if (next) {
+      setPracticeRaw((current) => {
+        undoStack.current.push(current);
+        return next;
+      });
+    }
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "z" && !e.shiftKey) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
         e.preventDefault();
-        undo();
+        if (e.shiftKey) { redo(); } else { undo(); }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => { window.removeEventListener("keydown", handleKeyDown); };
-  }, [undo]);
+  }, [undo, redo]);
 
   // UI state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
