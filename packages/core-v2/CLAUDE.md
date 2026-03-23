@@ -4,40 +4,6 @@
 
 Effect-TS services, Drizzle ORM schemas, domain logic for lacrosse management.
 
-## STRUCTURE
-
-```
-src/
-├── auth/               # Auth subsystem (→ src/auth/AGENTS.md)
-├── organization/       # Multi-tenant org management
-├── team/               # Teams within organizations  
-├── player/             # Player profiles + contact-info/
-├── game/               # Game scheduling, stats
-├── season/             # Season management
-├── feedback/           # User feedback system
-├── email/              # AWS SES email service
-├── user/               # User profiles
-├── drizzle/            # Drizzle service + types (→ src/drizzle/AGENTS.md)
-├── schema.ts           # Shared validation schemas (see SHARED SCHEMAS)
-├── error.ts            # Shared error types (see ERROR HANDLING)
-├── runtime.server.ts   # ManagedRuntime with all services
-├── auth.ts             # AuthService + exported `auth` instance
-├── config.ts           # AppConfig (Effect Config for env vars)
-├── util.ts             # decodeArguments, parsePostgresError
-└── kv.ts               # KV service
-```
-
-## WHERE TO LOOK
-
-| Task | Location |
-|------|----------|
-| Add new domain | Create `src/{domain}/` with all 5-6 files |
-| Add DB table | `src/schema.ts` (exports) + `src/{domain}/{domain}.sql.ts` |
-| Add service method | `src/{domain}/{domain}.service.ts` |
-| Add RPC endpoint | `src/{domain}/{domain}.contract.ts` |
-| Modify auth/roles | `src/auth/` (→ `src/auth/AGENTS.md`) |
-| DB connection issues | `src/drizzle/` (→ `src/drizzle/AGENTS.md`) |
-
 ## PER-DOMAIN FILE PATTERN
 
 ```
@@ -142,15 +108,6 @@ Use **text columns in PG** + **`Schema.Literal` unions in Effect** for enumerate
 | Direct pool access | Bypasses layer | Use DrizzleService |
 | Import from `effect/internal` | Unstable APIs | Use public exports |
 | `getTableColumns` | Deprecated in Drizzle | Use `getColumns` from `drizzle-orm` |
-
-## COMMANDS
-
-```bash
-bun run db:generate    # Generate migrations from schema changes
-bun run db:migrate     # Apply migrations (exit 9 = no changes, OK)
-bun run db:studio      # Open Drizzle Studio
-bun run test           # Run vitest
-```
 
 ## CRITICAL NOTES
 

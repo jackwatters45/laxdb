@@ -4,93 +4,6 @@
 
 Effect-TS based data pipeline for consuming external APIs and web scraping.
 
-## STRUCTURE
-
-```
-src/
-├── api-client/              # REST and GraphQL clients
-│   ├── rest-client.service.ts  # makeRestClient
-│   ├── graphql.service.ts      # makeGraphQLClient
-│   └── *.test.ts               # Client tests
-├── extract/                 # Data extraction
-│   ├── pll/                    # PLL-specific extractors (run.ts, manifest, etc.)
-│   ├── nll/                    # NLL-specific extractors
-│   ├── mll/                    # MLL-specific extractors
-│   ├── msl/                    # MSL-specific extractors
-│   ├── wla/                    # WLA-specific extractors
-│   ├── extract.schema.ts       # Shared extraction types
-│   ├── incremental.service.ts  # Incremental extraction logic
-│   └── season-config.ts        # Current vs historical season config
-├── validate/                # Data validation
-│   ├── validate.service.ts     # Reusable validators
-│   ├── validate-pll.ts         # PLL validation script
-│   ├── validate-nll.ts         # NLL validation script
-│   └── *.test.ts               # Validation tests
-├── pll/                     # Premier Lacrosse League client
-│   ├── pll.client.ts           # PLLClient service
-│   ├── pll.schema.ts           # Response schemas
-│   └── pll.integration.test.ts # Integration tests
-├── nll/                     # National Lacrosse League client
-│   ├── nll.client.ts           # NLLClient service
-│   ├── nll.schema.ts           # Response schemas
-│   └── nll.integration.test.ts # Integration tests
-├── mll/                     # Major League Lacrosse client
-│   ├── mll.client.ts           # MLLClient service
-│   ├── mll.schema.ts           # Response schemas
-│   └── mll.integration.test.ts # Integration tests
-├── wla/                     # Western Lacrosse Association client
-│   ├── wla.client.ts           # WLAClient service
-│   ├── wla.schema.ts           # Response schemas
-│   └── wla.integration.test.ts # Integration tests
-├── scraper/                 # Web scraping
-├── parser/                  # HTML parsing (Cheerio)
-├── config.ts                # Configuration
-└── error.ts                 # Shared error types
-```
-
-## COMMANDS
-
-```bash
-# Tests (requires API credentials)
-infisical run --env=dev -- bun run test
-
-# Type check
-bun run typecheck
-
-# Lint + format
-bun run fix
-
-# PLL data extraction (requires credentials)
-infisical run --env=dev -- bun src/extract/pll/run.ts
-
-# NLL data extraction (no credentials needed)
-bun src/extract/nll/run.ts
-
-# PLL data validation
-infisical run --env=dev -- bun src/validate/validate-pll.ts
-
-# NLL data validation (no credentials needed)
-bun src/validate/validate-nll.ts
-
-# MLL data extraction (no credentials needed)
-bun src/extract/mll/run.ts
-
-# MLL data validation (no credentials needed)
-bun src/validate/validate-mll.ts
-
-# MSL data extraction (no credentials needed)
-bun src/extract/msl/run.ts
-
-# MSL data validation (no credentials needed)
-bun src/validate/validate-msl.ts
-
-# WLA data extraction (no credentials needed)
-bun src/extract/wla/run.ts
-
-# WLA data validation (no credentials needed)
-bun src/validate/validate-wla.ts
-```
-
 ## ADDING A NEW ENDPOINT
 
 See `docs/ADDING_DATA_SOURCE.md` for detailed guide.
@@ -367,6 +280,16 @@ Options: `{ mode: "incremental" | "force" | "skip" }`
 Required (stored in Infisical):
 - `PLL_REST_TOKEN` - REST API bearer token
 - `PLL_GRAPHQL_TOKEN` - GraphQL API bearer token
+
+## SCRAPING PATTERNS
+
+Learnings from MLL/MSL/WLA implementation (v0.0.2):
+
+- **SPA sites need browser automation**: HTML fetch returns empty for JS-rendered content (Pointstreak/DigitalShift)
+- **Wayback Machine has gaps**: MLL schedules 2007-2019 not archived - always verify coverage first
+- **Season ID discovery**: Use API filters endpoint when available (e.g., `web.api.digitalshift.ca/partials/stats/filters?type=season`)
+- **Type filter callbacks**: Always annotate `.filter((x: Type) =>` to avoid implicit any errors
+- **Use safeString utils**: Import from `@laxdb/pipeline/util` for unknown-to-string conversions
 
 ## ANTI-PATTERNS
 

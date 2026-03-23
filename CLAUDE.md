@@ -56,52 +56,16 @@ User Request → TanStack Start (web) → Effect RPC (api) → Effect Services (
 | `useState` for server data | Missing cache/sync     | TanStack Query         |
 | Radix API patterns         | We use Base UI         | Check component source |
 
-## COMMANDS
-
-```bash
-# Development
-bun run dev                     # All packages via Alchemy
-infisical run --env=dev -- bun run dev  # With secrets
-
-# Database (in packages/core)
-bun run db:generate             # Generate migrations
-bun run db:migrate              # Apply migrations
-bun run db:studio               # Drizzle Studio
-
-# Quality
-bun run typecheck               # TypeScript check (tsgo --build)
-bun run lint                    # Lint only (oxlint)
-bun run format                  # Format only (oxfmt)
-bun run fix                     # Lint + format combined
-
-# Deployment
-bun run deploy                  # Deploy via Alchemy
-bun run destroy                 # Tear down
-```
-
 ## INFRASTRUCTURE
 
 Managed via `alchemy.run.ts`:
-
-- **Compute**: Cloudflare Workers (web, marketing, docs)
-- **Database**: PlanetScale PostgreSQL via Hyperdrive connection pooling
-- **Storage**: R2 buckets
-- **Cache**: KV namespaces
-- **Stages**: prod (laxdb.io), dev (dev.laxdb.io), PR previews
 
 ## REFERENCE DOCS
 
 External documentation in `references/`:
 
-- `references/effect-ts/` - Effect patterns
-- `references/better-auth.txt` - Auth patterns
-- `references/tanstack-router.txt` - Router docs
-- `references/ALCHEMY.md` - Alchemy IaC patterns
-- `references/infisical/` - Secrets management
-
-For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alchemy`
-
 <!-- effect-solutions:start -->
+
 ## Effect Best Practices
 
 **IMPORTANT:** Always consult effect-solutions before writing Effect code.
@@ -113,39 +77,16 @@ For Alchemy patterns, run `effect-solutions list` or check `~/.local/share/alche
 Topics: quick-start, project-setup, tsconfig, basics, services-and-layers, data-modeling, error-handling, config, testing, cli.
 
 Never guess at Effect patterns - check the guide first.
+
 <!-- effect-solutions:end -->
-
-## PIPELINE SCRAPING PATTERNS
-
-Learnings from MLL/MSL/WLA implementation (v0.0.2):
-
-- **SPA sites need browser automation**: HTML fetch returns empty for JS-rendered content (Pointstreak/DigitalShift)
-- **Wayback Machine has gaps**: MLL schedules 2007-2019 not archived - always verify coverage first
-- **Season ID discovery**: Use API filters endpoint when available (e.g., `web.api.digitalshift.ca/partials/stats/filters?type=season`)
-- **Type filter callbacks**: Always annotate `.filter((x: Type) =>` to avoid implicit any errors
-- **Use safeString utils**: Import from `@laxdb/pipeline/util` for unknown-to-string conversions
-
-## PLANS DIRECTORY STRUCTURE
-
-All planning, tracking, and documentation lives in `plans/`:
-
-```
-plans/
-├── todos/           # Code review findings, tech debt (file-todos skill)
-├── features/        # Feature specs (comprehensive planning docs)
-├── archive/         # Completed PRD versions
-├── prd.json         # Ralph PRD active work items
-├── progress.txt     # Ralph session log
-├── ROADMAP.md       # High-level roadmap and backlog
-└── FEATURE_SPEC_TEMPLATE.md
-```
-
-**IMPORTANT**: This project uses `plans/todos/` instead of root `todos/`. When using `/triage`, `/workflows:review`, or `file-todos` skill, substitute `plans/todos/` for any `todos/` path references.
 
 ## CHILD INTENT NODES
 
-- `packages/core/AGENTS.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
-- `packages/api/AGENTS.md` - RPC/HTTP API patterns
-- `packages/web/AGENTS.md` - Frontend routing, components
-- `packages/ui/AGENTS.md` - Base UI component APIs
-- `packages/pipeline/AGENTS.md` - Data ingestion, external APIs
+- `packages/core/CLAUDE.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
+- `packages/api/CLAUDE.md` - RPC/HTTP API patterns
+- `packages/api-v2/CLAUDE.md` - Effect RPC API (v2, HttpApi + RpcGroup)
+- `packages/web/CLAUDE.md` - Frontend routing, components
+- `packages/ui/CLAUDE.md` - Base UI component APIs
+- `packages/pipeline/CLAUDE.md` - Data ingestion, external APIs, scraping patterns
+- `packages/cli/CLAUDE.md` - CLI tools for API interaction
+- `packages/practice-planner/CLAUDE.md` - Visual practice planning canvas

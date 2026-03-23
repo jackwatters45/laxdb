@@ -30,20 +30,6 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(KVNamespace.layer(env.MY_KV)));
 ```
 
-## STRUCTURE
-
-```
-src/
-├── KVNamespace.ts      # Public KV API
-├── R2Bucket.ts         # Public R2 API
-├── D1Database.ts       # Public D1 API
-├── Worker.ts           # Worker utilities
-└── internal/           # Implementation details
-    ├── kv-namespace.ts # KV implementation
-    ├── r2-bucket.ts    # R2 implementation
-    └── ...
-```
-
 ## NOTES
 
 - Wraps raw Cloudflare bindings with Effect error handling
