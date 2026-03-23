@@ -1,3 +1,5 @@
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
 import {
   MousePointer2,
   Hand,
@@ -29,84 +31,63 @@ export function CanvasControls({
   onOrganize,
 }: CanvasControlsProps) {
   return (
-    <div className="flex items-center gap-0.5 bg-card border border-border rounded-xl shadow-lg px-1.5 py-1">
-      {/* Mode toggles */}
-      <ControlButton
-        active={mode === "pointer"}
+    <div className="flex items-center gap-1 bg-card border border-border rounded-xl shadow-lg px-1.5 py-1">
+      <Button
+        variant={mode === "pointer" ? "default" : "ghost"}
+        size="icon-sm"
         onClick={() => {
           onModeChange("pointer");
         }}
         title="Select (V)"
       >
-        <MousePointer2 size={15} />
-      </ControlButton>
-      <ControlButton
-        active={mode === "pan"}
+        <MousePointer2 />
+      </Button>
+      <Button
+        variant={mode === "pan" ? "default" : "ghost"}
+        size="icon-sm"
         onClick={() => {
           onModeChange("pan");
         }}
         title="Pan (Space)"
       >
-        <Hand size={15} />
-      </ControlButton>
+        <Hand />
+      </Button>
 
-      <Divider />
+      <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      {/* Zoom */}
-      <ControlButton onClick={onZoomOut} title="Zoom Out">
-        <ZoomOut size={15} />
-      </ControlButton>
-      <span className="px-2 text-[11px] font-medium text-muted-foreground tabular-nums min-w-[40px] text-center select-none">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onZoomOut}
+        title="Zoom Out"
+      >
+        <ZoomOut />
+      </Button>
+      <span className="px-1 text-[11px] font-medium text-muted-foreground tabular-nums min-w-[40px] text-center select-none">
         {Math.round(scale * 100)}%
       </span>
-      <ControlButton onClick={onZoomIn} title="Zoom In">
-        <ZoomIn size={15} />
-      </ControlButton>
+      <Button variant="ghost" size="icon-sm" onClick={onZoomIn} title="Zoom In">
+        <ZoomIn />
+      </Button>
 
-      <Divider />
+      <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      {/* Fit & Organize */}
-      <ControlButton onClick={onZoomToFit} title="Zoom to Fit">
-        <Maximize size={15} />
-      </ControlButton>
-      <ControlButton onClick={onOrganize} title="Auto-Organize">
-        <LayoutGrid size={15} />
-      </ControlButton>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onZoomToFit}
+        title="Zoom to Fit"
+      >
+        <Maximize />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onOrganize}
+        title="Auto-Organize"
+      >
+        <LayoutGrid />
+      </Button>
     </div>
   );
-}
-
-function ControlButton({
-  active,
-  onClick,
-  title,
-  children,
-}: {
-  active?: boolean;
-  onClick: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`
-        flex items-center justify-center
-        w-8 h-8 rounded-lg
-        transition-all duration-150
-        ${
-          active
-            ? "bg-foreground text-background shadow-sm"
-            : "text-muted-foreground hover:bg-accent hover:text-foreground"
-        }
-      `}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Divider() {
-  return <div className="w-px h-5 bg-border mx-1" />;
 }

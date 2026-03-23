@@ -1,3 +1,6 @@
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
 import { Sparkles, Library, GitBranch, Clock } from "lucide-react";
 import { useState, useCallback } from "react";
@@ -359,56 +362,50 @@ function HomePage() {
         {/* Top Bar */}
         <header className="flex items-center justify-between h-13 px-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 z-20">
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              variant={drillSidebarOpen ? "default" : "outline"}
+              size="default"
               onClick={() => {
                 setDrillSidebarOpen((v) => !v);
               }}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
-                drillSidebarOpen
-                  ? "bg-foreground text-background border-foreground"
-                  : "text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
-              }`}
             >
-              <Library size={14} />
+              <Library />
               Drills
-            </button>
+            </Button>
 
-            <div className="w-px h-5 bg-border" />
+            <Separator orientation="vertical" className="h-5" />
 
-            <h1
-              className="text-sm font-semibold text-foreground"
-              style={{ fontFamily: "var(--font-sans)", fontStyle: "normal" }}
-            >
+            <h1 className="text-sm font-semibold text-foreground">
               {practice.name}
             </h1>
-            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Clock size={11} />
+            <Badge variant="outline" className="gap-1">
+              <Clock className="size-2.5" />
               {totalMinutes} min
-            </span>
+            </Badge>
             <span className="text-[11px] text-muted-foreground/50">
               {nodes.length} blocks
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="outline"
+              size="default"
               onClick={() => {
                 setSplitModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:border-foreground/30 hover:text-foreground transition-all"
             >
-              <GitBranch size={13} />
+              <GitBranch />
               Split
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setQuickPlanOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
             >
-              <Sparkles size={13} />
+              <Sparkles />
               Quick Plan
-            </button>
+            </Button>
           </div>
         </header>
 

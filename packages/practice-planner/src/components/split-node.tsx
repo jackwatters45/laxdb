@@ -1,3 +1,13 @@
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@laxdb/ui/components/ui/dialog";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { GitBranch, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -22,8 +32,6 @@ export function SplitNodeModal({
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const addGroup = () => {
     const name = newGroup.trim();
     if (name && !groups.includes(name)) {
@@ -39,69 +47,54 @@ export function SplitNodeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent className="sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <GitBranch className="size-4 text-violet-500" />
+            Group Split
+          </DialogTitle>
+          <DialogDescription>
+            Define groups to work in parallel lanes
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Modal */}
-      <div className="z-10 w-[400px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-5 pb-4">
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-900/30">
-            <GitBranch
-              size={18}
-              className="text-violet-600 dark:text-violet-400"
-            />
-          </div>
-          <div>
-            <h2
-              className="text-base font-semibold text-foreground"
-              style={{ fontFamily: "var(--font-sans)", fontStyle: "normal" }}
-            >
-              Group Split
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Define groups to work in parallel lanes
-            </p>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div className="px-5 pb-4 space-y-3">
+        <div className="space-y-3 py-2">
           {groups.map((group, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input
-                type="text"
+              <Input
                 value={group}
                 onChange={(e) => {
                   const updated = [...groups];
                   updated[i] = e.target.value;
                   setGroups(updated);
                 }}
-                className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10"
                 placeholder="Group name"
               />
               {groups.length > 2 && (
-                <button
-                  aria-label="Remove group"
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => {
                     removeGroup(i);
                   }}
-                  className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                  className="text-muted-foreground hover:text-destructive"
                 >
-                  <X size={14} />
-                </button>
+                  <X />
+                  <span className="sr-only">Remove group</span>
+                </Button>
               )}
             </div>
           ))}
 
           {/* Add new group */}
           <div className="flex items-center gap-2">
-            <input
-              type="text"
+            <Input
               value={newGroup}
               onChange={(e) => {
                 setNewGroup(e.target.value);
@@ -110,26 +103,20 @@ export function SplitNodeModal({
                 if (e.key === "Enter") addGroup();
               }}
               placeholder="Add another group..."
-              className="flex-1 px-3 py-2 text-sm bg-background border border-dashed border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 placeholder:text-muted-foreground/40"
+              className="border-dashed"
             />
-            <button
-              onClick={addGroup}
-              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
-            >
-              <Plus size={14} />
-            </button>
+            <Button variant="ghost" size="icon-sm" onClick={addGroup}>
+              <Plus />
+              <span className="sr-only">Add group</span>
+            </Button>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-muted/30">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg"
-          >
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               const valid = groups.filter((g) => g.trim());
               if (valid.length >= 2) {
@@ -137,12 +124,11 @@ export function SplitNodeModal({
                 onClose();
               }
             }}
-            className="px-4 py-2 text-sm font-medium bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
           >
             Create Split
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
