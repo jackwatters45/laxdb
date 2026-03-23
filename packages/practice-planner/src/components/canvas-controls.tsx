@@ -1,10 +1,6 @@
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@laxdb/ui/components/ui/toggle-group";
-import {
   MousePointer2,
   Hand,
   ZoomIn,
@@ -35,32 +31,27 @@ export function CanvasControls({
   onOrganize,
 }: CanvasControlsProps) {
   return (
-    <div className="flex items-center gap-1 bg-card border border-border rounded-xl shadow-lg px-1.5 py-1">
-      <ToggleGroup
-        value={[mode]}
-        onValueChange={(values) => {
-          const next = values[0] as CanvasMode | undefined;
-          if (next) onModeChange(next);
-        }}
-        variant="outline"
-        size="sm"
+    <div className="flex items-center gap-0.5 bg-card border border-border rounded-xl shadow-lg px-1.5 py-1">
+      <Button
+        variant={mode === "pointer" ? "secondary" : "ghost"}
+        size="icon-sm"
+        onClick={() => { onModeChange("pointer"); }}
+        title="Select (V)"
       >
-        <ToggleGroupItem value="pointer" title="Select (V)">
-          <MousePointer2 />
-        </ToggleGroupItem>
-        <ToggleGroupItem value="pan" title="Pan (Space)">
-          <Hand />
-        </ToggleGroupItem>
-      </ToggleGroup>
+        <MousePointer2 />
+      </Button>
+      <Button
+        variant={mode === "pan" ? "secondary" : "ghost"}
+        size="icon-sm"
+        onClick={() => { onModeChange("pan"); }}
+        title="Pan (Space)"
+      >
+        <Hand />
+      </Button>
 
       <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        onClick={onZoomOut}
-        title="Zoom Out"
-      >
+      <Button variant="ghost" size="icon-sm" onClick={onZoomOut} title="Zoom Out">
         <ZoomOut />
       </Button>
       <span className="px-1 text-[11px] font-medium text-muted-foreground tabular-nums min-w-[40px] text-center select-none">
@@ -72,20 +63,10 @@ export function CanvasControls({
 
       <Separator orientation="vertical" className="h-5 mx-0.5" />
 
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        onClick={onZoomToFit}
-        title="Zoom to Fit"
-      >
+      <Button variant="ghost" size="icon-sm" onClick={onZoomToFit} title="Zoom to Fit">
         <Maximize />
       </Button>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        onClick={onOrganize}
-        title="Auto-Organize"
-      >
+      <Button variant="ghost" size="icon-sm" onClick={onOrganize} title="Auto-Organize">
         <LayoutGrid />
       </Button>
     </div>
