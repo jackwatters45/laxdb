@@ -368,6 +368,16 @@ Required (stored in Infisical):
 - `PLL_REST_TOKEN` - REST API bearer token
 - `PLL_GRAPHQL_TOKEN` - GraphQL API bearer token
 
+## SCRAPING PATTERNS
+
+Learnings from MLL/MSL/WLA implementation (v0.0.2):
+
+- **SPA sites need browser automation**: HTML fetch returns empty for JS-rendered content (Pointstreak/DigitalShift)
+- **Wayback Machine has gaps**: MLL schedules 2007-2019 not archived - always verify coverage first
+- **Season ID discovery**: Use API filters endpoint when available (e.g., `web.api.digitalshift.ca/partials/stats/filters?type=season`)
+- **Type filter callbacks**: Always annotate `.filter((x: Type) =>` to avoid implicit any errors
+- **Use safeString utils**: Import from `@laxdb/pipeline/util` for unknown-to-string conversions
+
 ## ANTI-PATTERNS
 
 - **Hardcoded credentials**: Use config or environment variables
