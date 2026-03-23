@@ -1,4 +1,5 @@
 @import "@laxdb/ui/globals.css";
+@source "../../ui/src";
 
 /* Override the base div relative positioning for the canvas */
 @layer base {
