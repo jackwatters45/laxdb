@@ -81,21 +81,16 @@ export const PracticeHandlers = PracticeRpcs.toLayer(
     const service = yield* PracticeService;
 
     return {
-      // Practice CRUD
       PracticeList: () => service.list(),
       PracticeGet: (payload) => service.get(payload),
       PracticeCreate: (payload) => service.create(payload),
       PracticeUpdate: (payload) => service.update(payload),
       PracticeDelete: (payload) => service.delete(payload),
-
-      // Practice items
       PracticeListItems: (payload) => service.listItems(payload),
       PracticeAddItem: (payload) => service.addItem(payload),
       PracticeUpdateItem: (payload) => service.updateItem(payload),
       PracticeRemoveItem: (payload) => service.removeItem(payload),
       PracticeReorderItems: (payload) => service.reorderItems(payload),
-
-      // Practice review
       PracticeGetReview: (payload) => service.getReview(payload),
       PracticeCreateReview: (payload) => service.createReview(payload),
       PracticeUpdateReview: (payload) => service.updateReview(payload),
