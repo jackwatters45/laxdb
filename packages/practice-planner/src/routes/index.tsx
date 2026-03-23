@@ -428,6 +428,7 @@ function HomePage() {
             transform={transform}
             onTransformChange={setTransform}
             onSelectNode={setSelectedNodeId}
+            onUpdateNode={updateNode}
             onAddDrill={addDrillBetween}
           />
         </div>
