@@ -37,8 +37,6 @@ function isPracticeItemType(value: string): value is PracticeItemType {
   return PRACTICE_ITEM_TYPES.has(value);
 }
 
-const NO_DRILL = "__none__";
-
 interface ConfigPanelProps {
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
@@ -105,11 +103,16 @@ export function ConfigPanel({
               <Select
                 value={node.type}
                 onValueChange={(v) => {
-                  if (v && isPracticeItemType(v)) onUpdate(node.id, { type: v });
+                  if (v !== null && isPracticeItemType(v)) onUpdate(node.id, { type: v });
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string | null) => {
+                      const opt = TYPE_OPTIONS.find((o) => o.value === value);
+                      return opt?.label ?? "Select type";
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {TYPE_OPTIONS.map((opt) => (
@@ -202,33 +205,49 @@ export function ConfigPanel({
           {/* Drill Picker */}
           {!isStart && node.type !== "water-break" && (
             <Field label="Linked Drill" icon={<Target className="size-3.5" />}>
-              <Select
-                value={node.drillId ?? NO_DRILL}
-                onValueChange={(v) => {
-                  const drillId = v === NO_DRILL ? null : v;
-                  const drill = drillId
-                    ? MOCK_DRILLS.find((d) => d.id === drillId)
-                    : null;
-                  onUpdate(node.id, {
-                    drillId,
-                    label: drill?.name ?? node.label,
-                    durationMinutes:
-                      drill?.durationMinutes ?? node.durationMinutes,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_DRILL}>None</SelectItem>
-                  {MOCK_DRILLS.map((drill) => (
-                    <SelectItem key={drill.id} value={drill.id}>
-                      {drill.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-1.5">
+                <Select
+                  value={node.drillId}
+                  onValueChange={(v) => {
+                    const drill = v !== null
+                      ? MOCK_DRILLS.find((d) => d.id === v)
+                      : null;
+                    onUpdate(node.id, {
+                      drillId: v,
+                      label: drill?.name ?? node.label,
+                      durationMinutes:
+                        drill?.durationMinutes ?? node.durationMinutes,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {(value: string | null) => {
+                        if (!value) return "None";
+                        const drill = MOCK_DRILLS.find((d) => d.id === value);
+                        return drill?.name ?? "None";
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MOCK_DRILLS.map((drill) => (
+                      <SelectItem key={drill.id} value={drill.id}>
+                        {drill.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {node.drillId && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => { onUpdate(node.id, { drillId: null }); }}
+                  >
+                    <X />
+                    <span className="sr-only">Unlink drill</span>
+                  </Button>
+                )}
+              </div>
             </Field>
           )}
 
