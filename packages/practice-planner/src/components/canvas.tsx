@@ -135,24 +135,35 @@ export function Canvas({
   const handleWheel = useCallback(
     (e: ReactWheelEvent) => {
       e.preventDefault();
-      const container = containerRef.current;
-      if (!container) return;
 
-      const rect = container.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      if (e.metaKey || e.ctrlKey) {
+        // Cmd/Ctrl + scroll → zoom toward cursor
+        const container = containerRef.current;
+        if (!container) return;
 
-      const delta = -e.deltaY * ZOOM_SENSITIVITY;
-      const newScale = Math.min(
-        MAX_SCALE,
-        Math.max(MIN_SCALE, transform.scale * (1 + delta)),
-      );
+        const rect = container.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
-      const scaleRatio = newScale / transform.scale;
-      const newX = mouseX - (mouseX - transform.x) * scaleRatio;
-      const newY = mouseY - (mouseY - transform.y) * scaleRatio;
+        const delta = -e.deltaY * ZOOM_SENSITIVITY;
+        const newScale = Math.min(
+          MAX_SCALE,
+          Math.max(MIN_SCALE, transform.scale * (1 + delta)),
+        );
 
-      onTransformChange({ x: newX, y: newY, scale: newScale });
+        const scaleRatio = newScale / transform.scale;
+        const newX = mouseX - (mouseX - transform.x) * scaleRatio;
+        const newY = mouseY - (mouseY - transform.y) * scaleRatio;
+
+        onTransformChange({ x: newX, y: newY, scale: newScale });
+      } else {
+        // Plain scroll → pan
+        onTransformChange({
+          ...transform,
+          x: transform.x - e.deltaX,
+          y: transform.y - e.deltaY,
+        });
+      }
     },
     [transform, onTransformChange],
   );
