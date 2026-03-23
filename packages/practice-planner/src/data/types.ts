@@ -77,7 +77,7 @@ export interface PracticeNode {
   notes: string | null;
   groups: string[];
   priority: PracticeItemPriority;
-  position: { x: number; y: number };
+  position?: { x: number; y: number };
 }
 
 /** An edge connecting two practice nodes */

@@ -7,7 +7,6 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "exactOptionalPropertyTypes": false
+    }
   }
 }
