@@ -14,6 +14,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-start",
       type: "activity",
+      variant: "start",
       drillId: null,
       label: "Start",
       durationMinutes: null,
@@ -25,6 +26,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-warmup-jog",
       type: "warmup",
+      variant: "default",
       drillId: "drill-warmup-jog",
       label: "Dynamic Warm-Up Jog",
       durationMinutes: 8,
@@ -36,6 +38,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-stickwork",
       type: "warmup",
+      variant: "default",
       drillId: "drill-warmup-stickwork",
       label: "Partner Stick Work",
       durationMinutes: 10,
@@ -47,6 +50,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-split",
       type: "activity",
+      variant: "split",
       drillId: null,
       label: "Positional Split",
       durationMinutes: null,
@@ -59,6 +63,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-shooting-horn",
       type: "drill",
+      variant: "default",
       drillId: "drill-shooting-around",
       label: "Shooting Around the Horn",
       durationMinutes: 15,
@@ -70,6 +75,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-shooting-run",
       type: "drill",
+      variant: "default",
       drillId: "drill-shooting-on-run",
       label: "Shooting on the Run",
       durationMinutes: 12,
@@ -82,6 +88,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-1v1-defense",
       type: "drill",
+      variant: "default",
       drillId: "drill-1v1-defense",
       label: "1v1 Defensive Slides",
       durationMinutes: 15,
@@ -93,6 +100,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-team-slides",
       type: "drill",
+      variant: "default",
       drillId: "drill-team-slides",
       label: "Team Slide Package",
       durationMinutes: 20,
@@ -105,6 +113,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-water",
       type: "water-break",
+      variant: "default",
       drillId: null,
       label: "Water Break",
       durationMinutes: 5,
@@ -116,6 +125,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-scrimmage",
       type: "drill",
+      variant: "default",
       drillId: "drill-full-scrimmage",
       label: "Full-Field Scrimmage",
       durationMinutes: 20,
@@ -127,6 +137,7 @@ export const SAMPLE_PRACTICE: Practice = {
     {
       id: "node-cooldown",
       type: "cooldown",
+      variant: "default",
       drillId: "drill-cooldown-stretch",
       label: "Static Stretch & Review",
       durationMinutes: 10,

@@ -76,8 +76,8 @@ export function WorkflowNode({
 }: WorkflowNodeProps) {
   const config = TYPE_CONFIG[node.type];
   const Icon = config.icon;
-  const isStart = node.label === "Start";
-  const isSplit = node.label.toLowerCase().includes("split");
+  const isStart = node.variant === "start";
+  const isSplit = node.variant === "split";
 
   if (isStart) {
     return (

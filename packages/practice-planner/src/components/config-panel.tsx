@@ -16,6 +16,18 @@ import type {
   PracticeItemPriority,
 } from "@/data/types";
 
+const PRACTICE_ITEM_TYPES = new Set<string>([
+  "warmup",
+  "drill",
+  "cooldown",
+  "water-break",
+  "activity",
+]);
+
+function isPracticeItemType(value: string): value is PracticeItemType {
+  return PRACTICE_ITEM_TYPES.has(value);
+}
+
 interface ConfigPanelProps {
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
@@ -47,7 +59,7 @@ export function ConfigPanel({
     ? MOCK_DRILLS.find((d) => d.id === node.drillId)
     : null;
 
-  const isStart = node.label === "Start";
+  const isStart = node.variant === "start";
 
   return (
     <div className="w-[340px] h-full border-l border-border bg-card flex flex-col overflow-hidden">
@@ -57,6 +69,7 @@ export function ConfigPanel({
           {node.label}
         </h3>
         <button
+          aria-label="Close"
           onClick={onClose}
           className="flex-shrink-0 p-1 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
         >
@@ -85,7 +98,9 @@ export function ConfigPanel({
             <select
               value={node.type}
               onChange={(e) => {
-                onUpdate(node.id, { type: e.target.value as PracticeItemType });
+                if (isPracticeItemType(e.target.value)) {
+                  onUpdate(node.id, { type: e.target.value });
+                }
               }}
               className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-shadow appearance-none"
             >

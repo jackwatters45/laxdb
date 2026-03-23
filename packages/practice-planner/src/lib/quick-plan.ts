@@ -1,10 +1,8 @@
 import { MOCK_DRILLS } from "@/data/mock-drills";
 import type { PracticeNode, PracticeEdge, DrillCategory } from "@/data/types";
 
-let idCounter = 0;
 function nextId(prefix: string): string {
-  idCounter++;
-  return `${prefix}-${Date.now()}-${idCounter}`;
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 interface QuickPlanOptions {
@@ -38,6 +36,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
   const startNode: PracticeNode = {
     id: nextId("node"),
     type: "activity",
+    variant: "start",
     drillId: null,
     label: "Start",
     durationMinutes: null,
@@ -59,6 +58,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
       const node: PracticeNode = {
         id: nextId("node"),
         type: "warmup",
+        variant: "default",
         drillId: drill.id,
         label: drill.name,
         durationMinutes: dur,
@@ -93,6 +93,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
     const node: PracticeNode = {
       id: nextId("node"),
       type: "drill",
+      variant: "default",
       drillId: drill.id,
       label: drill.name,
       durationMinutes: dur,
@@ -111,6 +112,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
       const water: PracticeNode = {
         id: nextId("node"),
         type: "water-break",
+        variant: "default",
         drillId: null,
         label: "Water Break",
         durationMinutes: 5,
@@ -132,6 +134,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
       const node: PracticeNode = {
         id: nextId("node"),
         type: "cooldown",
+        variant: "default",
         drillId: cooldown.id,
         label: cooldown.name,
         durationMinutes: cooldown.durationMinutes ?? 10,

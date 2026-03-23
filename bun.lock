@@ -216,7 +216,7 @@
         "@vitejs/plugin-react": "^4.7.0",
         "clsx": "^2.1.1",
         "lucide-react": "^0.563.0",
-        "motion": "12.0.1",
+        "motion": "^12.28.1",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
         "tailwind-merge": "^2.6.0",
@@ -3405,6 +3405,8 @@
     "@laxdb/pipeline/@effect/platform-bun": ["@effect/platform-bun@0.87.0", "", { "dependencies": { "@effect/platform-node-shared": "^0.57.0", "multipasta": "^0.2.7" }, "peerDependencies": { "@effect/cluster": "^0.56.0", "@effect/platform": "^0.94.0", "@effect/rpc": "^0.73.0", "@effect/sql": "^0.49.0", "effect": "^3.19.13" } }, "sha512-O0WJXc5f4qTcdEXWQDb5JDT0b4qiSrrOovRiZ46O+c3ZdC6wkc7vuvmvI9L6gI3rNmDgPZtK+IkELH6P20dLXA=="],
 
     "@laxdb/practice-planner/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
+
+    "@laxdb/practice-planner/motion": ["motion@12.28.1", "", { "dependencies": { "framer-motion": "^12.28.1", "tslib": "^2.4.0" }, "peerDependencies": { "@emotion/is-prop-valid": "*", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@emotion/is-prop-valid", "react", "react-dom"] }, "sha512-qGq5+6r4IMivHbT2EUhCwxz2NgFBuba3sWDrxcHt06+nYqKMevYJiVh/N90nMRof+vIUpiq8C22ZeOXwkWWiZg=="],
 
     "@laxdb/practice-planner/tailwind-merge": ["tailwind-merge@2.6.0", "", {}, "sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA=="],
 

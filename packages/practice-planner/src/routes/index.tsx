@@ -24,10 +24,8 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-let idCounter = 100;
 function nextId(prefix: string): string {
-  idCounter++;
-  return `${prefix}-${Date.now()}-${idCounter}`;
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 function HomePage() {
@@ -109,6 +107,7 @@ function HomePage() {
       const newNode: PracticeNode = {
         id: nextId("node"),
         type: "drill",
+        variant: "default",
         drillId: null,
         label: "New Block",
         durationMinutes: 10,
@@ -162,6 +161,7 @@ function HomePage() {
       const newNode: PracticeNode = {
         id: nextId("node"),
         type,
+        variant: "default",
         drillId: drill.id,
         label: drill.name,
         durationMinutes: drill.durationMinutes,
@@ -203,6 +203,7 @@ function HomePage() {
       const splitNode: PracticeNode = {
         id: nextId("node"),
         type: "activity",
+        variant: "split",
         drillId: null,
         label: "Group Split",
         durationMinutes: null,
@@ -235,6 +236,7 @@ function HomePage() {
         const laneNode: PracticeNode = {
           id: nextId("node"),
           type: "drill",
+          variant: "default",
           drillId: null,
           label: `${group} Drill`,
           durationMinutes: 15,

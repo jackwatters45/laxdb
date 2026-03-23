@@ -77,6 +77,7 @@ export function DrillSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
         <h3 className="text-sm font-semibold text-foreground">Drill Library</h3>
         <button
+          aria-label="Close"
           onClick={onClose}
           className="p-1 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
         >

@@ -2,8 +2,8 @@ import type { PracticeNode } from "@/data/types";
 
 /** Returns the visual width, height, and rendered left/top for a node */
 export function getNodeGeometry(node: PracticeNode) {
-  const isStart = node.label === "Start";
-  const isSplit = node.label.toLowerCase().includes("split");
+  const isStart = node.variant === "start";
+  const isSplit = node.variant === "split";
 
   let width: number;
   let height: number;

@@ -67,10 +67,14 @@ export type PracticeStatus =
   | "completed"
   | "cancelled";
 
+/** Visual variant for special node rendering */
+export type PracticeNodeVariant = "start" | "split" | "default";
+
 /** A node in the practice workflow */
 export interface PracticeNode {
   id: string;
   type: PracticeItemType;
+  variant: PracticeNodeVariant;
   drillId: string | null;
   label: string;
   durationMinutes: number | null;

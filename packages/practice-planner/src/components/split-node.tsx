@@ -1,5 +1,5 @@
 import { GitBranch, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SplitNodeModalProps {
   isOpen: boolean;
@@ -14,6 +14,13 @@ export function SplitNodeModal({
 }: SplitNodeModalProps) {
   const [groups, setGroups] = useState<string[]>(["Offense", "Defense"]);
   const [newGroup, setNewGroup] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setGroups(["Offense", "Defense"]);
+      setNewGroup("");
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -79,6 +86,7 @@ export function SplitNodeModal({
               />
               {groups.length > 2 && (
                 <button
+                  aria-label="Remove group"
                   onClick={() => {
                     removeGroup(i);
                   }}

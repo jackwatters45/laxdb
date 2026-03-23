@@ -84,6 +84,7 @@ export function QuickPlanModal({
             </p>
           </div>
           <button
+            aria-label="Close"
             onClick={onClose}
             className="ml-auto p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
           >
