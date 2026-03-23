@@ -5,14 +5,12 @@ interface WorkflowEdgeProps {
   edge: PracticeEdge;
   sourceNode: PracticeNode;
   targetNode: PracticeNode;
-  isDropTarget?: boolean;
 }
 
 export function WorkflowEdge({
   edge,
   sourceNode,
   targetNode,
-  isDropTarget,
 }: WorkflowEdgeProps) {
   const { sx, sy, tx, ty, sourceSide, targetSide } = getEdgeAnchors(
     sourceNode,
@@ -41,26 +39,13 @@ export function WorkflowEdge({
 
   return (
     <g>
-      {isDropTarget && (
-        <path
-          d={d}
-          fill="none"
-          stroke="oklch(var(--primary))"
-          strokeWidth={6}
-          strokeLinecap="round"
-          opacity={0.2}
-        />
-      )}
       <path
         d={d}
         fill="none"
-        stroke={isDropTarget ? "oklch(var(--primary))" : "oklch(var(--border-strong))"}
-        strokeWidth={isDropTarget ? 2 : 1.5}
+        stroke="oklch(var(--border-strong))"
+        strokeWidth={1.5}
       />
-      <polygon
-        points={arrowPoints}
-        fill={isDropTarget ? "oklch(var(--primary))" : "oklch(var(--border-strong))"}
-      />
+      <polygon points={arrowPoints} fill="oklch(var(--border-strong))" />
       {edge.label && (
         <g>
           <rect
