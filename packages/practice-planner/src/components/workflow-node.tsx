@@ -66,6 +66,7 @@ interface WorkflowNodeProps {
   isSelected: boolean;
   onSelect: (nodeId: string) => void;
   scale: number;
+  isDragging?: boolean;
 }
 
 export function WorkflowNode({
@@ -73,6 +74,7 @@ export function WorkflowNode({
   isSelected,
   onSelect,
   scale,
+  isDragging,
 }: WorkflowNodeProps) {
   const config = TYPE_CONFIG[node.type];
   const Icon = config.icon;
@@ -93,7 +95,9 @@ export function WorkflowNode({
           shadow-md
           transition-all duration-200 ease-out
           cursor-pointer select-none
-          ${isSelected ? "ring-2 ring-foreground/50 ring-offset-2 ring-offset-background scale-105" : "hover:scale-[1.03] hover:shadow-lg"}
+          ${isDragging ? "shadow-lg opacity-90" : "shadow-md"}
+          ${!isDragging && isSelected ? "ring-2 ring-foreground/50 ring-offset-2 ring-offset-background" : ""}
+          ${!isDragging && !isSelected ? "hover:shadow-lg" : ""}
         `}
         style={{ fontSize: `${Math.max(11, 14 / Math.max(scale, 0.5))}px` }}
       >
@@ -119,10 +123,10 @@ export function WorkflowNode({
           w-[180px] h-[56px] rounded-full
           border-2 border-dashed border-violet-300 dark:border-violet-700
           bg-violet-50/80 dark:bg-violet-950/40
-          shadow-sm
-          transition-all duration-200 ease-out
           cursor-pointer select-none
-          ${isSelected ? "ring-2 ring-violet-400/50 ring-offset-2 ring-offset-background scale-105 border-solid" : "hover:scale-[1.02] hover:shadow-md hover:border-violet-400"}
+          ${isDragging ? "shadow-lg opacity-90" : "shadow-sm"}
+          ${!isDragging && isSelected ? "ring-2 ring-violet-400/50 ring-offset-2 ring-offset-background border-solid" : ""}
+          ${!isDragging && !isSelected ? "hover:shadow-md hover:border-violet-400" : ""}
         `}
       >
         <GitBranch size={16} className="text-violet-500 mr-2" />
@@ -142,10 +146,10 @@ export function WorkflowNode({
       className={`
         w-[260px] rounded-xl border
         ${config.bg} ${config.border}
-        shadow-sm
-        transition-all duration-200 ease-out
         cursor-pointer select-none text-left
-        ${isSelected ? "ring-2 ring-foreground/20 ring-offset-2 ring-offset-background scale-[1.02] shadow-md" : "hover:scale-[1.01] hover:shadow-md"}
+        ${isDragging ? "shadow-lg ring-2 ring-foreground/10 opacity-90" : "shadow-sm"}
+        ${!isDragging && isSelected ? "ring-2 ring-foreground/20 ring-offset-2 ring-offset-background shadow-md" : ""}
+        ${!isDragging && !isSelected ? "hover:shadow-md" : ""}
       `}
     >
       <div className="p-3.5">

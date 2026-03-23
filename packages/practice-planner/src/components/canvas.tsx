@@ -30,12 +30,14 @@ interface CanvasProps {
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
+  onUpdateNode: (nodeId: string, updates: Partial<PracticeNode>) => void;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
 }
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 2;
 const ZOOM_SENSITIVITY = 0.001;
+const DRAG_THRESHOLD = 4;
 
 export function Canvas({
   nodes,
@@ -45,12 +47,18 @@ export function Canvas({
   transform,
   onTransformChange,
   onSelectNode,
+  onUpdateNode,
   onAddDrill,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [spaceHeld, setSpaceHeld] = useState(false);
+
+  // Drag state
+  const [dragNodeId, setDragNodeId] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
+  const [isDragging, setIsDragging] = useState(false);
 
   // Build node map for edge lookup
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
@@ -79,6 +87,30 @@ export function Canvas({
 
   const shouldPan = mode === "pan" || spaceHeld;
 
+  // --- Node drag handlers ---
+
+  const handleNodeMouseDown = useCallback(
+    (nodeId: string, e: ReactMouseEvent) => {
+      if (shouldPan || e.button !== 0) return;
+      e.stopPropagation();
+
+      const node = nodeMap.get(nodeId);
+      if (!node) return;
+
+      setDragNodeId(nodeId);
+      setDragStart({
+        mouseX: e.clientX,
+        mouseY: e.clientY,
+        nodeX: node.position.x,
+        nodeY: node.position.y,
+      });
+      setIsDragging(false);
+    },
+    [shouldPan, nodeMap],
+  );
+
+  // --- Canvas-level mouse handlers ---
+
   const handleMouseDown = useCallback(
     (e: ReactMouseEvent) => {
       if (shouldPan && e.button === 0) {
@@ -92,6 +124,23 @@ export function Canvas({
 
   const handleMouseMove = useCallback(
     (e: ReactMouseEvent) => {
+      // Node dragging takes priority
+      if (dragNodeId) {
+        const dx = e.clientX - dragStart.mouseX;
+        const dy = e.clientY - dragStart.mouseY;
+
+        // Only start dragging after threshold to distinguish from clicks
+        if (!isDragging && Math.abs(dx) + Math.abs(dy) < DRAG_THRESHOLD) return;
+        setIsDragging(true);
+
+        // Convert screen delta to canvas coordinates (account for zoom)
+        const newX = dragStart.nodeX + dx / transform.scale;
+        const newY = dragStart.nodeY + dy / transform.scale;
+
+        onUpdateNode(dragNodeId, { position: { x: newX, y: newY } });
+        return;
+      }
+
       if (isPanning) {
         onTransformChange({
           ...transform,
@@ -100,12 +149,20 @@ export function Canvas({
         });
       }
     },
-    [isPanning, panStart, transform, onTransformChange],
+    [dragNodeId, dragStart, isDragging, isPanning, panStart, transform, onTransformChange, onUpdateNode],
   );
 
   const handleMouseUp = useCallback(() => {
+    if (dragNodeId) {
+      if (!isDragging) {
+        // Was a click, not a drag — select the node
+        onSelectNode(dragNodeId);
+      }
+      setDragNodeId(null);
+      setIsDragging(false);
+    }
     setIsPanning(false);
-  }, []);
+  }, [dragNodeId, isDragging, onSelectNode]);
 
   const handleWheel = useCallback(
     (e: ReactWheelEvent) => {
@@ -168,15 +225,19 @@ export function Canvas({
     };
   }, [nodes]);
 
+  const isNodeBeingDragged = dragNodeId !== null && isDragging;
+
   return (
     <div
       ref={containerRef}
       className={`w-full h-full overflow-hidden ${
-        shouldPan
-          ? isPanning
-            ? "cursor-grabbing"
-            : "cursor-grab"
-          : "cursor-default"
+        isNodeBeingDragged
+          ? "cursor-grabbing"
+          : shouldPan
+            ? isPanning
+              ? "cursor-grabbing"
+              : "cursor-grab"
+            : "cursor-default"
       }`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -197,7 +258,6 @@ export function Canvas({
         className="origin-top-left"
         style={{
           transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
-          willChange: "transform",
         }}
         onClick={handleCanvasClick}
       >
@@ -229,42 +289,46 @@ export function Canvas({
           </g>
         </svg>
 
-        {/* Add-between buttons */}
-        {edges.map((edge) => {
-          const source = nodeMap.get(edge.source);
-          const target = nodeMap.get(edge.target);
-          if (!source || !target) return null;
-          return (
-            <AddNodeButton
-              key={`add-${edge.id}`}
-              sourceNode={source}
-              targetNode={target}
-              onAddDrill={onAddDrill}
-            />
-          );
-        })}
+        {/* Add-between buttons (hidden while dragging) */}
+        {!isNodeBeingDragged &&
+          edges.map((edge) => {
+            const source = nodeMap.get(edge.source);
+            const target = nodeMap.get(edge.target);
+            if (!source || !target) return null;
+            return (
+              <AddNodeButton
+                key={`add-${edge.id}`}
+                sourceNode={source}
+                targetNode={target}
+                onAddDrill={onAddDrill}
+              />
+            );
+          })}
 
         {/* Node layer */}
         {nodes.map((node) => {
           const geo = getNodeGeometry(node);
+          const beingDragged = dragNodeId === node.id && isDragging;
 
           return (
             <div
               key={node.id}
-              className="absolute"
+              className="absolute left-0 top-0"
               style={{
-                left: geo.left,
-                top: geo.top,
-                transition: isPanning
+                transform: `translate(${geo.left}px, ${geo.top}px)`,
+                transition: beingDragged || isPanning
                   ? "none"
-                  : "left 0.3s ease, top 0.3s ease",
+                  : "transform 0.2s ease-out",
+                zIndex: beingDragged ? 50 : undefined,
               }}
+              onMouseDown={(e) => { handleNodeMouseDown(node.id, e); }}
             >
               <WorkflowNode
                 node={node}
                 isSelected={selectedNodeId === node.id}
                 onSelect={onSelectNode}
                 scale={transform.scale}
+                isDragging={beingDragged}
               />
             </div>
           );
