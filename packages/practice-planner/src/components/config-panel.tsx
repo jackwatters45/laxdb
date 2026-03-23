@@ -2,40 +2,34 @@ import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
-
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@laxdb/ui/components/ui/toggle-group";
-import { X, Clock, Users, FileText, Tag, Trash2, Target } from "lucide-react";
+import {
+  X,
+  Clock,
+  Users,
+  FileText,
+  Trash2,
+  ArrowRightLeft,
+  Flame,
+  Snowflake,
+  Target,
+} from "lucide-react";
+import { useState } from "react";
 
 import { MOCK_DRILLS } from "@/data/mock-drills";
 import type {
+  Drill,
   PracticeNode,
   PracticeItemType,
   PracticeItemPriority,
 } from "@/data/types";
 
-const PRACTICE_ITEM_TYPES: ReadonlySet<string> = new Set<PracticeItemType>([
-  "warmup",
-  "drill",
-  "cooldown",
-  "water-break",
-  "activity",
-]);
-
-function isPracticeItemType(value: string): value is PracticeItemType {
-  return PRACTICE_ITEM_TYPES.has(value);
-}
+import { DrillPickerPopover } from "./drill-picker";
 
 interface ConfigPanelProps {
   node: PracticeNode;
@@ -44,19 +38,17 @@ interface ConfigPanelProps {
   onClose: () => void;
 }
 
-const TYPE_OPTIONS: { value: PracticeItemType; label: string }[] = [
-  { value: "warmup", label: "Warm-up" },
-  { value: "drill", label: "Drill" },
-  { value: "cooldown", label: "Cool-down" },
-  { value: "water-break", label: "Water Break" },
-  { value: "activity", label: "Activity" },
-];
-
 const PRIORITY_OPTIONS: { value: PracticeItemPriority; label: string }[] = [
   { value: "required", label: "Required" },
   { value: "optional", label: "Optional" },
   { value: "if-time", label: "If Time" },
 ];
+
+function drillToType(drill: Drill): PracticeItemType {
+  if (drill.tags.includes("warmup")) return "warmup";
+  if (drill.tags.includes("cooldown")) return "cooldown";
+  return "drill";
+}
 
 export function ConfigPanel({
   node,
@@ -69,6 +61,18 @@ export function ConfigPanel({
     : null;
 
   const isStart = node.variant === "start";
+  const isSplit = node.variant === "split";
+  const isSpecial = isStart || isSplit || node.type === "water-break";
+
+  const handleSwapDrill = (drill: Drill) => {
+    onUpdate(node.id, {
+      drillId: drill.id,
+      label: drill.name,
+      type: drillToType(drill),
+      durationMinutes: drill.durationMinutes,
+      notes: drill.subtitle,
+    });
+  };
 
   return (
     <div className="w-[340px] h-full border-l border-border bg-card flex flex-col overflow-hidden">
@@ -83,11 +87,31 @@ export function ConfigPanel({
         </Button>
       </div>
 
-      {/* Body */}
+      {/* Drill identity — top of panel */}
+      {linkedDrill && (
+        <DrillIdentity
+          drill={linkedDrill}
+          onSwap={handleSwapDrill}
+        />
+      )}
+
+      {/* No drill linked — prompt to pick one */}
+      {!linkedDrill && !isSpecial && (
+        <div className="px-4 py-3 border-b border-border">
+          <DrillPickerPopover onSelect={handleSwapDrill}>
+            <Button variant="outline" size="lg" className="w-full">
+              <Target />
+              Pick a drill
+            </Button>
+          </DrillPickerPopover>
+        </div>
+      )}
+
+      {/* Editable fields */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 space-y-5">
           {/* Label */}
-          <Field label="Label" icon={<Tag className="size-3.5" />}>
+          <Field label="Label" icon={<FileText className="size-3.5" />}>
             <Input
               value={node.label}
               onChange={(e) => {
@@ -96,34 +120,6 @@ export function ConfigPanel({
               disabled={isStart}
             />
           </Field>
-
-          {/* Type */}
-          {!isStart && (
-            <Field label="Type" icon={<Target className="size-3.5" />}>
-              <Select
-                value={node.type}
-                onValueChange={(v) => {
-                  if (v !== null && isPracticeItemType(v)) onUpdate(node.id, { type: v });
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {(value: string | null) => {
-                      const opt = TYPE_OPTIONS.find((o) => o.value === value);
-                      return opt?.label ?? "Select type";
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {TYPE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          )}
 
           {/* Duration */}
           {!isStart && (
@@ -201,81 +197,6 @@ export function ConfigPanel({
               className="min-h-[60px]"
             />
           </Field>
-
-          {/* Drill Picker */}
-          {!isStart && node.type !== "water-break" && (
-            <Field label="Linked Drill" icon={<Target className="size-3.5" />}>
-              <div className="flex items-center gap-1.5">
-                <Select
-                  value={node.drillId}
-                  onValueChange={(v) => {
-                    const drill = v !== null
-                      ? MOCK_DRILLS.find((d) => d.id === v)
-                      : null;
-                    onUpdate(node.id, {
-                      drillId: v,
-                      label: drill?.name ?? node.label,
-                      durationMinutes:
-                        drill?.durationMinutes ?? node.durationMinutes,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value: string | null) => {
-                        if (!value) return "None";
-                        const drill = MOCK_DRILLS.find((d) => d.id === value);
-                        return drill?.name ?? "None";
-                      }}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MOCK_DRILLS.map((drill) => (
-                      <SelectItem key={drill.id} value={drill.id}>
-                        {drill.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {node.drillId && (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => { onUpdate(node.id, { drillId: null }); }}
-                  >
-                    <X />
-                    <span className="sr-only">Unlink drill</span>
-                  </Button>
-                )}
-              </div>
-            </Field>
-          )}
-
-          {/* Linked Drill Details */}
-          {linkedDrill && (
-            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
-              <p className="text-xs font-semibold text-foreground">
-                {linkedDrill.name}
-              </p>
-              {linkedDrill.subtitle && (
-                <p className="text-xs text-muted-foreground">
-                  {linkedDrill.subtitle}
-                </p>
-              )}
-              {linkedDrill.description && (
-                <p className="text-xs text-muted-foreground/80 leading-relaxed">
-                  {linkedDrill.description}
-                </p>
-              )}
-              <div className="flex flex-wrap gap-1 pt-1">
-                {linkedDrill.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-[10px]">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -298,6 +219,60 @@ export function ConfigPanel({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function DrillIdentity({
+  drill,
+  onSwap,
+}: {
+  drill: Drill;
+  onSwap: (drill: Drill) => void;
+}) {
+  const Icon = drill.tags.includes("warmup")
+    ? Flame
+    : drill.tags.includes("cooldown")
+      ? Snowflake
+      : Target;
+
+  return (
+    <div className="px-4 py-3 border-b border-border space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2 min-w-0">
+          <Icon className="size-3.5 mt-0.5 flex-shrink-0 text-muted-foreground" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-foreground truncate">
+              {drill.name}
+            </p>
+            {drill.subtitle && (
+              <p className="text-xs text-muted-foreground truncate">
+                {drill.subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+        <DrillPickerPopover onSelect={onSwap}>
+          <Button variant="ghost" size="icon-sm" title="Swap drill">
+            <ArrowRightLeft />
+            <span className="sr-only">Swap drill</span>
+          </Button>
+        </DrillPickerPopover>
+      </div>
+
+      {drill.description && (
+        <p className="text-xs text-muted-foreground/80 leading-relaxed">
+          {drill.description}
+        </p>
+      )}
+
+      <div className="flex flex-wrap gap-1">
+        {drill.tags.map((tag) => (
+          <Badge key={tag} variant="secondary" className="text-[10px]">
+            {tag}
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }

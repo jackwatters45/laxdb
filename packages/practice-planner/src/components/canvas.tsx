@@ -8,7 +8,7 @@ import {
   type WheelEvent as ReactWheelEvent,
 } from "react";
 
-import type { PracticeNode, PracticeEdge } from "@/data/types";
+import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
 import { getNodeGeometry } from "@/lib/node-geometry";
 
 import { AddNodeButton } from "./add-node-button";
@@ -30,7 +30,7 @@ interface CanvasProps {
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
-  onAddBetween: (afterNodeId: string, beforeNodeId: string) => void;
+  onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
 }
 
 const MIN_SCALE = 0.25;
@@ -45,7 +45,7 @@ export function Canvas({
   transform,
   onTransformChange,
   onSelectNode,
-  onAddBetween,
+  onAddDrill,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPanning, setIsPanning] = useState(false);
@@ -239,7 +239,7 @@ export function Canvas({
               key={`add-${edge.id}`}
               sourceNode={source}
               targetNode={target}
-              onAdd={onAddBetween}
+              onAddDrill={onAddDrill}
             />
           );
         })}
