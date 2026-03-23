@@ -134,8 +134,8 @@ plans/
 
 ## CHILD INTENT NODES
 
-- `packages/core/AGENTS.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
-- `packages/api/AGENTS.md` - RPC/HTTP API patterns
-- `packages/web/AGENTS.md` - Frontend routing, components
-- `packages/ui/AGENTS.md` - Base UI component APIs
+- `packages/core/CLAUDE.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
+- `packages/api/CLAUDE.md` - RPC/HTTP API patterns
+- `packages/web/CLAUDE.md` - Frontend routing, components
+- `packages/ui/CLAUDE.md` - Base UI component APIs
 - `packages/pipeline/CLAUDE.md` - Data ingestion, external APIs, scraping patterns
