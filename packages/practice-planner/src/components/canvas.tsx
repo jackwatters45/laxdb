@@ -183,10 +183,13 @@ export function Canvas({
         onUpdateNode(dragNodeId, { position: { x: newX, y: newY } });
 
         // Find nearest edge for drop target highlight
-        const geo = getNodeGeometry({ position: { x: newX, y: newY }, variant: "default" } as PracticeNode);
-        const nodeCenterX = geo.left + geo.width / 2;
-        const nodeCenterY = geo.top + geo.height / 2;
-        setHoverEdgeId(findNearestEdge(nodeCenterX, nodeCenterY, dragNodeId));
+        const draggedNode = nodeMap.get(dragNodeId);
+        if (draggedNode) {
+          const geo = getNodeGeometry({ ...draggedNode, position: { x: newX, y: newY } });
+          const nodeCenterX = geo.left + geo.width / 2;
+          const nodeCenterY = geo.top + geo.height / 2;
+          setHoverEdgeId(findNearestEdge(nodeCenterX, nodeCenterY, dragNodeId));
+        }
 
         return;
       }
@@ -207,10 +210,11 @@ export function Canvas({
       if (!isDragging) {
         // Was a click, not a drag — select the node
         onSelectNode(dragNodeId);
-      } else {
-        // Was a drag — move node to hovered edge (or leave detached)
+      } else if (hoverEdgeId) {
+        // Dropped on an edge — detach and reinsert
         onMoveNodeToEdge(dragNodeId, hoverEdgeId);
       }
+      // else: just a reposition, graph stays unchanged
       setDragNodeId(null);
       setIsDragging(false);
       setHoverEdgeId(null);
