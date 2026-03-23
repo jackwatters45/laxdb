@@ -1,12 +1,7 @@
 import { eq } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import {
-  DatabaseLive,
-  headOrFail,
-  PgDrizzle,
-  query,
-} from "../drizzle/drizzle.service";
+import { headOrFail, PgDrizzle, query } from "../drizzle/drizzle.service";
 
 import type { GetUserFromEmailInput } from "./user.schema";
 import { type UserSelect, userTable } from "./user.sql";
@@ -27,7 +22,5 @@ export class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
     } as const;
   }),
 }) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(DatabaseLive),
-  );
+  static readonly layer = Layer.effect(this, this.make);
 }
