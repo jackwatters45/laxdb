@@ -14,14 +14,20 @@ import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
-type ClientDeps = RpcPracticeClient | RpcDrillClient;
-
-const run = <A, E>(effect: Effect.Effect<A, E, ClientDeps>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, RpcPracticeClient>) =>
   effect.pipe(
     Effect.provide(
-      Layer.mergeAll(RpcPracticeClient.layer, RpcDrillClient.layer).pipe(
+      RpcPracticeClient.layer.pipe(
         Layer.provide(makeRpcProtocol(testServer.url)),
       ),
+    ),
+    Effect.runPromise,
+  );
+
+const runDrill = <A, E>(effect: Effect.Effect<A, E, RpcDrillClient>) =>
+  effect.pipe(
+    Effect.provide(
+      RpcDrillClient.layer.pipe(Layer.provide(makeRpcProtocol(testServer.url))),
     ),
     Effect.runPromise,
   );
@@ -184,13 +190,18 @@ describe("Practice Items RPC", () => {
   });
 
   it("adds a drill item to a practice", async () => {
+    // Create drill separately to avoid multiplexing two RPC groups on one connection
+    const createdDrill = await runDrill(
+      Effect.gen(function* () {
+        const client = yield* RpcDrillClient;
+        return yield* client.DrillCreate(minimalDrill);
+      }),
+    );
     const item = await run(
       Effect.gen(function* () {
-        const practice = yield* RpcPracticeClient;
-        const drill = yield* RpcDrillClient;
-        const createdPractice = yield* practice.PracticeCreate(minimalPractice);
-        const createdDrill = yield* drill.DrillCreate(minimalDrill);
-        return yield* practice.PracticeAddItem({
+        const client = yield* RpcPracticeClient;
+        const createdPractice = yield* client.PracticeCreate(minimalPractice);
+        return yield* client.PracticeAddItem({
           practicePublicId: createdPractice.publicId,
           type: "drill",
           drillPublicId: createdDrill.publicId,
