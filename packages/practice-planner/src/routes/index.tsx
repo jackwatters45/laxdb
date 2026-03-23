@@ -1,8 +1,8 @@
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Library, GitBranch } from "lucide-react";
-import { useState, useCallback } from "react";
+import { Sparkles, Library, GitBranch, Settings } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 import { Canvas } from "@/components/canvas";
 import { CanvasControls } from "@/components/canvas-controls";
@@ -32,9 +32,35 @@ function nextId(prefix: string): string {
 }
 
 function HomePage() {
-  // Practice state
-  const [practice, setPractice] = useState<Practice>(SAMPLE_PRACTICE);
+  // Practice state with undo
+  const [practice, setPracticeRaw] = useState<Practice>(SAMPLE_PRACTICE);
+  const historyRef = useRef<Practice[]>([]);
   const { nodes, edges } = practice;
+
+  const setPractice = useCallback((updater: Practice | ((prev: Practice) => Practice)) => {
+    setPracticeRaw((prev) => {
+      historyRef.current.push(prev);
+      // Cap history at 50 entries
+      if (historyRef.current.length > 50) historyRef.current.shift();
+      return typeof updater === "function" ? updater(prev) : updater;
+    });
+  }, []);
+
+  const undo = useCallback(() => {
+    const prev = historyRef.current.pop();
+    if (prev) setPracticeRaw(prev);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => { window.removeEventListener("keydown", handleKeyDown); };
+  }, [undo]);
 
   // UI state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -266,6 +292,18 @@ function HomePage() {
     [nodes, edges],
   );
 
+  const appendDrill = useCallback(
+    (drill: Drill) => {
+      const type: PracticeItemType = drill.tags.includes("warmup")
+        ? "warmup"
+        : drill.tags.includes("cooldown")
+          ? "cooldown"
+          : "drill";
+      addDrillFromSidebar(drill, type);
+    },
+    [addDrillFromSidebar],
+  );
+
   const handleSplitCreate = useCallback(
     (groups: string[]) => {
       // Find the last node without outgoing edges
@@ -451,18 +489,30 @@ function HomePage() {
 
             <button
               onClick={openSettings}
-              className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 hover:bg-accent transition-colors"
             >
               <h1 className="text-sm font-semibold text-foreground text-balance">
                 {practice.name}
               </h1>
+              <Settings className="size-3 text-muted-foreground" />
             </button>
-            <span className="text-xs text-muted-foreground tabular-nums">
-              {totalMinutes} min
-            </span>
-            <span className="text-xs text-muted-foreground/50 tabular-nums">
-              {canvasNodes.length} blocks
-            </span>
+
+            {practice.durationMinutes ? (
+              <DurationIndicator
+                actual={totalMinutes}
+                target={practice.durationMinutes}
+                blocks={canvasNodes.length}
+              />
+            ) : (
+              <>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {totalMinutes} min
+                </span>
+                <span className="text-xs text-muted-foreground/50 tabular-nums">
+                  {canvasNodes.length} blocks
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -488,6 +538,7 @@ function HomePage() {
             onSelectNode={selectNode}
             onUpdateNode={updateNode}
             onAddDrill={addDrillBetween}
+            onAppendDrill={appendDrill}
           />
         </div>
 
@@ -539,6 +590,44 @@ function HomePage() {
         onClose={() => { setQuickPlanOpen(false); }}
         onGenerate={handleQuickGenerate}
       />
+    </div>
+  );
+}
+
+function DurationIndicator({
+  actual,
+  target,
+  blocks,
+}: {
+  actual: number;
+  target: number;
+  blocks: number;
+}) {
+  const pct = Math.min(Math.round((actual / target) * 100), 100);
+  const over = actual > target;
+  const diff = Math.abs(actual - target);
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
+        <div className="w-16 h-1.5 rounded-full bg-border overflow-hidden">
+          <div
+            className={`h-full rounded-full ${over ? "bg-destructive" : "bg-foreground"}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {actual}/{target} min
+        </span>
+      </div>
+      {diff > 0 && (
+        <span className={`text-[10px] tabular-nums ${over ? "text-destructive" : "text-muted-foreground/50"}`}>
+          {over ? `+${diff}` : `-${diff}`}
+        </span>
+      )}
+      <span className="text-xs text-muted-foreground/50 tabular-nums">
+        {blocks} blocks
+      </span>
     </div>
   );
 }

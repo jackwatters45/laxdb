@@ -7,10 +7,14 @@ import {
   type WheelEvent as ReactWheelEvent,
 } from "react";
 
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Plus } from "lucide-react";
+
 import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
 import { getNodeGeometry } from "@/lib/node-geometry";
 
 import { AddNodeButton } from "./add-node-button";
+import { DrillPickerPopover } from "./drill-picker";
 import { WorkflowEdge } from "./workflow-edge";
 import { WorkflowNode } from "./workflow-node";
 
@@ -29,6 +33,7 @@ interface CanvasProps {
   onSelectNode: (nodeId: string | null) => void;
   onUpdateNode: (nodeId: string, updates: Partial<PracticeNode>) => void;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
+  onAppendDrill: (drill: Drill) => void;
 }
 
 const MIN_SCALE = 0.25;
@@ -45,6 +50,7 @@ export function Canvas({
   onSelectNode,
   onUpdateNode,
   onAddDrill,
+  onAppendDrill,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -302,6 +308,36 @@ export function Canvas({
             </div>
           );
         })}
+
+        {/* Append button at end of flow */}
+        {!isNodeBeingDragged && (() => {
+          const sourceIds = new Set(edges.map((e) => e.source));
+          const tailNodes = nodes.filter((n) => !sourceIds.has(n.id));
+          return tailNodes.map((tail) => {
+            const geo = getNodeGeometry(tail);
+            const cx = geo.left + geo.width / 2;
+            const ty = geo.top + geo.height + 30;
+            return (
+              <div
+                key={`append-${tail.id}`}
+                className="absolute left-0 top-0"
+                style={{ transform: `translate(${cx - 60}px, ${ty}px)` }}
+              >
+                <DrillPickerPopover onSelect={onAppendDrill}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-dashed text-muted-foreground"
+                    onClick={(e) => { e.stopPropagation(); }}
+                  >
+                    <Plus strokeWidth={2} />
+                    Add drill
+                  </Button>
+                </DrillPickerPopover>
+              </div>
+            );
+          });
+        })()}
       </div>
     </div>
   );

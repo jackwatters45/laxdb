@@ -20,6 +20,11 @@ export function getNodeGeometry(node: PracticeNode) {
     height = 56;
     left = node.position.x + 40;
     top = node.position.y;
+  } else if (node.type === "water-break") {
+    width = 260;
+    height = 36;
+    left = node.position.x;
+    top = node.position.y;
   } else {
     width = 260;
     height = 82;

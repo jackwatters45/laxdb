@@ -137,6 +137,38 @@ export function WorkflowNode({
     );
   }
 
+  // Water break — thin horizontal bar
+  if (node.type === "water-break") {
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(node.id);
+        }}
+        className={`
+          w-[260px] rounded-full border
+          ${config.bg} ${config.border}
+          cursor-pointer select-none
+          ${isDragging ? "shadow-lg opacity-90" : ""}
+          ${!isDragging && isSelected ? "ring-2 ring-foreground/20 ring-offset-2 ring-offset-background" : ""}
+          ${!isDragging && !isSelected ? "hover:shadow-sm" : ""}
+        `}
+      >
+        <div className="flex items-center justify-center gap-2 px-4 py-1.5">
+          <Droplets size={12} className="text-sky-500 flex-shrink-0" />
+          <span className="text-xs font-medium text-muted-foreground">
+            Water Break
+          </span>
+          {node.durationMinutes && (
+            <span className="text-[11px] text-muted-foreground/50 tabular-nums">
+              {node.durationMinutes} min
+            </span>
+          )}
+        </div>
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={(e) => {
