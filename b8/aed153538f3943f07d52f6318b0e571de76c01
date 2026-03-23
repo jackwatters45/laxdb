@@ -1,0 +1,55 @@
+packages/practice-planner/src/components/canvas-controls.tsx
+  1afd96eae1e095f5 1-108
+packages/practice-planner/src/site.ts
+  1afd96eae1e095f5 1-5
+packages/practice-planner/src/components/canvas.tsx
+  1afd96eae1e095f5 1-275
+packages/practice-planner/src/data/types.ts
+  1afd96eae1e095f5 1-69,73-76,78-107
+packages/practice-planner/src/components/split-node.tsx
+  1afd96eae1e095f5 1,3-17,25-88,90-134
+packages/practice-planner/src/data/sample-practice.ts
+  1afd96eae1e095f5 1-16,18-28,30-40,42-52,54-65,67-77,79-90,92-102,104-115,117-127,129-139,141-173
+packages/practice-planner/src/router.tsx
+  1afd96eae1e095f5 1-18
+packages/practice-planner/src/components/quick-plan-modal.tsx
+  1afd96eae1e095f5 1-86,88-194
+packages/practice-planner/src/routes/index.tsx
+  1afd96eae1e095f5 1,3-27,31-37,39-109,111-163,165-205,207-238,240-349,351-379,381,383-435,437-458,470-472
+packages/practice-planner/src/components/drill-sidebar.tsx
+  1afd96eae1e095f5 1-79,81-177
+packages/practice-planner/package.json
+  1afd96eae1e095f5 1-22,24-37
+packages/practice-planner/src/globals.css
+  1afd96eae1e095f5 1-17
+packages/practice-planner/tsconfig.json
+  1afd96eae1e095f5 1-13
+packages/practice-planner/vite.config.ts
+  1afd96eae1e095f5 1-32
+packages/practice-planner/src/lib/node-geometry.ts
+  1afd96eae1e095f5 1-4,7-46
+packages/practice-planner/src/components/workflow-edge.tsx
+  1afd96eae1e095f5 1-60
+packages/practice-planner/src/components/add-node-button.tsx
+  1afd96eae1e095f5 1-60
+packages/practice-planner/src/lib/quick-plan.ts
+  1afd96eae1e095f5 1-4,6-38,40-60,62-95,97-114,116-136,138-163
+packages/practice-planner/src/components/workflow-node.tsx
+  1afd96eae1e095f5 1-78,81-175
+packages/practice-planner/src/components/config-panel.tsx
+  1afd96eae1e095f5 1-18,31-61,63-71,73-100,104-276
+packages/practice-planner/src/lib/layout.ts
+  1afd96eae1e095f5 1-115
+alchemy.run.ts
+  1afd96eae1e095f5 198-210,215
+packages/practice-planner/src/routes/__root.tsx
+  1afd96eae1e095f5 1-44
+packages/practice-planner/src/data/mock-drills.ts
+  1afd96eae1e095f5 1-293
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "b8aed153538f3943f07d52f6318b0e571de76c01",
+  "prompts": {}
+}
