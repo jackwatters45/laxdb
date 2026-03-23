@@ -1,12 +1,7 @@
 import { asc, eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import {
-  DatabaseLive,
-  headOrFail,
-  PgDrizzle,
-  query,
-} from "../drizzle/drizzle.service";
+import { headOrFail, PgDrizzle, query } from "../drizzle/drizzle.service";
 
 import type {
   AddItemInput,
@@ -251,7 +246,5 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
     }),
   },
 ) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(DatabaseLive),
-  );
+  static readonly layer = Layer.effect(this, this.make);
 }

@@ -1,12 +1,7 @@
 import { eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import {
-  DatabaseLive,
-  headOrFail,
-  PgDrizzle,
-  query,
-} from "../drizzle/drizzle.service";
+import { headOrFail, PgDrizzle, query } from "../drizzle/drizzle.service";
 
 import { playerTable } from "./player.sql";
 
@@ -66,7 +61,5 @@ export class PlayerRepo extends ServiceMap.Service<PlayerRepo>()("PlayerRepo", {
     } as const;
   }),
 }) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(DatabaseLive),
-  );
+  static readonly layer = Layer.effect(this, this.make);
 }
