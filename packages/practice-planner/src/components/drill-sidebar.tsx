@@ -164,10 +164,7 @@ function DrillCard({ drill, onAdd }: { drill: Drill; onAdd: () => void }) {
         )}
         <div className="flex items-center gap-2 pl-5">
           {drill.durationMinutes && (
-            <Badge
-              variant="outline"
-              className="h-4 text-[10px] px-1.5 gap-0.5"
-            >
+            <Badge variant="outline" className="h-4 text-[10px] px-1.5 gap-0.5">
               <Clock className="size-2.5" />
               {drill.durationMinutes}m
             </Badge>

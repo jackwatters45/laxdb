@@ -101,20 +101,26 @@ function HomePage() {
     [selectedNodeId],
   );
 
-  const addNodeBetween = useCallback(
-    (afterId: string, beforeId: string) => {
+  const addDrillBetween = useCallback(
+    (afterId: string, beforeId: string, drill: Drill) => {
       const afterNode = nodes.find((n) => n.id === afterId);
       const beforeNode = nodes.find((n) => n.id === beforeId);
       if (!afterNode || !beforeNode) return;
 
+      const drillType: PracticeItemType = drill.tags.includes("warmup")
+        ? "warmup"
+        : drill.tags.includes("cooldown")
+          ? "cooldown"
+          : "drill";
+
       const newNode: PracticeNode = {
         id: nextId("node"),
-        type: "drill",
+        type: drillType,
         variant: "default",
-        drillId: null,
-        label: "New Block",
-        durationMinutes: 10,
-        notes: null,
+        drillId: drill.id,
+        label: drill.name,
+        durationMinutes: drill.durationMinutes,
+        notes: drill.subtitle,
         groups: ["all"],
         priority: "optional",
         position: {
@@ -419,7 +425,7 @@ function HomePage() {
             transform={transform}
             onTransformChange={setTransform}
             onSelectNode={setSelectedNodeId}
-            onAddBetween={addNodeBetween}
+            onAddDrill={addDrillBetween}
           />
         </div>
 
