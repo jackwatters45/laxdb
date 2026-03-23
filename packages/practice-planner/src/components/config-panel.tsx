@@ -25,6 +25,20 @@ import type {
   PracticeItemPriority,
 } from "@/data/types";
 
+const PRACTICE_ITEM_TYPES: ReadonlySet<string> = new Set<PracticeItemType>([
+  "warmup",
+  "drill",
+  "cooldown",
+  "water-break",
+  "activity",
+]);
+
+function isPracticeItemType(value: string): value is PracticeItemType {
+  return PRACTICE_ITEM_TYPES.has(value);
+}
+
+const NO_DRILL = "__none__";
+
 interface ConfigPanelProps {
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
@@ -91,7 +105,7 @@ export function ConfigPanel({
               <Select
                 value={node.type}
                 onValueChange={(v) => {
-                  if (v) onUpdate(node.id, { type: v as PracticeItemType });
+                  if (v && isPracticeItemType(v)) onUpdate(node.id, { type: v });
                 }}
               >
                 <SelectTrigger className="w-full">
@@ -189,11 +203,14 @@ export function ConfigPanel({
           {!isStart && node.type !== "water-break" && (
             <Field label="Linked Drill" icon={<Target className="size-3.5" />}>
               <Select
-                value={node.drillId ?? ""}
+                value={node.drillId ?? NO_DRILL}
                 onValueChange={(v) => {
-                  const drill = v ? MOCK_DRILLS.find((d) => d.id === v) : null;
+                  const drillId = v === NO_DRILL ? null : v;
+                  const drill = drillId
+                    ? MOCK_DRILLS.find((d) => d.id === drillId)
+                    : null;
                   onUpdate(node.id, {
-                    drillId: v ?? null,
+                    drillId,
                     label: drill?.name ?? node.label,
                     durationMinutes:
                       drill?.durationMinutes ?? node.durationMinutes,
@@ -204,7 +221,7 @@ export function ConfigPanel({
                   <SelectValue placeholder="None" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value={NO_DRILL}>None</SelectItem>
                   {MOCK_DRILLS.map((drill) => (
                     <SelectItem key={drill.id} value={drill.id}>
                       {drill.name}
