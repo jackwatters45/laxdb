@@ -13,41 +13,36 @@ import { RpcClient, RpcSerialization } from "effect/unstable/rpc";
 
 const isLocal = process.env.IS_LOCAL === "true";
 
-function getServiceBindingFetch(): typeof fetch | undefined {
-  if (isLocal) return undefined;
+/**
+ * In production, the API service binding gives us a Worker-to-Worker fetch
+ * that resolves the virtual `http://api/rpc` URL with zero network hops.
+ * In local dev, we fall back to the global fetch hitting localhost.
+ */
+function getApiFetch(): { fetch?: typeof fetch; url: string } {
+  if (isLocal) {
+    return { url: `http://localhost:${process.env.API_PORT ?? "1337"}/rpc` };
+  }
   const { env } = require("cloudflare:workers") as { env: Env };
-  return env.API?.fetch.bind(env.API);
+  return { fetch: env.API?.fetch.bind(env.API), url: "http://api/rpc" };
 }
 
-const rpcUrl = (apiFetch: typeof fetch | undefined) =>
-  apiFetch
-    ? "http://api/rpc"
-    : `http://localhost:${process.env.API_PORT ?? "1337"}/rpc`;
-
 function buildRuntime() {
-  const apiFetch = getServiceBindingFetch();
+  const api = getApiFetch();
 
-  const protocol = RpcClient.layerProtocolHttp({
-    url: rpcUrl(apiFetch),
-  }).pipe(
-    Layer.provide([
-      apiFetch
-        ? FetchHttpClient.layer.pipe(
-            Layer.provide(Layer.succeed(FetchHttpClient.Fetch, apiFetch)),
-          )
-        : FetchHttpClient.layer,
-      RpcSerialization.layerNdjson,
-    ]),
+  const http = api.fetch
+    ? FetchHttpClient.layer.pipe(
+        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, api.fetch)),
+      )
+    : FetchHttpClient.layer;
+
+  const protocol = RpcClient.layerProtocolHttp({ url: api.url }).pipe(
+    Layer.provide([http, RpcSerialization.layerNdjson]),
   );
 
   return ManagedRuntime.make(RpcApiClient.layer.pipe(Layer.provide(protocol)));
 }
 
 let _runtime: ReturnType<typeof buildRuntime> | undefined;
-
-function getRuntime() {
-  return (_runtime ??= buildRuntime());
-}
 
 /**
  * Run an Effect that depends on the RPC client.
@@ -56,5 +51,5 @@ function getRuntime() {
 export function runApi<A, E>(
   effect: Effect.Effect<A, E, RpcApiClient>,
 ): Promise<A> {
-  return getRuntime().runPromise(effect);
+  return (_runtime ??= buildRuntime()).runPromise(effect);
 }
