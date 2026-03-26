@@ -119,7 +119,7 @@ if (app.local) {
     command: "cd packages/core-v2 && bun run db:push",
     env: { DATABASE_URL: schemaRole.connectionUrl },
   });
-} else {
+} else if (isPermanentStage) {
   await Exec("DrizzleMigrateV2", {
     command: `sh -c 'cd packages/core-v2 && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
     env: { DATABASE_URL: schemaRole.connectionUrl },
@@ -129,6 +129,12 @@ if (app.local) {
         "packages/core-v2/migrations/**/*.sql",
       ],
     },
+  });
+} else {
+  // PR stages share the dev branch — push is idempotent, migrate fails on existing tables
+  await Exec("DrizzlePushV2", {
+    command: "cd packages/core-v2 && bun run db:push",
+    env: { DATABASE_URL: schemaRole.connectionUrl },
   });
 }
 
