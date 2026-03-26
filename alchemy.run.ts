@@ -190,7 +190,9 @@ export const marketing = await TanStackStart("marketing", {
 // });
 
 export const practicePlanner = await TanStackStart("practice-planner", {
-  bindings: {},
+  bindings: {
+    API: api2,
+  },
   cwd: "./packages/practice-planner",
   domains: [getDomain("planner")],
 });
