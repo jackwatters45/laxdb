@@ -7,9 +7,12 @@ import { DrillRepo } from "./drill.repo";
 import {
   CreateDrillInput,
   DeleteDrillInput,
+  Drill,
   GetDrillInput,
   UpdateDrillInput,
 } from "./drill.schema";
+
+const asDrill = (row: typeof Drill.Type) => new Drill(row);
 
 export class DrillService extends ServiceMap.Service<DrillService>()(
   "DrillService",
@@ -20,6 +23,7 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
       return {
         list: () =>
           repo.list().pipe(
+            Effect.map((rows) => rows.map(asDrill)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
@@ -31,6 +35,7 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
             const decoded = yield* decodeArguments(GetDrillInput, input);
             return yield* repo.get(decoded);
           }).pipe(
+            Effect.map(asDrill),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),
@@ -47,6 +52,7 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
             const decoded = yield* decodeArguments(CreateDrillInput, input);
             return yield* repo.create(decoded);
           }).pipe(
+            Effect.map(asDrill),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(new NotFoundError({ domain: "Drill", id: "new" })),
             ),
@@ -61,6 +67,7 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
             const decoded = yield* decodeArguments(UpdateDrillInput, input);
             return yield* repo.update(decoded);
           }).pipe(
+            Effect.map(asDrill),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),
@@ -77,6 +84,7 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
             const decoded = yield* decodeArguments(DeleteDrillInput, input);
             return yield* repo.delete(decoded);
           }).pipe(
+            Effect.map(asDrill),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Drill", id: input.publicId }),

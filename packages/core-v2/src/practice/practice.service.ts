@@ -5,6 +5,9 @@ import { decodeArguments, parsePostgresError } from "../util";
 
 import { PracticeRepo } from "./practice.repo";
 import {
+  Practice,
+  PracticeItem,
+  PracticeReview,
   AddItemInput,
   CreatePracticeInput,
   CreateReviewInput,
@@ -19,6 +22,10 @@ import {
   UpdateReviewInput,
 } from "./practice.schema";
 
+const asPractice = (row: typeof Practice.Type) => new Practice(row);
+const asItem = (row: typeof PracticeItem.Type) => new PracticeItem(row);
+const asReview = (row: typeof PracticeReview.Type) => new PracticeReview(row);
+
 export class PracticeService extends ServiceMap.Service<PracticeService>()(
   "PracticeService",
   {
@@ -32,7 +39,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
 
         list: () =>
           repo.list().pipe(
-            Effect.catchTag("SqlError", (e) =>
+            Effect.map((rows) => rows.map(asPractice)),            Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
             Effect.tapError(Effect.logError),
@@ -43,6 +50,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(GetPracticeInput, input);
             return yield* repo.get(decoded);
           }).pipe(
+            Effect.map(asPractice),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -62,6 +70,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(CreatePracticeInput, input);
             return yield* repo.create(decoded);
           }).pipe(
+            Effect.map(asPractice),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -81,6 +90,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdatePracticeInput, input);
             return yield* repo.update(decoded);
           }).pipe(
+            Effect.map(asPractice),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -100,6 +110,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(DeletePracticeInput, input);
             return yield* repo.delete(decoded);
           }).pipe(
+            Effect.map(asPractice),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -134,6 +145,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(AddItemInput, input);
             return yield* repo.addItem(decoded);
           }).pipe(
+            Effect.map(asItem),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -153,6 +165,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdateItemInput, input);
             return yield* repo.updateItem(decoded);
           }).pipe(
+            Effect.map(asItem),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -172,6 +185,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(RemoveItemInput, input);
             return yield* repo.removeItem(decoded);
           }).pipe(
+            Effect.map(asItem),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -206,6 +220,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(GetReviewInput, input);
             return yield* repo.getReview(decoded);
           }).pipe(
+            Effect.map(asReview),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -225,6 +240,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(CreateReviewInput, input);
             return yield* repo.createReview(decoded);
           }).pipe(
+            Effect.map(asReview),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
@@ -244,6 +260,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(UpdateReviewInput, input);
             return yield* repo.updateReview(decoded);
           }).pipe(
+            Effect.map(asReview),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({
