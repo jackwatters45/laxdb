@@ -6,15 +6,10 @@
  *
  * Only call runApi() from inside createServerFn handlers.
  */
-import { RpcPracticeClient } from "@laxdb/api-v2/practice/practice.client";
-import type { Effect} from "effect";
-import { Layer, ManagedRuntime } from "effect";
+import { RpcApiClient } from "@laxdb/api-v2/client";
+import { Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 import { RpcClient, RpcSerialization } from "effect/unstable/rpc";
-
-// ---------------------------------------------------------------------------
-// Protocol layer — service binding in prod, direct fetch in local dev
-// ---------------------------------------------------------------------------
 
 const isLocal = process.env.IS_LOCAL === "true";
 
@@ -24,19 +19,17 @@ function getServiceBindingFetch(): typeof fetch | undefined {
   return env.API?.fetch.bind(env.API);
 }
 
-let _runtime: ManagedRuntime.ManagedRuntime<RpcPracticeClient, never> | undefined;
-
-function getRuntime() {
-  if (_runtime) return _runtime;
-  console.log("[api] building runtime...");
-
-  const apiFetch = getServiceBindingFetch();
-
-  const rpcUrl = apiFetch
+const rpcUrl = (apiFetch: typeof fetch | undefined) =>
+  apiFetch
     ? "http://api/rpc"
     : `http://localhost:${process.env.API_PORT ?? "1337"}/rpc`;
 
-  const protocol = RpcClient.layerProtocolHttp({ url: rpcUrl }).pipe(
+function buildRuntime() {
+  const apiFetch = getServiceBindingFetch();
+
+  const protocol = RpcClient.layerProtocolHttp({
+    url: rpcUrl(apiFetch),
+  }).pipe(
     Layer.provide([
       apiFetch
         ? FetchHttpClient.layer.pipe(
@@ -47,19 +40,21 @@ function getRuntime() {
     ]),
   );
 
-  const ApiLive = RpcPracticeClient.layer.pipe(Layer.provide(protocol));
-
-  _runtime = ManagedRuntime.make(ApiLive);
-  console.log("[api] runtime created");
-  return _runtime;
+  return ManagedRuntime.make(RpcApiClient.layer.pipe(Layer.provide(protocol)));
 }
 
-// ---------------------------------------------------------------------------
-// Convenience runner
-// ---------------------------------------------------------------------------
+let _runtime: ReturnType<typeof buildRuntime> | undefined;
 
+function getRuntime() {
+  return (_runtime ??= buildRuntime());
+}
+
+/**
+ * Run an Effect that depends on the RPC client.
+ * Only call from inside createServerFn handlers.
+ */
 export function runApi<A, E>(
-  effect: Effect.Effect<A, E, RpcPracticeClient>,
+  effect: Effect.Effect<A, E, RpcApiClient>,
 ): Promise<A> {
   return getRuntime().runPromise(effect);
 }

@@ -1,4 +1,4 @@
-import { RpcPracticeClient } from "@laxdb/api-v2/practice/practice.client";
+import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -19,7 +19,7 @@ import type { Practice } from "@/data/types";
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcPracticeClient;
+      const client = yield* RpcApiClient;
       return yield* client.PracticeList();
     }),
   ),
