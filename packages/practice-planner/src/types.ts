@@ -1,71 +1,51 @@
-/** Drill difficulty levels */
-export type Difficulty = "beginner" | "intermediate" | "advanced";
+import type {
+  Difficulty as DifficultySchema,
+  Category as CategorySchema,
+  PositionGroup as PositionGroupSchema,
+  Intensity as IntensitySchema,
+  FieldSpace as FieldSpaceSchema,
+  Drill as DbDrill,
+} from "@laxdb/core-v2/drill/drill.schema";
+import type {
+  PracticeItemType as PracticeItemTypeSchema,
+  PracticeItemPriority as PracticeItemPrioritySchema,
+  PracticeStatus as PracticeStatusSchema,
+} from "@laxdb/core-v2/practice/practice.schema";
+/**
+ * Frontend types for the practice planner.
+ *
+ * Scalar types (Difficulty, Category, etc.) are derived from core-v2 schemas
+ * to stay in sync with the DB. Domain types (Drill, PracticeGraph) are defined
+ * here for the canvas editor's graph model.
+ */
+import type { Schema } from "effect";
 
-/** Drill categories */
-export type DrillCategory =
-  | "passing"
-  | "shooting"
-  | "defense"
-  | "ground-balls"
-  | "face-offs"
-  | "clearing"
-  | "riding"
-  | "transition"
-  | "man-up"
-  | "man-down"
-  | "conditioning";
+// ---------------------------------------------------------------------------
+// Scalar types — derived from core-v2 schemas
+// ---------------------------------------------------------------------------
 
-/** Position groups */
-export type PositionGroup =
-  | "attack"
-  | "midfield"
-  | "defense"
-  | "goalie"
-  | "all";
+export type Difficulty = Schema.Schema.Type<typeof DifficultySchema>;
+export type DrillCategory = Schema.Schema.Type<typeof CategorySchema>;
+export type PositionGroup = Schema.Schema.Type<typeof PositionGroupSchema>;
+export type Intensity = Schema.Schema.Type<typeof IntensitySchema>;
+export type FieldSpace = Schema.Schema.Type<typeof FieldSpaceSchema>;
+export type PracticeItemType = Schema.Schema.Type<
+  typeof PracticeItemTypeSchema
+>;
+export type PracticeItemPriority = Schema.Schema.Type<
+  typeof PracticeItemPrioritySchema
+>;
+export type PracticeStatus = Schema.Schema.Type<typeof PracticeStatusSchema>;
 
-/** Intensity levels */
-export type Intensity = "low" | "medium" | "high";
+// ---------------------------------------------------------------------------
+// Drill — mirrors DB Drill without timestamps (frontend doesn't need them)
+// ---------------------------------------------------------------------------
 
-/** Field space requirements */
-export type FieldSpace = "full-field" | "half-field" | "box";
+export type Drill = Omit<typeof DbDrill.Type, "createdAt" | "updatedAt">;
 
-/** A drill template that can be added to a practice */
-export interface Drill {
-  id: string;
-  name: string;
-  subtitle: string | null;
-  description: string | null;
-  difficulty: Difficulty;
-  categories: DrillCategory[];
-  positionGroups: PositionGroup[];
-  intensity: Intensity | null;
-  contact: boolean;
-  competitive: boolean;
-  playerCount: number | null;
-  durationMinutes: number | null;
-  fieldSpace: FieldSpace | null;
-  equipment: string[];
-  tags: string[];
-}
-
-/** Practice item types */
-export type PracticeItemType =
-  | "warmup"
-  | "drill"
-  | "cooldown"
-  | "water-break"
-  | "activity";
-
-/** Priority levels for practice items */
-export type PracticeItemPriority = "required" | "optional" | "if-time";
-
-/** Practice status */
-export type PracticeStatus =
-  | "draft"
-  | "scheduled"
-  | "in-progress"
-  | "completed"
-  | "cancelled";
+// ---------------------------------------------------------------------------
+// Practice graph — canvas editor model (NOT the DB Practice)
+// ---------------------------------------------------------------------------
 
 /** Visual variant for special node rendering */
 export type PracticeNodeVariant = "start" | "split" | "default";
@@ -92,8 +72,8 @@ export interface PracticeEdge {
   label?: string;
 }
 
-/** A complete practice plan */
-export interface Practice {
+/** A complete practice plan (canvas graph model) */
+export interface PracticeGraph {
   id: string;
   name: string;
   date: string | null;

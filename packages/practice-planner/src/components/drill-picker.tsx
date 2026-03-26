@@ -14,7 +14,7 @@ import {
 import { Clock, Flame, Snowflake, Target } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock";
+import { useDrills } from "@/hooks/use-drills";
 import type { Drill } from "@/types";
 
 interface DrillPickerPopoverProps {
@@ -58,29 +58,46 @@ interface DrillPickerListProps {
 }
 
 function DrillPickerList({ onSelect }: DrillPickerListProps) {
+  const drills = useDrills();
   return (
     <Command>
       <CommandInput placeholder="Search drills..." />
       <CommandList>
         <CommandEmpty>No drills found.</CommandEmpty>
         <CommandGroup heading="Warm-ups">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("warmup")).map((drill) => (
-            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-          ))}
+          {drills
+            .filter((d) => d.tags.includes("warmup"))
+            .map((drill) => (
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
+            ))}
         </CommandGroup>
         <CommandGroup heading="Drills">
-          {MOCK_DRILLS.filter(
-            (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
-          ).map((drill) => (
-            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-          ))}
+          {drills
+            .filter(
+              (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
+            )
+            .map((drill) => (
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
+            ))}
         </CommandGroup>
         <CommandGroup heading="Cool-downs">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map(
-            (drill) => (
-              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-            ),
-          )}
+          {drills
+            .filter((d) => d.tags.includes("cooldown"))
+            .map((drill) => (
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
+            ))}
         </CommandGroup>
       </CommandList>
     </Command>

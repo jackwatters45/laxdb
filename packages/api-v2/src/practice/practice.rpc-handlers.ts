@@ -1,12 +1,6 @@
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
 
-import {
-  asPractice,
-  asPracticeItem as asItem,
-  asPracticeReview as asReview,
-} from "../lib/mappers";
-
 import { PracticeRpcs } from "./practice.rpc";
 
 export const PracticeRpcHandlers = PracticeRpcs.toLayer(
@@ -14,39 +8,19 @@ export const PracticeRpcHandlers = PracticeRpcs.toLayer(
     const service = yield* PracticeService;
 
     return {
-      // Practice CRUD
-      PracticeList: () =>
-        service.list().pipe(Effect.map((rows) => rows.map(asPractice))),
-      PracticeGet: (payload) =>
-        service.get(payload).pipe(Effect.map(asPractice)),
-      PracticeCreate: (payload) =>
-        service.create(payload).pipe(Effect.map(asPractice)),
-      PracticeUpdate: (payload) =>
-        service.update(payload).pipe(Effect.map(asPractice)),
-      PracticeDelete: (payload) =>
-        service.delete(payload).pipe(Effect.map(asPractice)),
-
-      // Practice items
-      PracticeListItems: (payload) =>
-        service.listItems(payload).pipe(Effect.map((rows) => rows.map(asItem))),
-      PracticeAddItem: (payload) =>
-        service.addItem(payload).pipe(Effect.map(asItem)),
-      PracticeUpdateItem: (payload) =>
-        service.updateItem(payload).pipe(Effect.map(asItem)),
-      PracticeRemoveItem: (payload) =>
-        service.removeItem(payload).pipe(Effect.map(asItem)),
-      PracticeReorderItems: (payload) =>
-        service
-          .reorderItems(payload)
-          .pipe(Effect.map((rows) => rows.map(asItem))),
-
-      // Practice review
-      PracticeGetReview: (payload) =>
-        service.getReview(payload).pipe(Effect.map(asReview)),
-      PracticeCreateReview: (payload) =>
-        service.createReview(payload).pipe(Effect.map(asReview)),
-      PracticeUpdateReview: (payload) =>
-        service.updateReview(payload).pipe(Effect.map(asReview)),
+      PracticeList: () => service.list(),
+      PracticeGet: (payload) => service.get(payload),
+      PracticeCreate: (payload) => service.create(payload),
+      PracticeUpdate: (payload) => service.update(payload),
+      PracticeDelete: (payload) => service.delete(payload),
+      PracticeListItems: (payload) => service.listItems(payload),
+      PracticeAddItem: (payload) => service.addItem(payload),
+      PracticeUpdateItem: (payload) => service.updateItem(payload),
+      PracticeRemoveItem: (payload) => service.removeItem(payload),
+      PracticeReorderItems: (payload) => service.reorderItems(payload),
+      PracticeGetReview: (payload) => service.getReview(payload),
+      PracticeCreateReview: (payload) => service.createReview(payload),
+      PracticeUpdateReview: (payload) => service.updateReview(payload),
     };
   }),
 ).pipe(Layer.provide(PracticeService.layer));

@@ -5,6 +5,9 @@ import { decodeArguments, parsePostgresError } from "../util";
 
 import { PracticeRepo } from "./practice.repo";
 import {
+  Practice,
+  PracticeItem,
+  PracticeReview,
   AddItemInput,
   CreatePracticeInput,
   CreateReviewInput,
@@ -12,9 +15,6 @@ import {
   GetPracticeInput,
   GetReviewInput,
   ListItemsInput,
-  Practice,
-  PracticeItem,
-  PracticeReview,
   RemoveItemInput,
   ReorderItemsInput,
   UpdateItemInput,
@@ -135,7 +135,6 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ListItemsInput, input);
             return yield* repo.listItems(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asItem)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
@@ -207,7 +206,6 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ReorderItemsInput, input);
             return yield* repo.reorderItems(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asItem)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),

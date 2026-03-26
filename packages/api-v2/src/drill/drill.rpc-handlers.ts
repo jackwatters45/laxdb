@@ -1,8 +1,6 @@
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer } from "effect";
 
-import { asDrill } from "../lib/mappers";
-
 import { DrillRpcs } from "./drill.rpc";
 
 export const DrillRpcHandlers = DrillRpcs.toLayer(
@@ -10,15 +8,11 @@ export const DrillRpcHandlers = DrillRpcs.toLayer(
     const service = yield* DrillService;
 
     return {
-      DrillList: () =>
-        service.list().pipe(Effect.map((rows) => rows.map(asDrill))),
-      DrillGet: (payload) => service.get(payload).pipe(Effect.map(asDrill)),
-      DrillCreate: (payload) =>
-        service.create(payload).pipe(Effect.map(asDrill)),
-      DrillUpdate: (payload) =>
-        service.update(payload).pipe(Effect.map(asDrill)),
-      DrillDelete: (payload) =>
-        service.delete(payload).pipe(Effect.map(asDrill)),
+      DrillList: () => service.list(),
+      DrillGet: (payload) => service.get(payload),
+      DrillCreate: (payload) => service.create(payload),
+      DrillUpdate: (payload) => service.update(payload),
+      DrillDelete: (payload) => service.delete(payload),
     };
   }),
 ).pipe(Layer.provide(DrillService.layer));

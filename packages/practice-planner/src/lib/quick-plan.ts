@@ -1,5 +1,4 @@
-import { MOCK_DRILLS } from "@/data/mock";
-import type { PracticeNode, PracticeEdge, DrillCategory } from "@/types";
+import type { Drill, PracticeNode, PracticeEdge, DrillCategory } from "@/types";
 
 function nextId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -22,7 +21,10 @@ interface QuickPlanResult {
  * and arranging them in a standard flow:
  *   Start -> Warm-up -> Drills -> Water Break -> More Drills -> Cool-down
  */
-export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
+export function generateQuickPlan(
+  drills: readonly Drill[],
+  options: QuickPlanOptions,
+): QuickPlanResult {
   const { durationMinutes, categories, includeWarmup, includeCooldown } =
     options;
 
@@ -50,7 +52,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
 
   // Warm-up
   if (includeWarmup) {
-    const warmupDrills = MOCK_DRILLS.filter((d) => d.tags.includes("warmup"));
+    const warmupDrills = drills.filter((d) => d.tags.includes("warmup"));
 
     for (const drill of warmupDrills) {
       if (remainingMinutes <= 0) break;
@@ -59,7 +61,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
         id: nextId("node"),
         type: "warmup",
         variant: "default",
-        drillId: drill.id,
+        drillId: drill.publicId,
         label: drill.name,
         durationMinutes: dur,
         notes: drill.subtitle,
@@ -74,9 +76,9 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
   }
 
   // Main drills from selected categories
-  const matchingDrills = MOCK_DRILLS.filter(
+  const matchingDrills = drills.filter(
     (d) =>
-      d.categories.some((c) => categories.includes(c)) &&
+      d.category.some((c) => categories.includes(c)) &&
       !d.tags.includes("warmup") &&
       !d.tags.includes("cooldown"),
   );
@@ -94,7 +96,7 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
       id: nextId("node"),
       type: "drill",
       variant: "default",
-      drillId: drill.id,
+      drillId: drill.publicId,
       label: drill.name,
       durationMinutes: dur,
       notes: drill.subtitle,
@@ -129,13 +131,13 @@ export function generateQuickPlan(options: QuickPlanOptions): QuickPlanResult {
 
   // Cooldown
   if (includeCooldown) {
-    const cooldown = MOCK_DRILLS.find((d) => d.tags.includes("cooldown"));
+    const cooldown = drills.find((d) => d.tags.includes("cooldown"));
     if (cooldown) {
       const node: PracticeNode = {
         id: nextId("node"),
         type: "cooldown",
         variant: "default",
-        drillId: cooldown.id,
+        drillId: cooldown.publicId,
         label: cooldown.name,
         durationMinutes: cooldown.durationMinutes ?? 10,
         notes: cooldown.subtitle,

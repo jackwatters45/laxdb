@@ -33,7 +33,8 @@ import {
   Target,
 } from "lucide-react";
 
-import { MOCK_DRILLS } from "@/data/mock";
+import { useDrills } from "@/hooks/use-drills";
+import { drillToType } from "@/lib/drill-utils";
 import type {
   Drill,
   PracticeNode,
@@ -59,12 +60,6 @@ const PRIORITY_OPTIONS: { value: PracticeItemPriority; label: string }[] = [
   { value: "if-time", label: "If Time" },
 ];
 
-function drillToType(drill: Drill): PracticeItemType {
-  if (drill.tags.includes("warmup")) return "warmup";
-  if (drill.tags.includes("cooldown")) return "cooldown";
-  return "drill";
-}
-
 export function ConfigPanel({
   node,
   onUpdate,
@@ -74,8 +69,9 @@ export function ConfigPanel({
   canMoveDown,
   onClose,
 }: ConfigPanelProps) {
+  const drills = useDrills();
   const linkedDrill = node.drillId
-    ? MOCK_DRILLS.find((d) => d.id === node.drillId)
+    ? drills.find((d) => d.publicId === node.drillId)
     : null;
 
   const isStart = node.variant === "start";
@@ -84,7 +80,7 @@ export function ConfigPanel({
 
   const handleSwapDrill = (drill: Drill) => {
     onUpdate(node.id, {
-      drillId: drill.id,
+      drillId: drill.publicId,
       label: drill.name,
       type: drillToType(drill),
       durationMinutes: drill.durationMinutes,

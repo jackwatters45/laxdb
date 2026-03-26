@@ -9,7 +9,8 @@ import {
 import { Search, Clock, Flame, Target, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock";
+import { useDrills } from "@/hooks/use-drills";
+import { drillToType } from "@/lib/drill-utils";
 import type { Drill, PracticeItemType } from "@/types";
 
 interface DrillSidebarProps {
@@ -32,21 +33,16 @@ const CATEGORIES = [
   { value: "cooldown", label: "Cool-downs", tag: "cooldown" },
 ] as const;
 
-function drillToType(drill: Drill): PracticeItemType {
-  if (drill.tags.includes("warmup")) return "warmup";
-  if (drill.tags.includes("cooldown")) return "cooldown";
-  return "drill";
-}
-
 export function DrillSidebar({
   isOpen,
   onClose,
   onAddDrill,
 }: DrillSidebarProps) {
+  const drills = useDrills();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const filtered = MOCK_DRILLS.filter((drill) => {
+  const filtered = drills.filter((drill) => {
     const matchesSearch =
       !search ||
       drill.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -56,9 +52,7 @@ export function DrillSidebar({
     const cat = CATEGORIES.find((c) => c.value === activeCategory);
     const matchesCategory =
       activeCategory === "all" ||
-      drill.categories.includes(
-        activeCategory as Drill["categories"][number],
-      ) ||
+      drill.category.includes(activeCategory as Drill["category"][number]) ||
       (cat && "tag" in cat && drill.tags.includes(cat.tag));
 
     return matchesSearch && matchesCategory;
@@ -120,7 +114,7 @@ export function DrillSidebar({
         <div className="p-3 space-y-1">
           {filtered.map((drill) => (
             <DrillCard
-              key={drill.id}
+              key={drill.publicId}
               drill={drill}
               onAdd={() => {
                 onAddDrill(drill, drillToType(drill));

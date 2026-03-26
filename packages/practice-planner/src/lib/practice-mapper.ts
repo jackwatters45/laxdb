@@ -11,7 +11,7 @@ import type {
 
 import { autoLayout } from "@/lib/layout";
 import type {
-  Practice,
+  PracticeGraph,
   PracticeNode,
   PracticeEdge,
   PracticeNodeVariant,
@@ -23,24 +23,24 @@ import type {
 // DB → Frontend
 // ---------------------------------------------------------------------------
 
-/** Reconstruct a frontend Practice from DB practice + items */
+/** Reconstruct a frontend PracticeGraph from DB practice + items */
 export function fromDb(
   dbPractice: typeof DbPractice.Type,
   dbItems: readonly (typeof DbItem.Type)[],
-): Practice {
+): PracticeGraph {
   const sorted = [...dbItems].toSorted((a, b) => a.orderIndex - b.orderIndex);
 
   // Build nodes
   const nodes: PracticeNode[] = sorted.map((item) => ({
     id: item.publicId,
-    type: item.type as PracticeItemType,
+    type: item.type,
     variant: (item.variant ?? "default") as PracticeNodeVariant,
     drillId: item.drillPublicId,
     label: item.label ?? "",
     durationMinutes: item.durationMinutes,
     notes: item.notes,
     groups: [...item.groups],
-    priority: item.priority as PracticeItemPriority,
+    priority: item.priority,
     position: {
       x: item.positionX ?? 0,
       y: item.positionY ?? 0,
@@ -83,7 +83,7 @@ export function fromDb(
 // ---------------------------------------------------------------------------
 
 /** Extract practice metadata for update */
-export function toPracticeUpdate(practice: Practice) {
+export function toPracticeUpdate(practice: PracticeGraph) {
   return {
     publicId: practice.id,
     name: practice.name,
@@ -97,7 +97,7 @@ export function toPracticeUpdate(practice: Practice) {
 }
 
 /** Convert frontend nodes to DB item inputs, preserving order from edges */
-export function toItemInputs(practice: Practice) {
+export function toItemInputs(practice: PracticeGraph) {
   // Topological sort via edges to get order
   const ordered = topologicalSort(practice.nodes, practice.edges);
 
