@@ -5,13 +5,13 @@ import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { FileText, MapPin, Calendar, Clock, X } from "lucide-react";
 
-import type { Practice } from "@/types";
+import type { PracticeGraph } from "@/types";
 
 interface PracticeSettingsProps {
-  practice: Practice;
+  practice: PracticeGraph;
   totalMinutes: number;
   blockCount: number;
-  onUpdate: (updates: Partial<Practice>) => void;
+  onUpdate: (updates: Partial<PracticeGraph>) => void;
   onClose: () => void;
 }
 

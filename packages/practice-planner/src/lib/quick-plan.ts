@@ -22,7 +22,7 @@ interface QuickPlanResult {
  *   Start -> Warm-up -> Drills -> Water Break -> More Drills -> Cool-down
  */
 export function generateQuickPlan(
-  drills: Drill[],
+  drills: readonly Drill[],
   options: QuickPlanOptions,
 ): QuickPlanResult {
   const { durationMinutes, categories, includeWarmup, includeCooldown } =
@@ -61,7 +61,7 @@ export function generateQuickPlan(
         id: nextId("node"),
         type: "warmup",
         variant: "default",
-        drillId: drill.id,
+        drillId: drill.publicId,
         label: drill.name,
         durationMinutes: dur,
         notes: drill.subtitle,
@@ -78,7 +78,7 @@ export function generateQuickPlan(
   // Main drills from selected categories
   const matchingDrills = drills.filter(
     (d) =>
-      d.categories.some((c) => categories.includes(c)) &&
+      d.category.some((c) => categories.includes(c)) &&
       !d.tags.includes("warmup") &&
       !d.tags.includes("cooldown"),
   );
@@ -96,7 +96,7 @@ export function generateQuickPlan(
       id: nextId("node"),
       type: "drill",
       variant: "default",
-      drillId: drill.id,
+      drillId: drill.publicId,
       label: drill.name,
       durationMinutes: dur,
       notes: drill.subtitle,
@@ -137,7 +137,7 @@ export function generateQuickPlan(
         id: nextId("node"),
         type: "cooldown",
         variant: "default",
-        drillId: cooldown.id,
+        drillId: cooldown.publicId,
         label: cooldown.name,
         durationMinutes: cooldown.durationMinutes ?? 10,
         notes: cooldown.subtitle,

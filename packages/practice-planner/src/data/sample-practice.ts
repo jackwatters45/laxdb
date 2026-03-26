@@ -1,7 +1,7 @@
-import type { Practice } from "../types";
+import type { PracticeGraph } from "../types";
 
 /** Pre-built example practice for the starting state */
-export const SAMPLE_PRACTICE: Practice = {
+export const SAMPLE_PRACTICE: PracticeGraph = {
   id: "practice-sample-1",
   name: "Tuesday Team Practice",
   date: "2026-03-17",

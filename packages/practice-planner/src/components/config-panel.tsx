@@ -33,6 +33,8 @@ import {
   Target,
 } from "lucide-react";
 
+import { useDrills } from "@/hooks/use-drills";
+import { drillToType } from "@/lib/drill-utils";
 import type {
   Drill,
   PracticeNode,
@@ -43,7 +45,6 @@ import type {
 import { DrillPickerPopover } from "./drill-picker";
 
 interface ConfigPanelProps {
-  drills: Drill[];
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
   onDelete: (nodeId: string) => void;
@@ -59,14 +60,7 @@ const PRIORITY_OPTIONS: { value: PracticeItemPriority; label: string }[] = [
   { value: "if-time", label: "If Time" },
 ];
 
-function drillToType(drill: Drill): PracticeItemType {
-  if (drill.tags.includes("warmup")) return "warmup";
-  if (drill.tags.includes("cooldown")) return "cooldown";
-  return "drill";
-}
-
 export function ConfigPanel({
-  drills,
   node,
   onUpdate,
   onDelete,
@@ -75,8 +69,9 @@ export function ConfigPanel({
   canMoveDown,
   onClose,
 }: ConfigPanelProps) {
+  const drills = useDrills();
   const linkedDrill = node.drillId
-    ? drills.find((d) => d.id === node.drillId)
+    ? drills.find((d) => d.publicId === node.drillId)
     : null;
 
   const isStart = node.variant === "start";
@@ -85,7 +80,7 @@ export function ConfigPanel({
 
   const handleSwapDrill = (drill: Drill) => {
     onUpdate(node.id, {
-      drillId: drill.id,
+      drillId: drill.publicId,
       label: drill.name,
       type: drillToType(drill),
       durationMinutes: drill.durationMinutes,
@@ -140,17 +135,13 @@ export function ConfigPanel({
 
       {/* Drill identity — top of panel */}
       {linkedDrill && (
-        <DrillIdentity
-          drill={linkedDrill}
-          drills={drills}
-          onSwap={handleSwapDrill}
-        />
+        <DrillIdentity drill={linkedDrill} onSwap={handleSwapDrill} />
       )}
 
       {/* No drill linked — prompt to pick one */}
       {!linkedDrill && !isSpecial && (
         <div className="px-4 py-3 border-b border-border">
-          <DrillPickerPopover drills={drills} onSelect={handleSwapDrill}>
+          <DrillPickerPopover onSelect={handleSwapDrill}>
             <Button variant="outline" size="lg" className="w-full">
               <Target />
               Pick a drill
@@ -296,11 +287,9 @@ export function ConfigPanel({
 
 function DrillIdentity({
   drill,
-  drills,
   onSwap,
 }: {
   drill: Drill;
-  drills: Drill[];
   onSwap: (drill: Drill) => void;
 }) {
   const Icon = drill.tags.includes("warmup")
@@ -325,7 +314,7 @@ function DrillIdentity({
             )}
           </div>
         </div>
-        <DrillPickerPopover drills={drills} onSelect={onSwap}>
+        <DrillPickerPopover onSelect={onSwap}>
           <Button variant="ghost" size="icon-sm" aria-label="Swap drill">
             <ArrowRightLeft />
           </Button>

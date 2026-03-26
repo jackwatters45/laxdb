@@ -14,10 +14,10 @@ import {
 import { Clock, Flame, Snowflake, Target } from "lucide-react";
 import { useState } from "react";
 
+import { useDrills } from "@/hooks/use-drills";
 import type { Drill } from "@/types";
 
 interface DrillPickerPopoverProps {
-  drills: Drill[];
   children: React.ReactNode;
   onSelect: (drill: Drill) => void;
   open?: boolean;
@@ -29,12 +29,12 @@ interface DrillPickerPopoverProps {
  * Wraps a trigger element (e.g. the "+" button between nodes).
  */
 export function DrillPickerPopover({
-  drills,
   children,
   onSelect,
   open,
   onOpenChange,
 }: DrillPickerPopoverProps) {
+  const drills = useDrills();
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = open ?? internalOpen;
   const setIsOpen = onOpenChange ?? setInternalOpen;
@@ -44,7 +44,6 @@ export function DrillPickerPopover({
       <PopoverTrigger render={children as React.ReactElement} />
       <PopoverContent className="w-[280px] p-0" side="right" align="start">
         <DrillPickerList
-          drills={drills}
           onSelect={(drill) => {
             onSelect(drill);
             setIsOpen(false);
@@ -56,11 +55,11 @@ export function DrillPickerPopover({
 }
 
 interface DrillPickerListProps {
-  drills: Drill[];
   onSelect: (drill: Drill) => void;
 }
 
-function DrillPickerList({ drills, onSelect }: DrillPickerListProps) {
+function DrillPickerList({ onSelect }: DrillPickerListProps) {
+  const drills = useDrills();
   return (
     <Command>
       <CommandInput placeholder="Search drills..." />
@@ -70,7 +69,11 @@ function DrillPickerList({ drills, onSelect }: DrillPickerListProps) {
           {drills
             .filter((d) => d.tags.includes("warmup"))
             .map((drill) => (
-              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
             ))}
         </CommandGroup>
         <CommandGroup heading="Drills">
@@ -79,14 +82,22 @@ function DrillPickerList({ drills, onSelect }: DrillPickerListProps) {
               (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
             )
             .map((drill) => (
-              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
             ))}
         </CommandGroup>
         <CommandGroup heading="Cool-downs">
           {drills
             .filter((d) => d.tags.includes("cooldown"))
             .map((drill) => (
-              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+              <DrillOption
+                key={drill.publicId}
+                drill={drill}
+                onSelect={onSelect}
+              />
             ))}
         </CommandGroup>
       </CommandList>
