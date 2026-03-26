@@ -26,7 +26,7 @@ export const DrillContract = {
   list: {
     success: Schema.Array(Drill),
     error: DrillErrors,
-    payload: Schema.Void,
+    payload: Schema.NullOr(Schema.Void),
   },
   get: {
     success: Drill,

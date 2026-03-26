@@ -1,12 +1,12 @@
 import { DatabaseLive } from "@laxdb/core-v2/drizzle/drizzle.service";
 import { Layer } from "effect";
 
-import { DrillHandlers } from "./drill/drill.rpc";
-import { PlayerHandlers } from "./player/player.rpc";
-import { PracticeHandlers } from "./practice/practice.rpc";
+import { DrillRpcHandlers } from "./drill/drill.rpc-handlers";
+import { PlayerRpcHandlers } from "./player/player.rpc-handlers";
+import { PracticeRpcHandlers } from "./practice/practice.rpc-handlers";
 
 export const LaxdbRpcV2Handlers = Layer.mergeAll(
-  DrillHandlers,
-  PlayerHandlers,
-  PracticeHandlers,
+  DrillRpcHandlers,
+  PlayerRpcHandlers,
+  PracticeRpcHandlers,
 ).pipe(Layer.provide(DatabaseLive));

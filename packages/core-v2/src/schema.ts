@@ -35,7 +35,7 @@ export const DateSchema = DateFromString.annotate({
 });
 
 export const CreatedAtSchema = DateFromString;
-export const UpdatedAtSchema = Schema.NullOr(DateFromString);
+export const UpdatedAtSchema = Schema.UndefinedOr(Schema.NullOr(DateFromString));
 
 export const TimestampsSchema = {
   createdAt: CreatedAtSchema,
