@@ -7,7 +7,7 @@
  * Only call runApi() from inside createServerFn handlers.
  */
 import { RpcApiClient } from "@laxdb/api-v2/client";
-import { Effect, Layer, ManagedRuntime } from "effect";
+import { type Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 import { RpcClient, RpcSerialization } from "effect/unstable/rpc";
 
