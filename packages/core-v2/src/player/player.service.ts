@@ -6,12 +6,9 @@ import { decodeArguments, parsePostgresError } from "../util";
 import { PlayerRepo } from "./player.repo";
 import {
   CreatePlayerInput,
-  Player,
   PlayerByIdInput,
   UpdatePlayerInput,
 } from "./player.schema";
-
-const asPlayer = (row: typeof Player.Type) => new Player(row);
 
 export class PlayerService extends ServiceMap.Service<PlayerService>()(
   "PlayerService",
@@ -22,7 +19,6 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
       return {
         list: () =>
           repo.list().pipe(
-            Effect.map((rows) => rows.map(asPlayer)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
@@ -36,7 +32,6 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.getByPublicId(decoded.publicId);
           }).pipe(
-            Effect.map(asPlayer),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
@@ -53,7 +48,6 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
             const decoded = yield* decodeArguments(CreatePlayerInput, input);
             return yield* repo.create(decoded);
           }).pipe(
-            Effect.map(asPlayer),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: "create" }),
@@ -73,7 +67,6 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
             const decoded = yield* decodeArguments(UpdatePlayerInput, input);
             return yield* repo.update(decoded.publicId, decoded);
           }).pipe(
-            Effect.map(asPlayer),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
@@ -93,7 +86,6 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.delete(decoded.publicId);
           }).pipe(
-            Effect.map(asPlayer),
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
