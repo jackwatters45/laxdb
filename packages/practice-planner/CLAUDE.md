@@ -6,11 +6,13 @@
 
 - **Framework**: TanStack Start (React 19)
 - **Styling**: Tailwind v4 via `@tailwindcss/vite`
-- **Deployment**: Cloudflare Workers via Alchemy
+- **Deployment**: Cloudflare Workers via Alchemy (NO wrangler — Alchemy handles all builds, deploys, bindings, and local dev)
 - **UI Components**: Consume from `@laxdb/ui` (includes `cn`, `motion`)
+- **API**: Service binding to `api-v2` worker (bound as `API` in `alchemy.run.ts`). Use `env.API.fetch()` to call RPCs — no external URLs.
 
 ## Key Patterns
 
+- **Backend is core-v2 + api-v2**: All data access goes through `@laxdb/core-v2` services exposed via `@laxdb/api-v2` Effect RPC. Never use `@laxdb/core` or `@laxdb/api` (v1). Do NOT reference `packages/web` — it is outdated and uses v1 patterns.
 - **No duplicate deps**: Utilities (`cn`, `clsx`, `tailwind-merge`) come from `@laxdb/ui`. Don't add them as direct dependencies.
 - **Icon version alignment**: `lucide-react` version must match `@laxdb/ui` to avoid duplicate bundles.
 - **CSS tokens**: Import via `@import "@laxdb/ui/globals.css"` in `globals.css`.

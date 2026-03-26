@@ -27,6 +27,8 @@ export const PracticeItemType = Schema.Literals([
   "activity",
 ]);
 
+export const PracticeItemVariant = Schema.Literals(["default", "split"]);
+
 export const PracticeItemPriority = Schema.Literals([
   "required",
   "optional",
@@ -53,12 +55,15 @@ export class PracticeItem extends Schema.Class<PracticeItem>("PracticeItem")({
   ...PublicIdSchema,
   practicePublicId: NanoidSchema,
   type: PracticeItemType,
+  variant: PracticeItemVariant,
   drillPublicId: Schema.NullOr(NanoidSchema),
   label: Schema.NullOr(Schema.String),
   durationMinutes: Schema.NullOr(Schema.Number),
   notes: Schema.NullOr(Schema.String),
   groups: Schema.Array(Schema.String),
   orderIndex: Schema.Number,
+  positionX: Schema.NullOr(Schema.Number),
+  positionY: Schema.NullOr(Schema.Number),
   priority: PracticeItemPriority,
   ...TimestampsSchema,
 }) {}
@@ -122,12 +127,15 @@ export class DeletePracticeInput extends Schema.Class<DeletePracticeInput>(
 export class AddItemInput extends Schema.Class<AddItemInput>("AddItemInput")({
   practicePublicId: NanoidSchema,
   type: PracticeItemType,
+  variant: Schema.optional(PracticeItemVariant),
   drillPublicId: Schema.optional(Schema.NullOr(NanoidSchema)),
   label: Schema.optional(Schema.NullOr(Schema.String)),
   durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),
   notes: Schema.optional(Schema.NullOr(Schema.String)),
   groups: Schema.optional(Schema.Array(Schema.String)),
   orderIndex: Schema.optional(Schema.Number),
+  positionX: Schema.optional(Schema.NullOr(Schema.Number)),
+  positionY: Schema.optional(Schema.NullOr(Schema.Number)),
   priority: Schema.optional(PracticeItemPriority),
 }) {}
 
@@ -136,12 +144,15 @@ export class UpdateItemInput extends Schema.Class<UpdateItemInput>(
 )({
   publicId: NanoidSchema,
   type: Schema.optional(PracticeItemType),
+  variant: Schema.optional(PracticeItemVariant),
   drillPublicId: Schema.optional(Schema.NullOr(NanoidSchema)),
   label: Schema.optional(Schema.NullOr(Schema.String)),
   durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),
   notes: Schema.optional(Schema.NullOr(Schema.String)),
   groups: Schema.optional(Schema.Array(Schema.String)),
   orderIndex: Schema.optional(Schema.Number),
+  positionX: Schema.optional(Schema.NullOr(Schema.Number)),
+  positionY: Schema.optional(Schema.NullOr(Schema.Number)),
   priority: Schema.optional(PracticeItemPriority),
 }) {}
 
@@ -191,3 +202,10 @@ export class UpdateReviewInput extends Schema.Class<UpdateReviewInput>(
   needsImprovement: Schema.optional(Schema.NullOr(Schema.String)),
   notes: Schema.optional(Schema.NullOr(Schema.String)),
 }) {}
+
+/** Wrap plain rows as Schema.Class instances */
+export const asPractice = (row: typeof Practice.Type) => new Practice(row);
+export const asPracticeItem = (row: typeof PracticeItem.Type) =>
+  new PracticeItem(row);
+export const asPracticeReview = (row: typeof PracticeReview.Type) =>
+  new PracticeReview(row);

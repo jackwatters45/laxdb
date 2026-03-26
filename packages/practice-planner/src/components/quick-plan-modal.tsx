@@ -1,4 +1,20 @@
-import { Sparkles, Clock, X } from "lucide-react";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@laxdb/ui/components/ui/dialog";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Label } from "@laxdb/ui/components/ui/label";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@laxdb/ui/components/ui/toggle-group";
+import { Sparkles, Clock } from "lucide-react";
 import { useState } from "react";
 
 import type { DrillCategory } from "@/data/types";
@@ -14,20 +30,16 @@ interface QuickPlanModalProps {
   }) => void;
 }
 
-const CATEGORY_OPTIONS: {
-  value: DrillCategory;
-  label: string;
-  emoji: string;
-}[] = [
-  { value: "passing", label: "Passing", emoji: "." },
-  { value: "shooting", label: "Shooting", emoji: "." },
-  { value: "defense", label: "Defense", emoji: "." },
-  { value: "ground-balls", label: "Ground Balls", emoji: "." },
-  { value: "face-offs", label: "Face-offs", emoji: "." },
-  { value: "transition", label: "Transition", emoji: "." },
-  { value: "man-up", label: "Man-Up", emoji: "." },
-  { value: "man-down", label: "Man-Down", emoji: "." },
-  { value: "conditioning", label: "Conditioning", emoji: "." },
+const CATEGORY_OPTIONS: { value: DrillCategory; label: string }[] = [
+  { value: "passing", label: "Passing" },
+  { value: "shooting", label: "Shooting" },
+  { value: "defense", label: "Defense" },
+  { value: "ground-balls", label: "Ground Balls" },
+  { value: "face-offs", label: "Face-offs" },
+  { value: "transition", label: "Transition" },
+  { value: "man-up", label: "Man-Up" },
+  { value: "man-down", label: "Man-Down" },
+  { value: "conditioning", label: "Conditioning" },
 ];
 
 const DURATION_PRESETS = [60, 90, 120];
@@ -46,8 +58,6 @@ export function QuickPlanModal({
   const [includeWarmup, setIncludeWarmup] = useState(true);
   const [includeCooldown, setIncludeCooldown] = useState(true);
 
-  if (!isOpen) return null;
-
   const toggleCategory = (cat: DrillCategory) => {
     setCategories((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
@@ -55,74 +65,53 @@ export function QuickPlanModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent className="sm:max-w-[460px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Sparkles className="size-4 text-amber-500" />
+            Quick Plan
+          </DialogTitle>
+          <DialogDescription>
+            Auto-generate a practice flow in seconds
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Modal */}
-      <div className="z-10 w-[460px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-5 pb-4">
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/30">
-            <Sparkles
-              size={18}
-              className="text-amber-600 dark:text-amber-400"
-            />
-          </div>
-          <div>
-            <h2
-              className="text-base font-semibold text-foreground"
-              style={{ fontFamily: "var(--font-sans)", fontStyle: "normal" }}
-            >
-              Quick Plan
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Auto-generate a practice flow in seconds
-            </p>
-          </div>
-          <button
-            aria-label="Close"
-            onClick={onClose}
-            className="ml-auto p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="px-5 pb-4 space-y-5">
+        <div className="space-y-5 py-2">
           {/* Duration */}
-          <div>
-            <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-              <Clock size={12} />
+          <div className="space-y-2">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground gap-1.5">
+              <Clock className="size-3" />
               Practice Duration
-            </label>
+            </Label>
             <div className="flex items-center gap-2">
-              {DURATION_PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  onClick={() => {
-                    setDuration(preset);
-                  }}
-                  className={`px-4 py-2 text-sm rounded-lg border transition-all ${
-                    duration === preset
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-foreground border-border hover:border-foreground/30"
-                  }`}
-                >
-                  {preset} min
-                </button>
-              ))}
-              <input
+              <ToggleGroup
+                value={[String(duration)]}
+                onValueChange={(values) => {
+                  const next = values[0] as string | undefined;
+                  if (next) setDuration(parseInt(next, 10));
+                }}
+                variant="outline"
+                spacing={1}
+              >
+                {DURATION_PRESETS.map((preset) => (
+                  <ToggleGroupItem key={preset} value={String(preset)}>
+                    {preset} min
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+              <Input
                 type="number"
                 value={duration}
                 onChange={(e) => {
                   setDuration(parseInt(e.target.value, 10) || 60);
                 }}
-                className="w-20 px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/10"
+                className="w-20"
                 min={30}
                 max={180}
               />
@@ -131,70 +120,61 @@ export function QuickPlanModal({
           </div>
 
           {/* Categories */}
-          <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">
+          <div className="space-y-2">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
               Focus Areas
-            </label>
+            </Label>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORY_OPTIONS.map((cat) => (
-                <button
+                <Button
                   key={cat.value}
+                  variant={
+                    categories.includes(cat.value) ? "default" : "outline"
+                  }
+                  size="sm"
                   onClick={() => {
                     toggleCategory(cat.value);
                   }}
-                  className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
-                    categories.includes(cat.value)
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-muted-foreground border-border hover:border-foreground/30"
-                  }`}
                 >
                   {cat.label}
-                </button>
+                </Button>
               ))}
             </div>
             {categories.length === 0 && (
-              <p className="text-[10px] text-destructive mt-1">
+              <p className="text-[10px] text-destructive">
                 Select at least one focus area
               </p>
             )}
           </div>
 
           {/* Options */}
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-              <input
-                type="checkbox"
+          <div className="flex gap-6">
+            <Label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
                 checked={includeWarmup}
-                onChange={(e) => {
-                  setIncludeWarmup(e.target.checked);
+                onCheckedChange={(checked) => {
+                  setIncludeWarmup(checked);
                 }}
-                className="rounded accent-foreground"
               />
               Include warm-up
-            </label>
-            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-              <input
-                type="checkbox"
+            </Label>
+            <Label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
                 checked={includeCooldown}
-                onChange={(e) => {
-                  setIncludeCooldown(e.target.checked);
+                onCheckedChange={(checked) => {
+                  setIncludeCooldown(checked);
                 }}
-                className="rounded accent-foreground"
               />
               Include cool-down
-            </label>
+            </Label>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-muted/30">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg"
-          >
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               if (categories.length > 0) {
                 onGenerate({
@@ -207,13 +187,12 @@ export function QuickPlanModal({
               }
             }}
             disabled={categories.length === 0}
-            className="px-5 py-2 text-sm font-medium bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Sparkles size={14} />
+            <Sparkles />
             Generate Plan
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

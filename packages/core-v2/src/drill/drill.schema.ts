@@ -120,3 +120,6 @@ export class DeleteDrillInput extends Schema.Class<DeleteDrillInput>(
 )({
   publicId: NanoidSchema,
 }) {}
+
+/** Wrap a plain row as a Schema.Class instance */
+export const asDrill = (row: typeof Drill.Type) => new Drill(row);

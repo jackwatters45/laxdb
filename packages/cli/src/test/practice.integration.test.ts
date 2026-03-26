@@ -4,26 +4,24 @@
  * Tests the full RPC round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcDrillClient } from "@laxdb/api-v2/drill/drill.client";
-import { RpcPracticeClient } from "@laxdb/api-v2/practice/practice.client";
+import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import {
-  makeRun,
-  startTestServer,
-  truncateAllTables,
-  type TestServer,
-} from "./server";
+import { apiLayer } from "../shared";
+
+import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
-let run: ReturnType<ReturnType<typeof makeRun<RpcPracticeClient>>>;
-let runDrill: ReturnType<ReturnType<typeof makeRun<RpcDrillClient>>>;
+
+const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+  effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
+
+const runDrill = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+  effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
   testServer = await startTestServer();
-  run = makeRun(RpcPracticeClient.layer)(testServer);
-  runDrill = makeRun(RpcDrillClient.layer)(testServer);
 });
 
 afterAll(async () => {
@@ -47,7 +45,7 @@ describe("Practice RPC", () => {
   it("lists practices (empty)", async () => {
     const practices = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         return yield* client.PracticeList();
       }),
     );
@@ -57,7 +55,7 @@ describe("Practice RPC", () => {
   it("creates a practice", async () => {
     const practice = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         return yield* client.PracticeCreate({
           ...minimalPractice,
           name: "Morning Practice",
@@ -75,7 +73,7 @@ describe("Practice RPC", () => {
   it("gets a practice by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         return yield* client.PracticeGet({ publicId: created.publicId });
       }),
@@ -86,7 +84,7 @@ describe("Practice RPC", () => {
   it("lists all practices", async () => {
     const practices = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         yield* client.PracticeCreate(minimalPractice);
         yield* client.PracticeCreate({
           ...minimalPractice,
@@ -101,7 +99,7 @@ describe("Practice RPC", () => {
   it("updates a practice", async () => {
     const updated = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         return yield* client.PracticeUpdate({
           publicId: created.publicId,
@@ -117,7 +115,7 @@ describe("Practice RPC", () => {
   it("deletes a practice", async () => {
     const remaining = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         yield* client.PracticeDelete({ publicId: created.publicId });
         return yield* client.PracticeList();
@@ -130,7 +128,7 @@ describe("Practice RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcPracticeClient;
+          const client = yield* RpcApiClient;
           return yield* client.PracticeGet({ publicId: "AbCdEfGhIjKl" });
         }),
       ),
@@ -167,7 +165,7 @@ describe("Practice Items RPC", () => {
   it("adds an item to a practice", async () => {
     const item = await run(
       Effect.gen(function* () {
-        const practice = yield* RpcPracticeClient;
+        const practice = yield* RpcApiClient;
         const created = yield* practice.PracticeCreate(minimalPractice);
         return yield* practice.PracticeAddItem({
           practicePublicId: created.publicId,
@@ -183,13 +181,13 @@ describe("Practice Items RPC", () => {
     // Create drill separately to avoid multiplexing two RPC groups on one connection
     const createdDrill = await runDrill(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         return yield* client.DrillCreate(minimalDrill);
       }),
     );
     const item = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const createdPractice = yield* client.PracticeCreate(minimalPractice);
         return yield* client.PracticeAddItem({
           practicePublicId: createdPractice.publicId,
@@ -204,7 +202,7 @@ describe("Practice Items RPC", () => {
   it("lists items for a practice", async () => {
     const items = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         yield* client.PracticeAddItem({
           practicePublicId: created.publicId,
@@ -225,7 +223,7 @@ describe("Practice Items RPC", () => {
   it("removes an item from a practice", async () => {
     const items = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         const item = yield* client.PracticeAddItem({
           practicePublicId: created.publicId,
@@ -254,7 +252,7 @@ describe("Practice Review RPC", () => {
   it("creates a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         return yield* client.PracticeCreateReview({
           practicePublicId: created.publicId,
@@ -271,7 +269,7 @@ describe("Practice Review RPC", () => {
   it("gets a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         yield* client.PracticeCreateReview({
           practicePublicId: created.publicId,
@@ -290,7 +288,7 @@ describe("Practice Review RPC", () => {
   it("updates a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPracticeClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PracticeCreate(minimalPractice);
         yield* client.PracticeCreateReview({
           practicePublicId: created.publicId,
@@ -311,7 +309,7 @@ describe("Practice Review RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcPracticeClient;
+          const client = yield* RpcApiClient;
           const created = yield* client.PracticeCreate(minimalPractice);
           return yield* client.PracticeGetReview({
             practicePublicId: created.publicId,

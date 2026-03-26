@@ -11,7 +11,16 @@ import {
 import globalsCss from "@/globals.css?url";
 import { siteConfig } from "@/site";
 
+function NotFound() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-muted-foreground">Page not found</p>
+    </div>
+  );
+}
+
 export const Route = createRootRoute({
+  notFoundComponent: NotFound,
   head: () => ({
     meta: [
       { charSet: "utf-8" },

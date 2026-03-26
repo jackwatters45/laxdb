@@ -4,7 +4,9 @@
  * Common flags and helpers used across all CLI subcommands.
  */
 
-import { Effect } from "effect";
+import { RpcApiClient } from "@laxdb/api-v2/client";
+import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { Effect, Layer } from "effect";
 import { Flag } from "effect/unstable/cli";
 
 export const prettyFlag = Flag.boolean("pretty").pipe(
@@ -27,3 +29,6 @@ export const readStdin: Effect.Effect<unknown, Error> = Effect.tryPromise({
   catch: (e: unknown) =>
     new Error(`Failed to read JSON from stdin: ${String(e)}`),
 });
+
+export const apiLayer = (baseUrl: string) =>
+  RpcApiClient.layer.pipe(Layer.provide(makeRpcProtocol(baseUrl)));

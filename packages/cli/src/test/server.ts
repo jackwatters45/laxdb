@@ -8,10 +8,9 @@
 
 import { createServer, type Server } from "node:http";
 
-import { DrillHandlers } from "@laxdb/api-v2/drill/drill.rpc";
-import { PlayerHandlers } from "@laxdb/api-v2/player/player.rpc";
-import { PracticeHandlers } from "@laxdb/api-v2/practice/practice.rpc";
-import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { DrillRpcHandlers } from "@laxdb/api-v2/drill/drill.rpc-handlers";
+import { PlayerRpcHandlers } from "@laxdb/api-v2/player/player.rpc-handlers";
+import { PracticeRpcHandlers } from "@laxdb/api-v2/practice/practice.rpc-handlers";
 import { LaxdbRpcV2 } from "@laxdb/api-v2/rpc-group";
 import { TestDatabaseLive, truncateAll } from "@laxdb/core-v2/test/db";
 import { DateTime, Effect, Layer } from "effect";
@@ -20,9 +19,9 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 // Handler layers with test database instead of production DatabaseLive
 const TestHandlers = Layer.mergeAll(
-  DrillHandlers,
-  PlayerHandlers,
-  PracticeHandlers,
+  DrillRpcHandlers,
+  PlayerRpcHandlers,
+  PracticeRpcHandlers,
 ).pipe(Layer.provide(TestDatabaseLive));
 
 const RpcRouter = RpcServer.layerHttp({
@@ -54,6 +53,7 @@ export async function startTestServer(): Promise<TestServer> {
   const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
 
   const server = createServer(async (req, res) => {
+    const url = `http://localhost${req.url ?? "/"}`;
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value) {
@@ -71,11 +71,13 @@ export async function startTestServer(): Promise<TestServer> {
         : await new Promise<Buffer>((resolve, reject) => {
             const chunks: Buffer[] = [];
             req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () =>{  resolve(Buffer.concat(chunks)); });
+            req.on("end", () => {
+              resolve(Buffer.concat(chunks));
+            });
             req.on("error", reject);
           });
 
-    const request = new Request(`http://localhost${req.url ?? "/"}`, {
+    const request = new Request(url, {
       method: req.method,
       headers,
       body,
@@ -116,19 +118,5 @@ export async function startTestServer(): Promise<TestServer> {
  */
 export const truncateAllTables = () =>
   Effect.provide(truncateAll, TestDatabaseLive).pipe(Effect.runPromise);
-
-/**
- * Create a typed run helper for a given RPC client layer.
- */
-export const makeRun =
-  <Client>(clientLayer: Layer.Layer<Client>) =>
-  (server: { url: string }) =>
-  <A, E>(effect: Effect.Effect<A, E, Client>) =>
-    effect.pipe(
-      Effect.provide(
-        clientLayer.pipe(Layer.provide(makeRpcProtocol(server.url))),
-      ),
-      Effect.runPromise,
-    );
 
 export { truncateAll, TestDatabaseLive };

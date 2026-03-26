@@ -37,12 +37,18 @@ export const practiceItemTable = pgTable(
     type: text("type")
       .notNull()
       .$type<"warmup" | "drill" | "cooldown" | "water-break" | "activity">(),
+    variant: text("variant")
+      .notNull()
+      .default("default")
+      .$type<"default" | "split">(),
     drillPublicId: text("drill_public_id"),
     label: text("label"),
     durationMinutes: integer("duration_minutes"),
     notes: text("notes"),
     groups: text("groups").array().notNull().default(["all"]),
     orderIndex: integer("order_index").notNull().default(0),
+    positionX: integer("position_x"),
+    positionY: integer("position_y"),
     priority: text("priority")
       .notNull()
       .default("required")

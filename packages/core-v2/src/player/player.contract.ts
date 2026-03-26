@@ -25,7 +25,7 @@ export const PlayerContract = {
   list: {
     success: Schema.Array(Player),
     error: PlayerErrors,
-    payload: Schema.Void,
+    payload: Schema.NullOr(Schema.Void),
   },
   get: {
     success: Player,

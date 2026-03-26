@@ -4,23 +4,21 @@
  * Tests the full RPC round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcPlayerClient } from "@laxdb/api-v2/player/player.client";
+import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import {
-  makeRun,
-  startTestServer,
-  truncateAllTables,
-  type TestServer,
-} from "./server";
+import { apiLayer } from "../shared";
+
+import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
-let run: ReturnType<ReturnType<typeof makeRun<RpcPlayerClient>>>;
+
+const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+  effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
   testServer = await startTestServer();
-  run = makeRun(RpcPlayerClient.layer)(testServer);
 });
 
 afterAll(async () => {
@@ -35,7 +33,7 @@ describe("Player RPC", () => {
   it("lists players (empty)", async () => {
     const players = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         return yield* client.PlayerList();
       }),
     );
@@ -45,7 +43,7 @@ describe("Player RPC", () => {
   it("creates a player", async () => {
     const player = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         return yield* client.PlayerCreate({
           name: "Alice",
           email: "alice@test.com",
@@ -60,7 +58,7 @@ describe("Player RPC", () => {
   it("gets a player by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PlayerCreate({
           name: "Bob",
           email: "bob@test.com",
@@ -74,7 +72,7 @@ describe("Player RPC", () => {
   it("lists all players", async () => {
     const players = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         yield* client.PlayerCreate({ name: "A", email: "a@test.com" });
         yield* client.PlayerCreate({ name: "B", email: "b@test.com" });
         return yield* client.PlayerList();
@@ -86,7 +84,7 @@ describe("Player RPC", () => {
   it("updates a player", async () => {
     const updated = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PlayerCreate({
           name: "Original",
           email: "orig@test.com",
@@ -104,7 +102,7 @@ describe("Player RPC", () => {
   it("deletes a player", async () => {
     const remaining = await run(
       Effect.gen(function* () {
-        const client = yield* RpcPlayerClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.PlayerCreate({
           name: "ToDelete",
           email: "del@test.com",
@@ -120,7 +118,7 @@ describe("Player RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcPlayerClient;
+          const client = yield* RpcApiClient;
           return yield* client.PlayerGet({ publicId: "AbCdEfGhIjKl" });
         }),
       ),
@@ -131,7 +129,7 @@ describe("Player RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcPlayerClient;
+          const client = yield* RpcApiClient;
           return yield* client.PlayerDelete({ publicId: "AbCdEfGhIjKl" });
         }),
       ),

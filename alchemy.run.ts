@@ -83,8 +83,16 @@ const currentBranch =
       ? devBranch
       : personalBranch;
 
-// Admin role for current branch
-const dbRole = await Role(`db-role-${stage}-v2`, {
+// Schema role — stable per branch, owns tables, used for migrations/push
+const branchName = currentBranch === devBranch ? "dev" : currentBranch === personalBranch ? "personal" : "main";
+const schemaRole = await Role(`db-schema-${branchName}-v2`, {
+  database,
+  branch: currentBranch,
+  inheritedRoles: ["postgres"],
+});
+
+// Runtime role — per stage, used by workers
+const dbRole = await Role(`db-role-${stage}-v3`, {
   database,
   branch: currentBranch,
   inheritedRoles: ["postgres"],
@@ -97,46 +105,32 @@ const db = await Hyperdrive("hyperdrive", {
 });
 
 // Generate Drizzle migrations (v1 — disabled while developing v2)
-await Exec("DrizzleGenerate", {
-  command: "cd packages/core && bun run db:generate",
-  env: {
-    DATABASE_URL: dbRole.connectionUrl,
-  },
-  memoize: {
-    patterns: ["drizzle.config.ts", "src/schema.ts"],
-  },
-});
+// Schema management: generate + push locally, migrate in CI/prod
+if (app.local) {
+  await Exec("DrizzleGenerate", {
+    command: "cd packages/core && bun run db:generate",
+    env: { DATABASE_URL: schemaRole.connectionUrl },
+    memoize: {
+      patterns: ["drizzle.config.ts", "src/schema.ts"],
+    },
+  });
 
-// // Apply migrations to the database (v1 — disabled while developing v2)
-// await Exec("DrizzleMigrate", {
-//   command:
-//     process.platform === "win32"
-//       ? `cmd /C "cd packages/core && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
-//       : `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
-//   env: {
-//     DATABASE_URL: dbRole.connectionUrl,
-//   },
-//   memoize: {
-//     patterns: ["drizzle.config.ts", "drizzle/*.sql"],
-//   },
-// });
-
-// Apply core-v2 migrations
-// await Exec("DrizzleMigrateV2", {
-//   command:
-//     process.platform === "win32"
-//       ? `cmd /C "cd packages/core-v2 && bun run db:migrate || if %ERRORLEVEL%==9 exit 0 else exit %ERRORLEVEL%"`
-//       : `sh -c 'cd packages/core-v2 && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
-//   env: {
-//     DATABASE_URL: dbRole.connectionUrl,
-//   },
-//   memoize: {
-//     patterns: [
-//       "packages/core-v2/drizzle.config.ts",
-//       "packages/core-v2/migrations/**/*.sql",
-//     ],
-//   },
-// });
+  await Exec("DrizzlePushV2", {
+    command: "cd packages/core-v2 && bun run db:push",
+    env: { DATABASE_URL: schemaRole.connectionUrl },
+  });
+} else {
+  await Exec("DrizzleMigrateV2", {
+    command: `sh -c 'cd packages/core-v2 && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
+    env: { DATABASE_URL: schemaRole.connectionUrl },
+    memoize: {
+      patterns: [
+        "packages/core-v2/drizzle.config.ts",
+        "packages/core-v2/migrations/**/*.sql",
+      ],
+    },
+  });
+}
 
 // Start Drizzle Studio in local development
 // if (app.local) {
@@ -196,7 +190,10 @@ export const marketing = await TanStackStart("marketing", {
 // });
 
 export const practicePlanner = await TanStackStart("practice-planner", {
-  bindings: {},
+  bindings: {
+    API: api2,
+    IS_LOCAL: app.local ? "true" : "",
+  },
   cwd: "./packages/practice-planner",
   domains: [getDomain("planner")],
 });

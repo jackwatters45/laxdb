@@ -37,7 +37,7 @@ export const PracticeContract = {
   list: {
     success: Schema.Array(Practice),
     error: PracticeErrors,
-    payload: Schema.Void,
+    payload: Schema.NullOr(Schema.Void),
   },
   get: {
     success: Practice,

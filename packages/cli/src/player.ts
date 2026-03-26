@@ -16,23 +16,19 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcPlayerClient } from "@laxdb/api-v2/player/player.client";
-import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { RpcApiClient } from "@laxdb/api-v2/client";
 import {
   CreatePlayerInput,
   UpdatePlayerInput,
 } from "@laxdb/core-v2/player/player.schema";
-import { Effect, Layer, Option, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
-import { baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
+import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-const playerLayer = (baseUrl: string) =>
-  RpcPlayerClient.layer.pipe(Layer.provide(makeRpcProtocol(baseUrl)));
 
 // ---------------------------------------------------------------------------
 // Subcommands
@@ -43,10 +39,10 @@ const listCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const players = yield* client.PlayerList();
       yield* output(players, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 const getCommand = Command.make(
@@ -58,10 +54,10 @@ const getCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const player = yield* client.PlayerGet({ publicId });
       yield* output(player, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 const createCommand = Command.make(
@@ -74,13 +70,13 @@ const createCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const player = yield* client.PlayerCreate({
         name: opts.name,
         email: opts.email,
       });
       yield* output(player, opts.pretty);
-    }).pipe(Effect.provide(playerLayer(opts.baseUrl))),
+    }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
 );
 
 const updateCommand = Command.make(
@@ -100,14 +96,14 @@ const updateCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const player = yield* client.PlayerUpdate({
         publicId: opts.publicId,
         name: Option.getOrUndefined(opts.name),
         email: Option.getOrUndefined(opts.email),
       });
       yield* output(player, opts.pretty);
-    }).pipe(Effect.provide(playerLayer(opts.baseUrl))),
+    }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
 );
 
 const deleteCommand = Command.make(
@@ -119,10 +115,10 @@ const deleteCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const player = yield* client.PlayerDelete({ publicId });
       yield* output(player, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
@@ -134,7 +130,7 @@ const bulkCreateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePlayerInput),
@@ -145,7 +141,7 @@ const bulkCreateCommand = Command.make(
         results.push(player);
       }
       yield* output(results, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 const bulkUpdateCommand = Command.make(
@@ -153,7 +149,7 @@ const bulkUpdateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePlayerInput),
@@ -164,7 +160,7 @@ const bulkUpdateCommand = Command.make(
         results.push(player);
       }
       yield* output(results, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 const bulkDeleteCommand = Command.make(
@@ -172,7 +168,7 @@ const bulkDeleteCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcPlayerClient;
+      const client = yield* RpcApiClient;
       const raw = yield* readStdin;
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
@@ -183,7 +179,7 @@ const bulkDeleteCommand = Command.make(
         results.push(player);
       }
       yield* output(results, pretty);
-    }).pipe(Effect.provide(playerLayer(baseUrl))),
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
 // ---------------------------------------------------------------------------
