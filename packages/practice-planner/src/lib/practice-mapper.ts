@@ -9,6 +9,7 @@ import type {
   PracticeItem as DbItem,
 } from "@laxdb/core-v2/practice/practice.schema";
 
+import { autoLayout } from "@/lib/layout";
 import type {
   Practice,
   PracticeNode,
@@ -16,8 +17,7 @@ import type {
   PracticeNodeVariant,
   PracticeItemType,
   PracticeItemPriority,
-} from "@/data/types";
-import { autoLayout } from "@/lib/layout";
+} from "@/types";
 
 // ---------------------------------------------------------------------------
 // DB → Frontend

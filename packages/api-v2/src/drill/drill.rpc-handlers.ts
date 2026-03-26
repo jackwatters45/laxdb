@@ -1,6 +1,7 @@
-import { asDrill } from "@laxdb/core-v2/drill/drill.schema";
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer } from "effect";
+
+import { asDrill } from "../lib/mappers";
 
 import { DrillRpcs } from "./drill.rpc";
 

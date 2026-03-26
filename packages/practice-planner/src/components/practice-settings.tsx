@@ -5,7 +5,7 @@ import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { FileText, MapPin, Calendar, Clock, X } from "lucide-react";
 
-import type { Practice } from "@/data/types";
+import type { Practice } from "@/types";
 
 interface PracticeSettingsProps {
   practice: Practice;

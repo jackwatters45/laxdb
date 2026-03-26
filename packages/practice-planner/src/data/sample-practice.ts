@@ -1,4 +1,4 @@
-import type { Practice } from "./types";
+import type { Practice } from "../types";
 
 /** Pre-built example practice for the starting state */
 export const SAMPLE_PRACTICE: Practice = {

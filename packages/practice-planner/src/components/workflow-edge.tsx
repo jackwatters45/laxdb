@@ -1,5 +1,5 @@
-import type { PracticeNode, PracticeEdge } from "@/data/types";
 import { getEdgeAnchors } from "@/lib/node-geometry";
+import type { PracticeNode, PracticeEdge } from "@/types";
 
 interface WorkflowEdgeProps {
   edge: PracticeEdge;

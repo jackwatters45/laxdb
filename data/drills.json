@@ -1,0 +1,3654 @@
+[
+  {
+    "name": "Quick Sticks Wall Ball",
+    "subtitle": "Rapid-fire catch and release against a wall",
+    "description": "Stand 3-5 yards from a sturdy wall. Catch and release the ball immediately without cradling. Focus on soft hands and a quick release.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 1,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["wall", "ball", "stick"],
+    "videoUrl": "https://www.youtube.com/watch?v=eUzj3EhPBS4",
+    "coachNotes": null,
+    "tags": ["wall-ball", "solo", "stick-skills", "warm-up"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "No cradling between catch and throw",
+      "Develop 'soft hands' — absorb the ball on the catch",
+      "Aim for a specific spot on the wall each rep"
+    ],
+    "steps": [
+      "Stand 3-5 yards from a brick or concrete wall",
+      "Throw the ball against the wall at chest height",
+      "Catch and immediately release without cradling",
+      "Complete 25-50 reps with dominant hand",
+      "Switch to non-dominant hand and repeat"
+    ],
+    "commonMistakes": [
+      "Cradling between catch and throw — defeats the purpose",
+      "Standing too far from the wall — reduces rep speed",
+      "Not switching hands"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/wall-ball-workouts/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "One-Handed Wall Ball",
+    "subtitle": "Build wrist snap and forearm strength",
+    "description": "Hold the stick with one hand at the balance point. Pass and catch against a wall using only wrist snap. Builds forearm strength and the fine motor control needed for quick releases.",
+    "difficulty": "intermediate",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 1,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["wall", "ball", "stick"],
+    "videoUrl": "https://www.youtube.com/watch?v=eUzj3EhPBS4",
+    "coachNotes": null,
+    "tags": ["wall-ball", "solo", "stick-skills", "strength"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Use wrist snap only — no arm swing",
+      "Keep elbow relatively still",
+      "Builds the forearm strength critical for shooting power"
+    ],
+    "steps": [
+      "Stand 5 yards from the wall",
+      "Hold stick with one hand near the balance point (throat area)",
+      "Snap wrist to throw the ball against the wall",
+      "Catch with the same hand",
+      "Complete 25 reps per hand"
+    ],
+    "commonMistakes": [
+      "Using full arm motion instead of isolating wrist",
+      "Gripping too tightly — stay loose",
+      "Not completing reps on weak hand"
+    ],
+    "source": {
+      "url": "https://www.elevatesportsequipment.com/blogs/news/d1-lacrosse-wall-ball-routine",
+      "siteName": "Elevate Sports",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Cross-Body (Canadian) Wall Ball",
+    "subtitle": "Catch and throw on the opposite shoulder without switching hands",
+    "description": "Throw and catch on the opposite side of your body without switching hands. For example, hold the stick right-handed but catch on your left shoulder. Simulates passing while protecting the stick through traffic.",
+    "difficulty": "advanced",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 1,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["wall", "ball", "stick"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["wall-ball", "solo", "stick-skills", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Keep the stick close to your body across the face",
+      "This mimics protecting the stick while passing in traffic",
+      "Focus on accuracy before speed"
+    ],
+    "steps": [
+      "Stand 5-7 yards from the wall",
+      "Hold stick right-handed but position it on your left shoulder",
+      "Throw and catch without switching hands",
+      "Complete 25 reps, then switch to left-handed on right shoulder"
+    ],
+    "commonMistakes": [
+      "Switching hands instead of keeping cross-body",
+      "Dropping the elbow — keep it up for a clean release"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/wall-ball-workouts/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Lax Shuffle Wall Ball",
+    "subtitle": "Pass and catch while shuffling laterally along the wall",
+    "description": "Shuffle sideways along the wall while passing and catching. Simulates passing while moving through traffic and develops coordination between footwork and stick skills.",
+    "difficulty": "intermediate",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 1,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["wall", "ball", "stick"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["wall-ball", "solo", "stick-skills", "footwork"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Keep feet moving — never stop shuffling",
+      "Stay in an athletic stance, knees bent",
+      "Maintain accuracy while moving"
+    ],
+    "steps": [
+      "Stand 5 yards from the wall",
+      "Begin shuffling laterally (right)",
+      "Throw and catch while continuing to shuffle",
+      "After 10 reps, reverse direction (shuffle left)",
+      "Switch hands and repeat"
+    ],
+    "commonMistakes": [
+      "Stopping feet to throw — must stay in motion",
+      "Crossing feet during shuffle"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/wall-ball-workouts/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Egg Toss",
+    "subtitle": "Partner passing with increasing distance",
+    "description": "In pairs, players start close and pass back and forth. Every successful catch allows them to take one giant step backward. The last pair to drop their 'egg' wins.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks"],
+    "videoUrl": null,
+    "coachNotes": "Great warm-up drill. Gets players laughing and competing early in practice.",
+    "tags": ["partner", "warm-up", "fun", "competitive"],
+    "ageGroup": ["youth", "middle-school", "high-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Step toward your target with your opposite foot",
+      "Follow through with stick pointed at your partner",
+      "Absorb the catch — don't stab at the ball"
+    ],
+    "steps": [
+      "Pair up players facing each other, 5 yards apart",
+      "Pass back and forth",
+      "On each successful catch, both take one step back",
+      "If the ball is dropped, that pair is eliminated",
+      "Last pair standing wins"
+    ],
+    "commonMistakes": [
+      "Throwing too hard at close distance",
+      "Not stepping with opposite foot"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Star Drill",
+    "subtitle": "Five-line passing drill with movement",
+    "description": "Five lines form a star shape. Players pass to the line two spots away and then follow their pass to the end of that line. Requires high-level focus and communication.",
+    "difficulty": "intermediate",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 10,
+    "maxPlayers": 25,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Excellent team passing drill. Forces communication — players must call for the ball.",
+    "tags": ["team", "passing", "communication", "warm-up"],
+    "ageGroup": ["middle-school", "high-school", "college"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Call for the ball before it arrives",
+      "Pass to the line two spots away (skip one line)",
+      "Follow your pass and join the back of that line",
+      "Keep your head on a swivel to avoid collisions"
+    ],
+    "steps": [
+      "Set up 5 cones in a star pattern, 15-20 yards apart",
+      "Place players in lines behind each cone",
+      "First player passes to the line two spots to their right",
+      "After passing, sprint to the end of the line they passed to",
+      "Receiving player catches, then passes to the line two spots away",
+      "Continue the pattern"
+    ],
+    "commonMistakes": [
+      "Passing to the wrong line (adjacent instead of two away)",
+      "Not following the pass",
+      "Not communicating — leads to collisions"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "3-Man Weave",
+    "subtitle": "Classic full-field passing and conditioning drill",
+    "description": "Three players run down the field, passing the ball and weaving behind the player they just passed to. Excellent for conditioning, transition passing, and communication.",
+    "difficulty": "intermediate",
+    "category": ["passing", "transition", "conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 3,
+    "maxPlayers": 30,
+    "durationMinutes": 15,
+    "fieldSpace": "full-field",
+    "equipment": ["balls", "sticks"],
+    "videoUrl": null,
+    "coachNotes": "Run this drill at the start of practice as a warm-up with conditioning built in.",
+    "tags": ["team", "transition", "conditioning", "warm-up", "classic"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Lead your receiver with the pass",
+      "Sprint behind the person you pass to",
+      "Finish with a shot on goal at the end",
+      "Maintain spacing — don't bunch up"
+    ],
+    "steps": [
+      "Three players line up across the field at the end line",
+      "Middle player starts with the ball",
+      "Pass to one side, then weave behind the receiver",
+      "Receiver passes to the third player, weaves behind them",
+      "Continue down the field",
+      "Finish with a shot on goal"
+    ],
+    "commonMistakes": [
+      "Not weaving behind the receiver — running straight",
+      "Bunching up — maintain 10-yard spacing",
+      "Slowing down after passing"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Triangle Passing",
+    "subtitle": "Three-player continuous passing in a triangle formation",
+    "description": "Three players form a triangle about 10-15 yards apart. They pass in one direction (clockwise), then switch to the other (counter-clockwise) to work both hands.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 3,
+    "maxPlayers": 3,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["partner", "passing", "warm-up", "fundamentals"],
+    "ageGroup": ["youth", "middle-school", "high-school"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Catch with outside hand, pass with outside hand",
+      "Switch direction to work both hands equally",
+      "Step toward your target on every pass"
+    ],
+    "steps": [
+      "Set up 3 cones in a triangle, 10-15 yards apart",
+      "One player at each cone",
+      "Pass clockwise for 2 minutes",
+      "Switch to counter-clockwise for 2 minutes",
+      "Add a second ball for advanced groups"
+    ],
+    "commonMistakes": [
+      "Always using dominant hand — switch with direction change",
+      "Flat-footed catching — stay on balls of feet"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Monkey in the Middle",
+    "subtitle": "Keep-away passing game with a defender",
+    "description": "A classic keep-away game in a 10x10 yard box. Two offensive players try to pass around one defender. If the defender touches the ball, they switch roles.",
+    "difficulty": "beginner",
+    "category": ["passing", "defense"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 3,
+    "maxPlayers": 3,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Great for youth — competitive and fun while teaching passing under pressure.",
+    "tags": ["fun", "youth", "competitive", "passing", "defense"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Passers: use fakes before throwing",
+      "Defender: read the passer's eyes and stick position",
+      "Move your feet — don't stand flat-footed"
+    ],
+    "steps": [
+      "Set up a 10x10 yard box with cones",
+      "Two offensive players on opposite sides, one defender in the middle",
+      "Offensive players pass back and forth",
+      "If the defender touches or intercepts the ball, they switch with the passer",
+      "Rotate every 2 minutes regardless"
+    ],
+    "commonMistakes": [
+      "Passers standing still — move to create angles",
+      "Defender lunging instead of shuffling"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Back-Up Contest",
+    "subtitle": "Partner passing distance challenge",
+    "description": "Partners start close together. After every successful catch, both players take one step back. If the ball is dropped, the pair is out or must start over.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["partner", "competitive", "fun", "passing"],
+    "ageGroup": ["youth", "middle-school", "high-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Technique matters more at longer distances",
+      "Step and follow through to generate distance",
+      "Absorb the catch with give in the arms"
+    ],
+    "steps": [
+      "Pair up facing each other, 3 yards apart",
+      "Pass back and forth",
+      "On each successful catch, both take one giant step back",
+      "Drop = elimination or restart",
+      "Last pair standing wins"
+    ],
+    "commonMistakes": [
+      "Muscling the throw at long distance — use proper technique",
+      "Stiff hands on the catch"
+    ],
+    "source": {
+      "url": "https://skillshark.com/blog/7-best-lacrosse-drills",
+      "siteName": "SkillShark",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Around the World (Spot Shooting)",
+    "subtitle": "Shoot from 5 spots around the arc, targeting corners",
+    "description": "Place 5 balls at 5 distinct spots around the 10-15 yard arc (wing, top left, top center, top right, opposite wing). Shoot all 5 balls sequentially, aiming for the exact same corner of the goal.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Start without a goalie to build confidence, then add one.",
+    "tags": ["shooting", "accuracy", "form"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Pick a specific spot — a link in the net mesh, not just 'the corner'",
+      "Ensure feet and shoulders are squared to the target before releasing",
+      "Repeat the circuit for each corner of the goal"
+    ],
+    "steps": [
+      "Place 5 balls at 5 spots around the arc: wing, top-left, top-center, top-right, opposite wing",
+      "Start at first spot, shoot aiming for top-right corner",
+      "Move to next spot and repeat",
+      "After completing all 5 spots, repeat for each corner (top-left, bottom-right, bottom-left)"
+    ],
+    "commonMistakes": [
+      "Aiming vaguely at 'the corner' instead of a precise spot",
+      "Rushing the shot — set your feet first",
+      "Not following through"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/snipe-the-corners-how-to-improve-lacrosse-shooting-accuracy/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "One-Handed Form Shooting",
+    "subtitle": "Isolate wrist snap for accuracy",
+    "description": "Stand approximately 5 yards from the goal with no goalie. Hold the stick with only your top hand at the balance point. Snap your wrist to shoot the ball into the corners.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "This is a technique drill, not a power drill. Focus on precision.",
+    "tags": ["shooting", "form", "technique", "wrist-snap"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Isolate wrist snap and elbow placement",
+      "Keep shooting elbow high and away from your body",
+      "Maintain a vertical overhand release"
+    ],
+    "steps": [
+      "Stand 5 yards from the goal (no goalie)",
+      "Hold stick with only your top (dominant) hand at the balance point",
+      "Snap wrist to shoot into corners",
+      "Focus on top-right, top-left, bottom-right, bottom-left in sequence",
+      "Switch to non-dominant hand"
+    ],
+    "commonMistakes": [
+      "Using arm instead of wrist — isolate the snap",
+      "Dropping the elbow",
+      "Shooting with too much power — this is about accuracy"
+    ],
+    "source": {
+      "url": "https://gladiatorlacrosse.com/best-lacrosse-shooting-drills-for-accuracy/",
+      "siteName": "Gladiator Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Shooting on the Run (Alley Drill)",
+    "subtitle": "Full-speed dodge and shoot down the alley",
+    "description": "Start at a cone at the top of the box. Dodge 'down the alley' (the side of the field) at full speed and shoot while moving. Aim for the far pipe.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 15,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Emphasize that power comes from core rotation, not arm strength.",
+    "tags": ["shooting", "on-the-run", "game-speed"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Get hands back early and away from body as you run",
+      "Generate power through core torque, not just arms",
+      "Rotate hips toward the goal just before release",
+      "Aim for the far pipe — shoot across the goalie's body"
+    ],
+    "steps": [
+      "Place a cone at the top of the box",
+      "Line up behind the cone with a ball",
+      "Sprint down the alley at full speed",
+      "Shoot while moving — do not stop your feet",
+      "Aim for the far pipe"
+    ],
+    "commonMistakes": [
+      "Slowing down or stopping to shoot",
+      "Dropping hands before the shot",
+      "Not rotating hips — arm-only shot lacks power"
+    ],
+    "source": {
+      "url": "https://trilogylacrosse.com/5-keys-to-effective-shooting-drills/",
+      "siteName": "Trilogy Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Hitch and Go",
+    "subtitle": "Pump fake into a sprint and shot",
+    "description": "Receive a pass, perform a hard pump fake (hitch), then sprint toward the middle of the field for a shot. Teaches deception and quick release.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 15,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["shooting", "deception", "game-speed", "dodge-and-shoot"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Sell the fake — the hitch must be dramatic enough to move a defender",
+      "Quick release after the hitch — unload immediately",
+      "Simulate beating a sliding defender"
+    ],
+    "steps": [
+      "Line of players at the wing or top, with a feeder",
+      "Receive a pass from the feeder",
+      "Perform a hard pump fake (full shooting motion without releasing)",
+      "Sprint toward the middle of the field",
+      "Shoot on the run"
+    ],
+    "commonMistakes": [
+      "Weak fake — defender doesn't bite",
+      "Too much time between fake and shot",
+      "Running laterally instead of attacking the cage"
+    ],
+    "source": {
+      "url": "https://trilogylacrosse.com/5-keys-to-effective-shooting-drills/",
+      "siteName": "Trilogy Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Over-Goal Shooting Drill",
+    "subtitle": "Force overhand technique by shooting over an obstacle goal",
+    "description": "Place one goal about 20 yards in front of the target goal. Stand behind the obstacle goal and shoot over the top of it into the target net. Forces proper overhand mechanics.",
+    "difficulty": "advanced",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "2 goals"],
+    "videoUrl": null,
+    "coachNotes": "Great drill for players who tend to shoot sidearm.",
+    "tags": ["shooting", "form", "overhand", "technique"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Forces high release point — sidearm shots hit the obstacle",
+      "Focus on extended arm position to clear the obstacle",
+      "Maintain power despite the high release"
+    ],
+    "steps": [
+      "Place an obstacle goal 20 yards in front of the target goal",
+      "Stand behind the obstacle goal",
+      "Shoot over the top of it into the target net",
+      "If ball hits the obstacle, your release is too low",
+      "Aim for corners of the target goal"
+    ],
+    "commonMistakes": [
+      "Dropping to sidearm — the obstacle catches it",
+      "Not extending arms fully",
+      "Losing accuracy while trying to clear the obstacle"
+    ],
+    "source": {
+      "url": "https://www.physicaleducationupdate.com/public/Lacrosse_The_OverGoal_Shooting_Drill.cfm",
+      "siteName": "Physical Education Update",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Pipe City",
+    "subtitle": "Aim for the pipe to train precision shooting",
+    "description": "Take shots from 10-12 yards out, aiming specifically to hit the metal pipe of the goal or a bucket/cone placed right next to it. The 'ping' confirms elite accuracy.",
+    "difficulty": "advanced",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Make it competitive — who can hit the pipe the most in 10 shots?",
+    "tags": ["shooting", "accuracy", "competitive", "precision"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Hearing the 'ping' confirms the shot is in the hardest spot for a goalie",
+      "Change planes — if you catch high, shoot low; catch low, shoot high",
+      "This is the smallest target you can aim for"
+    ],
+    "steps": [
+      "Stand 10-12 yards from the goal",
+      "Aim to hit the pipe (top bar, left pipe, or right pipe)",
+      "Take 10 shots per round",
+      "Track hits — make it a competition",
+      "Vary your shooting position (standing, on the run, off a dodge)"
+    ],
+    "commonMistakes": [
+      "Getting frustrated — this is intentionally difficult",
+      "Sacrificing form for power"
+    ],
+    "source": {
+      "url": "https://gladiatorlacrosse.com/best-lacrosse-shooting-drills-for-accuracy/",
+      "siteName": "Gladiator Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Ground Ball Rodeo",
+    "subtitle": "Chaotic scramble for ground balls under pressure",
+    "description": "Multiple players fight for one ball in a tight space. The winner must scoop and clear the ball to a coach. Simulates game-speed ground ball battles.",
+    "difficulty": "intermediate",
+    "category": ["ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 12,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": "High energy drill — great for building toughness. Keep reps short.",
+    "tags": ["ground-balls", "competitive", "toughness", "chaos"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Two butts low — stick butt and player butt",
+      "Box out before scooping",
+      "Run through the ball and accelerate away from the scrum"
+    ],
+    "steps": [
+      "Create a 10x10 yard box with cones",
+      "3-4 players inside the box",
+      "Coach rolls or throws a ball into the box",
+      "Players fight for the ground ball",
+      "Winner must scoop and pass to the coach outside the box",
+      "Reset and repeat"
+    ],
+    "commonMistakes": [
+      "Standing upright — must stay low",
+      "Scooping and standing still — must accelerate away",
+      "Reaching instead of getting body over the ball"
+    ],
+    "source": {
+      "url": "https://lacrossedrive.com/drill/skill-drills/ground-balls/",
+      "siteName": "Lacrosse Drive",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Man-Ball Drill",
+    "subtitle": "Partner ground ball with designated roles",
+    "description": "Two players approach a ground ball. One 'takes the man' (body check/box out) while the other 'takes the ball.' Teaches teamwork on 50/50 ground balls.",
+    "difficulty": "intermediate",
+    "category": ["ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks"],
+    "videoUrl": null,
+    "coachNotes": "Critical fundamental for winning the ground ball battle. The 'man' player must communicate.",
+    "tags": ["ground-balls", "teamwork", "contact", "fundamentals"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Communication: yell 'Man!' or 'Ball!' before arriving",
+      "'Man' player uses hips and shoulders to shield opponent",
+      "'Ball' player scoops in stride and accelerates away",
+      "Top hand high on the scoop for maximum control"
+    ],
+    "steps": [
+      "Two pairs of players line up 10 yards from a ground ball",
+      "Coach blows whistle",
+      "One player from each pair calls 'Man!' (blocks) and the other calls 'Ball!' (scoops)",
+      "Execute the roles",
+      "Ball player must complete a pass to a coach/teammate after scooping"
+    ],
+    "commonMistakes": [
+      "Both players going for the ball — someone must take the man",
+      "Not communicating before arriving",
+      "Man player going too high — stay low and box out"
+    ],
+    "source": {
+      "url": "https://www.ussportscamps.com/tips/lacrosse/boys-defensive-offensive-dril-man-ball",
+      "siteName": "US Sports Camps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Plus 1 Drill",
+    "subtitle": "2v2 ground ball scramble with a late-entering 5th player",
+    "description": "A 2v2 scramble for a ground ball. A 5th player (the '+1') enters to help the team that wins the scoop, creating a numbers advantage situation.",
+    "difficulty": "advanced",
+    "category": ["ground-balls", "transition"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 5,
+    "maxPlayers": 5,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Adds transition element to ground ball work. The +1 simulates a late-breaking midfielder.",
+    "tags": ["ground-balls", "transition", "competitive", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Win the ground ball first — everything starts there",
+      "+1 player must read who wins and sprint to support",
+      "Losing team must immediately transition to defense"
+    ],
+    "steps": [
+      "Two pairs of players line up on opposite sides",
+      "Coach rolls a ground ball between them",
+      "2v2 scramble for the ball",
+      "5th player (+1) enters from the sideline to join the team that wins possession",
+      "Play 3v2 to goal",
+      "Reset and rotate"
+    ],
+    "commonMistakes": [
+      "+1 entering too early before possession is decided",
+      "Losing team not transitioning to defense quickly"
+    ],
+    "source": {
+      "url": "https://lacrossedrive.com/drill/skill-drills/ground-balls/",
+      "siteName": "Lacrosse Drive",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Hungry Hungry Hippos",
+    "subtitle": "Fun youth ground ball collection race",
+    "description": "Scatter all team balls in the center of a 20x20 yard grid. On the whistle, players race to scoop one ball at a time and return it to their 'nest' (a bucket or designated cone). The player or team with the most balls wins.",
+    "difficulty": "beginner",
+    "category": ["ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "cones", "buckets"],
+    "videoUrl": null,
+    "coachNotes": "Kids love this drill. Disguises high-rep ground ball work as a game.",
+    "tags": ["youth", "fun", "ground-balls", "competitive", "game"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Scoop through the ball — don't stab at it",
+      "Butt to the grass on every scoop",
+      "One ball at a time — no carrying multiples"
+    ],
+    "steps": [
+      "Set up a 20x20 yard grid with cones",
+      "Scatter 20-30 balls in the center",
+      "Players start at edges or assigned 'nests' (cones/buckets)",
+      "On whistle, race to scoop one ball and bring it back to nest",
+      "Return for another ball immediately",
+      "Player/team with the most balls when the center is empty wins"
+    ],
+    "commonMistakes": [
+      "Trying to carry multiple balls",
+      "Not using proper scoop technique in the rush",
+      "Standing upright — stay low"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/youth-lacrosse-practice-ideas/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Messy Backyard",
+    "subtitle": "Team ground ball race — clean your side",
+    "description": "Divide players into two teams with a 'backyard' grid in between. Each team must scoop balls from their side and deposit them into the opponent's side. After 60 seconds, the team with the cleanest backyard wins.",
+    "difficulty": "beginner",
+    "category": ["ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Another great disguised ground ball drill for youth. High energy, lots of reps.",
+    "tags": ["youth", "fun", "ground-balls", "competitive", "game"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Proper scoop form even in the chaos",
+      "Scoop and place — don't just throw the ball",
+      "Keep your head up to avoid collisions"
+    ],
+    "steps": [
+      "Divide a 20x20 yard grid in half",
+      "Scatter equal numbers of balls on each side",
+      "Two teams, one on each side",
+      "On whistle, scoop balls from your side and deposit on opponent's side",
+      "60-second timer",
+      "Team with fewer balls on their side wins"
+    ],
+    "commonMistakes": [
+      "Throwing balls instead of placing them on the other side",
+      "Poor scoop technique in the rush"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/youth-lacrosse-practice-ideas/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Diamond Drill (1v1 Defense)",
+    "subtitle": "Defender approaches ball carrier at speed",
+    "description": "Four cones in a 10-yard diamond. Attacker and defender sprint to side cones, then meet at top. Coach feeds the ball and they play live 1v1. Teaches defensive approach and breakdown.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "cones", "goal"],
+    "videoUrl": null,
+    "coachNotes": null,
+    "tags": ["defense", "1v1", "footwork", "approach"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Break down (short choppy steps) before contact",
+      "Stay balanced — don't lunge",
+      "Use stick to disrupt the dodger's vision",
+      "Drive the attacker toward the sideline"
+    ],
+    "steps": [
+      "Set up 4 cones in a 10-yard diamond shape",
+      "Attacker starts at one side cone, defender at the other",
+      "Both sprint to the top cone",
+      "Coach feeds the ball to the attacker as they arrive",
+      "Play live 1v1 to the goal",
+      "Rotate roles"
+    ],
+    "commonMistakes": [
+      "Defender arriving flat-footed instead of broken down",
+      "Overcommitting to the stick check",
+      "Not staying between attacker and the goal"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/five-defensive-lacrosse-drills/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Zig-Zag Defensive Footwork",
+    "subtitle": "Lateral shuffle drill for body positioning",
+    "description": "Set 7-8 cones in a zig-zag pattern. The defender moves backward using lateral shuffles, keeping chest square and stick up. Trains influence and sideline positioning.",
+    "difficulty": "beginner",
+    "category": ["defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones", "stick"],
+    "videoUrl": null,
+    "coachNotes": "Fundamental footwork drill. Can be done individually or in groups.",
+    "tags": ["defense", "footwork", "fundamentals", "agility"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Never cross your feet — always shuffle",
+      "Keep chest square to the imaginary attacker",
+      "Stick up and active — don't let it drag",
+      "Stay in an athletic stance, hips low"
+    ],
+    "steps": [
+      "Set 7-8 cones in a zig-zag pattern, 5 yards apart",
+      "Start at the first cone in defensive stance",
+      "Shuffle laterally to the next cone",
+      "Change direction at each cone",
+      "Keep stick up and active throughout",
+      "Complete 3-5 reps"
+    ],
+    "commonMistakes": [
+      "Crossing feet — always shuffle",
+      "Standing too upright",
+      "Dropping the stick between cones"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/five-defensive-lacrosse-drills/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "NASCAR Drill",
+    "subtitle": "Sprint to close out on a moving dodger",
+    "description": "Defender starts near the goal and sprints out to a dodger who is already moving. The goal is to 'break down' (short, choppy steps) just before contact to avoid being blown by.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Critical for teaching the approach. Most goals are scored when the defender arrives too fast and gets dodged.",
+    "tags": ["defense", "approach", "closeout", "1v1"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Sprint to close the gap, then break down 3-4 yards out",
+      "Short choppy steps on the approach — don't lunge",
+      "Use stick to disrupt vision, not wild checks",
+      "Force the attacker to their weak hand"
+    ],
+    "steps": [
+      "Defender starts at the crease area",
+      "Attacker starts at midfield, already moving toward the goal",
+      "On whistle, defender sprints to close out",
+      "Defender must break down before reaching the attacker",
+      "Play live 1v1",
+      "Rotate"
+    ],
+    "commonMistakes": [
+      "Not breaking down — arriving at full speed and getting dodged",
+      "Lunging with the stick",
+      "Not getting hip-to-hip with the attacker"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/five-defensive-lacrosse-drills/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Salisbury Call Drill (Slide and Recover)",
+    "subtitle": "Team defensive slide rotation on command",
+    "description": "Fast-paced drill where a coach calls a trigger. One defender slides to the ball, remaining defenders communicate 'Two' (second slide) and 'Bump' roles. Practices the recovery phase.",
+    "difficulty": "advanced",
+    "category": ["defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 6,
+    "maxPlayers": 12,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "cones", "goal"],
+    "videoUrl": "https://www.youtube.com/watch?v=QoBhqfw8lzA",
+    "coachNotes": "This is the backbone of team defense. Run it every practice.",
+    "tags": ["defense", "team", "sliding", "communication", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Communication is everything — call 'Ball!', 'Hot!', 'Two!', 'Fire!'",
+      "Slide to where the dodger is going, not where they are",
+      "The beaten defender must recover to the 'hole' to find a new man",
+      "Maintain slide tunnels — clear paths to the ball"
+    ],
+    "steps": [
+      "Set up 5-6 offensive players around the perimeter (stationary or passing)",
+      "4-5 defenders in a man-down or even-strength configuration",
+      "Coach calls a 'trigger' — defender on ball yells 'Ball!'",
+      "Adjacent defender slides ('Hot!') and calls 'Fire!'",
+      "Next defender rotates to cover ('Two!')",
+      "Original beaten defender sprints to the hole and finds the open man",
+      "Reset and repeat from different positions"
+    ],
+    "commonMistakes": [
+      "Silent defense — must communicate constantly",
+      "Sliding too late or too early",
+      "Not recovering after sliding — leaves a man open"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/trigger-slide-and-recovery-drill-for-team-defense/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "5-Cone Slide and Recover",
+    "subtitle": "Continuous defensive rotation in a circle",
+    "description": "Arrange 5 cones in a circle with 4 offensive players and 3 defenders. As offense passes the ball, 3 defenders must constantly rotate: one on ball, one 'Hot', one 'Two'.",
+    "difficulty": "advanced",
+    "category": ["defense"],
+    "positionGroup": ["defense"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 7,
+    "maxPlayers": 7,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Emphasizes that defense is a moving unit. When one slides, everyone rotates.",
+    "tags": ["defense", "team", "sliding", "rotation", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Defense is a unit — when one moves, everyone adjusts",
+      "Always know who is 'Hot' and who is 'Two'",
+      "Keep sticks up in passing lanes",
+      "Rotate together like a string"
+    ],
+    "steps": [
+      "Place 5 cones in a circle, 10 yards apart",
+      "4 offensive players stand at 4 of the cones",
+      "3 defenders inside the circle",
+      "Offense passes the ball around the circle",
+      "Defenders rotate: one pressures ball, one is Hot, one is Two",
+      "Every pass triggers a rotation",
+      "Run for 2-3 minutes, then swap groups"
+    ],
+    "commonMistakes": [
+      "Ball-watching instead of covering your rotation",
+      "Not talking — silent defense gets scored on",
+      "Over-committing to the ball — losing your secondary assignment"
+    ],
+    "source": {
+      "url": "https://lacrossedrive.com/5-cone-slide-and-recover-drill/",
+      "siteName": "Lacrosse Drive",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Chop Drill (Face-Off)",
+    "subtitle": "Isolate the first punch motion for hand speed",
+    "description": "Perform just the first 'punch' motion of a clamp repeatedly on a whistle to isolate reaction speed. Pure hand speed training for face-off specialists.",
+    "difficulty": "intermediate",
+    "category": ["face-offs"],
+    "positionGroup": ["midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["face-off stick", "ball"],
+    "videoUrl": null,
+    "coachNotes": "High-rep drill. Focus on clean technique, not just speed.",
+    "tags": ["face-offs", "hand-speed", "technique", "specialist"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Isolate just the first punch — don't complete the full clamp",
+      "Drive top hand down and across",
+      "Keep weight balanced — don't lean forward onto hands"
+    ],
+    "steps": [
+      "Set up in face-off stance (Standing Neutral Grip)",
+      "On whistle, perform just the initial punch/clamp motion",
+      "Reset to starting position",
+      "Repeat for 10-20 reps per set",
+      "Rest 30 seconds between sets"
+    ],
+    "commonMistakes": [
+      "Anticipating the whistle — must react",
+      "Leaning weight onto hands before the whistle",
+      "Completing the full exit instead of isolating the punch"
+    ],
+    "source": {
+      "url": "https://signaturelacrosse.com/blogs/news/lacrosse-face-off-drills",
+      "siteName": "Signature Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Resistance Band Clamps",
+    "subtitle": "Build explosive clamp power with resistance",
+    "description": "Use a resistance band anchored to a fence or held by a partner to build the 'snap' muscles in your forearms. Perform clamp motions against resistance.",
+    "difficulty": "intermediate",
+    "category": ["face-offs"],
+    "positionGroup": ["midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 5,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["face-off stick", "resistance band", "fence or partner"],
+    "videoUrl": null,
+    "coachNotes": "Strength-building drill. Don't sacrifice form for reps.",
+    "tags": ["face-offs", "strength", "specialist", "resistance"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Maintain proper SNG stance throughout",
+      "Focus on explosive snap against the resistance",
+      "Control the return — don't let the band snap your hands back"
+    ],
+    "steps": [
+      "Anchor a resistance band to a fence or have a partner hold it",
+      "Attach band to your stick or hands",
+      "Set up in face-off stance",
+      "Perform clamp motion against the resistance",
+      "10-15 reps per set, 3-4 sets"
+    ],
+    "commonMistakes": [
+      "Using too much resistance — start light",
+      "Losing proper stance under load",
+      "Jerky motions instead of smooth, explosive snaps"
+    ],
+    "source": {
+      "url": "https://signaturelacrosse.com/blogs/news/lacrosse-face-off-drills",
+      "siteName": "Signature Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Whistle Cadence Drill",
+    "subtitle": "Unpredictable timing for face-off reaction training",
+    "description": "Use a whistle app or partner with unpredictable timing (holding 'Set' for 1-5 seconds) to prevent anticipating. Trains pure reaction to the whistle.",
+    "difficulty": "intermediate",
+    "category": ["face-offs"],
+    "positionGroup": ["midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["face-off stick", "ball", "whistle"],
+    "videoUrl": null,
+    "coachNotes": "The randomized timing is critical — muscle memory must be triggered by sound, not anticipation.",
+    "tags": ["face-offs", "reaction-time", "specialist"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Stay relaxed before the whistle — tension slows reaction",
+      "React to the sound, not to anticipation",
+      "Vary the hold time from 1-5 seconds"
+    ],
+    "steps": [
+      "Set up in face-off stance",
+      "Partner or coach calls 'Down... Set...' with random timing",
+      "On whistle, execute your primary move (clamp, rake, etc.)",
+      "Reset and repeat",
+      "15-20 reps per session"
+    ],
+    "commonMistakes": [
+      "Anticipating the whistle and false-starting",
+      "Not varying the hold time enough",
+      "Tensing up during the hold — stay loose"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/the-center-x-mastering-faceoff-technique-in-lacrosse/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "50/50 Tie-Up Drill",
+    "subtitle": "Battle for the ball from a contested clamp position",
+    "description": "Start with both sticks already clamped on the ball. On the whistle, fight to win the 'exit' using hip rotation and leverage. Practices winning the battle after the initial clamp.",
+    "difficulty": "advanced",
+    "category": ["face-offs"],
+    "positionGroup": ["midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 10,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["face-off sticks", "ball"],
+    "videoUrl": null,
+    "coachNotes": "Many face-offs come down to the tie-up. This drill isolates that critical moment.",
+    "tags": ["face-offs", "competitive", "specialist", "wrestling"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Use hip rotation and leverage, not just arm strength",
+      "Stay low — center of gravity wins",
+      "Practice multiple exit moves (pop out, push through)"
+    ],
+    "steps": [
+      "Two face-off players set up with sticks clamped on the ball",
+      "On whistle, both fight to win possession",
+      "Winner must cleanly exit with the ball",
+      "Best of 5, then rotate partners"
+    ],
+    "commonMistakes": [
+      "Standing too upright — stay low",
+      "Using only arms — hips and core generate the power",
+      "Not practicing counter moves when your primary fails"
+    ],
+    "source": {
+      "url": "https://signaturelacrosse.com/blogs/news/lacrosse-face-off-drills",
+      "siteName": "Signature Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Banana Curl Breakout",
+    "subtitle": "Clearing drill with curved sprint path",
+    "description": "Upon a goalie save or 'Clear' call, defenders sprint toward the sideline in a curved 'banana' path. This opens their hips to the goalie, providing a chest-pass target.",
+    "difficulty": "intermediate",
+    "category": ["clearing"],
+    "positionGroup": ["defense", "goalie"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 5,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "full-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Fundamental clear pattern. The curve is what makes the pass easy — running straight away forces an over-the-shoulder catch.",
+    "tags": ["clearing", "team", "transition", "goalie"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Run a curved path — not straight — to open hips to the goalie",
+      "Present a chest-pass target, not an over-the-shoulder target",
+      "Look back to the goalie as you curl",
+      "Sprint after catching — don't jog"
+    ],
+    "steps": [
+      "Goalie starts with the ball in the crease",
+      "Defenders start in the box area",
+      "On 'Clear!' call, defenders sprint toward sidelines in curved banana paths",
+      "Goalie reads the field and hits the most open defender",
+      "Defender catches and transitions up field",
+      "Add riding pressure for advanced reps"
+    ],
+    "commonMistakes": [
+      "Running straight away from the goalie — must curve",
+      "Not looking back for the pass",
+      "Jogging instead of sprinting after the catch"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/the-great-escape-mastering-clearing-efficiency-in-lacrosse/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Goalie Z-Pattern Scan",
+    "subtitle": "Goalie reads clearing options in priority order",
+    "description": "The goalie scans the field in a 'Z' shape after a save: first across midline for a fast break, then across the top of the box for a delayed break, then to the wings at GLE.",
+    "difficulty": "intermediate",
+    "category": ["clearing"],
+    "positionGroup": ["goalie"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 7,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "full-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "The goalie is the quarterback of the clear. This drill teaches the read progression.",
+    "tags": ["clearing", "goalie", "decision-making", "reads"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Z-pattern: midline first (fast break), then box top (delayed), then wings (GLE)",
+      "Read the whole field before committing to a pass",
+      "Hit the first open man — don't hold the ball",
+      "Strong outlet pass — goalies must throw accurately"
+    ],
+    "steps": [
+      "Goalie makes a save or starts with the ball",
+      "Scan the field in a Z-pattern: far midfield → near midfield → far wing → near wing",
+      "Clearing players position themselves at these spots",
+      "Coach designates which player is 'open' each rep",
+      "Goalie must find and hit the open man",
+      "Vary which player is open each time"
+    ],
+    "commonMistakes": [
+      "Tunnel vision — only looking at one option",
+      "Holding the ball too long — creates riding pressure",
+      "Weak passes that get picked off"
+    ],
+    "source": {
+      "url": "https://us.humankinetics.com/blogs/excerpt/clearing-drills",
+      "siteName": "Human Kinetics",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "1v1 Revenge Ride",
+    "subtitle": "Immediate transition from offense to riding",
+    "description": "Following a shot or turnover, the original offensive player immediately becomes the rider. They must ride the clearing player toward the sideline, using the boundary as an extra defender.",
+    "difficulty": "intermediate",
+    "category": ["riding"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Teaches the mentality of immediate transition. Attack players must ride hard.",
+    "tags": ["riding", "transition", "1v1", "competitive"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Transition mentally from offense to defense instantly",
+      "Use the sideline as an extra defender — push the clearer there",
+      "Sprint to get in front of the clearing player",
+      "Stick in passing lanes to disrupt the clear"
+    ],
+    "steps": [
+      "Attacker takes a shot on goal",
+      "Goalie makes the save and begins clearing to a defender",
+      "The attacker immediately becomes the rider",
+      "Ride the clearing defender 1v1",
+      "Force toward the sideline or cause a turnover",
+      "Play resets after a successful clear or turnover"
+    ],
+    "commonMistakes": [
+      "Standing and watching after the shot — must transition immediately",
+      "Chasing instead of angling off the clearing player",
+      "Not using the sideline as leverage"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/the-great-escape-mastering-clearing-efficiency-in-lacrosse/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "West Genny (3v2 Fast Break)",
+    "subtitle": "Continuous full-field transition drill",
+    "description": "A continuous full-field drill where a 3v2 starts at one end. After the shot, the shooter and two defenders exit while remaining players become defenders as 3 new offensive players enter from the sideline.",
+    "difficulty": "advanced",
+    "category": ["transition"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 12,
+    "maxPlayers": 24,
+    "durationMinutes": 20,
+    "fieldSpace": "full-field",
+    "equipment": ["balls", "sticks", "2 goals"],
+    "videoUrl": "https://www.youtube.com/watch?v=Ye4loCYwr4E",
+    "coachNotes": "One of the best all-around drills in lacrosse. Combines conditioning, transition, fast breaks, and decision-making.",
+    "tags": ["transition", "fast-break", "conditioning", "team", "classic", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Move the ball quickly — don't overdodge",
+      "Find the open man in the fast break",
+      "Transition immediately from offense to defense",
+      "Communicate: who's hot, who's covering who"
+    ],
+    "steps": [
+      "Split team into groups of 3 on each sideline",
+      "Start with a 3v2 at one end",
+      "After the play ends (goal, save, or turnover), the 3 offensive players sprint off",
+      "2 defenders plus 1 new player become the next offensive group of 3",
+      "3 new defenders enter from the other sideline",
+      "Continuous flow — keep the drill moving"
+    ],
+    "commonMistakes": [
+      "Slow transitions — must sprint on and off",
+      "Overdodging instead of passing in the fast break",
+      "Defenders not communicating matchups"
+    ],
+    "source": {
+      "url": "https://www.championshipproductions.com/news/2012/12/11/two-competitive-team-lacrosse-drills-to-improve-transition-play/",
+      "siteName": "Championship Productions",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "4v3 Scramble",
+    "subtitle": "Ground ball to numbers-up transition",
+    "description": "Coach rolls a ball into a group of 3 middies. Winner enters the offensive zone to create a 4v3 (with 3 attack and 3 poles already in place). Forces quick decision-making with numbers advantage.",
+    "difficulty": "advanced",
+    "category": ["transition", "ground-balls"],
+    "positionGroup": ["midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 10,
+    "maxPlayers": 10,
+    "durationMinutes": 20,
+    "fieldSpace": "full-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Combines ground balls with unsettled transition. Game-like reps.",
+    "tags": ["transition", "ground-balls", "numbers-advantage", "competitive"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Win the ground ball first — everything starts there",
+      "Sprint to create the 4v3 advantage quickly",
+      "Move the ball — the advantage disappears as defense recovers",
+      "Identify where the slide is coming from"
+    ],
+    "steps": [
+      "3 attack players and 3 defensemen set up in the offensive zone",
+      "3 midfielders line up at midfield",
+      "Coach rolls a ground ball between the middies",
+      "Winner sprints to offensive zone creating 4v3",
+      "Losers sprint back to play defense (or sit out)",
+      "Play until a goal, save, or turnover"
+    ],
+    "commonMistakes": [
+      "Holding the ball too long — defense is recovering",
+      "Not recognizing where the open man is",
+      "Midfielders not sprinting after the ground ball result"
+    ],
+    "source": {
+      "url": "https://laxplaybook.com/practice-plans/high-school-mens-lacrosse-practice-plan-mastering-transitions-and-fast-breaks",
+      "siteName": "LaxPlaybook",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Walk the Arc",
+    "subtitle": "Goalie positioning and movement drill",
+    "description": "Set up 5 cones on the arc (left pipe, left 45°, center, right 45°, right pipe). Practice moving between them using drop steps and jump stops to land balanced at each position.",
+    "difficulty": "beginner",
+    "category": ["defense"],
+    "positionGroup": ["goalie"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 4,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones", "stick", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Fundamental goalie drill. Must be perfect before adding shots.",
+    "tags": ["goalie", "positioning", "footwork", "fundamentals"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Use a drop step (open hip) to move, followed by a jump stop to land balanced",
+      "Stay square to the imaginary ball at each cone",
+      "Keep hands up in ready position at all times",
+      "Move along the arc, not straight across the crease"
+    ],
+    "steps": [
+      "Set up 5 cones on the goalie arc: left pipe, left 45°, center, right 45°, right pipe",
+      "Start at center cone in ready stance",
+      "Drop step to left 45° cone, jump stop, set",
+      "Drop step to left pipe, jump stop, set",
+      "Return to center, then repeat to the right side",
+      "Increase speed as form improves"
+    ],
+    "commonMistakes": [
+      "Crossing feet — always use drop step",
+      "Moving in a straight line instead of following the arc",
+      "Dropping hands during movement",
+      "Not being set (balanced) when arriving at each position"
+    ],
+    "source": {
+      "url": "https://laxgoalierat.com/how-to-properly-move-on-the-lacrosse-goalie-arc/",
+      "siteName": "Lax Goalie Rat",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Numbered Arc Drill",
+    "subtitle": "Goalie reacts to called positions on the arc",
+    "description": "Coach calls out a number (1-5) representing a spot on the arc. Goalie must sprint or shuffle to that spot and land perfectly set. Builds reaction and positioning under pressure.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["goalie"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 4,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones", "stick", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Add shots after arrival to combine positioning with saves.",
+    "tags": ["goalie", "positioning", "reaction-time", "footwork"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Be set before the shot comes — positioning first",
+      "Sprint to the spot, then jump stop to balance",
+      "Keep hands up and ready even while moving"
+    ],
+    "steps": [
+      "Number the 5 arc positions 1 through 5",
+      "Goalie starts at center (position 3)",
+      "Coach calls a random number",
+      "Goalie sprints/shuffles to that position and sets",
+      "Coach can add a shot immediately after arrival",
+      "Increase speed of calls as goalie improves"
+    ],
+    "commonMistakes": [
+      "Not being set before the shot arrives",
+      "Moving too slowly between positions",
+      "Cheating by anticipating the next call"
+    ],
+    "source": {
+      "url": "https://laxgoalierat.com/lacrosse-goalie-drills/",
+      "siteName": "Lax Goalie Rat",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Colored Ball Reaction Drill",
+    "subtitle": "Goalie calls color while making the save",
+    "description": "Coach tosses tennis balls of different colors. Goalie must shout the color while driving their top hand and lead foot to make the save. Combines visual processing with save mechanics.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["goalie"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 2,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["colored tennis balls", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Forces the goalie to track the ball all the way in. The color call proves they're watching.",
+    "tags": ["goalie", "reaction-time", "hand-speed", "tracking"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Call the color BEFORE making the save — proves you're tracking",
+      "Use proper lead hand, lead step mechanics",
+      "Keep eyes on the ball through the entire flight"
+    ],
+    "steps": [
+      "Coach stands 10-15 yards out with a bucket of different colored tennis balls",
+      "Toss a ball at the goalie at moderate speed",
+      "Goalie must call the color AND make the save",
+      "Increase speed and vary locations",
+      "20-30 reps per session"
+    ],
+    "commonMistakes": [
+      "Making the save without calling the color — not tracking properly",
+      "Guessing the color instead of actually seeing it",
+      "Reverting to bad mechanics under cognitive load"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/coach-lacrosse-goalie-reaction-time/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Reaction Ball Drill",
+    "subtitle": "Unpredictable bounces for goalie reaction training",
+    "description": "Use a six-sided reaction ball against a wall. Its unpredictable bounce forces the goalie to react to the ball's actual movement rather than a pre-determined path.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["goalie"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 2,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["reaction ball", "wall"],
+    "videoUrl": null,
+    "coachNotes": "Can be done solo. Great for pre-practice warm-up.",
+    "tags": ["goalie", "reaction-time", "solo", "warm-up"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Stay in athletic stance — ready to move any direction",
+      "React to what you see, not what you expect",
+      "Use proper save mechanics even on wild bounces"
+    ],
+    "steps": [
+      "Stand 5-8 feet from a wall",
+      "Throw the reaction ball at the wall",
+      "React to the unpredictable bounce and catch/save it",
+      "Vary throw speed and angle",
+      "3-5 minute sessions"
+    ],
+    "commonMistakes": [
+      "Standing flat-footed — stay on balls of feet",
+      "Only using hands — move your whole body",
+      "Throwing too hard at first — build up speed"
+    ],
+    "source": {
+      "url": "https://laxgoalierat.com/lacrosse-goalie-drills/",
+      "siteName": "Lax Goalie Rat",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Shell Drill (Man-Up/Man-Down)",
+    "subtitle": "Slow-motion defensive rotation for EMO defense",
+    "description": "A stationary or slow-moving 5v5 or 6v5 drill focusing solely on defensive rotations as the ball is passed around the perimeter. Teaches zone defense principles.",
+    "difficulty": "intermediate",
+    "category": ["man-down", "defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 10,
+    "maxPlayers": 12,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Teach at walk-through speed first. Add tempo once rotations are clean.",
+    "tags": ["man-down", "defense", "rotation", "zone", "team"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Keep sticks up in passing lanes at all times",
+      "Rotate as a string — when one moves, all adjust",
+      "Identify the cutter and communicate",
+      "Force shots from outside and low-angle positions"
+    ],
+    "steps": [
+      "6 offensive players set up in man-up formation (e.g., 3-3)",
+      "5 defenders in man-down zone",
+      "Offense passes the ball around the perimeter (no dodging initially)",
+      "Defense rotates with each pass",
+      "Coach pauses to correct positioning",
+      "Gradually add dodging and live play"
+    ],
+    "commonMistakes": [
+      "Ball-watching — must track both ball and assigned zone",
+      "Not keeping sticks up in passing lanes",
+      "Over-rotating and leaving backside open"
+    ],
+    "source": {
+      "url": "https://www.championshipproductions.com/news/2010/11/30/3-effective-man-down-lacrosse-drills-to-boost-defensive-play/",
+      "siteName": "Championship Productions",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Knock-Down Drill",
+    "subtitle": "Defenders intercept cross-crease passes",
+    "description": "Coach fires passes across the crease area. Defenders must sprint to tip or intercept the passes. Builds the instinct to get sticks in passing lanes during man-down defense.",
+    "difficulty": "intermediate",
+    "category": ["man-down", "defense"],
+    "positionGroup": ["defense"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 4,
+    "maxPlayers": 8,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Every tipped or intercepted pass in man-down is a huge play. This drill builds that reflex.",
+    "tags": ["man-down", "defense", "interceptions", "sticks-up"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Keep stick up and active — anticipate the passing lane",
+      "Sprint to the lane, don't reach",
+      "Even a tip that prevents a catch is a win"
+    ],
+    "steps": [
+      "2-3 defenders set up in the crease area",
+      "Coach stands at wing or top with balls",
+      "Coach fires passes across the crease (varying height and speed)",
+      "Defenders sprint to tip or intercept",
+      "Track successful knock-downs per round",
+      "20-30 pass attempts per session"
+    ],
+    "commonMistakes": [
+      "Reaching with one hand instead of moving body to the lane",
+      "Dropping stick between passes",
+      "Not resetting position after each attempt"
+    ],
+    "source": {
+      "url": "https://www.championshipproductions.com/news/2010/11/30/3-effective-man-down-lacrosse-drills-to-boost-defensive-play/",
+      "siteName": "Championship Productions",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Numbers Game (Man-Up/Man-Down)",
+    "subtitle": "Variable numbers advantage game drill",
+    "description": "Coach calls numbers to create variable advantages (2v1, 3v2, 4v3, 5v4, 6v5). Players sprint in from the sideline when their number is called. Teaches both man-up offense and man-down defense.",
+    "difficulty": "intermediate",
+    "category": ["man-up", "man-down", "transition"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 12,
+    "maxPlayers": 24,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "All-time favorite drill for youth through college. Keeps everyone engaged.",
+    "tags": ["man-up", "man-down", "transition", "competitive", "team", "fun"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Offense: move the ball quickly to find the open man",
+      "Defense: communicate and rotate as a unit",
+      "Be ready — your number could be called at any time",
+      "Sprint onto the field — simulates game urgency"
+    ],
+    "steps": [
+      "Assign numbers to players (1 through 6)",
+      "Offense on one sideline, defense on the other",
+      "Coach calls 'Offense 3, Defense 2' (creating a 3v2)",
+      "Those players sprint onto the field",
+      "Coach puts ball in play",
+      "Play until goal, save, or turnover",
+      "Coach calls new numbers for next rep — vary the advantage"
+    ],
+    "commonMistakes": [
+      "Not sprinting when number is called — jog = bench",
+      "Offense holding ball instead of moving it in advantage",
+      "Defense panicking instead of communicating"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/numbers-game-man-down-practice-drill/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "5-10-5 Pro Agility Shuttle",
+    "subtitle": "Classic agility test for change of direction",
+    "description": "Three cones 5 yards apart in a line. Start at center, sprint 5 yards right (touch), sprint 10 yards left (touch), sprint 5 yards back to center.",
+    "difficulty": "intermediate",
+    "category": ["conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones"],
+    "videoUrl": null,
+    "coachNotes": "Standard combine test. Time players and track improvement over the season.",
+    "tags": ["conditioning", "agility", "speed", "testing"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Stay low on the turns — don't stand up",
+      "Plant the outside foot hard to change direction",
+      "Explode out of each turn",
+      "Pump arms for acceleration"
+    ],
+    "steps": [
+      "Place 3 cones in a line, 5 yards apart",
+      "Start at the middle cone in athletic stance",
+      "On whistle, sprint 5 yards to the right cone (touch the line)",
+      "Sprint 10 yards to the left cone (touch the line)",
+      "Sprint 5 yards back to the center cone",
+      "Time each rep"
+    ],
+    "commonMistakes": [
+      "Standing too tall on direction changes",
+      "Not touching the line on each turn",
+      "Decelerating before the finish"
+    ],
+    "source": {
+      "url": "https://ultimategoallacrosse.com/speed-agility-conditioning",
+      "siteName": "Ultimate Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "T-Drill",
+    "subtitle": "Multi-directional agility drill",
+    "description": "Cones in a T shape (5 yards apart). Sprint forward to center, shuffle left, shuffle across to far right, shuffle back to center, backpedal to start.",
+    "difficulty": "intermediate",
+    "category": ["conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones"],
+    "videoUrl": null,
+    "coachNotes": "Covers all four movement directions. Great for defenders especially.",
+    "tags": ["conditioning", "agility", "footwork", "speed"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Sprint forward, shuffle laterally, backpedal — don't turn and run",
+      "Stay in athletic stance throughout",
+      "Touch each cone with your hand",
+      "Do with stick in hand for sport-specificity"
+    ],
+    "steps": [
+      "Set up 4 cones in a T shape, each 5 yards apart",
+      "Start at the bottom of the T",
+      "Sprint forward to the center cone (touch)",
+      "Shuffle left to the end cone (touch)",
+      "Shuffle right across to the far end cone (touch)",
+      "Shuffle back to center (touch)",
+      "Backpedal to start"
+    ],
+    "commonMistakes": [
+      "Turning hips to run instead of shuffling laterally",
+      "Not touching cones",
+      "Standing upright during shuffles"
+    ],
+    "source": {
+      "url": "https://www.edgelacrossetraining.com/blog/agility-drills-to-improve-quickness",
+      "siteName": "Edge Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "300-Yard Shuttle",
+    "subtitle": "Anaerobic endurance test",
+    "description": "Sprint 25 yards and back 6 times (300 yards total). Aim to finish under 60 seconds with 2-3 minutes rest between sets. Simulates the anaerobic demands of lacrosse.",
+    "difficulty": "advanced",
+    "category": ["conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["cones"],
+    "videoUrl": null,
+    "coachNotes": "Standard lacrosse conditioning test. Target times: <54 seconds for varsity, <60 for JV.",
+    "tags": ["conditioning", "endurance", "testing", "anaerobic"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Pace yourself — don't go 100% on the first two sprints",
+      "Stay low on the turns",
+      "Push through the last 2 reps when legs are heavy",
+      "Full rest between sets — this is not a jog recovery"
+    ],
+    "steps": [
+      "Set up 2 cones 25 yards apart",
+      "Sprint from cone A to cone B and back (50 yards)",
+      "Repeat 6 times without stopping (300 yards total)",
+      "Record time",
+      "Rest 2-3 minutes",
+      "Repeat for 2-4 sets total"
+    ],
+    "commonMistakes": [
+      "Going too hard on the first rep and dying on the last",
+      "Not touching the line on turns",
+      "Not resting enough between sets"
+    ],
+    "source": {
+      "url": "https://gladiatorlacrosse.com/lacrosse-conditioning-drills-for-all-positions/",
+      "siteName": "Gladiator Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Full-Field Middie Intervals",
+    "subtitle": "110-yard sprint intervals for midfielders",
+    "description": "Sprint the full length of the field (110 yards), rest for 30-45 seconds, and repeat 6-10 times. Simulates the transition demands on midfielders.",
+    "difficulty": "advanced",
+    "category": ["conditioning"],
+    "positionGroup": ["midfield"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 15,
+    "fieldSpace": "full-field",
+    "equipment": [],
+    "videoUrl": null,
+    "coachNotes": "Midfielders run the most in lacrosse. This drill builds the engine they need.",
+    "tags": ["conditioning", "midfield", "endurance", "sprints"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Full speed — this simulates a full-field transition",
+      "Active rest — walk/jog during the 30-45 second rest",
+      "Maintain form even when fatigued",
+      "Carry a stick for sport-specific conditioning"
+    ],
+    "steps": [
+      "Line up on one end line",
+      "Sprint 110 yards to the opposite end line",
+      "Rest 30-45 seconds (walk back to midfield)",
+      "Sprint again",
+      "Repeat 6-10 times",
+      "Track times to monitor conditioning"
+    ],
+    "commonMistakes": [
+      "Jogging instead of sprinting",
+      "Too much rest between reps",
+      "Poor form when fatigued — leads to injury"
+    ],
+    "source": {
+      "url": "https://www.usalacrosse.com/magazine/game-ready-drills-two-way-middie",
+      "siteName": "USA Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Split Dodge Cone Drill",
+    "subtitle": "Isolate the split dodge with cone defenders",
+    "description": "Set up cones 5-10 yards apart. Sprint toward the first cone, plant outside foot hard, switch hands across your face, and explode toward the second cone.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls", "cones"],
+    "videoUrl": null,
+    "coachNotes": "The split dodge is the bread-and-butter move. Every player must master it.",
+    "tags": ["dodging", "footwork", "fundamentals", "split-dodge"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Plant the outside foot hard — this sells the fake",
+      "Switch hands quickly across the face",
+      "Explode out of the dodge — change of speed is critical",
+      "Protect the stick on the switch"
+    ],
+    "steps": [
+      "Set up 2 cones 5-10 yards apart",
+      "Sprint toward the first cone with ball in right hand",
+      "Plant right foot hard at the cone",
+      "Switch hands (right to left) across your face",
+      "Explode toward the second cone",
+      "Repeat going back, switching left to right"
+    ],
+    "commonMistakes": [
+      "Slowing down before the dodge — must maintain speed",
+      "Switching hands below the waist — keep it across the face",
+      "Not changing speed after the dodge"
+    ],
+    "source": {
+      "url": "https://stringerssociety.com/blog/lacrosse-dodges/",
+      "siteName": "Stringers Society",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Roll Dodge Drill",
+    "subtitle": "Practice the spin move with a defender or obstacle",
+    "description": "Run toward a defender or heavy pole/obstacle. Plant lead foot between the defender's feet, roll your back across their chest, and keep stick tucked tight to ear to prevent trail checks.",
+    "difficulty": "intermediate",
+    "category": ["passing"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": true,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Use a trash can or blocking pad as a 'defender' for solo reps.",
+    "tags": ["dodging", "footwork", "roll-dodge", "contact"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Plant lead foot between defender's feet — get tight",
+      "Roll your back across the defender — use your body as a shield",
+      "Keep stick tucked to your ear — prevents trail checks",
+      "Accelerate out of the roll — don't spin and stand"
+    ],
+    "steps": [
+      "Approach a stationary defender or obstacle at 3/4 speed",
+      "Plant lead foot between/beside the defender",
+      "Spin (roll) keeping back toward the defender",
+      "Tuck stick tight to ear throughout the rotation",
+      "Explode out of the roll toward the goal",
+      "Progress to live 1v1 once technique is clean"
+    ],
+    "commonMistakes": [
+      "Starting the roll too far from the defender",
+      "Extending stick away from body during the spin",
+      "Not accelerating out of the roll"
+    ],
+    "source": {
+      "url": "https://stringerssociety.com/blog/lacrosse-dodges/",
+      "siteName": "Stringers Society",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "1v1 Island Drill",
+    "subtitle": "Confined 1v1 dodging in a small box",
+    "description": "Attacker and defender start in a 5x5 yard box. Attacker must use one of the 4 core dodges to get past. Teaches real-time reading of defensive positioning and stick pressure.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["attack", "midfield", "defense"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["sticks", "balls", "cones", "goal"],
+    "videoUrl": null,
+    "coachNotes": "The small space forces quick decisions. Great for both attackers and defenders.",
+    "tags": ["dodging", "1v1", "competitive", "decision-making"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Attacker: read the defender's stance and react",
+      "Defender: stay balanced, don't overcommit",
+      "If defender is square, split dodge",
+      "If defender is tight, roll dodge",
+      "If defender's stick is high, face dodge underneath"
+    ],
+    "steps": [
+      "Create a 5x5 yard box with cones",
+      "Attacker starts at one end with the ball",
+      "Defender starts in the middle",
+      "Attacker must dodge past the defender to reach the other side (or shoot)",
+      "Play is dead if ball goes out of the box",
+      "Rotate after 3-5 reps per attacker"
+    ],
+    "commonMistakes": [
+      "Attacker using the same dodge every time — must read and react",
+      "Defender lunging instead of maintaining position",
+      "Not finishing after the dodge — must attack the cage"
+    ],
+    "source": {
+      "url": "https://stringerssociety.com/blog/lacrosse-dodges/",
+      "siteName": "Stringers Society",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Sharks and Minnows",
+    "subtitle": "Youth cradling game with defenders",
+    "description": "Minnows (players with balls) must cradle from one end line to the other. Sharks (defenders/coaches) try to poke the ball away or tag them. If a minnow loses their ball, they become a shark.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Youth favorite. Gets kids running, cradling, and dodging with max engagement.",
+    "tags": ["youth", "fun", "cradling", "competitive", "game", "dodging"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Protect the stick — keep it on your outside hip",
+      "Change speed and direction to avoid sharks",
+      "Keep your head up — see the open lanes"
+    ],
+    "steps": [
+      "All players start on one end line with a ball (minnows)",
+      "1-3 players start as sharks in the middle (no ball)",
+      "On whistle, minnows run to the other end line while cradling",
+      "Sharks try to knock the ball away or tag minnows",
+      "If you lose your ball, you become a shark",
+      "Last minnow standing wins"
+    ],
+    "commonMistakes": [
+      "Minnows not protecting their stick",
+      "Running in a straight line — dodge the sharks",
+      "Sharks chasing instead of positioning"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/youth-lacrosse-practice-ideas/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Pinnie Tag",
+    "subtitle": "Cradling while protecting a tail flag",
+    "description": "Every player has a ball and a pinnie tucked into their waistband like a tail. While cradling, they must try to pull others' pinnies while protecting their own.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["sticks", "balls", "pinnies"],
+    "videoUrl": null,
+    "coachNotes": "Multitasking drill disguised as a game. Builds spatial awareness while cradling.",
+    "tags": ["youth", "fun", "cradling", "competitive", "game"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Must cradle the ball the entire time — can't hold it in the pocket",
+      "Use body positioning to shield your pinnie",
+      "Keep your head on a swivel — offense and defense simultaneously"
+    ],
+    "steps": [
+      "Define a playing area (20x20 yard box)",
+      "Each player tucks a pinnie into the back of their waistband",
+      "Each player carries a ball in their stick",
+      "On whistle, try to pull others' pinnies while keeping your own",
+      "If you lose your ball OR your pinnie, you're out",
+      "Last player standing wins"
+    ],
+    "commonMistakes": [
+      "Forgetting to cradle while focused on grabbing pinnies",
+      "Turning your back too much — leaves your pinnie exposed"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/youth-lacrosse-practice-ideas/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Castle Defender",
+    "subtitle": "Shoot to topple a cone pyramid in the goal",
+    "description": "Stack five cones in a pyramid inside the goal. Players take turns shooting to topple the castle. Award points for hitting specific cones or corners.",
+    "difficulty": "beginner",
+    "category": ["shooting"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Makes shooting practice fun for young players. They'll take 50 shots without realizing it.",
+    "tags": ["youth", "fun", "shooting", "accuracy", "competitive", "game"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Aim for specific cones — precision over power",
+      "Use proper shooting form even in a game setting",
+      "Follow through on every shot"
+    ],
+    "steps": [
+      "Stack 5 cones in a pyramid inside the goal (3 on bottom, 2 on top)",
+      "Players line up 10-12 yards out",
+      "Take turns shooting at the cone pyramid",
+      "Points for each cone knocked down",
+      "Bonus points for specific targets (top cone = 3 points)",
+      "Reset pyramid after each round"
+    ],
+    "commonMistakes": [
+      "Blasting shots without aiming",
+      "Poor form — still enforce proper mechanics",
+      "Shooting from too close or too far"
+    ],
+    "source": {
+      "url": "https://www.veo.com/article/youth-lacrosse-drills-beginners",
+      "siteName": "Veo",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Draw Control Boxing Out",
+    "subtitle": "Women's lacrosse draw circle positioning drill",
+    "description": "Coaches stand on the draw line and throw ground balls or high balls to two opponents on the circle. Players must use their bodies to box out the opponent and gain possession.",
+    "difficulty": "intermediate",
+    "category": ["ground-balls"],
+    "positionGroup": ["midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 3,
+    "maxPlayers": 12,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks"],
+    "videoUrl": "https://www.youtube.com/watch?v=u9eYaW06iv0",
+    "coachNotes": "Draw controls are possession changers. Winning the draw is like winning a face-off.",
+    "tags": ["womens", "draw-control", "ground-balls", "competitive"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["womens-field"],
+    "coachingPoints": [
+      "Position body between opponent and the ball",
+      "Box out with hips and shoulders",
+      "Track the ball in the air — hand-eye coordination is key",
+      "Communicate with circle players"
+    ],
+    "steps": [
+      "Two players set up on opposite sides of the draw circle",
+      "Coach stands at the center line",
+      "Coach throws a ball high in the air or rolls it on the ground",
+      "Players compete to box out and gain possession",
+      "Winner must complete a pass to a teammate",
+      "Rotate partners every 3 reps"
+    ],
+    "commonMistakes": [
+      "Not boxing out — going straight for the ball",
+      "Losing the ball after the initial win due to poor cradling",
+      "Not communicating with circle teammates"
+    ],
+    "source": {
+      "url": "https://www.youtube.com/watch?v=u9eYaW06iv0",
+      "siteName": "YouTube",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "8-Meter Arc Clearing Drill",
+    "subtitle": "Women's lacrosse free position shooting space practice",
+    "description": "Practice resetting after a foul where players must clear the arc 'like spokes on a wheel' to ensure the shooter has a safe, unobstructed path for a free position shot.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 7,
+    "maxPlayers": 12,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Shooting space violations are common. This drill prevents them.",
+    "tags": ["womens", "shooting-space", "free-position", "rules"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["womens-field"],
+    "coachingPoints": [
+      "Clear the arc like spokes on a wheel — spread out evenly",
+      "Give the shooter a clear, unobstructed path to the goal",
+      "Move quickly — the shooter wants to go before defense resets"
+    ],
+    "steps": [
+      "Simulate a foul inside the 8-meter arc",
+      "Shooter places ball on the 8-meter mark",
+      "All other players must clear the arc",
+      "Clear 'like spokes on a wheel' — even spacing",
+      "Shooter takes the free position shot",
+      "Repeat from different positions around the arc"
+    ],
+    "commonMistakes": [
+      "Players bunching up while clearing",
+      "Clearing too slowly — gives defense time to set up",
+      "Shooter not being ready when the arc is clear"
+    ],
+    "source": {
+      "url": "https://laxplaybook.com/w-rules/understanding-shooting-space-in-womens-lacrosse-key-rules-and-tactics",
+      "siteName": "LaxPlaybook",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Quadrant 4v4 (Creating Space)",
+    "subtitle": "Women's lacrosse spacing drill in the CSA",
+    "description": "Divide the critical scoring area into four quadrants. Players must stay within their assigned quadrant while trying to score, forcing proper spacing and passing lanes.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 8,
+    "maxPlayers": 8,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Solves the number one youth problem: everyone running to the ball. Forces spacing.",
+    "tags": ["womens", "spacing", "team-offense", "competitive"],
+    "ageGroup": ["middle-school", "high-school", "college"],
+    "gameType": ["womens-field"],
+    "coachingPoints": [
+      "Stay in your quadrant — trust your teammates",
+      "Create passing lanes within the spacing structure",
+      "Off-ball movement within your quadrant to get open",
+      "Defense must also stay disciplined in coverage"
+    ],
+    "steps": [
+      "Divide the CSA into 4 quadrants with cones",
+      "4v4, each player assigned a quadrant",
+      "Players must stay in their quadrant",
+      "Play to score — emphasize ball movement and spacing",
+      "Rotate quadrants every 3-4 minutes"
+    ],
+    "commonMistakes": [
+      "Leaving your quadrant to 'help' — trust the system",
+      "Not moving within the quadrant — can still cut and dodge",
+      "Defenders sagging to the ball and leaving their quadrant"
+    ],
+    "source": {
+      "url": "https://www.achievelax.com/wp-content/uploads/2022/01/Offensive-Spacing-and-Drills.pdf",
+      "siteName": "Achieve Lax",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Bucket Drill (Box Lacrosse)",
+    "subtitle": "Box lacrosse shooting on the move",
+    "description": "Place a bucket or pylon 5-6 meters in front of the goal. Two lines at GLE. Players scoop a ball, run around the bucket to center themselves, and shoot while moving toward the cage.",
+    "difficulty": "intermediate",
+    "category": ["shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 4,
+    "maxPlayers": 16,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "goal", "bucket or pylon"],
+    "videoUrl": null,
+    "coachNotes": "Box lacrosse shooting requires accuracy over power due to the smaller goal and larger goalie equipment.",
+    "tags": ["box-lacrosse", "shooting", "on-the-run"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["box"],
+    "coachingPoints": [
+      "Quick release — box goalies take away time",
+      "Change planes: catch high, shoot low (and vice versa)",
+      "Pick corners — box goals are small, accuracy is everything",
+      "Shoot in stride — don't stop your feet"
+    ],
+    "steps": [
+      "Place a bucket or pylon 5-6 meters in front of the box lacrosse goal",
+      "Two lines form at Goal Line Extended on each side",
+      "First player scoops a ball from the ground",
+      "Runs around the bucket toward center",
+      "Shoots while moving toward the cage",
+      "Alternate lines"
+    ],
+    "commonMistakes": [
+      "Stopping to shoot — must shoot on the run",
+      "Telegraphing where you're shooting",
+      "Not changing planes to beat the goalie"
+    ],
+    "source": {
+      "url": "https://laxlife.ca/beginner-lacrosse-drills-shooting/",
+      "siteName": "Laxlife",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Off-Ball Pick-and-Roll (Box Lacrosse)",
+    "subtitle": "Box lacrosse pick and roll away from the ball",
+    "description": "Simulates indoor game scenarios where a player sets a pick away from the ball. Once the picker seals the defender, they roll to the net to receive a pass and finish in traffic.",
+    "difficulty": "advanced",
+    "category": ["shooting", "transition"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": true,
+    "competitive": false,
+    "minPlayers": 4,
+    "maxPlayers": 10,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "The 2-man game is the foundation of box lacrosse offense.",
+    "tags": ["box-lacrosse", "pick-and-roll", "2-man-game", "team-offense"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["box"],
+    "coachingPoints": [
+      "Picker must be set — moving picks are penalties",
+      "Roll to the net immediately after the ball carrier passes",
+      "Ball carrier: use the pick tight — rub shoulders",
+      "Look for the slip if defense overplays the pick"
+    ],
+    "steps": [
+      "Ball carrier on one side, picker on opposite side",
+      "2 defenders guard them",
+      "Picker sets up and sets a screen for their teammate's defender",
+      "After ball carrier uses the pick, picker rolls to the net",
+      "Ball carrier feeds the roller for a finish",
+      "Rotate roles every 3 reps"
+    ],
+    "commonMistakes": [
+      "Moving pick — picker must be stationary",
+      "Ball carrier not using the pick tight enough",
+      "Roller not going hard to the net — must be decisive"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/box-lacrosse-off-ball-pick-roll-shooting-drill/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Inside Arc Finishing (Box Lacrosse)",
+    "subtitle": "Catch and shoot in one motion off the crease",
+    "description": "Two lines 12 yards on either side of the box goal. One player cuts on an arc 2-3 yards off the crease while the other feeds them. Cutter must catch and shoot in one motion.",
+    "difficulty": "advanced",
+    "category": ["shooting"],
+    "positionGroup": ["attack"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 4,
+    "maxPlayers": 12,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Crease play wins games in box lacrosse. This drill builds the touch needed for tight-space finishing.",
+    "tags": ["box-lacrosse", "shooting", "crease", "finishing"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["box"],
+    "coachingPoints": [
+      "Catch and shoot in one motion — no cradling",
+      "Practice dip-and-dunk and behind-the-head fakes",
+      "Cut hard on the arc — half-speed cuts don't get open",
+      "Change planes to beat the box goalie"
+    ],
+    "steps": [
+      "Two lines form 12 yards on either side of the goal",
+      "One player from line A cuts on a 2-3 yard arc off the crease",
+      "Player from line B feeds them a pass",
+      "Cutter catches and shoots in one motion",
+      "Alternate feeding and cutting lines",
+      "Add a defender for advanced reps"
+    ],
+    "commonMistakes": [
+      "Catching and cradling before shooting — too slow in box",
+      "Cutting in a straight line instead of an arc",
+      "Not selling a fake before the shot"
+    ],
+    "source": {
+      "url": "https://laxlife.ca/beginner-lacrosse-drills-shooting/",
+      "siteName": "Laxlife",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Skeleton Pick and Roll",
+    "subtitle": "Two-man game foundation drill",
+    "description": "Set up 4 cones: two at the top and two at GLE. A player drives from the lower cone to accept a pick from a teammate. The picker holds position until the ball carrier passes, then rolls toward the goal for a feed.",
+    "difficulty": "intermediate",
+    "category": ["shooting", "passing"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 4,
+    "maxPlayers": 12,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": "https://www.youtube.com/watch?v=UyrPxiCZsfo",
+    "coachNotes": "The 2-man game is the most important concept in modern lacrosse offense. Run this every practice.",
+    "tags": ["2-man-game", "pick-and-roll", "team-offense", "fundamentals"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Picker: set a firm base, feet wider than shoulders, stay stationary",
+      "Ball carrier: rub shoulders with the picker — no daylight",
+      "Picker: roll hard to the goal after the ball carrier passes",
+      "Read the defense — if they switch, feed the roller immediately"
+    ],
+    "steps": [
+      "Set up 4 cones: 2 at the top (15 yards out), 2 at GLE",
+      "Ball carrier starts at a lower cone, picker at the upper cone",
+      "Ball carrier drives toward the picker",
+      "Picker sets a screen",
+      "Ball carrier uses the screen, drives to the cage or passes",
+      "Picker rolls to the goal to receive a feed",
+      "Finish with a shot"
+    ],
+    "commonMistakes": [
+      "Moving pick — picker must be completely stationary",
+      "Ball carrier not getting tight to the pick",
+      "Picker rolling away from the goal instead of toward it"
+    ],
+    "source": {
+      "url": "https://www.ussportscamps.com/tips/lacrosse/boys-offensive-drill-pick-and-roll",
+      "siteName": "US Sports Camps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Phone Booth 2v2",
+    "subtitle": "Tight-space 2v2 with picks and quick passes",
+    "description": "High-intensity 2v2 drill in a confined space. Forces players to use tight picks, quick dump passes, and touch passes to navigate defensive pressure in close quarters.",
+    "difficulty": "advanced",
+    "category": ["shooting", "passing", "defense"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 4,
+    "maxPlayers": 16,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "goal", "cones"],
+    "videoUrl": null,
+    "coachNotes": "Great for box lacrosse skills. The confined space mirrors game situations.",
+    "tags": ["2-man-game", "competitive", "tight-space", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "box"],
+    "coachingPoints": [
+      "Quick decisions — no time to think in tight space",
+      "Use picks and quick touch passes",
+      "Protect the stick in traffic",
+      "Defenders: communicate switches"
+    ],
+    "steps": [
+      "Set up a 10x10 yard box near the goal",
+      "2 attackers vs 2 defenders inside the box",
+      "Play live — attackers try to score",
+      "Must stay inside the box boundaries",
+      "30-second shot clock",
+      "Rotate groups every 2-3 reps"
+    ],
+    "commonMistakes": [
+      "Overdodging — pass the ball in tight space",
+      "Standing still — constant movement is required",
+      "Defenders: not communicating switches on picks"
+    ],
+    "source": {
+      "url": "https://www.coachup.com/nation/articles/the-two-man-game-in-lacrosse",
+      "siteName": "CoachUp Nation",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Three and Go (3v3)",
+    "subtitle": "Complete 3 passes before attacking the goal",
+    "description": "Starts as a 3v3 ground ball scenario. Players must complete three passes before attacking the goal. Forces players to spread out and find open lanes before initiating a dodge.",
+    "difficulty": "intermediate",
+    "category": ["passing", "shooting", "ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 18,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Prevents the one-man show. Teaches ball movement and off-ball activity.",
+    "tags": ["team-offense", "3v3", "ball-movement", "competitive"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Three passes before you can dodge or shoot",
+      "Off-ball players must move to create passing lanes",
+      "Don't force passes — reverse the ball if needed",
+      "After 3 passes, attack immediately — don't hesitate"
+    ],
+    "steps": [
+      "3v3 inside the offensive zone",
+      "Start with a contested ground ball or coach feed",
+      "Offensive team must complete 3 passes before shooting",
+      "Count passes out loud",
+      "After 3 passes, play is live — dodge, shoot, or keep passing",
+      "Play until goal, save, or turnover"
+    ],
+    "commonMistakes": [
+      "Rushing passes to get to 3 — quality passes count",
+      "All three players standing still waiting for the ball",
+      "Not attacking after completing 3 passes"
+    ],
+    "source": {
+      "url": "https://lacrossedrive.com/drill/situation/3v3/",
+      "siteName": "Lacrosse Drive",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Bogeys Build-Up Drill",
+    "subtitle": "Progressive 1v1 to 2v2 to 3v3",
+    "description": "Starts as a 1v1, then builds to 2v2, and finally 3v3 as players enter from the sideline. Teaches how to integrate secondary and tertiary options as complexity increases.",
+    "difficulty": "advanced",
+    "category": ["shooting", "defense", "transition"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 18,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Teaches players to adjust as the situation evolves. Mirrors real game complexity.",
+    "tags": ["team-offense", "progressive", "competitive", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "1v1: attack aggressively — it's your best chance",
+      "2v2: look for the 2-man game immediately",
+      "3v3: ball movement and off-ball cutting",
+      "Defenders: communicate as new players enter"
+    ],
+    "steps": [
+      "Start with 1v1 at the top of the box",
+      "After 5 seconds, a second attacker and defender enter from opposite sides",
+      "Now 2v2 — find the 2-man game",
+      "After 5 more seconds, third attacker and defender enter",
+      "Now 3v3 — play to conclusion",
+      "Rotate groups"
+    ],
+    "commonMistakes": [
+      "Not attacking in the 1v1 phase — waiting for help",
+      "New players entering and standing still",
+      "Not adjusting strategy as numbers change"
+    ],
+    "source": {
+      "url": "https://lacrossedrive.com/drill/situation/3v3/",
+      "siteName": "Lacrosse Drive",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "M-W-8 Stick Check Drill",
+    "subtitle": "Defenseman stick precision training",
+    "description": "Hold your stick in athletic stance and trace the letters M, W, and the number 8 around a stationary object (teammate's outstretched arms or a pole) without touching it. Builds muscle memory for complex stick movements.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["defense"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 10,
+    "durationMinutes": 10,
+    "fieldSpace": null,
+    "equipment": ["long pole", "pole or partner"],
+    "videoUrl": null,
+    "coachNotes": "Underrated drill. Defensive stick skills are as important as offensive ones.",
+    "tags": ["defense", "long-pole", "stick-skills", "technique"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Precision over speed — don't touch the obstacle",
+      "Keep the pattern smooth and controlled",
+      "Build speed gradually as muscle memory develops",
+      "Use both hands — switch grip"
+    ],
+    "steps": [
+      "Stand in athletic defensive stance facing a stationary object (pole, teammate, etc.)",
+      "Hold long pole in defensive position",
+      "Trace the letter 'M' around the object without touching it",
+      "Then trace 'W'",
+      "Then trace '8' (figure eight)",
+      "10 reps of each pattern, increasing speed"
+    ],
+    "commonMistakes": [
+      "Rushing and hitting the obstacle",
+      "Moving feet — stay in defensive stance",
+      "Using only one grip pattern"
+    ],
+    "source": {
+      "url": "https://laxallstars.com/defensive-lacrosse-drill-takeaway-teacher/",
+      "siteName": "Lax All Stars",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Poke Check Drill (Zig-Zag)",
+    "subtitle": "Throw poke checks while shuffling through cones",
+    "description": "Shuffle between cones in a zig-zag pattern. At each cone, change direction and throw a controlled poke or lift check while maintaining a low, balanced defensive stance.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["defense"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 15,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["long pole", "cones"],
+    "videoUrl": "https://www.youtube.com/watch?v=Kva4SL2Ylck",
+    "coachNotes": "Combines footwork with checking. Feet first, stick second — always.",
+    "tags": ["defense", "long-pole", "footwork", "checks"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Poke check: slide stick through top hand like a pool cue",
+      "Stay low and balanced — don't lunge forward",
+      "Short, sharp motions — no wind-up",
+      "Feet stay moving through the entire drill"
+    ],
+    "steps": [
+      "Set up 6-8 cones in a zig-zag pattern, 5 yards apart",
+      "Start at first cone in defensive stance with long pole",
+      "Shuffle to the next cone",
+      "At each cone, change direction and throw a poke check",
+      "Maintain low defensive stance throughout",
+      "3-5 reps through the course"
+    ],
+    "commonMistakes": [
+      "Lunging on the poke check — shifts weight forward",
+      "Standing upright between checks",
+      "Wind-up before the check — should be quick and hidden"
+    ],
+    "source": {
+      "url": "https://laxcamps.com/blog/five-defensive-lacrosse-drills/",
+      "siteName": "LaxCamps",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Takeaway Teacher",
+    "subtitle": "Practice precision checks on a swaying target",
+    "description": "Slide a short stick through a goal's netting to simulate an attacker's cradle. Stand at GLE and throw precise pokes, lifts, and slaps at the swaying stick to build timing and precision.",
+    "difficulty": "intermediate",
+    "category": ["defense"],
+    "positionGroup": ["defense"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 5,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["long pole", "short stick", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Solo drill. Can be done before or after practice. Builds the precision for legal, effective checks.",
+    "tags": ["defense", "long-pole", "solo", "technique", "checks"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Aim for the hands and bottom of the stick head",
+      "Vary your checks: poke, lift, slap",
+      "The target sways — read the movement and time your check",
+      "Practice from different angles"
+    ],
+    "steps": [
+      "Slide a short stick through the goal netting so it hangs and sways",
+      "Stand at GLE with your long pole",
+      "Throw precision checks at the swaying stick",
+      "Practice poke checks, lift checks, and slap checks",
+      "10 reps of each type",
+      "Move to different angles around the crease"
+    ],
+    "commonMistakes": [
+      "Wild swinging — be precise",
+      "Only practicing one type of check",
+      "Standing too close or too far from the target"
+    ],
+    "source": {
+      "url": "https://laxallstars.com/defensive-lacrosse-drill-takeaway-teacher/",
+      "siteName": "Lax All Stars",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Traffic Light Cradling",
+    "subtitle": "Youth cradling at varying speeds",
+    "description": "Coach calls out colors: Red = walk while cradling, Yellow = jog while cradling, Green = sprint while cradling. Teaches maintaining ball control at different speeds.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 3,
+    "maxPlayers": 30,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Perfect for U8-U10. Teaches speed variation while maintaining stick control.",
+    "tags": ["youth", "cradling", "fundamentals", "fun"],
+    "ageGroup": ["youth"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Keep the stick 'in the box' (near the ear) at all speeds",
+      "Cradle tighter and closer to body at higher speeds",
+      "Switch hands periodically"
+    ],
+    "steps": [
+      "All players spread out in a defined area with a ball",
+      "Coach calls 'Red!' — everyone walks while cradling",
+      "Coach calls 'Yellow!' — everyone jogs",
+      "Coach calls 'Green!' — everyone sprints",
+      "Vary the calls rapidly to keep kids engaged",
+      "If the ball drops, do 3 ground ball pickups before rejoining"
+    ],
+    "commonMistakes": [
+      "Dropping the stick down at higher speeds",
+      "Only cradling with dominant hand"
+    ],
+    "source": {
+      "url": "https://www.veo.com/article/youth-lacrosse-drills-beginners",
+      "siteName": "Veo",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Wall Cradle (Verticality Drill)",
+    "subtitle": "Force vertical stick position against a wall",
+    "description": "Stand with your back against a wall and cradle. If your stick hits the wall, it's too horizontal. Forces a tight, vertical 'box' cradle essential for stick protection.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 20,
+    "durationMinutes": 5,
+    "fieldSpace": null,
+    "equipment": ["stick", "ball", "wall"],
+    "videoUrl": null,
+    "coachNotes": "Simple but powerful drill for fixing horizontal cradling habits.",
+    "tags": ["cradling", "fundamentals", "solo", "technique"],
+    "ageGroup": ["youth", "middle-school", "high-school"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "If stick hits the wall, it's too horizontal — tighten up",
+      "Keep the stick vertical and close to your ear",
+      "This is the cradle you use in traffic"
+    ],
+    "steps": [
+      "Stand with your back flat against a wall",
+      "Cradle the ball side to side",
+      "If your stick hits the wall, your cradle is too wide/horizontal",
+      "Tighten the cradle until you can move freely without hitting the wall",
+      "Practice for 1-2 minutes per hand"
+    ],
+    "commonMistakes": [
+      "Leaning away from the wall to cheat — stay flat against it",
+      "Only practicing dominant hand"
+    ],
+    "source": {
+      "url": "https://kbandstraining.com/pages/lacrosse-cradling-youth-lacrosse-drills",
+      "siteName": "Kbands Training",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Mirror Stick Protection",
+    "subtitle": "Self-check cradle visibility in a mirror",
+    "description": "Stand in front of a mirror and cradle. If you can see the ball in the mirror, a defender can see and check it. Practice keeping the stick vertical and tucked behind your shoulder.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 1,
+    "durationMinutes": 5,
+    "fieldSpace": null,
+    "equipment": ["stick", "ball", "mirror"],
+    "videoUrl": null,
+    "coachNotes": "At-home drill. Builds awareness of stick visibility that translates to game situations.",
+    "tags": ["cradling", "protection", "solo", "at-home"],
+    "ageGroup": ["youth", "middle-school", "high-school"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "If you can see the ball in the mirror, a defender can check it",
+      "Keep stick behind your shoulder — use your body as a shield",
+      "Practice both hands"
+    ],
+    "steps": [
+      "Stand in front of a full-length mirror",
+      "Hold your stick as if a defender is in front of you (the mirror)",
+      "Cradle and move laterally",
+      "If you can see the ball in the mirror, adjust your stick position",
+      "Goal: the ball should be completely hidden behind your body/shoulder"
+    ],
+    "commonMistakes": [
+      "Stick too far from the body — tuck it in",
+      "Not simulating game movement — move laterally, not just standing"
+    ],
+    "source": {
+      "url": "https://kbandstraining.com/pages/lacrosse-cradling-youth-lacrosse-drills",
+      "siteName": "Kbands Training",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Dynamic Warm-Up: World's Greatest Stretch",
+    "subtitle": "Full-body lacrosse warm-up stretch",
+    "description": "A deep lunge with a thoracic twist that targets the hamstrings, hips, and upper back simultaneously. Essential component of a lacrosse dynamic warm-up.",
+    "difficulty": "beginner",
+    "category": ["conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 5,
+    "fieldSpace": "box",
+    "equipment": [],
+    "videoUrl": null,
+    "coachNotes": "Part of the standard dynamic warm-up. Do before every practice and game.",
+    "tags": ["warm-up", "stretching", "mobility", "injury-prevention"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Deep lunge — back knee close to the ground",
+      "Rotate through the thoracic spine, not the lower back",
+      "Hold the twist for 2-3 seconds",
+      "Move through 10-20 yards"
+    ],
+    "steps": [
+      "Step forward into a deep lunge",
+      "Place the same-side hand on the ground next to your front foot",
+      "Rotate your torso and reach the opposite hand toward the sky",
+      "Hold for 2-3 seconds",
+      "Step forward into the next lunge and repeat on the other side",
+      "Cover 10-20 yards"
+    ],
+    "commonMistakes": [
+      "Shallow lunge — get deep",
+      "Rotating from the lower back instead of mid-back",
+      "Rushing through it — this is about mobility, not speed"
+    ],
+    "source": {
+      "url": "https://www.usalacrosse.com/magazine/dynamic-warmup-look-phase-one-laxfit",
+      "siteName": "USA Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Quick Stick Shuttle",
+    "subtitle": "Rapid-fire partner passing with no cradle",
+    "description": "Partners stand 5 yards apart and exchange rapid-fire passes without cradling. Focuses on soft hands and quick releases as a stick-work warm-up.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 30,
+    "durationMinutes": 5,
+    "fieldSpace": "box",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Perfect warm-up drill. Gets hands active quickly.",
+    "tags": ["warm-up", "passing", "stick-skills", "partner"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "No cradling — catch and release immediately",
+      "Soft hands on the catch — absorb, don't fight the ball",
+      "Aim for your partner's stick-side ear"
+    ],
+    "steps": [
+      "Partners face each other, 5 yards apart",
+      "Pass back and forth as quickly as possible",
+      "No cradling between catch and throw",
+      "30-second rounds",
+      "Switch hands and repeat"
+    ],
+    "commonMistakes": [
+      "Cradling between catch and throw",
+      "Passing too hard at close range",
+      "Not switching to weak hand"
+    ],
+    "source": {
+      "url": "https://athletesuntapped.com/blog/essential-lacrosse-warm-up-drills/",
+      "siteName": "Athletes Untapped",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Ball Drop Sprint",
+    "subtitle": "Reaction sprint with ground ball finish",
+    "description": "A partner drops a lacrosse ball from shoulder height. You must sprint and scoop it before the second bounce. Builds explosive reaction and ground ball technique.",
+    "difficulty": "intermediate",
+    "category": ["conditioning", "ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Combines conditioning with ground ball work. Kids love the competitive element.",
+    "tags": ["conditioning", "ground-balls", "reaction-time", "speed"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "React to the drop, not to anticipation",
+      "Sprint low — you need to scoop immediately",
+      "Proper ground ball technique even at speed"
+    ],
+    "steps": [
+      "Partner stands 5-8 yards away holding a ball at shoulder height",
+      "Sprinter starts in athletic stance facing the partner",
+      "Partner drops the ball (no throwing)",
+      "Sprinter reacts and scoops before the second bounce",
+      "Increase distance as reaction improves",
+      "10 reps per player"
+    ],
+    "commonMistakes": [
+      "Anticipating the drop — must react to visual cue",
+      "Standing too upright during the sprint",
+      "Scooping with poor technique due to rushing"
+    ],
+    "source": {
+      "url": "https://gladiatorlacrosse.com/lacrosse-conditioning-drills-for-all-positions/",
+      "siteName": "Gladiator Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Flipz Catching Drill",
+    "subtitle": "Self-toss catching for beginners",
+    "description": "Toss the ball 4-5 feet into the air yourself. Reach up with your stick to meet the ball and pull it back toward your shoulder as it lands in the pocket. Teaches 'soft hands'.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "low",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 30,
+    "durationMinutes": 5,
+    "fieldSpace": null,
+    "equipment": ["stick", "ball"],
+    "videoUrl": null,
+    "coachNotes": "Best first catching drill for absolute beginners. Eliminates the variable of a partner's throw.",
+    "tags": ["beginner", "catching", "fundamentals", "solo"],
+    "ageGroup": ["youth"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Reach UP to meet the ball — don't wait for it to fall",
+      "Pull the stick back toward your shoulder as the ball lands (give with it)",
+      "This 'give' is what 'soft hands' means"
+    ],
+    "steps": [
+      "Hold your stick in catching position",
+      "Toss the ball 4-5 feet straight up with your free hand",
+      "Reach up with your stick to meet the ball",
+      "As the ball enters the pocket, pull the stick back toward your shoulder",
+      "20 catches with right hand, 20 with left"
+    ],
+    "commonMistakes": [
+      "Waiting for the ball to fall into the stick — reach up",
+      "Not pulling back (giving) — ball bounces out",
+      "Tossing too high or too far from body"
+    ],
+    "source": {
+      "url": "https://www.swaxlaxlacrosse.com/blog/catching-its-all-about-the-flipz",
+      "siteName": "Swax Lax",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Musical Ground Balls",
+    "subtitle": "Musical chairs but with lacrosse ground balls",
+    "description": "Like musical chairs, but players must scoop a ball to stay in the game. Scatter fewer balls than players. When music stops (or whistle blows), scramble to scoop a ball. Player without a ball is out.",
+    "difficulty": "beginner",
+    "category": ["ground-balls"],
+    "positionGroup": ["all"],
+    "intensity": "high",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "End-of-practice fun drill. Kids go all-out because of the elimination format.",
+    "tags": ["youth", "fun", "ground-balls", "competitive", "game"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Proper scoop technique even in the scramble",
+      "Keep your head up — see where the balls are",
+      "Be aggressive but controlled"
+    ],
+    "steps": [
+      "Scatter balls in a defined area (1 fewer ball than players)",
+      "Players jog/run around the area while whistle blows (or music plays)",
+      "When whistle stops, scramble to scoop a ball",
+      "Player without a ball is eliminated",
+      "Remove one ball and repeat",
+      "Last player standing wins"
+    ],
+    "commonMistakes": [
+      "Pushing other players — keep it clean",
+      "Poor scoop technique in the rush"
+    ],
+    "source": {
+      "url": "https://signaturelacrosse.com/blogs/news/lacrosse-practice-plan-template",
+      "siteName": "Signature Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Face Dodge Passing",
+    "subtitle": "Protect the stick with a face dodge before passing",
+    "description": "As you receive the ball from a partner, perform a face dodge (pulling the stick across your face to protect it) before passing back. Combines catching, dodging, and passing in one rep.",
+    "difficulty": "intermediate",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Combines three skills in one rep. Great for efficiency in practice.",
+    "tags": ["passing", "dodging", "face-dodge", "partner"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Sell the dodge — pull the stick dramatically across your face",
+      "Don't switch hands during the face dodge",
+      "Immediately pass back to your partner after the dodge"
+    ],
+    "steps": [
+      "Partners face each other, 10 yards apart",
+      "Player A passes to Player B",
+      "Player B catches, performs a face dodge, then passes back",
+      "Player A catches, performs a face dodge, and passes back",
+      "Continuous for 2 minutes, then switch to weak hand"
+    ],
+    "commonMistakes": [
+      "Switching hands during the face dodge — defeats the purpose",
+      "Lazy dodge that wouldn't fool a defender",
+      "Breaking the rhythm between dodge and pass"
+    ],
+    "source": {
+      "url": "https://www.championshipproductions.com/news/2013/05/14/pair-passing-the-perfect-drill-to-open-lacrosse-practice-with/",
+      "siteName": "Championship Productions",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Clear Through Drill",
+    "subtitle": "Women's lacrosse off-ball cutting to create space",
+    "description": "Off-ball players practice cutting through the 8-meter arc to draw their defenders away from the ball carrier, creating a gap for a teammate to dodge and shoot.",
+    "difficulty": "intermediate",
+    "category": ["passing", "shooting"],
+    "positionGroup": ["attack", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 6,
+    "maxPlayers": 12,
+    "durationMinutes": 15,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "The most important off-ball concept in women's lacrosse. When a teammate dodges toward you, clear through to make space.",
+    "tags": ["womens", "off-ball", "spacing", "cutting"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["womens-field"],
+    "coachingPoints": [
+      "When the ball carrier dodges toward you, cut through the 8-meter",
+      "Your cut draws your defender away, creating space",
+      "Cut with purpose — make it look like you want the ball",
+      "Clear to the opposite side of the field"
+    ],
+    "steps": [
+      "Set up 3v3 or 4v4 around the 8-meter arc",
+      "Ball carrier initiates a dodge from the wing",
+      "The player closest to the dodge path 'clears through' the arc",
+      "Their defender follows, opening space",
+      "Ball carrier attacks the vacated space",
+      "If the clearing player's defender doesn't follow, they become the open pass target"
+    ],
+    "commonMistakes": [
+      "Standing still when the ball carrier drives toward you",
+      "Cutting toward the ball instead of away (clogs the lane)",
+      "Jogging the cut — must sprint to sell it"
+    ],
+    "source": {
+      "url": "https://www.achievelax.com/wp-content/uploads/2022/01/Offensive-Spacing-and-Drills.pdf",
+      "siteName": "Achieve Lax",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Four-Corner Give and Go (Box Lacrosse)",
+    "subtitle": "Pass and cut from four corners of the floor",
+    "description": "Four lines set under the restraining lines. Players pass diagonally across the floor, cut toward the net, and receive a return pass for a quick-release shot.",
+    "difficulty": "intermediate",
+    "category": ["passing", "shooting"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 8,
+    "maxPlayers": 20,
+    "durationMinutes": 15,
+    "fieldSpace": "box",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Box lacrosse fundamental drill. Teaches give-and-go which is the basis of all box offense.",
+    "tags": ["box-lacrosse", "give-and-go", "passing", "shooting"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["box"],
+    "coachingPoints": [
+      "Pass and immediately cut — don't watch your pass",
+      "Cut toward the net at speed",
+      "Quick release shot on the return pass",
+      "Change planes on the shot"
+    ],
+    "steps": [
+      "Four lines at the four corners of the box floor",
+      "Player from line A passes diagonally to Player from line B",
+      "Player A immediately cuts toward the net",
+      "Player B returns the pass to cutting Player A",
+      "Player A catches and shoots in one motion",
+      "Rotate lines"
+    ],
+    "commonMistakes": [
+      "Watching the pass instead of cutting immediately",
+      "Slow cut — must sprint to the net",
+      "Catching and cradling instead of quick-release shot"
+    ],
+    "source": {
+      "url": "https://www.usalacrosse.com/sites/default/files/documents/Box-Lacrosse/12U-Box-Practice5.pdf",
+      "siteName": "USA Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Agility Ladder Cradling",
+    "subtitle": "Ladder footwork patterns while cradling",
+    "description": "Perform agility ladder patterns (Ickey Shuffle, Two-Feet-In, Lateral Hops) while cradling a ball. Advanced players practice split dodges through the ladder.",
+    "difficulty": "intermediate",
+    "category": ["conditioning"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 15,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["agility ladder", "stick", "ball"],
+    "videoUrl": null,
+    "coachNotes": "Sport-specific conditioning. The stick adds the lacrosse element to standard footwork drills.",
+    "tags": ["conditioning", "agility", "cradling", "footwork"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field", "box"],
+    "coachingPoints": [
+      "Maintain proper cradle throughout — don't let footwork ruin stick work",
+      "Stay on balls of feet — quick, light steps",
+      "Keep head up — don't look at the ladder",
+      "Progress to split dodges and hand switches through the ladder"
+    ],
+    "steps": [
+      "Lay out an agility ladder on the field",
+      "Perform standard ladder patterns while cradling",
+      "Start with: Two-Feet-In, Ickey Shuffle, Lateral Hops",
+      "Advanced: split dodge hand switches at every other rung",
+      "3 reps of each pattern",
+      "Switch hands between reps"
+    ],
+    "commonMistakes": [
+      "Looking down at the ladder — keep head up",
+      "Losing the ball during complex footwork patterns",
+      "Sacrificing footwork quality to maintain the cradle (or vice versa)"
+    ],
+    "source": {
+      "url": "https://www.edgelacrossetraining.com/blog/agility-drills-to-improve-quickness",
+      "siteName": "Edge Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Rapid Fire Relay",
+    "subtitle": "Team race to complete accurate passes",
+    "description": "Teams of 4-5 players race to complete 20 accurate passes to a coach or target 10 yards away. Encourages passing under the pressure of a race.",
+    "difficulty": "beginner",
+    "category": ["passing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": true,
+    "minPlayers": 8,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "half-field",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Adds competitive pressure to basic passing. Kids try harder when their team is counting on them.",
+    "tags": ["youth", "passing", "competitive", "team", "fun"],
+    "ageGroup": ["youth", "middle-school"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Accuracy over speed — dropped passes cost time",
+      "Proper form even under pressure",
+      "Encourage teammates — it's a team effort"
+    ],
+    "steps": [
+      "Divide into teams of 4-5 players",
+      "Each team lines up 10 yards from a coach or target",
+      "On whistle, first player passes to the coach",
+      "Coach passes back, player goes to end of line",
+      "Next player goes immediately",
+      "First team to complete 20 successful catches wins"
+    ],
+    "commonMistakes": [
+      "Rushing and throwing wild passes",
+      "Not being ready when it's your turn",
+      "Dropped passes — only completed catches count"
+    ],
+    "source": {
+      "url": "https://mcflylacrosse.com/wp-content/uploads/2024/10/45-Youth-Lacrosse-Skills-and-Drills.pdf",
+      "siteName": "McFly Lacrosse",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Over-the-Shoulder Passing",
+    "subtitle": "Lead pass to a sprinting teammate",
+    "description": "One partner runs away while the other throws a lead pass over their shoulder, simulating a clear or fast break outlet pass. Teaches timing and pass placement.",
+    "difficulty": "intermediate",
+    "category": ["passing", "clearing"],
+    "positionGroup": ["all"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "full-field",
+    "equipment": ["sticks", "balls"],
+    "videoUrl": null,
+    "coachNotes": "Critical skill for clearing and transition. The receiver should never break stride.",
+    "tags": ["passing", "clearing", "transition", "partner"],
+    "ageGroup": ["middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Lead the runner — throw where they're going, not where they are",
+      "Receiver: don't slow down or turn around",
+      "Passer: throw to the stick side (outside shoulder)",
+      "Receiver: reach back and cradle through the catch"
+    ],
+    "steps": [
+      "Partners start 5 yards apart, facing the same direction",
+      "Receiver sprints away at full speed",
+      "Passer throws a lead pass over the receiver's outside shoulder",
+      "Receiver catches without breaking stride",
+      "Continue down the field",
+      "Switch roles and return"
+    ],
+    "commonMistakes": [
+      "Throwing behind the runner",
+      "Receiver slowing down to wait for the ball",
+      "Throwing to the wrong shoulder (inside = defender can reach it)"
+    ],
+    "source": {
+      "url": "https://www.championshipproductions.com/news/2013/05/14/pair-passing-the-perfect-drill-to-open-lacrosse-practice-with/",
+      "siteName": "Championship Productions",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "Trigger Drill (3v3/4v4)",
+    "subtitle": "Live scrimmage with coached slide triggers",
+    "description": "A 3v3 or 4v4 scrimmage where offense keeps possession until the coach blows a whistle or a dodger beats their man. This triggers an immediate slide rotation.",
+    "difficulty": "advanced",
+    "category": ["defense"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "high",
+    "contact": true,
+    "competitive": true,
+    "minPlayers": 6,
+    "maxPlayers": 8,
+    "durationMinutes": 20,
+    "fieldSpace": "half-field",
+    "equipment": ["balls", "sticks", "goal"],
+    "videoUrl": null,
+    "coachNotes": "Teaches players to recognize the exact moment a slide is necessary versus just hedging.",
+    "tags": ["defense", "sliding", "team", "competitive", "advanced"],
+    "ageGroup": ["high-school", "college", "adult"],
+    "gameType": ["mens-field"],
+    "coachingPoints": [
+      "Recognize the EXACT moment the slide is needed — not too early, not too late",
+      "The difference between hedging (faking) and committing to the slide",
+      "Off-ball defenders must rotate immediately when the slide fires",
+      "Communication: 'Fire!' when sliding, 'Two!' when covering the next"
+    ],
+    "steps": [
+      "Set up 3v3 or 4v4 half-field",
+      "Offense passes the ball around, looking to dodge",
+      "When a dodger beats their defender (or coach blows whistle), it triggers a slide",
+      "Defense must execute full slide rotation",
+      "If defense recovers, play continues",
+      "If offense scores, defense does push-ups"
+    ],
+    "commonMistakes": [
+      "Sliding too early — tips off the offense",
+      "Sliding too late — dodger gets a clean look",
+      "Not recovering after the slide — leaves a man open"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/trigger-slide-and-recovery-drill-for-team-defense/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  },
+  {
+    "name": "In-and-Out Footwork Drill",
+    "subtitle": "Defensive approach and retreat pattern",
+    "description": "Defenders practice sprinting forward 5 yards to close out a phantom attacker, then immediately transition into a drop-step and backpedal. Mimics the approach-and-retreat rhythm of on-ball defense.",
+    "difficulty": "beginner",
+    "category": ["defense", "conditioning"],
+    "positionGroup": ["defense", "midfield"],
+    "intensity": "medium",
+    "contact": false,
+    "competitive": false,
+    "minPlayers": 1,
+    "maxPlayers": 20,
+    "durationMinutes": 10,
+    "fieldSpace": "box",
+    "equipment": ["cones", "stick"],
+    "videoUrl": null,
+    "coachNotes": "Fundamental defensive footwork pattern. Simple but essential.",
+    "tags": ["defense", "footwork", "fundamentals", "approach"],
+    "ageGroup": ["youth", "middle-school", "high-school", "college", "adult"],
+    "gameType": ["mens-field", "womens-field"],
+    "coachingPoints": [
+      "Sprint forward to close the gap",
+      "Break down into short choppy steps before the 'attacker'",
+      "Drop step and backpedal — don't turn your hips",
+      "Stay low throughout — don't pop up"
+    ],
+    "steps": [
+      "Place 2 cones 5 yards apart",
+      "Start at cone A in defensive stance",
+      "Sprint forward to cone B (closing out)",
+      "Break down with choppy steps at cone B",
+      "Drop step and backpedal to cone A",
+      "Repeat 10 times",
+      "Add lateral movement for advanced reps"
+    ],
+    "commonMistakes": [
+      "Arriving at full speed without breaking down",
+      "Turning hips during the retreat — stay square",
+      "Standing too tall"
+    ],
+    "source": {
+      "url": "https://laxlibrary.com/in-and-out-footwork-drill-for-defense/",
+      "siteName": "LaxLibrary",
+      "author": null,
+      "videoTimestamp": null
+    }
+  }
+]

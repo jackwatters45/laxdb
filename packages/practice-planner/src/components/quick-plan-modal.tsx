@@ -17,7 +17,7 @@ import {
 import { Sparkles, Clock } from "lucide-react";
 import { useState } from "react";
 
-import type { DrillCategory } from "@/data/types";
+import type { DrillCategory } from "@/types";
 
 interface QuickPlanModalProps {
   isOpen: boolean;

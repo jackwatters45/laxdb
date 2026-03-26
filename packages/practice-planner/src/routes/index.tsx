@@ -6,9 +6,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 import { Plus, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
 
-import { SAMPLE_PRACTICE } from "@/data/sample-practice";
-import type { Practice } from "@/data/types";
+import { SAMPLE_PRACTICE } from "@/data/mock";
 import { runApi } from "@/lib/api";
+import type { Practice } from "@/types";
 
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(

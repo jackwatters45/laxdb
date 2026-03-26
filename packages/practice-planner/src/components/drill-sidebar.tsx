@@ -9,8 +9,8 @@ import {
 import { Search, Clock, Flame, Target, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock-drills";
-import type { Drill, PracticeItemType } from "@/data/types";
+import { MOCK_DRILLS } from "@/data/mock";
+import type { Drill, PracticeItemType } from "@/types";
 
 interface DrillSidebarProps {
   isOpen: boolean;

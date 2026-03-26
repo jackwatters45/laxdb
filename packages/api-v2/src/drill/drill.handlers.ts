@@ -1,9 +1,9 @@
-import { asDrill } from "@laxdb/core-v2/drill/drill.schema";
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
+import { asDrill } from "../lib/mappers";
 
 export const DrillsHandlersLive = HttpApiBuilder.group(
   LaxdbApiV2,

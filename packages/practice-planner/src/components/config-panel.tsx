@@ -33,13 +33,13 @@ import {
   Target,
 } from "lucide-react";
 
-import { MOCK_DRILLS } from "@/data/mock-drills";
+import { MOCK_DRILLS } from "@/data/mock";
 import type {
   Drill,
   PracticeNode,
   PracticeItemType,
   PracticeItemPriority,
-} from "@/data/types";
+} from "@/types";
 
 import { DrillPickerPopover } from "./drill-picker";
 

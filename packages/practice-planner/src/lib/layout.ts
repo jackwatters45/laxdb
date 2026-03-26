@@ -1,4 +1,4 @@
-import type { PracticeNode, PracticeEdge } from "@/data/types";
+import type { PracticeNode, PracticeEdge } from "@/types";
 
 const NODE_WIDTH = 260;
 const NODE_HEIGHT = 100;

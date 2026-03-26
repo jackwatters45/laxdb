@@ -11,7 +11,9 @@ import { DrillSidebar } from "@/components/drill-sidebar";
 import { PracticeSettings } from "@/components/practice-settings";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
 import { SplitNodeModal } from "@/components/split-node";
-import { SAMPLE_PRACTICE } from "@/data/sample-practice";
+import { SAMPLE_PRACTICE } from "@/data/mock";
+import { autoLayout } from "@/lib/layout";
+import { generateQuickPlan } from "@/lib/quick-plan";
 import type {
   PracticeNode,
   PracticeEdge,
@@ -19,9 +21,7 @@ import type {
   PracticeItemType,
   Drill,
   DrillCategory,
-} from "@/data/types";
-import { autoLayout } from "@/lib/layout";
-import { generateQuickPlan } from "@/lib/quick-plan";
+} from "@/types";
 
 export const Route = createFileRoute("/practice/$id")({
   component: PracticePlannerPage,

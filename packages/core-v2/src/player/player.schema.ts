@@ -38,6 +38,3 @@ export class UpdatePlayerInput extends Schema.Class<UpdatePlayerInput>(
   name: Schema.optional(PlayerNameSchema),
   email: Schema.optional(Schema.String),
 }) {}
-
-/** Wrap a plain row as a Schema.Class instance */
-export const asPlayer = (row: typeof Player.Type) => new Player(row);

@@ -14,8 +14,8 @@ import {
 import { Clock, Flame, Snowflake, Target } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock-drills";
-import type { Drill } from "@/data/types";
+import { MOCK_DRILLS } from "@/data/mock";
+import type { Drill } from "@/types";
 
 interface DrillPickerPopoverProps {
   children: React.ReactNode;
