@@ -92,7 +92,7 @@ const schemaRole = await Role(`db-schema-${branchName}-v2`, {
 });
 
 // Runtime role — per stage, used by workers
-const dbRole = await Role(`db-role-${stage}-v2`, {
+const dbRole = await Role(`db-role-${stage}-v3`, {
   database,
   branch: currentBranch,
   inheritedRoles: ["postgres"],
@@ -190,7 +190,10 @@ export const marketing = await TanStackStart("marketing", {
 // });
 
 export const practicePlanner = await TanStackStart("practice-planner", {
-  bindings: {},
+  bindings: {
+    API: api2,
+    IS_LOCAL: app.local ? "true" : "",
+  },
   cwd: "./packages/practice-planner",
   domains: [getDomain("planner")],
 });
