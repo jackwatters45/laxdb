@@ -68,12 +68,13 @@ export async function startTestServer(): Promise<TestServer> {
     const body =
       req.method === "GET" || req.method === "HEAD"
         ? undefined
-        : await new Promise<Buffer>((resolve) => {
+        : await new Promise<Buffer>((resolve, reject) => {
             const chunks: Buffer[] = [];
             req.on("data", (chunk: Buffer) => chunks.push(chunk));
             req.on("end", () => {
               resolve(Buffer.concat(chunks));
             });
+            req.on("error", reject);
           });
 
     const request = new Request(url, {
