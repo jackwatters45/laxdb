@@ -34,14 +34,18 @@ export function AddNodeButton({
       }}
     >
       <DrillPickerPopover
-        onSelect={(drill) => { onAddDrill(sourceNode.id, targetNode.id, drill); }}
+        onSelect={(drill) => {
+          onAddDrill(sourceNode.id, targetNode.id, drill);
+        }}
       >
         <Button
           variant="outline"
           size="icon-sm"
           aria-label="Add drill"
           className="rounded-full opacity-0 group-hover/add:opacity-100 shadow-sm"
-          onClick={(e) => { e.stopPropagation(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           <Plus strokeWidth={2.5} />
         </Button>

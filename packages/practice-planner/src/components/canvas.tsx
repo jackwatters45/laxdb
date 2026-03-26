@@ -1,3 +1,5 @@
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Plus } from "lucide-react";
 import {
   useState,
   useRef,
@@ -6,9 +8,6 @@ import {
   type MouseEvent as ReactMouseEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react";
-
-import { Button } from "@laxdb/ui/components/ui/button";
-import { Plus } from "lucide-react";
 
 import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
 import { getNodeGeometry } from "@/lib/node-geometry";
@@ -60,7 +59,12 @@ export function Canvas({
 
   // Node drag state
   const [dragNodeId, setDragNodeId] = useState<string | null>(null);
-  const [dragStart, setDragStart] = useState({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
+  const [dragStart, setDragStart] = useState({
+    mouseX: 0,
+    mouseY: 0,
+    nodeX: 0,
+    nodeY: 0,
+  });
   const [isDragging, setIsDragging] = useState(false);
 
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
@@ -124,7 +128,16 @@ export function Canvas({
         });
       }
     },
-    [dragNodeId, dragStart, isDragging, isPanning, panStart, transform, onTransformChange, onUpdateNode],
+    [
+      dragNodeId,
+      dragStart,
+      isDragging,
+      isPanning,
+      panStart,
+      transform,
+      onTransformChange,
+      onUpdateNode,
+    ],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -291,12 +304,15 @@ export function Canvas({
               className="absolute left-0 top-0"
               style={{
                 transform: `translate(${geo.left}px, ${geo.top}px)`,
-                transition: beingDragged || isPanning
-                  ? "none"
-                  : "transform 0.2s ease-out",
+                transition:
+                  beingDragged || isPanning
+                    ? "none"
+                    : "transform 0.2s ease-out",
                 zIndex: beingDragged ? 50 : undefined,
               }}
-              onMouseDown={(e) => { handleNodeMouseDown(node.id, e); }}
+              onMouseDown={(e) => {
+                handleNodeMouseDown(node.id, e);
+              }}
             >
               <WorkflowNode
                 node={node}
@@ -310,34 +326,37 @@ export function Canvas({
         })}
 
         {/* Append button at end of flow */}
-        {!isNodeBeingDragged && (() => {
-          const sourceIds = new Set(edges.map((e) => e.source));
-          const tailNodes = nodes.filter((n) => !sourceIds.has(n.id));
-          return tailNodes.map((tail) => {
-            const geo = getNodeGeometry(tail);
-            const cx = geo.left + geo.width / 2;
-            const ty = geo.top + geo.height + 30;
-            return (
-              <div
-                key={`append-${tail.id}`}
-                className="absolute left-0 top-0"
-                style={{ transform: `translate(${cx - 60}px, ${ty}px)` }}
-              >
-                <DrillPickerPopover onSelect={onAppendDrill}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-dashed text-muted-foreground"
-                    onClick={(e) => { e.stopPropagation(); }}
-                  >
-                    <Plus strokeWidth={2} />
-                    Add drill
-                  </Button>
-                </DrillPickerPopover>
-              </div>
-            );
-          });
-        })()}
+        {!isNodeBeingDragged &&
+          (() => {
+            const sourceIds = new Set(edges.map((e) => e.source));
+            const tailNodes = nodes.filter((n) => !sourceIds.has(n.id));
+            return tailNodes.map((tail) => {
+              const geo = getNodeGeometry(tail);
+              const cx = geo.left + geo.width / 2;
+              const ty = geo.top + geo.height + 30;
+              return (
+                <div
+                  key={`append-${tail.id}`}
+                  className="absolute left-0 top-0"
+                  style={{ transform: `translate(${cx - 60}px, ${ty}px)` }}
+                >
+                  <DrillPickerPopover onSelect={onAppendDrill}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-dashed text-muted-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <Plus strokeWidth={2} />
+                      Add drill
+                    </Button>
+                  </DrillPickerPopover>
+                </div>
+              );
+            });
+          })()}
       </div>
     </div>
   );

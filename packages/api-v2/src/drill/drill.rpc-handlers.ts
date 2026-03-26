@@ -1,10 +1,8 @@
-import { Drill } from "@laxdb/core-v2/drill/drill.schema";
+import { asDrill } from "@laxdb/core-v2/drill/drill.schema";
 import { DrillService } from "@laxdb/core-v2/drill/drill.service";
 import { Effect, Layer } from "effect";
 
 import { DrillRpcs } from "./drill.rpc";
-
-const asDrill = (row: typeof Drill.Type) => new Drill(row);
 
 export const DrillRpcHandlers = DrillRpcs.toLayer(
   Effect.gen(function* () {

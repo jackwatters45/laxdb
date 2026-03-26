@@ -1,20 +1,14 @@
 import { RpcApiClient } from "@laxdb/api-v2/client";
-import { Button } from "@laxdb/ui/components/ui/button";
 import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import {
-  Plus,
-  Calendar,
-  Clock,
-  MapPin,
-  ChevronRight,
-} from "lucide-react";
 import { Effect } from "effect";
+import { Plus, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
 
-import { runApi } from "@/lib/api";
 import { SAMPLE_PRACTICE } from "@/data/sample-practice";
 import type { Practice } from "@/data/types";
+import { runApi } from "@/lib/api";
 
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
@@ -51,9 +45,11 @@ function PracticeListPage() {
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
-        <Button onClick={() => {
-          // TODO: create practice via RPC, navigate to /practice/:id
-        }}>
+        <Button
+          onClick={() => {
+            // TODO: create practice via RPC, navigate to /practice/:id
+          }}
+        >
           <Plus />
           New Practice
         </Button>
@@ -120,9 +116,7 @@ function PracticeCard({ practice }: { practice: Practice }) {
             <Clock size={12} />
             {totalMinutes} min
           </span>
-          <span className="tabular-nums">
-            {blockCount} blocks
-          </span>
+          <span className="tabular-nums">{blockCount} blocks</span>
           {practice.location && (
             <span className="flex items-center gap-1">
               <MapPin size={12} />

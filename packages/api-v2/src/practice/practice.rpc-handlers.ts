@@ -1,16 +1,12 @@
 import {
-  Practice,
-  PracticeItem,
-  PracticeReview,
+  asPractice,
+  asPracticeItem as asItem,
+  asPracticeReview as asReview,
 } from "@laxdb/core-v2/practice/practice.schema";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
 
 import { PracticeRpcs } from "./practice.rpc";
-
-const asPractice = (row: typeof Practice.Type) => new Practice(row);
-const asItem = (row: typeof PracticeItem.Type) => new PracticeItem(row);
-const asReview = (row: typeof PracticeReview.Type) => new PracticeReview(row);
 
 export const PracticeRpcHandlers = PracticeRpcs.toLayer(
   Effect.gen(function* () {

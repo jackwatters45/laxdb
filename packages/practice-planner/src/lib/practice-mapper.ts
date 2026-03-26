@@ -4,8 +4,10 @@
  * DB → Frontend: items sorted by orderIndex become nodes; edges derived from order.
  * Frontend → DB: nodes topologically sorted to produce orderIndex; positions persisted.
  */
-import type { Practice as DbPractice } from "@laxdb/core-v2/practice/practice.schema";
-import type { PracticeItem as DbItem } from "@laxdb/core-v2/practice/practice.schema";
+import type {
+  Practice as DbPractice,
+  PracticeItem as DbItem,
+} from "@laxdb/core-v2/practice/practice.schema";
 
 import type {
   Practice,
@@ -59,9 +61,8 @@ export function fromDb(
 
   // Auto-layout if positions are all zeros (fresh from DB with no positions)
   const allZero = nodes.every((n) => n.position.x === 0 && n.position.y === 0);
-  const finalNodes = allZero && nodes.length > 0
-    ? autoLayout(nodes, edges).nodes
-    : nodes;
+  const finalNodes =
+    allZero && nodes.length > 0 ? autoLayout(nodes, edges).nodes : nodes;
 
   return {
     id: dbPractice.publicId,

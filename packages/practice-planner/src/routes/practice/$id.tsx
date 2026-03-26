@@ -38,14 +38,17 @@ function PracticePlannerPage() {
   const redoStack = useRef<Practice[]>([]);
   const { nodes, edges } = practice;
 
-  const setPractice = useCallback((updater: Practice | ((prev: Practice) => Practice)) => {
-    setPracticeRaw((prev) => {
-      undoStack.current.push(prev);
-      if (undoStack.current.length > 50) undoStack.current.shift();
-      redoStack.current = [];
-      return typeof updater === "function" ? updater(prev) : updater;
-    });
-  }, []);
+  const setPractice = useCallback(
+    (updater: Practice | ((prev: Practice) => Practice)) => {
+      setPracticeRaw((prev) => {
+        undoStack.current.push(prev);
+        if (undoStack.current.length > 50) undoStack.current.shift();
+        redoStack.current = [];
+        return typeof updater === "function" ? updater(prev) : updater;
+      });
+    },
+    [],
+  );
 
   const undo = useCallback(() => {
     const prev = undoStack.current.pop();
@@ -71,11 +74,17 @@ function PracticePlannerPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "z") {
         e.preventDefault();
-        if (e.shiftKey) { redo(); } else { undo(); }
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => { window.removeEventListener("keydown", handleKeyDown); };
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [undo, redo]);
 
   // UI state
@@ -116,14 +125,14 @@ function PracticePlannerPage() {
         ),
       }));
     },
-    [],
+    [setPractice],
   );
 
   const updatePractice = useCallback(
     (updates: Partial<Practice>) => {
       setPractice((prev) => ({ ...prev, ...updates }));
     },
-    [],
+    [setPractice],
   );
 
   const deleteNode = useCallback(
@@ -159,19 +168,21 @@ function PracticePlannerPage() {
         setSelectedNodeId(null);
       }
     },
-    [selectedNodeId],
+    [selectedNodeId, setPractice],
   );
 
   const moveNodeInFlow = useCallback(
     (nodeId: string, direction: "up" | "down") => {
       setPractice((prev) => {
         // Find the sibling to swap with
-        const siblingEdge = direction === "up"
-          ? prev.edges.find((e) => e.target === nodeId)
-          : prev.edges.find((e) => e.source === nodeId);
+        const siblingEdge =
+          direction === "up"
+            ? prev.edges.find((e) => e.target === nodeId)
+            : prev.edges.find((e) => e.source === nodeId);
         if (!siblingEdge) return prev;
 
-        const siblingId = direction === "up" ? siblingEdge.source : siblingEdge.target;
+        const siblingId =
+          direction === "up" ? siblingEdge.source : siblingEdge.target;
         // Don't swap with Start node
         const sibling = prev.nodes.find((n) => n.id === siblingId);
         if (!sibling || sibling.variant === "start") return prev;
@@ -205,7 +216,7 @@ function PracticePlannerPage() {
         return { ...prev, nodes: newNodes, edges: newEdges };
       });
     },
-    [],
+    [setPractice],
   );
 
   const addDrillBetween = useCallback(
@@ -262,7 +273,7 @@ function PracticePlannerPage() {
 
       setSelectedNodeId(newNode.id);
     },
-    [nodes],
+    [nodes, setPractice],
   );
 
   const addDrillFromSidebar = useCallback(
@@ -305,7 +316,7 @@ function PracticePlannerPage() {
 
       setSelectedNodeId(newNode.id);
     },
-    [nodes, edges],
+    [nodes, edges, setPractice],
   );
 
   const appendDrill = useCallback(
@@ -391,7 +402,7 @@ function PracticePlannerPage() {
         edges: [...prev.edges, ...newEdges],
       }));
     },
-    [nodes, edges],
+    [nodes, edges, setPractice],
   );
 
   const handleQuickGenerate = useCallback(
@@ -414,7 +425,7 @@ function PracticePlannerPage() {
       // Auto-center on the new plan
       setTransform({ x: 500, y: 40, scale: 0.75 });
     },
-    [practice],
+    [practice, setPractice],
   );
 
   const handleOrganize = useCallback(() => {
@@ -423,7 +434,7 @@ function PracticePlannerPage() {
       ...prev,
       nodes: result.nodes,
     }));
-  }, [nodes, edges]);
+  }, [nodes, edges, setPractice]);
 
   const handleZoomToFit = useCallback(() => {
     if (nodes.length === 0) return;
@@ -484,7 +495,9 @@ function PracticePlannerPage() {
       {/* Drill Sidebar (left) */}
       <DrillSidebar
         isOpen={drillSidebarOpen}
-        onClose={() => { setDrillSidebarOpen(false); }}
+        onClose={() => {
+          setDrillSidebarOpen(false);
+        }}
         onAddDrill={addDrillFromSidebar}
       />
 
@@ -495,7 +508,9 @@ function PracticePlannerPage() {
           <div className="flex items-center gap-3">
             <Button
               variant={drillSidebarOpen ? "default" : "outline"}
-              onClick={() => { setDrillSidebarOpen((v) => !v); }}
+              onClick={() => {
+                setDrillSidebarOpen((v) => !v);
+              }}
             >
               <Library />
               Drills
@@ -532,11 +547,20 @@ function PracticePlannerPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => { setSplitModalOpen(true); }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSplitModalOpen(true);
+              }}
+            >
               <GitBranch />
               Split
             </Button>
-            <Button onClick={() => { setQuickPlanOpen(true); }}>
+            <Button
+              onClick={() => {
+                setQuickPlanOpen(true);
+              }}
+            >
               <Sparkles />
               Quick Plan
             </Button>
@@ -578,11 +602,15 @@ function PracticePlannerPage() {
           onDelete={deleteNode}
           onMove={moveNodeInFlow}
           canMoveUp={(() => {
-            const incoming = canvasEdges.find((e) => e.target === selectedNode.id);
+            const incoming = canvasEdges.find(
+              (e) => e.target === selectedNode.id,
+            );
             return !!incoming;
           })()}
           canMoveDown={canvasEdges.some((e) => e.source === selectedNode.id)}
-          onClose={() => { selectNode(null); }}
+          onClose={() => {
+            selectNode(null);
+          }}
         />
       )}
       {!selectedNode && settingsOpen && (
@@ -591,19 +619,25 @@ function PracticePlannerPage() {
           totalMinutes={totalMinutes}
           blockCount={canvasNodes.length}
           onUpdate={updatePractice}
-          onClose={() => { setSettingsOpen(false); }}
+          onClose={() => {
+            setSettingsOpen(false);
+          }}
         />
       )}
 
       {/* Modals */}
       <SplitNodeModal
         isOpen={splitModalOpen}
-        onClose={() => { setSplitModalOpen(false); }}
+        onClose={() => {
+          setSplitModalOpen(false);
+        }}
         onConfirm={handleSplitCreate}
       />
       <QuickPlanModal
         isOpen={quickPlanOpen}
-        onClose={() => { setQuickPlanOpen(false); }}
+        onClose={() => {
+          setQuickPlanOpen(false);
+        }}
         onGenerate={handleQuickGenerate}
       />
     </div>
@@ -637,7 +671,9 @@ function DurationIndicator({
         </span>
       </div>
       {diff > 0 && (
-        <span className={`text-[10px] tabular-nums ${over ? "text-destructive" : "text-muted-foreground/50"}`}>
+        <span
+          className={`text-[10px] tabular-nums ${over ? "text-destructive" : "text-muted-foreground/50"}`}
+        >
           {over ? `+${diff}` : `-${diff}`}
         </span>
       )}

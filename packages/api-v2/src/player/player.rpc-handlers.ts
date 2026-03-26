@@ -1,10 +1,8 @@
-import { Player } from "@laxdb/core-v2/player/player.schema";
+import { asPlayer } from "@laxdb/core-v2/player/player.schema";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer } from "effect";
 
 import { PlayerRpcs } from "./player.rpc";
-
-const asPlayer = (row: typeof Player.Type) => new Player(row);
 
 export const PlayerRpcHandlers = PlayerRpcs.toLayer(
   Effect.gen(function* () {

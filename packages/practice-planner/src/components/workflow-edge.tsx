@@ -18,11 +18,7 @@ export function WorkflowEdge({
   );
 
   // Build a smooth bezier with control points that follow the exit/entry direction
-  const dist = Math.max(
-    Math.abs(tx - sx),
-    Math.abs(ty - sy),
-    40,
-  );
+  const dist = Math.max(Math.abs(tx - sx), Math.abs(ty - sy), 40);
   const offset = Math.min(dist * 0.5, 80);
 
   const cp1 = controlOffset(sx, sy, sourceSide, offset);

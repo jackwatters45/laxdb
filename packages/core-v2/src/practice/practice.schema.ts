@@ -202,3 +202,10 @@ export class UpdateReviewInput extends Schema.Class<UpdateReviewInput>(
   needsImprovement: Schema.optional(Schema.NullOr(Schema.String)),
   notes: Schema.optional(Schema.NullOr(Schema.String)),
 }) {}
+
+/** Wrap plain rows as Schema.Class instances */
+export const asPractice = (row: typeof Practice.Type) => new Practice(row);
+export const asPracticeItem = (row: typeof PracticeItem.Type) =>
+  new PracticeItem(row);
+export const asPracticeReview = (row: typeof PracticeReview.Type) =>
+  new PracticeReview(row);

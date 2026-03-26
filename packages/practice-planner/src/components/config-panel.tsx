@@ -105,7 +105,9 @@ export function ConfigPanel({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => { onMove(node.id, "up"); }}
+                onClick={() => {
+                  onMove(node.id, "up");
+                }}
                 disabled={!canMoveUp}
                 aria-label="Move up"
               >
@@ -114,7 +116,9 @@ export function ConfigPanel({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => { onMove(node.id, "down"); }}
+                onClick={() => {
+                  onMove(node.id, "down");
+                }}
                 disabled={!canMoveDown}
                 aria-label="Move down"
               >
@@ -122,7 +126,12 @@ export function ConfigPanel({
               </Button>
             </>
           )}
-          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close panel">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            aria-label="Close panel"
+          >
             <X />
           </Button>
         </div>
@@ -152,7 +161,9 @@ export function ConfigPanel({
           <Field label="Label" icon={<FileText className="size-3.5" />}>
             <Input
               value={node.label}
-              onChange={(e) => { onUpdate(node.id, { label: e.target.value }); }}
+              onChange={(e) => {
+                onUpdate(node.id, { label: e.target.value });
+              }}
               disabled={isStart}
             />
           </Field>
@@ -226,7 +237,9 @@ export function ConfigPanel({
           <Field label="Notes" icon={<FileText className="size-3.5" />}>
             <Textarea
               value={node.notes ?? ""}
-              onChange={(e) => { onUpdate(node.id, { notes: e.target.value || null }); }}
+              onChange={(e) => {
+                onUpdate(node.id, { notes: e.target.value || null });
+              }}
               placeholder="Add coaching notes..."
               className="min-h-[60px]"
             />
@@ -252,15 +265,17 @@ export function ConfigPanel({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete "{node.label}"?</AlertDialogTitle>
                   <AlertDialogDescription className="text-pretty">
-                    This block will be removed from the practice plan.
-                    Connected blocks will be re-linked automatically.
+                    This block will be removed from the practice plan. Connected
+                    blocks will be re-linked automatically.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     render={<Button variant="destructive" />}
-                    onClick={() => { onDelete(node.id); }}
+                    onClick={() => {
+                      onDelete(node.id);
+                    }}
                   >
                     Delete
                   </AlertDialogAction>

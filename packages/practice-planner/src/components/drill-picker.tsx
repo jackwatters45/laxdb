@@ -76,9 +76,11 @@ function DrillPickerList({ onSelect }: DrillPickerListProps) {
           ))}
         </CommandGroup>
         <CommandGroup heading="Cool-downs">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map((drill) => (
-            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-          ))}
+          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map(
+            (drill) => (
+              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+            ),
+          )}
         </CommandGroup>
       </CommandList>
     </Command>
@@ -101,7 +103,9 @@ function DrillOption({
   return (
     <CommandItem
       value={`${drill.name} ${drill.tags.join(" ")}`}
-      onSelect={() => { onSelect(drill); }}
+      onSelect={() => {
+        onSelect(drill);
+      }}
     >
       <Icon className="text-muted-foreground" />
       <div className="flex flex-col gap-0.5 min-w-0">

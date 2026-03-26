@@ -103,7 +103,8 @@ export async function startTestServer(): Promise<TestServer> {
     cleanup: async () => {
       await new Promise<void>((resolve, reject) => {
         server.close((err) => {
-          err ? reject(err) : resolve();
+          if (err) reject(err);
+          else resolve();
         });
       });
       await dispose();

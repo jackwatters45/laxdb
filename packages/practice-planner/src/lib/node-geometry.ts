@@ -43,7 +43,12 @@ interface Anchor {
   side: Side;
 }
 
-function getCenter(g: { left: number; top: number; width: number; height: number }) {
+function getCenter(g: {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}) {
   return { cx: g.left + g.width / 2, cy: g.top + g.height / 2 };
 }
 
@@ -72,7 +77,14 @@ function getAnchorPoint(
 export function getEdgeAnchors(
   source: PracticeNode,
   target: PracticeNode,
-): { sx: number; sy: number; tx: number; ty: number; sourceSide: Side; targetSide: Side } {
+): {
+  sx: number;
+  sy: number;
+  tx: number;
+  ty: number;
+  sourceSide: Side;
+  targetSide: Side;
+} {
   const sg = getNodeGeometry(source);
   const tg = getNodeGeometry(target);
 

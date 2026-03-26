@@ -3,13 +3,7 @@ import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
-import {
-  FileText,
-  MapPin,
-  Calendar,
-  Clock,
-  X,
-} from "lucide-react";
+import { FileText, MapPin, Calendar, Clock, X } from "lucide-react";
 
 import type { Practice } from "@/data/types";
 
@@ -35,7 +29,12 @@ export function PracticeSettings({
         <h3 className="text-sm font-semibold text-foreground text-balance">
           Practice Details
         </h3>
-        <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close panel">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onClose}
+          aria-label="Close panel"
+        >
           <X />
         </Button>
       </div>
@@ -43,11 +42,17 @@ export function PracticeSettings({
       {/* Summary */}
       <div className="px-4 py-3 border-b border-border flex gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Duration</p>
-          <p className="text-sm font-semibold tabular-nums">{totalMinutes} min</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Duration
+          </p>
+          <p className="text-sm font-semibold tabular-nums">
+            {totalMinutes} min
+          </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Blocks</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Blocks
+          </p>
           <p className="text-sm font-semibold tabular-nums">{blockCount}</p>
         </div>
       </div>
@@ -58,7 +63,9 @@ export function PracticeSettings({
           <Field label="Name" icon={<FileText className="size-3.5" />}>
             <Input
               value={practice.name}
-              onChange={(e) => { onUpdate({ name: e.target.value }); }}
+              onChange={(e) => {
+                onUpdate({ name: e.target.value });
+              }}
               placeholder="Practice name"
             />
           </Field>
@@ -67,7 +74,9 @@ export function PracticeSettings({
             <Input
               type="date"
               value={practice.date ?? ""}
-              onChange={(e) => { onUpdate({ date: e.target.value || null }); }}
+              onChange={(e) => {
+                onUpdate({ date: e.target.value || null });
+              }}
             />
           </Field>
 
@@ -95,7 +104,9 @@ export function PracticeSettings({
           <Field label="Location" icon={<MapPin className="size-3.5" />}>
             <Input
               value={practice.location ?? ""}
-              onChange={(e) => { onUpdate({ location: e.target.value || null }); }}
+              onChange={(e) => {
+                onUpdate({ location: e.target.value || null });
+              }}
               placeholder="Field, gym, etc."
             />
           </Field>
@@ -103,7 +114,9 @@ export function PracticeSettings({
           <Field label="Description" icon={<FileText className="size-3.5" />}>
             <Textarea
               value={practice.description ?? ""}
-              onChange={(e) => { onUpdate({ description: e.target.value || null }); }}
+              onChange={(e) => {
+                onUpdate({ description: e.target.value || null });
+              }}
               placeholder="Practice focus, goals, themes..."
               className="min-h-[80px]"
             />
@@ -112,7 +125,9 @@ export function PracticeSettings({
           <Field label="Notes" icon={<FileText className="size-3.5" />}>
             <Textarea
               value={practice.notes ?? ""}
-              onChange={(e) => { onUpdate({ notes: e.target.value || null }); }}
+              onChange={(e) => {
+                onUpdate({ notes: e.target.value || null });
+              }}
               placeholder="Reminders, equipment needed..."
               className="min-h-[60px]"
             />

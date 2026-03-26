@@ -4,32 +4,21 @@
  * Tests the full RPC round-trip: client → HTTP → handler → service → DB
  */
 
-
 import { RpcApiClient } from "@laxdb/api-v2/client";
-import { apiLayer } from "../shared";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { apiLayer } from "../shared";
 
 import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
 const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
-  effect.pipe(
-    Effect.provide(
-      apiLayer(testServer.url),
-      ),
-    ),
-    Effect.runPromise,
-  );
+  effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 const runDrill = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
-  effect.pipe(
-    Effect.provide(
-      apiLayer(testServer.url),
-    ),
-    Effect.runPromise,
-  );
+  effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
   testServer = await startTestServer();
