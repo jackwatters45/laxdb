@@ -39,7 +39,8 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
 
         list: () =>
           repo.list().pipe(
-            Effect.map((rows) => rows.map(asPractice)),            Effect.catchTag("SqlError", (e) =>
+            Effect.map((rows) => rows.map(asPractice)),
+            Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
             Effect.tapError(Effect.logError),
