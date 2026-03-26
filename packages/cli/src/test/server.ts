@@ -8,9 +8,9 @@
 
 import { createServer, type Server } from "node:http";
 
-import { DrillHandlers } from "@laxdb/api-v2/drill/drill.rpc";
-import { PlayerHandlers } from "@laxdb/api-v2/player/player.rpc";
-import { PracticeHandlers } from "@laxdb/api-v2/practice/practice.rpc";
+import { DrillRpcHandlers } from "@laxdb/api-v2/drill/drill.rpc-handlers";
+import { PlayerRpcHandlers } from "@laxdb/api-v2/player/player.rpc-handlers";
+import { PracticeRpcHandlers } from "@laxdb/api-v2/practice/practice.rpc-handlers";
 import { LaxdbRpcV2 } from "@laxdb/api-v2/rpc-group";
 import { TestDatabaseLive, truncateAll } from "@laxdb/core-v2/test/db";
 import { DateTime, Effect, Layer } from "effect";
@@ -19,9 +19,9 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 // Handler layers with test database instead of production DatabaseLive
 const TestHandlers = Layer.mergeAll(
-  DrillHandlers,
-  PlayerHandlers,
-  PracticeHandlers,
+  DrillRpcHandlers,
+  PlayerRpcHandlers,
+  PracticeRpcHandlers,
 ).pipe(Layer.provide(TestDatabaseLive));
 
 const RpcRouter = RpcServer.layerHttp({

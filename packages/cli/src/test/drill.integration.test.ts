@@ -4,19 +4,19 @@
  * Tests the full RPC round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcDrillClient } from "@laxdb/api-v2/drill/drill.client";
-import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
-import { Effect, Layer } from "effect";
+import { RpcApiClient } from "@laxdb/api-v2/client";
+import { apiLayer } from "../shared";
+import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
-const run = <A, E>(effect: Effect.Effect<A, E, RpcDrillClient>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
   effect.pipe(
     Effect.provide(
-      RpcDrillClient.layer.pipe(Layer.provide(makeRpcProtocol(testServer.url))),
+      apiLayer(testServer.url),
     ),
     Effect.runPromise,
   );
@@ -53,7 +53,7 @@ describe("Drill RPC", () => {
   it("lists drills (empty)", async () => {
     const drills = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         return yield* client.DrillList();
       }),
     );
@@ -63,7 +63,7 @@ describe("Drill RPC", () => {
   it("creates a drill", async () => {
     const drill = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         return yield* client.DrillCreate(minimalDrill);
       }),
     );
@@ -74,7 +74,7 @@ describe("Drill RPC", () => {
   it("creates a drill with all fields", async () => {
     const drill = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         return yield* client.DrillCreate({
           ...minimalDrill,
           name: "Full Drill",
@@ -101,7 +101,7 @@ describe("Drill RPC", () => {
   it("gets a drill by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.DrillCreate(minimalDrill);
         return yield* client.DrillGet({ publicId: created.publicId });
       }),
@@ -112,7 +112,7 @@ describe("Drill RPC", () => {
   it("lists all drills", async () => {
     const drills = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         yield* client.DrillCreate(minimalDrill);
         yield* client.DrillCreate({ ...minimalDrill, name: "Ground Balls" });
         return yield* client.DrillList();
@@ -124,7 +124,7 @@ describe("Drill RPC", () => {
   it("updates a drill", async () => {
     const updated = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.DrillCreate(minimalDrill);
         return yield* client.DrillUpdate({
           publicId: created.publicId,
@@ -138,7 +138,7 @@ describe("Drill RPC", () => {
   it("deletes a drill", async () => {
     const remaining = await run(
       Effect.gen(function* () {
-        const client = yield* RpcDrillClient;
+        const client = yield* RpcApiClient;
         const created = yield* client.DrillCreate(minimalDrill);
         yield* client.DrillDelete({ publicId: created.publicId });
         return yield* client.DrillList();
@@ -151,7 +151,7 @@ describe("Drill RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcDrillClient;
+          const client = yield* RpcApiClient;
           return yield* client.DrillGet({ publicId: "AbCdEfGhIjKl" });
         }),
       ),
