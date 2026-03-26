@@ -58,7 +58,7 @@ User Request → TanStack Start (web) → Effect RPC (api) → Effect Services (
 
 ## INFRASTRUCTURE
 
-Managed via `alchemy.run.ts`:
+Managed via `alchemy.run.ts`. **No wrangler** — Alchemy handles all builds, deploys, bindings, and local dev. Do not use `wrangler` commands.
 
 ## REFERENCE DOCS
 

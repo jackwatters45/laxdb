@@ -10,6 +10,8 @@ export default defineConfig({
     url: `${process.env.DATABASE_URL!}?sslmode=require`,
   },
   migrations: {},
+  extensionsFilters: ["postgis"],
+  schemaFilter: ["public"],
   verbose: true,
   strict: true,
 }) satisfies Config;
