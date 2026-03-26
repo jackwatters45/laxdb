@@ -1,6 +1,4 @@
 import { PracticeContract } from "@laxdb/core-v2/practice/practice.contract";
-import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
-import { Effect, Layer } from "effect";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
 export class PracticeRpcs extends RpcGroup.make(
@@ -75,25 +73,3 @@ export class PracticeRpcs extends RpcGroup.make(
     payload: PracticeContract.updateReview.payload,
   }),
 ) {}
-
-export const PracticeHandlers = PracticeRpcs.toLayer(
-  Effect.gen(function* () {
-    const service = yield* PracticeService;
-
-    return {
-      PracticeList: () => service.list(),
-      PracticeGet: (payload) => service.get(payload),
-      PracticeCreate: (payload) => service.create(payload),
-      PracticeUpdate: (payload) => service.update(payload),
-      PracticeDelete: (payload) => service.delete(payload),
-      PracticeListItems: (payload) => service.listItems(payload),
-      PracticeAddItem: (payload) => service.addItem(payload),
-      PracticeUpdateItem: (payload) => service.updateItem(payload),
-      PracticeRemoveItem: (payload) => service.removeItem(payload),
-      PracticeReorderItems: (payload) => service.reorderItems(payload),
-      PracticeGetReview: (payload) => service.getReview(payload),
-      PracticeCreateReview: (payload) => service.createReview(payload),
-      PracticeUpdateReview: (payload) => service.updateReview(payload),
-    };
-  }),
-).pipe(Layer.provide(PracticeService.layer));

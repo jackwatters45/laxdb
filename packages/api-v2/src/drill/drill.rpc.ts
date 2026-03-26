@@ -1,6 +1,4 @@
 import { DrillContract } from "@laxdb/core-v2/drill/drill.contract";
-import { DrillService } from "@laxdb/core-v2/drill/drill.service";
-import { Effect, Layer } from "effect";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
 export class DrillRpcs extends RpcGroup.make(
@@ -30,17 +28,3 @@ export class DrillRpcs extends RpcGroup.make(
     payload: DrillContract.delete.payload,
   }),
 ) {}
-
-export const DrillHandlers = DrillRpcs.toLayer(
-  Effect.gen(function* () {
-    const service = yield* DrillService;
-
-    return {
-      DrillList: () => service.list(),
-      DrillGet: (payload) => service.get(payload),
-      DrillCreate: (payload) => service.create(payload),
-      DrillUpdate: (payload) => service.update(payload),
-      DrillDelete: (payload) => service.delete(payload),
-    };
-  }),
-).pipe(Layer.provide(DrillService.layer));

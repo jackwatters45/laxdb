@@ -10,7 +10,7 @@ import {
   GitBranch,
 } from "lucide-react";
 
-import type { PracticeNode, PracticeItemType } from "@/data/types";
+import type { PracticeNode, PracticeItemType } from "@/types";
 
 const TYPE_CONFIG: Record<
   PracticeItemType,

@@ -1,6 +1,7 @@
-import { asPlayer } from "@laxdb/core-v2/player/player.schema";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer } from "effect";
+
+import { asPlayer } from "../lib/mappers";
 
 import { PlayerRpcs } from "./player.rpc";
 

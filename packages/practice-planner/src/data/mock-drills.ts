@@ -1,4 +1,4 @@
-import type { Drill } from "./types";
+import type { Drill } from "../types";
 
 // TODO: replace with API-backed data once drill service is implemented
 export const MOCK_DRILLS: Drill[] = [

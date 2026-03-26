@@ -1,9 +1,9 @@
-import { asPlayer } from "@laxdb/core-v2/player/player.schema";
 import { PlayerService } from "@laxdb/core-v2/player/player.service";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
+import { asPlayer } from "../lib/mappers";
 
 export const PlayersHandlersLive = HttpApiBuilder.group(
   LaxdbApiV2,

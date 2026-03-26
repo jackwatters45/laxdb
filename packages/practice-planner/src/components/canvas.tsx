@@ -9,8 +9,8 @@ import {
   type WheelEvent as ReactWheelEvent,
 } from "react";
 
-import type { Drill, PracticeNode, PracticeEdge } from "@/data/types";
 import { getNodeGeometry } from "@/lib/node-geometry";
+import type { Drill, PracticeNode, PracticeEdge } from "@/types";
 
 import { AddNodeButton } from "./add-node-button";
 import { DrillPickerPopover } from "./drill-picker";

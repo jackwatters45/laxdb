@@ -1,8 +1,8 @@
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Plus } from "lucide-react";
 
-import type { Drill, PracticeNode } from "@/data/types";
 import { getEdgeAnchors } from "@/lib/node-geometry";
+import type { Drill, PracticeNode } from "@/types";
 
 import { DrillPickerPopover } from "./drill-picker";
 

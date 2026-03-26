@@ -1,10 +1,11 @@
+import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
+import { Effect, Layer } from "effect";
+
 import {
   asPractice,
   asPracticeItem as asItem,
   asPracticeReview as asReview,
-} from "@laxdb/core-v2/practice/practice.schema";
-import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
-import { Effect, Layer } from "effect";
+} from "../lib/mappers";
 
 import { PracticeRpcs } from "./practice.rpc";
 

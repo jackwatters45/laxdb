@@ -1,5 +1,5 @@
-import { MOCK_DRILLS } from "@/data/mock-drills";
-import type { PracticeNode, PracticeEdge, DrillCategory } from "@/data/types";
+import { MOCK_DRILLS } from "@/data/mock";
+import type { PracticeNode, PracticeEdge, DrillCategory } from "@/types";
 
 function nextId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;

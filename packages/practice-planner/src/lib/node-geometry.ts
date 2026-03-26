@@ -1,4 +1,4 @@
-import type { PracticeNode } from "@/data/types";
+import type { PracticeNode } from "@/types";
 
 /** Returns the visual width, height, and rendered left/top for a node */
 export function getNodeGeometry(node: PracticeNode) {
