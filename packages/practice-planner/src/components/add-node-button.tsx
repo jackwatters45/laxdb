@@ -7,12 +7,14 @@ import type { Drill, PracticeNode } from "@/types";
 import { DrillPickerPopover } from "./drill-picker";
 
 interface AddNodeButtonProps {
+  drills: Drill[];
   sourceNode: PracticeNode;
   targetNode: PracticeNode;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
 }
 
 export function AddNodeButton({
+  drills,
   sourceNode,
   targetNode,
   onAddDrill,
@@ -34,6 +36,7 @@ export function AddNodeButton({
       }}
     >
       <DrillPickerPopover
+        drills={drills}
         onSelect={(drill) => {
           onAddDrill(sourceNode.id, targetNode.id, drill);
         }}

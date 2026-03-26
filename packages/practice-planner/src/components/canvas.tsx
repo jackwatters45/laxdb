@@ -24,6 +24,7 @@ interface CanvasTransform {
 }
 
 interface CanvasProps {
+  drills: Drill[];
   nodes: PracticeNode[];
   edges: PracticeEdge[];
   selectedNodeId: string | null;
@@ -41,6 +42,7 @@ const ZOOM_SENSITIVITY = 0.001;
 const DRAG_THRESHOLD = 4;
 
 export function Canvas({
+  drills,
   nodes,
   edges,
   selectedNodeId,
@@ -286,6 +288,7 @@ export function Canvas({
             return (
               <AddNodeButton
                 key={`add-${edge.id}`}
+                drills={drills}
                 sourceNode={source}
                 targetNode={target}
                 onAddDrill={onAddDrill}
@@ -340,7 +343,7 @@ export function Canvas({
                   className="absolute left-0 top-0"
                   style={{ transform: `translate(${cx - 60}px, ${ty}px)` }}
                 >
-                  <DrillPickerPopover onSelect={onAppendDrill}>
+                  <DrillPickerPopover drills={drills} onSelect={onAppendDrill}>
                     <Button
                       variant="outline"
                       size="sm"

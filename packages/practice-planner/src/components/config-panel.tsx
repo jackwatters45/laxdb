@@ -33,7 +33,6 @@ import {
   Target,
 } from "lucide-react";
 
-import { MOCK_DRILLS } from "@/data/mock";
 import type {
   Drill,
   PracticeNode,
@@ -44,6 +43,7 @@ import type {
 import { DrillPickerPopover } from "./drill-picker";
 
 interface ConfigPanelProps {
+  drills: Drill[];
   node: PracticeNode;
   onUpdate: (nodeId: string, updates: Partial<PracticeNode>) => void;
   onDelete: (nodeId: string) => void;
@@ -66,6 +66,7 @@ function drillToType(drill: Drill): PracticeItemType {
 }
 
 export function ConfigPanel({
+  drills,
   node,
   onUpdate,
   onDelete,
@@ -75,7 +76,7 @@ export function ConfigPanel({
   onClose,
 }: ConfigPanelProps) {
   const linkedDrill = node.drillId
-    ? MOCK_DRILLS.find((d) => d.id === node.drillId)
+    ? drills.find((d) => d.id === node.drillId)
     : null;
 
   const isStart = node.variant === "start";
@@ -139,13 +140,17 @@ export function ConfigPanel({
 
       {/* Drill identity — top of panel */}
       {linkedDrill && (
-        <DrillIdentity drill={linkedDrill} onSwap={handleSwapDrill} />
+        <DrillIdentity
+          drill={linkedDrill}
+          drills={drills}
+          onSwap={handleSwapDrill}
+        />
       )}
 
       {/* No drill linked — prompt to pick one */}
       {!linkedDrill && !isSpecial && (
         <div className="px-4 py-3 border-b border-border">
-          <DrillPickerPopover onSelect={handleSwapDrill}>
+          <DrillPickerPopover drills={drills} onSelect={handleSwapDrill}>
             <Button variant="outline" size="lg" className="w-full">
               <Target />
               Pick a drill
@@ -291,9 +296,11 @@ export function ConfigPanel({
 
 function DrillIdentity({
   drill,
+  drills,
   onSwap,
 }: {
   drill: Drill;
+  drills: Drill[];
   onSwap: (drill: Drill) => void;
 }) {
   const Icon = drill.tags.includes("warmup")
@@ -318,7 +325,7 @@ function DrillIdentity({
             )}
           </div>
         </div>
-        <DrillPickerPopover onSelect={onSwap}>
+        <DrillPickerPopover drills={drills} onSelect={onSwap}>
           <Button variant="ghost" size="icon-sm" aria-label="Swap drill">
             <ArrowRightLeft />
           </Button>

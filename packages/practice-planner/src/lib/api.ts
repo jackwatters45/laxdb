@@ -47,9 +47,14 @@ let _runtime: ReturnType<typeof buildRuntime> | undefined;
 /**
  * Run an Effect that depends on the RPC client.
  * Only call from inside createServerFn handlers.
+ *
+ * Results are round-tripped through JSON to convert Effect Schema.Class
+ * instances into plain objects — seroval (TanStack Start's dehydration
+ * serializer) rejects class instances.
  */
-export function runApi<A, E>(
+export async function runApi<A, E>(
   effect: Effect.Effect<A, E, RpcApiClient>,
 ): Promise<A> {
-  return (_runtime ??= buildRuntime()).runPromise(effect);
+  const result = await (_runtime ??= buildRuntime()).runPromise(effect);
+  return JSON.parse(JSON.stringify(result)) as A;
 }

@@ -1,20 +1,34 @@
 import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 import { Plus, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
 
-import { SAMPLE_PRACTICE } from "@/data/mock";
 import { runApi } from "@/lib/api";
-import type { Practice } from "@/types";
 
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
       const client = yield* RpcApiClient;
       return yield* client.PracticeList();
+    }),
+  ),
+);
+
+const createPractice = createServerFn({ method: "POST" }).handler(() =>
+  runApi(
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      return yield* client.PracticeCreate({
+        name: "Untitled Practice",
+        date: null,
+        description: null,
+        notes: null,
+        durationMinutes: null,
+        location: null,
+      });
     }),
   ),
 );
@@ -33,36 +47,33 @@ const statusColors: Record<string, string> = {
 };
 
 function PracticeListPage() {
-  const dbPractices = Route.useLoaderData();
-  // TODO: map DB practices to frontend type once we have real data
-  // For now, show sample practice as fallback
-  const practices: Practice[] = dbPractices.length > 0 ? [] : [SAMPLE_PRACTICE];
+  const practices = Route.useLoaderData();
+  const navigate = useNavigate();
+
+  const handleCreate = async () => {
+    const practice = await createPractice();
+    await navigate({ to: "/practice/$id", params: { id: practice.publicId } });
+  };
 
   return (
     <div className="min-h-dvh bg-background">
-      {/* Header */}
       <header className="flex items-center justify-between h-14 px-6 border-b border-border bg-card">
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
-        <Button
-          onClick={() => {
-            // TODO: create practice via RPC, navigate to /practice/:id
-          }}
-        >
+        <Button onClick={handleCreate}>
           <Plus />
           New Practice
         </Button>
       </header>
 
-      {/* Practice list */}
       <div className="max-w-3xl mx-auto px-6 py-8">
         {practices.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-muted-foreground text-pretty mb-4">
               No practices yet. Create your first practice plan.
             </p>
-            <Button>
+            <Button onClick={handleCreate}>
               <Plus />
               New Practice
             </Button>
@@ -70,7 +81,7 @@ function PracticeListPage() {
         ) : (
           <div className="flex flex-col gap-2">
             {practices.map((practice) => (
-              <PracticeCard key={practice.id} practice={practice} />
+              <PracticeCard key={practice.publicId} practice={practice} />
             ))}
           </div>
         )}
@@ -79,23 +90,21 @@ function PracticeListPage() {
   );
 }
 
-function PracticeCard({ practice }: { practice: Practice }) {
-  const totalMinutes = practice.nodes.reduce(
-    (sum, n) => sum + (n.durationMinutes ?? 0),
-    0,
-  );
-  const blockCount = practice.nodes.filter((n) => n.variant !== "start").length;
-
+function PracticeCard({
+  practice,
+}: {
+  practice: (typeof Route.types.loaderData)[number];
+}) {
   return (
     <Link
       to="/practice/$id"
-      params={{ id: practice.id }}
+      params={{ id: practice.publicId }}
       className="group flex items-center justify-between rounded-lg border border-border bg-card p-4 hover:border-foreground/20 transition-colors"
     >
       <div className="flex flex-col gap-1.5 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground truncate">
-            {practice.name}
+            {practice.name ?? "Untitled Practice"}
           </span>
           <Badge
             variant="secondary"
@@ -109,14 +118,15 @@ function PracticeCard({ practice }: { practice: Practice }) {
           {practice.date && (
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {practice.date}
+              {new Date(practice.date).toLocaleDateString()}
             </span>
           )}
-          <span className="flex items-center gap-1 tabular-nums">
-            <Clock size={12} />
-            {totalMinutes} min
-          </span>
-          <span className="tabular-nums">{blockCount} blocks</span>
+          {practice.durationMinutes && (
+            <span className="flex items-center gap-1 tabular-nums">
+              <Clock size={12} />
+              {practice.durationMinutes} min
+            </span>
+          )}
           {practice.location && (
             <span className="flex items-center gap-1">
               <MapPin size={12} />

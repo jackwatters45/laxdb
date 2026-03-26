@@ -1,6 +1,9 @@
+import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Effect } from "effect";
 import { Sparkles, Library, GitBranch, Settings } from "lucide-react";
 import { useState, useCallback, useRef, useEffect } from "react";
 
@@ -12,6 +15,8 @@ import { PracticeSettings } from "@/components/practice-settings";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
 import { SplitNodeModal } from "@/components/split-node";
 import { SAMPLE_PRACTICE } from "@/data/mock";
+import { runApi } from "@/lib/api";
+import { mapDrill as mapDrillFromDb } from "@/lib/drill-mapper";
 import { autoLayout } from "@/lib/layout";
 import { generateQuickPlan } from "@/lib/quick-plan";
 import type {
@@ -23,8 +28,18 @@ import type {
   DrillCategory,
 } from "@/types";
 
+const loadDrills = createServerFn({ method: "GET" }).handler(() =>
+  runApi(
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      return yield* client.DrillList();
+    }),
+  ),
+);
+
 export const Route = createFileRoute("/practice/$id")({
   component: PracticePlannerPage,
+  loader: () => loadDrills(),
 });
 
 function nextId(prefix: string): string {
@@ -32,6 +47,9 @@ function nextId(prefix: string): string {
 }
 
 function PracticePlannerPage() {
+  const dbDrills = Route.useLoaderData();
+  const drills: Drill[] = dbDrills.map((d) => mapDrillFromDb(d));
+
   // Practice state with undo/redo
   const [practice, setPracticeRaw] = useState<Practice>(SAMPLE_PRACTICE);
   const undoStack = useRef<Practice[]>([]);
@@ -412,7 +430,7 @@ function PracticePlannerPage() {
       includeWarmup: boolean;
       includeCooldown: boolean;
     }) => {
-      const plan = generateQuickPlan(options);
+      const plan = generateQuickPlan(drills, options);
       setPractice({
         ...practice,
         name: "Quick Practice Plan",
@@ -425,7 +443,7 @@ function PracticePlannerPage() {
       // Auto-center on the new plan
       setTransform({ x: 500, y: 40, scale: 0.75 });
     },
-    [practice, setPractice],
+    [drills, practice, setPractice],
   );
 
   const handleOrganize = useCallback(() => {
@@ -494,6 +512,7 @@ function PracticePlannerPage() {
     <div className="flex h-dvh w-screen overflow-hidden bg-background">
       {/* Drill Sidebar (left) */}
       <DrillSidebar
+        drills={drills}
         isOpen={drillSidebarOpen}
         onClose={() => {
           setDrillSidebarOpen(false);
@@ -570,6 +589,7 @@ function PracticePlannerPage() {
         {/* Canvas */}
         <div className="flex-1 overflow-hidden">
           <Canvas
+            drills={drills}
             nodes={canvasNodes}
             edges={canvasEdges}
             selectedNodeId={selectedNodeId}
@@ -597,6 +617,7 @@ function PracticePlannerPage() {
       {/* Right panel — node config or practice settings */}
       {selectedNode && (
         <ConfigPanel
+          drills={drills}
           node={selectedNode}
           onUpdate={updateNode}
           onDelete={deleteNode}

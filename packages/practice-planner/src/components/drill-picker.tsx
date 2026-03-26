@@ -14,10 +14,10 @@ import {
 import { Clock, Flame, Snowflake, Target } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock";
 import type { Drill } from "@/types";
 
 interface DrillPickerPopoverProps {
+  drills: Drill[];
   children: React.ReactNode;
   onSelect: (drill: Drill) => void;
   open?: boolean;
@@ -29,6 +29,7 @@ interface DrillPickerPopoverProps {
  * Wraps a trigger element (e.g. the "+" button between nodes).
  */
 export function DrillPickerPopover({
+  drills,
   children,
   onSelect,
   open,
@@ -43,6 +44,7 @@ export function DrillPickerPopover({
       <PopoverTrigger render={children as React.ReactElement} />
       <PopoverContent className="w-[280px] p-0" side="right" align="start">
         <DrillPickerList
+          drills={drills}
           onSelect={(drill) => {
             onSelect(drill);
             setIsOpen(false);
@@ -54,33 +56,38 @@ export function DrillPickerPopover({
 }
 
 interface DrillPickerListProps {
+  drills: Drill[];
   onSelect: (drill: Drill) => void;
 }
 
-function DrillPickerList({ onSelect }: DrillPickerListProps) {
+function DrillPickerList({ drills, onSelect }: DrillPickerListProps) {
   return (
     <Command>
       <CommandInput placeholder="Search drills..." />
       <CommandList>
         <CommandEmpty>No drills found.</CommandEmpty>
         <CommandGroup heading="Warm-ups">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("warmup")).map((drill) => (
-            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-          ))}
+          {drills
+            .filter((d) => d.tags.includes("warmup"))
+            .map((drill) => (
+              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+            ))}
         </CommandGroup>
         <CommandGroup heading="Drills">
-          {MOCK_DRILLS.filter(
-            (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
-          ).map((drill) => (
-            <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-          ))}
+          {drills
+            .filter(
+              (d) => !d.tags.includes("warmup") && !d.tags.includes("cooldown"),
+            )
+            .map((drill) => (
+              <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
+            ))}
         </CommandGroup>
         <CommandGroup heading="Cool-downs">
-          {MOCK_DRILLS.filter((d) => d.tags.includes("cooldown")).map(
-            (drill) => (
+          {drills
+            .filter((d) => d.tags.includes("cooldown"))
+            .map((drill) => (
               <DrillOption key={drill.id} drill={drill} onSelect={onSelect} />
-            ),
-          )}
+            ))}
         </CommandGroup>
       </CommandList>
     </Command>

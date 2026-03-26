@@ -9,10 +9,10 @@ import {
 import { Search, Clock, Flame, Target, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 
-import { MOCK_DRILLS } from "@/data/mock";
 import type { Drill, PracticeItemType } from "@/types";
 
 interface DrillSidebarProps {
+  drills: Drill[];
   isOpen: boolean;
   onClose: () => void;
   onAddDrill: (drill: Drill, type: PracticeItemType) => void;
@@ -39,6 +39,7 @@ function drillToType(drill: Drill): PracticeItemType {
 }
 
 export function DrillSidebar({
+  drills,
   isOpen,
   onClose,
   onAddDrill,
@@ -46,7 +47,7 @@ export function DrillSidebar({
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const filtered = MOCK_DRILLS.filter((drill) => {
+  const filtered = drills.filter((drill) => {
     const matchesSearch =
       !search ||
       drill.name.toLowerCase().includes(search.toLowerCase()) ||
