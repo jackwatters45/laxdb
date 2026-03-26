@@ -34,7 +34,6 @@ export function DrillPickerPopover({
   open,
   onOpenChange,
 }: DrillPickerPopoverProps) {
-  const drills = useDrills();
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = open ?? internalOpen;
   const setIsOpen = onOpenChange ?? setInternalOpen;

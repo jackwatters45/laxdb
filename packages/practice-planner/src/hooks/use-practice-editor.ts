@@ -160,77 +160,83 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
   const addDrillBetween = useCallback(
     (afterId: string, beforeId: string, drill: Drill) => {
-      const afterNode = practice.nodes.find((n) => n.id === afterId);
-      const beforeNode = practice.nodes.find((n) => n.id === beforeId);
-      if (!afterNode || !beforeNode) return;
-
-      const newNode: PracticeNode = {
-        id: nextId("node"),
-        type: drillToType(drill),
-        variant: "default",
-        drillId: drill.publicId,
-        label: drill.name,
-        durationMinutes: drill.durationMinutes,
-        notes: drill.subtitle,
-        groups: ["all"],
-        priority: "optional",
-        position: {
-          x: (afterNode.position.x + beforeNode.position.x) / 2,
-          y: (afterNode.position.y + beforeNode.position.y) / 2,
-        },
-      };
+      const nodeId = nextId("node");
 
       setPractice((prev) => {
+        const afterNode = prev.nodes.find((n) => n.id === afterId);
+        const beforeNode = prev.nodes.find((n) => n.id === beforeId);
+        if (!afterNode || !beforeNode) return prev;
+
+        const newNode: PracticeNode = {
+          id: nodeId,
+          type: drillToType(drill),
+          variant: "default",
+          drillId: drill.publicId,
+          label: drill.name,
+          durationMinutes: drill.durationMinutes,
+          notes: drill.subtitle,
+          groups: ["all"],
+          priority: "optional",
+          position: {
+            x: (afterNode.position.x + beforeNode.position.x) / 2,
+            y: (afterNode.position.y + beforeNode.position.y) / 2,
+          },
+        };
+
         const newEdges = prev.edges.filter(
           (e) => !(e.source === afterId && e.target === beforeId),
         );
         newEdges.push(
-          { id: nextId("edge"), source: afterId, target: newNode.id },
-          { id: nextId("edge"), source: newNode.id, target: beforeId },
+          { id: nextId("edge"), source: afterId, target: nodeId },
+          { id: nextId("edge"), source: nodeId, target: beforeId },
         );
         return { ...prev, nodes: [...prev.nodes, newNode], edges: newEdges };
       });
 
-      return newNode.id;
+      return nodeId;
     },
-    [practice.nodes, setPractice],
+    [setPractice],
   );
 
   const addDrillFromSidebar = useCallback(
     (drill: Drill, type: PracticeItemType) => {
-      const { nodes: n, edges: e } = practice;
-      const sourcesSet = new Set(e.map((edge) => edge.source));
-      const lastNode = n.find((node) => !sourcesSet.has(node.id)) ?? n.at(-1);
-      if (!lastNode) return;
+      const nodeId = nextId("node");
 
-      const newNode: PracticeNode = {
-        id: nextId("node"),
-        type,
-        variant: "default",
-        drillId: drill.publicId,
-        label: drill.name,
-        durationMinutes: drill.durationMinutes,
-        notes: drill.subtitle,
-        groups: ["all"],
-        priority: "optional",
-        position: {
-          x: lastNode.position.x,
-          y: lastNode.position.y + 140,
-        },
-      };
+      setPractice((prev) => {
+        const sourcesSet = new Set(prev.edges.map((e) => e.source));
+        const lastNode =
+          prev.nodes.find((n) => !sourcesSet.has(n.id)) ?? prev.nodes.at(-1);
+        if (!lastNode) return prev;
 
-      setPractice((prev) => ({
-        ...prev,
-        nodes: [...prev.nodes, newNode],
-        edges: [
-          ...prev.edges,
-          { id: nextId("edge"), source: lastNode.id, target: newNode.id },
-        ],
-      }));
+        const newNode: PracticeNode = {
+          id: nodeId,
+          type,
+          variant: "default",
+          drillId: drill.publicId,
+          label: drill.name,
+          durationMinutes: drill.durationMinutes,
+          notes: drill.subtitle,
+          groups: ["all"],
+          priority: "optional",
+          position: {
+            x: lastNode.position.x,
+            y: lastNode.position.y + 140,
+          },
+        };
 
-      return newNode.id;
+        return {
+          ...prev,
+          nodes: [...prev.nodes, newNode],
+          edges: [
+            ...prev.edges,
+            { id: nextId("edge"), source: lastNode.id, target: nodeId },
+          ],
+        };
+      });
+
+      return nodeId;
     },
-    [practice, setPractice],
+    [setPractice],
   );
 
   const appendDrill = useCallback(
@@ -240,68 +246,70 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
   const addSplit = useCallback(
     (groups: string[]) => {
-      const { nodes: n, edges: e } = practice;
-      const sourcesSet = new Set(e.map((edge) => edge.source));
-      const lastNode =
-        n.filter((node) => !sourcesSet.has(node.id)).at(-1) ?? n.at(-1);
-      if (!lastNode) return;
+      setPractice((prev) => {
+        const sourcesSet = new Set(prev.edges.map((e) => e.source));
+        const lastNode =
+          prev.nodes.filter((n) => !sourcesSet.has(n.id)).at(-1) ??
+          prev.nodes.at(-1);
+        if (!lastNode) return prev;
 
-      const splitNode: PracticeNode = {
-        id: nextId("node"),
-        type: "activity",
-        variant: "split",
-        drillId: null,
-        label: "Group Split",
-        durationMinutes: null,
-        notes: `Split into: ${groups.join(", ")}`,
-        groups: ["all"],
-        priority: "required",
-        position: { x: lastNode.position.x, y: lastNode.position.y + 140 },
-      };
-
-      const newNodes: PracticeNode[] = [splitNode];
-      const newEdges: PracticeEdge[] = [
-        { id: nextId("edge"), source: lastNode.id, target: splitNode.id },
-      ];
-
-      const laneWidth = 280;
-      const totalWidth = groups.length * laneWidth;
-      const startX = splitNode.position.x - totalWidth / 2 + laneWidth / 2;
-
-      for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
-        if (!group) continue;
-        const laneNode: PracticeNode = {
+        const splitNode: PracticeNode = {
           id: nextId("node"),
-          type: "drill",
-          variant: "default",
+          type: "activity",
+          variant: "split",
           drillId: null,
-          label: `${group} Drill`,
-          durationMinutes: 15,
-          notes: null,
-          groups: [group],
-          priority: "optional",
-          position: {
-            x: startX + i * laneWidth,
-            y: splitNode.position.y + 160,
-          },
+          label: "Group Split",
+          durationMinutes: null,
+          notes: `Split into: ${groups.join(", ")}`,
+          groups: ["all"],
+          priority: "required",
+          position: { x: lastNode.position.x, y: lastNode.position.y + 140 },
         };
-        newNodes.push(laneNode);
-        newEdges.push({
-          id: nextId("edge"),
-          source: splitNode.id,
-          target: laneNode.id,
-          label: group,
-        });
-      }
 
-      setPractice((prev) => ({
-        ...prev,
-        nodes: [...prev.nodes, ...newNodes],
-        edges: [...prev.edges, ...newEdges],
-      }));
+        const newNodes: PracticeNode[] = [splitNode];
+        const newEdges: PracticeEdge[] = [
+          { id: nextId("edge"), source: lastNode.id, target: splitNode.id },
+        ];
+
+        const laneWidth = 280;
+        const totalWidth = groups.length * laneWidth;
+        const startX = splitNode.position.x - totalWidth / 2 + laneWidth / 2;
+
+        for (let i = 0; i < groups.length; i++) {
+          const group = groups[i];
+          if (!group) continue;
+          const laneNode: PracticeNode = {
+            id: nextId("node"),
+            type: "drill",
+            variant: "default",
+            drillId: null,
+            label: `${group} Drill`,
+            durationMinutes: 15,
+            notes: null,
+            groups: [group],
+            priority: "optional",
+            position: {
+              x: startX + i * laneWidth,
+              y: splitNode.position.y + 160,
+            },
+          };
+          newNodes.push(laneNode);
+          newEdges.push({
+            id: nextId("edge"),
+            source: splitNode.id,
+            target: laneNode.id,
+            label: group,
+          });
+        }
+
+        return {
+          ...prev,
+          nodes: [...prev.nodes, ...newNodes],
+          edges: [...prev.edges, ...newEdges],
+        };
+      });
     },
-    [practice, setPractice],
+    [setPractice],
   );
 
   return {

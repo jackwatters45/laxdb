@@ -56,5 +56,7 @@ export async function runApi<A, E>(
   effect: Effect.Effect<A, E, RpcApiClient>,
 ): Promise<A> {
   const result = await (_runtime ??= buildRuntime()).runPromise(effect);
+  // JSON round-trip strips Effect Schema.Class metadata; the shape is
+  // guaranteed by Effect's schema encoder so the cast is safe.
   return JSON.parse(JSON.stringify(result)) as A;
 }
