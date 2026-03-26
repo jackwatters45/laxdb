@@ -1,8 +1,10 @@
 /// <reference types="vite/client" />
 
 import { ThemeProvider } from "@laxdb/ui/components/theme-provider";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
@@ -19,7 +21,9 @@ function NotFound() {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   notFoundComponent: NotFound,
   head: () => ({
     meta: [
@@ -37,15 +41,18 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <Outlet />
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            <Outlet />
+          </ThemeProvider>
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>

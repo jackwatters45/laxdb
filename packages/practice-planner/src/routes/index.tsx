@@ -4,7 +4,15 @@ import { Button } from "@laxdb/ui/components/ui/button";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
-import { Plus, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Calendar,
+  Clock,
+  MapPin,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
+import { useState } from "react";
 
 import { runApi } from "@/lib/api";
 
@@ -49,8 +57,10 @@ const statusColors: Record<string, string> = {
 function PracticeListPage() {
   const practices = Route.useLoaderData();
   const navigate = useNavigate();
+  const [creating, setCreating] = useState(false);
 
   const handleCreate = async () => {
+    setCreating(true);
     const practice = await createPractice();
     await navigate({ to: "/practice/$id", params: { id: practice.publicId } });
   };
@@ -61,9 +71,9 @@ function PracticeListPage() {
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
-        <Button onClick={handleCreate}>
-          <Plus />
-          New Practice
+        <Button onClick={handleCreate} disabled={creating}>
+          {creating ? <Loader2 className="animate-spin" /> : <Plus />}
+          {creating ? "Creating…" : "New Practice"}
         </Button>
       </header>
 
@@ -73,9 +83,9 @@ function PracticeListPage() {
             <p className="text-muted-foreground text-pretty mb-4">
               No practices yet. Create your first practice plan.
             </p>
-            <Button onClick={handleCreate}>
-              <Plus />
-              New Practice
+            <Button onClick={handleCreate} disabled={creating}>
+              {creating ? <Loader2 className="animate-spin" /> : <Plus />}
+              {creating ? "Creating…" : "New Practice"}
             </Button>
           </div>
         ) : (

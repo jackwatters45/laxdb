@@ -1,11 +1,12 @@
 import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 import { Sparkles, Library, GitBranch, Settings } from "lucide-react";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 
 import { Canvas } from "@/components/canvas";
 import { CanvasControls } from "@/components/canvas-controls";
@@ -15,18 +16,12 @@ import { PracticeSettings } from "@/components/practice-settings";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
 import { SplitNodeModal } from "@/components/split-node";
 import { SAMPLE_PRACTICE } from "@/data/mock";
+import { useCanvasControls } from "@/hooks/use-canvas-controls";
+import { DrillsProvider } from "@/hooks/use-drills";
+import { usePracticeEditor } from "@/hooks/use-practice-editor";
 import { runApi } from "@/lib/api";
-import { mapDrill as mapDrillFromDb } from "@/lib/drill-mapper";
-import { autoLayout } from "@/lib/layout";
 import { generateQuickPlan } from "@/lib/quick-plan";
-import type {
-  PracticeNode,
-  PracticeEdge,
-  Practice,
-  PracticeItemType,
-  Drill,
-  DrillCategory,
-} from "@/types";
+import type { Drill, DrillCategory } from "@/types";
 
 const loadDrills = createServerFn({ method: "GET" }).handler(() =>
   runApi(
@@ -39,83 +34,37 @@ const loadDrills = createServerFn({ method: "GET" }).handler(() =>
 
 export const Route = createFileRoute("/practice/$id")({
   component: PracticePlannerPage,
-  loader: () => loadDrills(),
 });
 
-function nextId(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
-
 function PracticePlannerPage() {
-  const dbDrills = Route.useLoaderData();
-  const drills: Drill[] = dbDrills.map((d) => mapDrillFromDb(d));
+  const { data: drills = [] } = useQuery({
+    queryKey: ["drills"],
+    queryFn: () => loadDrills(),
+  });
 
-  // Practice state with undo/redo
-  const [practice, setPracticeRaw] = useState<Practice>(SAMPLE_PRACTICE);
-  const undoStack = useRef<Practice[]>([]);
-  const redoStack = useRef<Practice[]>([]);
-  const { nodes, edges } = practice;
-
-  const setPractice = useCallback(
-    (updater: Practice | ((prev: Practice) => Practice)) => {
-      setPracticeRaw((prev) => {
-        undoStack.current.push(prev);
-        if (undoStack.current.length > 50) undoStack.current.shift();
-        redoStack.current = [];
-        return typeof updater === "function" ? updater(prev) : updater;
-      });
-    },
-    [],
-  );
-
-  const undo = useCallback(() => {
-    const prev = undoStack.current.pop();
-    if (prev) {
-      setPracticeRaw((current) => {
-        redoStack.current.push(current);
-        return prev;
-      });
-    }
-  }, []);
-
-  const redo = useCallback(() => {
-    const next = redoStack.current.pop();
-    if (next) {
-      setPracticeRaw((current) => {
-        undoStack.current.push(current);
-        return next;
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-        e.preventDefault();
-        if (e.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [undo, redo]);
+  // Core editor state
+  const editor = usePracticeEditor(SAMPLE_PRACTICE);
+  const { practice, nodes, edges } = editor;
 
   // UI state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-
-  const [transform, setTransform] = useState({ x: 500, y: 40, scale: 0.75 });
   const [drillSidebarOpen, setDrillSidebarOpen] = useState(false);
   const [splitModalOpen, setSplitModalOpen] = useState(false);
   const [quickPlanOpen, setQuickPlanOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
 
-  // Deselect node when opening settings, close settings when selecting a node
+  // Canvas transform
+  const canvas = useCanvasControls({
+    nodes,
+    edges,
+    sidebarOpen: drillSidebarOpen,
+    panelOpen: !!selectedNode || settingsOpen,
+    setPractice: editor.setPractice,
+  });
+
+  // Node selection helpers
   const openSettings = useCallback(() => {
     setSelectedNodeId(null);
     setSettingsOpen(true);
@@ -126,301 +75,29 @@ function PracticePlannerPage() {
     if (nodeId) setSettingsOpen(false);
   }, []);
 
-  // Total duration
-  const totalMinutes = nodes.reduce(
-    (sum, n) => sum + (n.durationMinutes ?? 0),
-    0,
-  );
-
-  // ---- Mutations ----
-
-  const updateNode = useCallback(
-    (nodeId: string, updates: Partial<PracticeNode>) => {
-      setPractice((prev) => ({
-        ...prev,
-        nodes: prev.nodes.map((n) =>
-          n.id === nodeId ? { ...n, ...updates } : n,
-        ),
-      }));
-    },
-    [setPractice],
-  );
-
-  const updatePractice = useCallback(
-    (updates: Partial<Practice>) => {
-      setPractice((prev) => ({ ...prev, ...updates }));
-    },
-    [setPractice],
-  );
-
-  const deleteNode = useCallback(
+  // Wrap mutations that also affect selection
+  const handleDeleteNode = useCallback(
     (nodeId: string) => {
-      setPractice((prev) => {
-        // Find edges connected to this node
-        const incomingEdges = prev.edges.filter((e) => e.target === nodeId);
-        const outgoingEdges = prev.edges.filter((e) => e.source === nodeId);
-
-        // Remove old edges
-        let newEdges = prev.edges.filter(
-          (e) => e.source !== nodeId && e.target !== nodeId,
-        );
-
-        // Reconnect: each incoming source connects to each outgoing target
-        for (const ie of incomingEdges) {
-          for (const oe of outgoingEdges) {
-            newEdges.push({
-              id: nextId("edge"),
-              source: ie.source,
-              target: oe.target,
-            });
-          }
-        }
-
-        return {
-          ...prev,
-          nodes: prev.nodes.filter((n) => n.id !== nodeId),
-          edges: newEdges,
-        };
-      });
-      if (selectedNodeId === nodeId) {
-        setSelectedNodeId(null);
-      }
+      editor.deleteNode(nodeId);
+      if (selectedNodeId === nodeId) setSelectedNodeId(null);
     },
-    [selectedNodeId, setPractice],
+    [editor, selectedNodeId],
   );
 
-  const moveNodeInFlow = useCallback(
-    (nodeId: string, direction: "up" | "down") => {
-      setPractice((prev) => {
-        // Find the sibling to swap with
-        const siblingEdge =
-          direction === "up"
-            ? prev.edges.find((e) => e.target === nodeId)
-            : prev.edges.find((e) => e.source === nodeId);
-        if (!siblingEdge) return prev;
-
-        const siblingId =
-          direction === "up" ? siblingEdge.source : siblingEdge.target;
-        // Don't swap with Start node
-        const sibling = prev.nodes.find((n) => n.id === siblingId);
-        if (!sibling || sibling.variant === "start") return prev;
-
-        // Swap positions
-        const node = prev.nodes.find((n) => n.id === nodeId);
-        if (!node) return prev;
-
-        const newNodes = prev.nodes.map((n) => {
-          if (n.id === nodeId) return { ...n, position: sibling.position };
-          if (n.id === siblingId) return { ...n, position: node.position };
-          return n;
-        });
-
-        // Swap edges: rewire so graph order matches visual order
-        // Before (up): ...→ sibling → node → ...
-        // After (up):  ...→ node → sibling → ...
-        const newEdges = prev.edges.map((e) => {
-          let source = e.source;
-          let target = e.target;
-          // Swap all references between the two nodes
-          if (source === nodeId) source = siblingId;
-          else if (source === siblingId) source = nodeId;
-          if (target === nodeId) target = siblingId;
-          else if (target === siblingId) target = nodeId;
-          return source === e.source && target === e.target
-            ? e
-            : { ...e, source, target };
-        });
-
-        return { ...prev, nodes: newNodes, edges: newEdges };
-      });
-    },
-    [setPractice],
-  );
-
-  const addDrillBetween = useCallback(
+  const handleAddDrillBetween = useCallback(
     (afterId: string, beforeId: string, drill: Drill) => {
-      const afterNode = nodes.find((n) => n.id === afterId);
-      const beforeNode = nodes.find((n) => n.id === beforeId);
-      if (!afterNode || !beforeNode) return;
-
-      const drillType: PracticeItemType = drill.tags.includes("warmup")
-        ? "warmup"
-        : drill.tags.includes("cooldown")
-          ? "cooldown"
-          : "drill";
-
-      const newNode: PracticeNode = {
-        id: nextId("node"),
-        type: drillType,
-        variant: "default",
-        drillId: drill.id,
-        label: drill.name,
-        durationMinutes: drill.durationMinutes,
-        notes: drill.subtitle,
-        groups: ["all"],
-        priority: "optional",
-        position: {
-          x: (afterNode.position.x + beforeNode.position.x) / 2,
-          y: (afterNode.position.y + beforeNode.position.y) / 2,
-        },
-      };
-
-      setPractice((prev) => {
-        // Remove edge between after and before
-        const newEdges = prev.edges.filter(
-          (e) => !(e.source === afterId && e.target === beforeId),
-        );
-        // Add edges: after -> new -> before
-        newEdges.push({
-          id: nextId("edge"),
-          source: afterId,
-          target: newNode.id,
-        });
-        newEdges.push({
-          id: nextId("edge"),
-          source: newNode.id,
-          target: beforeId,
-        });
-
-        return {
-          ...prev,
-          nodes: [...prev.nodes, newNode],
-          edges: newEdges,
-        };
-      });
-
-      setSelectedNodeId(newNode.id);
+      const newId = editor.addDrillBetween(afterId, beforeId, drill);
+      if (newId) setSelectedNodeId(newId);
     },
-    [nodes, setPractice],
+    [editor],
   );
 
-  const addDrillFromSidebar = useCallback(
-    (drill: Drill, type: PracticeItemType) => {
-      // Find the last node (node with no outgoing edges)
-      const sourcesSet = new Set(edges.map((e) => e.source));
-      const lastNode = nodes.find((n) => !sourcesSet.has(n.id));
-      const afterNode = lastNode ?? nodes.at(-1);
-
-      if (!afterNode) return;
-
-      const newNode: PracticeNode = {
-        id: nextId("node"),
-        type,
-        variant: "default",
-        drillId: drill.id,
-        label: drill.name,
-        durationMinutes: drill.durationMinutes,
-        notes: drill.subtitle,
-        groups: ["all"],
-        priority: "optional",
-        position: {
-          x: afterNode.position.x,
-          y: afterNode.position.y + 140,
-        },
-      };
-
-      setPractice((prev) => ({
-        ...prev,
-        nodes: [...prev.nodes, newNode],
-        edges: [
-          ...prev.edges,
-          {
-            id: nextId("edge"),
-            source: afterNode.id,
-            target: newNode.id,
-          },
-        ],
-      }));
-
-      setSelectedNodeId(newNode.id);
+  const handleAddDrillFromSidebar = useCallback(
+    (...args: Parameters<typeof editor.addDrillFromSidebar>) => {
+      const newId = editor.addDrillFromSidebar(...args);
+      if (newId) setSelectedNodeId(newId);
     },
-    [nodes, edges, setPractice],
-  );
-
-  const appendDrill = useCallback(
-    (drill: Drill) => {
-      const type: PracticeItemType = drill.tags.includes("warmup")
-        ? "warmup"
-        : drill.tags.includes("cooldown")
-          ? "cooldown"
-          : "drill";
-      addDrillFromSidebar(drill, type);
-    },
-    [addDrillFromSidebar],
-  );
-
-  const handleSplitCreate = useCallback(
-    (groups: string[]) => {
-      // Find the last node without outgoing edges
-      const sourcesSet = new Set(edges.map((e) => e.source));
-      const tailNodes = nodes.filter((n) => !sourcesSet.has(n.id));
-      const lastNode = tailNodes.at(-1) ?? nodes.at(-1);
-      if (!lastNode) return;
-
-      const splitNode: PracticeNode = {
-        id: nextId("node"),
-        type: "activity",
-        variant: "split",
-        drillId: null,
-        label: "Group Split",
-        durationMinutes: null,
-        notes: `Split into: ${groups.join(", ")}`,
-        groups: ["all"],
-        priority: "required",
-        position: {
-          x: lastNode.position.x,
-          y: lastNode.position.y + 140,
-        },
-      };
-
-      const newNodes: PracticeNode[] = [splitNode];
-      const newEdges: PracticeEdge[] = [
-        {
-          id: nextId("edge"),
-          source: lastNode.id,
-          target: splitNode.id,
-        },
-      ];
-
-      // Create a placeholder node for each group
-      const laneWidth = 280;
-      const totalWidth = groups.length * laneWidth;
-      const startX = splitNode.position.x - totalWidth / 2 + laneWidth / 2;
-
-      for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
-        if (!group) continue;
-        const laneNode: PracticeNode = {
-          id: nextId("node"),
-          type: "drill",
-          variant: "default",
-          drillId: null,
-          label: `${group} Drill`,
-          durationMinutes: 15,
-          notes: null,
-          groups: [group],
-          priority: "optional",
-          position: {
-            x: startX + i * laneWidth - 130 + 130,
-            y: splitNode.position.y + 160,
-          },
-        };
-        newNodes.push(laneNode);
-        newEdges.push({
-          id: nextId("edge"),
-          source: splitNode.id,
-          target: laneNode.id,
-          label: group,
-        });
-      }
-
-      setPractice((prev) => ({
-        ...prev,
-        nodes: [...prev.nodes, ...newNodes],
-        edges: [...prev.edges, ...newEdges],
-      }));
-    },
-    [nodes, edges, setPractice],
+    [editor],
   );
 
   const handleQuickGenerate = useCallback(
@@ -431,7 +108,7 @@ function PracticePlannerPage() {
       includeCooldown: boolean;
     }) => {
       const plan = generateQuickPlan(drills, options);
-      setPractice({
+      editor.setPractice({
         ...practice,
         name: "Quick Practice Plan",
         durationMinutes: options.durationMinutes,
@@ -439,229 +116,201 @@ function PracticePlannerPage() {
         edges: plan.edges,
       });
       setSelectedNodeId(null);
-
-      // Auto-center on the new plan
-      setTransform({ x: 500, y: 40, scale: 0.75 });
+      canvas.setTransform({ x: 500, y: 40, scale: 0.75 });
     },
-    [drills, practice, setPractice],
+    [drills, practice, editor, canvas],
   );
 
-  const handleOrganize = useCallback(() => {
-    const result = autoLayout(nodes, edges);
-    setPractice((prev) => ({
-      ...prev,
-      nodes: result.nodes,
-    }));
-  }, [nodes, edges, setPractice]);
-
-  const handleZoomToFit = useCallback(() => {
-    if (nodes.length === 0) return;
-    const minX = Math.min(...nodes.map((n) => n.position.x));
-    const maxX = Math.max(...nodes.map((n) => n.position.x)) + 260;
-    const minY = Math.min(...nodes.map((n) => n.position.y));
-    const maxY = Math.max(...nodes.map((n) => n.position.y)) + 100;
-
-    const contentW = maxX - minX;
-    const contentH = maxY - minY;
-    const viewW =
-      window.innerWidth -
-      (drillSidebarOpen ? 300 : 0) -
-      (selectedNode ? 340 : 0);
-    const viewH = window.innerHeight;
-
-    const scaleX = (viewW - 100) / contentW;
-    const scaleY = (viewH - 100) / contentH;
-    const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.25), 1.5);
-
-    const cx = (minX + maxX) / 2;
-    const cy = (minY + maxY) / 2;
-
-    setTransform({
-      x: viewW / 2 - cx * scale + (drillSidebarOpen ? 150 : 0),
-      y: viewH / 2 - cy * scale,
-      scale,
-    });
-  }, [nodes, drillSidebarOpen, selectedNode]);
-
-  const handleZoomIn = useCallback(() => {
-    setTransform((t) => ({
-      ...t,
-      scale: Math.min(2, t.scale * 1.2),
-    }));
-  }, []);
-
-  const handleZoomOut = useCallback(() => {
-    setTransform((t) => ({
-      ...t,
-      scale: Math.max(0.25, t.scale / 1.2),
-    }));
-  }, []);
-
-  // Keyboard shortcuts
-  // (Delete is handled via onKeyDown in parent — but we'll also catch it here)
-
-  // Filter out Start node from canvas — practice details are in the settings panel
+  // Derived
+  const totalMinutes = nodes.reduce(
+    (sum, n) => sum + (n.durationMinutes ?? 0),
+    0,
+  );
   const canvasNodes = nodes.filter((n) => n.variant !== "start");
   const canvasEdges = edges.filter((e) => {
     const startNode = nodes.find((n) => n.variant === "start");
-    if (!startNode) return true;
-    return e.source !== startNode.id && e.target !== startNode.id;
+    return (
+      !startNode || (e.source !== startNode.id && e.target !== startNode.id)
+    );
   });
 
   return (
-    <div className="flex h-dvh w-screen overflow-hidden bg-background">
-      {/* Drill Sidebar (left) */}
-      <DrillSidebar
-        drills={drills}
-        isOpen={drillSidebarOpen}
-        onClose={() => {
-          setDrillSidebarOpen(false);
-        }}
-        onAddDrill={addDrillFromSidebar}
-      />
+    <DrillsProvider drills={drills}>
+      <div className="flex h-dvh w-screen overflow-hidden bg-background">
+        {/* Drill Sidebar (left) */}
+        <DrillSidebar
+          isOpen={drillSidebarOpen}
+          onClose={() => {
+            setDrillSidebarOpen(false);
+          }}
+          onAddDrill={handleAddDrillFromSidebar}
+        />
 
-      {/* Main canvas area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <header className="flex items-center justify-between h-12 px-4 border-b border-border bg-card flex-shrink-0 z-10">
-          <div className="flex items-center gap-3">
-            <Button
-              variant={drillSidebarOpen ? "default" : "outline"}
-              onClick={() => {
-                setDrillSidebarOpen((v) => !v);
-              }}
-            >
-              <Library />
-              Drills
-            </Button>
+        {/* Main canvas area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <PlannerToolbar
+            practice={practice}
+            totalMinutes={totalMinutes}
+            blockCount={canvasNodes.length}
+            drillSidebarOpen={drillSidebarOpen}
+            onToggleSidebar={() => {
+              setDrillSidebarOpen((v) => !v);
+            }}
+            onOpenSettings={openSettings}
+            onOpenSplit={() => {
+              setSplitModalOpen(true);
+            }}
+            onOpenQuickPlan={() => {
+              setQuickPlanOpen(true);
+            }}
+          />
 
-            <Separator orientation="vertical" className="h-5" />
-
-            <button
-              onClick={openSettings}
-              className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 hover:bg-accent transition-colors"
-            >
-              <h1 className="text-sm font-semibold text-foreground text-balance">
-                {practice.name}
-              </h1>
-              <Settings className="size-3 text-muted-foreground" />
-            </button>
-
-            {practice.durationMinutes ? (
-              <DurationIndicator
-                actual={totalMinutes}
-                target={practice.durationMinutes}
-                blocks={canvasNodes.length}
-              />
-            ) : (
-              <>
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  {totalMinutes} min
-                </span>
-                <span className="text-xs text-muted-foreground/50 tabular-nums">
-                  {canvasNodes.length} blocks
-                </span>
-              </>
-            )}
+          <div className="flex-1 overflow-hidden">
+            <Canvas
+              nodes={canvasNodes}
+              edges={canvasEdges}
+              selectedNodeId={selectedNodeId}
+              transform={canvas.transform}
+              onTransformChange={canvas.setTransform}
+              onSelectNode={selectNode}
+              onUpdateNode={editor.updateNode}
+              onAddDrill={handleAddDrillBetween}
+              onAppendDrill={editor.appendDrill}
+            />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSplitModalOpen(true);
-              }}
-            >
-              <GitBranch />
-              Split
-            </Button>
-            <Button
-              onClick={() => {
-                setQuickPlanOpen(true);
-              }}
-            >
-              <Sparkles />
-              Quick Plan
-            </Button>
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+            <CanvasControls
+              scale={canvas.transform.scale}
+              onZoomIn={canvas.zoomIn}
+              onZoomOut={canvas.zoomOut}
+              onZoomToFit={canvas.zoomToFit}
+              onOrganize={canvas.organize}
+            />
           </div>
-        </header>
-
-        {/* Canvas */}
-        <div className="flex-1 overflow-hidden">
-          <Canvas
-            drills={drills}
-            nodes={canvasNodes}
-            edges={canvasEdges}
-            selectedNodeId={selectedNodeId}
-            transform={transform}
-            onTransformChange={setTransform}
-            onSelectNode={selectNode}
-            onUpdateNode={updateNode}
-            onAddDrill={addDrillBetween}
-            onAppendDrill={appendDrill}
-          />
         </div>
 
-        {/* Bottom Controls */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
-          <CanvasControls
-            scale={transform.scale}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onZoomToFit={handleZoomToFit}
-            onOrganize={handleOrganize}
+        {/* Right panel */}
+        {selectedNode && (
+          <ConfigPanel
+            node={selectedNode}
+            onUpdate={editor.updateNode}
+            onDelete={handleDeleteNode}
+            onMove={editor.moveNodeInFlow}
+            canMoveUp={canvasEdges.some((e) => e.target === selectedNode.id)}
+            canMoveDown={canvasEdges.some((e) => e.source === selectedNode.id)}
+            onClose={() => {
+              selectNode(null);
+            }}
           />
-        </div>
+        )}
+        {!selectedNode && settingsOpen && (
+          <PracticeSettings
+            practice={practice}
+            totalMinutes={totalMinutes}
+            blockCount={canvasNodes.length}
+            onUpdate={editor.updatePractice}
+            onClose={() => {
+              setSettingsOpen(false);
+            }}
+          />
+        )}
+
+        {/* Modals */}
+        <SplitNodeModal
+          isOpen={splitModalOpen}
+          onClose={() => {
+            setSplitModalOpen(false);
+          }}
+          onConfirm={editor.addSplit}
+        />
+        <QuickPlanModal
+          isOpen={quickPlanOpen}
+          onClose={() => {
+            setQuickPlanOpen(false);
+          }}
+          onGenerate={handleQuickGenerate}
+        />
+      </div>
+    </DrillsProvider>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function PlannerToolbar({
+  practice,
+  totalMinutes,
+  blockCount,
+  drillSidebarOpen,
+  onToggleSidebar,
+  onOpenSettings,
+  onOpenSplit,
+  onOpenQuickPlan,
+}: {
+  practice: { name: string; durationMinutes: number | null };
+  totalMinutes: number;
+  blockCount: number;
+  drillSidebarOpen: boolean;
+  onToggleSidebar: () => void;
+  onOpenSettings: () => void;
+  onOpenSplit: () => void;
+  onOpenQuickPlan: () => void;
+}) {
+  return (
+    <header className="flex items-center justify-between h-12 px-4 border-b border-border bg-card flex-shrink-0 z-10">
+      <div className="flex items-center gap-3">
+        <Button
+          variant={drillSidebarOpen ? "default" : "outline"}
+          onClick={onToggleSidebar}
+        >
+          <Library />
+          Drills
+        </Button>
+
+        <Separator orientation="vertical" className="h-5" />
+
+        <button
+          onClick={onOpenSettings}
+          className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 hover:bg-accent transition-colors"
+        >
+          <h1 className="text-sm font-semibold text-foreground text-balance">
+            {practice.name}
+          </h1>
+          <Settings className="size-3 text-muted-foreground" />
+        </button>
+
+        {practice.durationMinutes ? (
+          <DurationIndicator
+            actual={totalMinutes}
+            target={practice.durationMinutes}
+            blocks={blockCount}
+          />
+        ) : (
+          <>
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {totalMinutes} min
+            </span>
+            <span className="text-xs text-muted-foreground/50 tabular-nums">
+              {blockCount} blocks
+            </span>
+          </>
+        )}
       </div>
 
-      {/* Right panel — node config or practice settings */}
-      {selectedNode && (
-        <ConfigPanel
-          drills={drills}
-          node={selectedNode}
-          onUpdate={updateNode}
-          onDelete={deleteNode}
-          onMove={moveNodeInFlow}
-          canMoveUp={(() => {
-            const incoming = canvasEdges.find(
-              (e) => e.target === selectedNode.id,
-            );
-            return !!incoming;
-          })()}
-          canMoveDown={canvasEdges.some((e) => e.source === selectedNode.id)}
-          onClose={() => {
-            selectNode(null);
-          }}
-        />
-      )}
-      {!selectedNode && settingsOpen && (
-        <PracticeSettings
-          practice={practice}
-          totalMinutes={totalMinutes}
-          blockCount={canvasNodes.length}
-          onUpdate={updatePractice}
-          onClose={() => {
-            setSettingsOpen(false);
-          }}
-        />
-      )}
-
-      {/* Modals */}
-      <SplitNodeModal
-        isOpen={splitModalOpen}
-        onClose={() => {
-          setSplitModalOpen(false);
-        }}
-        onConfirm={handleSplitCreate}
-      />
-      <QuickPlanModal
-        isOpen={quickPlanOpen}
-        onClose={() => {
-          setQuickPlanOpen(false);
-        }}
-        onGenerate={handleQuickGenerate}
-      />
-    </div>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onOpenSplit}>
+          <GitBranch />
+          Split
+        </Button>
+        <Button onClick={onOpenQuickPlan}>
+          <Sparkles />
+          Quick Plan
+        </Button>
+      </div>
+    </header>
   );
 }
 
