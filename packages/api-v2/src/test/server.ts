@@ -86,7 +86,9 @@ export async function startTestServer(): Promise<TestServer> {
         : await new Promise<Buffer>((resolve, reject) => {
             const chunks: Buffer[] = [];
             req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () =>{  resolve(Buffer.concat(chunks)); });
+            req.on("end", () => {
+              resolve(Buffer.concat(chunks));
+            });
             req.on("error", reject);
           });
 
