@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PracticeNewRouteImport } from './routes/practice/new'
 import { Route as PracticeIdRouteImport } from './routes/practice/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PracticeNewRoute = PracticeNewRouteImport.update({
+  id: '/practice/new',
+  path: '/practice/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeIdRoute = PracticeIdRouteImport.update({
@@ -26,27 +32,31 @@ const PracticeIdRoute = PracticeIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/practice/new': typeof PracticeNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/practice/new': typeof PracticeNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/practice/new': typeof PracticeNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/practice/$id'
+  fullPaths: '/' | '/practice/$id' | '/practice/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/practice/$id'
-  id: '__root__' | '/' | '/practice/$id'
+  to: '/' | '/practice/$id' | '/practice/new'
+  id: '__root__' | '/' | '/practice/$id' | '/practice/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PracticeIdRoute: typeof PracticeIdRoute
+  PracticeNewRoute: typeof PracticeNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/practice/new': {
+      id: '/practice/new'
+      path: '/practice/new'
+      fullPath: '/practice/new'
+      preLoaderRoute: typeof PracticeNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice/$id': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PracticeIdRoute: PracticeIdRoute,
+  PracticeNewRoute: PracticeNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
