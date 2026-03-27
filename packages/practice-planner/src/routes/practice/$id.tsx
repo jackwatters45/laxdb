@@ -1,12 +1,18 @@
 import { RpcApiClient } from "@laxdb/api-v2/client";
+import {
+  PracticeItemPriority as PracticeItemPrioritySchema,
+  PracticeItemType as PracticeItemTypeSchema,
+  PracticeItemVariant as PracticeItemVariantSchema,
+  PracticeStatus as PracticeStatusSchema,
+} from "@laxdb/core-v2/practice/practice.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { Sparkles, Library, GitBranch, Settings } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { Canvas } from "@/components/canvas";
 import { CanvasControls } from "@/components/canvas-controls";
@@ -15,13 +21,14 @@ import { DrillSidebar } from "@/components/drill-sidebar";
 import { PracticeSettings } from "@/components/practice-settings";
 import { QuickPlanModal } from "@/components/quick-plan-modal";
 import { SplitNodeModal } from "@/components/split-node";
-import { SAMPLE_PRACTICE } from "@/data/mock";
 import { useCanvasControls } from "@/hooks/use-canvas-controls";
 import { DrillsProvider } from "@/hooks/use-drills";
 import { usePracticeEditor } from "@/hooks/use-practice-editor";
+import { usePracticePersistence } from "@/hooks/use-practice-persistence";
 import { runApi } from "@/lib/api";
+import { fromDb } from "@/lib/practice-mapper";
 import { generateQuickPlan } from "@/lib/quick-plan";
-import type { Drill, DrillCategory } from "@/types";
+import type { Drill, DrillCategory, PracticeNode } from "@/types";
 
 const loadDrills = createServerFn({ method: "GET" }).handler(() =>
   runApi(
@@ -32,19 +39,164 @@ const loadDrills = createServerFn({ method: "GET" }).handler(() =>
   ),
 );
 
+const SaveItemFields = {
+  type: PracticeItemTypeSchema,
+  variant: Schema.optional(PracticeItemVariantSchema),
+  drillPublicId: Schema.optional(Schema.NullOr(Schema.String)),
+  label: Schema.optional(Schema.NullOr(Schema.String)),
+  durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),
+  notes: Schema.optional(Schema.NullOr(Schema.String)),
+  groups: Schema.optional(Schema.Array(Schema.String)),
+  orderIndex: Schema.optional(Schema.Number),
+  positionX: Schema.optional(Schema.NullOr(Schema.Number)),
+  positionY: Schema.optional(Schema.NullOr(Schema.Number)),
+  priority: Schema.optional(PracticeItemPrioritySchema),
+};
+
+const SavePracticeInput = Schema.Struct({
+  practiceId: Schema.String,
+  practice: Schema.Struct({
+    name: Schema.String,
+    date: Schema.NullOr(Schema.String),
+    description: Schema.NullOr(Schema.String),
+    notes: Schema.NullOr(Schema.String),
+    durationMinutes: Schema.NullOr(Schema.Number),
+    location: Schema.NullOr(Schema.String),
+    status: PracticeStatusSchema,
+  }),
+  addedItems: Schema.Array(Schema.Struct(SaveItemFields)),
+  updatedItems: Schema.Array(
+    Schema.Struct({ publicId: Schema.String, ...SaveItemFields }),
+  ),
+  removedItemIds: Schema.Array(Schema.String),
+  orderedIds: Schema.Array(Schema.String),
+});
+
+const savePractice = createServerFn({ method: "POST" })
+  .inputValidator((data: typeof SavePracticeInput.Type) =>
+    Schema.decodeSync(SavePracticeInput)(data),
+  )
+  .handler(({ data }) =>
+    runApi(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+
+        // Update practice metadata
+        yield* client.PracticeUpdate({
+          publicId: data.practiceId,
+          name: data.practice.name,
+          date: data.practice.date ? new Date(data.practice.date) : undefined,
+          description: data.practice.description,
+          notes: data.practice.notes,
+          durationMinutes: data.practice.durationMinutes,
+          location: data.practice.location,
+        });
+
+        // Remove deleted items
+        for (const id of data.removedItemIds) {
+          yield* client.PracticeRemoveItem({ publicId: id });
+        }
+
+        // Add new items
+        for (const item of data.addedItems) {
+          yield* client.PracticeAddItem({
+            practicePublicId: data.practiceId,
+            ...item,
+          });
+        }
+
+        // Update existing items
+        for (const item of data.updatedItems) {
+          yield* client.PracticeUpdateItem(item);
+        }
+      }),
+    ),
+  );
+
+const loadPractice = createServerFn({ method: "GET" })
+  .inputValidator((data: { id: string }) => data)
+  .handler(({ data }) =>
+    runApi(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const [practice, items] = yield* Effect.all([
+          client.PracticeGet({ publicId: data.id }),
+          client.PracticeListItems({ practicePublicId: data.id }),
+        ]);
+        return { practice, items };
+      }),
+    ),
+  );
+
 export const Route = createFileRoute("/practice/$id")({
   component: PracticePlannerPage,
+  loader: ({ params }) => loadPractice({ data: { id: params.id } }),
 });
 
 function PracticePlannerPage() {
+  const { practice: dbPractice, items: dbItems } = Route.useLoaderData();
+
   const { data: drills = [] } = useQuery({
     queryKey: ["drills"],
     queryFn: () => loadDrills(),
   });
 
+  // Convert DB data to canvas graph
+  const initialGraph = useMemo(
+    () => fromDb(dbPractice, dbItems),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount
+    [],
+  );
+
   // Core editor state
-  const editor = usePracticeEditor(SAMPLE_PRACTICE);
+  const editor = usePracticeEditor(initialGraph);
   const { practice, nodes, edges } = editor;
+
+  // Auto-save
+  const { saving, lastSaved } = usePracticePersistence({
+    practice,
+    initialNodes: initialGraph.nodes,
+    buildPayload: (current, knownIds) => {
+      const nodeToItem = (n: PracticeNode) => ({
+        type: n.type,
+        variant: n.variant === "start" ? ("default" as const) : n.variant,
+        drillPublicId: n.drillId,
+        label: n.label,
+        durationMinutes: n.durationMinutes,
+        notes: n.notes,
+        groups: [...n.groups],
+        positionX: Math.round(n.position.x),
+        positionY: Math.round(n.position.y),
+        priority: n.priority,
+      });
+
+      return {
+        practiceId: current.id,
+        practice: {
+          name: current.name,
+          date: current.date,
+          description: current.description,
+          notes: current.notes,
+          durationMinutes: current.durationMinutes,
+          location: current.location,
+          status: current.status,
+        },
+        addedItems: current.nodes
+          .filter((n) => !knownIds.has(n.id))
+          .map((n, i) => ({ ...nodeToItem(n), orderIndex: i })),
+        updatedItems: current.nodes
+          .filter((n) => knownIds.has(n.id))
+          .map((n, i) => ({ publicId: n.id, ...nodeToItem(n), orderIndex: i })),
+        removedItemIds: [...knownIds].filter(
+          (id) => !current.nodes.some((n) => n.id === id),
+        ),
+        orderedIds: current.nodes
+          .filter((n) => knownIds.has(n.id))
+          .map((n) => n.id),
+      };
+    },
+    onSave: (payload) => savePractice({ data: payload }),
+  });
 
   // UI state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -152,6 +304,8 @@ function PracticePlannerPage() {
             practice={practice}
             totalMinutes={totalMinutes}
             blockCount={canvasNodes.length}
+            saving={saving}
+            lastSaved={lastSaved}
             drillSidebarOpen={drillSidebarOpen}
             onToggleSidebar={() => {
               setDrillSidebarOpen((v) => !v);
@@ -173,7 +327,8 @@ function PracticePlannerPage() {
               transform={canvas.transform}
               onTransformChange={canvas.setTransform}
               onSelectNode={selectNode}
-              onUpdateNode={editor.updateNode}
+              onDragNode={editor.updateNodeRaw}
+              onDragEnd={editor.commitDrag}
               onAddDrill={handleAddDrillBetween}
               onAppendDrill={editor.appendDrill}
             />
@@ -244,6 +399,8 @@ function PlannerToolbar({
   practice,
   totalMinutes,
   blockCount,
+  saving,
+  lastSaved,
   drillSidebarOpen,
   onToggleSidebar,
   onOpenSettings,
@@ -253,6 +410,8 @@ function PlannerToolbar({
   practice: { name: string; durationMinutes: number | null };
   totalMinutes: number;
   blockCount: number;
+  saving: boolean;
+  lastSaved: Date | null;
   drillSidebarOpen: boolean;
   onToggleSidebar: () => void;
   onOpenSettings: () => void;
@@ -301,6 +460,13 @@ function PlannerToolbar({
       </div>
 
       <div className="flex items-center gap-2">
+        <span className="text-[11px] text-muted-foreground/50">
+          {saving
+            ? "Saving…"
+            : lastSaved
+              ? `Saved ${lastSaved.toLocaleTimeString()}`
+              : ""}
+        </span>
         <Button variant="outline" onClick={onOpenSplit}>
           <GitBranch />
           Split

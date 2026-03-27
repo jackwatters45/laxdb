@@ -21,7 +21,15 @@ interface CanvasProps {
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
-  onUpdateNode: (nodeId: string, updates: Partial<PracticeNode>) => void;
+  onDragNode: (
+    nodeId: string,
+    updates: { position: { x: number; y: number } },
+  ) => void;
+  onDragEnd: (
+    nodeId: string,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+  ) => void;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
   onAppendDrill: (drill: Drill) => void;
 }
@@ -33,7 +41,8 @@ export function Canvas({
   transform,
   onTransformChange,
   onSelectNode,
-  onUpdateNode,
+  onDragNode,
+  onDragEnd,
   onAddDrill,
   onAppendDrill,
 }: CanvasProps) {
@@ -52,7 +61,8 @@ export function Canvas({
     transform,
     onTransformChange,
     onSelectNode,
-    onUpdateNode,
+    onDragNode,
+    onDragEnd,
     containerRef,
   });
 
