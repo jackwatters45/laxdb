@@ -1,4 +1,3 @@
-import { PracticeDefaultsService } from "@laxdb/core-v2/practice/practice-defaults.service";
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
 
@@ -9,7 +8,6 @@ import { PracticeRpcs } from "./practice.rpc";
 export const PracticeRpcHandlers = PracticeRpcs.toLayer(
   Effect.gen(function* () {
     const service = yield* PracticeService;
-    const defaultsService = yield* PracticeDefaultsService;
 
     return withRpcLogging({
       PracticeList: () => service.list(),
@@ -27,11 +25,6 @@ export const PracticeRpcHandlers = PracticeRpcs.toLayer(
       PracticeGetReview: (payload) => service.getReview(payload),
       PracticeCreateReview: (payload) => service.createReview(payload),
       PracticeUpdateReview: (payload) => service.updateReview(payload),
-      PracticeGetDefaults: () => defaultsService.get(),
-      PracticeUpsertDefaults: (payload) => defaultsService.upsert(payload),
     });
   }),
-).pipe(
-  Layer.provide(PracticeService.layer),
-  Layer.provide(PracticeDefaultsService.layer),
-);
+).pipe(Layer.provide(PracticeService.layer));

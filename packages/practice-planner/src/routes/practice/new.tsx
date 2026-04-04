@@ -19,6 +19,7 @@ import { ArrowLeft, Calendar, Clock, MapPin, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
+import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -28,7 +29,8 @@ const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
       const client = yield* RpcApiClient;
-      return yield* client.PracticeGetDefaults();
+      const values = yield* client.DefaultsGetNamespace(practiceDefaultsScope);
+      return decodePracticeDefaults(values);
     }),
   ),
 );
@@ -112,9 +114,9 @@ function NewPracticePage() {
 
   const [date, setDate] = useState("");
   const [duration, setDuration] = useState(
-    defaults?.durationMinutes?.toString() ?? "",
+    defaults.durationMinutes?.toString() ?? "",
   );
-  const [location, setLocation] = useState(defaults?.location ?? "");
+  const [location, setLocation] = useState(defaults.location ?? "");
   const [description, setDescription] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("blank");
 

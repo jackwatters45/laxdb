@@ -1,4 +1,3 @@
-import { PracticeDefaultsContract } from "@laxdb/core-v2/practice/practice-defaults.contract";
 import { PracticeContract } from "@laxdb/core-v2/practice/practice.contract";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
@@ -82,17 +81,5 @@ export class PracticeRpcs extends RpcGroup.make(
     success: PracticeContract.updateReview.success,
     error: PracticeContract.updateReview.error,
     payload: PracticeContract.updateReview.payload,
-  }),
-
-  // Practice defaults
-  Rpc.make("PracticeGetDefaults", {
-    success: PracticeDefaultsContract.get.success,
-    error: PracticeDefaultsContract.get.error,
-    payload: PracticeDefaultsContract.get.payload,
-  }),
-  Rpc.make("PracticeUpsertDefaults", {
-    success: PracticeDefaultsContract.upsert.success,
-    error: PracticeDefaultsContract.upsert.error,
-    payload: PracticeDefaultsContract.upsert.payload,
   }),
 ) {}

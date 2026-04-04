@@ -12,11 +12,12 @@ import { HttpRouter, HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
+import { DefaultsRpcHandlers } from "../defaults/defaults.rpc-handlers";
 import { LaxdbApiV2 } from "../definition";
 import { DrillsHandlersLive } from "../drill/drill.handlers";
 import { DrillRpcHandlers } from "../drill/drill.rpc-handlers";
-import { PlayRpcHandlers } from "../play/play.rpc-handlers";
 import { PlaysHandlersLive } from "../play/play.handlers";
+import { PlayRpcHandlers } from "../play/play.rpc-handlers";
 import { PlayersHandlersLive } from "../player/player.handlers";
 import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
@@ -25,6 +26,7 @@ import { LaxdbRpcV2 } from "../rpc-group";
 
 // RPC handlers backed by test DB
 const TestRpcHandlers = Layer.mergeAll(
+  DefaultsRpcHandlers,
   DrillRpcHandlers,
   PlayRpcHandlers,
   PlayerRpcHandlers,
