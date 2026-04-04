@@ -1,0 +1,35 @@
+packages/cli/src/test/defaults.integration.test.ts
+  d2606a139bdafa3f 1-119
+packages/cli/src/test/practice.integration.test.ts
+  d2606a139bdafa3f 242-370
+packages/cli/src/play.ts
+  d2606a139bdafa3f 1-278
+packages/cli/src/test/server.ts
+  d2606a139bdafa3f 11,13,24,26
+packages/cli/src/defaults.ts
+  d2606a139bdafa3f 1-23,25-106
+packages/cli/src/test/play.integration.test.ts
+  d2606a139bdafa3f 1-148
+packages/cli/src/practice.ts
+  d2606a139bdafa3f 10-11,23,376-417,565-566
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "1d85a2243299c8725c692d6b842413c47caf8e8b",
+  "prompts": {
+    "d2606a139bdafa3f": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "a41a6b88-e12c-4914-a357-cc9ee2ac7a1b",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 852,
+      "total_deletions": 12,
+      "accepted_lines": 830,
+      "overriden_lines": 0
+    }
+  }
+}
