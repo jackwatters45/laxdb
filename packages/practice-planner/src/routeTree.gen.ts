@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DrillsIndexRouteImport } from './routes/drills/index'
 import { Route as PracticeNewRouteImport } from './routes/practice/new'
@@ -16,6 +17,11 @@ import { Route as PracticeIdRouteImport } from './routes/practice/$id'
 import { Route as DrillsNewRouteImport } from './routes/drills/new'
 import { Route as DrillsIdRouteImport } from './routes/drills/$id'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,6 +55,7 @@ const DrillsIdRoute = DrillsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/settings'
     | '/drills/$id'
     | '/drills/new'
     | '/practice/$id'
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/settings'
     | '/drills/$id'
     | '/drills/new'
     | '/practice/$id'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/settings'
     | '/drills/$id'
     | '/drills/new'
     | '/practice/$id'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SettingsRoute: typeof SettingsRoute
   DrillsIdRoute: typeof DrillsIdRoute
   DrillsNewRoute: typeof DrillsNewRoute
   PracticeIdRoute: typeof PracticeIdRoute
@@ -110,6 +123,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -157,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SettingsRoute: SettingsRoute,
   DrillsIdRoute: DrillsIdRoute,
   DrillsNewRoute: DrillsNewRoute,
   PracticeIdRoute: PracticeIdRoute,

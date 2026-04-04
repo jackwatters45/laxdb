@@ -147,25 +147,18 @@ function DrillsListPage() {
   );
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
-        <Link
-          to="/"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
+    <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
+      <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-foreground">Drill Bank</h1>
-        <div className="flex-1" />
         <Link to="/drills/new">
           <Button>
             <Plus />
             New Drill
           </Button>
         </Link>
-      </header>
+      </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
+      <div className="space-y-5">
         {/* Search & Filters */}
         <div className="space-y-3">
           <div className="relative max-w-sm">

@@ -22,7 +22,6 @@ import {
   MapPin,
   ChevronRight,
   Trash2,
-  Library,
 } from "lucide-react";
 
 import { runApi } from "@/lib/api";
@@ -69,27 +68,20 @@ function PracticeListPage() {
   const practices = Route.useLoaderData();
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center justify-between h-14 px-6 border-b border-border bg-card">
+    <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
-        <div className="flex-1" />
-        <Link to="/drills">
-          <Button variant="ghost">
-            <Library size={16} />
-            Drill Bank
-          </Button>
-        </Link>
         <Link to="/practice/new">
           <Button>
             <Plus />
             New Practice
           </Button>
         </Link>
-      </header>
+      </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div>
         {practices.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-muted-foreground text-pretty mb-4">

@@ -283,8 +283,8 @@ function DrillDetailPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
+    <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+      <div className="flex items-center gap-3">
         <Link
           to="/drills"
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -304,9 +304,9 @@ function DrillDetailPage() {
           <Pencil size={14} />
           Edit
         </Button>
-      </header>
+      </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+      <div className="space-y-6">
         {/* Header info */}
         <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
@@ -512,8 +512,8 @@ interface DrillEditViewProps {
 
 function DrillEditView(props: DrillEditViewProps) {
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
+    <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="flex items-center gap-3">
         <button
           onClick={props.onCancel}
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -529,9 +529,9 @@ function DrillEditView(props: DrillEditViewProps) {
           {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
           {props.saving ? "Saving…" : "Save"}
         </Button>
-      </header>
+      </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="space-y-8">
         <DrillFormFields {...props} />
       </div>
     </div>

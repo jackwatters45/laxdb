@@ -21,8 +21,17 @@ import { useState } from "react";
 import { runApi } from "@/lib/api";
 
 // ---------------------------------------------------------------------------
-// Server function
+// Server functions
 // ---------------------------------------------------------------------------
+
+const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
+  runApi(
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      return yield* client.PracticeGetDefaults();
+    }),
+  ),
+);
 
 // Client form shape — date is a string here, converted to Date in the handler.
 // The RPC uses core-v2's CreatePracticeInput which expects Date.
@@ -59,6 +68,7 @@ const createPractice = createServerFn({ method: "POST" })
 
 export const Route = createFileRoute("/practice/new")({
   component: NewPracticePage,
+  loader: () => loadDefaults(),
 });
 
 // ---------------------------------------------------------------------------
@@ -97,11 +107,14 @@ const TEMPLATES = [
 
 function NewPracticePage() {
   const navigate = useNavigate();
+  const defaults = Route.useLoaderData();
   const [creating, setCreating] = useState(false);
 
   const [date, setDate] = useState("");
-  const [duration, setDuration] = useState("");
-  const [location, setLocation] = useState("");
+  const [duration, setDuration] = useState(
+    defaults?.durationMinutes?.toString() ?? "",
+  );
+  const [location, setLocation] = useState(defaults?.location ?? "");
   const [description, setDescription] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("blank");
 
@@ -122,8 +135,8 @@ function NewPracticePage() {
   };
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
+    <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="flex items-center gap-3">
         <Link
           to="/"
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -131,9 +144,9 @@ function NewPracticePage() {
           <ArrowLeft size={18} />
         </Link>
         <h1 className="text-lg font-semibold text-foreground">New Practice</h1>
-      </header>
+      </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="space-y-8">
         {/* Details */}
         <FieldSet>
           <FieldLegend>Details</FieldLegend>
