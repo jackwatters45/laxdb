@@ -1,0 +1,25 @@
+packages/api-v2/src/rpc-logging.ts
+  72b1a1a6c7b08f89 1-37
+packages/api-v2/src/play/play.rpc-handlers.ts
+  72b1a1a6c7b08f89 4-5,12,18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "6bb33975a5cb222848ed402a3430fe3b6f26ac86",
+  "prompts": {
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 2,
+      "accepted_lines": 41,
+      "overriden_lines": 0
+    }
+  }
+}
