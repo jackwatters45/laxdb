@@ -1,0 +1,47 @@
+packages/practice-planner/src/routes/drills/index.tsx
+  f089a8dfab6efd0e 1-423
+packages/practice-planner/src/routes/drills/new.tsx
+  f089a8dfab6efd0e 1-208
+packages/practice-planner/src/lib/practice-name.ts
+  38800d5d471b320a 1-30
+packages/practice-planner/src/routes/practice/$id.tsx
+  38800d5d471b320a 30,408-410,440
+packages/practice-planner/src/routes/drills/$id.tsx
+  f089a8dfab6efd0e 1-833
+packages/practice-planner/src/routes/index.tsx
+  38800d5d471b320a 29,139,202
+  f089a8dfab6efd0e 25,77-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "bd9e6bbd1835ca9e14f36f8cd40172fa5d8e3f9d",
+  "prompts": {
+    "38800d5d471b320a": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "9ae6d38c-5f89-416c-83ac-6a1bdd93092c",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 43,
+      "total_deletions": 36,
+      "accepted_lines": 38,
+      "overriden_lines": 0
+    },
+    "f089a8dfab6efd0e": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "0de87e87-5022-4036-90dc-b78066495a25",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1472,
+      "overriden_lines": 0
+    }
+  }
+}
