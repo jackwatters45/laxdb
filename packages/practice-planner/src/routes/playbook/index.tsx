@@ -66,12 +66,10 @@ const deletePlay = createServerFn({ method: "POST" })
 // Route
 // ---------------------------------------------------------------------------
 
-export const Route = createFileRoute("/playbook/")(
-  {
-    component: PlaybookListPage,
-    loader: () => listPlays(),
-  },
-);
+export const Route = createFileRoute("/playbook/")({
+  component: PlaybookListPage,
+  loader: () => listPlays(),
+});
 
 // ---------------------------------------------------------------------------
 // Constants

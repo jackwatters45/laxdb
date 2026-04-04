@@ -72,11 +72,6 @@ function PracticeListPage() {
           Practice Plans
         </h1>
         <nav className="flex items-center gap-1 ml-4">
-          <Link to="/drills">
-            <Button variant="ghost" size="sm">
-              Drills
-            </Button>
-          </Link>
           <Link to="/playbook">
             <Button variant="ghost" size="sm">
               Playbook

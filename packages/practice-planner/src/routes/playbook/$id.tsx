@@ -415,7 +415,7 @@ export function PlayFormFields(props: {
               onChange={(e) => {
                 props.setName(e.target.value);
               }}
-              placeholder='e.g. 2-3-1 Slide'
+              placeholder="e.g. 2-3-1 Slide"
             />
           </div>
           <div>
