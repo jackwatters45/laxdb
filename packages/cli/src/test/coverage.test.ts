@@ -22,6 +22,13 @@ async function walk(dir: string): Promise<string[]> {
   return files.flat();
 }
 
+/**
+ * Extract all RPC names from the API source by matching Rpc.make("...") calls.
+ *
+ * Assumption: all RPCs use the string literal form `Rpc.make("Name", ...)`. If
+ * the codebase ever uses template literals or re-exported Rpc definitions this
+ * regex will miss them and the test will fail — update the pattern accordingly.
+ */
 async function getApiRpcNames() {
   const files = await walk(apiSrcRoot);
   const rpcFiles = files.filter((file) => file.endsWith(".rpc.ts"));

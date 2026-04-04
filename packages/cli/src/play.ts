@@ -14,7 +14,11 @@
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { RpcApiClient } from "@laxdb/api/client";
-import { CreatePlayInput, UpdatePlayInput } from "@laxdb/core/play/play.schema";
+import {
+  CreatePlayInput,
+  PlayCategory,
+  UpdatePlayInput,
+} from "@laxdb/core/play/play.schema";
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
@@ -26,16 +30,8 @@ const parseCsv = (csv: string) =>
     .map((value) => value.trim())
     .filter((value) => value.length > 0);
 
-const categoryChoices = [
-  "offense",
-  "defense",
-  "clear",
-  "ride",
-  "faceoff",
-  "emo",
-  "man-down",
-  "transition",
-] as const;
+// Derived from core schema — stays in sync automatically
+const categoryChoices = PlayCategory.literals;
 
 const formationFlag = Flag.string("formation").pipe(
   Flag.withDescription("Formation or alignment"),
@@ -108,6 +104,7 @@ const createCommand = Command.make(
     Effect.gen(function* () {
       const client = yield* RpcApiClient;
       const tagValues = Option.map(opts.tags, parseCsv);
+      // Create uses getOrNull: schema requires string | null (null = "no value")
       const play = yield* client.PlayCreate({
         name: opts.name,
         category: opts.category,
@@ -147,6 +144,7 @@ const updateCommand = Command.make(
     Effect.gen(function* () {
       const client = yield* RpcApiClient;
       const tagValues = Option.map(opts.tags, parseCsv);
+      // Update uses getOrUndefined: undefined = "leave unchanged", null = "clear field"
       const play = yield* client.PlayUpdate({
         publicId: opts.publicId,
         name: Option.getOrUndefined(opts.name),
@@ -187,11 +185,11 @@ const bulkCreateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePlayInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const play = yield* client.PlayCreate(item);
-        results.push(play);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PlayCreate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -206,11 +204,11 @@ const bulkUpdateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePlayInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const play = yield* client.PlayUpdate(item);
-        results.push(play);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PlayUpdate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -225,11 +223,11 @@ const bulkDeleteCommand = Command.make(
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
-      const results = [];
-      for (const publicId of ids) {
-        const play = yield* client.PlayDelete({ publicId });
-        results.push(play);
-      }
+      const results = yield* Effect.forEach(
+        ids,
+        (publicId) => client.PlayDelete({ publicId }),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );

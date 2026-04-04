@@ -36,7 +36,7 @@ const valuesFlag = Flag.string("values").pipe(
   Flag.optional,
 );
 
-const decodeDefaultsValues = Schema.decodeUnknownSync(DefaultsValues);
+const decodeDefaultsValues = Schema.decodeUnknownEffect(DefaultsValues);
 
 const getCommand = Command.make(
   "get",
@@ -81,7 +81,7 @@ const patchCommand = Command.make(
               new Error(`Failed to parse --values JSON: ${String(error)}`),
           }),
       });
-      const values = decodeDefaultsValues(rawValues);
+      const values = yield* decodeDefaultsValues(rawValues);
       const updated = yield* client.DefaultsPatchNamespace({
         scopeType: opts.scopeType,
         scopeId: opts.scopeId,

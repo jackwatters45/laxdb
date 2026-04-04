@@ -30,7 +30,7 @@ import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 // Helpers
 // ---------------------------------------------------------------------------
 
-const decodePracticeEdges = Schema.decodeUnknownSync(
+const decodePracticeEdges = Schema.decodeUnknownEffect(
   Schema.Array(PracticeEdgeInput),
 );
 
@@ -416,7 +416,7 @@ const replaceEdgesCommand = Command.make(
               new Error(`Failed to parse --edges JSON: ${String(error)}`),
           }),
       });
-      const edges = decodePracticeEdges(rawEdges);
+      const edges = yield* decodePracticeEdges(rawEdges);
       const replaced = yield* client.PracticeReplaceEdges({
         practicePublicId: opts.practiceId,
         edges,
@@ -509,11 +509,11 @@ const bulkCreateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePracticeInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const practice = yield* client.PracticeCreate(item);
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PracticeCreate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -528,11 +528,11 @@ const bulkUpdateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePracticeInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const practice = yield* client.PracticeUpdate(item);
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PracticeUpdate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -547,11 +547,11 @@ const bulkDeleteCommand = Command.make(
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
-      const results = [];
-      for (const publicId of ids) {
-        const practice = yield* client.PracticeDelete({ publicId });
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        ids,
+        (publicId) => client.PracticeDelete({ publicId }),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );

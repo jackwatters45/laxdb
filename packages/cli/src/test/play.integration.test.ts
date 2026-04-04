@@ -138,7 +138,7 @@ describe("Play RPC", () => {
     expect(remaining).toHaveLength(0);
   });
 
-  it("get nonexistent play fails", async () => {
+  it("get nonexistent play fails with NotFoundError", async () => {
     await expect(
       run(
         Effect.gen(function* () {
@@ -146,6 +146,6 @@ describe("Play RPC", () => {
           return yield* client.PlayGet({ publicId: "AbCdEfGhIjKl" });
         }),
       ),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({ _tag: "NotFoundError", domain: "Play" });
   });
 });
