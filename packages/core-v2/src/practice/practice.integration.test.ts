@@ -356,6 +356,108 @@ describe("PracticeService integration", () => {
       }),
     ));
 
+  it("persists item variant and canvas position", () =>
+    run(
+      Effect.gen(function* () {
+        yield* truncateAll;
+        const svc = yield* PracticeService;
+
+        const practice = yield* svc.create(validCreatePractice());
+        const item = yield* svc.addItem(
+          validAddItem(practice.publicId, {
+            type: "activity",
+            variant: "split",
+            positionX: 120,
+            positionY: 240,
+          }),
+        );
+
+        expect(item.variant).toBe("split");
+        expect(item.positionX).toBe(120);
+        expect(item.positionY).toBe(240);
+
+        yield* svc.updateItem({
+          publicId: item.publicId,
+          variant: "default",
+          positionX: 360,
+          positionY: 480,
+        });
+
+        const items = yield* svc.listItems({
+          practicePublicId: practice.publicId,
+        });
+        const persisted = items[0];
+
+        expect(persisted?.variant).toBe("default");
+        expect(persisted?.positionX).toBe(360);
+        expect(persisted?.positionY).toBe(480);
+      }),
+    ));
+
+  it("replaces persisted practice edges", () =>
+    run(
+      Effect.gen(function* () {
+        yield* truncateAll;
+        const svc = yield* PracticeService;
+
+        const practice = yield* svc.create(validCreatePractice());
+        const warmup = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "warmup", orderIndex: 0 }),
+        );
+        const split = yield* svc.addItem(
+          validAddItem(practice.publicId, {
+            type: "activity",
+            variant: "split",
+            orderIndex: 1,
+          }),
+        );
+        const drill = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "drill", orderIndex: 2 }),
+        );
+
+        const replaced = yield* svc.replaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: warmup.publicId,
+              targetPublicId: split.publicId,
+              label: null,
+            },
+            {
+              sourcePublicId: split.publicId,
+              targetPublicId: drill.publicId,
+              label: "Offense",
+            },
+          ],
+        });
+
+        expect(replaced).toHaveLength(2);
+
+        const edges = yield* svc.listEdges({
+          practicePublicId: practice.publicId,
+        });
+
+        expect(
+          edges.map((edge) => ({
+            sourcePublicId: edge.sourcePublicId,
+            targetPublicId: edge.targetPublicId,
+            label: edge.label,
+          })),
+        ).toEqual([
+          {
+            sourcePublicId: warmup.publicId,
+            targetPublicId: split.publicId,
+            label: null,
+          },
+          {
+            sourcePublicId: split.publicId,
+            targetPublicId: drill.publicId,
+            label: "Offense",
+          },
+        ]);
+      }),
+    ));
+
   // NOTE: No FK cascade — deleting a practice does NOT auto-remove its items.
   // Items are orphaned. Consider adding ON DELETE CASCADE to the FK constraint
   // or implementing application-level cleanup in PracticeService.delete.

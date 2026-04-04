@@ -14,23 +14,27 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { LaxdbApiV2 } from "../definition";
 import { DrillsHandlersLive } from "../drill/drill.handlers";
-import { DrillHandlers } from "../drill/drill.rpc";
+import { DrillRpcHandlers } from "../drill/drill.rpc-handlers";
+import { PlayRpcHandlers } from "../play/play.rpc-handlers";
+import { PlaysHandlersLive } from "../play/play.handlers";
 import { PlayersHandlersLive } from "../player/player.handlers";
-import { PlayerHandlers } from "../player/player.rpc";
+import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
-import { PracticeHandlers } from "../practice/practice.rpc";
+import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
 import { LaxdbRpcV2 } from "../rpc-group";
 
 // RPC handlers backed by test DB
 const TestRpcHandlers = Layer.mergeAll(
-  DrillHandlers,
-  PlayerHandlers,
-  PracticeHandlers,
+  DrillRpcHandlers,
+  PlayRpcHandlers,
+  PlayerRpcHandlers,
+  PracticeRpcHandlers,
 ).pipe(Layer.provide(TestDatabaseLive));
 
 // HTTP API handlers backed by test DB
 const TestHttpHandlers = Layer.mergeAll(
   DrillsHandlersLive,
+  PlaysHandlersLive,
   PlayersHandlersLive,
   PracticesHandlersLive,
 ).pipe(Layer.provide(TestDatabaseLive));

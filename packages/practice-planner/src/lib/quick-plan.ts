@@ -17,7 +17,7 @@ interface QuickPlanResult {
 }
 
 /**
- * Generates a practice plan by selecting drills from the mock library
+ * Generates a practice plan by selecting drills from the library
  * and arranging them in a standard flow:
  *   Start -> Warm-up -> Drills -> Water Break -> More Drills -> Cool-down
  */

@@ -21,7 +21,15 @@ interface CanvasProps {
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
-  onUpdateNode: (nodeId: string, updates: Partial<PracticeNode>) => void;
+  onDragNode: (
+    nodeId: string,
+    updates: { position: { x: number; y: number } },
+  ) => void;
+  onDragEnd: (
+    nodeId: string,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+  ) => void;
   onAddDrill: (afterNodeId: string, beforeNodeId: string, drill: Drill) => void;
   onAppendDrill: (drill: Drill) => void;
 }
@@ -33,7 +41,8 @@ export function Canvas({
   transform,
   onTransformChange,
   onSelectNode,
-  onUpdateNode,
+  onDragNode,
+  onDragEnd,
   onAddDrill,
   onAppendDrill,
 }: CanvasProps) {
@@ -52,7 +61,8 @@ export function Canvas({
     transform,
     onTransformChange,
     onSelectNode,
-    onUpdateNode,
+    onDragNode,
+    onDragEnd,
     containerRef,
   });
 
@@ -81,7 +91,7 @@ export function Canvas({
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full overflow-hidden ${
+      className={`relative w-full h-full overflow-hidden ${
         isNodeBeingDragged || isPanning ? "cursor-grabbing" : "cursor-grab"
       }`}
       {...handlers}
@@ -92,6 +102,30 @@ export function Canvas({
         backgroundPosition: `${transform.x}px ${transform.y}px`,
       }}
     >
+      {nodes.length === 0 ? (
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card/80 px-6 py-5 text-center shadow-sm backdrop-blur">
+            <p className="text-sm font-medium text-foreground">
+              Start with your first drill
+            </p>
+            <p className="max-w-xs text-xs text-muted-foreground text-pretty">
+              Add a drill from your library or generate a quick plan to build the
+              practice structure.
+            </p>
+            <DrillPickerPopover onSelect={onAppendDrill}>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <Plus strokeWidth={2} />
+                Add first drill
+              </Button>
+            </DrillPickerPopover>
+          </div>
+        </div>
+      ) : null}
+
       <div
         data-canvas="true"
         className="origin-top-left"

@@ -68,6 +68,15 @@ export class PracticeItem extends Schema.Class<PracticeItem>("PracticeItem")({
   ...TimestampsSchema,
 }) {}
 
+export class PracticeEdge extends Schema.Class<PracticeEdge>("PracticeEdge")({
+  ...PublicIdSchema,
+  practicePublicId: NanoidSchema,
+  sourcePublicId: NanoidSchema,
+  targetPublicId: NanoidSchema,
+  label: Schema.NullOr(Schema.String),
+  ...TimestampsSchema,
+}) {}
+
 export class PracticeReview extends Schema.Class<PracticeReview>(
   "PracticeReview",
 )({
@@ -173,6 +182,27 @@ export class ReorderItemsInput extends Schema.Class<ReorderItemsInput>(
 )({
   practicePublicId: NanoidSchema,
   orderedIds: Schema.Array(NanoidSchema),
+}) {}
+
+export class PracticeEdgeInput extends Schema.Class<PracticeEdgeInput>(
+  "PracticeEdgeInput",
+)({
+  sourcePublicId: NanoidSchema,
+  targetPublicId: NanoidSchema,
+  label: Schema.optional(Schema.NullOr(Schema.String)),
+}) {}
+
+export class ListEdgesInput extends Schema.Class<ListEdgesInput>(
+  "ListEdgesInput",
+)({
+  practicePublicId: NanoidSchema,
+}) {}
+
+export class ReplaceEdgesInput extends Schema.Class<ReplaceEdgesInput>(
+  "ReplaceEdgesInput",
+)({
+  practicePublicId: NanoidSchema,
+  edges: Schema.Array(PracticeEdgeInput),
 }) {}
 
 // ---------------------------------------------------------------------------
