@@ -1,13 +1,15 @@
 import { PracticeService } from "@laxdb/core-v2/practice/practice.service";
 import { Effect, Layer } from "effect";
 
+import { withRpcLogging } from "../rpc-logging";
+
 import { PracticeRpcs } from "./practice.rpc";
 
 export const PracticeRpcHandlers = PracticeRpcs.toLayer(
   Effect.gen(function* () {
     const service = yield* PracticeService;
 
-    return {
+    return withRpcLogging({
       PracticeList: () => service.list(),
       PracticeGet: (payload) => service.get(payload),
       PracticeCreate: (payload) => service.create(payload),
@@ -21,6 +23,6 @@ export const PracticeRpcHandlers = PracticeRpcs.toLayer(
       PracticeGetReview: (payload) => service.getReview(payload),
       PracticeCreateReview: (payload) => service.createReview(payload),
       PracticeUpdateReview: (payload) => service.updateReview(payload),
-    };
+    });
   }),
 ).pipe(Layer.provide(PracticeService.layer));
