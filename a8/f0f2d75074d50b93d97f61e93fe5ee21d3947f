@@ -1,0 +1,49 @@
+packages/api-v2/src/rpc-logging.ts
+  f089a8dfab6efd0e 1-12,15-17,20-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "a8f0f2d75074d50b93d97f61e93fe5ee21d3947f",
+  "prompts": {
+    "38800d5d471b320a": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "9ae6d38c-5f89-416c-83ac-6a1bdd93092c",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "f089a8dfab6efd0e": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "0de87e87-5022-4036-90dc-b78066495a25",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 33,
+      "overriden_lines": 0
+    }
+  }
+}
