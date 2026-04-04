@@ -239,6 +239,135 @@ describe("Practice Items RPC", () => {
   });
 });
 
+describe("Practice Edges RPC", () => {
+  const minimalPractice = {
+    name: null,
+    date: null,
+    description: null,
+    notes: null,
+    durationMinutes: null,
+    location: null,
+  };
+
+  it("lists edges (empty)", async () => {
+    const edges = await run(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const practice = yield* client.PracticeCreate(minimalPractice);
+        return yield* client.PracticeListEdges({
+          practicePublicId: practice.publicId,
+        });
+      }),
+    );
+    expect(edges).toEqual([]);
+  });
+
+  it("replaces edges", async () => {
+    const edges = await run(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const practice = yield* client.PracticeCreate(minimalPractice);
+        const item1 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "warmup",
+        });
+        const item2 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "drill",
+        });
+        return yield* client.PracticeReplaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: item1.publicId,
+              targetPublicId: item2.publicId,
+            },
+          ],
+        });
+      }),
+    );
+    expect(edges).toHaveLength(1);
+    expect(edges[0].sourcePublicId).toBeTruthy();
+    expect(edges[0].targetPublicId).toBeTruthy();
+  });
+
+  it("replace edges clears previous edges", async () => {
+    const edges = await run(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const practice = yield* client.PracticeCreate(minimalPractice);
+        const item1 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "warmup",
+        });
+        const item2 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "drill",
+        });
+        const item3 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "cooldown",
+        });
+
+        // Set initial edges
+        yield* client.PracticeReplaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: item1.publicId,
+              targetPublicId: item2.publicId,
+            },
+          ],
+        });
+
+        // Replace with different edges
+        return yield* client.PracticeReplaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: item2.publicId,
+              targetPublicId: item3.publicId,
+              label: "next",
+            },
+          ],
+        });
+      }),
+    );
+    expect(edges).toHaveLength(1);
+    expect(edges[0].label).toBe("next");
+  });
+
+  it("list edges returns replaced edges", async () => {
+    const edges = await run(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const practice = yield* client.PracticeCreate(minimalPractice);
+        const item1 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "warmup",
+        });
+        const item2 = yield* client.PracticeAddItem({
+          practicePublicId: practice.publicId,
+          type: "drill",
+        });
+        yield* client.PracticeReplaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: item1.publicId,
+              targetPublicId: item2.publicId,
+            },
+          ],
+        });
+        return yield* client.PracticeListEdges({
+          practicePublicId: practice.publicId,
+        });
+      }),
+    );
+    expect(edges).toHaveLength(1);
+  });
+});
+
 describe("Practice Review RPC", () => {
   const minimalPractice = {
     name: null,

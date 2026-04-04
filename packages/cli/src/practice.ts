@@ -7,6 +7,8 @@
  *   bun src/practice.ts create --duration 120 --location "Main Field"
  *   bun src/practice.ts add-item <practiceId> --type drill --drill <drillId>
  *   bun src/practice.ts list-items <practiceId>
+ *   bun src/practice.ts list-edges <practiceId>
+ *   echo '[{"sourcePublicId":"...","targetPublicId":"..."}]' | bun src/practice.ts replace-edges <practiceId>
  *   bun src/practice.ts review <practiceId> --went-well "Good energy"
  *   bun src/practice.ts --base-url https://api.laxdb.io list
  *   LAXDB_API_URL=https://api.laxdb.io bun src/practice.ts list
@@ -18,6 +20,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { RpcApiClient } from "@laxdb/api/client";
 import {
   CreatePracticeInput,
+  PracticeEdgeInput,
   UpdatePracticeInput,
 } from "@laxdb/core/practice/practice.schema";
 import { Effect, Option, Schema } from "effect";
@@ -370,6 +373,49 @@ const reorderItemsCommand = Command.make(
 );
 
 // ---------------------------------------------------------------------------
+// Practice edges
+// ---------------------------------------------------------------------------
+
+const listEdgesCommand = Command.make(
+  "list-edges",
+  {
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ practiceId, pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const edges = yield* client.PracticeListEdges({
+        practicePublicId: practiceId,
+      });
+      yield* output(edges, pretty);
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
+);
+
+const replaceEdgesCommand = Command.make(
+  "replace-edges",
+  {
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ practiceId, pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const raw = yield* readStdin;
+      const edges = yield* Schema.decodeUnknownEffect(
+        Schema.Array(PracticeEdgeInput),
+      )(raw);
+      const result = yield* client.PracticeReplaceEdges({
+        practicePublicId: practiceId,
+        edges,
+      });
+      yield* output(result, pretty);
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
+);
+
+// ---------------------------------------------------------------------------
 // Practice review
 // ---------------------------------------------------------------------------
 
@@ -516,6 +562,8 @@ const practiceCommand = Command.make("practice").pipe(
     removeItemCommand,
     listItemsCommand,
     reorderItemsCommand,
+    listEdgesCommand,
+    replaceEdgesCommand,
     reviewCommand,
     getReviewCommand,
     bulkCreateCommand,
