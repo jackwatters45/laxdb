@@ -1,0 +1,25 @@
+packages/practice-planner/src/components/canvas.tsx
+  1afd96eae1e095f5 27-32,65
+packages/practice-planner/package.json
+  1afd96eae1e095f5 29-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "f76862bbd11f7905fd234c1ea6d421044806e52e",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 571,
+      "total_deletions": 0,
+      "accepted_lines": 571,
+      "overriden_lines": 0
+    }
+  }
+}
