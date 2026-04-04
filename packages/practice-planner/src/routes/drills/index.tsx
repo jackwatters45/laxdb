@@ -21,7 +21,6 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import {
-  ArrowLeft,
   Clock,
   Flame,
   Plus,

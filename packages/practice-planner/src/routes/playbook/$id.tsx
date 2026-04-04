@@ -12,10 +12,10 @@ import {
 } from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { ArrowLeft, Check, Loader2, Pencil, X } from "lucide-react";
+import { Check, Loader2, Pencil } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
@@ -203,42 +203,40 @@ function PlayDetailPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
-        <Link
-          to="/playbook"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <h1 className="text-lg font-semibold text-foreground truncate">
-          {play.name}
-        </h1>
-        <div className="flex-1" />
-        <Button
-          variant="outline"
-          onClick={() => {
-            setEditing(true);
-          }}
-        >
-          <Pencil size={14} />
-          Edit
-        </Button>
-      </header>
-
       <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
-        {/* Header info */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge
-              variant="secondary"
-              className={categoryColors[play.category]}
-            >
-              {play.category}
-            </Badge>
-            {play.formation && (
-              <Badge variant="outline">{play.formation}</Badge>
-            )}
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 space-y-3">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                {play.name}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Play reference, formation notes, and coaching context.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge
+                variant="secondary"
+                className={categoryColors[play.category]}
+              >
+                {play.category}
+              </Badge>
+              {play.formation && (
+                <Badge variant="outline">{play.formation}</Badge>
+              )}
+            </div>
           </div>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEditing(true);
+            }}
+          >
+            <Pencil size={14} />
+            Edit
+          </Button>
         </div>
 
         <Separator />
@@ -348,25 +346,32 @@ interface PlayEditViewProps {
 function PlayEditView(props: PlayEditViewProps) {
   return (
     <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
-        <button
-          onClick={props.onCancel}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X size={18} />
-        </button>
-        <h1 className="text-lg font-semibold text-foreground">Edit Play</h1>
-        <div className="flex-1" />
-        <Button variant="ghost" onClick={props.onCancel}>
-          Cancel
-        </Button>
-        <Button onClick={props.onSave} disabled={props.saving || !props.name}>
-          {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
-          {props.saving ? "Saving…" : "Save"}
-        </Button>
-      </header>
-
       <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Edit Play
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Update the details, links, and notes coaches use to teach this
+              set.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={props.onCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={props.onSave}
+              disabled={props.saving || !props.name}
+            >
+              {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
+              {props.saving ? "Saving…" : "Save"}
+            </Button>
+          </div>
+        </div>
+
         <PlayFormFields {...props} />
       </div>
     </div>
