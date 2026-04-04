@@ -67,10 +67,18 @@ function PracticeListPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="flex items-center justify-between h-14 px-6 border-b border-border bg-card">
+      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
+        <nav className="flex items-center gap-1 ml-4">
+          <Link to="/playbook">
+            <Button variant="ghost" size="sm">
+              Playbook
+            </Button>
+          </Link>
+        </nav>
+        <div className="flex-1" />
         <Button onClick={handleCreate} disabled={creating}>
           {creating ? <Loader2 className="animate-spin" /> : <Plus />}
           {creating ? "Creating…" : "New Practice"}
