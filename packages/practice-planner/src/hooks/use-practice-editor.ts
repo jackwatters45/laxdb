@@ -67,6 +67,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
   // --- Mutations ---
 
+  /** Update a node with undo tracking. */
   const updateNode = useCallback(
     (nodeId: string, updates: Partial<PracticeNode>) => {
       setPractice((prev) => ({
@@ -77,6 +78,50 @@ export function usePracticeEditor(initial: PracticeGraph) {
       }));
     },
     [setPractice],
+  );
+
+  /** Update a node without pushing to the undo stack (for drag moves). */
+  const updateNodeRaw = useCallback(
+    (nodeId: string, updates: Partial<PracticeNode>) => {
+      setPracticeRaw((prev) => ({
+        ...prev,
+        nodes: prev.nodes.map((n) =>
+          n.id === nodeId ? { ...n, ...updates } : n,
+        ),
+      }));
+    },
+    [],
+  );
+
+  /**
+   * Commit a node move to the undo stack after a drag completes.
+   * Records the before-position so undo restores correctly.
+   */
+  const commitDrag = useCallback(
+    (
+      nodeId: string,
+      from: { x: number; y: number },
+      to: { x: number; y: number },
+    ) => {
+      // Only commit if the position actually changed
+      if (from.x === to.x && from.y === to.y) return;
+
+      // Push current state (with the node at its final position) as a new undo entry,
+      // but the snapshot we push is the state *before* the drag started.
+      setPracticeRaw((current) => {
+        const beforeDrag: PracticeGraph = {
+          ...current,
+          nodes: current.nodes.map((n) =>
+            n.id === nodeId ? { ...n, position: from } : n,
+          ),
+        };
+        undoStack.current.push(beforeDrag);
+        if (undoStack.current.length > 50) undoStack.current.shift();
+        redoStack.current = [];
+        return current; // keep current state unchanged
+      });
+    },
+    [],
   );
 
   const updatePractice = useCallback(
@@ -318,6 +363,8 @@ export function usePracticeEditor(initial: PracticeGraph) {
     edges: practice.edges,
     setPractice,
     updateNode,
+    updateNodeRaw,
+    commitDrag,
     updatePractice,
     deleteNode,
     moveNodeInFlow,

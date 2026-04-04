@@ -1,12 +1,12 @@
+import { useMachine } from "@xstate/react";
 import {
-  useState,
-  useCallback,
-  useRef,
   useMemo,
+  useCallback,
+  type RefObject,
   type MouseEvent as ReactMouseEvent,
   type WheelEvent as ReactWheelEvent,
-  type RefObject,
 } from "react";
+import { setup, assign } from "xstate";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -28,16 +28,166 @@ interface UseCanvasInteractionsOptions<N extends Positionable> {
   transform: CanvasTransform;
   onTransformChange: (t: CanvasTransform) => void;
   onSelectNode: (nodeId: string | null) => void;
-  onUpdateNode: (
+  /** Called on every mousemove during a drag — bypasses undo. */
+  onDragNode: (
     nodeId: string,
     updates: { position: { x: number; y: number } },
+  ) => void;
+  /** Called once when a drag finishes — commits to undo stack. */
+  onDragEnd: (
+    nodeId: string,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
   ) => void;
   containerRef: RefObject<HTMLDivElement | null>;
   minScale?: number;
   maxScale?: number;
   zoomSensitivity?: number;
-  dragThreshold?: number;
 }
+
+const DRAG_THRESHOLD = 4;
+
+// ---------------------------------------------------------------------------
+// Machine context
+// ---------------------------------------------------------------------------
+
+interface MachineContext {
+  /** Node ID being interacted with (drag intent or active drag) */
+  nodeId: string | null;
+  /** Mouse position at the start of a node mousedown */
+  mouseStart: { x: number; y: number };
+  /** Node position at the start of a node mousedown (for undo) */
+  nodeStart: { x: number; y: number };
+  /** Current node position during drag (for undo commit on drop) */
+  nodeCurrent: { x: number; y: number };
+  /** Mouse position at the start (or last tick) of a canvas pan */
+  panMouseStart: { x: number; y: number };
+}
+
+// ---------------------------------------------------------------------------
+// Machine events
+// ---------------------------------------------------------------------------
+
+type MachineEvent =
+  | {
+      type: "NODE_MOUSEDOWN";
+      nodeId: string;
+      clientX: number;
+      clientY: number;
+      nodeX: number;
+      nodeY: number;
+    }
+  | { type: "CANVAS_MOUSEDOWN"; clientX: number; clientY: number }
+  | { type: "MOUSEMOVE"; clientX: number; clientY: number }
+  | { type: "MOUSEUP" }
+  | { type: "CANVAS_CLICK" };
+
+// ---------------------------------------------------------------------------
+// Machine definition
+// ---------------------------------------------------------------------------
+
+const canvasInteractionMachine = setup({
+  types: {
+    context: {} as MachineContext,
+    events: {} as MachineEvent,
+  },
+  guards: {
+    pastDragThreshold: ({ context, event }) => {
+      if (event.type !== "MOUSEMOVE") return false;
+      const dx = Math.abs(event.clientX - context.mouseStart.x);
+      const dy = Math.abs(event.clientY - context.mouseStart.y);
+      return dx + dy >= DRAG_THRESHOLD;
+    },
+  },
+}).createMachine({
+  id: "canvasInteraction",
+  initial: "idle",
+  context: {
+    nodeId: null,
+    mouseStart: { x: 0, y: 0 },
+    nodeStart: { x: 0, y: 0 },
+    nodeCurrent: { x: 0, y: 0 },
+    panMouseStart: { x: 0, y: 0 },
+  },
+  states: {
+    idle: {
+      on: {
+        NODE_MOUSEDOWN: {
+          target: "dragIntent",
+          actions: assign({
+            nodeId: ({ event }) => event.nodeId,
+            mouseStart: ({ event }) => ({
+              x: event.clientX,
+              y: event.clientY,
+            }),
+            nodeStart: ({ event }) => ({ x: event.nodeX, y: event.nodeY }),
+            nodeCurrent: ({ event }) => ({ x: event.nodeX, y: event.nodeY }),
+          }),
+        },
+        CANVAS_MOUSEDOWN: {
+          target: "panning",
+          actions: assign({
+            panMouseStart: ({ event }) => ({
+              x: event.clientX,
+              y: event.clientY,
+            }),
+          }),
+        },
+      },
+    },
+
+    dragIntent: {
+      on: {
+        MOUSEMOVE: [
+          {
+            guard: "pastDragThreshold",
+            target: "dragging",
+          },
+          // Below threshold — stay in dragIntent, don't update anything
+        ],
+        MOUSEUP: {
+          target: "idle",
+          // Mouseup without dragging = click to select (handled in hook)
+        },
+      },
+    },
+
+    dragging: {
+      on: {
+        MOUSEMOVE: {
+          actions: assign({
+            nodeCurrent: ({ context, event }) => ({
+              x: context.nodeStart.x + event.clientX - context.mouseStart.x,
+              y: context.nodeStart.y + event.clientY - context.mouseStart.y,
+            }),
+          }),
+        },
+        MOUSEUP: {
+          target: "idle",
+          actions: assign({
+            nodeId: () => null,
+          }),
+        },
+      },
+    },
+
+    panning: {
+      on: {
+        MOUSEMOVE: {
+          actions: assign({
+            panMouseStart: ({ event }) => ({
+              x: event.clientX,
+              y: event.clientY,
+            }),
+          }),
+        },
+        MOUSEUP: {
+          target: "idle",
+        },
+      },
+    },
+  },
+});
 
 // ---------------------------------------------------------------------------
 // Hook
@@ -48,25 +198,24 @@ export function useCanvasInteractions<N extends Positionable>({
   transform,
   onTransformChange,
   onSelectNode,
-  onUpdateNode,
+  onDragNode,
+  onDragEnd,
   containerRef,
   minScale = 0.25,
   maxScale = 2,
   zoomSensitivity = 0.001,
-  dragThreshold = 4,
 }: UseCanvasInteractionsOptions<N>) {
-  // Pan state
-  const [isPanning, setIsPanning] = useState(false);
-  const panStart = useRef({ x: 0, y: 0 });
-
-  // Node drag state
-  const [dragNodeId, setDragNodeId] = useState<string | null>(null);
-  const dragStart = useRef({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+  const [state, send] = useMachine(canvasInteractionMachine);
 
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
-  const isNodeBeingDragged = dragNodeId !== null && isDragging;
+  const isDragging = state.matches("dragging");
+  const isPanning = state.matches("panning");
+  const dragNodeId =
+    state.matches("dragging") || state.matches("dragIntent")
+      ? state.context.nodeId
+      : null;
+  const isNodeBeingDragged = isDragging && dragNodeId !== null;
 
   // --- Node: mousedown to start drag/select ---
 
@@ -78,16 +227,16 @@ export function useCanvasInteractions<N extends Positionable>({
       const node = nodeMap.get(nodeId);
       if (!node) return;
 
-      setDragNodeId(nodeId);
-      dragStart.current = {
-        mouseX: e.clientX,
-        mouseY: e.clientY,
+      send({
+        type: "NODE_MOUSEDOWN",
+        nodeId,
+        clientX: e.clientX,
+        clientY: e.clientY,
         nodeX: node.position.x,
         nodeY: node.position.y,
-      };
-      setIsDragging(false);
+      });
     },
-    [nodeMap],
+    [nodeMap, send],
   );
 
   // --- Canvas: mousedown to start pan ---
@@ -95,65 +244,80 @@ export function useCanvasInteractions<N extends Positionable>({
   const handleMouseDown = useCallback(
     (e: ReactMouseEvent) => {
       if (e.button === 0) {
-        setIsPanning(true);
-        panStart.current = {
-          x: e.clientX - transform.x,
-          y: e.clientY - transform.y,
-        };
+        send({
+          type: "CANVAS_MOUSEDOWN",
+          clientX: e.clientX,
+          clientY: e.clientY,
+        });
       }
     },
-    [transform.x, transform.y],
+    [send],
   );
 
   // --- Mousemove: drag node or pan canvas ---
 
   const handleMouseMove = useCallback(
     (e: ReactMouseEvent) => {
-      if (dragNodeId) {
-        const dx = e.clientX - dragStart.current.mouseX;
-        const dy = e.clientY - dragStart.current.mouseY;
+      const currentState = state.value;
 
-        if (!isDragging && Math.abs(dx) + Math.abs(dy) < dragThreshold) return;
-        setIsDragging(true);
+      if (currentState === "dragIntent" || currentState === "dragging") {
+        // Send event to machine for threshold detection + context update
+        send({ type: "MOUSEMOVE", clientX: e.clientX, clientY: e.clientY });
 
-        onUpdateNode(dragNodeId, {
-          position: {
-            x: dragStart.current.nodeX + dx / transform.scale,
-            y: dragStart.current.nodeY + dy / transform.scale,
-          },
-        });
+        // If we're in dragging (or just transitioned), update the node position
+        // We read from context directly for the position calculation
+        if (state.context.nodeId) {
+          const dx = e.clientX - state.context.mouseStart.x;
+          const dy = e.clientY - state.context.mouseStart.y;
+          const dist = Math.abs(dx) + Math.abs(dy);
+
+          // Only call onDragNode if past threshold (either already dragging or will be)
+          if (currentState === "dragging" || dist >= DRAG_THRESHOLD) {
+            onDragNode(state.context.nodeId, {
+              position: {
+                x: state.context.nodeStart.x + dx / transform.scale,
+                y: state.context.nodeStart.y + dy / transform.scale,
+              },
+            });
+          }
+        }
         return;
       }
 
-      if (isPanning) {
+      if (currentState === "panning") {
+        const dx = e.clientX - state.context.panMouseStart.x;
+        const dy = e.clientY - state.context.panMouseStart.y;
+        send({ type: "MOUSEMOVE", clientX: e.clientX, clientY: e.clientY });
         onTransformChange({
           ...transform,
-          x: e.clientX - panStart.current.x,
-          y: e.clientY - panStart.current.y,
+          x: transform.x + dx,
+          y: transform.y + dy,
         });
       }
     },
-    [
-      dragNodeId,
-      isDragging,
-      isPanning,
-      transform,
-      dragThreshold,
-      onTransformChange,
-      onUpdateNode,
-    ],
+    [state, send, transform, onTransformChange, onDragNode],
   );
 
-  // --- Mouseup: finish drag (select if click) or finish pan ---
+  // --- Mouseup: finish drag or finish pan ---
 
   const handleMouseUp = useCallback(() => {
-    if (dragNodeId) {
-      if (!isDragging) onSelectNode(dragNodeId);
-      setDragNodeId(null);
-      setIsDragging(false);
+    const currentState = state.value;
+
+    if (currentState === "dragIntent" && state.context.nodeId) {
+      // No drag happened — this is a click to select
+      onSelectNode(state.context.nodeId);
     }
-    setIsPanning(false);
-  }, [dragNodeId, isDragging, onSelectNode]);
+
+    if (currentState === "dragging" && state.context.nodeId) {
+      // Drag finished — commit to undo stack with start → end positions
+      const node = nodeMap.get(state.context.nodeId);
+      if (node) {
+        onDragEnd(state.context.nodeId, state.context.nodeStart, node.position);
+      }
+    }
+
+    send({ type: "MOUSEUP" });
+  }, [state, send, onSelectNode, onDragEnd, nodeMap]);
 
   // --- Wheel: Cmd+scroll = zoom, plain scroll = pan ---
 
