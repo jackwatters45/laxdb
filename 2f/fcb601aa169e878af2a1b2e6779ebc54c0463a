@@ -1,0 +1,59 @@
+packages/api-v2/src/play/play.handlers.ts
+  72b1a1a6c7b08f89 1-21
+packages/core-v2/src/play/play.contract.ts
+  72b1a1a6c7b08f89 1-51
+packages/core-v2/src/play/play.service.ts
+  72b1a1a6c7b08f89 1-105
+packages/core-v2/src/play/play.repo.ts
+  72b1a1a6c7b08f89 1-92
+packages/practice-planner/src/routes/playbook/index.tsx
+  72b1a1a6c7b08f89 1-359
+packages/practice-planner/src/routes/index.tsx
+  72b1a1a6c7b08f89 82-86
+packages/api-v2/src/rpc-logging.ts
+  72b1a1a6c7b08f89 1-37
+packages/practice-planner/src/routes/playbook/$id.tsx
+  72b1a1a6c7b08f89 1-542
+packages/practice-planner/src/types.ts
+  72b1a1a6c7b08f89 49
+packages/practice-planner/src/routes/playbook/new.tsx
+  72b1a1a6c7b08f89 1-151
+packages/api-v2/src/rpc-group.ts
+  72b1a1a6c7b08f89 4,10
+packages/api-v2/src/play/play.rpc-handlers.ts
+  72b1a1a6c7b08f89 1-20
+packages/core-v2/src/play/play.schema.ts
+  72b1a1a6c7b08f89 1-72
+packages/api-v2/src/play/play.rpc.ts
+  72b1a1a6c7b08f89 1-30
+packages/api-v2/src/play/play.api.ts
+  72b1a1a6c7b08f89 1-69
+packages/api-v2/src/groups/index.ts
+  72b1a1a6c7b08f89 5,11
+packages/api-v2/src/definition.ts
+  72b1a1a6c7b08f89 4,10
+packages/core-v2/src/play/play.sql.ts
+  72b1a1a6c7b08f89 1-45
+packages/api-v2/src/rpc-handlers.ts
+  72b1a1a6c7b08f89 5,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "2ffcb601aa169e878af2a1b2e6779ebc54c0463a",
+  "prompts": {
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 2,
+      "accepted_lines": 1608,
+      "overriden_lines": 0
+    }
+  }
+}
