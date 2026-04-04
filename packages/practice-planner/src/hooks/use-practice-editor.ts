@@ -251,7 +251,6 @@ export function usePracticeEditor(initial: PracticeGraph) {
         const sourcesSet = new Set(prev.edges.map((e) => e.source));
         const lastNode =
           prev.nodes.find((n) => !sourcesSet.has(n.id)) ?? prev.nodes.at(-1);
-        if (!lastNode) return prev;
 
         const newNode: PracticeNode = {
           id: nodeId,
@@ -263,19 +262,23 @@ export function usePracticeEditor(initial: PracticeGraph) {
           notes: drill.subtitle,
           groups: ["all"],
           priority: "optional",
-          position: {
-            x: lastNode.position.x,
-            y: lastNode.position.y + 140,
-          },
+          position: lastNode
+            ? {
+                x: lastNode.position.x,
+                y: lastNode.position.y + 140,
+              }
+            : { x: 0, y: 0 },
         };
 
         return {
           ...prev,
           nodes: [...prev.nodes, newNode],
-          edges: [
-            ...prev.edges,
-            { id: nextId("edge"), source: lastNode.id, target: nodeId },
-          ],
+          edges: lastNode
+            ? [
+                ...prev.edges,
+                { id: nextId("edge"), source: lastNode.id, target: nodeId },
+              ]
+            : prev.edges,
         };
       });
 

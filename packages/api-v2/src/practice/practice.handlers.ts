@@ -30,6 +30,10 @@ export const PracticesHandlersLive = HttpApiBuilder.group(
         .handle("reorderPracticeItems", ({ payload }) =>
           service.reorderItems(payload),
         )
+        .handle("listPracticeEdges", ({ payload }) => service.listEdges(payload))
+        .handle("replacePracticeEdges", ({ payload }) =>
+          service.replaceEdges(payload),
+        )
         .handle("getPracticeReview", ({ payload }) =>
           service.getReview(payload),
         )

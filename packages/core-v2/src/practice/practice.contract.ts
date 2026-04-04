@@ -14,12 +14,15 @@ import {
   DeletePracticeInput,
   GetPracticeInput,
   GetReviewInput,
+  ListEdgesInput,
   ListItemsInput,
   Practice,
+  PracticeEdge,
   PracticeItem,
   PracticeReview,
   RemoveItemInput,
   ReorderItemsInput,
+  ReplaceEdgesInput,
   UpdateItemInput,
   UpdatePracticeInput,
   UpdateReviewInput,
@@ -85,6 +88,16 @@ export const PracticeContract = {
     success: Schema.Array(PracticeItem),
     error: PracticeErrors,
     payload: ReorderItemsInput,
+  },
+  listEdges: {
+    success: Schema.Array(PracticeEdge),
+    error: PracticeErrors,
+    payload: ListEdgesInput,
+  },
+  replaceEdges: {
+    success: Schema.Array(PracticeEdge),
+    error: PracticeErrors,
+    payload: ReplaceEdgesInput,
   },
 
   // Practice review

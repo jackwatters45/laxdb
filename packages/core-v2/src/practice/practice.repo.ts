@@ -10,14 +10,17 @@ import type {
   DeletePracticeInput,
   GetPracticeInput,
   GetReviewInput,
+  ListEdgesInput,
   ListItemsInput,
   RemoveItemInput,
   ReorderItemsInput,
+  ReplaceEdgesInput,
   UpdateItemInput,
   UpdatePracticeInput,
   UpdateReviewInput,
 } from "./practice.schema";
 import {
+  practiceEdgeTable,
   practiceItemTable,
   practiceReviewTable,
   practiceTable,
@@ -31,6 +34,7 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
 
       const { id: _pid, ...practiceCols } = getColumns(practiceTable);
       const { id: _iid, ...itemCols } = getColumns(practiceItemTable);
+      const { id: _eid, ...edgeCols } = getColumns(practiceEdgeTable);
       const { id: _rid, ...reviewCols } = getColumns(practiceReviewTable);
 
       return {
@@ -120,12 +124,15 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
               .values({
                 practicePublicId: input.practicePublicId,
                 type: input.type,
+                variant: input.variant ?? "default",
                 drillPublicId: input.drillPublicId ?? null,
                 label: input.label ?? null,
                 durationMinutes: input.durationMinutes ?? null,
                 notes: input.notes ?? null,
                 groups: [...(input.groups ?? ["all"])],
                 orderIndex: input.orderIndex ?? 0,
+                positionX: input.positionX ?? null,
+                positionY: input.positionY ?? null,
                 priority: input.priority ?? "required",
               })
               .returning(itemCols),
@@ -137,6 +144,7 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
               .update(practiceItemTable)
               .set({
                 ...(input.type !== undefined && { type: input.type }),
+                ...(input.variant !== undefined && { variant: input.variant }),
                 ...(input.drillPublicId !== undefined && {
                   drillPublicId: input.drillPublicId,
                 }),
@@ -150,6 +158,12 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
                 }),
                 ...(input.orderIndex !== undefined && {
                   orderIndex: input.orderIndex,
+                }),
+                ...(input.positionX !== undefined && {
+                  positionX: input.positionX,
+                }),
+                ...(input.positionY !== undefined && {
+                  positionY: input.positionY,
                 }),
                 ...(input.priority !== undefined && {
                   priority: input.priority,
@@ -188,6 +202,46 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
                   ),
                 )
                 .orderBy(asc(practiceItemTable.orderIndex)),
+            );
+          }).pipe(Effect.tapError(Effect.logError)),
+
+        listEdges: (input: ListEdgesInput) =>
+          query(
+            db
+              .select(edgeCols)
+              .from(practiceEdgeTable)
+              .where(
+                eq(practiceEdgeTable.practicePublicId, input.practicePublicId),
+              )
+              .orderBy(asc(practiceEdgeTable.createdAt)),
+          ).pipe(Effect.tapError(Effect.logError)),
+
+        replaceEdges: (input: ReplaceEdgesInput) =>
+          Effect.gen(function* () {
+            yield* query(
+              db
+                .delete(practiceEdgeTable)
+                .where(
+                  eq(practiceEdgeTable.practicePublicId, input.practicePublicId),
+                ),
+            );
+
+            if (input.edges.length === 0) {
+              return [];
+            }
+
+            return yield* query(
+              db
+                .insert(practiceEdgeTable)
+                .values(
+                  input.edges.map((edge) => ({
+                    practicePublicId: input.practicePublicId,
+                    sourcePublicId: edge.sourcePublicId,
+                    targetPublicId: edge.targetPublicId,
+                    label: edge.label ?? null,
+                  })),
+                )
+                .returning(edgeCols),
             );
           }).pipe(Effect.tapError(Effect.logError)),
 

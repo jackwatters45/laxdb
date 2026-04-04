@@ -23,5 +23,5 @@ export const TestDatabaseLive = Layer.mergeAll(PgLive, TestDrizzleLive);
 
 export const truncateAll = Effect.gen(function* () {
   const sql = yield* PgClient.PgClient;
-  yield* sql`TRUNCATE TABLE practice_review, practice_item, practice, drill, player, "user" CASCADE`;
+  yield* sql`TRUNCATE TABLE practice_edge, practice_review, practice_item, practice, play, drill, player, "user" CASCADE`;
 });

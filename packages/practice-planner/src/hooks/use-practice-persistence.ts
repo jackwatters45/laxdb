@@ -1,22 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type {
-  PracticeGraph,
-  PracticeItemPriority,
-  PracticeItemType,
-  PracticeNode,
-  PracticeNodeVariant,
-  PracticeStatus,
-} from "@/types";
+import type { PracticeGraph, PracticeNode } from "@/types";
 
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
+interface BuiltPayload<P> {
+  payload: P;
+  persistedIds: readonly string[];
+}
 
 interface UsePracticePersistenceOptions<P> {
   practice: PracticeGraph;
   initialNodes: readonly PracticeNode[];
-  buildPayload: (current: PracticeGraph, knownIds: ReadonlySet<string>) => P;
+  buildPayload: (
+    current: PracticeGraph,
+    knownIds: ReadonlySet<string>,
+  ) => BuiltPayload<P>;
   onSave: (payload: P) => Promise<unknown>;
   debounceMs?: number;
 }
@@ -31,42 +28,56 @@ export function usePracticePersistence<P>({
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const knownIds = useRef(new Set(initialNodes.map((n) => n.id)));
+  const knownIdsRef = useRef(new Set(initialNodes.map((node) => node.id)));
+  const queuedPracticeRef = useRef<PracticeGraph | null>(null);
   const isFirstRender = useRef(true);
+  const isSavingRef = useRef(false);
 
-  const save = useCallback(
-    async (current: PracticeGraph) => {
-      const payload = buildPayload(current, knownIds.current);
+  const buildPayloadRef = useRef(buildPayload);
+  buildPayloadRef.current = buildPayload;
 
-      setSaving(true);
-      try {
-        await onSave(payload);
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
 
-        // Update known IDs after successful save
-        for (const n of current.nodes) knownIds.current.add(n.id);
-        const currentIds = new Set(current.nodes.map((n) => n.id));
-        for (const id of knownIds.current) {
-          if (!currentIds.has(id)) knownIds.current.delete(id);
-        }
+  const save = useCallback(async (current: PracticeGraph) => {
+    queuedPracticeRef.current = current;
+    if (isSavingRef.current) return;
 
+    isSavingRef.current = true;
+    setSaving(true);
+
+    try {
+      while (queuedPracticeRef.current) {
+        const nextPractice = queuedPracticeRef.current;
+        queuedPracticeRef.current = null;
+
+        const { payload, persistedIds } = buildPayloadRef.current(
+          nextPractice,
+          knownIdsRef.current,
+        );
+
+        await onSaveRef.current(payload);
+        knownIdsRef.current = new Set(persistedIds);
         setLastSaved(new Date());
-      } finally {
-        setSaving(false);
       }
-    },
-    [buildPayload, onSave],
-  );
+    } finally {
+      isSavingRef.current = false;
+      setSaving(false);
+    }
+  }, []);
 
-  // Debounced auto-save — skip initial render
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
+
     if (timerRef.current) clearTimeout(timerRef.current);
+
     timerRef.current = setTimeout(() => {
       void save(practice);
     }, debounceMs);
+
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };

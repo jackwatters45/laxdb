@@ -56,6 +56,16 @@ export class PracticeRpcs extends RpcGroup.make(
     error: PracticeContract.reorderItems.error,
     payload: PracticeContract.reorderItems.payload,
   }),
+  Rpc.make("PracticeListEdges", {
+    success: PracticeContract.listEdges.success,
+    error: PracticeContract.listEdges.error,
+    payload: PracticeContract.listEdges.payload,
+  }),
+  Rpc.make("PracticeReplaceEdges", {
+    success: PracticeContract.replaceEdges.success,
+    error: PracticeContract.replaceEdges.error,
+    payload: PracticeContract.replaceEdges.payload,
+  }),
 
   // Practice review
   Rpc.make("PracticeGetReview", {

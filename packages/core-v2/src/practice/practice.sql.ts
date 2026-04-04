@@ -66,6 +66,25 @@ export const practiceItemTable = pgTable(
   ],
 );
 
+export const practiceEdgeTable = pgTable(
+  "practice_edge",
+  {
+    ...ids,
+
+    practicePublicId: text("practice_public_id").notNull(),
+    sourcePublicId: text("source_public_id").notNull(),
+    targetPublicId: text("target_public_id").notNull(),
+    label: text("label"),
+
+    ...timestamps,
+  },
+  (table) => [
+    index("idx_practice_edge_practice").on(table.practicePublicId),
+    index("idx_practice_edge_source").on(table.sourcePublicId),
+    index("idx_practice_edge_target").on(table.targetPublicId),
+  ],
+);
+
 export const practiceReviewTable = pgTable(
   "practice_review",
   {
@@ -88,6 +107,10 @@ export type PracticeInsert = typeof practiceTable.$inferInsert;
 type PracticeItemInternal = typeof practiceItemTable.$inferSelect;
 export type PracticeItemRow = Omit<PracticeItemInternal, "id">;
 export type PracticeItemInsert = typeof practiceItemTable.$inferInsert;
+
+type PracticeEdgeInternal = typeof practiceEdgeTable.$inferSelect;
+export type PracticeEdgeRow = Omit<PracticeEdgeInternal, "id">;
+export type PracticeEdgeInsert = typeof practiceEdgeTable.$inferInsert;
 
 type PracticeReviewInternal = typeof practiceReviewTable.$inferSelect;
 export type PracticeReviewRow = Omit<PracticeReviewInternal, "id">;

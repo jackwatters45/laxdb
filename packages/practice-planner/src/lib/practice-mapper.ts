@@ -1,40 +1,37 @@
 /**
- * Maps between DB types (flat ordered items) and frontend types (graph with nodes + edges).
+ * Maps between DB types (flat persisted items + explicit edges) and frontend
+ * types (graph with nodes + edges).
  *
- * DB → Frontend: items sorted by orderIndex become nodes; edges derived from order.
- * Frontend → DB: nodes topologically sorted to produce orderIndex; positions persisted.
+ * DB → Frontend: items become nodes; persisted edges define graph topology.
+ * For older rows with no persisted edges yet, fall back to linear order.
+ * Frontend → DB: start nodes are UI-only and excluded from persistence.
  */
 import type {
   Practice as DbPractice,
+  PracticeEdge as DbPracticeEdge,
   PracticeItem as DbItem,
 } from "@laxdb/core-v2/practice/practice.schema";
 
 import { autoLayout } from "@/lib/layout";
-import type {
-  PracticeGraph,
-  PracticeNode,
-  PracticeEdge,
-  PracticeNodeVariant,
-  PracticeItemType,
-  PracticeItemPriority,
-} from "@/types";
+import type { PracticeGraph, PracticeNode, PracticeEdge } from "@/types";
 
-// ---------------------------------------------------------------------------
-// DB → Frontend
-// ---------------------------------------------------------------------------
+interface PersistedPracticeGraph {
+  nodes: PracticeNode[];
+  edges: PracticeEdge[];
+}
 
-/** Reconstruct a frontend PracticeGraph from DB practice + items */
+/** Reconstruct a frontend PracticeGraph from DB practice + items + edges. */
 export function fromDb(
   dbPractice: typeof DbPractice.Type,
   dbItems: readonly (typeof DbItem.Type)[],
+  dbEdges: readonly (typeof DbPracticeEdge.Type)[],
 ): PracticeGraph {
-  const sorted = [...dbItems].toSorted((a, b) => a.orderIndex - b.orderIndex);
+  const sortedItems = [...dbItems].toSorted((a, b) => a.orderIndex - b.orderIndex);
 
-  // Build nodes
-  const nodes: PracticeNode[] = sorted.map((item) => ({
+  const nodes: PracticeNode[] = sortedItems.map((item) => ({
     id: item.publicId,
     type: item.type,
-    variant: (item.variant ?? "default") as PracticeNodeVariant,
+    variant: item.variant,
     drillId: item.drillPublicId,
     label: item.label ?? "",
     durationMinutes: item.durationMinutes,
@@ -47,22 +44,24 @@ export function fromDb(
     },
   }));
 
-  // Derive edges from order (item[0] → item[1] → item[2] ...)
-  const edges: PracticeEdge[] = [];
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const source = nodes[i]!;
-    const target = nodes[i + 1]!;
-    edges.push({
-      id: `edge-${source.id}-${target.id}`,
-      source: source.id,
-      target: target.id,
-    });
-  }
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const edges =
+    dbEdges.length > 0
+      ? dbEdges
+          .filter(
+            (edge) =>
+              nodeIds.has(edge.sourcePublicId) && nodeIds.has(edge.targetPublicId),
+          )
+          .map((edge) => ({
+            id: edge.publicId,
+            source: edge.sourcePublicId,
+            target: edge.targetPublicId,
+            ...(edge.label !== null ? { label: edge.label } : {}),
+          }))
+      : deriveLinearEdges(nodes);
 
-  // Auto-layout if positions are all zeros (fresh from DB with no positions)
-  const allZero = nodes.every((n) => n.position.x === 0 && n.position.y === 0);
-  const finalNodes =
-    allZero && nodes.length > 0 ? autoLayout(nodes, edges).nodes : nodes;
+  const allZero = nodes.every((node) => node.position.x === 0 && node.position.y === 0);
+  const finalNodes = allZero && nodes.length > 0 ? autoLayout(nodes, edges).nodes : nodes;
 
   return {
     id: dbPractice.publicId,
@@ -78,55 +77,23 @@ export function fromDb(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Frontend → DB (for saving)
-// ---------------------------------------------------------------------------
+/** Strip UI-only nodes/edges before persistence. */
+export function toPersistedGraph(practice: PracticeGraph): PersistedPracticeGraph {
+  const nodes = practice.nodes.filter((node) => node.variant !== "start");
+  const persistedIds = new Set(nodes.map((node) => node.id));
+  const edges = practice.edges.filter(
+    (edge) => persistedIds.has(edge.source) && persistedIds.has(edge.target),
+  );
 
-/** Extract practice metadata for update */
-export function toPracticeUpdate(practice: PracticeGraph) {
-  return {
-    publicId: practice.id,
-    name: practice.name,
-    date: practice.date ? new Date(practice.date) : null,
-    description: practice.description,
-    notes: practice.notes,
-    durationMinutes: practice.durationMinutes,
-    location: practice.location,
-    status: practice.status,
-  };
+  return { nodes, edges };
 }
 
-/** Convert frontend nodes to DB item inputs, preserving order from edges */
-export function toItemInputs(practice: PracticeGraph) {
-  // Topological sort via edges to get order
-  const ordered = topologicalSort(practice.nodes, practice.edges);
-
-  return ordered.map((node, index) => ({
-    publicId: node.id,
-    practicePublicId: practice.id,
-    type: node.type,
-    variant: node.variant === "start" ? ("default" as const) : node.variant,
-    drillPublicId: node.drillId,
-    label: node.label,
-    durationMinutes: node.durationMinutes,
-    notes: node.notes,
-    groups: node.groups,
-    orderIndex: index,
-    positionX: Math.round(node.position.x),
-    positionY: Math.round(node.position.y),
-    priority: node.priority,
-  }));
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function topologicalSort(
-  nodes: PracticeNode[],
-  edges: PracticeEdge[],
+/** Order nodes by graph flow so orderIndex stays stable across reloads. */
+export function orderNodesByFlow(
+  nodes: readonly PracticeNode[],
+  edges: readonly PracticeEdge[],
 ): PracticeNode[] {
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
   const inDegree = new Map<string, number>();
   const children = new Map<string, string[]>();
 
@@ -137,30 +104,50 @@ function topologicalSort(
 
   for (const edge of edges) {
     inDegree.set(edge.target, (inDegree.get(edge.target) ?? 0) + 1);
-    children.get(edge.source)?.push(edge.target);
+    const existingChildren = children.get(edge.source);
+    if (existingChildren) existingChildren.push(edge.target);
   }
 
   const queue = nodes
-    .filter((n) => (inDegree.get(n.id) ?? 0) === 0)
-    .map((n) => n.id);
+    .filter((node) => (inDegree.get(node.id) ?? 0) === 0)
+    .map((node) => node.id);
   const result: PracticeNode[] = [];
 
   while (queue.length > 0) {
-    const id = queue.shift()!;
+    const id = queue.shift();
+    if (!id) break;
+
     const node = nodeMap.get(id);
     if (node) result.push(node);
 
     for (const childId of children.get(id) ?? []) {
-      const deg = (inDegree.get(childId) ?? 1) - 1;
-      inDegree.set(childId, deg);
-      if (deg === 0) queue.push(childId);
+      const degree = (inDegree.get(childId) ?? 1) - 1;
+      inDegree.set(childId, degree);
+      if (degree === 0) queue.push(childId);
     }
   }
 
-  // Append any orphans not reached
   for (const node of nodes) {
     if (!result.includes(node)) result.push(node);
   }
 
   return result;
+}
+
+function deriveLinearEdges(nodes: readonly PracticeNode[]): PracticeEdge[] {
+  const edges: PracticeEdge[] = [];
+
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const source = nodes[i];
+    const target = nodes[i + 1];
+    if (!source || !target) continue;
+
+    edges.push({
+      id: `edge-${source.id}-${target.id}`,
+      source: source.id,
+      target: target.id,
+    });
+  }
+
+  return edges;
 }

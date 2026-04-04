@@ -91,6 +91,24 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       },
     ),
   )
+  .add(
+    HttpApiEndpoint.post("listPracticeEdges", "/api/practices/edges", {
+      success: PracticeContract.listEdges.success,
+      error: errors,
+      payload: PracticeContract.listEdges.payload,
+    }),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      "replacePracticeEdges",
+      "/api/practices/edges/replace",
+      {
+        success: PracticeContract.replaceEdges.success,
+        error: errors,
+        payload: PracticeContract.replaceEdges.payload,
+      },
+    ),
+  )
 
   // Practice review
   .add(

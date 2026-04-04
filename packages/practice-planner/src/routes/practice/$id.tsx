@@ -26,7 +26,7 @@ import { DrillsProvider } from "@/hooks/use-drills";
 import { usePracticeEditor } from "@/hooks/use-practice-editor";
 import { usePracticePersistence } from "@/hooks/use-practice-persistence";
 import { runApi } from "@/lib/api";
-import { fromDb } from "@/lib/practice-mapper";
+import { fromDb, orderNodesByFlow, toPersistedGraph } from "@/lib/practice-mapper";
 import { practiceName } from "@/lib/practice-name";
 import { generateQuickPlan } from "@/lib/quick-plan";
 import type { Drill, DrillCategory, PracticeNode } from "@/types";
@@ -69,7 +69,13 @@ const SavePracticeInput = Schema.Struct({
     Schema.Struct({ publicId: Schema.String, ...SaveItemFields }),
   ),
   removedItemIds: Schema.Array(Schema.String),
-  orderedIds: Schema.Array(Schema.String),
+  edges: Schema.Array(
+    Schema.Struct({
+      sourcePublicId: Schema.String,
+      targetPublicId: Schema.String,
+      label: Schema.NullOr(Schema.String),
+    }),
+  ),
 });
 
 const savePractice = createServerFn({ method: "POST" })
@@ -89,6 +95,7 @@ const savePractice = createServerFn({ method: "POST" })
           notes: data.practice.notes,
           durationMinutes: data.practice.durationMinutes,
           location: data.practice.location,
+          status: data.practice.status,
         });
 
         // Remove deleted items
@@ -108,6 +115,12 @@ const savePractice = createServerFn({ method: "POST" })
         for (const item of data.updatedItems) {
           yield* client.PracticeUpdateItem(item);
         }
+
+        // Replace graph edges after items exist in their latest shape
+        yield* client.PracticeReplaceEdges({
+          practicePublicId: data.practiceId,
+          edges: data.edges,
+        });
       }),
     ),
   );
@@ -118,11 +131,12 @@ const loadPractice = createServerFn({ method: "GET" })
     runApi(
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
-        const [practice, items] = yield* Effect.all([
+        const [practice, items, edges] = yield* Effect.all([
           client.PracticeGet({ publicId: data.id }),
           client.PracticeListItems({ practicePublicId: data.id }),
+          client.PracticeListEdges({ practicePublicId: data.id }),
         ]);
-        return { practice, items };
+        return { practice, items, edges };
       }),
     ),
   );
@@ -133,7 +147,8 @@ export const Route = createFileRoute("/practice/$id")({
 });
 
 function PracticePlannerPage() {
-  const { practice: dbPractice, items: dbItems } = Route.useLoaderData();
+  const { practice: dbPractice, items: dbItems, edges: dbEdges } =
+    Route.useLoaderData();
 
   const { data: drills = [] } = useQuery({
     queryKey: ["drills"],
@@ -142,7 +157,7 @@ function PracticePlannerPage() {
 
   // Convert DB data to canvas graph
   const initialGraph = useMemo(
-    () => fromDb(dbPractice, dbItems),
+    () => fromDb(dbPractice, dbItems, dbEdges),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount
     [],
   );
@@ -156,41 +171,63 @@ function PracticePlannerPage() {
     practice,
     initialNodes: initialGraph.nodes,
     buildPayload: (current, knownIds) => {
-      const nodeToItem = (n: PracticeNode) => ({
-        type: n.type,
-        variant: n.variant === "start" ? ("default" as const) : n.variant,
-        drillPublicId: n.drillId,
-        label: n.label,
-        durationMinutes: n.durationMinutes,
-        notes: n.notes,
-        groups: [...n.groups],
-        positionX: Math.round(n.position.x),
-        positionY: Math.round(n.position.y),
-        priority: n.priority,
-      });
+      const { nodes: persistedNodes, edges: persistedEdges } =
+        toPersistedGraph(current);
+      const orderedNodes = orderNodesByFlow(persistedNodes, persistedEdges);
+      const orderedEntries = orderedNodes.map((node, orderIndex) => ({
+        node,
+        orderIndex,
+      }));
+      const persistedIds = persistedNodes.map((node) => node.id);
+      const persistedIdSet = new Set(persistedIds);
+
+      const nodeToItem = (node: PracticeNode, orderIndex: number) => {
+        const variant: "default" | "split" =
+          node.variant === "split" ? "split" : "default";
+
+        return {
+          type: node.type,
+          variant,
+          drillPublicId: node.drillId,
+          label: node.label,
+          durationMinutes: node.durationMinutes,
+          notes: node.notes,
+          groups: [...node.groups],
+          orderIndex,
+          positionX: Math.round(node.position.x),
+          positionY: Math.round(node.position.y),
+          priority: node.priority,
+        };
+      };
 
       return {
-        practiceId: current.id,
-        practice: {
-          date: current.date,
-          description: current.description,
-          notes: current.notes,
-          durationMinutes: current.durationMinutes,
-          location: current.location,
-          status: current.status,
+        payload: {
+          practiceId: current.id,
+          practice: {
+            date: current.date,
+            description: current.description,
+            notes: current.notes,
+            durationMinutes: current.durationMinutes,
+            location: current.location,
+            status: current.status,
+          },
+          addedItems: orderedEntries
+            .filter(({ node }) => !knownIds.has(node.id))
+            .map(({ node, orderIndex }) => nodeToItem(node, orderIndex)),
+          updatedItems: orderedEntries
+            .filter(({ node }) => knownIds.has(node.id))
+            .map(({ node, orderIndex }) => ({
+              publicId: node.id,
+              ...nodeToItem(node, orderIndex),
+            })),
+          removedItemIds: [...knownIds].filter((id) => !persistedIdSet.has(id)),
+          edges: persistedEdges.map((edge) => ({
+            sourcePublicId: edge.source,
+            targetPublicId: edge.target,
+            label: edge.label ?? null,
+          })),
         },
-        addedItems: current.nodes
-          .filter((n) => !knownIds.has(n.id))
-          .map((n, i) => ({ ...nodeToItem(n), orderIndex: i })),
-        updatedItems: current.nodes
-          .filter((n) => knownIds.has(n.id))
-          .map((n, i) => ({ publicId: n.id, ...nodeToItem(n), orderIndex: i })),
-        removedItemIds: [...knownIds].filter(
-          (id) => !current.nodes.some((n) => n.id === id),
-        ),
-        orderedIds: current.nodes
-          .filter((n) => knownIds.has(n.id))
-          .map((n) => n.id),
+        persistedIds,
       };
     },
     onSave: (payload) => savePractice({ data: payload }),

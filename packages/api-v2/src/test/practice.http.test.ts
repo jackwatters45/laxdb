@@ -199,6 +199,45 @@ describe("POST /api/practices/items", () => {
   });
 });
 
+describe("POST /api/practices/edges", () => {
+  it("replaces and lists graph edges", async () => {
+    const practiceId = await createPractice();
+    const { data: warmupData } = await post(s.url, "/api/practices/items/add", {
+      practicePublicId: practiceId,
+      type: "warmup",
+      orderIndex: 0,
+    });
+    const { data: splitData } = await post(s.url, "/api/practices/items/add", {
+      practicePublicId: practiceId,
+      type: "activity",
+      variant: "split",
+      orderIndex: 1,
+    });
+
+    const warmupId = (warmupData as Record<string, unknown>).publicId as string;
+    const splitId = (splitData as Record<string, unknown>).publicId as string;
+
+    const replace = await post(s.url, "/api/practices/edges/replace", {
+      practicePublicId: practiceId,
+      edges: [
+        {
+          sourcePublicId: warmupId,
+          targetPublicId: splitId,
+          label: "Offense",
+        },
+      ],
+    });
+    expect(replace.status).toBe(200);
+
+    const { status, data } = await post(s.url, "/api/practices/edges", {
+      practicePublicId: practiceId,
+    });
+    expect(status).toBe(200);
+    expect(data).toHaveLength(1);
+    expect((data as Array<Record<string, unknown>>)[0]?.label).toBe("Offense");
+  });
+});
+
 describe("POST /api/practices/review", () => {
   it("creates a review", async () => {
     const publicId = await createPractice();

@@ -6,6 +6,7 @@ import { decodeArguments, parsePostgresError } from "../util";
 import { PracticeRepo } from "./practice.repo";
 import {
   Practice,
+  PracticeEdge,
   PracticeItem,
   PracticeReview,
   AddItemInput,
@@ -14,9 +15,11 @@ import {
   DeletePracticeInput,
   GetPracticeInput,
   GetReviewInput,
+  ListEdgesInput,
   ListItemsInput,
   RemoveItemInput,
   ReorderItemsInput,
+  ReplaceEdgesInput,
   UpdateItemInput,
   UpdatePracticeInput,
   UpdateReviewInput,
@@ -24,6 +27,7 @@ import {
 
 const asPractice = (row: typeof Practice.Type) => new Practice(row);
 const asItem = (row: typeof PracticeItem.Type) => new PracticeItem(row);
+const asEdge = (row: typeof PracticeEdge.Type) => new PracticeEdge(row);
 const asReview = (row: typeof PracticeReview.Type) => new PracticeReview(row);
 
 export class PracticeService extends ServiceMap.Service<PracticeService>()(
@@ -135,6 +139,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ListItemsInput, input);
             return yield* repo.listItems(decoded);
           }).pipe(
+            Effect.map((rows) => rows.map(asItem)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
@@ -206,6 +211,31 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ReorderItemsInput, input);
             return yield* repo.reorderItems(decoded);
           }).pipe(
+            Effect.map((rows) => rows.map(asItem)),
+            Effect.catchTag("SqlError", (e) =>
+              Effect.fail(parsePostgresError(e)),
+            ),
+            Effect.tapError(Effect.logError),
+          ),
+
+        listEdges: (input: ListEdgesInput) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(ListEdgesInput, input);
+            return yield* repo.listEdges(decoded);
+          }).pipe(
+            Effect.map((rows) => rows.map(asEdge)),
+            Effect.catchTag("SqlError", (e) =>
+              Effect.fail(parsePostgresError(e)),
+            ),
+            Effect.tapError(Effect.logError),
+          ),
+
+        replaceEdges: (input: ReplaceEdgesInput) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(ReplaceEdgesInput, input);
+            return yield* repo.replaceEdges(decoded);
+          }).pipe(
+            Effect.map((rows) => rows.map(asEdge)),
             Effect.catchTag("SqlError", (e) =>
               Effect.fail(parsePostgresError(e)),
             ),
