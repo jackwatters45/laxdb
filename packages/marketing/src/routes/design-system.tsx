@@ -392,7 +392,7 @@ color: var(--color-subtle);`}
             </div>
             <div className="flex items-start gap-3">
               <code className="shrink-0 text-xs text-foreground tabular-nums">
-                packages/web/src/globals.css
+                packages/practice-planner/src/globals.css
               </code>
               <span className="text-xs text-muted-foreground">
                 One-line import: @import &quot;@laxdb/ui/globals.css&quot;

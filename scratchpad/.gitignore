@@ -1,6 +1,0 @@
-*
-!package.json
-!.gitignore
-!tsconfig.json
-!json-render-demo/
-!json-render-demo/**
