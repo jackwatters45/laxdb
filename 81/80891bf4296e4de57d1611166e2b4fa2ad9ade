@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "8180891bf4296e4de57d1611166e2b4fa2ad9ade",
+  "prompts": {
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 5,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
