@@ -1,0 +1,1 @@
+DROP TABLE "practice_defaults";
