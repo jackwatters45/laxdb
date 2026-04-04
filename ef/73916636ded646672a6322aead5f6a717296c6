@@ -1,0 +1,57 @@
+packages/core-v2/src/play/play.service.ts
+  72b1a1a6c7b08f89 1-105
+packages/api-v2/src/play/play.handlers.ts
+  72b1a1a6c7b08f89 1-21
+packages/practice-planner/src/routes/index.tsx
+  72b1a1a6c7b08f89 70,74-86
+packages/api-v2/src/play/play.rpc-handlers.ts
+  72b1a1a6c7b08f89 1-20
+packages/api-v2/src/play/play.rpc.ts
+  72b1a1a6c7b08f89 1-30
+packages/practice-planner/src/routes/playbook/index.tsx
+  72b1a1a6c7b08f89 1-361
+packages/practice-planner/src/routes/playbook/$id.tsx
+  72b1a1a6c7b08f89 1-542
+packages/core-v2/src/play/play.repo.ts
+  72b1a1a6c7b08f89 1-92
+packages/core-v2/src/play/play.schema.ts
+  72b1a1a6c7b08f89 1-72
+packages/core-v2/src/play/play.sql.ts
+  72b1a1a6c7b08f89 1-45
+packages/core-v2/src/play/play.contract.ts
+  72b1a1a6c7b08f89 1-51
+packages/api-v2/src/play/play.api.ts
+  72b1a1a6c7b08f89 1-69
+packages/api-v2/src/definition.ts
+  72b1a1a6c7b08f89 4,10
+packages/api-v2/src/rpc-handlers.ts
+  72b1a1a6c7b08f89 5,11
+packages/practice-planner/src/routes/playbook/new.tsx
+  72b1a1a6c7b08f89 1-151
+packages/api-v2/src/groups/index.ts
+  72b1a1a6c7b08f89 5,11
+packages/api-v2/src/rpc-group.ts
+  72b1a1a6c7b08f89 4,10
+packages/practice-planner/src/types.ts
+  72b1a1a6c7b08f89 10-12,51-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "ef73916636ded646672a6322aead5f6a717296c6",
+  "prompts": {
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 1592,
+      "total_deletions": 1,
+      "accepted_lines": 1592,
+      "overriden_lines": 0
+    }
+  }
+}
