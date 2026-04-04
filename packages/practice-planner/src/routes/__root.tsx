@@ -10,6 +10,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { AppShell } from "@/components/app-shell";
 import globalsCss from "@/globals.css?url";
 import { siteConfig } from "@/site";
 
@@ -50,7 +51,9 @@ function RootComponent() {
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            <Outlet />
+            <AppShell>
+              <Outlet />
+            </AppShell>
           </ThemeProvider>
         </QueryClientProvider>
         <Scripts />

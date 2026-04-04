@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { runApi } from "@/lib/api";
+import { practiceName } from "@/lib/practice-name";
 
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
@@ -67,8 +68,8 @@ function PracticeListPage() {
   const practices = Route.useLoaderData();
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="flex items-center justify-between h-14 px-6 border-b border-border bg-card">
+    <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
@@ -78,9 +79,9 @@ function PracticeListPage() {
             New Practice
           </Button>
         </Link>
-      </header>
+      </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div>
         {practices.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-muted-foreground text-pretty mb-4">
@@ -127,7 +128,7 @@ function PracticeCard({
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground truncate">
-              {practice.name ?? "Untitled Practice"}
+              {practiceName(practice)}
             </span>
             <Badge
               variant="secondary"
@@ -190,7 +191,7 @@ function PracticeCard({
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Delete "{practice.name ?? "Untitled Practice"}"?
+                Delete "{practiceName(practice)}"?
               </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this practice plan and all its

@@ -9,13 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaybookIndexRouteImport } from './routes/playbook/index'
+import { Route as DrillsIndexRouteImport } from './routes/drills/index'
 import { Route as PracticeNewRouteImport } from './routes/practice/new'
 import { Route as PracticeIdRouteImport } from './routes/practice/$id'
+import { Route as PlaybookNewRouteImport } from './routes/playbook/new'
+import { Route as PlaybookIdRouteImport } from './routes/playbook/$id'
+import { Route as DrillsNewRouteImport } from './routes/drills/new'
+import { Route as DrillsIdRouteImport } from './routes/drills/$id'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIndexRoute = PlaybookIndexRouteImport.update({
+  id: '/playbook/',
+  path: '/playbook/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsIndexRoute = DrillsIndexRouteImport.update({
+  id: '/drills/',
+  path: '/drills/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeNewRoute = PracticeNewRouteImport.update({
@@ -28,44 +50,144 @@ const PracticeIdRoute = PracticeIdRouteImport.update({
   path: '/practice/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaybookNewRoute = PlaybookNewRouteImport.update({
+  id: '/playbook/new',
+  path: '/playbook/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIdRoute = PlaybookIdRouteImport.update({
+  id: '/playbook/$id',
+  path: '/playbook/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsNewRoute = DrillsNewRouteImport.update({
+  id: '/drills/new',
+  path: '/drills/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsIdRoute = DrillsIdRouteImport.update({
+  id: '/drills/$id',
+  path: '/drills/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills/': typeof DrillsIndexRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills': typeof DrillsIndexRoute
+  '/playbook': typeof PlaybookIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills/': typeof DrillsIndexRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/practice/$id' | '/practice/new'
+  fullPaths:
+    | '/'
+    | '/settings'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills/'
+    | '/playbook/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/practice/$id' | '/practice/new'
-  id: '__root__' | '/' | '/practice/$id' | '/practice/new'
+  to:
+    | '/'
+    | '/settings'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills'
+    | '/playbook'
+  id:
+    | '__root__'
+    | '/'
+    | '/settings'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills/'
+    | '/playbook/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SettingsRoute: typeof SettingsRoute
+  DrillsIdRoute: typeof DrillsIdRoute
+  DrillsNewRoute: typeof DrillsNewRoute
+  PlaybookIdRoute: typeof PlaybookIdRoute
+  PlaybookNewRoute: typeof PlaybookNewRoute
   PracticeIdRoute: typeof PracticeIdRoute
   PracticeNewRoute: typeof PracticeNewRoute
+  DrillsIndexRoute: typeof DrillsIndexRoute
+  PlaybookIndexRoute: typeof PlaybookIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/': {
+      id: '/playbook/'
+      path: '/playbook'
+      fullPath: '/playbook/'
+      preLoaderRoute: typeof PlaybookIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills/': {
+      id: '/drills/'
+      path: '/drills'
+      fullPath: '/drills/'
+      preLoaderRoute: typeof DrillsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice/new': {
@@ -82,23 +204,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playbook/new': {
+      id: '/playbook/new'
+      path: '/playbook/new'
+      fullPath: '/playbook/new'
+      preLoaderRoute: typeof PlaybookNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/$id': {
+      id: '/playbook/$id'
+      path: '/playbook/$id'
+      fullPath: '/playbook/$id'
+      preLoaderRoute: typeof PlaybookIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills/new': {
+      id: '/drills/new'
+      path: '/drills/new'
+      fullPath: '/drills/new'
+      preLoaderRoute: typeof DrillsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills/$id': {
+      id: '/drills/$id'
+      path: '/drills/$id'
+      fullPath: '/drills/$id'
+      preLoaderRoute: typeof DrillsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SettingsRoute: SettingsRoute,
+  DrillsIdRoute: DrillsIdRoute,
+  DrillsNewRoute: DrillsNewRoute,
+  PlaybookIdRoute: PlaybookIdRoute,
+  PlaybookNewRoute: PlaybookNewRoute,
   PracticeIdRoute: PracticeIdRoute,
   PracticeNewRoute: PracticeNewRoute,
+  DrillsIndexRoute: DrillsIndexRoute,
+  PlaybookIndexRoute: PlaybookIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

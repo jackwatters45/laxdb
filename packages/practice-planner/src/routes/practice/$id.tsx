@@ -27,6 +27,7 @@ import { usePracticeEditor } from "@/hooks/use-practice-editor";
 import { usePracticePersistence } from "@/hooks/use-practice-persistence";
 import { runApi } from "@/lib/api";
 import { fromDb } from "@/lib/practice-mapper";
+import { practiceName } from "@/lib/practice-name";
 import { generateQuickPlan } from "@/lib/quick-plan";
 import type { Drill, DrillCategory, PracticeNode } from "@/types";
 
@@ -56,7 +57,6 @@ const SaveItemFields = {
 const SavePracticeInput = Schema.Struct({
   practiceId: Schema.String,
   practice: Schema.Struct({
-    name: Schema.String,
     date: Schema.NullOr(Schema.String),
     description: Schema.NullOr(Schema.String),
     notes: Schema.NullOr(Schema.String),
@@ -84,7 +84,6 @@ const savePractice = createServerFn({ method: "POST" })
         // Update practice metadata
         yield* client.PracticeUpdate({
           publicId: data.practiceId,
-          name: data.practice.name,
           date: data.practice.date ? new Date(data.practice.date) : undefined,
           description: data.practice.description,
           notes: data.practice.notes,
@@ -173,7 +172,6 @@ function PracticePlannerPage() {
       return {
         practiceId: current.id,
         practice: {
-          name: current.name,
           date: current.date,
           description: current.description,
           notes: current.notes,
@@ -262,7 +260,6 @@ function PracticePlannerPage() {
       const plan = generateQuickPlan(drills, options);
       editor.setPractice({
         ...practice,
-        name: "Quick Practice Plan",
         durationMinutes: options.durationMinutes,
         nodes: plan.nodes,
         edges: plan.edges,
@@ -407,7 +404,11 @@ function PlannerToolbar({
   onOpenSplit,
   onOpenQuickPlan,
 }: {
-  practice: { name: string; durationMinutes: number | null };
+  practice: {
+    date: string | null;
+    location: string | null;
+    durationMinutes: number | null;
+  };
   totalMinutes: number;
   blockCount: number;
   saving: boolean;
@@ -436,7 +437,7 @@ function PlannerToolbar({
           className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 hover:bg-accent transition-colors"
         >
           <h1 className="text-sm font-semibold text-foreground text-balance">
-            {practice.name}
+            {practiceName(practice)}
           </h1>
           <Settings className="size-3 text-muted-foreground" />
         </button>
