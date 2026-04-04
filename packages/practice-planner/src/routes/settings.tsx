@@ -16,6 +16,7 @@ import { ArrowLeft, Clock, MapPin, Loader2, Check } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
+import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -25,7 +26,8 @@ const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
       const client = yield* RpcApiClient;
-      return yield* client.PracticeGetDefaults();
+      const values = yield* client.DefaultsGetNamespace(practiceDefaultsScope);
+      return decodePracticeDefaults(values);
     }),
   ),
 );
@@ -43,10 +45,14 @@ const saveDefaults = createServerFn({ method: "POST" })
     runApi(
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
-        return yield* client.PracticeUpsertDefaults({
-          durationMinutes: data.durationMinutes,
-          location: data.location,
+        const values = yield* client.DefaultsPatchNamespace({
+          ...practiceDefaultsScope,
+          values: {
+            durationMinutes: data.durationMinutes,
+            location: data.location,
+          },
         });
+        return decodePracticeDefaults(values);
       }),
     ),
   );
@@ -70,9 +76,9 @@ function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const [duration, setDuration] = useState(
-    defaults?.durationMinutes?.toString() ?? "",
+    defaults.durationMinutes?.toString() ?? "",
   );
-  const [location, setLocation] = useState(defaults?.location ?? "");
+  const [location, setLocation] = useState(defaults.location ?? "");
 
   const handleSave = async () => {
     setSaving(true);

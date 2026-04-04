@@ -1,4 +1,6 @@
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
+// Legacy table kept in schema for a follow-up cleanup migration. Runtime code
+// now reads and writes generic defaults via the `defaults` table instead.
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
