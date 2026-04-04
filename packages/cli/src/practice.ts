@@ -18,6 +18,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { RpcApiClient } from "@laxdb/api/client";
 import {
   CreatePracticeInput,
+  PracticeEdgeInput,
   UpdatePracticeInput,
 } from "@laxdb/core/practice/practice.schema";
 import { Effect, Option, Schema } from "effect";
@@ -28,6 +29,10 @@ import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+const decodePracticeEdges = Schema.decodeUnknownEffect(
+  Schema.Array(PracticeEdgeInput),
+);
 
 // ---------------------------------------------------------------------------
 // Practice CRUD
@@ -369,6 +374,57 @@ const reorderItemsCommand = Command.make(
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
 );
 
+const listEdgesCommand = Command.make(
+  "list-edges",
+  {
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ practiceId, pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const edges = yield* client.PracticeListEdges({
+        practicePublicId: practiceId,
+      });
+      yield* output(edges, pretty);
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
+);
+
+const replaceEdgesCommand = Command.make(
+  "replace-edges",
+  {
+    practiceId: Argument.string("practiceId"),
+    edges: Flag.string("edges").pipe(
+      Flag.withDescription(
+        "JSON array of edges; falls back to stdin when omitted",
+      ),
+      Flag.optional,
+    ),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  (opts) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const rawEdges = yield* Option.match(opts.edges, {
+        onNone: () => readStdin,
+        onSome: (value) =>
+          Effect.try({
+            try: () => JSON.parse(value),
+            catch: (error: unknown) =>
+              new Error(`Failed to parse --edges JSON: ${String(error)}`),
+          }),
+      });
+      const edges = yield* decodePracticeEdges(rawEdges);
+      const replaced = yield* client.PracticeReplaceEdges({
+        practicePublicId: opts.practiceId,
+        edges,
+      });
+      yield* output(replaced, opts.pretty);
+    }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
+);
+
 // ---------------------------------------------------------------------------
 // Practice review
 // ---------------------------------------------------------------------------
@@ -453,11 +509,11 @@ const bulkCreateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePracticeInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const practice = yield* client.PracticeCreate(item);
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PracticeCreate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -472,11 +528,11 @@ const bulkUpdateCommand = Command.make(
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePracticeInput),
       )(raw);
-      const results = [];
-      for (const item of items) {
-        const practice = yield* client.PracticeUpdate(item);
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        items,
+        (item) => client.PracticeUpdate(item),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -491,11 +547,11 @@ const bulkDeleteCommand = Command.make(
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
-      const results = [];
-      for (const publicId of ids) {
-        const practice = yield* client.PracticeDelete({ publicId });
-        results.push(practice);
-      }
+      const results = yield* Effect.forEach(
+        ids,
+        (publicId) => client.PracticeDelete({ publicId }),
+        { concurrency: 5 },
+      );
       yield* output(results, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -516,6 +572,8 @@ const practiceCommand = Command.make("practice").pipe(
     removeItemCommand,
     listItemsCommand,
     reorderItemsCommand,
+    listEdgesCommand,
+    replaceEdgesCommand,
     reviewCommand,
     getReviewCommand,
     bulkCreateCommand,
