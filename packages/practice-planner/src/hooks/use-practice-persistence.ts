@@ -33,31 +33,41 @@ export function usePracticePersistence<P>({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const knownIds = useRef(new Set(initialNodes.map((n) => n.id)));
   const isFirstRender = useRef(true);
+  const isSaving = useRef(false);
 
-  const save = useCallback(
-    async (current: PracticeGraph) => {
-      const payload = buildPayload(current, knownIds.current);
+  // Keep callbacks in refs so the debounce effect only re-triggers on
+  // practice changes, not on callback identity changes.
+  const buildPayloadRef = useRef(buildPayload);
+  buildPayloadRef.current = buildPayload;
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
 
-      setSaving(true);
-      try {
-        await onSave(payload);
+  const save = useCallback(async (current: PracticeGraph) => {
+    // Prevent concurrent saves
+    if (isSaving.current) return;
+    isSaving.current = true;
 
-        // Update known IDs after successful save
-        for (const n of current.nodes) knownIds.current.add(n.id);
-        const currentIds = new Set(current.nodes.map((n) => n.id));
-        for (const id of knownIds.current) {
-          if (!currentIds.has(id)) knownIds.current.delete(id);
-        }
+    const payload = buildPayloadRef.current(current, knownIds.current);
 
-        setLastSaved(new Date());
-      } finally {
-        setSaving(false);
+    setSaving(true);
+    try {
+      await onSaveRef.current(payload);
+
+      // Update known IDs after successful save
+      for (const n of current.nodes) knownIds.current.add(n.id);
+      const currentIds = new Set(current.nodes.map((n) => n.id));
+      for (const id of knownIds.current) {
+        if (!currentIds.has(id)) knownIds.current.delete(id);
       }
-    },
-    [buildPayload, onSave],
-  );
 
-  // Debounced auto-save — skip initial render
+      setLastSaved(new Date());
+    } finally {
+      setSaving(false);
+      isSaving.current = false;
+    }
+  }, []);
+
+  // Debounced auto-save — skip initial render, only re-trigger on practice changes
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
