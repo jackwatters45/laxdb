@@ -10,11 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaybookIndexRouteImport } from './routes/playbook/index'
 import { Route as PracticeIdRouteImport } from './routes/practice/$id'
+import { Route as PlaybookNewRouteImport } from './routes/playbook/new'
+import { Route as PlaybookIdRouteImport } from './routes/playbook/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIndexRoute = PlaybookIndexRouteImport.update({
+  id: '/playbook/',
+  path: '/playbook/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeIdRoute = PracticeIdRouteImport.update({
@@ -22,31 +30,64 @@ const PracticeIdRoute = PracticeIdRouteImport.update({
   path: '/practice/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaybookNewRoute = PlaybookNewRouteImport.update({
+  id: '/playbook/new',
+  path: '/playbook/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIdRoute = PlaybookIdRouteImport.update({
+  id: '/playbook/$id',
+  path: '/playbook/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/playbook': typeof PlaybookIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/practice/$id'
+  fullPaths:
+    | '/'
+    | '/playbook/$id'
+    | '/playbook/new'
+    | '/practice/$id'
+    | '/playbook/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/practice/$id'
-  id: '__root__' | '/' | '/practice/$id'
+  to: '/' | '/playbook/$id' | '/playbook/new' | '/practice/$id' | '/playbook'
+  id:
+    | '__root__'
+    | '/'
+    | '/playbook/$id'
+    | '/playbook/new'
+    | '/practice/$id'
+    | '/playbook/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlaybookIdRoute: typeof PlaybookIdRoute
+  PlaybookNewRoute: typeof PlaybookNewRoute
   PracticeIdRoute: typeof PracticeIdRoute
+  PlaybookIndexRoute: typeof PlaybookIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playbook/': {
+      id: '/playbook/'
+      path: '/playbook'
+      fullPath: '/playbook/'
+      preLoaderRoute: typeof PlaybookIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/practice/$id': {
       id: '/practice/$id'
       path: '/practice/$id'
@@ -65,12 +113,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playbook/new': {
+      id: '/playbook/new'
+      path: '/playbook/new'
+      fullPath: '/playbook/new'
+      preLoaderRoute: typeof PlaybookNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/$id': {
+      id: '/playbook/$id'
+      path: '/playbook/$id'
+      fullPath: '/playbook/$id'
+      preLoaderRoute: typeof PlaybookIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlaybookIdRoute: PlaybookIdRoute,
+  PlaybookNewRoute: PlaybookNewRoute,
   PracticeIdRoute: PracticeIdRoute,
+  PlaybookIndexRoute: PlaybookIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

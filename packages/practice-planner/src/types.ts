@@ -7,6 +7,10 @@ import type {
   Drill as DbDrill,
 } from "@laxdb/core-v2/drill/drill.schema";
 import type {
+  PlayCategory as PlayCategorySchema,
+  Play as DbPlay,
+} from "@laxdb/core-v2/play/play.schema";
+import type {
   PracticeItemType as PracticeItemTypeSchema,
   PracticeItemPriority as PracticeItemPrioritySchema,
   PracticeStatus as PracticeStatusSchema,
@@ -42,6 +46,13 @@ export type PracticeStatus = Schema.Schema.Type<typeof PracticeStatusSchema>;
 // ---------------------------------------------------------------------------
 
 export type Drill = Omit<typeof DbDrill.Type, "createdAt" | "updatedAt">;
+
+// ---------------------------------------------------------------------------
+// Play — mirrors DB Play without timestamps (frontend doesn't need them)
+// ---------------------------------------------------------------------------
+
+export type PlayCategory = Schema.Schema.Type<typeof PlayCategorySchema>;
+export type Play = Omit<typeof DbPlay.Type, "createdAt" | "updatedAt">;
 
 // ---------------------------------------------------------------------------
 // Practice graph — canvas editor model (NOT the DB Practice)
