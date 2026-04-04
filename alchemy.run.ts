@@ -104,7 +104,7 @@ const db = await Hyperdrive("hyperdrive", {
   adopt: true,
 });
 
-// Generate Drizzle migrations (v1 — disabled while developing v2)
+// Generate Drizzle migrations
 // Schema management: generate + push locally, migrate in CI/prod
 if (app.local) {
   await Exec("DrizzleGenerate", {
@@ -115,42 +115,42 @@ if (app.local) {
     },
   });
 
-  await Exec("DrizzlePushV2", {
-    command: "cd packages/core-v2 && bun run db:push",
+  await Exec("DrizzlePush", {
+    command: "cd packages/core && bun run db:push",
     env: { DATABASE_URL: schemaRole.connectionUrl },
   });
 } else if (isPermanentStage) {
-  await Exec("DrizzleMigrateV2", {
-    command: `sh -c 'cd packages/core-v2 && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
+  await Exec("DrizzleMigrate", {
+    command: `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
     env: { DATABASE_URL: schemaRole.connectionUrl },
     memoize: {
       patterns: [
-        "packages/core-v2/drizzle.config.ts",
-        "packages/core-v2/migrations/**/*.sql",
+        "packages/core/drizzle.config.ts",
+        "packages/core/migrations/**/*.sql",
       ],
     },
   });
 } else {
   // PR stages share the dev branch — push is idempotent, migrate fails on existing tables
-  await Exec("DrizzlePushV2", {
-    command: "cd packages/core-v2 && bun run db:push",
+  await Exec("DrizzlePush", {
+    command: "cd packages/core && bun run db:push",
     env: { DATABASE_URL: schemaRole.connectionUrl },
   });
 }
 
 // Start Drizzle Studio in local development
-// if (app.local) {
-//   Exec("DrizzleStudio", {
-//     command: "cd packages/core-v2 && bun run db:studio",
-//     env: {
-//       DATABASE_URL: dbRole.connectionUrl,
-//     },
-//   });
+if (app.local) {
+  Exec("DrizzleStudio", {
+    command: "cd packages/core && bun run db:studio",
+    env: {
+      DATABASE_URL: dbRole.connectionUrl,
+    },
+  });
 
-//   Exec("Storybook", {
-//     command: "cd packages/ui && bun run storybook",
-//   });
-// }
+  Exec("Storybook", {
+    command: "cd packages/ui && bun run storybook",
+  });
+}
 
 // KV
 export const kv = await KVNamespace("kv", {});
@@ -158,8 +158,8 @@ export const kv = await KVNamespace("kv", {});
 // Storage
 export const storage = await R2Bucket("storage", {});
 
-export const api2 = await Worker("api-v2", {
-  entrypoint: "packages/api-v2/src/index.ts",
+export const api = await Worker("api", {
+  entrypoint: "packages/api/src/index.ts",
   url: true,
   compatibility: "node",
   bindings: {
@@ -171,33 +171,15 @@ export const api2 = await Worker("api-v2", {
   },
 });
 
-// export const web = await TanStackStart("web", {
-//   cwd: "./packages/web",
-//   domains: [getDomain("app")],
-//   bindings: {
-//     DB: db,
-//     KV: kv,
-//     STORAGE: storage,
-//     DATABASE_URL: dbRole.connectionUrl,
-//     ...secrets,
-//   },
-// });
-
 export const marketing = await TanStackStart("marketing", {
   bindings: {},
   cwd: "./packages/marketing",
   domains: [domain],
 });
 
-// export const docs = await TanStackStart("docs", {
-//   bindings: {},
-//   cwd: "./packages/docs",
-//   domains: [getDomain("docs")],
-// });
-
 export const practicePlanner = await TanStackStart("practice-planner", {
   bindings: {
-    API: api2,
+    API: api,
     IS_LOCAL: app.local ? "true" : "",
   },
   cwd: "./packages/practice-planner",
@@ -206,11 +188,9 @@ export const practicePlanner = await TanStackStart("practice-planner", {
 
 console.log({
   domain,
-  // web: web.url,
   marketing: marketing.url,
   practicePlanner: practicePlanner.url,
-  // docs: docs.url,
-  api2: api2.url,
+  api: api.url,
   db: database.id,
   kv: kv.namespaceId,
   r2: storage.name,

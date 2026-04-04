@@ -4,8 +4,8 @@
  * Common flags and helpers used across all CLI subcommands.
  */
 
-import { RpcApiClient } from "@laxdb/api-v2/client";
-import { makeRpcProtocol } from "@laxdb/api-v2/protocol";
+import { RpcApiClient } from "@laxdb/api/client";
+import { makeRpcProtocol } from "@laxdb/api/protocol";
 import { Effect, Layer } from "effect";
 import { Flag } from "effect/unstable/cli";
 

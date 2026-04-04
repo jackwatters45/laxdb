@@ -4,7 +4,7 @@
   "exclude": ["src/test"],
   "compilerOptions": {
     "paths": {
-      "@laxdb/core-v2/*": ["../core-v2/src/*"]
+      "@laxdb/core/*": ["../core/src/*"]
     }
   }
 }

@@ -16,11 +16,11 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import {
   CreatePlayerInput,
   UpdatePlayerInput,
-} from "@laxdb/core-v2/player/player.schema";
+} from "@laxdb/core/player/player.schema";
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 

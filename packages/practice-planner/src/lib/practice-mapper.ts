@@ -10,7 +10,7 @@ import type {
   Practice as DbPractice,
   PracticeEdge as DbPracticeEdge,
   PracticeItem as DbItem,
-} from "@laxdb/core-v2/practice/practice.schema";
+} from "@laxdb/core/practice/practice.schema";
 
 import { autoLayout } from "@/lib/layout";
 import type { PracticeGraph, PracticeNode, PracticeEdge } from "@/types";

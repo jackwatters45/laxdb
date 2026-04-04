@@ -6,19 +6,21 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware --fix",
     "format": "oxfmt",
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@effect-atom/atom-react": "^0.4.4",
-    "@effect/platform": "0.94.1",
-    "@effect/rpc": "^0.73.0",
-    "@laxdb/core": "workspace:*"
+    "@laxdb/core": "workspace:*",
+    "effect": "^4.0.0-beta.31"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241218.0"
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "pg": "^8.16.0",
+    "vitest": "^3.2.1"
   },
   "effect": {
     "generateExports": {

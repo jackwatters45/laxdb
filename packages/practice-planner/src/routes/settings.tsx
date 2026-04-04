@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Field,

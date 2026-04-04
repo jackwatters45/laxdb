@@ -1,10 +1,10 @@
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import {
   PracticeItemPriority as PracticeItemPrioritySchema,
   PracticeItemType as PracticeItemTypeSchema,
   PracticeItemVariant as PracticeItemVariantSchema,
   PracticeStatus as PracticeStatusSchema,
-} from "@laxdb/core-v2/practice/practice.schema";
+} from "@laxdb/core/practice/practice.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";

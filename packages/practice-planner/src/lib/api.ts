@@ -1,12 +1,12 @@
 /**
- * Effect RPC client for the api-v2 worker.
+ * Effect RPC client for the api worker.
  *
  * Production: uses `API` service binding (Worker-to-Worker, no network hop).
- * Local dev: uses fetch to the api-v2 dev server (Alchemy runs it separately).
+ * Local dev: uses fetch to the api dev server (Alchemy runs it separately).
  *
  * Only call runApi() from inside createServerFn handlers.
  */
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import { type Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 import { RpcClient, RpcSerialization } from "effect/unstable/rpc";

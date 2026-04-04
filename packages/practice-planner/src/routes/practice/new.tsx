@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Field,
@@ -36,7 +36,7 @@ const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
 );
 
 // Client form shape — date is a string here, converted to Date in the handler.
-// The RPC uses core-v2's CreatePracticeInput which expects Date.
+// The RPC uses core's CreatePracticeInput which expects Date.
 const CreatePracticeForm = Schema.Struct({
   date: Schema.NullOr(Schema.String),
   description: Schema.NullOr(Schema.String),

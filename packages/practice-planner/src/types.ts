@@ -5,27 +5,27 @@ import type {
   Intensity as IntensitySchema,
   FieldSpace as FieldSpaceSchema,
   Drill as DbDrill,
-} from "@laxdb/core-v2/drill/drill.schema";
+} from "@laxdb/core/drill/drill.schema";
 import type {
   PlayCategory as PlayCategorySchema,
   Play as DbPlay,
-} from "@laxdb/core-v2/play/play.schema";
+} from "@laxdb/core/play/play.schema";
 import type {
   PracticeItemType as PracticeItemTypeSchema,
   PracticeItemPriority as PracticeItemPrioritySchema,
   PracticeStatus as PracticeStatusSchema,
-} from "@laxdb/core-v2/practice/practice.schema";
+} from "@laxdb/core/practice/practice.schema";
 /**
  * Frontend types for the practice planner.
  *
- * Scalar types (Difficulty, Category, etc.) are derived from core-v2 schemas
+ * Scalar types (Difficulty, Category, etc.) are derived from core schemas
  * to stay in sync with the DB. Domain types (Drill, PracticeGraph) are defined
  * here for the canvas editor's graph model.
  */
 import type { Schema } from "effect";
 
 // ---------------------------------------------------------------------------
-// Scalar types — derived from core-v2 schemas
+// Scalar types — derived from core schemas
 // ---------------------------------------------------------------------------
 
 export type Difficulty = Schema.Schema.Type<typeof DifficultySchema>;

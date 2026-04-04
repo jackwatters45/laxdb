@@ -14,13 +14,13 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import {
   Category,
   CreateDrillInput,
   PositionGroup,
   UpdateDrillInput,
-} from "@laxdb/core-v2/drill/drill.schema";
+} from "@laxdb/core/drill/drill.schema";
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 

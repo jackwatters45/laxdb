@@ -15,11 +15,11 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import {
   CreatePracticeInput,
   UpdatePracticeInput,
-} from "@laxdb/core-v2/practice/practice.schema";
+} from "@laxdb/core/practice/practice.schema";
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 

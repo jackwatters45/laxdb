@@ -59,7 +59,7 @@ const { data: drills = [] } = useQuery({
 
 ### `runApi` boundary
 
-All RPC calls go through `runApi()` in `lib/api.ts`, which must only be called inside `createServerFn` handlers — never from client components. `runApi` manages a `ManagedRuntime` singleton, uses NDJSON serialization matching the api-v2 server, and JSON round-trips results to strip Effect `Schema.Class` instances (seroval can't serialize them).
+All RPC calls go through `runApi()` in `lib/api.ts`, which must only be called inside `createServerFn` handlers — never from client components. `runApi` manages a `ManagedRuntime` singleton, uses NDJSON serialization matching the api server, and JSON round-trips results to strip Effect `Schema.Class` instances (seroval can't serialize them).
 
 ## RPC Client
 
@@ -71,7 +71,7 @@ Prefer context providers over prop drilling. Data that multiple components need 
 
 ## Types
 
-Scalar types (`Difficulty`, `DrillCategory`, `PracticeItemType`, etc.) are derived from `core-v2` schemas via `Schema.Schema.Type<>` — never duplicated. The `Drill` type is derived directly from the DB schema class. `PracticeGraph` is the frontend canvas model (nodes + edges) — intentionally named differently from the DB `Practice` to avoid confusion.
+Scalar types (`Difficulty`, `DrillCategory`, `PracticeItemType`, etc.) are derived from `core` schemas via `Schema.Schema.Type<>` — never duplicated. The `Drill` type is derived directly from the DB schema class. `PracticeGraph` is the frontend canvas model (nodes + edges) — intentionally named differently from the DB `Practice` to avoid confusion.
 
 ## Anti-patterns
 
@@ -79,7 +79,7 @@ Scalar types (`Difficulty`, `DrillCategory`, `PracticeItemType`, etc.) are deriv
 |-------|------------|
 | Create per-group RPC clients | Single `RpcApiClient` |
 | Call `runApi()` from client components | Wrap in `createServerFn` |
-| Duplicate types from core-v2 | Derive via `Schema.Schema.Type<>` |
+| Duplicate types from core | Derive via `Schema.Schema.Type<>` |
 | Pass shared data as props through layers | Context provider + hook |
 | Block SSR with data not on first paint | `useQuery` for deferred data |
 | Use `Practice` for the canvas model | `PracticeGraph` (avoids DB collision) |
@@ -90,4 +90,4 @@ Scalar types (`Difficulty`, `DrillCategory`, `PracticeItemType`, etc.) are deriv
 - **Icon version alignment**: `lucide-react` version must match `@laxdb/ui`.
 - **CSS tokens**: `@import "@laxdb/ui/globals.css"` in `globals.css`.
 - **Route tree**: `routeTree.gen.ts` is auto-generated. Never edit manually, always commit changes.
-- **Backend**: All data access through `core-v2` + `api-v2`. Never use v1 packages.
+- **Backend**: All data access through `core` + `api`. Never use v1 packages.
