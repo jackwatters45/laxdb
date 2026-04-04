@@ -11,8 +11,8 @@
  *   bun src/extract/wla/run.ts --status
  */
 
-import { Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Command, Flag } from "effect/unstable/cli";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, LogLevel, Logger } from "effect";
 
 import {
@@ -28,21 +28,21 @@ import { WLAManifestService } from "./wla.manifest";
 
 const DEFAULT_SEASON = new Date().getFullYear();
 
-const seasonOption = Options.integer("season").pipe(
-  Options.withAlias("s"),
-  Options.withDescription(`Season year (default: ${DEFAULT_SEASON})`),
-  Options.withDefault(DEFAULT_SEASON),
+const seasonOption = Flag.integer("season").pipe(
+  Flag.withAlias("s"),
+  Flag.withDescription(`Season year (default: ${DEFAULT_SEASON})`),
+  Flag.withDefault(DEFAULT_SEASON),
 );
 
-const allOption = Options.boolean("all").pipe(
-  Options.withAlias("a"),
-  Options.withDescription("Extract all seasons (2005-2025)"),
-  Options.withDefault(false),
+const allOption = Flag.boolean("all").pipe(
+  Flag.withAlias("a"),
+  Flag.withDescription("Extract all seasons (2005-2025)"),
+  Flag.withDefault(false),
 );
 
-const scheduleOption = Options.boolean("schedule").pipe(
-  Options.withDescription("Include schedule extraction"),
-  Options.withDefault(false),
+const scheduleOption = Flag.boolean("schedule").pipe(
+  Flag.withDescription("Include schedule extraction"),
+  Flag.withDefault(false),
 );
 
 // Main command
@@ -106,7 +106,7 @@ cli(process.argv).pipe(
     Layer.mergeAll(
       WLAExtractorService.Default,
       WLAManifestService.Default,
-      BunContext.layer,
+      BunServices.layer,
     ),
   ),
   BunRuntime.runMain,

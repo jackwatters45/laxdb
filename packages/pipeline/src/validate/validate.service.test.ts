@@ -1,5 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { describe, it, expect, layer } from "@effect/vitest";
 import { Effect } from "effect";
 
@@ -19,7 +20,7 @@ const makeTempDir = Effect.gen(function* () {
   return path.join(tempBase, "validate-test");
 });
 
-layer(BunContext.layer)("validateFileExists", (it) => {
+layer(BunServices.layer)("validateFileExists", (it) => {
   it.scoped("returns exists: true for existing file", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
@@ -53,7 +54,7 @@ layer(BunContext.layer)("validateFileExists", (it) => {
   );
 });
 
-layer(BunContext.layer)("validateJsonArray", (it) => {
+layer(BunServices.layer)("validateJsonArray", (it) => {
   it.scoped("validates valid JSON array", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;

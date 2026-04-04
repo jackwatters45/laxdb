@@ -1,5 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer, Schema } from "effect";
 
 import { PLLClient } from "../../pll/pll.client";
@@ -610,7 +611,7 @@ export class PLLExtractorService extends Effect.Service<PLLExtractorService>()(
         ExtractConfigService.Default,
         PLLManifestService.Default,
         IncrementalExtractionService.Default,
-        BunContext.layer,
+        BunServices.layer,
       ),
     ],
   },

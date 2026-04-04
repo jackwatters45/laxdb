@@ -1,6 +1,6 @@
-import { FileSystem } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { SystemError } from "@effect/platform/Error";
+import { FileSystem } from "effect/FileSystem";
+import { BunServices } from "@effect/platform-bun";
+import { SystemError } from "effect/PlatformError";
 import { Effect, Exit, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -36,7 +36,7 @@ describe("saveJson", () => {
       ...overrides,
     } as unknown as FileSystem.FileSystem);
 
-    return Layer.provideMerge(MockFS, BunContext.layer);
+    return Layer.provideMerge(MockFS, BunServices.layer);
   };
 
   it("creates directory and writes file successfully", async () => {

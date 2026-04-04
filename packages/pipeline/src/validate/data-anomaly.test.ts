@@ -1,9 +1,10 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { describe, it, expect, beforeAll } from "@effect/vitest";
 import { Effect, Schema, Ref } from "effect";
 
-const TestLayer = BunContext.layer;
+const TestLayer = BunServices.layer;
 
 const PlayerDetailSchema = Schema.Struct({
   slug: Schema.String,

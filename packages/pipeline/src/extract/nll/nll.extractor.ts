@@ -1,5 +1,5 @@
-import { Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
@@ -312,7 +312,7 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         ExtractConfigService.Default,
         NLLManifestService.Default,
         IncrementalExtractionService.Default,
-        BunContext.layer,
+        BunServices.layer,
       ),
     ],
   },

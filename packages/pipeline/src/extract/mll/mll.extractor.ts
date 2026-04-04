@@ -1,5 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
@@ -408,7 +409,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         ExtractConfigService.Default,
         MLLManifestService.Default,
         IncrementalExtractionService.Default,
-        BunContext.layer,
+        BunServices.layer,
       ),
     ],
   },

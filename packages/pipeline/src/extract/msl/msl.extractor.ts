@@ -1,5 +1,5 @@
-import { Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Either, Layer } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
@@ -349,7 +349,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
         ExtractConfigService.Default,
         MSLManifestService.Default,
         IncrementalExtractionService.Default,
-        BunContext.layer,
+        BunServices.layer,
       ),
     ],
   },

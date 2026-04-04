@@ -5,8 +5,9 @@
  * This factory creates a manifest service given the source name and empty season manifest creator.
  */
 
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer, Schema } from "effect";
 
 import { ExtractConfigService } from "./extract.config";
@@ -232,5 +233,5 @@ export const createManifestServiceEffect = <
 /** Default dependencies for manifest services */
 export const ManifestServiceDependencies = Layer.merge(
   ExtractConfigService.Default,
-  BunContext.layer,
+  BunServices.layer,
 );

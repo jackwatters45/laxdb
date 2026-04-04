@@ -10,8 +10,8 @@
  *   bun src/extract/nll/run.ts --status
  */
 
-import { Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Command, Flag } from "effect/unstable/cli";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, LogLevel, Logger } from "effect";
 
 import {
@@ -25,10 +25,10 @@ import {
 import { NLLExtractorService } from "./nll.extractor";
 import { NLLManifestService } from "./nll.manifest";
 
-const seasonOption = Options.integer("season").pipe(
-  Options.withAlias("s"),
-  Options.withDescription("Season ID to extract"),
-  Options.withDefault(225),
+const seasonOption = Flag.integer("season").pipe(
+  Flag.withAlias("s"),
+  Flag.withDescription("Season ID to extract"),
+  Flag.withDefault(225),
 );
 
 // Main command
@@ -78,7 +78,7 @@ cli(process.argv).pipe(
     Layer.mergeAll(
       NLLExtractorService.Default,
       NLLManifestService.Default,
-      BunContext.layer,
+      BunServices.layer,
     ),
   ),
   BunRuntime.runMain,

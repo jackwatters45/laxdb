@@ -1,4 +1,5 @@
-import { FileSystem, Path } from "@effect/platform";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 import { readJsonFile } from "@laxdb/core/util";
 import { Effect, Schema } from "effect";
 

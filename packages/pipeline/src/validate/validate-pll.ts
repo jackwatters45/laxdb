@@ -1,5 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { readJsonFile } from "@laxdb/core/util";
 import { Effect, Layer } from "effect";
 
@@ -332,7 +333,7 @@ const program = Effect.gen(function* () {
 
 const MainLayer = Layer.mergeAll(
   ExtractConfigService.Default,
-  BunContext.layer,
+  BunServices.layer,
 );
 
 BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

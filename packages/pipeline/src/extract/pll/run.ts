@@ -10,8 +10,8 @@
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --status
  */
 
-import { Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Command, Flag } from "effect/unstable/cli";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, LogLevel, Logger, Option } from "effect";
 
 import {
@@ -25,21 +25,21 @@ import {
 import { PLLExtractorService } from "./pll.extractor";
 import { PLLManifestService } from "./pll.manifest";
 
-const yearOption = Options.integer("year").pipe(
-  Options.withAlias("y"),
-  Options.withDescription("Extract specific year (2019-2030)"),
-  Options.optional,
+const yearOption = Flag.integer("year").pipe(
+  Flag.withAlias("y"),
+  Flag.withDescription("Extract specific year (2019-2030)"),
+  Flag.optional,
 );
 
-const allOption = Options.boolean("all").pipe(
-  Options.withAlias("a"),
-  Options.withDescription("Extract all years (2019-2025)"),
-  Options.withDefault(false),
+const allOption = Flag.boolean("all").pipe(
+  Flag.withAlias("a"),
+  Flag.withDescription("Extract all years (2019-2025)"),
+  Flag.withDefault(false),
 );
 
-const noDetailsOption = Options.boolean("no-details").pipe(
-  Options.withDescription("Skip detail endpoints (faster)"),
-  Options.withDefault(false),
+const noDetailsOption = Flag.boolean("no-details").pipe(
+  Flag.withDescription("Skip detail endpoints (faster)"),
+  Flag.withDefault(false),
 );
 
 // Main command
@@ -116,7 +116,7 @@ cli(process.argv).pipe(
     Layer.mergeAll(
       PLLExtractorService.Default,
       PLLManifestService.Default,
-      BunContext.layer,
+      BunServices.layer,
     ),
   ),
   BunRuntime.runMain,

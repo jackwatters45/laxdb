@@ -1,7 +1,8 @@
 import { relative } from "node:path";
 
-import { FileSystem, Path } from "@effect/platform";
-import type { PlatformError } from "@effect/platform/Error";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import type { PlatformError } from "effect/PlatformError";
 import { Duration, Effect, Either, Schema } from "effect";
 
 import { type PipelineError, type RateLimitError } from "../error";

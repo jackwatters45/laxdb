@@ -1,5 +1,5 @@
-import { Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
 import { Effect, Config } from "effect";
 
 export interface ExtractConfig {
@@ -35,6 +35,6 @@ export class ExtractConfigService extends Effect.Service<ExtractConfigService>()
         delayBetweenBatchesMs,
       } satisfies ExtractConfig;
     }),
-    dependencies: [BunContext.layer],
+    dependencies: [BunServices.layer],
   },
 ) {}

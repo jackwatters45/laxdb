@@ -11,8 +11,8 @@
  *   bun src/extract/mll/run.ts --status
  */
 
-import { Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Command, Flag } from "effect/unstable/cli";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, LogLevel, Logger } from "effect";
 
 import {
@@ -26,21 +26,21 @@ import {
 import { MLLExtractorService } from "./mll.extractor";
 import { MLLManifestService } from "./mll.manifest";
 
-const yearOption = Options.integer("year").pipe(
-  Options.withAlias("y"),
-  Options.withDescription("Extract specific year (default: 2019)"),
-  Options.withDefault(2019),
+const yearOption = Flag.integer("year").pipe(
+  Flag.withAlias("y"),
+  Flag.withDescription("Extract specific year (default: 2019)"),
+  Flag.withDefault(2019),
 );
 
-const allOption = Options.boolean("all").pipe(
-  Options.withAlias("a"),
-  Options.withDescription("Extract all seasons (2001-2020)"),
-  Options.withDefault(false),
+const allOption = Flag.boolean("all").pipe(
+  Flag.withAlias("a"),
+  Flag.withDescription("Extract all seasons (2001-2020)"),
+  Flag.withDefault(false),
 );
 
-const withScheduleOption = Options.boolean("with-schedule").pipe(
-  Options.withDescription("Include Wayback schedule extraction"),
-  Options.withDefault(false),
+const withScheduleOption = Flag.boolean("with-schedule").pipe(
+  Flag.withDescription("Include Wayback schedule extraction"),
+  Flag.withDefault(false),
 );
 
 // Main command
@@ -104,7 +104,7 @@ cli(process.argv).pipe(
     Layer.mergeAll(
       MLLExtractorService.Default,
       MLLManifestService.Default,
-      BunContext.layer,
+      BunServices.layer,
     ),
   ),
   BunRuntime.runMain,
