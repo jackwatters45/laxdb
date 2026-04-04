@@ -1,9 +1,17 @@
 import { RpcApiClient } from "@laxdb/api-v2/client";
 import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+  FieldLegend,
+  FieldDescription,
+} from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
-import { Label } from "@laxdb/ui/components/ui/label";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import { cn } from "@laxdb/ui/lib/utils";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
@@ -19,7 +27,6 @@ import { runApi } from "@/lib/api";
 // Client form shape — date is a string here, converted to Date in the handler.
 // The RPC uses core-v2's CreatePracticeInput which expects Date.
 const CreatePracticeForm = Schema.Struct({
-  name: Schema.String,
   date: Schema.NullOr(Schema.String),
   description: Schema.NullOr(Schema.String),
   durationMinutes: Schema.NullOr(Schema.Number),
@@ -35,7 +42,7 @@ const createPractice = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
         return yield* client.PracticeCreate({
-          name: data.name || null,
+          name: null,
           date: data.date ? new Date(data.date) : null,
           description: data.description ?? null,
           notes: null,
@@ -92,7 +99,6 @@ function NewPracticePage() {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
 
-  const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [duration, setDuration] = useState("");
   const [location, setLocation] = useState("");
@@ -103,7 +109,6 @@ function NewPracticePage() {
     setCreating(true);
     const practice = await createPractice({
       data: {
-        name: name || "Untitled Practice",
         date: date || null,
         description: description || null,
         durationMinutes: duration ? parseInt(duration, 10) : null,
@@ -130,33 +135,18 @@ function NewPracticePage() {
 
       <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
         {/* Details */}
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Details</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              All fields are optional — you can fill these in later.
-            </p>
-          </div>
-
-          <div className="grid gap-4">
-            <div>
-              <Label htmlFor="name">Practice Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-                placeholder="e.g. Tuesday Team Practice"
-              />
-            </div>
-
+        <FieldSet>
+          <FieldLegend>Details</FieldLegend>
+          <FieldDescription className="-mt-1.5">
+            All fields are optional — you can fill these in later.
+          </FieldDescription>
+          <FieldGroup>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="date">
-                  <Calendar size={12} className="inline mr-1.5 -mt-0.5" />
+              <Field>
+                <FieldLabel htmlFor="date">
+                  <Calendar size={12} />
                   Date
-                </Label>
+                </FieldLabel>
                 <Input
                   id="date"
                   type="date"
@@ -165,12 +155,12 @@ function NewPracticePage() {
                     setDate(e.target.value);
                   }}
                 />
-              </div>
-              <div>
-                <Label htmlFor="duration">
-                  <Clock size={12} className="inline mr-1.5 -mt-0.5" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="duration">
+                  <Clock size={12} />
                   Duration (minutes)
-                </Label>
+                </FieldLabel>
                 <Input
                   id="duration"
                   type="number"
@@ -182,14 +172,14 @@ function NewPracticePage() {
                   min={1}
                   max={300}
                 />
-              </div>
+              </Field>
             </div>
 
-            <div>
-              <Label htmlFor="location">
-                <MapPin size={12} className="inline mr-1.5 -mt-0.5" />
+            <Field>
+              <FieldLabel htmlFor="location">
+                <MapPin size={12} />
                 Location
-              </Label>
+              </FieldLabel>
               <Input
                 id="location"
                 value={location}
@@ -198,10 +188,10 @@ function NewPracticePage() {
                 }}
                 placeholder="e.g. Main Field"
               />
-            </div>
+            </Field>
 
-            <div>
-              <Label htmlFor="description">Description</Label>
+            <Field>
+              <FieldLabel htmlFor="description">Description</FieldLabel>
               <Textarea
                 id="description"
                 value={description}
@@ -211,33 +201,32 @@ function NewPracticePage() {
                 placeholder="Practice focus, goals, themes..."
                 className="min-h-[80px]"
               />
-            </div>
-          </div>
-        </section>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
         <Separator />
 
         {/* Templates */}
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Template</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Choose a starting structure for your practice.
-            </p>
-          </div>
-
+        <FieldSet>
+          <FieldLegend>Template</FieldLegend>
+          <FieldDescription className="-mt-1.5">
+            Choose a starting structure for your practice.
+          </FieldDescription>
           <div className="grid grid-cols-2 gap-3">
             {TEMPLATES.map((template) => (
               <button
                 key={template.id}
+                type="button"
                 onClick={() => {
                   setSelectedTemplate(template.id);
                 }}
-                className={`text-left rounded-lg border p-4 transition-colors ${
+                className={cn(
+                  "text-left rounded-lg border p-4 transition-colors",
                   selectedTemplate === template.id
                     ? "border-foreground bg-accent"
-                    : "border-border hover:border-foreground/20"
-                }`}
+                    : "border-border hover:border-foreground/20",
+                )}
               >
                 <p className="text-sm font-medium text-foreground">
                   {template.name}
@@ -248,7 +237,7 @@ function NewPracticePage() {
               </button>
             ))}
           </div>
-        </section>
+        </FieldSet>
 
         <Separator />
 

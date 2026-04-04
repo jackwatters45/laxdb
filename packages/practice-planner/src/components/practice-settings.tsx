@@ -60,16 +60,6 @@ export function PracticeSettings({
       {/* Fields */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 space-y-5">
-          <Field label="Name" icon={<FileText className="size-3.5" />}>
-            <Input
-              value={practice.name}
-              onChange={(e) => {
-                onUpdate({ name: e.target.value });
-              }}
-              placeholder="Practice name"
-            />
-          </Field>
-
           <Field label="Date" icon={<Calendar className="size-3.5" />}>
             <Input
               type="date"

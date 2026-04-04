@@ -10,12 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DrillsIndexRouteImport } from './routes/drills/index'
 import { Route as PracticeNewRouteImport } from './routes/practice/new'
 import { Route as PracticeIdRouteImport } from './routes/practice/$id'
+import { Route as DrillsNewRouteImport } from './routes/drills/new'
+import { Route as DrillsIdRouteImport } from './routes/drills/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsIndexRoute = DrillsIndexRouteImport.update({
+  id: '/drills/',
+  path: '/drills/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeNewRoute = PracticeNewRouteImport.update({
@@ -28,35 +36,76 @@ const PracticeIdRoute = PracticeIdRouteImport.update({
   path: '/practice/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DrillsNewRoute = DrillsNewRouteImport.update({
+  id: '/drills/new',
+  path: '/drills/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsIdRoute = DrillsIdRouteImport.update({
+  id: '/drills/$id',
+  path: '/drills/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills/': typeof DrillsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills': typeof DrillsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/drills/$id': typeof DrillsIdRoute
+  '/drills/new': typeof DrillsNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
+  '/drills/': typeof DrillsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/practice/$id' | '/practice/new'
+  fullPaths:
+    | '/'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/practice/$id' | '/practice/new'
-  id: '__root__' | '/' | '/practice/$id' | '/practice/new'
+  to:
+    | '/'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills'
+  id:
+    | '__root__'
+    | '/'
+    | '/drills/$id'
+    | '/drills/new'
+    | '/practice/$id'
+    | '/practice/new'
+    | '/drills/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DrillsIdRoute: typeof DrillsIdRoute
+  DrillsNewRoute: typeof DrillsNewRoute
   PracticeIdRoute: typeof PracticeIdRoute
   PracticeNewRoute: typeof PracticeNewRoute
+  DrillsIndexRoute: typeof DrillsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills/': {
+      id: '/drills/'
+      path: '/drills'
+      fullPath: '/drills/'
+      preLoaderRoute: typeof DrillsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice/new': {
@@ -82,13 +138,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/drills/new': {
+      id: '/drills/new'
+      path: '/drills/new'
+      fullPath: '/drills/new'
+      preLoaderRoute: typeof DrillsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills/$id': {
+      id: '/drills/$id'
+      path: '/drills/$id'
+      fullPath: '/drills/$id'
+      preLoaderRoute: typeof DrillsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DrillsIdRoute: DrillsIdRoute,
+  DrillsNewRoute: DrillsNewRoute,
   PracticeIdRoute: PracticeIdRoute,
   PracticeNewRoute: PracticeNewRoute,
+  DrillsIndexRoute: DrillsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

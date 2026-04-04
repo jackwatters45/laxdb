@@ -22,9 +22,11 @@ import {
   MapPin,
   ChevronRight,
   Trash2,
+  Library,
 } from "lucide-react";
 
 import { runApi } from "@/lib/api";
+import { practiceName } from "@/lib/practice-name";
 
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
@@ -72,6 +74,13 @@ function PracticeListPage() {
         <h1 className="text-lg font-semibold text-foreground">
           Practice Plans
         </h1>
+        <div className="flex-1" />
+        <Link to="/drills">
+          <Button variant="ghost">
+            <Library size={16} />
+            Drill Bank
+          </Button>
+        </Link>
         <Link to="/practice/new">
           <Button>
             <Plus />
@@ -127,7 +136,7 @@ function PracticeCard({
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground truncate">
-              {practice.name ?? "Untitled Practice"}
+              {practiceName(practice)}
             </span>
             <Badge
               variant="secondary"
@@ -190,7 +199,7 @@ function PracticeCard({
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Delete "{practice.name ?? "Untitled Practice"}"?
+                Delete "{practiceName(practice)}"?
               </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this practice plan and all its
