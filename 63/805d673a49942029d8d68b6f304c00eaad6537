@@ -1,0 +1,23 @@
+packages/practice-planner/src/routes/settings.tsx
+  a35b76669b61b8c3 12,15-16,75,79-82,88-89,92,104,120,122-123,137-139,148,152,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "63805d673a49942029d8d68b6f304c00eaad6537",
+  "prompts": {
+    "a35b76669b61b8c3": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "3d57c0f8-bb2a-4fc1-8c09-596132cb6fc2",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 25,
+      "accepted_lines": 21,
+      "overriden_lines": 0
+    }
+  }
+}

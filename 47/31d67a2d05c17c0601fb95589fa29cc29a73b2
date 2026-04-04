@@ -1,0 +1,9 @@
+packages/practice-planner/src/routes/settings.tsx
+  a35b76669b61b8c3 12,15-16,75,79-83,89-90,93,105,121,123-124,138-140,149,153,162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4731d67a2d05c17c0601fb95589fa29cc29a73b2",
+  "prompts": {}
+}
