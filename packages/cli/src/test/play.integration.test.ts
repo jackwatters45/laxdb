@@ -17,6 +17,7 @@ let testServer: TestServer;
 const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
+
 beforeAll(async () => {
   testServer = await startTestServer();
 });
@@ -112,6 +113,24 @@ describe("Play RPC", () => {
     expect(play.formation).toBe("2-2-2");
     expect(play.description).toBe("Extra man offense play");
     expect(play.tags).toEqual(["emo", "settled"]);
+  });
+
+  it("bulk-create smoke test creates multiple plays", async () => {
+    const [created, plays] = await run(
+      Effect.gen(function* () {
+        const client = yield* RpcApiClient;
+        const created = yield* Effect.forEach(
+          [minimalPlay, { ...minimalPlay, name: "Clear 1", category: "clear" as const }],
+          (item) => client.PlayCreate(item),
+          { concurrency: 5 },
+        );
+        const plays = yield* client.PlayList();
+        return [created, plays] as const;
+      }),
+    );
+
+    expect(created).toHaveLength(2);
+    expect(plays).toHaveLength(2);
   });
 
   it("lists all plays", async () => {

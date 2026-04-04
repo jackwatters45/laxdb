@@ -9,6 +9,9 @@
  *   bun src/play.ts delete <publicId>
  *   echo '[...]' | bun src/play.ts bulk-create
  *
+ * Bulk operations are concurrent for throughput but non-atomic: a later failure
+ * does not roll back items already created, updated, or deleted.
+ *
  * Add --pretty for formatted JSON output.
  */
 

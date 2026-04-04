@@ -6,6 +6,8 @@ export const CLI_ENTRYPOINTS = [
   "practice",
 ] as const;
 
+// Must stay alphabetically sorted and be updated whenever a new API RPC is
+// intentionally exposed through the CLI. coverage.test.ts enforces both.
 export const CLI_RPC_COVERAGE = [
   "DefaultsGetNamespace",
   "DefaultsPatchNamespace",

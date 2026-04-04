@@ -51,6 +51,10 @@ function runHelp(entrypoint: string) {
         cwd: cliPkgRoot,
       });
 
+      const timeout = setTimeout(() => {
+        child.kill("SIGTERM");
+      }, 5_000);
+
       let stdout = "";
       let stderr = "";
 
@@ -62,14 +66,26 @@ function runHelp(entrypoint: string) {
         stderr += chunk.toString();
       });
 
-      child.on("close", (code) => {
-        resolve({ code, stdout, stderr });
+      child.on("close", (code, signal) => {
+        clearTimeout(timeout);
+        resolve({
+          code,
+          stdout,
+          stderr:
+            signal === "SIGTERM"
+              ? `${stderr}\nTimed out waiting for --help output`
+              : stderr,
+        });
       });
     },
   );
 }
 
 describe("CLI coverage", () => {
+  it("keeps the coverage manifest sorted", () => {
+    expect([...CLI_RPC_COVERAGE]).toEqual([...CLI_RPC_COVERAGE].toSorted());
+  });
+
   it("tracks every RPC exposed by the API", async () => {
     await expect(getApiRpcNames()).resolves.toEqual([...CLI_RPC_COVERAGE]);
   });
