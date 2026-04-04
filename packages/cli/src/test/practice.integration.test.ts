@@ -4,7 +4,7 @@
  * Tests the full RPC round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcApiClient } from "@laxdb/api-v2/client";
+import { RpcApiClient } from "@laxdb/api/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

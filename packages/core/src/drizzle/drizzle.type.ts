@@ -26,5 +26,4 @@ export const timestamps = {
   updatedAt: timestamp("updated_at").$onUpdate(
     () => /* @__PURE__ */ new Date(),
   ),
-  deletedAt: timestamp("deleted_at"),
 };

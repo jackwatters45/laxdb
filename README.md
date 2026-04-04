@@ -9,27 +9,26 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 - Infrastructure: Cloudflare Workers via Alchemy (TypeScript IaC)
 - Database: PlanetScale (PostgreSQL) with Drizzle ORM
 - Authentication: better-auth with organization and team support
-- Frontend: TanStack Start (Web App, Marketing Site)
+- Frontend: TanStack Start (Practice Planner, Marketing Site)
 - Monorepo Management: Bun Workspaces and Turborepo
 
 ## Project Structure
 
 - `packages/api`: Effect-based HTTP API with RPC support
 - `packages/core`: Shared business logic, database schemas, and core services
+- `packages/cli`: RPC-driven developer CLI
 - `packages/docs`: Documentation site built with Fumadocs
-- `packages/effect-cloudflare`: Effect-TS bindings for Cloudflare primitives (KV, R2, D1, etc.)
 - `packages/marketing`: Marketing website built with TanStack Start
 - `packages/pipeline`: Effect-based web scraping and HTML parsing pipeline
-- `packages/scripts`: Internal utility and maintenance scripts
+- `packages/practice-planner`: Practice planning app built with TanStack Start
 - `packages/ui`: Shared UI component library built with shadcn/ui (Base UI)
-- `packages/web`: Main web application built with TanStack Start, deployed on Cloudflare Workers
 
 ## Getting Started
 
 ### Prerequisites
 
 - Bun runtime
-- Cloudflare account with Wrangler CLI configured
+- Cloudflare account access
 
 ### Environment Setup
 

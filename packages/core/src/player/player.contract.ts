@@ -8,32 +8,29 @@ import {
 } from "../error";
 
 import {
-  AddPlayerToTeamInput,
-  BulkDeletePlayersInput,
-  BulkRemovePlayersFromTeamInput,
   CreatePlayerInput,
-  DeletePlayerInput,
-  GetAllPlayersInput,
-  GetTeamPlayersInput,
   Player,
-  RemovePlayerFromTeamInput,
-  TeamPlayer,
+  PlayerByIdInput,
   UpdatePlayerInput,
-  UpdateTeamPlayerInput,
 } from "./player.schema";
 
-export const PlayerErrors = Schema.Union(
+export const PlayerErrors = Schema.Union([
   NotFoundError,
   ValidationError,
   DatabaseError,
   ConstraintViolationError,
-);
+]);
 
 export const PlayerContract = {
   list: {
     success: Schema.Array(Player),
     error: PlayerErrors,
-    payload: GetAllPlayersInput,
+    payload: Schema.NullOr(Schema.Void),
+  },
+  get: {
+    success: Player,
+    error: PlayerErrors,
+    payload: PlayerByIdInput,
   },
   create: {
     success: Player,
@@ -48,36 +45,6 @@ export const PlayerContract = {
   delete: {
     success: Player,
     error: PlayerErrors,
-    payload: DeletePlayerInput,
-  },
-  bulkDelete: {
-    success: Schema.Void,
-    error: PlayerErrors,
-    payload: BulkDeletePlayersInput,
-  },
-  getTeamPlayers: {
-    success: Schema.Array(TeamPlayer),
-    error: PlayerErrors,
-    payload: GetTeamPlayersInput,
-  },
-  addPlayerToTeam: {
-    success: Schema.Any,
-    error: PlayerErrors,
-    payload: AddPlayerToTeamInput,
-  },
-  updateTeamPlayer: {
-    success: Schema.Any,
-    error: PlayerErrors,
-    payload: UpdateTeamPlayerInput,
-  },
-  removePlayerFromTeam: {
-    success: Schema.Void,
-    error: PlayerErrors,
-    payload: RemovePlayerFromTeamInput,
-  },
-  bulkRemovePlayersFromTeam: {
-    success: Schema.Void,
-    error: PlayerErrors,
-    payload: BulkRemovePlayersFromTeamInput,
+    payload: PlayerByIdInput,
   },
 } as const;

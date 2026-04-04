@@ -7,8 +7,8 @@
 - **`autoLayout` uses `Array.shift()` for BFS (O(n²))**: Fine for typical practice sizes, but a proper deque would be more correct.
 - **Extract `cn` utility**: Replace manual template-literal class concatenations — reuse `cn` from `@laxdb/ui` to reduce noise.
 - **`globals.css` SVG workaround**: `svg, svg * { position: static }` patches a bug where a global `div { position: relative }` in `@laxdb/ui` breaks SVG layout. Fix the root cause in `@laxdb/ui/globals.css` instead.
-- **`@laxdb/api-v2` added to `@laxdb/cli`**: Verify this lockfile change was intentional — may be an accidental dependency from the merge.
+- **`@laxdb/api` added to `@laxdb/cli`**: Verify this lockfile change was intentional — may be an accidental dependency from the merge.
 
 ## Architecture
 
-- **Consider folding into `packages/web`**: Evaluate whether this should be a route in the main app rather than a standalone Cloudflare Worker, to avoid maintaining a separate deployment target for a UI prototype.
+- **Consider folding into a future product app**: Evaluate whether this should remain a standalone Cloudflare Worker or eventually live inside a broader application surface to avoid maintaining a separate deployment target.

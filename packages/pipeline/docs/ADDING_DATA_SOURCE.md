@@ -646,4 +646,4 @@ After extraction and validation are complete:
 1. **Database Schema** - Design Drizzle tables in `@laxdb/core`
 2. **Import Service** - Create sync service to populate database
 3. **API Layer** - Add endpoints in `@laxdb/api`
-4. **Web Routes** - Build UI in `@laxdb/web`
+4. **App Routes** - Build UI in `@laxdb/practice-planner` (or another active frontend package)

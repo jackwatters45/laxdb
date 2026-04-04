@@ -1,19 +1,21 @@
-import { Layer } from "effect";
+import { Layer, ServiceMap } from "effect";
+import { RpcClient } from "effect/unstable/rpc";
 
-import { RpcAuthClient } from "./auth/auth.client";
-import { RpcGameClient } from "./game/game.client";
-import { RpcOrganizationClient } from "./organization/organization.client";
-import { RpcContactInfoClient } from "./player/contact-info/contact-info.client";
-import { RpcPlayerClient } from "./player/player.client";
-import { RpcSeasonClient } from "./season/season.client";
-import { RpcTeamClient } from "./team/team.client";
+import { LaxdbRpcV2 } from "./rpc-group";
 
-export const RpcClientLive = Layer.mergeAll(
-  RpcGameClient.Default,
-  RpcSeasonClient.Default,
-  RpcPlayerClient.Default,
-  RpcContactInfoClient.Default,
-  RpcTeamClient.Default,
-  RpcOrganizationClient.Default,
-  RpcAuthClient.Default,
-);
+/**
+ * Single RPC client for all api groups (Drill, Player, Practice).
+ *
+ * Uses one RpcClient.make with the merged group — mirrors the server's
+ * single RpcServer.layerHttp({ group: LaxdbRpcV2 }). This is required
+ * because each RpcClient.make call needs its own Protocol (withRun's
+ * semaphore only allows one active `run` callback).
+ */
+export class RpcApiClient extends ServiceMap.Service<RpcApiClient>()(
+  "RpcApiClient",
+  {
+    make: RpcClient.make(LaxdbRpcV2),
+  },
+) {
+  static readonly layer = Layer.effect(this, this.make);
+}

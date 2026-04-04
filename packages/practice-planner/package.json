@@ -13,8 +13,8 @@
     "fix": "bun run lint && bun run format"
   },
   "dependencies": {
-    "@laxdb/api-v2": "workspace:*",
-    "@laxdb/core-v2": "workspace:*",
+    "@laxdb/api": "workspace:*",
+    "@laxdb/core": "workspace:*",
     "@laxdb/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.95.2",

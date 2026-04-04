@@ -90,6 +90,14 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
 ) {}
 ```
 
+## ENUM STRATEGY
+
+Use **text columns in PG** + **`Schema.Literal` unions in Effect** for enumerated values. No Postgres enums.
+
+- **Why:** PG enums require migrations to add/remove values (`ALTER TYPE`). Removing values is especially painful. Text + schema validation lets us evolve values with a code change, no migration.
+- **Pattern:** Define `Schema.Literal` in `{domain}.schema.ts`, use as text column in `{domain}.sql.ts`
+- **Example:** `drill.schema.ts` — `Difficulty`, `Category`, `PositionGroup`, `Intensity`, `FieldSpace`
+
 ## ANTI-PATTERNS
 
 | Pattern | Why Bad | Do Instead |
@@ -105,12 +113,11 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
 
 - **Effect Schema**: Uses `Schema.Class<T>("Name")({...})` pattern, NOT Zod
 - **PlanetScale**: PostgreSQL mode, not MySQL - use pg syntax
-- **runtime.server.ts**: Composes all services - add new services here
+- **Layer wiring lives with each package**: Services expose their own layers (for example `PlayerService.layer`) and are composed at the API boundary.
 - **Config**: Use `AppConfig` for env vars, secrets use `Config.redacted()`
 
 ## CHILD INTENT NODES
 
 Only complex subsystems have dedicated Intent Nodes. Other domains (organization, team, player, game, season, feedback, email, user) follow the standard per-domain file pattern above and don't need separate documentation.
 
-- `src/auth/AGENTS.md` - Authentication, roles, permissions (better-auth integration is non-trivial)
-- `src/drizzle/AGENTS.md` - Database connection, Hyperdrive/PlanetScale specifics
+- `src/drizzle/CLAUDE.md` - Database connection, Hyperdrive/PlanetScale specifics

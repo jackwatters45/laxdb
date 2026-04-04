@@ -8,11 +8,11 @@
 
 import { createServer, type Server } from "node:http";
 
-import { DrillRpcHandlers } from "@laxdb/api-v2/drill/drill.rpc-handlers";
-import { PlayerRpcHandlers } from "@laxdb/api-v2/player/player.rpc-handlers";
-import { PracticeRpcHandlers } from "@laxdb/api-v2/practice/practice.rpc-handlers";
-import { LaxdbRpcV2 } from "@laxdb/api-v2/rpc-group";
-import { TestDatabaseLive, truncateAll } from "@laxdb/core-v2/test/db";
+import { DrillRpcHandlers } from "@laxdb/api/drill/drill.rpc-handlers";
+import { PlayerRpcHandlers } from "@laxdb/api/player/player.rpc-handlers";
+import { PracticeRpcHandlers } from "@laxdb/api/practice/practice.rpc-handlers";
+import { LaxdbRpcV2 } from "@laxdb/api/rpc-group";
+import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
 import { HttpRouter, HttpServer } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
