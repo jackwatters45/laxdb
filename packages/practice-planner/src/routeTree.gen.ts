@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaybookIndexRouteImport } from './routes/playbook/index'
 import { Route as DrillsIndexRouteImport } from './routes/drills/index'
 import { Route as PracticeNewRouteImport } from './routes/practice/new'
 import { Route as PracticeIdRouteImport } from './routes/practice/$id'
+import { Route as PlaybookNewRouteImport } from './routes/playbook/new'
+import { Route as PlaybookIdRouteImport } from './routes/playbook/$id'
 import { Route as DrillsNewRouteImport } from './routes/drills/new'
 import { Route as DrillsIdRouteImport } from './routes/drills/$id'
 
@@ -25,6 +28,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIndexRoute = PlaybookIndexRouteImport.update({
+  id: '/playbook/',
+  path: '/playbook/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrillsIndexRoute = DrillsIndexRouteImport.update({
@@ -40,6 +48,16 @@ const PracticeNewRoute = PracticeNewRouteImport.update({
 const PracticeIdRoute = PracticeIdRouteImport.update({
   id: '/practice/$id',
   path: '/practice/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookNewRoute = PlaybookNewRouteImport.update({
+  id: '/playbook/new',
+  path: '/playbook/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookIdRoute = PlaybookIdRouteImport.update({
+  id: '/playbook/$id',
+  path: '/playbook/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrillsNewRoute = DrillsNewRouteImport.update({
@@ -58,18 +76,24 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
   '/drills/': typeof DrillsIndexRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
   '/drills': typeof DrillsIndexRoute
+  '/playbook': typeof PlaybookIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +101,12 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/drills/$id': typeof DrillsIdRoute
   '/drills/new': typeof DrillsNewRoute
+  '/playbook/$id': typeof PlaybookIdRoute
+  '/playbook/new': typeof PlaybookNewRoute
   '/practice/$id': typeof PracticeIdRoute
   '/practice/new': typeof PracticeNewRoute
   '/drills/': typeof DrillsIndexRoute
+  '/playbook/': typeof PlaybookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +115,36 @@ export interface FileRouteTypes {
     | '/settings'
     | '/drills/$id'
     | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
     | '/practice/$id'
     | '/practice/new'
     | '/drills/'
+    | '/playbook/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/settings'
     | '/drills/$id'
     | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
     | '/practice/$id'
     | '/practice/new'
     | '/drills'
+    | '/playbook'
   id:
     | '__root__'
     | '/'
     | '/settings'
     | '/drills/$id'
     | '/drills/new'
+    | '/playbook/$id'
+    | '/playbook/new'
     | '/practice/$id'
     | '/practice/new'
     | '/drills/'
+    | '/playbook/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +152,12 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   DrillsIdRoute: typeof DrillsIdRoute
   DrillsNewRoute: typeof DrillsNewRoute
+  PlaybookIdRoute: typeof PlaybookIdRoute
+  PlaybookNewRoute: typeof PlaybookNewRoute
   PracticeIdRoute: typeof PracticeIdRoute
   PracticeNewRoute: typeof PracticeNewRoute
   DrillsIndexRoute: typeof DrillsIndexRoute
+  PlaybookIndexRoute: typeof PlaybookIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/': {
+      id: '/playbook/'
+      path: '/playbook'
+      fullPath: '/playbook/'
+      preLoaderRoute: typeof PlaybookIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drills/': {
@@ -156,6 +202,20 @@ declare module '@tanstack/react-router' {
       path: '/practice/$id'
       fullPath: '/practice/$id'
       preLoaderRoute: typeof PracticeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/new': {
+      id: '/playbook/new'
+      path: '/playbook/new'
+      fullPath: '/playbook/new'
+      preLoaderRoute: typeof PlaybookNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook/$id': {
+      id: '/playbook/$id'
+      path: '/playbook/$id'
+      fullPath: '/playbook/$id'
+      preLoaderRoute: typeof PlaybookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drills/new': {
@@ -180,19 +240,13 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   DrillsIdRoute: DrillsIdRoute,
   DrillsNewRoute: DrillsNewRoute,
+  PlaybookIdRoute: PlaybookIdRoute,
+  PlaybookNewRoute: PlaybookNewRoute,
   PracticeIdRoute: PracticeIdRoute,
   PracticeNewRoute: PracticeNewRoute,
   DrillsIndexRoute: DrillsIndexRoute,
+  PlaybookIndexRoute: PlaybookIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

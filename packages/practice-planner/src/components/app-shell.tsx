@@ -1,10 +1,11 @@
 import { cn } from "@laxdb/ui/lib/utils";
 import { Link, useMatches } from "@tanstack/react-router";
-import { ClipboardList, Dumbbell, Settings } from "lucide-react";
+import { ClipboardList, Dumbbell, BookOpen, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "/", label: "Practices", icon: ClipboardList },
   { to: "/drills", label: "Drills", icon: Dumbbell },
+  { to: "/playbook", label: "Playbook", icon: BookOpen },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
