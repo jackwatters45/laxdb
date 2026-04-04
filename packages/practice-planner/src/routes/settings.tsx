@@ -9,11 +9,11 @@ import {
   FieldDescription,
 } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { ArrowLeft, Clock, MapPin, Loader2, Check } from "lucide-react";
-import { useState } from "react";
+import { Clock, MapPin, Loader2, Check } from "lucide-react";
+import { type FormEvent, useState } from "react";
 
 import { runApi } from "@/lib/api";
 import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
@@ -72,23 +72,25 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const defaults = Route.useLoaderData();
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const [duration, setDuration] = useState(
-    defaults.durationMinutes?.toString() ?? "",
-  );
-  const [location, setLocation] = useState(defaults.location ?? "");
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const raw = (fd.get("durationMinutes") ?? "") as string;
+    const loc = (fd.get("location") ?? "") as string;
 
-  const handleSave = async () => {
     setSaving(true);
     setSaved(false);
     await saveDefaults({
       data: {
-        durationMinutes: duration ? parseInt(duration, 10) : null,
-        location: location || null,
+        durationMinutes: raw ? parseInt(raw, 10) : null,
+        location: loc || null,
       },
     });
+    await router.invalidate();
     setSaving(false);
     setSaved(true);
     setTimeout(() => {
@@ -100,7 +102,7 @@ function SettingsPage() {
     <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
       <h1 className="text-lg font-semibold text-foreground">Settings</h1>
 
-      <div className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <FieldSet>
           <FieldLegend>Practice Defaults</FieldLegend>
           <FieldDescription className="-mt-1.5">
@@ -116,11 +118,10 @@ function SettingsPage() {
               </FieldLabel>
               <Input
                 id="default-duration"
+                name="durationMinutes"
                 type="number"
-                value={duration}
-                onChange={(e) => {
-                  setDuration(e.target.value);
-                }}
+                key={`dur-${defaults.durationMinutes}`}
+                defaultValue={defaults.durationMinutes?.toString() ?? ""}
                 placeholder="120"
                 min={15}
                 max={300}
@@ -134,10 +135,9 @@ function SettingsPage() {
               </FieldLabel>
               <Input
                 id="default-location"
-                value={location}
-                onChange={(e) => {
-                  setLocation(e.target.value);
-                }}
+                name="location"
+                key={`loc-${defaults.location}`}
+                defaultValue={defaults.location ?? ""}
                 placeholder="e.g. Main Field"
               />
             </Field>
@@ -146,9 +146,11 @@ function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <Link to="/">
-            <Button variant="ghost">Cancel</Button>
+            <Button type="button" variant="ghost">
+              Cancel
+            </Button>
           </Link>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button type="submit" disabled={saving}>
             {saving ? (
               <Loader2 className="animate-spin" />
             ) : saved ? (
@@ -157,7 +159,7 @@ function SettingsPage() {
             {saving ? "Saving\u2026" : saved ? "Saved" : "Save Defaults"}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
