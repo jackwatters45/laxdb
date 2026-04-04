@@ -1,0 +1,39 @@
+packages/practice-planner/src/routes/practice/new.tsx
+  38800d5d471b320a 24,27-34,71,110,115,117
+packages/core-v2/src/practice/practice-defaults.repo.ts
+  38800d5d471b320a 1-41,43-65
+packages/api-v2/src/practice/practice.rpc-handlers.ts
+  38800d5d471b320a 1,12,28-29,32-34
+packages/core-v2/src/practice/practice-defaults.sql.ts
+  38800d5d471b320a 1-16
+packages/core-v2/src/practice/practice-defaults.service.ts
+  38800d5d471b320a 1-51
+packages/core-v2/src/practice/practice-defaults.schema.ts
+  38800d5d471b320a 1-27
+packages/practice-planner/src/routes/settings.tsx
+  38800d5d471b320a 1-87,91-93,96,98-114,118-131,135-157
+packages/core-v2/src/practice/practice-defaults.contract.ts
+  38800d5d471b320a 1-31
+packages/api-v2/src/practice/practice.rpc.ts
+  38800d5d471b320a 1,76-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "e6f26345415cd08fc7e1472c8f071321a2bdadaa",
+  "prompts": {
+    "38800d5d471b320a": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "9ae6d38c-5f89-416c-83ac-6a1bdd93092c",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 402,
+      "total_deletions": 11,
+      "accepted_lines": 368,
+      "overriden_lines": 13
+    }
+  }
+}
