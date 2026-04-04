@@ -17,18 +17,10 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@laxdb/ui/components/ui/toggle-group";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import {
-  ArrowLeft,
-  Check,
-  Clock,
-  Loader2,
-  Pencil,
-  Users,
-  X,
-} from "lucide-react";
+import { Check, Clock, Loader2, Pencil, Users } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
@@ -284,17 +276,16 @@ function DrillDetailPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          to="/drills"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <h1 className="text-lg font-semibold text-foreground truncate">
-          {drill.name}
-        </h1>
-        <div className="flex-1" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            {drill.name}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Drill details, coaching notes, and reusable setup information.
+          </p>
+        </div>
+
         <Button
           variant="outline"
           onClick={() => {
@@ -513,22 +504,25 @@ interface DrillEditViewProps {
 function DrillEditView(props: DrillEditViewProps) {
   return (
     <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={props.onCancel}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X size={18} />
-        </button>
-        <h1 className="text-lg font-semibold text-foreground">Edit Drill</h1>
-        <div className="flex-1" />
-        <Button variant="ghost" onClick={props.onCancel}>
-          Cancel
-        </Button>
-        <Button onClick={props.onSave} disabled={props.saving || !props.name}>
-          {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
-          {props.saving ? "Saving…" : "Save"}
-        </Button>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Edit Drill
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Update the details, constraints, and coaching cues for this drill.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" onClick={props.onCancel}>
+            Cancel
+          </Button>
+          <Button onClick={props.onSave} disabled={props.saving || !props.name}>
+            {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
+            {props.saving ? "Saving…" : "Save"}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-8">

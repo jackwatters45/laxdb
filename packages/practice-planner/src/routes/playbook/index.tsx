@@ -20,15 +20,7 @@ import {
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import {
-  ArrowLeft,
-  BookOpen,
-  Plus,
-  Search,
-  Shield,
-  Swords,
-  Trash2,
-} from "lucide-react";
+import { BookOpen, Plus, Search, Shield, Swords, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
@@ -142,24 +134,25 @@ function PlaybookListPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="flex items-center h-14 px-6 border-b border-border bg-card gap-3">
-        <Link
-          to="/"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <h1 className="text-lg font-semibold text-foreground">Playbook</h1>
-        <div className="flex-1" />
-        <Link to="/playbook/new">
-          <Button>
-            <Plus />
-            New Play
-          </Button>
-        </Link>
-      </header>
-
       <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Playbook
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Save formations, personnel notes, and reference links for your
+              core sets.
+            </p>
+          </div>
+
+          <Link to="/playbook/new">
+            <Button>
+              <Plus />
+              New Play
+            </Button>
+          </Link>
+        </div>
         {/* Search & Filters */}
         <div className="space-y-3">
           <div className="relative max-w-sm">

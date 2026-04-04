@@ -15,7 +15,7 @@ import { cn } from "@laxdb/ui/lib/utils";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { ArrowLeft, Calendar, Clock, MapPin, Loader2 } from "lucide-react";
+import { Calendar, Clock, MapPin, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
@@ -138,14 +138,13 @@ function NewPracticePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
-      <div className="flex items-center gap-3">
-        <Link
-          to="/"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <h1 className="text-lg font-semibold text-foreground">New Practice</h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          New Practice
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Start a fresh practice plan and fill in the details as you go.
+        </p>
       </div>
 
       <div className="space-y-8">
