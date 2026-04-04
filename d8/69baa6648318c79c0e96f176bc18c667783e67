@@ -1,0 +1,23 @@
+packages/api-v2/src/play/play.rpc-handlers.ts
+  72b1a1a6c7b08f89 10,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d869baa6648318c79c0e96f176bc18c667783e67",
+  "prompts": {
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 4,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
