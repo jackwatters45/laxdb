@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@laxdb/core": "workspace:*",
-    "effect": "^4.0.0-beta.31"
+    "effect": "^4.0.0-beta.43"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
