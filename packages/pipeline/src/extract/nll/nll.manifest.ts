@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -36,14 +36,17 @@ export type NLLExtractionManifest = ExtractionManifest<
 >;
 
 // NLL Manifest Service - uses generic factory
-export class NLLManifestService extends Effect.Service<NLLManifestService>()(
+export class NLLManifestService extends ServiceMap.Service<NLLManifestService>()(
   "NLLManifestService",
   {
-    effect: createManifestServiceEffect({
+    make: createManifestServiceEffect({
       source: "nll",
       seasonManifestSchema: NLLSeasonManifest,
       createEmptySeasonManifest: createEmptyNLLSeasonManifest,
     }),
-    dependencies: [ManifestServiceDependencies],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(ManifestServiceDependencies),
+  );
+}

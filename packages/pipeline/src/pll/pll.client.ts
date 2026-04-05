@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Schema, ServiceMap, Layer } from "effect";
 
 import { makeGraphQLClient } from "../api-client/graphql.service";
 import { makeRestClient } from "../api-client/rest-client.service";
@@ -43,8 +43,8 @@ import {
   PLLTeamsResponse,
 } from "./pll.schema";
 
-export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
-  effect: Effect.gen(function* () {
+export class PLLClient extends ServiceMap.Service<PLLClient>()("PLLClient", {
+  make: Effect.gen(function* () {
     const config = yield* PLLConfig;
 
     const restClient = makeRestClient({
@@ -62,7 +62,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
     return {
       getStandings: (input: typeof PLLStandingsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLStandingsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLStandingsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `/standings?year=${request.year}&champSeries=${request.champSeries}`;
@@ -81,7 +81,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getStandingsGraphQL: (input: typeof PLLStandingsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLStandingsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLStandingsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const response = yield* graphqlClient.query(
@@ -103,7 +103,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getPlayers: (input: typeof PLLPlayersRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLPlayersRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLPlayersRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const response = yield* graphqlClient.query(
@@ -127,7 +127,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getStatLeaders: (input: typeof PLLStatLeadersRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLStatLeadersRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLStatLeadersRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -151,7 +151,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getAdvancedPlayers: (input: typeof PLLAdvancedPlayersRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLAdvancedPlayersRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLAdvancedPlayersRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -174,7 +174,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getTeams: (input: typeof PLLTeamsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLTeamsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLTeamsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const response = yield* graphqlClient.query(
@@ -195,7 +195,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getCareerStats: (input: typeof PLLCareerStatsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLCareerStatsRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLCareerStatsRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -217,7 +217,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getPlayerDetail: (input: typeof PLLPlayerDetailRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLPlayerDetailRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLPlayerDetailRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -238,7 +238,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getTeamDetail: (input: typeof PLLTeamDetailRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLTeamDetailRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLTeamDetailRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -261,7 +261,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getTeamStats: (input: typeof PLLTeamStatsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLTeamStatsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLTeamStatsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const response = yield* graphqlClient.query(
@@ -284,7 +284,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getEvents: (input: typeof PLLEventsRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLEventsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(PLLEventsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `/events?year=${request.year}&includeCS=${request.includeCS}&includeWLL=${request.includeWLL}`;
@@ -298,7 +298,7 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
 
       getEventDetail: (input: typeof PLLEventDetailRequest.Encoded) =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(PLLEventDetailRequest)(
+          const request = yield* Schema.decodeUnknownEffect(PLLEventDetailRequest)(
             input,
           ).pipe(Effect.mapError(mapParseError));
           const response = yield* graphqlClient.query(
@@ -317,6 +317,9 @@ export class PLLClient extends Effect.Service<PLLClient>()("PLLClient", {
           ),
         ),
     };
-  }),
-  dependencies: [PLLConfig.Default],
-}) {}
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(PLLConfig.layer)),
+  );
+}

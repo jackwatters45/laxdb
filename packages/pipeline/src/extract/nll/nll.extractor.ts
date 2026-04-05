@@ -1,6 +1,7 @@
-import { Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Either, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
+import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
 
 import { NLLClient } from "../../nll/nll.client";
 import type {
@@ -18,24 +19,35 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import { NLLManifestService, type NLLSeasonManifest } from "./nll.manifest";
+import {
+  NLLManifestService,
+  type NLLExtractionManifest,
+  type NLLSeasonManifest,
+} from "./nll.manifest";
 
 const NLL_SEASONS = [225] as const;
 
-export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
+export class NLLExtractorService extends ServiceMap.Service<NLLExtractorService>()(
   "NLLExtractorService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const client = yield* NLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* NLLManifestService;
       const incremental = yield* IncrementalExtractionService;
-      const path = yield* Path.Path;
+      const fs = yield* FileSystem;
+      const path = yield* Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "nll", String(seasonId), `${entity}.json`);
+      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
+        ServiceMap.add(Path, path),
+      );
+
+      const saveOutputJson = <T>(filePath: string, data: T) =>
+        saveJson(filePath, data).pipe(Effect.provide(ioServices));
 
       /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
@@ -43,21 +55,21 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
           const result = yield* client
             .getTeams({ seasonId })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly NLLTeam[]);
           }
-          yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
+          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts players for a season. @see isCriticalError for error handling. */
@@ -68,24 +80,24 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           );
           const result = yield* client
             .getPlayers({ seasonId })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly NLLPlayer[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "players"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts player stats for a season. @see isCriticalError for error handling. */
@@ -96,24 +108,24 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           );
           const result = yield* client
             .getPlayerStats({ seasonId, phase: "REG" })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly NLLPlayerStatsRow[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "player-stats"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} player stats (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} player stats (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts standings for a season. @see isCriticalError for error handling. */
@@ -124,24 +136,24 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           );
           const result = yield* client
             .getStandings({ seasonId })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly NLLStanding[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "standings"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts schedule for a season. @see isCriticalError for error handling. */
@@ -152,30 +164,30 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           );
           const result = yield* client
             .getSchedule({ seasonId })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly NLLMatch[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "schedule"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} matches (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} matches (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       const extractSeason = (
         seasonId: number,
         options: IncrementalExtractOptions = {},
-      ) =>
+      ): Effect.Effect<NLLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           yield* Effect.log(`\n${"=".repeat(50)}`);
           yield* Effect.log(`Extracting NLL Season ${seasonId}`);
@@ -276,7 +288,9 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
           return manifest;
         });
 
-      const extractAll = (options: IncrementalExtractOptions = {}) =>
+      const extractAll = (
+        options: IncrementalExtractOptions = {},
+      ): Effect.Effect<NLLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           yield* Effect.log("🏈 NLL Full Extraction");
           yield* Effect.log(`Output directory: ${config.outputDir}`);
@@ -306,14 +320,17 @@ export class NLLExtractorService extends Effect.Service<NLLExtractorService>()(
         extractAll,
       };
     }),
-    dependencies: [
-      Layer.mergeAll(
-        NLLClient.Default,
-        ExtractConfigService.Default,
-        NLLManifestService.Default,
-        IncrementalExtractionService.Default,
-        BunContext.layer,
-      ),
-    ],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(
+      Layer.mergeAll(
+        NLLClient.layer,
+        ExtractConfigService.layer,
+        NLLManifestService.layer,
+        IncrementalExtractionService.layer,
+        BunServices.layer,
+      ),
+    ),
+  );
+}

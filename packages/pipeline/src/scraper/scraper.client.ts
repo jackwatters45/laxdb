@@ -1,4 +1,4 @@
-import { Effect, Schedule } from "effect";
+import { Effect, Schedule, ServiceMap, Layer } from "effect";
 
 import { PipelineConfig } from "../config";
 
@@ -16,10 +16,10 @@ type ScraperError =
   | ScraperRateLimitError
   | ScraperNetworkError;
 
-export class ScraperClient extends Effect.Service<ScraperClient>()(
+export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
   "ScraperClient",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const config = yield* PipelineConfig;
 
       const fetchUrl = (
@@ -125,16 +125,13 @@ export class ScraperClient extends Effect.Service<ScraperClient>()(
 
       const fetchWithRetry = (request: ScrapeRequest) =>
         fetchUrl(request).pipe(
-          Effect.retry(
-            Schedule.exponential(config.retryDelay).pipe(
-              Schedule.compose(Schedule.recurs(config.maxRetries)),
-              Schedule.whileInput(
-                (error: ScraperError) =>
-                  error._tag === "ScraperNetworkError" ||
-                  error._tag === "ScraperTimeoutError",
-              ),
-            ),
-          ),
+          Effect.retry({
+            schedule: Schedule.exponential(config.retryDelay),
+            times: config.maxRetries,
+            while: (error: ScraperError) =>
+              error instanceof ScraperNetworkError ||
+              error instanceof ScraperTimeoutError,
+          }),
         );
 
       return {
@@ -142,6 +139,8 @@ export class ScraperClient extends Effect.Service<ScraperClient>()(
         fetchWithRetry,
       } as const;
     }),
-    dependencies: [PipelineConfig.Default],
-  },
-) {}
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(PipelineConfig.layer)),
+  );
+}

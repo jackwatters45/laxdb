@@ -12,7 +12,7 @@ describe("PLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(standings.length).toBe(8);
@@ -29,7 +29,7 @@ describe("PLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(standings.length).toBeGreaterThan(0);
@@ -42,7 +42,7 @@ describe("PLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(standings[0]).toBeDefined();
@@ -68,7 +68,7 @@ describe("PLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(standings.length).toBeGreaterThan(0);
@@ -87,7 +87,7 @@ describe("PLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(standings[0]).toBeDefined();
@@ -113,7 +113,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players.length).toBe(5);
@@ -136,7 +136,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithStats = players.find(
@@ -161,7 +161,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithPostStats = players.find(
@@ -184,7 +184,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players.length).toBeGreaterThan(50);
@@ -204,7 +204,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players[0]).toBeDefined();
@@ -229,7 +229,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players[0]?.allTeams[0]).toBeDefined();
@@ -252,7 +252,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithStats = players.find(
@@ -280,7 +280,7 @@ describe("PLLClient", () => {
       });
 
       const leaders = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(leaders.length).toBeGreaterThan(0);
@@ -302,7 +302,7 @@ describe("PLLClient", () => {
       });
 
       const leaders = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(leaders.length).toBeGreaterThan(0);
@@ -319,7 +319,7 @@ describe("PLLClient", () => {
       });
 
       const leaders = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(leaders[0]).toBeDefined();
@@ -344,7 +344,7 @@ describe("PLLClient", () => {
       });
 
       const leaders = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(leaders).toBeInstanceOf(Array);
@@ -359,7 +359,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players.length).toBe(5);
@@ -375,7 +375,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithTeam = players.find((p) => p.currentTeam !== null);
@@ -392,7 +392,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithStats = players.find(
@@ -412,7 +412,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithAdvanced = players.find(
@@ -440,7 +440,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithAdvanced = players.find(
@@ -463,7 +463,7 @@ describe("PLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(players.length).toBeLessThanOrEqual(250);
@@ -479,7 +479,7 @@ describe("PLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(teams.length).toBeGreaterThan(0);
@@ -495,7 +495,7 @@ describe("PLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(teams.length).toBeGreaterThan(0);
@@ -511,7 +511,7 @@ describe("PLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(teams[0]).toBeDefined();
@@ -529,7 +529,7 @@ describe("PLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const teamWithStats = teams.find((t) => t.stats);
@@ -548,7 +548,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(stats.length).toBe(25);
@@ -564,7 +564,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(stats.length).toBe(10);
@@ -578,7 +578,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(stats[0]).toBeDefined();
@@ -599,7 +599,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playerWithExp = stats.find((s) => s.player.experience !== null);
@@ -626,7 +626,7 @@ describe("PLLClient", () => {
       });
 
       const player = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(player).toBeDefined();
@@ -654,7 +654,7 @@ describe("PLLClient", () => {
       });
 
       const player = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(player).toBeDefined();
@@ -680,7 +680,7 @@ describe("PLLClient", () => {
       });
 
       const team = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(team).toBeDefined();
@@ -704,7 +704,7 @@ describe("PLLClient", () => {
       });
 
       const team = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(team).toBeDefined();
@@ -731,7 +731,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(stats).toBeDefined();
@@ -754,7 +754,7 @@ describe("PLLClient", () => {
       });
 
       const stats = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(stats).toBeDefined();
@@ -773,7 +773,7 @@ describe("PLLClient", () => {
       });
 
       const events = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(events.length).toBeGreaterThan(0);
@@ -789,7 +789,7 @@ describe("PLLClient", () => {
       });
 
       const events = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(events.length).toBeGreaterThan(0);
@@ -802,7 +802,7 @@ describe("PLLClient", () => {
       });
 
       const events = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(events[0]).toBeDefined();
@@ -817,7 +817,7 @@ describe("PLLClient", () => {
       });
 
       const events = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const eventWithTeams = events.find((e) => e.homeTeam && e.awayTeam);
@@ -837,7 +837,7 @@ describe("PLLClient", () => {
       });
 
       const event = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(event).toBeDefined();
@@ -856,7 +856,7 @@ describe("PLLClient", () => {
       });
 
       const event = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(event?.homeTeam).toBeDefined();
@@ -874,7 +874,7 @@ describe("PLLClient", () => {
       });
 
       const event = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(event?.playLogs).toBeDefined();
@@ -896,7 +896,7 @@ describe("PLLClient", () => {
       });
 
       const event = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       const playLog = event?.playLogs?.[0];
@@ -920,7 +920,7 @@ describe("PLLClient", () => {
       });
 
       const event = await Effect.runPromise(
-        program.pipe(Effect.provide(PLLClient.Default)),
+        program.pipe(Effect.provide(PLLClient.layer)),
       );
 
       expect(event).toBeDefined();

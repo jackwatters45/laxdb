@@ -1,4 +1,4 @@
-import { Config, Duration, Effect, Redacted } from "effect";
+import { Config, Duration, Effect, Layer, Redacted, ServiceMap } from "effect";
 
 export interface PipelineConfigValues {
   readonly userAgent: string;
@@ -22,10 +22,10 @@ export const DEFAULT_PIPELINE_CONFIG: PipelineConfigValues = {
   defaultTimeout: Duration.millis(30000),
 };
 
-export class PipelineConfig extends Effect.Service<PipelineConfig>()(
+export class PipelineConfig extends ServiceMap.Service<PipelineConfig>()(
   "PipelineConfig",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const userAgent = yield* Config.string("PIPELINE_USER_AGENT").pipe(
         Config.withDefault(DEFAULT_PIPELINE_CONFIG.userAgent),
       );
@@ -62,10 +62,12 @@ export class PipelineConfig extends Effect.Service<PipelineConfig>()(
       } satisfies PipelineConfigValues;
     }),
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
-export class PLLConfig extends Effect.Service<PLLConfig>()("PLLConfig", {
-  effect: Effect.gen(function* () {
+export class PLLConfig extends ServiceMap.Service<PLLConfig>()("PLLConfig", {
+  make: Effect.gen(function* () {
     const restToken = yield* Config.redacted("PLL_REST_TOKEN");
     const graphqlToken = yield* Config.redacted("PLL_GRAPHQL_TOKEN");
 
@@ -89,20 +91,24 @@ export class PLLConfig extends Effect.Service<PLLConfig>()("PLLConfig", {
       },
     } as const;
   }),
-}) {}
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
-export class NLLConfig extends Effect.Service<NLLConfig>()("NLLConfig", {
-  succeed: {
+export class NLLConfig extends ServiceMap.Service<NLLConfig>()("NLLConfig", {
+  make: Effect.succeed({
     baseUrl: "https://nllstatsapp.aordev.com/",
     headers: {
       origin: "https://www.nll.com",
       referer: "https://www.nll.com/",
     },
-  } as const,
-}) {}
+  } as const),
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
-export class MLLConfig extends Effect.Service<MLLConfig>()("MLLConfig", {
-  succeed: {
+export class MLLConfig extends ServiceMap.Service<MLLConfig>()("MLLConfig", {
+  make: Effect.succeed({
     statscrewBaseUrl: "https://www.statscrew.com/lacrosse",
     waybackCdxUrl: "https://web.archive.org/cdx/search/cdx",
     waybackWebUrl: "https://web.archive.org/web",
@@ -110,27 +116,33 @@ export class MLLConfig extends Effect.Service<MLLConfig>()("MLLConfig", {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     },
-  } as const,
-}) {}
+  } as const),
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
-export class MSLConfig extends Effect.Service<MSLConfig>()("MSLConfig", {
-  succeed: {
+export class MSLConfig extends ServiceMap.Service<MSLConfig>()("MSLConfig", {
+  make: Effect.succeed({
     gamesheetBaseUrl: "https://gamesheetstats.com",
     mainSiteBaseUrl: "https://www.majorserieslacrosse.ca",
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     },
-  } as const,
-}) {}
+  } as const),
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
-export class WLAConfig extends Effect.Service<WLAConfig>()("WLAConfig", {
-  succeed: {
+export class WLAConfig extends ServiceMap.Service<WLAConfig>()("WLAConfig", {
+  make: Effect.succeed({
     baseUrl: "https://www.wlalacrosse.com",
     statsUrl: "https://www.wlalacrosse.com/stats",
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     },
-  } as const,
-}) {}
+  } as const),
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}

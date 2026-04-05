@@ -1,6 +1,7 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Either, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
+import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
 
 import { MLLClient } from "../../mll/mll.client";
 import {
@@ -20,7 +21,10 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type { MLLSeasonManifest } from "./mll.manifest";
+import type {
+  MLLExtractionManifest,
+  MLLSeasonManifest,
+} from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
 
 // MLL operated from 2001-2020 (20 seasons)
@@ -29,21 +33,27 @@ const MLL_YEARS = [
   2014, 2015, 2016, 2017, 2018, 2019, 2020,
 ] as const;
 
-export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
+export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>()(
   "MLLExtractorService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const client = yield* MLLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MLLManifestService;
       const incremental = yield* IncrementalExtractionService;
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
+      const fs = yield* FileSystem;
+      const path = yield* Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "mll", String(year), `${entity}.json`);
+      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
+        ServiceMap.add(Path, path),
+      );
+
+      const saveOutputJson = <T>(filePath: string, data: T) =>
+        saveJson(filePath, data).pipe(Effect.provide(ioServices));
 
       /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (year: number) =>
@@ -51,21 +61,21 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(`  📊 Extracting teams for year ${year}...`);
           const result = yield* client
             .getTeams({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MLLTeam[]);
           }
-          yield* saveJson(getOutputPath(year, "teams"), result.right.data);
+          yield* saveOutputJson(getOutputPath(year, "teams"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts players for a season. @see isCriticalError for error handling. */
@@ -74,21 +84,21 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(`  🏃 Extracting players for year ${year}...`);
           const result = yield* client
             .getPlayers({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MLLPlayer[]);
           }
-          yield* saveJson(getOutputPath(year, "players"), result.right.data);
+          yield* saveOutputJson(getOutputPath(year, "players"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts goalies for a season. @see isCriticalError for error handling. */
@@ -97,21 +107,21 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(`  🥅 Extracting goalies for year ${year}...`);
           const result = yield* client
             .getGoalies({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MLLGoalie[]);
           }
-          yield* saveJson(getOutputPath(year, "goalies"), result.right.data);
+          yield* saveOutputJson(getOutputPath(year, "goalies"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} goalies (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} goalies (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts standings for a season. @see isCriticalError for error handling. */
@@ -120,21 +130,21 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(`  🏆 Extracting standings for year ${year}...`);
           const result = yield* client
             .getStandings({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MLLStanding[]);
           }
-          yield* saveJson(getOutputPath(year, "standings"), result.right.data);
+          yield* saveOutputJson(getOutputPath(year, "standings"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts stat leaders for a season. @see isCriticalError for error handling. */
@@ -143,24 +153,24 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           yield* Effect.log(`  ⭐ Extracting stat leaders for year ${year}...`);
           const result = yield* client
             .getStatLeaders({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MLLStatLeader[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(year, "stat-leaders"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} stat leaders (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} stat leaders (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts schedule via Wayback Machine. May have gaps for 2007-2019. @see isCriticalError for error handling. */
@@ -171,36 +181,36 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           );
           const result = yield* client
             .getSchedule({ year })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
 
-          if (Either.isLeft(result)) {
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message} (schedule may be incomplete for this year)`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message} (schedule may be incomplete for this year)`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             yield* Effect.log(`     📊 Schedule coverage: 0%`);
             return emptyExtractResult([] as readonly MLLGame[]);
           }
 
-          yield* saveJson(getOutputPath(year, "schedule"), result.right.data);
+          yield* saveOutputJson(getOutputPath(year, "schedule"), result.success.data);
 
           // Get team count for coverage calculation
           const teamsPath = getOutputPath(year, "teams");
           const teamsContent = yield* fs
             .readFileString(teamsPath)
-            .pipe(Effect.catchTag("SystemError", () => Effect.succeed("[]")));
+            .pipe(Effect.catchTag("PlatformError", () => Effect.succeed("[]")));
           const parsed: unknown = JSON.parse(teamsContent);
           const teams: unknown[] = Array.isArray(parsed) ? parsed : [];
           const teamCount = teams.length || 6; // Default to 6 if no teams file
           const expectedGames = getExpectedGames(teamCount);
           const coverage =
             expectedGames > 0
-              ? Math.round((result.right.count / expectedGames) * 100)
+              ? Math.round((result.success.count / expectedGames) * 100)
               : 0;
 
-          if (result.right.count === 0) {
+          if (result.success.count === 0) {
             yield* Effect.log(
               `     ⚠ No schedule data found (Wayback coverage may be incomplete)`,
             );
@@ -209,19 +219,19 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
             );
           } else {
             yield* Effect.log(
-              `     ✓ ${result.right.count} games (${result.right.durationMs}ms)`,
+              `     ✓ ${result.success.count} games (${result.success.durationMs}ms)`,
             );
             yield* Effect.log(
-              `     📊 Schedule coverage: ${coverage}% (${result.right.count}/${expectedGames} expected games)`,
+              `     📊 Schedule coverage: ${coverage}% (${result.success.count}/${expectedGames} expected games)`,
             );
           }
-          return result.right;
+          return result.success;
         });
 
       const extractSeason = (
         year: number,
         options: IncrementalExtractOptions & { includeSchedule?: boolean } = {},
-      ) =>
+      ): Effect.Effect<MLLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           const { includeSchedule = false } = options;
 
@@ -344,7 +354,7 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
           startYear?: number;
           endYear?: number;
         } = {},
-      ) =>
+      ): Effect.Effect<MLLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           const includeSchedule = options.includeSchedule ?? false;
           const startYear = options.startYear ?? 2001;
@@ -402,14 +412,17 @@ export class MLLExtractorService extends Effect.Service<MLLExtractorService>()(
         extractAll,
       };
     }),
-    dependencies: [
-      Layer.mergeAll(
-        MLLClient.Default,
-        ExtractConfigService.Default,
-        MLLManifestService.Default,
-        IncrementalExtractionService.Default,
-        BunContext.layer,
-      ),
-    ],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(
+      Layer.mergeAll(
+        MLLClient.layer,
+        ExtractConfigService.layer,
+        MLLManifestService.layer,
+        IncrementalExtractionService.layer,
+        BunServices.layer,
+      ),
+    ),
+  );
+}

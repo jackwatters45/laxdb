@@ -5,7 +5,7 @@
  * and staleness thresholds for incremental scraping.
  */
 
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 // ============================================================================
 // Configuration Types
@@ -24,10 +24,10 @@ export interface SeasonConfig {
 // Season Config Service
 // ============================================================================
 
-export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
+export class SeasonConfigService extends ServiceMap.Service<SeasonConfigService>()(
   "SeasonConfigService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const currentYear = new Date().getFullYear();
 
       const config: SeasonConfig = {
@@ -36,26 +36,16 @@ export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
         historicalSeasonMaxAgeHours: null,
       };
 
-      /**
-       * Check if a season ID represents a "current" season.
-       * Current seasons = current year + lookahead years.
-       */
       const isCurrentSeason = (seasonId: number): boolean => {
-        // For year-based season IDs (2019, 2020, etc.)
         if (seasonId >= 2000 && seasonId <= 2100) {
           return (
             seasonId >= currentYear &&
             seasonId <= currentYear + config.lookaheadYears
           );
         }
-        // For non-year IDs (like NLL's 225), always treat as current
-        // since we don't know the mapping
         return true;
       };
 
-      /**
-       * Get current season years for year-based extractors.
-       */
       const getCurrentSeasonYears = (): number[] => {
         const years: number[] = [];
         for (let i = 0; i <= config.lookaheadYears; i++) {
@@ -64,10 +54,6 @@ export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
         return years;
       };
 
-      /**
-       * Get max age in hours for a given season.
-       * Returns null if staleness should never be checked (historical seasons).
-       */
       const getMaxAgeHours = (seasonId: number): number | null => {
         if (isCurrentSeason(seasonId)) {
           return config.currentSeasonMaxAgeHours;
@@ -75,16 +61,11 @@ export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
         return config.historicalSeasonMaxAgeHours;
       };
 
-      /**
-       * Check if a timestamp is stale given a max age in hours.
-       */
       const isTimestampStale = (
         timestamp: string | null | undefined,
         maxAgeHours: number | null,
       ): boolean => {
-        // No timestamp = always stale
         if (!timestamp) return true;
-        // No max age = never stale (historical)
         if (maxAgeHours === null) return false;
 
         const ageMs = Date.now() - new Date(timestamp).getTime();
@@ -102,4 +83,6 @@ export class SeasonConfigService extends Effect.Service<SeasonConfigService>()(
       };
     }),
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make);
+}

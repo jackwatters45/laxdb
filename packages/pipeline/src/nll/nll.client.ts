@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Duration, Effect, Schedule, Schema } from "effect";
+import { Duration, Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
 
 import { makeRestClient } from "../api-client/rest-client.service";
 import { NLLConfig, PipelineConfig } from "../config";
@@ -22,8 +22,8 @@ import {
   NLLTeamsResponse,
 } from "./nll.schema";
 
-export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
-  effect: Effect.gen(function* () {
+export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
+  make: Effect.gen(function* () {
     const config = yield* NLLConfig;
     const pipelineConfig = yield* PipelineConfig;
 
@@ -37,7 +37,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
         input: typeof NLLTeamsRequest.Encoded,
       ): Effect.Effect<readonly NLLTeam[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(NLLTeamsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(NLLTeamsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=teams&season_id=${request.seasonId}`;
@@ -54,7 +54,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
         input: typeof NLLPlayersRequest.Encoded,
       ): Effect.Effect<readonly NLLPlayer[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(NLLPlayersRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(NLLPlayersRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=players&season_id=${request.seasonId}`;
@@ -71,7 +71,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
         input: typeof NLLStandingsRequest.Encoded,
       ): Effect.Effect<readonly NLLStanding[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(NLLStandingsRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(NLLStandingsRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=standings&season_id=${request.seasonId}`;
@@ -88,7 +88,7 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
         input: typeof NLLScheduleRequest.Encoded,
       ): Effect.Effect<readonly NLLMatch[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decode(NLLScheduleRequest)(input).pipe(
+          const request = yield* Schema.decodeUnknownEffect(NLLScheduleRequest)(input).pipe(
             Effect.mapError(mapParseError),
           );
           const endpoint = `?data_type=schedule&season_id=${request.seasonId}`;
@@ -183,11 +183,10 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
 
           return allStats;
         }).pipe(
-          Effect.retry(
-            Schedule.exponential(Duration.millis(1000)).pipe(
-              Schedule.compose(Schedule.recurs(2)),
-            ),
-          ),
+          Effect.retry({
+            schedule: Schedule.exponential(Duration.millis(1000)),
+            times: 2,
+          }),
           Effect.tap((stats) =>
             Effect.log(
               `Scraped ${stats.length} player stats for season ${input.seasonId}`,
@@ -195,9 +194,12 @@ export class NLLClient extends Effect.Service<NLLClient>()("NLLClient", {
           ),
         ),
     };
-  }),
-  dependencies: [NLLConfig.Default, PipelineConfig.Default],
-}) {}
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(NLLConfig.layer, PipelineConfig.layer)),
+  );
+}
 
 /**
  * Maps NLL season ID to season name string.

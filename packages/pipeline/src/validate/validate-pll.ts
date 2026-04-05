@@ -1,6 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { readJsonFile } from "@laxdb/core/util";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { ExtractConfigService } from "../extract/extract.config";
@@ -18,6 +18,7 @@ import {
   crossReference,
   buildReport,
   printReport,
+  readJsonFile,
   validateFileExists,
 } from "./validate.service";
 
@@ -73,8 +74,8 @@ const YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const pllDir = path.join(config.outputDir, "pll");
   const startTime = Date.now();
 
@@ -235,7 +236,7 @@ const program = Effect.gen(function* () {
   if (statLeadersFileResult.exists) {
     const statLeadersData = yield* readJsonFile<StatLeadersData>(
       statLeadersPath,
-    ).pipe(Effect.catchAll(() => Effect.succeed({} as StatLeadersData)));
+    ).pipe(Effect.catch(() => Effect.succeed({} as StatLeadersData)));
 
     const yearCount = Object.keys(statLeadersData).length;
     const firstYearData = Object.values(statLeadersData)[0];
@@ -331,8 +332,8 @@ const program = Effect.gen(function* () {
 });
 
 const MainLayer = Layer.mergeAll(
-  ExtractConfigService.Default,
-  BunContext.layer,
+  ExtractConfigService.layer,
+  BunServices.layer,
 );
 
 BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

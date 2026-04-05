@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HttpError, NetworkError, ParseError, RateLimitError } from "../error";
 
+import { expectErrorInstance, getFailureError } from "../test-helpers";
+
 import { makeRestClient } from "./rest-client.service";
 
 const TestResponse = Schema.Struct({
@@ -101,15 +103,8 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        expect(error._tag).toBe("Fail");
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(NetworkError);
-          expect(error.error.message).toContain("Network error");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), NetworkError);
+      expect(error.message).toContain("Network error");
     });
 
     it("returns HttpError on non-ok response", async () => {
@@ -122,14 +117,9 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/999", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof HttpError) {
-          expect(error.error.message).toContain("HTTP 404");
-          expect(error.error.statusCode).toBe(404);
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), HttpError);
+      expect(error.message).toContain("HTTP 404");
+      expect(error.statusCode).toBe(404);
     });
 
     it("returns RateLimitError on 429 response", async () => {
@@ -145,13 +135,11 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof RateLimitError) {
-          expect(error.error.retryAfterMs).toBe(60000);
-        }
-      }
+      const error = expectErrorInstance(
+        getFailureError(result),
+        RateLimitError,
+      );
+      expect(error.retryAfterMs).toBe(60000);
     });
 
     it("returns ParseError on invalid response shape", async () => {
@@ -164,14 +152,8 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(ParseError);
-          expect(error.error.message).toContain("Schema validation failed");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), ParseError);
+      expect(error.message).toContain("Schema validation failed");
     });
 
     it("returns HttpError on invalid JSON response", async () => {
@@ -184,14 +166,8 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(HttpError);
-          expect(error.error.message).toContain("Failed to parse JSON");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), HttpError);
+      expect(error.message).toContain("Failed to parse JSON");
     });
   });
 

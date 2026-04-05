@@ -145,7 +145,7 @@ describe("getGames", () => {
     });
 
     const games = await Effect.runPromise(
-      program.pipe(Effect.provide(PLLClient.Default)),
+      program.pipe(Effect.provide(PLLClient.layer)),
     );
 
     expect(games.length).toBe(5);

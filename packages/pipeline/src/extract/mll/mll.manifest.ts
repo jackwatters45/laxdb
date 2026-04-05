@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -38,14 +38,17 @@ export type MLLExtractionManifest = ExtractionManifest<
 >;
 
 // MLL Manifest Service - uses generic factory
-export class MLLManifestService extends Effect.Service<MLLManifestService>()(
+export class MLLManifestService extends ServiceMap.Service<MLLManifestService>()(
   "MLLManifestService",
   {
-    effect: createManifestServiceEffect({
+    make: createManifestServiceEffect({
       source: "mll",
       seasonManifestSchema: MLLSeasonManifest,
       createEmptySeasonManifest: createEmptyMLLSeasonManifest,
     }),
-    dependencies: [ManifestServiceDependencies],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(ManifestServiceDependencies),
+  );
+}

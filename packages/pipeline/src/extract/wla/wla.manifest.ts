@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -36,14 +36,17 @@ export type WLAExtractionManifest = ExtractionManifest<
 >;
 
 // WLA Manifest Service - uses generic factory
-export class WLAManifestService extends Effect.Service<WLAManifestService>()(
+export class WLAManifestService extends ServiceMap.Service<WLAManifestService>()(
   "WLAManifestService",
   {
-    effect: createManifestServiceEffect({
+    make: createManifestServiceEffect({
       source: "wla",
       seasonManifestSchema: WLASeasonManifest,
       createEmptySeasonManifest: createEmptyWLASeasonManifest,
     }),
-    dependencies: [ManifestServiceDependencies],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(ManifestServiceDependencies),
+  );
+}

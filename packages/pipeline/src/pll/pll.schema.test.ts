@@ -25,7 +25,7 @@ describe("PLLStandingsRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { year: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLStandingsRequest)(input),
+      Schema.decodeUnknownEffect(PLLStandingsRequest)(input),
     );
     expect(result.year).toBe(2024);
     expect(result.champSeries).toBe(false);
@@ -34,7 +34,7 @@ describe("PLLStandingsRequest", () => {
   it("decodes request with champSeries true", async () => {
     const input = { year: 2024, champSeries: true };
     const result = await Effect.runPromise(
-      Schema.decode(PLLStandingsRequest)(input),
+      Schema.decodeUnknownEffect(PLLStandingsRequest)(input),
     );
     expect(result.champSeries).toBe(true);
   });
@@ -42,14 +42,14 @@ describe("PLLStandingsRequest", () => {
   it("rejects year before 2019", async () => {
     const input = { year: 2018 };
     await expect(
-      Effect.runPromise(Schema.decode(PLLStandingsRequest)(input)),
+      Effect.runPromise(Schema.decodeUnknownEffect(PLLStandingsRequest)(input)),
     ).rejects.toThrow();
   });
 
   it("rejects year after 2035", async () => {
     const input = { year: 2036 };
     await expect(
-      Effect.runPromise(Schema.decode(PLLStandingsRequest)(input)),
+      Effect.runPromise(Schema.decodeUnknownEffect(PLLStandingsRequest)(input)),
     ).rejects.toThrow();
   });
 });
@@ -58,7 +58,7 @@ describe("PLLPlayersRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { season: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLPlayersRequest)(input),
+      Schema.decodeUnknownEffect(PLLPlayersRequest)(input),
     );
     expect(result.season).toBe(2024);
     expect(result.league).toBe("PLL");
@@ -77,7 +77,7 @@ describe("PLLPlayersRequest", () => {
       limit: 50,
     };
     const result = await Effect.runPromise(
-      Schema.decode(PLLPlayersRequest)(input),
+      Schema.decodeUnknownEffect(PLLPlayersRequest)(input),
     );
     expect(result.league).toBe("WLL");
     expect(result.includeZPP).toBe(true);
@@ -87,14 +87,14 @@ describe("PLLPlayersRequest", () => {
   it("rejects negative limit", async () => {
     const input = { season: 2024, limit: -1 };
     await expect(
-      Effect.runPromise(Schema.decode(PLLPlayersRequest)(input)),
+      Effect.runPromise(Schema.decodeUnknownEffect(PLLPlayersRequest)(input)),
     ).rejects.toThrow();
   });
 
   it("rejects limit over 1000", async () => {
     const input = { season: 2024, limit: 1001 };
     await expect(
-      Effect.runPromise(Schema.decode(PLLPlayersRequest)(input)),
+      Effect.runPromise(Schema.decodeUnknownEffect(PLLPlayersRequest)(input)),
     ).rejects.toThrow();
   });
 });
@@ -103,7 +103,7 @@ describe("PLLStatLeadersRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { year: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLStatLeadersRequest)(input),
+      Schema.decodeUnknownEffect(PLLStatLeadersRequest)(input),
     );
     expect(result.year).toBe(2024);
     expect(result.seasonSegment).toBe("regular");
@@ -112,7 +112,7 @@ describe("PLLStatLeadersRequest", () => {
   it("accepts post segment", async () => {
     const input = { year: 2024, seasonSegment: "post" as const };
     const result = await Effect.runPromise(
-      Schema.decode(PLLStatLeadersRequest)(input),
+      Schema.decodeUnknownEffect(PLLStatLeadersRequest)(input),
     );
     expect(result.seasonSegment).toBe("post");
   });
@@ -122,7 +122,7 @@ describe("PLLAdvancedPlayersRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { year: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLAdvancedPlayersRequest)(input),
+      Schema.decodeUnknownEffect(PLLAdvancedPlayersRequest)(input),
     );
     expect(result.year).toBe(2024);
     expect(result.limit).toBe(250);
@@ -132,7 +132,7 @@ describe("PLLAdvancedPlayersRequest", () => {
   it("accepts custom limit", async () => {
     const input = { year: 2024, limit: 100 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLAdvancedPlayersRequest)(input),
+      Schema.decodeUnknownEffect(PLLAdvancedPlayersRequest)(input),
     );
     expect(result.limit).toBe(100);
   });
@@ -142,7 +142,7 @@ describe("PLLTeamsRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { year: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLTeamsRequest)(input),
+      Schema.decodeUnknownEffect(PLLTeamsRequest)(input),
     );
     expect(result.year).toBe(2024);
     expect(result.includeChampSeries).toBe(false);
@@ -151,7 +151,7 @@ describe("PLLTeamsRequest", () => {
   it("accepts includeChampSeries", async () => {
     const input = { year: 2024, includeChampSeries: true };
     const result = await Effect.runPromise(
-      Schema.decode(PLLTeamsRequest)(input),
+      Schema.decodeUnknownEffect(PLLTeamsRequest)(input),
     );
     expect(result.includeChampSeries).toBe(true);
   });
@@ -161,7 +161,7 @@ describe("PLLCareerStatsRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = {};
     const result = await Effect.runPromise(
-      Schema.decode(PLLCareerStatsRequest)(input),
+      Schema.decodeUnknownEffect(PLLCareerStatsRequest)(input),
     );
     // limit is optional without a default in the schema
     // (default of 25 is applied at client/query level)
@@ -171,7 +171,7 @@ describe("PLLCareerStatsRequest", () => {
   it("accepts stat filter", async () => {
     const input = { stat: "goals", limit: 50 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLCareerStatsRequest)(input),
+      Schema.decodeUnknownEffect(PLLCareerStatsRequest)(input),
     );
     expect(result.stat).toBe("goals");
     expect(result.limit).toBe(50);
@@ -182,7 +182,7 @@ describe("PLLPlayerDetailRequest", () => {
   it("decodes valid request", async () => {
     const input = { slug: "liam-byrnes", statsYear: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLPlayerDetailRequest)(input),
+      Schema.decodeUnknownEffect(PLLPlayerDetailRequest)(input),
     );
     expect(result.slug).toBe("liam-byrnes");
     expect(result.statsYear).toBe(2024);
@@ -191,7 +191,7 @@ describe("PLLPlayerDetailRequest", () => {
   it("requires slug", async () => {
     const input = { statsYear: 2024 } as unknown;
     await expect(
-      Effect.runPromise(Schema.decodeUnknown(PLLPlayerDetailRequest)(input)),
+      Effect.runPromise(Schema.decodeUnknownEffect(PLLPlayerDetailRequest)(input)),
     ).rejects.toThrow();
   });
 });
@@ -200,7 +200,7 @@ describe("PLLTeamDetailRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { id: "ARC", year: 2024, statsYear: 2024, eventsYear: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLTeamDetailRequest)(input),
+      Schema.decodeUnknownEffect(PLLTeamDetailRequest)(input),
     );
     expect(result.id).toBe("ARC");
     expect(result.includeChampSeries).toBe(false);
@@ -211,7 +211,7 @@ describe("PLLTeamStatsRequest", () => {
   it("decodes valid request", async () => {
     const input = { id: "ARC", year: 2024, segment: "regular" as const };
     const result = await Effect.runPromise(
-      Schema.decode(PLLTeamStatsRequest)(input),
+      Schema.decodeUnknownEffect(PLLTeamStatsRequest)(input),
     );
     expect(result.segment).toBe("regular");
   });
@@ -219,7 +219,7 @@ describe("PLLTeamStatsRequest", () => {
   it("accepts post segment", async () => {
     const input = { id: "ARC", year: 2024, segment: "post" as const };
     const result = await Effect.runPromise(
-      Schema.decode(PLLTeamStatsRequest)(input),
+      Schema.decodeUnknownEffect(PLLTeamStatsRequest)(input),
     );
     expect(result.segment).toBe("post");
   });
@@ -229,7 +229,7 @@ describe("PLLEventsRequest", () => {
   it("decodes valid request with defaults", async () => {
     const input = { year: 2024 };
     const result = await Effect.runPromise(
-      Schema.decode(PLLEventsRequest)(input),
+      Schema.decodeUnknownEffect(PLLEventsRequest)(input),
     );
     expect(result.year).toBe(2024);
     expect(result.includeCS).toBe(true);
@@ -262,7 +262,7 @@ describe("Response schemas", () => {
         conferenceSeed: 1,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLTeamStanding)(input),
+        Schema.decodeUnknownEffect(PLLTeamStanding)(input),
       );
       expect(result.teamId).toBe("ARC");
       expect(result.wins).toBe(10);
@@ -291,7 +291,7 @@ describe("Response schemas", () => {
         conferenceSeed: null,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLTeamStanding)(input),
+        Schema.decodeUnknownEffect(PLLTeamStanding)(input),
       );
       expect(result.location).toBeNull();
       expect(result.seed).toBeNull();
@@ -327,7 +327,7 @@ describe("Response schemas", () => {
         plusMinus: 5,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLPlayerStats)(input),
+        Schema.decodeUnknownEffect(PLLPlayerStats)(input),
       );
       expect(result.goals).toBe(5);
       expect(result.plusMinus).toBe(5);
@@ -349,7 +349,7 @@ describe("Response schemas", () => {
         fullName: "Archers LC",
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLPlayerTeam)(input),
+        Schema.decodeUnknownEffect(PLLPlayerTeam)(input),
       );
       expect(result.officialId).toBe("ARC");
       expect(result.year).toBe(2024);
@@ -373,7 +373,7 @@ describe("Response schemas", () => {
         year: 2024,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLStatLeader)(input),
+        Schema.decodeUnknownEffect(PLLStatLeader)(input),
       );
       expect(result.statValue).toBe(50);
       expect(result.playerRank).toBe(1);
@@ -441,7 +441,7 @@ describe("Response schemas", () => {
         touches: 3000,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLTeamStats)(input),
+        Schema.decodeUnknownEffect(PLLTeamStats)(input),
       );
       expect(result.gamesPlayed).toBe(12);
       expect(result.faceoffPct).toBe(51.7);
@@ -468,7 +468,7 @@ describe("Response schemas", () => {
         faceoffsWon: 0,
       };
       const result = await Effect.runPromise(
-        Schema.decode(PLLCareerStat)(input),
+        Schema.decodeUnknownEffect(PLLCareerStat)(input),
       );
       expect(result.player.name).toBe("Lyle Thompson");
       expect(result.goals).toBe(120);
@@ -515,7 +515,7 @@ describe("Response schemas", () => {
         ticketId: null,
         snl: null,
       };
-      const result = await Effect.runPromise(Schema.decode(PLLEvent)(input));
+      const result = await Effect.runPromise(Schema.decodeUnknownEffect(PLLEvent)(input));
       expect(result.id).toBe(123);
       expect(result.year).toBe(2024);
     });

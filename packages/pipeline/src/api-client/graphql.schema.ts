@@ -4,24 +4,27 @@ export class GraphQLClientConfig extends Schema.Class<GraphQLClientConfig>(
   "GraphQLClientConfig",
 )({
   endpoint: Schema.String,
-  defaultHeaders: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.String }),
-  ),
+  defaultHeaders: Schema.optional(Schema.Record(Schema.String, Schema.String)),
   authHeader: Schema.optional(Schema.String),
-  timeoutMs: Schema.optional(Schema.Number.pipe(Schema.positive())),
-  maxRetries: Schema.optional(
-    Schema.Number.pipe(Schema.int(), Schema.nonNegative()),
+  timeoutMs: Schema.optional(
+    Schema.Number.check(Schema.isGreaterThan(0)),
   ),
-  retryDelayMs: Schema.optional(Schema.Number.pipe(Schema.positive())),
+  maxRetries: Schema.optional(
+    Schema.Number.check(
+      Schema.isInt(),
+      Schema.isGreaterThanOrEqualTo(0),
+    ),
+  ),
+  retryDelayMs: Schema.optional(
+    Schema.Number.check(Schema.isGreaterThan(0)),
+  ),
 }) {}
 
 export class GraphQLRequest extends Schema.Class<GraphQLRequest>(
   "GraphQLRequest",
 )({
   query: Schema.String,
-  variables: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.Unknown }),
-  ),
+  variables: Schema.optional(Schema.Record(Schema.String, Schema.Unknown)),
   operationName: Schema.optional(Schema.String),
 }) {}
 
@@ -38,14 +41,12 @@ export class GraphQLErrorItem extends Schema.Class<GraphQLErrorItem>(
   message: Schema.String,
   locations: Schema.optional(Schema.Array(GraphQLErrorLocation)),
   path: Schema.optional(
-    Schema.Array(Schema.Union(Schema.String, Schema.Number)),
+    Schema.Array(Schema.Union([Schema.String, Schema.Number])),
   ),
-  extensions: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.Unknown }),
-  ),
+  extensions: Schema.optional(Schema.Record(Schema.String, Schema.Unknown)),
 }) {}
 
-export const GraphQLResponse = <T extends Schema.Schema.Any>(dataSchema: T) =>
+export const GraphQLResponse = <T extends Schema.Top>(dataSchema: T) =>
   Schema.Struct({
     data: Schema.NullOr(dataSchema),
     errors: Schema.optional(Schema.Array(GraphQLErrorItem)),

@@ -1,6 +1,6 @@
-import { FileSystem } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { SystemError } from "@effect/platform/Error";
+import { FileSystem } from "effect/FileSystem";
+import { BunServices } from "@effect/platform-bun";
+import { PlatformError, systemError } from "effect/PlatformError";
 import { Effect, Exit, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -13,30 +13,31 @@ import {
   TimeoutError,
 } from "../error";
 
+import { expectErrorInstance, getFailureError } from "../test-helpers";
 import { isCriticalError, saveJson } from "./util";
 
 describe("saveJson", () => {
   const createTestLayer = (overrides: {
     makeDirectory?: (
       path: string,
-      options?: FileSystem.MakeDirectoryOptions,
-    ) => Effect.Effect<void, SystemError>;
+      options?: { recursive?: boolean },
+    ) => Effect.Effect<void, PlatformError>;
     writeFileString?: (
       path: string,
       data: string,
-    ) => Effect.Effect<void, SystemError>;
+    ) => Effect.Effect<void, PlatformError>;
   }) => {
     const baseMock = {
       makeDirectory: () => Effect.void,
       writeFileString: () => Effect.void,
     };
 
-    const MockFS = Layer.succeed(FileSystem.FileSystem, {
+    const MockFS = Layer.succeed(FileSystem, {
       ...baseMock,
       ...overrides,
-    } as unknown as FileSystem.FileSystem);
+    } as unknown as FileSystem);
 
-    return Layer.provideMerge(MockFS, BunContext.layer);
+    return Layer.provideMerge(MockFS, BunServices.layer);
   };
 
   it("creates directory and writes file successfully", async () => {
@@ -76,8 +77,8 @@ describe("saveJson", () => {
       makeDirectory: () => Effect.void,
       writeFileString: () =>
         Effect.fail(
-          new SystemError({
-            reason: "InvalidData",
+          systemError({
+            _tag: "InvalidData",
             module: "FileSystem",
             method: "writeFileString",
             description: "Disk full",
@@ -92,23 +93,16 @@ describe("saveJson", () => {
       ),
     );
 
-    expect(Exit.isFailure(result)).toBe(true);
-    if (Exit.isFailure(result)) {
-      const error = result.cause;
-      expect(error._tag).toBe("Fail");
-      if (error._tag === "Fail") {
-        expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain("Failed to write");
-      }
-    }
+    const error = expectErrorInstance(getFailureError(result), Error);
+    expect(error.message).toContain("Failed to write");
   });
 
   it("fails with descriptive error when directory creation fails", async () => {
     const TestLayer = createTestLayer({
       makeDirectory: () =>
         Effect.fail(
-          new SystemError({
-            reason: "PermissionDenied",
+          systemError({
+            _tag: "PermissionDenied",
             module: "FileSystem",
             method: "makeDirectory",
             description: "Permission denied",
@@ -123,15 +117,8 @@ describe("saveJson", () => {
       ),
     );
 
-    expect(Exit.isFailure(result)).toBe(true);
-    if (Exit.isFailure(result)) {
-      const error = result.cause;
-      expect(error._tag).toBe("Fail");
-      if (error._tag === "Fail") {
-        expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain("Failed to write");
-      }
-    }
+    const error = expectErrorInstance(getFailureError(result), Error);
+    expect(error.message).toContain("Failed to write");
   });
 
   it("properly serializes complex data with formatting", async () => {

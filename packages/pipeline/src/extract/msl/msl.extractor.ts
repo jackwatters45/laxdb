@@ -1,6 +1,7 @@
-import { Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { Duration, Effect, Either, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
+import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
 
 import { MSLClient } from "../../msl/msl.client";
 import type {
@@ -19,7 +20,10 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type { MSLSeasonManifest } from "./msl.manifest";
+import type {
+  MSLExtractionManifest,
+  MSLSeasonManifest,
+} from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
 
 // MSL seasons available on Gamesheet (2023-2025)
@@ -30,43 +34,51 @@ const MSL_SEASONS = Object.entries(MSL_GAMESHEET_SEASONS).map(
     seasonId,
   }),
 );
+const decodeMSLSeasonId = Schema.decodeUnknownSync(MSLSeasonId);
 
-export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
+export class MSLExtractorService extends ServiceMap.Service<MSLExtractorService>()(
   "MSLExtractorService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const client = yield* MSLClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* MSLManifestService;
       const incremental = yield* IncrementalExtractionService;
-      const path = yield* Path.Path;
+      const fs = yield* FileSystem;
+      const path = yield* Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "msl", String(seasonId), `${entity}.json`);
+      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
+        ServiceMap.add(Path, path),
+      );
+
+      const saveOutputJson = <T>(filePath: string, data: T) =>
+        saveJson(filePath, data).pipe(Effect.provide(ioServices));
 
       /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
           const result = yield* client
-            .getTeams({ seasonId: MSLSeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getTeams({ seasonId: decodeMSLSeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MSLTeam[]);
           }
-          yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
+          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts players for a season. @see isCriticalError for error handling. */
@@ -76,25 +88,25 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             `  🏃 Extracting players for season ${seasonId}...`,
           );
           const result = yield* client
-            .getPlayers({ seasonId: MSLSeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getPlayers({ seasonId: decodeMSLSeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MSLPlayer[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "players"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts goalies for a season. @see isCriticalError for error handling. */
@@ -104,25 +116,25 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             `  🧤 Extracting goalies for season ${seasonId}...`,
           );
           const result = yield* client
-            .getGoalies({ seasonId: MSLSeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getGoalies({ seasonId: decodeMSLSeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MSLGoalie[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "goalies"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} goalies (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} goalies (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts standings for a season. @see isCriticalError for error handling. */
@@ -132,25 +144,25 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             `  📋 Extracting standings for season ${seasonId}...`,
           );
           const result = yield* client
-            .getStandings({ seasonId: MSLSeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getStandings({ seasonId: decodeMSLSeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MSLStanding[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "standings"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts schedule for a season. @see isCriticalError for error handling. */
@@ -160,31 +172,31 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
             `  📅 Extracting schedule for season ${seasonId}...`,
           );
           const result = yield* client
-            .getSchedule({ seasonId: MSLSeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getSchedule({ seasonId: decodeMSLSeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly MSLGame[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "schedule"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} games (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} games (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       const extractSeason = (
         seasonId: number,
         options: IncrementalExtractOptions = {},
-      ) =>
+      ): Effect.Effect<MSLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           // Find year for this seasonId
           const season = MSL_SEASONS.find((s) => s.seasonId === seasonId);
@@ -290,7 +302,7 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
           startYear?: number;
           endYear?: number;
         } = {},
-      ) =>
+      ): Effect.Effect<MSLExtractionManifest, unknown> =>
         Effect.gen(function* () {
           const startYear = options.startYear ?? 2023;
           const endYear = options.endYear ?? 2025;
@@ -343,14 +355,17 @@ export class MSLExtractorService extends Effect.Service<MSLExtractorService>()(
         extractAll,
       };
     }),
-    dependencies: [
-      Layer.mergeAll(
-        MSLClient.Default,
-        ExtractConfigService.Default,
-        MSLManifestService.Default,
-        IncrementalExtractionService.Default,
-        BunContext.layer,
-      ),
-    ],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(
+      Layer.mergeAll(
+        MSLClient.layer,
+        ExtractConfigService.layer,
+        MSLManifestService.layer,
+        IncrementalExtractionService.layer,
+        BunServices.layer,
+      ),
+    ),
+  );
+}

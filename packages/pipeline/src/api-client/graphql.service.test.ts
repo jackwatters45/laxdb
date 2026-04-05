@@ -1,7 +1,8 @@
 import { Effect, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { HttpError, NetworkError, ParseError } from "../error";
+import { HttpError, NetworkError, ParseError, RateLimitError } from "../error";
+import { expectErrorInstance, getFailureError } from "../test-helpers";
 
 import { GraphQLError, makeGraphQLClient } from "./graphql.service";
 
@@ -24,10 +25,20 @@ describe("makeGraphQLClient", () => {
     vi.unstubAllGlobals();
   });
 
-  const createClient = (overrides?: { authHeader?: string }) =>
+  const createClient = (
+    overrides?: {
+      authHeader?: string;
+      maxRetries?: number;
+      retryDelayMs?: number;
+      timeoutMs?: number;
+    },
+  ) =>
     makeGraphQLClient({
       endpoint: "https://api.example.com/graphql",
       authHeader: overrides?.authHeader,
+      maxRetries: overrides?.maxRetries,
+      retryDelayMs: overrides?.retryDelayMs,
+      timeoutMs: overrides?.timeoutMs,
     });
 
   const TEST_QUERY = `query GetUser($id: ID!) { user(id: $id) { id name } }`;
@@ -140,15 +151,34 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        expect(error._tag).toBe("Fail");
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(NetworkError);
-          expect(error.error.message).toContain("Network error");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), NetworkError);
+      expect(error.message).toContain("Network error");
+    });
+
+    it("returns RateLimitError on 429 response", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response("Too Many Requests", {
+          status: 429,
+          headers: { "retry-after": "60" },
+        }),
+      );
+
+      const client = createClient();
+      const result = await Effect.runPromiseExit(
+        client.executeOnce(
+          {
+            query: TEST_QUERY,
+            variables: { id: "1" },
+          },
+          TestDataSchema,
+        ),
+      );
+
+      const error = expectErrorInstance(
+        getFailureError(result),
+        RateLimitError,
+      );
+      expect(error.retryAfterMs).toBe(60000);
     });
 
     it("returns HttpError on non-ok response", async () => {
@@ -164,14 +194,9 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof HttpError) {
-          expect(error.error.message).toContain("HTTP 500");
-          expect(error.error.statusCode).toBe(500);
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), HttpError);
+      expect(error.message).toContain("HTTP 500");
+      expect(error.statusCode).toBe(500);
     });
 
     it("returns HttpError on invalid JSON response", async () => {
@@ -184,14 +209,8 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(HttpError);
-          expect(error.error.message).toContain("Failed to parse JSON");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), HttpError);
+      expect(error.message).toContain("Failed to parse JSON");
     });
 
     it("returns ParseError on invalid response shape", async () => {
@@ -206,14 +225,8 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(ParseError);
-          expect(error.error.message).toContain("Schema validation failed");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), ParseError);
+      expect(error.message).toContain("Schema validation failed");
     });
 
     it("returns GraphQLError when response contains errors", async () => {
@@ -233,16 +246,11 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "999" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("User not found");
-          expect(error.error.message).toContain("Access denied");
-          expect(error.error.errors).toHaveLength(2);
-          expect(error.error.errors[0]?.path).toEqual(["user"]);
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), GraphQLError);
+      expect(error.message).toContain("User not found");
+      expect(error.message).toContain("Access denied");
+      expect(error.errors).toHaveLength(2);
+      expect(error.errors[0]?.path).toEqual(["user"]);
     });
 
     it("returns GraphQLError when data is null without errors", async () => {
@@ -255,14 +263,9 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("null data");
-          expect(error.error.errors).toHaveLength(0);
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), GraphQLError);
+      expect(error.message).toContain("null data");
+      expect(error.errors).toHaveLength(0);
     });
 
     it("returns GraphQLError with partial data and errors", async () => {
@@ -279,13 +282,54 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("Deprecated field accessed");
-        }
-      }
+      const error = expectErrorInstance(getFailureError(result), GraphQLError);
+      expect(error.message).toContain("Deprecated field accessed");
+    });
+  });
+
+  describe("retry behavior", () => {
+    it("retries when rate limit clears", async () => {
+      mockFetch
+        .mockResolvedValueOnce(
+          new Response("Too Many Requests", { status: 429 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({ data: { user: { id: 1, name: "Success" } } }),
+            {
+              status: 200,
+            },
+          ),
+        );
+
+      const client = createClient({ retryDelayMs: 10 });
+      const result = await Effect.runPromise(
+        client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
+      );
+
+      expect(result).toEqual({ user: { id: 1, name: "Success" } });
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("retries with backoff on persistent rate limit", async () => {
+      mockFetch.mockResolvedValue(
+        new Response("Too Many Requests", { status: 429 }),
+      );
+
+      const client = createClient({
+        maxRetries: 2,
+        retryDelayMs: 10,
+      });
+      const result = await Effect.runPromiseExit(
+        client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
+      );
+
+      const error = expectErrorInstance(
+        getFailureError(result),
+        RateLimitError,
+      );
+      expect(error.message).toContain("Rate limited by server");
+      expect(mockFetch).toHaveBeenCalledTimes(4);
     });
   });
 

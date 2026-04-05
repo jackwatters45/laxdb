@@ -1,49 +1,49 @@
 import { Schema } from "effect";
 
-export class ScraperError extends Schema.TaggedError<ScraperError>(
+export class ScraperError extends Schema.TaggedErrorClass<ScraperError>()(
   "ScraperError",
-)("ScraperError", {
+  {
   message: Schema.String,
   url: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 500 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 500 )),
 }) {}
 
-export class ScraperHttpError extends Schema.TaggedError<ScraperHttpError>(
+export class ScraperHttpError extends Schema.TaggedErrorClass<ScraperHttpError>()(
   "ScraperHttpError",
-)("ScraperHttpError", {
+  {
   message: Schema.String,
   url: Schema.String,
   statusCode: Schema.Number,
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 502 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 502 )),
 }) {}
 
-export class ScraperTimeoutError extends Schema.TaggedError<ScraperTimeoutError>(
+export class ScraperTimeoutError extends Schema.TaggedErrorClass<ScraperTimeoutError>()(
   "ScraperTimeoutError",
-)("ScraperTimeoutError", {
+  {
   message: Schema.String,
   url: Schema.String,
   timeoutMs: Schema.Number,
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 408 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 408 )),
 }) {}
 
-export class ScraperRateLimitError extends Schema.TaggedError<ScraperRateLimitError>(
+export class ScraperRateLimitError extends Schema.TaggedErrorClass<ScraperRateLimitError>()(
   "ScraperRateLimitError",
-)("ScraperRateLimitError", {
+  {
   message: Schema.String,
   url: Schema.String,
   retryAfterMs: Schema.optional(Schema.Number),
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 429 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 429 )),
 }) {}
 
-export class ScraperNetworkError extends Schema.TaggedError<ScraperNetworkError>(
+export class ScraperNetworkError extends Schema.TaggedErrorClass<ScraperNetworkError>()(
   "ScraperNetworkError",
-)("ScraperNetworkError", {
+  {
   message: Schema.String,
   url: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 503 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 503 )),
 }) {}

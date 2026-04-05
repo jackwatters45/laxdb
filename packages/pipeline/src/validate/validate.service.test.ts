@@ -1,312 +1,286 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext } from "@effect/platform-bun";
-import { describe, it, expect, layer } from "@effect/vitest";
-import { Effect } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunServices } from "@effect/platform-bun";
+import { Effect, Scope } from "effect";
+import { describe, expect, it } from "vitest";
 
 import {
+  buildReport,
+  crossReference,
   validateFileExists,
   validateJsonArray,
   validateRequiredFields,
   validateUniqueField,
-  crossReference,
-  buildReport,
 } from "./validate.service";
 
-const makeTempDir = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const tempBase = yield* fs.makeTempDirectoryScoped();
-  return path.join(tempBase, "validate-test");
+const runScoped = <A, E>(effect: Effect.Effect<A, E, Scope.Scope>) =>
+  Effect.runPromise(Effect.scoped(effect));
+
+describe("validateFileExists", () => {
+  it("returns exists: true for existing file", async () => {
+    const result = await runScoped(
+      Effect.gen(function* () {
+        const fs = yield* FileSystem;
+        const path = yield* Path;
+        const tempBase = yield* fs.makeTempDirectoryScoped();
+        const tempDir = path.join(tempBase, "validate-test");
+        yield* fs.makeDirectory(tempDir, { recursive: true });
+        const filePath = path.join(tempDir, "test.json");
+        yield* fs.writeFileString(filePath, "[]");
+        return yield* validateFileExists(filePath);
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
+
+    expect(result.exists).toBe(true);
+    expect(result.filePath).toContain("test.json");
+    expect(result.sizeBytes).toBeGreaterThan(0);
+    expect(result.checks[0]?.passed).toBe(true);
+  });
+
+  it("returns exists: false for missing file", async () => {
+    const result = await runScoped(
+      Effect.gen(function* () {
+        const path = yield* Path;
+        return yield* validateFileExists(
+          path.join("/tmp", "validate-test", "nonexistent.json"),
+        );
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
+
+    expect(result.exists).toBe(false);
+    expect(result.checks[0]?.passed).toBe(false);
+    expect(result.checks[0]?.issues[0]?.code).toBe("FILE_NOT_FOUND");
+  });
 });
 
-layer(BunContext.layer)("validateFileExists", (it) => {
-  it.scoped("returns exists: true for existing file", () =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      yield* fs.makeDirectory(tempDir, { recursive: true });
-      const filePath = path.join(tempDir, "test.json");
-      yield* fs.writeFileString(filePath, "[]");
+describe("validateJsonArray", () => {
+  it("validates valid JSON array", async () => {
+    const { result, data } = await runScoped(
+      Effect.gen(function* () {
+        const fs = yield* FileSystem;
+        const path = yield* Path;
+        const tempBase = yield* fs.makeTempDirectoryScoped();
+        const tempDir = path.join(tempBase, "validate-test");
+        yield* fs.makeDirectory(tempDir, { recursive: true });
+        const filePath = path.join(tempDir, "valid.json");
+        yield* fs.writeFileString(
+          filePath,
+          JSON.stringify([{ id: 1 }, { id: 2 }]),
+        );
+        return yield* validateJsonArray<{ id: number }>(filePath);
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
 
-      const result = yield* validateFileExists(filePath);
+    expect(result.exists).toBe(true);
+    expect(result.recordCount).toBe(2);
+    expect(data).toHaveLength(2);
+    expect(result.checks.every((c) => c.passed)).toBe(true);
+  });
 
-      expect(result.exists).toBe(true);
-      expect(result.filePath).toBe(filePath);
-      expect(result.sizeBytes).toBeGreaterThan(0);
-      expect(result.checks[0]?.passed).toBe(true);
-    }),
-  );
+  it("fails when JSON is not an array", async () => {
+    const { result } = await runScoped(
+      Effect.gen(function* () {
+        const fs = yield* FileSystem;
+        const path = yield* Path;
+        const tempBase = yield* fs.makeTempDirectoryScoped();
+        const tempDir = path.join(tempBase, "validate-test");
+        yield* fs.makeDirectory(tempDir, { recursive: true });
+        const filePath = path.join(tempDir, "object.json");
+        yield* fs.writeFileString(filePath, JSON.stringify({ key: "value" }));
+        return yield* validateJsonArray(filePath);
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
 
-  it.scoped("returns exists: false for missing file", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      const filePath = path.join(tempDir, "nonexistent.json");
+    expect(result.exists).toBe(true);
+    const parseCheck = result.checks.find((c) => c.checkName === "json_parse");
+    expect(parseCheck?.passed).toBe(false);
+    expect(parseCheck?.issues[0]?.code).toBe("NOT_ARRAY");
+  });
 
-      const result = yield* validateFileExists(filePath);
+  it("fails when array has fewer records than minimum", async () => {
+    const { result } = await runScoped(
+      Effect.gen(function* () {
+        const fs = yield* FileSystem;
+        const path = yield* Path;
+        const tempBase = yield* fs.makeTempDirectoryScoped();
+        const tempDir = path.join(tempBase, "validate-test");
+        yield* fs.makeDirectory(tempDir, { recursive: true });
+        const filePath = path.join(tempDir, "small.json");
+        yield* fs.writeFileString(filePath, JSON.stringify([{ id: 1 }]));
+        return yield* validateJsonArray(filePath, 10);
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
 
-      expect(result.exists).toBe(false);
-      expect(result.checks[0]?.passed).toBe(false);
-      expect(result.checks[0]?.issues[0]?.code).toBe("FILE_NOT_FOUND");
-    }),
-  );
-});
+    const parseCheck = result.checks.find((c) => c.checkName === "json_parse");
+    expect(parseCheck?.passed).toBe(false);
+    expect(parseCheck?.issues[0]?.code).toBe("INSUFFICIENT_RECORDS");
+  });
 
-layer(BunContext.layer)("validateJsonArray", (it) => {
-  it.scoped("validates valid JSON array", () =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      yield* fs.makeDirectory(tempDir, { recursive: true });
-      const filePath = path.join(tempDir, "valid.json");
-      yield* fs.writeFileString(
-        filePath,
-        JSON.stringify([{ id: 1 }, { id: 2 }]),
-      );
+  it("returns empty data for missing file", async () => {
+    const { result, data } = await runScoped(
+      Effect.gen(function* () {
+        const path = yield* Path;
+        return yield* validateJsonArray(
+          path.join("/tmp", "validate-test", "missing.json"),
+        );
+      }).pipe(Effect.provide(BunServices.layer)),
+    );
 
-      const { result, data } = yield* validateJsonArray<{ id: number }>(
-        filePath,
-      );
-
-      expect(result.exists).toBe(true);
-      expect(result.recordCount).toBe(2);
-      expect(data).toHaveLength(2);
-      expect(result.checks.every((c) => c.passed)).toBe(true);
-    }),
-  );
-
-  it.scoped("fails when JSON is not an array", () =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      yield* fs.makeDirectory(tempDir, { recursive: true });
-      const filePath = path.join(tempDir, "object.json");
-      yield* fs.writeFileString(filePath, JSON.stringify({ key: "value" }));
-
-      const { result } = yield* validateJsonArray(filePath);
-
-      expect(result.exists).toBe(true);
-      const parseCheck = result.checks.find(
-        (c) => c.checkName === "json_parse",
-      );
-      expect(parseCheck?.passed).toBe(false);
-      expect(parseCheck?.issues[0]?.code).toBe("NOT_ARRAY");
-    }),
-  );
-
-  it.scoped("fails when array has fewer records than minimum", () =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      yield* fs.makeDirectory(tempDir, { recursive: true });
-      const filePath = path.join(tempDir, "small.json");
-      yield* fs.writeFileString(filePath, JSON.stringify([{ id: 1 }]));
-
-      const { result } = yield* validateJsonArray(filePath, 10);
-
-      const parseCheck = result.checks.find(
-        (c) => c.checkName === "json_parse",
-      );
-      expect(parseCheck?.passed).toBe(false);
-      expect(parseCheck?.issues[0]?.code).toBe("INSUFFICIENT_RECORDS");
-    }),
-  );
-
-  it.scoped("returns empty data for missing file", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path;
-      const tempDir = yield* makeTempDir;
-      const filePath = path.join(tempDir, "missing.json");
-
-      const { result, data } = yield* validateJsonArray(filePath);
-
-      expect(result.exists).toBe(false);
-      expect(data).toHaveLength(0);
-    }),
-  );
+    expect(result.exists).toBe(false);
+    expect(data).toHaveLength(0);
+  });
 });
 
 describe("validateRequiredFields", () => {
-  it.effect("passes when all required fields present", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: "Alice" },
-        { id: "2", name: "Bob" },
-      ];
+  it("passes when all required fields present", async () => {
+    const data = [
+      { id: "1", name: "Alice" },
+      { id: "2", name: "Bob" },
+    ];
 
-      const result = yield* validateRequiredFields(data, ["id", "name"]);
+    const result = await Effect.runPromise(
+      validateRequiredFields(data, ["id", "name"]),
+    );
 
-      expect(result.passed).toBe(true);
-      expect(result.issues).toHaveLength(0);
-    }),
-  );
+    expect(result.passed).toBe(true);
+    expect(result.issues).toHaveLength(0);
+  });
 
-  it.effect("fails when field is missing in all records", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: null },
-        { id: "2", name: null },
-      ];
+  it("fails when field is missing in all records", async () => {
+    const data = [
+      { id: "1", name: null },
+      { id: "2", name: null },
+    ];
 
-      const result = yield* validateRequiredFields(data, ["id", "name"]);
+    const result = await Effect.runPromise(
+      validateRequiredFields(data, ["id", "name"]),
+    );
 
-      expect(result.passed).toBe(false);
-      expect(result.issues[0]?.code).toBe("FIELD_ALL_MISSING");
-    }),
-  );
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]?.code).toBe("FIELD_ALL_MISSING");
+  });
 
-  it.effect("warns when field is missing in most records", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: "Alice" },
-        { id: "2", name: null },
-        { id: "3", name: null },
-        { id: "4", name: null },
-      ];
+  it("warns when field is missing in most records", async () => {
+    const data = [
+      { id: "1", name: "Alice" },
+      { id: "2", name: null },
+      { id: "3", name: null },
+      { id: "4", name: null },
+    ];
 
-      const result = yield* validateRequiredFields(data, ["id", "name"]);
+    const result = await Effect.runPromise(
+      validateRequiredFields(data, ["id", "name"]),
+    );
 
-      expect(result.passed).toBe(true);
-      const nameIssue = result.issues.find((i) => i.message.includes("name"));
-      expect(nameIssue?.severity).toBe("warning");
-      expect(nameIssue?.code).toBe("FIELD_MOSTLY_MISSING");
-    }),
-  );
+    expect(result.passed).toBe(true);
+    const nameIssue = result.issues.find((i) => i.message.includes("name"));
+    expect(nameIssue?.severity).toBe("warning");
+    expect(nameIssue?.code).toBe("FIELD_MOSTLY_MISSING");
+  });
 
-  it.effect("reports info when field is missing in few records", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: "Alice" },
-        { id: "2", name: "Bob" },
-        { id: "3", name: "Carol" },
-        { id: "4", name: null },
-      ];
+  it("reports info when field is missing in few records", async () => {
+    const data = [
+      { id: "1", name: "Alice" },
+      { id: "2", name: "Bob" },
+      { id: "3", name: "Carol" },
+      { id: "4", name: null },
+    ];
 
-      const result = yield* validateRequiredFields(data, ["id", "name"]);
+    const result = await Effect.runPromise(
+      validateRequiredFields(data, ["id", "name"]),
+    );
 
-      expect(result.passed).toBe(true);
-      const nameIssue = result.issues.find((i) => i.message.includes("name"));
-      expect(nameIssue?.severity).toBe("info");
-      expect(nameIssue?.code).toBe("FIELD_SOME_MISSING");
-    }),
-  );
+    expect(result.passed).toBe(true);
+    const nameIssue = result.issues.find((i) => i.message.includes("name"));
+    expect(nameIssue?.severity).toBe("info");
+    expect(nameIssue?.code).toBe("FIELD_SOME_MISSING");
+  });
 });
 
 describe("validateUniqueField", () => {
-  it.effect("passes when all values are unique", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: "Alice" },
-        { id: "2", name: "Bob" },
-        { id: "3", name: "Carol" },
-      ];
+  it("passes when all values are unique", async () => {
+    const data = [
+      { id: "1", name: "Alice" },
+      { id: "2", name: "Bob" },
+      { id: "3", name: "Carol" },
+    ];
 
-      const result = yield* validateUniqueField(data, "id");
+    const result = await Effect.runPromise(validateUniqueField(data, "id"));
 
-      expect(result.passed).toBe(true);
-      expect(result.issues).toHaveLength(0);
-    }),
-  );
+    expect(result.passed).toBe(true);
+    expect(result.issues).toHaveLength(0);
+  });
 
-  it.effect("fails when duplicates exist", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: "1", name: "Alice" },
-        { id: "1", name: "Bob" },
-        { id: "2", name: "Carol" },
-      ];
+  it("fails when duplicates exist", async () => {
+    const data = [
+      { id: "1", name: "Alice" },
+      { id: "1", name: "Bob" },
+      { id: "2", name: "Carol" },
+    ];
 
-      const result = yield* validateUniqueField(data, "id");
+    const result = await Effect.runPromise(validateUniqueField(data, "id"));
 
-      expect(result.passed).toBe(false);
-      expect(result.issues[0]?.code).toBe("DUPLICATE_VALUES");
-    }),
-  );
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]?.code).toBe("DUPLICATE_VALUES");
+  });
 
-  it.effect("ignores null values when checking uniqueness", () =>
-    Effect.gen(function* () {
-      const data = [
-        { id: null, name: "Alice" },
-        { id: null, name: "Bob" },
-        { id: "1", name: "Carol" },
-      ];
+  it("ignores null values when checking uniqueness", async () => {
+    const data = [
+      { id: null, name: "Alice" },
+      { id: null, name: "Bob" },
+      { id: "1", name: "Carol" },
+    ];
 
-      const result = yield* validateUniqueField(data, "id");
+    const result = await Effect.runPromise(validateUniqueField(data, "id"));
 
-      expect(result.passed).toBe(true);
-    }),
-  );
+    expect(result.passed).toBe(true);
+  });
 });
 
 describe("crossReference", () => {
-  it.effect("returns full match when all source values exist in target", () =>
-    Effect.gen(function* () {
-      const source = [{ foreignKey: "A" }, { foreignKey: "B" }];
-      const target = [{ id: "A" }, { id: "B" }, { id: "C" }];
+  it("returns full match when all source values exist in target", async () => {
+    const source = [{ foreignKey: "A" }, { foreignKey: "B" }];
+    const target = [{ id: "A" }, { id: "B" }, { id: "C" }];
 
-      const result = yield* crossReference(
-        source,
-        target,
-        "foreignKey",
-        "id",
-        "source.json",
-        "target.json",
-      );
+    const result = await Effect.runPromise(
+      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+    );
 
-      expect(result.totalSourceRecords).toBe(2);
-      expect(result.matchedRecords).toBe(2);
-      expect(result.unmatchedRecords).toBe(0);
-      expect(result.unmatchedSamples).toBeUndefined();
-    }),
-  );
+    expect(result.totalSourceRecords).toBe(2);
+    expect(result.matchedRecords).toBe(2);
+    expect(result.unmatchedRecords).toBe(0);
+    expect(result.unmatchedSamples).toBeUndefined();
+  });
 
-  it.effect("returns partial match when some values missing", () =>
-    Effect.gen(function* () {
-      const source = [
-        { foreignKey: "A" },
-        { foreignKey: "B" },
-        { foreignKey: "X" },
-      ];
-      const target = [{ id: "A" }, { id: "B" }];
+  it("returns partial match when some values missing", async () => {
+    const source = [
+      { foreignKey: "A" },
+      { foreignKey: "B" },
+      { foreignKey: "X" },
+    ];
+    const target = [{ id: "A" }, { id: "B" }];
 
-      const result = yield* crossReference(
-        source,
-        target,
-        "foreignKey",
-        "id",
-        "source.json",
-        "target.json",
-      );
+    const result = await Effect.runPromise(
+      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+    );
 
-      expect(result.totalSourceRecords).toBe(3);
-      expect(result.matchedRecords).toBe(2);
-      expect(result.unmatchedRecords).toBe(1);
-      expect(result.unmatchedSamples).toContain("X");
-    }),
-  );
+    expect(result.totalSourceRecords).toBe(3);
+    expect(result.matchedRecords).toBe(2);
+    expect(result.unmatchedRecords).toBe(1);
+    expect(result.unmatchedSamples).toContain("X");
+  });
 
-  it.effect("handles null values in source data", () =>
-    Effect.gen(function* () {
-      const source = [{ foreignKey: "A" }, { foreignKey: null }];
-      const target = [{ id: "A" }];
+  it("handles null values in source data", async () => {
+    const source = [{ foreignKey: "A" }, { foreignKey: null }];
+    const target = [{ id: "A" }];
 
-      const result = yield* crossReference(
-        source,
-        target,
-        "foreignKey",
-        "id",
-        "source.json",
-        "target.json",
-      );
+    const result = await Effect.runPromise(
+      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+    );
 
-      expect(result.matchedRecords).toBe(1);
-      expect(result.unmatchedRecords).toBe(1);
-    }),
-  );
+    expect(result.matchedRecords).toBe(1);
+    expect(result.unmatchedRecords).toBe(1);
+  });
 });
 
 describe("buildReport", () => {

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, type ParseResult, Schedule, Schema } from "effect";
+import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
@@ -22,14 +22,14 @@ import {
   WLATeamsRequest,
 } from "./wla.schema";
 
-const mapParseError = (error: ParseResult.ParseError): ParseError =>
+const mapParseError = (error: Schema.SchemaError): ParseError =>
   new ParseError({
     message: `Invalid request: ${String(error)}`,
     cause: error,
   });
 
-export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
-  effect: Effect.gen(function* () {
+export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
+  make: Effect.gen(function* () {
     const wlaConfig = yield* WLAConfig;
     const pipelineConfig = yield* PipelineConfig;
 
@@ -120,15 +120,12 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       url: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
       fetchPage(url).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -170,7 +167,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(WLATeamsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(WLATeamsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -332,7 +329,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(WLAPlayersRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(WLAPlayersRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -547,7 +544,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(WLAGoaliesRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(WLAGoaliesRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1033,7 +1030,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(WLAStandingsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(WLAStandingsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1346,7 +1343,7 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(WLAScheduleRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(WLAScheduleRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1665,6 +1662,9 @@ export class WLAClient extends Effect.Service<WLAClient>()("WLAClient", {
       getStandings,
       getSchedule,
     };
-  }),
-  dependencies: [WLAConfig.Default, PipelineConfig.Default],
-}) {}
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(WLAConfig.layer, PipelineConfig.layer)),
+  );
+}

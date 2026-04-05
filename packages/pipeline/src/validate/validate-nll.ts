@@ -1,5 +1,6 @@
-import { FileSystem, Path } from "@effect/platform";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 
 import { ExtractConfigService } from "../extract/extract.config";
@@ -27,8 +28,8 @@ const NLL_SEASON = "225";
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const nllDir = path.join(config.outputDir, "nll");
   const seasonDir = path.join(nllDir, NLL_SEASON);
   const startTime = Date.now();
@@ -204,8 +205,8 @@ const program = Effect.gen(function* () {
 });
 
 const MainLayer = Layer.mergeAll(
-  ExtractConfigService.Default,
-  BunContext.layer,
+  ExtractConfigService.layer,
+  BunServices.layer,
 );
 
 BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));
