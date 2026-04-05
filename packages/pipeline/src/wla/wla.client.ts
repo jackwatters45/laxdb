@@ -1,9 +1,14 @@
 import * as cheerio from "cheerio";
-import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
+import { Effect, Layer, Option, Schedule, Schema, ServiceMap } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
-import { safeString, safeStringOrNull } from "../util";
+import {
+  mapParseError,
+  safeParseJson,
+  safeString,
+  safeStringOrNull,
+} from "../util";
 
 import {
   WLA_LEAGUE_ID,
@@ -21,12 +26,6 @@ import {
   WLATeam,
   WLATeamsRequest,
 } from "./wla.schema";
-
-const mapParseError = (error: Schema.SchemaError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -59,6 +58,32 @@ const pushUniqueByKey = <T>(
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
     items.push(item);
+  }
+};
+
+const extractFromEmbeddedJsonPatterns = <T>(
+  scriptContent: string,
+  patterns: readonly RegExp[],
+  extractItems: (data: unknown) => readonly T[],
+  pushItems: (items: readonly T[]) => void,
+) => {
+  for (const pattern of patterns) {
+    const match = scriptContent.match(pattern);
+    const rawJson = match?.[1];
+    if (!rawJson) {
+      continue;
+    }
+
+    const parsed = Effect.runSync(
+      safeParseJson<unknown>(rawJson, "Failed to parse embedded WLA JSON").pipe(
+        Effect.option,
+      ),
+    );
+    if (Option.isNone(parsed)) {
+      continue;
+    }
+
+    pushItems(extractItems(parsed.value));
   }
 };
 
@@ -385,27 +410,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded player data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"players"\s*:\s*(\[[\s\S]*?\])/,
-            /"leaders"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract player data from the parsed JSON
-                const extractedPlayers = extractPlayersFromData(data);
-                pushUniqueById(players, seenIds, extractedPlayers);
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"players"\s*:\s*(\[[\s\S]*?\])/,
+              /"leaders"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractPlayersFromData,
+            (extractedPlayers) => {
+              pushUniqueById(players, seenIds, extractedPlayers);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -595,27 +612,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded goalie data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"goalies"\s*:\s*(\[[\s\S]*?\])/,
-            /"goaltending"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract goalie data from the parsed JSON
-                const extractedGoalies = extractGoaliesFromData(data);
-                pushUniqueById(goalies, seenIds, extractedGoalies);
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"goalies"\s*:\s*(\[[\s\S]*?\])/,
+              /"goaltending"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractGoaliesFromData,
+            (extractedGoalies) => {
+              pushUniqueById(goalies, seenIds, extractedGoalies);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -1082,32 +1091,24 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded standings data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"standings"\s*:\s*(\[[\s\S]*?\])/,
-            /"teams"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract standings data from the parsed JSON
-                const extractedStandings = extractStandingsFromData(data);
-                pushUniqueByKey(
-                  standings,
-                  seenTeams,
-                  extractedStandings,
-                  (standing) => standing.team_id,
-                );
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"standings"\s*:\s*(\[[\s\S]*?\])/,
+              /"teams"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractStandingsFromData,
+            (extractedStandings) => {
+              pushUniqueByKey(
+                standings,
+                seenTeams,
+                extractedStandings,
+                (standing) => standing.team_id,
+              );
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -1398,27 +1399,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded schedule data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"schedule"\s*:\s*(\[[\s\S]*?\])/,
-            /"games"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract game data from the parsed JSON
-                const extractedGames = extractGamesFromData(data);
-                pushUniqueById(games, seenIds, extractedGames);
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"schedule"\s*:\s*(\[[\s\S]*?\])/,
+              /"games"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractGamesFromData,
+            (extractedGames) => {
+              pushUniqueById(games, seenIds, extractedGames);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -1520,7 +1513,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const scoreCell = cells[scoreIdx];
                 const scoreText = scoreCell?.text().trim() ?? "";
                 // Score format: "5-3" or "5 - 3" or separate columns
-                const scoreMatch = scoreText.match(/(\d+)\s*[-–]\s*(\d+)/);
+                const scoreMatch = scoreText.match(/(\d+)\s*[--]\s*(\d+)/);
                 if (scoreMatch) {
                   homeScore = Number.parseInt(scoreMatch[1] ?? "0", 10);
                   awayScore = Number.parseInt(scoreMatch[2] ?? "0", 10);
