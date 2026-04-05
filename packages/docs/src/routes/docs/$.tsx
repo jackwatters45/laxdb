@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { throwRouterError } from "@/lib/router-throws";
 import { createServerFn } from "@tanstack/react-start";
 import { staticFunctionMiddleware } from "@tanstack/start-static-server-functions";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
@@ -27,8 +28,9 @@ const loader = createServerFn({
   .middleware([staticFunctionMiddleware])
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
-    // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing notFound()
-    if (!page) throw notFound();
+    if (!page) {
+      return throwRouterError(notFound());
+    }
 
     return {
       path: page.path,

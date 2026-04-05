@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { throwRouterError } from "@/lib/router-throws";
 import type { Post } from "content-collections";
 
 import { publishedPosts } from "@/lib/posts";
@@ -10,8 +11,7 @@ export const Route = createFileRoute("/content/$slug")({
   loader: ({ params }: { params: { slug: string } }): Post => {
     const post = publishedPosts.find((p) => p.slug === params.slug);
     if (!post) {
-      // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing notFound()
-      throw notFound();
+      return throwRouterError(notFound());
     }
     return post;
   },

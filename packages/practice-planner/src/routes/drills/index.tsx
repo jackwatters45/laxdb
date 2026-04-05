@@ -1,15 +1,4 @@
 import { RpcApiClient } from "@laxdb/api/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@laxdb/ui/components/ui/alert-dialog";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -33,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { runApi } from "@/lib/api";
 import {
   DRILL_DIFFICULTY_COLORS,
@@ -359,45 +349,29 @@ function DrillCard({ drill }: { drill: Drill }) {
 
       {/* Delete */}
       <div className="pr-3 opacity-0 group-hover:opacity-100 transition-opacity">
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              />
-            }
-          >
-            <Trash2 size={14} />
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Delete &quot;{drill.name}&quot;?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete this drill. Any practice plans
-                referencing it will keep their items but lose the drill
-                association.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                render={<Button variant="destructive" />}
-                onClick={() => {
-                  void handleDelete();
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDeleteDialog
+          title={`Delete "${drill.name}"?`}
+          description={
+            <>
+              This will permanently delete this drill. Any practice plans
+              referencing it will keep their items but lose the drill
+              association.
+            </>
+          }
+          onConfirm={handleDelete}
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          }
+        >
+          <Trash2 size={14} />
+        </ConfirmDeleteDialog>
       </div>
     </div>
   );

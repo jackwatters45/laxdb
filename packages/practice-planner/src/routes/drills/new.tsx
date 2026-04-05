@@ -2,6 +2,7 @@ import { RpcApiClient } from "@laxdb/api/client";
 import { CreateDrillInput } from "@laxdb/core/drill/drill.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
@@ -154,9 +155,7 @@ function NewDrillPage() {
             <Button variant="ghost">Cancel</Button>
           </Link>
           <Button
-            onClick={() => {
-              void handleCreate();
-            }}
+            onClick={voidAsync(handleCreate)}
             disabled={creating || !name}
           >
             {creating ? <Loader2 className="animate-spin" /> : null}
