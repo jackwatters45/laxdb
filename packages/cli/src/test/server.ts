@@ -18,9 +18,10 @@ import { DrillRpcHandlers } from "@laxdb/api/drill/drill.rpc-handlers";
 import { PlayRpcHandlers } from "@laxdb/api/play/play.rpc-handlers";
 import { PlayerRpcHandlers } from "@laxdb/api/player/player.rpc-handlers";
 import { PracticeRpcHandlers } from "@laxdb/api/practice/practice.rpc-handlers";
+import { emptyRequestContext } from "@laxdb/api/request-context";
 import { LaxdbRpcV2 } from "@laxdb/api/rpc-group";
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
-import { DateTime, Effect, Layer, ServiceMap } from "effect";
+import { DateTime, Effect, Layer } from "effect";
 import { HttpRouter, HttpServer } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
@@ -92,9 +93,7 @@ export async function startTestServer(): Promise<TestServer> {
       body,
     });
 
-    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- test server uses an empty per-request service context
-    const emptyContext = ServiceMap.empty() as ServiceMap.ServiceMap<unknown>;
-    const response = await handler(request, emptyContext);
+    const response = await handler(request, emptyRequestContext);
 
     res.writeHead(response.status, Object.fromEntries(response.headers));
     const responseBody = await response.arrayBuffer();

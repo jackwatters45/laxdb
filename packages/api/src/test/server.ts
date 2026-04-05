@@ -12,7 +12,7 @@ import {
 } from "node:http";
 
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
-import { DateTime, Effect, Layer, ServiceMap } from "effect";
+import { DateTime, Effect, Layer } from "effect";
 import { HttpRouter, HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
@@ -27,6 +27,7 @@ import { PlayersHandlersLive } from "../player/player.handlers";
 import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
 import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
+import { emptyRequestContext } from "../request-context";
 import { LaxdbRpcV2 } from "../rpc-group";
 
 // RPC handlers backed by test DB
@@ -109,9 +110,7 @@ export async function startTestServer(): Promise<TestServer> {
       body,
     });
 
-    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- test server uses an empty per-request service context
-    const emptyContext = ServiceMap.empty() as ServiceMap.ServiceMap<unknown>;
-    const response = await handler(request, emptyContext);
+    const response = await handler(request, emptyRequestContext);
     res.writeHead(response.status, Object.fromEntries(response.headers));
     const responseBody = await response.arrayBuffer();
     res.end(Buffer.from(responseBody));

@@ -24,6 +24,7 @@ import {
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
+import { parseJsonValue } from "./json";
 import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -33,13 +34,6 @@ import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 const decodePracticeEdges = Schema.decodeUnknownEffect(
   Schema.Array(PracticeEdgeInput),
 );
-
-const parseJsonValue = (value: string, flagName: string) =>
-  Effect.try({
-    try: (): unknown => JSON.parse(value),
-    catch: (error: unknown) =>
-      new Error(`Failed to parse ${flagName} JSON: ${String(error)}`),
-  });
 
 // ---------------------------------------------------------------------------
 // Practice CRUD

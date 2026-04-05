@@ -1,4 +1,4 @@
-import { DateTime, Layer, ServiceMap } from "effect";
+import { DateTime, Layer } from "effect";
 import {
   HttpRouter,
   HttpServer,
@@ -9,6 +9,7 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
+import { emptyRequestContext } from "./request-context";
 import { LaxdbRpcV2 } from "./rpc-group";
 import { LaxdbRpcV2Handlers } from "./rpc-handlers";
 
@@ -55,9 +56,7 @@ const AllRoutes = Layer.mergeAll(
 export default {
   fetch: (request: Request) => {
     const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
-    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- empty request context satisfies handlers that don't require extra services at runtime
-    const emptyContext = ServiceMap.empty() as ServiceMap.ServiceMap<unknown>;
-    return handler(request, emptyContext).finally(() => {
+    return handler(request, emptyRequestContext).finally(() => {
       void dispose();
     });
   },

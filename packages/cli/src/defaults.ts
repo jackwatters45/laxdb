@@ -15,6 +15,7 @@ import { DefaultsValues } from "@laxdb/core/defaults/defaults.schema";
 import { Effect, Option, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
 
+import { parseJsonValue } from "./json";
 import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 const scopeTypeFlag = Flag.choice("scope-type", [
@@ -37,13 +38,6 @@ const valuesFlag = Flag.string("values").pipe(
 );
 
 const decodeDefaultsValues = Schema.decodeUnknownEffect(DefaultsValues);
-
-const parseJsonValue = (value: string, flagName: string) =>
-  Effect.try({
-    try: (): unknown => JSON.parse(value),
-    catch: (error: unknown) =>
-      new Error(`Failed to parse ${flagName} JSON: ${String(error)}`),
-  });
 
 const getCommand = Command.make(
   "get",
