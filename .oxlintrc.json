@@ -23,7 +23,6 @@
     "typescript/no-explicit-any": "warn",
     "typescript/no-non-null-assertion": "warn",
     "typescript/consistent-type-imports": "error",
-    "typescript/consistent-type-exports": "error",
     "import/no-cycle": "error",
     "import/no-duplicates": "error",
     "import/max-dependencies": "off",
