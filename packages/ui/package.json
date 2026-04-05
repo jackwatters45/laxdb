@@ -27,7 +27,7 @@
     "build-storybook": "storybook build",
     "typecheck": "tsgo --build",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
+    "lint:fix": "oxlint --fix --quiet",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "fix": "bun run lint:fix && bun run format:fix"

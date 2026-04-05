@@ -9,7 +9,7 @@
     "start": "node .output/server/index.mjs",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint -c ../../.oxlintrc.json --type-aware .",
-    "lint:fix": "oxlint -c ../../.oxlintrc.json --type-aware . --fix",
+    "lint:fix": "oxlint -c ../../.oxlintrc.json --type-aware . --fix --quiet",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "fix": "bun run lint:fix && bun run format:fix"
