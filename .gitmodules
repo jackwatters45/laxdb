@@ -1,0 +1,3 @@
+[submodule "references/code/effect-smol"]
+	path = references/code/effect-smol
+	url = https://github.com/Effect-TS/effect-smol.git
