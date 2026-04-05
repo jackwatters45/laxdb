@@ -7,6 +7,6 @@ import { ServiceMap } from "effect";
  * layers already provided when wiring the router, so an empty context is the
  * correct runtime value here.
  */
-// oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ServiceMap.empty() is the correct runtime value, but Effect's generic cannot preserve the narrower empty type through handler call sites
 export const emptyRequestContext =
+  // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ServiceMap.empty() is the correct runtime value, but Effect's generic cannot preserve the narrower empty type through handler call sites
   ServiceMap.empty() as ServiceMap.ServiceMap<unknown>;
