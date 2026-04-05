@@ -4,7 +4,12 @@
  * Serves the full API (HTTP routes + RPC) backed by TestDatabaseLive.
  */
 
-import { createServer, type Server } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type Server,
+  type ServerResponse,
+} from "node:http";
 
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
@@ -22,6 +27,7 @@ import { PlayersHandlersLive } from "../player/player.handlers";
 import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
 import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
+import { emptyRequestContext } from "../request-context";
 import { LaxdbRpcV2 } from "../rpc-group";
 
 // RPC handlers backed by test DB
@@ -74,7 +80,7 @@ export interface TestServer {
 export async function startTestServer(): Promise<TestServer> {
   const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
 
-  const server = createServer(async (req, res) => {
+  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value) {
@@ -104,10 +110,18 @@ export async function startTestServer(): Promise<TestServer> {
       body,
     });
 
-    const response = await handler(request);
+    const response = await handler(request, emptyRequestContext);
     res.writeHead(response.status, Object.fromEntries(response.headers));
     const responseBody = await response.arrayBuffer();
     res.end(Buffer.from(responseBody));
+  };
+
+  const server = createServer((req, res) => {
+    void handleRequest(req, res).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      res.statusCode = 500;
+      res.end(message);
+    });
   });
 
   await new Promise<void>((resolve) => {
@@ -150,7 +164,7 @@ export async function post(
   const res = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
   let data: unknown;
@@ -161,3 +175,33 @@ export async function post(
   }
   return { status: res.status, data };
 }
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const expectRecord = (value: unknown): Record<string, unknown> => {
+  if (!isRecord(value)) {
+    throw new Error("Expected an object response");
+  }
+  return value;
+};
+
+export const expectRecordArray = (
+  value: unknown,
+): Array<Record<string, unknown>> => {
+  if (!Array.isArray(value)) {
+    throw new TypeError("Expected an array response");
+  }
+
+  return value.map((item) => expectRecord(item));
+};
+
+export const expectString = (value: unknown, label: string): string => {
+  if (typeof value !== "string") {
+    throw new TypeError(`Expected ${label} to be a string`);
+  }
+  return value;
+};
+
+export const expectStringProp = (value: unknown, key: string): string =>
+  expectString(expectRecord(value)[key], key);

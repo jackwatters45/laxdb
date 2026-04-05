@@ -26,6 +26,23 @@ const mapParseError = (error: Schema.SchemaError): ParseError =>
     cause: error,
   });
 
+const parseJsonResponse = <T>(
+  response: string,
+  message: string,
+): Effect.Effect<T, ParseError> =>
+  Effect.try({
+    try: () => {
+      const parsed: unknown = JSON.parse(response);
+      // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- third-party MSL APIs return loosely typed JSON that is validated lazily by field access below
+      return parsed as T;
+    },
+    catch: () =>
+      new ParseError({
+        message,
+        cause: response.slice(0, 200),
+      }),
+  });
+
 export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
   make: Effect.gen(function* () {
     const mslConfig = yield* MSLConfig;
@@ -258,19 +275,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        let data: StandingsApiResponse | StandingsApiResponse[];
-        try {
-          data = JSON.parse(response) as
-            | StandingsApiResponse
-            | StandingsApiResponse[];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse standings API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const data = yield* parseJsonResponse<
+          StandingsApiResponse | StandingsApiResponse[]
+        >(response, `Failed to parse standings API response as JSON`);
 
         // Normalize to array (single division returns object, multiple returns array)
         const divisions = Array.isArray(data) ? data : [data];
@@ -385,17 +392,10 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          let data: PlayerApiResponse;
-          try {
-            data = JSON.parse(response) as PlayerApiResponse;
-          } catch {
-            return yield* Effect.fail(
-              new ParseError({
-                message: `Failed to parse player API response as JSON`,
-                cause: response.slice(0, 200),
-              }),
-            );
-          }
+          const data = yield* parseJsonResponse<PlayerApiResponse>(
+            response,
+            `Failed to parse player API response as JSON`,
+          );
 
           // Check if we have data - names is directly under tableData
           const tableData = data.tableData ?? {};
@@ -450,7 +450,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               jersey_number:
                 jersey !== null && jersey !== undefined ? String(jersey) : null,
               position,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLPlayerStats({
                 games_played: gamesPlayed,
@@ -547,17 +547,10 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          let data: GoalieApiResponse;
-          try {
-            data = JSON.parse(response) as GoalieApiResponse;
-          } catch {
-            return yield* Effect.fail(
-              new ParseError({
-                message: `Failed to parse goalie API response as JSON`,
-                cause: response.slice(0, 200),
-              }),
-            );
-          }
+          const data = yield* parseJsonResponse<GoalieApiResponse>(
+            response,
+            `Failed to parse goalie API response as JSON`,
+          );
 
           // Check if we have data - names is directly under tableData
           const tableData = data.tableData ?? {};
@@ -608,7 +601,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               last_name: lastName,
               jersey_number:
                 jersey !== null && jersey !== undefined ? String(jersey) : null,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLGoalieStats({
                 games_played: gamesPlayed,
@@ -697,19 +690,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        let data: StandingsApiResponse | StandingsApiResponse[];
-        try {
-          data = JSON.parse(response) as
-            | StandingsApiResponse
-            | StandingsApiResponse[];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse standings API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const data = yield* parseJsonResponse<
+          StandingsApiResponse | StandingsApiResponse[]
+        >(response, `Failed to parse standings API response as JSON`);
 
         // Normalize to array (single division returns object, multiple returns array)
         const divisions = Array.isArray(data) ? data : [data];
@@ -748,7 +731,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             const streak = streaks[i] ?? null;
 
             const standing = new MSLStanding({
-              team_id: teamId !== undefined ? String(teamId) : String(i),
+              team_id: teamId === undefined ? String(i) : String(teamId),
               team_name: teamName,
               position,
               wins: w,
@@ -832,19 +815,15 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           game: GameInfo;
         }
 
-        let data: GameEntry[];
-        try {
-          const parsed = JSON.parse(response);
-          // API returns array of game entries
-          data = Array.isArray(parsed) ? parsed : [];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse schedule API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const parsed = yield* parseJsonResponse<unknown>(
+          response,
+          `Failed to parse schedule API response as JSON`,
+        );
+        // API returns array of game entries
+        const data: GameEntry[] = Array.isArray(parsed)
+          ? // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Gamesheet schedule endpoint returns a homogeneous array of GameEntry-like records
+            (parsed as GameEntry[])
+          : [];
 
         const allGames: MSLGame[] = [];
 

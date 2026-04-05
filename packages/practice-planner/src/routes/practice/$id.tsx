@@ -58,6 +58,25 @@ const SaveItemFields = {
   priority: Schema.optional(PracticeItemPrioritySchema),
 };
 
+const nodeToItem = (node: PracticeNode, orderIndex: number) => {
+  const variant: "default" | "split" =
+    node.variant === "split" ? "split" : "default";
+
+  return {
+    type: node.type,
+    variant,
+    drillPublicId: node.drillId,
+    label: node.label,
+    durationMinutes: node.durationMinutes,
+    notes: node.notes,
+    groups: [...node.groups],
+    orderIndex,
+    positionX: Math.round(node.position.x),
+    positionY: Math.round(node.position.y),
+    priority: node.priority,
+  };
+};
+
 const SavePracticeInput = Schema.Struct({
   practiceId: Schema.String,
   practice: Schema.Struct({
@@ -187,25 +206,6 @@ function PracticePlannerPage() {
       }));
       const persistedIds = persistedNodes.map((node) => node.id);
       const persistedIdSet = new Set(persistedIds);
-
-      const nodeToItem = (node: PracticeNode, orderIndex: number) => {
-        const variant: "default" | "split" =
-          node.variant === "split" ? "split" : "default";
-
-        return {
-          type: node.type,
-          variant,
-          drillPublicId: node.drillId,
-          label: node.label,
-          durationMinutes: node.durationMinutes,
-          notes: node.notes,
-          groups: [...node.groups],
-          orderIndex,
-          positionX: Math.round(node.position.x),
-          positionY: Math.round(node.position.y),
-          priority: node.priority,
-        };
-      };
 
       return {
         payload: {

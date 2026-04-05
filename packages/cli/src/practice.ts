@@ -24,6 +24,7 @@ import {
 import { Effect, Option, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 
+import { parseJsonValue } from "./json";
 import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -409,12 +410,7 @@ const replaceEdgesCommand = Command.make(
       const client = yield* RpcApiClient;
       const rawEdges = yield* Option.match(opts.edges, {
         onNone: () => readStdin,
-        onSome: (value) =>
-          Effect.try({
-            try: () => JSON.parse(value),
-            catch: (error: unknown) =>
-              new Error(`Failed to parse --edges JSON: ${String(error)}`),
-          }),
+        onSome: (value) => parseJsonValue(value, "--edges"),
       });
       const edges = yield* decodePracticeEdges(rawEdges);
       const replaced = yield* client.PracticeReplaceEdges({

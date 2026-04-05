@@ -113,24 +113,26 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return <div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />;
+        Root: ({ className: rootClassName, rootRef, ...rootProps }) => {
+          return (
+            <div data-slot="calendar" ref={rootRef} className={cn(rootClassName)} {...rootProps} />
+          );
         },
-        Chevron: ({ className, orientation, ...props }) => {
+        Chevron: ({ className: iconClassName, orientation, ...iconProps }) => {
           if (orientation === "left") {
-            return <ChevronLeftIcon className={cn("size-4", className)} {...props} />;
+            return <ChevronLeftIcon className={cn("size-4", iconClassName)} {...iconProps} />;
           }
 
           if (orientation === "right") {
-            return <ChevronRightIcon className={cn("size-4", className)} {...props} />;
+            return <ChevronRightIcon className={cn("size-4", iconClassName)} {...iconProps} />;
           }
 
-          return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
+          return <ChevronDownIcon className={cn("size-4", iconClassName)} {...iconProps} />;
         },
         DayButton: CalendarDayButton,
-        WeekNumber: ({ children, ...props }) => {
+        WeekNumber: ({ children, ...weekNumberProps }) => {
           return (
-            <td {...props}>
+            <td {...weekNumberProps}>
               <div className="flex size-(--cell-size) items-center justify-center text-center">
                 {children}
               </div>

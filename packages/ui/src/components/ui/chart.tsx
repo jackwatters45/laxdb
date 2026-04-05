@@ -46,8 +46,10 @@ function ChartContainer({
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replaceAll(":", "")}`;
 
+  const contextValue = React.useMemo(() => ({ config }), [config]);
+
   return (
-    <ChartContext.Provider value={{ config }}>
+    <ChartContext.Provider value={contextValue}>
       <div
         data-slot="chart"
         data-chart={chartId}
@@ -65,7 +67,9 @@ function ChartContainer({
 }
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
+  const colorConfig = Object.entries(config).filter(
+    ([, itemConfig]) => itemConfig.theme || itemConfig.color,
+  );
 
   if (colorConfig.length === 0) {
     return null;
@@ -169,7 +173,7 @@ function ChartTooltipContent({
 
             return (
               <div
-                key={typeof item.dataKey === "function" ? index : item.dataKey}
+                key={String(item.dataKey ?? item.name ?? indicatorColor ?? "value")}
                 className={cn(
                   "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
                   indicator === "dot" && "items-center",

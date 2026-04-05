@@ -13,11 +13,12 @@ const FILTERS = [
 
 type FilterKey = (typeof FILTERS)[number]["key"];
 
+const isFilterKey = (value: unknown): value is FilterKey =>
+  FILTERS.some((filter) => filter.key === value);
+
 export const Route = createFileRoute("/blog/")({
   validateSearch: (search: Record<string, unknown>) => ({
-    filter: (FILTERS.some((f) => f.key === search.filter) ? search.filter : undefined) as
-      | FilterKey
-      | undefined,
+    filter: isFilterKey(search.filter) ? search.filter : undefined,
   }),
   component: BlogIndex,
 });
@@ -56,12 +57,12 @@ function BlogIndex() {
               <button
                 key={f.key}
                 type="button"
-                onClick={() =>
-                  navigate({
+                onClick={() => {
+                  void navigate({
                     to: "/blog",
                     search: { filter: f.key === "all" ? undefined : f.key },
-                  })
-                }
+                  });
+                }}
                 className={`relative pb-2.5 text-sm tracking-wide transition-colors ${
                   active ? "text-foreground" : "text-subtle hover:text-muted-foreground"
                 }`}

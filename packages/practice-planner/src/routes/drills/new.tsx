@@ -99,7 +99,7 @@ function NewDrillPage() {
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [categories, setCategories] = useState<DrillCategory[]>([]);
-  const [positionGroups, setPositionGroups] = useState<string[]>([]);
+  const [positionGroups, setPositionGroups] = useState<PositionGroup[]>([]);
   const [intensity, setIntensity] = useState<Intensity | "">("");
   const [contact, setContact] = useState(false);
   const [competitive, setCompetitive] = useState(false);
@@ -125,13 +125,13 @@ function NewDrillPage() {
         description: description || null,
         difficulty,
         category: categories,
-        positionGroup: positionGroups as PositionGroup[],
-        intensity: (intensity as Intensity) || null,
+        positionGroup: positionGroups,
+        intensity: intensity || null,
         contact,
         competitive,
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-        fieldSpace: (fieldSpace as FieldSpace) || null,
+        fieldSpace: fieldSpace || null,
         equipment: null,
         diagramUrl: null,
         videoUrl: null,
@@ -196,7 +196,12 @@ function NewDrillPage() {
           <Link to="/drills">
             <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleCreate} disabled={creating || !name}>
+          <Button
+            onClick={() => {
+              void handleCreate();
+            }}
+            disabled={creating || !name}
+          >
             {creating ? <Loader2 className="animate-spin" /> : null}
             {creating ? "Creating…" : "Create Drill"}
           </Button>

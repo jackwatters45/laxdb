@@ -70,9 +70,10 @@ const fromDatabaseUrl = Effect.try({
   catch: (cause) => new Error(String(cause)),
 });
 
-const getConnectionConfig = fromHyperdrive.pipe(
-  Effect.catch(() => fromDatabaseUrl),
-);
+const getConnectionConfig = Effect.matchEffect(fromHyperdrive, {
+  onFailure: () => fromDatabaseUrl,
+  onSuccess: Effect.succeed,
+});
 
 // ---------------------------------------------------------------------------
 // Layers

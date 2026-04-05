@@ -6,13 +6,19 @@
  * at the top level and it flows through handlers → services → repos.
  */
 
-import { createServer, type Server } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type Server,
+  type ServerResponse,
+} from "node:http";
 
 import { DefaultsRpcHandlers } from "@laxdb/api/defaults/defaults.rpc-handlers";
 import { DrillRpcHandlers } from "@laxdb/api/drill/drill.rpc-handlers";
 import { PlayRpcHandlers } from "@laxdb/api/play/play.rpc-handlers";
 import { PlayerRpcHandlers } from "@laxdb/api/player/player.rpc-handlers";
 import { PracticeRpcHandlers } from "@laxdb/api/practice/practice.rpc-handlers";
+import { emptyRequestContext } from "@laxdb/api/request-context";
 import { LaxdbRpcV2 } from "@laxdb/api/rpc-group";
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
@@ -56,7 +62,7 @@ export interface TestServer {
 export async function startTestServer(): Promise<TestServer> {
   const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
 
-  const server = createServer(async (req, res) => {
+  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     const url = `http://localhost${req.url ?? "/"}`;
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
@@ -87,11 +93,19 @@ export async function startTestServer(): Promise<TestServer> {
       body,
     });
 
-    const response = await handler(request);
+    const response = await handler(request, emptyRequestContext);
 
     res.writeHead(response.status, Object.fromEntries(response.headers));
     const responseBody = await response.arrayBuffer();
     res.end(Buffer.from(responseBody));
+  };
+
+  const server = createServer((req, res) => {
+    void handleRequest(req, res).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      res.statusCode = 500;
+      res.end(message);
+    });
   });
 
   await new Promise<void>((resolve) => {

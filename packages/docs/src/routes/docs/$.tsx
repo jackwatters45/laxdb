@@ -27,6 +27,7 @@ const loader = createServerFn({
   .middleware([staticFunctionMiddleware])
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
+    // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing notFound()
     if (!page) throw notFound();
 
     return {

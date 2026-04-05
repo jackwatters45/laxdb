@@ -20,7 +20,7 @@ import {
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { BookOpen, Plus, Search, Shield, Swords, Trash2 } from "lucide-react";
+import { BookOpen, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
@@ -90,16 +90,10 @@ const categoryColors: Record<PlayCategory, string> = {
   transition: "bg-cyan-500/10 text-cyan-600",
 };
 
-const categoryIcons: Record<PlayCategory, typeof Swords> = {
-  offense: Swords,
-  defense: Shield,
-  clear: Swords,
-  ride: Swords,
-  faceoff: Swords,
-  emo: Swords,
-  "man-down": Shield,
-  transition: Swords,
-};
+const isPlaybookCategory = (
+  value: string,
+): value is (typeof CATEGORIES)[number]["value"] =>
+  CATEGORIES.some((category) => category.value === value);
 
 // ---------------------------------------------------------------------------
 // Page
@@ -108,7 +102,8 @@ const categoryIcons: Record<PlayCategory, typeof Swords> = {
 function PlaybookListPage() {
   const plays = Route.useLoaderData();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] =
+    useState<(typeof CATEGORIES)[number]["value"]>("all");
 
   const filtered = plays.filter((play) => {
     const matchesSearch =
@@ -171,7 +166,7 @@ function PlaybookListPage() {
             value={[activeCategory]}
             onValueChange={(values) => {
               const next = values[0];
-              if (next) setActiveCategory(next);
+              if (next && isPlaybookCategory(next)) setActiveCategory(next);
             }}
             variant="outline"
             size="sm"
@@ -188,7 +183,7 @@ function PlaybookListPage() {
 
         {/* Results count */}
         <p className="text-xs text-muted-foreground">
-          {filtered.length} play{filtered.length !== 1 ? "s" : ""}
+          {filtered.length} play{filtered.length === 1 ? "" : "s"}
           {search || activeCategory !== "all" ? " matching filters" : ""}
         </p>
 
@@ -209,13 +204,7 @@ function PlaybookListPage() {
               </Link>
             )}
           </div>
-        ) : activeCategory !== "all" ? (
-          <div className="flex flex-col gap-2">
-            {filtered.map((play) => (
-              <PlayCard key={play.publicId} play={play} />
-            ))}
-          </div>
-        ) : (
+        ) : activeCategory === "all" ? (
           <div className="space-y-6">
             {grouped.map((group) => (
               <PlayGroup
@@ -223,6 +212,12 @@ function PlaybookListPage() {
                 title={group.label}
                 plays={group.plays}
               />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {filtered.map((play) => (
+              <PlayCard key={play.publicId} play={play} />
             ))}
           </div>
         )}
@@ -330,7 +325,9 @@ function PlayCard({ play }: { play: Play }) {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete "{play.name}"?</AlertDialogTitle>
+              <AlertDialogTitle>
+                Delete &quot;{play.name}&quot;?
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this play from your playbook.
               </AlertDialogDescription>
@@ -339,7 +336,9 @@ function PlayCard({ play }: { play: Play }) {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 render={<Button variant="destructive" />}
-                onClick={handleDelete}
+                onClick={() => {
+                  void handleDelete();
+                }}
               >
                 Delete
               </AlertDialogAction>

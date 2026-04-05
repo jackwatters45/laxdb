@@ -65,12 +65,12 @@ export default function LineGraph() {
   const tick = useSound("/sounds/tick.mp3", SOUND_OPTIONS);
   const popClick = useSound("/sounds/pop-click.wav", SOUND_OPTIONS);
 
-  function getIndexFromX(x: number) {
+  function getIndexFromX(pointerX: number) {
     const scrollLeft = rootRef.current?.scrollLeft ?? 0;
     const offsetLeft = boundsRef.current?.offsetLeft ?? 0;
     // Account for possible padding, and ignore (subtract) the scroll position
     const offset = offsetLeft - scrollLeft - LINE_WIDTH;
-    const index = Math.floor((x - offset) / LINE_STEP);
+    const index = Math.floor((pointerX - offset) / LINE_STEP);
     return index;
   }
 
@@ -211,8 +211,8 @@ export default function LineGraph() {
               {...blur}
               className="absolute bottom-full left-[50%] mb-4 flex translate-x-[-50%] flex-col"
             >
-              {activities.map((activity, index) => (
-                <Meta key={`activity-${index}`} activity={activity} />
+              {activities.map((activity) => (
+                <Meta key={activity.id} activity={activity} />
               ))}
             </motion.div>
           )}
@@ -325,18 +325,18 @@ export function Lines({
       onPointerLeave={onPointerLeave}
       {...props}
     >
-      {Array.from({ length: 365 }).map((_, i) => {
+      {Array.from({ length: 365 }, (_, dayIndex) => dayIndex).map((dayIndex) => {
         const activities = Array.from(data)
           .toSorted((a, b) => b.moving_time - a.moving_time)
-          .filter((a) => a.index === i);
+          .filter((a) => a.index === dayIndex);
 
         let isNewMonth = false;
         let totalDaysPassed = 0;
 
         for (let month = 0; month < daysInMonth.length; month++) {
           const days = daysInMonth[month] ?? 0;
-          if (totalDaysPassed + days > i) {
-            isNewMonth = totalDaysPassed === i;
+          if (totalDaysPassed + days > dayIndex) {
+            isNewMonth = totalDaysPassed === dayIndex;
             break;
           }
           totalDaysPassed += days;
@@ -344,7 +344,7 @@ export function Lines({
 
         return (
           <div
-            key={`day-${i}`}
+            key={`day-${dayIndex}`}
             className="relative flex flex-col gap-1 select-none [&>*[data-highlight=true]]:bg-orange"
             style={{
               width: LINE_WIDTH,

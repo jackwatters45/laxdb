@@ -1,3 +1,5 @@
+import * as React from "react";
+
 type OrbitingObjectProps = {
   /** Radius of the orbit in pixels */
   radiusPx?: number;
@@ -24,14 +26,19 @@ export const Orbit = ({
   const orbitDiameter = radiusPx * 2;
   const containerSize = orbitDiameter + defaultObjectSize;
   const initialOffset = radiusPx + defaultObjectSize / 2;
+  const orbitingItems = React.Children.toArray(orbitingObjects);
 
-  const positionedObjects = orbitingObjects.map((object, index) => {
+  const positionedObjects = orbitingItems.map((object, index) => {
     const delaySeconds = -(index * (durationSeconds / orbitingObjects.length));
+    const key =
+      React.isValidElement(object) && object.key !== null
+        ? String(object.key)
+        : `orbit-${String(index)}`;
 
     return (
       <div
         className="absolute flex items-center justify-center"
-        key={index}
+        key={key}
         style={{
           animationName: "spin",
           animationDuration: `${durationSeconds}s`,

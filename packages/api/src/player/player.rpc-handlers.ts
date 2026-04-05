@@ -1,3 +1,8 @@
+import type {
+  CreatePlayerInput,
+  PlayerByIdInput,
+  UpdatePlayerInput,
+} from "@laxdb/core/player/player.schema";
 import { PlayerService } from "@laxdb/core/player/player.service";
 import { Effect, Layer } from "effect";
 
@@ -11,10 +16,10 @@ export const PlayerRpcHandlers = PlayerRpcs.toLayer(
 
     return withRpcLogging({
       PlayerList: () => service.list(),
-      PlayerGet: (payload) => service.getByPublicId(payload),
-      PlayerCreate: (payload) => service.create(payload),
-      PlayerUpdate: (payload) => service.update(payload),
-      PlayerDelete: (payload) => service.delete(payload),
+      PlayerGet: (payload: PlayerByIdInput) => service.getByPublicId(payload),
+      PlayerCreate: (payload: CreatePlayerInput) => service.create(payload),
+      PlayerUpdate: (payload: UpdatePlayerInput) => service.update(payload),
+      PlayerDelete: (payload: PlayerByIdInput) => service.delete(payload),
     });
   }),
 ).pipe(Layer.provide(PlayerService.layer));

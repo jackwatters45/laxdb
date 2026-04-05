@@ -260,7 +260,12 @@ function NewPracticePage() {
           <Link to="/">
             <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleCreate} disabled={creating}>
+          <Button
+            onClick={() => {
+              void handleCreate();
+            }}
+            disabled={creating}
+          >
             {creating ? <Loader2 className="animate-spin" /> : null}
             {creating ? "Creating…" : "Create Practice"}
           </Button>

@@ -9,6 +9,7 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
+import { emptyRequestContext } from "./request-context";
 import { LaxdbRpcV2 } from "./rpc-group";
 import { LaxdbRpcV2Handlers } from "./rpc-handlers";
 
@@ -55,6 +56,8 @@ const AllRoutes = Layer.mergeAll(
 export default {
   fetch: (request: Request) => {
     const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
-    return handler(request).finally(dispose);
+    return handler(request, emptyRequestContext).finally(() => {
+      void dispose();
+    });
   },
 };

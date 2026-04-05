@@ -15,6 +15,7 @@ import { DefaultsValues } from "@laxdb/core/defaults/defaults.schema";
 import { Effect, Option, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
 
+import { parseJsonValue } from "./json";
 import { apiLayer, baseUrlFlag, output, prettyFlag, readStdin } from "./shared";
 
 const scopeTypeFlag = Flag.choice("scope-type", [
@@ -74,12 +75,7 @@ const patchCommand = Command.make(
       const client = yield* RpcApiClient;
       const rawValues = yield* Option.match(opts.values, {
         onNone: () => readStdin,
-        onSome: (value) =>
-          Effect.try({
-            try: () => JSON.parse(value),
-            catch: (error: unknown) =>
-              new Error(`Failed to parse --values JSON: ${String(error)}`),
-          }),
+        onSome: (value) => parseJsonValue(value, "--values"),
       });
       const values = yield* decodeDefaultsValues(rawValues);
       const updated = yield* client.DefaultsPatchNamespace({

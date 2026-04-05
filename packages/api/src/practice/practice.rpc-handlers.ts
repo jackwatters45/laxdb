@@ -1,3 +1,19 @@
+import type {
+  AddItemInput,
+  CreatePracticeInput,
+  CreateReviewInput,
+  DeletePracticeInput,
+  GetPracticeInput,
+  GetReviewInput,
+  ListEdgesInput,
+  ListItemsInput,
+  RemoveItemInput,
+  ReorderItemsInput,
+  ReplaceEdgesInput,
+  UpdateItemInput,
+  UpdatePracticeInput,
+  UpdateReviewInput,
+} from "@laxdb/core/practice/practice.schema";
 import { PracticeService } from "@laxdb/core/practice/practice.service";
 import { Effect, Layer } from "effect";
 
@@ -11,20 +27,29 @@ export const PracticeRpcHandlers = PracticeRpcs.toLayer(
 
     return withRpcLogging({
       PracticeList: () => service.list(),
-      PracticeGet: (payload) => service.get(payload),
-      PracticeCreate: (payload) => service.create(payload),
-      PracticeUpdate: (payload) => service.update(payload),
-      PracticeDelete: (payload) => service.delete(payload),
-      PracticeListItems: (payload) => service.listItems(payload),
-      PracticeAddItem: (payload) => service.addItem(payload),
-      PracticeUpdateItem: (payload) => service.updateItem(payload),
-      PracticeRemoveItem: (payload) => service.removeItem(payload),
-      PracticeReorderItems: (payload) => service.reorderItems(payload),
-      PracticeListEdges: (payload) => service.listEdges(payload),
-      PracticeReplaceEdges: (payload) => service.replaceEdges(payload),
-      PracticeGetReview: (payload) => service.getReview(payload),
-      PracticeCreateReview: (payload) => service.createReview(payload),
-      PracticeUpdateReview: (payload) => service.updateReview(payload),
+      PracticeGet: (payload: GetPracticeInput) => service.get(payload),
+      PracticeCreate: (payload: CreatePracticeInput) => service.create(payload),
+      PracticeUpdate: (payload: UpdatePracticeInput) => service.update(payload),
+      PracticeDelete: (payload: DeletePracticeInput) => service.delete(payload),
+      PracticeListItems: (payload: ListItemsInput) =>
+        service.listItems(payload),
+      PracticeAddItem: (payload: AddItemInput) => service.addItem(payload),
+      PracticeUpdateItem: (payload: UpdateItemInput) =>
+        service.updateItem(payload),
+      PracticeRemoveItem: (payload: RemoveItemInput) =>
+        service.removeItem(payload),
+      PracticeReorderItems: (payload: ReorderItemsInput) =>
+        service.reorderItems(payload),
+      PracticeListEdges: (payload: ListEdgesInput) =>
+        service.listEdges(payload),
+      PracticeReplaceEdges: (payload: ReplaceEdgesInput) =>
+        service.replaceEdges(payload),
+      PracticeGetReview: (payload: GetReviewInput) =>
+        service.getReview(payload),
+      PracticeCreateReview: (payload: CreateReviewInput) =>
+        service.createReview(payload),
+      PracticeUpdateReview: (payload: UpdateReviewInput) =>
+        service.updateReview(payload),
     });
   }),
 ).pipe(Layer.provide(PracticeService.layer));

@@ -28,6 +28,113 @@ const mapParseError = (error: Schema.SchemaError): ParseError =>
     cause: error,
   });
 
+const isWaybackRow = (row: unknown): row is readonly unknown[] =>
+  Array.isArray(row);
+
+const parseWaybackEntryRow = (row: readonly unknown[]) =>
+  new WaybackCDXEntry({
+    urlkey: typeof row[0] === "string" ? row[0] : "",
+    timestamp: typeof row[1] === "string" ? row[1] : "",
+    original: typeof row[2] === "string" ? row[2] : "",
+    mimetype: typeof row[3] === "string" ? row[3] : "",
+    statuscode: typeof row[4] === "string" ? row[4] : "",
+    digest: typeof row[5] === "string" ? row[5] : "",
+    length: typeof row[6] === "string" ? row[6] : "",
+  });
+
+const getSchedulePriority = (url: string): number => {
+  if (url.includes("/schedule/league")) return 0;
+  if (url.includes("/schedule.html")) return 1;
+  if (url.endsWith("/schedule/") || url.endsWith("/schedule")) return 2;
+  if (url.includes("/schedule.aspx")) return 3;
+  if (url.includes("?team=")) return 4;
+  if (url.includes("/events")) return 5;
+  return 6;
+};
+
+const normalizeMllTeamName = (name: string): string =>
+  name
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "")
+    .slice(0, 10);
+
+const extractMllTeamId = (href: string): string | null => {
+  const teamIdMatch = href.match(/[?&]team=(\d+)/);
+  return teamIdMatch?.[1] ?? null;
+};
+
+const parseMllScheduleDate = (dateStr: string): string | null => {
+  const cleaned = dateStr.trim();
+  if (!cleaned) return null;
+
+  const shortMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  if (shortMatch) {
+    const [, month, day, year] = shortMatch;
+    const fullYear = Number.parseInt(year ?? "0", 10);
+    const century = fullYear > 50 ? 1900 : 2000;
+    return `${century + fullYear}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+  }
+
+  const longMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (longMatch) {
+    const [, month, day, year] = longMatch;
+    return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+  }
+
+  const textMatch = cleaned.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (!textMatch) return null;
+
+  const [, monthName, day, year] = textMatch;
+  const months: Record<string, string> = {
+    january: "01",
+    february: "02",
+    march: "03",
+    april: "04",
+    may: "05",
+    june: "06",
+    july: "07",
+    august: "08",
+    september: "09",
+    october: "10",
+    november: "11",
+    december: "12",
+  };
+  const month = months[(monthName ?? "").toLowerCase()];
+  return month ? `${year}-${month}-${day?.padStart(2, "0")}` : null;
+};
+
+const parseMllScheduleScore = (text: string): number | null => {
+  const cleaned = text.trim().replaceAll(/[&]nbsp;?/gi, "");
+  if (!cleaned) return null;
+  const num = Number.parseInt(cleaned, 10);
+  return Number.isNaN(num) ? null : num;
+};
+
+const shouldReplaceMllGame = (existing: MLLGame | undefined, game: MLLGame) =>
+  existing !== undefined &&
+  (existing.home_score === null || existing.away_score === null) &&
+  game.home_score !== null &&
+  game.away_score !== null;
+
+const mergeMllGame = (
+  allGames: MLLGame[],
+  seenGameIds: Set<string>,
+  game: MLLGame,
+) => {
+  if (seenGameIds.has(game.id)) {
+    const existingIdx = allGames.findIndex(
+      (candidate) => candidate.id === game.id,
+    );
+    if (existingIdx >= 0 && shouldReplaceMllGame(allGames[existingIdx], game)) {
+      allGames[existingIdx] = game;
+    }
+    return;
+  }
+
+  seenGameIds.add(game.id);
+  allGames.push(game);
+};
+
 export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
   make: Effect.gen(function* () {
     const mllConfig = yield* MLLConfig;
@@ -225,27 +332,10 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         }
 
         // Skip header row, parse data rows into WaybackCDXEntry objects
-        const dataRows = json.slice(1) as string[][];
-        const entries = dataRows.map(
-          ([
-            urlkey,
-            timestamp,
-            original,
-            mimetype,
-            statuscode,
-            digest,
-            length,
-          ]) =>
-            new WaybackCDXEntry({
-              urlkey: urlkey ?? "",
-              timestamp: timestamp ?? "",
-              original: original ?? "",
-              mimetype: mimetype ?? "",
-              statuscode: statuscode ?? "",
-              digest: digest ?? "",
-              length: length ?? "",
-            }),
-        );
+        const entries = json
+          .slice(1)
+          .filter(isWaybackRow)
+          .map(parseWaybackEntryRow);
 
         // Filter by statuscode=200 (successful captures only)
         const successfulEntries = entries.filter(
@@ -882,19 +972,8 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         // Filter to prioritize main schedule pages over team-specific or event pages
         // Priority: /schedule/league/ > /schedule/ > /schedule?team= > /schedule/events
         const prioritized = sortedEntries.toSorted((a, b) => {
-          const getPriority = (url: string): number => {
-            if (url.includes("/schedule/league")) return 0;
-            if (url.includes("/schedule.html")) return 1;
-            if (url.endsWith("/schedule/") || url.endsWith("/schedule"))
-              return 2;
-            if (url.includes("/schedule.aspx")) return 3;
-            if (url.includes("?team=")) return 4;
-            if (url.includes("/events")) return 5;
-            return 6;
-          };
-
           const priorityDiff =
-            getPriority(a.original) - getPriority(b.original);
+            getSchedulePriority(a.original) - getSchedulePriority(b.original);
           if (priorityDiff !== 0) return priorityDiff;
 
           // For same priority, prefer more recent timestamp
@@ -935,79 +1014,6 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       const timestampMatch = sourceUrl.match(/\/web\/(\d{4})/);
       const _yearFromTimestamp = timestampMatch?.[1] ?? "";
 
-      // Helper to normalize team name for ID generation
-      const normalizeTeamName = (name: string): string =>
-        name
-          .toLowerCase()
-          .replaceAll(/[^a-z0-9]+/g, "")
-          .slice(0, 10);
-
-      // Helper to extract team ID from href
-      const extractTeamId = (href: string): string | null => {
-        // Pattern: ?team={ID} or /schedule/?team={ID}
-        const teamIdMatch = href.match(/[?&]team=(\d+)/);
-        return teamIdMatch?.[1] ?? null;
-      };
-
-      // Helper to parse date strings
-      const parseDate = (dateStr: string): string | null => {
-        const cleaned = dateStr.trim();
-        if (!cleaned) return null;
-
-        // Format: MM/DD/YY
-        const shortMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
-        if (shortMatch) {
-          const [, month, day, year] = shortMatch;
-          // Assume 2000s for MLL era
-          const fullYear = Number.parseInt(year ?? "0", 10);
-          const century = fullYear > 50 ? 1900 : 2000;
-          return `${century + fullYear}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
-        }
-
-        // Format: MM/DD/YYYY
-        const longMatch = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if (longMatch) {
-          const [, month, day, year] = longMatch;
-          return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
-        }
-
-        // Format: Month D, YYYY (e.g., "July 1, 2006")
-        const textMatch = cleaned.match(
-          /^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/,
-        );
-        if (textMatch) {
-          const [, monthName, day, year] = textMatch;
-          const months: Record<string, string> = {
-            january: "01",
-            february: "02",
-            march: "03",
-            april: "04",
-            may: "05",
-            june: "06",
-            july: "07",
-            august: "08",
-            september: "09",
-            october: "10",
-            november: "11",
-            december: "12",
-          };
-          const month = months[(monthName ?? "").toLowerCase()];
-          if (month) {
-            return `${year}-${month}-${day?.padStart(2, "0")}`;
-          }
-        }
-
-        return null;
-      };
-
-      // Helper to parse score (may be empty, "&nbsp;", or number)
-      const parseScore = (text: string): number | null => {
-        const cleaned = text.trim().replaceAll(/[&]nbsp;?/gi, "");
-        if (!cleaned) return null;
-        const num = Number.parseInt(cleaned, 10);
-        return Number.isNaN(num) ? null : num;
-      };
-
       // Generate unique game ID
       const generateGameId = (
         date: string | null,
@@ -1015,8 +1021,8 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         homeTeam: string,
       ): string => {
         const dateStr = date ?? "unknown";
-        const away = normalizeTeamName(awayTeam);
-        const home = normalizeTeamName(homeTeam);
+        const away = normalizeMllTeamName(awayTeam);
+        const home = normalizeMllTeamName(homeTeam);
         return `${dateStr}-${away}-${home}`;
       };
 
@@ -1058,7 +1064,7 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
                 index: idx,
                 name: text,
                 href,
-                teamId: extractTeamId(href),
+                teamId: extractMllTeamId(href),
               });
             }
           });
@@ -1070,7 +1076,7 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
           let dateStr: string | null = null;
           for (let i = 0; i < Math.min(3, cells.length); i++) {
             const cellText = doc(cells[i]).text().trim();
-            const parsed = parseDate(cellText);
+            const parsed = parseMllScheduleDate(cellText);
             if (parsed) {
               dateStr = parsed;
               break;
@@ -1089,11 +1095,15 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
 
           // Score is typically in the cell after the team name
           if (awayTeam.index + 1 < cells.length) {
-            awayScore = parseScore(doc(cells[awayTeam.index + 1]).text());
+            awayScore = parseMllScheduleScore(
+              doc(cells[awayTeam.index + 1]).text(),
+            );
           }
 
           if (homeTeam.index + 1 < cells.length) {
-            homeScore = parseScore(doc(cells[homeTeam.index + 1]).text());
+            homeScore = parseMllScheduleScore(
+              doc(cells[homeTeam.index + 1]).text(),
+            );
           }
 
           // Generate game ID and check for duplicates
@@ -1119,10 +1129,10 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
           // Map team IDs to MLL codes if possible
           const awayTeamId = awayTeam.teamId
             ? `MLL${awayTeam.teamId}`
-            : `MLL${normalizeTeamName(awayTeam.name).toUpperCase().slice(0, 3)}`;
+            : `MLL${normalizeMllTeamName(awayTeam.name).toUpperCase().slice(0, 3)}`;
           const homeTeamId = homeTeam.teamId
             ? `MLL${homeTeam.teamId}`
-            : `MLL${normalizeTeamName(homeTeam.name).toUpperCase().slice(0, 3)}`;
+            : `MLL${normalizeMllTeamName(homeTeam.name).toUpperCase().slice(0, 3)}`;
 
           const game = new MLLGame({
             id: gameId,
@@ -1158,7 +1168,7 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
             if (cells.length < 4) return;
 
             // Look for date pattern in first cell
-            const dateStr = parseDate(cells[0] ?? "");
+            const dateStr = parseMllScheduleDate(cells[0] ?? "");
             if (!dateStr) return;
 
             // Try to identify team names and scores
@@ -1202,8 +1212,8 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
               status = "scheduled";
             }
 
-            const awayTeamId = `MLL${normalizeTeamName(awayTeamName).toUpperCase().slice(0, 3)}`;
-            const homeTeamId = `MLL${normalizeTeamName(homeTeamName).toUpperCase().slice(0, 3)}`;
+            const awayTeamId = `MLL${normalizeMllTeamName(awayTeamName).toUpperCase().slice(0, 3)}`;
+            const homeTeamId = `MLL${normalizeMllTeamName(homeTeamName).toUpperCase().slice(0, 3)}`;
 
             const game = new MLLGame({
               id: gameId,
@@ -1661,26 +1671,7 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
 
           // Deduplicate games by ID
           for (const game of games) {
-            if (!seenGameIds.has(game.id)) {
-              seenGameIds.add(game.id);
-              allGames.push(game);
-            } else {
-              // If we already have this game, update with better data if available
-              const existingIdx = allGames.findIndex((g) => g.id === game.id);
-              if (existingIdx >= 0) {
-                const existing = allGames[existingIdx];
-                // Prefer games with scores over those without
-                if (
-                  existing &&
-                  (existing.home_score === null ||
-                    existing.away_score === null) &&
-                  game.home_score !== null &&
-                  game.away_score !== null
-                ) {
-                  allGames[existingIdx] = game;
-                }
-              }
-            }
+            mergeMllGame(allGames, seenGameIds, game);
           }
         }
 

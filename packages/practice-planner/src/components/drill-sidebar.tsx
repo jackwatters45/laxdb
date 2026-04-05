@@ -33,6 +33,30 @@ const CATEGORIES = [
   { value: "cooldown", label: "Cool-downs", tag: "cooldown" },
 ] as const;
 
+const isSidebarCategory = (
+  value: string,
+): value is (typeof CATEGORIES)[number]["value"] =>
+  CATEGORIES.some((category) => category.value === value);
+
+type SidebarCategory = (typeof CATEGORIES)[number]["value"];
+type SidebarDrillCategory = Extract<Drill["category"][number], SidebarCategory>;
+
+const DRILL_CATEGORY_VALUES: readonly SidebarDrillCategory[] = [
+  "passing",
+  "shooting",
+  "defense",
+  "ground-balls",
+  "face-offs",
+  "transition",
+  "man-up",
+  "conditioning",
+];
+
+const isDrillSidebarCategoryValue = (
+  value: SidebarCategory,
+): value is SidebarDrillCategory =>
+  DRILL_CATEGORY_VALUES.some((category) => category === value);
+
 export function DrillSidebar({
   isOpen,
   onClose,
@@ -40,7 +64,8 @@ export function DrillSidebar({
 }: DrillSidebarProps) {
   const drills = useDrills();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] =
+    useState<(typeof CATEGORIES)[number]["value"]>("all");
 
   const filtered = drills.filter((drill) => {
     const matchesSearch =
@@ -51,9 +76,13 @@ export function DrillSidebar({
 
     const cat = CATEGORIES.find((c) => c.value === activeCategory);
     const matchesCategory =
-      activeCategory === "all" ||
-      drill.category.includes(activeCategory as Drill["category"][number]) ||
-      (cat && "tag" in cat && drill.tags.includes(cat.tag));
+      activeCategory === "all"
+        ? true
+        : cat && "tag" in cat
+          ? drill.tags.includes(cat.tag)
+          : isDrillSidebarCategoryValue(activeCategory)
+            ? drill.category.includes(activeCategory)
+            : false;
 
     return matchesSearch && matchesCategory;
   });
@@ -92,7 +121,7 @@ export function DrillSidebar({
           value={[activeCategory]}
           onValueChange={(values) => {
             const next = values[0];
-            if (next) setActiveCategory(next);
+            if (next && isSidebarCategory(next)) setActiveCategory(next);
           }}
           variant="outline"
           size="sm"

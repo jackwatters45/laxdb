@@ -7,6 +7,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  expectRecord,
+  expectRecordArray,
+  expectStringProp,
   post,
   startTestServer,
   truncateAllTables,
@@ -58,7 +61,7 @@ async function createPractice(
     ...minimalPractice,
     ...overrides,
   });
-  return (data as Record<string, unknown>).publicId as string;
+  return expectStringProp(data, "publicId");
 }
 
 describe("POST /api/practices (CRUD)", () => {
@@ -76,7 +79,7 @@ describe("POST /api/practices (CRUD)", () => {
       location: "Main Field",
     });
     expect(status).toBe(200);
-    const practice = data as Record<string, unknown>;
+    const practice = expectRecord(data);
     expect(practice.name).toBe("Morning Practice");
     expect(practice.durationMinutes).toBe(90);
     expect(practice.location).toBe("Main Field");
@@ -90,7 +93,7 @@ describe("POST /api/practices (CRUD)", () => {
       publicId,
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).name).toBe("Test");
+    expect(expectRecord(data).name).toBe("Test");
   });
 
   it("lists all practices", async () => {
@@ -108,7 +111,7 @@ describe("POST /api/practices (CRUD)", () => {
       location: "Indoor",
     });
     expect(status).toBe(200);
-    const practice = data as Record<string, unknown>;
+    const practice = expectRecord(data);
     expect(practice.name).toBe("Updated");
     expect(practice.location).toBe("Indoor");
   });
@@ -139,7 +142,7 @@ describe("POST /api/practices/items", () => {
       type: "warmup",
     });
     expect(status).toBe(200);
-    const item = data as Record<string, unknown>;
+    const item = expectRecord(data);
     expect(item.type).toBe("warmup");
     expect(item.publicId).toHaveLength(12);
   });
@@ -151,7 +154,7 @@ describe("POST /api/practices/items", () => {
       "/api/drills/create",
       minimalDrill,
     );
-    const drillId = (drillData as Record<string, unknown>).publicId as string;
+    const drillId = expectStringProp(drillData, "publicId");
 
     const { status, data } = await post(s.url, "/api/practices/items/add", {
       practicePublicId: practiceId,
@@ -159,7 +162,7 @@ describe("POST /api/practices/items", () => {
       drillPublicId: drillId,
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).type).toBe("drill");
+    expect(expectRecord(data).type).toBe("drill");
   });
 
   it("lists items for a practice", async () => {
@@ -185,7 +188,7 @@ describe("POST /api/practices/items", () => {
       practicePublicId: practiceId,
       type: "warmup",
     });
-    const itemId = (itemData as Record<string, unknown>).publicId as string;
+    const itemId = expectStringProp(itemData, "publicId");
 
     const { status } = await post(s.url, "/api/practices/items/remove", {
       publicId: itemId,
@@ -214,8 +217,8 @@ describe("POST /api/practices/edges", () => {
       orderIndex: 1,
     });
 
-    const warmupId = (warmupData as Record<string, unknown>).publicId as string;
-    const splitId = (splitData as Record<string, unknown>).publicId as string;
+    const warmupId = expectStringProp(warmupData, "publicId");
+    const splitId = expectStringProp(splitData, "publicId");
 
     const replace = await post(s.url, "/api/practices/edges/replace", {
       practicePublicId: practiceId,
@@ -234,7 +237,7 @@ describe("POST /api/practices/edges", () => {
     });
     expect(status).toBe(200);
     expect(data).toHaveLength(1);
-    expect((data as Array<Record<string, unknown>>)[0]?.label).toBe("Offense");
+    expect(expectRecordArray(data)[0]?.label).toBe("Offense");
   });
 });
 
@@ -248,7 +251,7 @@ describe("POST /api/practices/review", () => {
       notes: null,
     });
     expect(status).toBe(200);
-    const review = data as Record<string, unknown>;
+    const review = expectRecord(data);
     expect(review.wentWell).toBe("Good energy");
     expect(review.needsImprovement).toBe("Transitions");
   });
@@ -265,7 +268,7 @@ describe("POST /api/practices/review", () => {
       practicePublicId: publicId,
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).wentWell).toBe("Passing");
+    expect(expectRecord(data).wentWell).toBe("Passing");
   });
 
   it("updates a review", async () => {
@@ -281,7 +284,7 @@ describe("POST /api/practices/review", () => {
       wentWell: "Updated",
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).wentWell).toBe("Updated");
+    expect(expectRecord(data).wentWell).toBe("Updated");
   });
 
   it("returns error for nonexistent review", async () => {

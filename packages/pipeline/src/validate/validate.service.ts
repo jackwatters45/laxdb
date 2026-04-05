@@ -17,7 +17,11 @@ export const readJsonFile = <T>(filePath: string) =>
     const fs = yield* FileSystem;
     const content = yield* fs.readFileString(filePath, "utf-8");
     return yield* Effect.try({
-      try: () => JSON.parse(content) as T,
+      try: () => {
+        const parsed: unknown = JSON.parse(content);
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- callers provide the expected JSON shape for validation workflows
+        return parsed as T;
+      },
       catch: () => new Error(`Invalid JSON: ${filePath}`),
     });
   });

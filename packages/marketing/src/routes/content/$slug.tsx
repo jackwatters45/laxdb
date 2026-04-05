@@ -10,6 +10,7 @@ export const Route = createFileRoute("/content/$slug")({
   loader: ({ params }: { params: { slug: string } }): Post => {
     const post = publishedPosts.find((p) => p.slug === params.slug);
     if (!post) {
+      // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing notFound()
       throw notFound();
     }
     return post;
