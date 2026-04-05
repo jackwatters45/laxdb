@@ -1,14 +1,3 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@laxdb/ui/components/ui/alert-dialog";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -35,8 +24,10 @@ import {
 
 import { useDrills } from "@/hooks/use-drills";
 import { drillToType } from "@/lib/drill-utils";
+import { isOptionValue } from "@/lib/option-guards";
 import type { Drill, PracticeNode, PracticeItemPriority } from "@/types";
 
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { DrillPickerPopover } from "./drill-picker";
 
 interface ConfigPanelProps {
@@ -208,10 +199,10 @@ export function ConfigPanel({
               <ToggleGroup
                 value={[node.priority]}
                 onValueChange={(values) => {
-                  const next = PRIORITY_OPTIONS.find(
-                    (option) => option.value === values[0],
-                  )?.value;
-                  if (next) onUpdate(node.id, { priority: next });
+                  const next = values[0];
+                  if (isOptionValue(PRIORITY_OPTIONS, next)) {
+                    onUpdate(node.id, { priority: next });
+                  }
                 }}
                 variant="outline"
                 size="sm"
@@ -245,38 +236,24 @@ export function ConfigPanel({
         <>
           <Separator />
           <div className="p-4">
-            <AlertDialog>
-              <AlertDialogTrigger
-                render={
-                  <Button variant="destructive" size="lg" className="w-full">
-                    <Trash2 />
-                    Delete Block
-                  </Button>
-                }
-              />
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Delete &quot;{node.label}&quot;?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="text-pretty">
-                    This block will be removed from the practice plan. Connected
-                    blocks will be re-linked automatically.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    render={<Button variant="destructive" />}
-                    onClick={() => {
-                      onDelete(node.id);
-                    }}
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmDeleteDialog
+              title={`Delete "${node.label}"?`}
+              description={
+                <span className="text-pretty">
+                  This block will be removed from the practice plan. Connected
+                  blocks will be re-linked automatically.
+                </span>
+              }
+              onConfirm={() => {
+                onDelete(node.id);
+              }}
+              trigger={
+                <Button variant="destructive" size="lg" className="w-full" />
+              }
+            >
+              <Trash2 />
+              Delete Block
+            </ConfirmDeleteDialog>
           </div>
         </>
       )}

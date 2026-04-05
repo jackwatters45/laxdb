@@ -1,24 +1,21 @@
 import { RpcApiClient } from "@laxdb/api/client";
+import { UpdatePlayInput } from "@laxdb/core/play/play.schema";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import { Input } from "@laxdb/ui/components/ui/input";
-import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
-import { Textarea } from "@laxdb/ui/components/ui/textarea";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { Check, Loader2, Pencil } from "lucide-react";
 import { useState } from "react";
 
+import {
+  PlayFormFields,
+  type PlayFormFieldsProps,
+} from "@/components/play-form-fields";
 import { runApi } from "@/lib/api";
+import { PLAY_CATEGORY_COLORS } from "@/lib/play-definitions";
 import type { PlayCategory } from "@/types";
 
 // ---------------------------------------------------------------------------
@@ -36,32 +33,9 @@ const getPlay = createServerFn({ method: "GET" })
     ),
   );
 
-const UpdatePlayForm = Schema.Struct({
-  publicId: Schema.String,
-  name: Schema.optional(Schema.String),
-  category: Schema.optional(
-    Schema.Literals([
-      "offense",
-      "defense",
-      "clear",
-      "ride",
-      "faceoff",
-      "emo",
-      "man-down",
-      "transition",
-    ]),
-  ),
-  formation: Schema.optional(Schema.NullOr(Schema.String)),
-  description: Schema.optional(Schema.NullOr(Schema.String)),
-  personnelNotes: Schema.optional(Schema.NullOr(Schema.String)),
-  tags: Schema.optional(Schema.Array(Schema.String)),
-  diagramUrl: Schema.optional(Schema.NullOr(Schema.String)),
-  videoUrl: Schema.optional(Schema.NullOr(Schema.String)),
-});
-
 const updatePlay = createServerFn({ method: "POST" })
-  .inputValidator((data: typeof UpdatePlayForm.Type) =>
-    Schema.decodeSync(UpdatePlayForm)(data),
+  .inputValidator((data: typeof UpdatePlayInput.Type) =>
+    Schema.decodeSync(UpdatePlayInput)(data),
   )
   .handler(({ data }) =>
     runApi(
@@ -80,32 +54,6 @@ export const Route = createFileRoute("/playbook/$id")({
   component: PlayDetailPage,
   loader: ({ params }) => getPlay({ data: params.id }),
 });
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const PLAY_CATEGORIES: { value: PlayCategory; label: string }[] = [
-  { value: "offense", label: "Offense" },
-  { value: "defense", label: "Defense" },
-  { value: "clear", label: "Clear" },
-  { value: "ride", label: "Ride" },
-  { value: "faceoff", label: "Face-off" },
-  { value: "emo", label: "EMO" },
-  { value: "man-down", label: "Man-Down" },
-  { value: "transition", label: "Transition" },
-];
-
-const categoryColors: Record<PlayCategory, string> = {
-  offense: "bg-blue-500/10 text-blue-600",
-  defense: "bg-red-500/10 text-red-600",
-  clear: "bg-teal-500/10 text-teal-600",
-  ride: "bg-orange-500/10 text-orange-600",
-  faceoff: "bg-purple-500/10 text-purple-600",
-  emo: "bg-green-500/10 text-green-600",
-  "man-down": "bg-amber-500/10 text-amber-600",
-  transition: "bg-cyan-500/10 text-cyan-600",
-};
 
 // ---------------------------------------------------------------------------
 // Page
@@ -195,9 +143,7 @@ function PlayDetailPage() {
         videoUrl={videoUrl}
         setVideoUrl={setVideoUrl}
         saving={saving}
-        onSave={() => {
-          void handleSave();
-        }}
+        onSave={voidAsync(handleSave)}
         onCancel={handleCancel}
       />
     );
@@ -220,7 +166,7 @@ function PlayDetailPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <Badge
                 variant="secondary"
-                className={categoryColors[play.category]}
+                className={PLAY_CATEGORY_COLORS[play.category]}
               >
                 {play.category}
               </Badge>
@@ -323,23 +269,7 @@ function PlayDetailPage() {
 // Edit View
 // ---------------------------------------------------------------------------
 
-interface PlayEditViewProps {
-  name: string;
-  setName: (v: string) => void;
-  category: PlayCategory;
-  setCategory: (v: PlayCategory) => void;
-  formation: string;
-  setFormation: (v: string) => void;
-  description: string;
-  setDescription: (v: string) => void;
-  personnelNotes: string;
-  setPersonnelNotes: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
-  diagramUrl: string;
-  setDiagramUrl: (v: string) => void;
-  videoUrl: string;
-  setVideoUrl: (v: string) => void;
+interface PlayEditViewProps extends PlayFormFieldsProps {
   saving: boolean;
   onSave: () => void;
   onCancel: () => void;
@@ -377,174 +307,5 @@ function PlayEditView(props: PlayEditViewProps) {
         <PlayFormFields {...props} />
       </div>
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared Form Fields (used by edit and create pages)
-// ---------------------------------------------------------------------------
-
-export function PlayFormFields(props: {
-  name: string;
-  setName: (v: string) => void;
-  category: PlayCategory;
-  setCategory: (v: PlayCategory) => void;
-  formation: string;
-  setFormation: (v: string) => void;
-  description: string;
-  setDescription: (v: string) => void;
-  personnelNotes: string;
-  setPersonnelNotes: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
-  diagramUrl: string;
-  setDiagramUrl: (v: string) => void;
-  videoUrl: string;
-  setVideoUrl: (v: string) => void;
-}) {
-  return (
-    <>
-      {/* Basic Info */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Basic Info</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Name and category are required. Everything else is optional.
-          </p>
-        </div>
-
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={props.name}
-              onChange={(e) => {
-                props.setName(e.target.value);
-              }}
-              placeholder="e.g. 2-3-1 Slide"
-            />
-          </div>
-          <div>
-            <Label>Category</Label>
-            <Select
-              value={props.category}
-              onValueChange={(value) => {
-                const next = PLAY_CATEGORIES.find((cat) => cat.value === value);
-                if (next) props.setCategory(next.value);
-              }}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PLAY_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="formation">Formation</Label>
-            <Input
-              id="formation"
-              value={props.formation}
-              onChange={(e) => {
-                props.setFormation(e.target.value);
-              }}
-              placeholder="e.g. 2-3-1, 1-4-1, 3-3"
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={props.description}
-              onChange={(e) => {
-                props.setDescription(e.target.value);
-              }}
-              placeholder="Play setup, reads, coaching points..."
-              className="min-h-[100px]"
-            />
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Personnel */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Personnel</h2>
-
-        <div>
-          <Label htmlFor="personnelNotes">Personnel Notes</Label>
-          <Textarea
-            id="personnelNotes"
-            value={props.personnelNotes}
-            onChange={(e) => {
-              props.setPersonnelNotes(e.target.value);
-            }}
-            placeholder="Who goes where, matchup assignments, slides..."
-            className="min-h-[80px]"
-          />
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Media */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Resources</h2>
-
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="diagramUrl">Diagram URL</Label>
-            <Input
-              id="diagramUrl"
-              value={props.diagramUrl}
-              onChange={(e) => {
-                props.setDiagramUrl(e.target.value);
-              }}
-              placeholder="https://..."
-            />
-          </div>
-          <div>
-            <Label htmlFor="videoUrl">Video URL</Label>
-            <Input
-              id="videoUrl"
-              value={props.videoUrl}
-              onChange={(e) => {
-                props.setVideoUrl(e.target.value);
-              }}
-              placeholder="https://..."
-            />
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Tags */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Tags</h2>
-
-        <div>
-          <Label htmlFor="tags">Tags</Label>
-          <Input
-            id="tags"
-            value={props.tags}
-            onChange={(e) => {
-              props.setTags(e.target.value);
-            }}
-            placeholder="settled, unsettled, invert, pick (comma-separated)"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Comma-separated. Use tags to organize and find plays quickly.
-          </p>
-        </div>
-      </section>
-    </>
   );
 }

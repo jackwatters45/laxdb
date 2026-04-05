@@ -1,43 +1,25 @@
 import { RpcApiClient } from "@laxdb/api/client";
+import { CreatePlayInput } from "@laxdb/core/play/play.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { PlayFormFields } from "@/components/play-form-fields";
 import { runApi } from "@/lib/api";
-import { PlayFormFields } from "@/routes/playbook/$id";
 import type { PlayCategory } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server function
 // ---------------------------------------------------------------------------
 
-const CreatePlayForm = Schema.Struct({
-  name: Schema.String,
-  category: Schema.Literals([
-    "offense",
-    "defense",
-    "clear",
-    "ride",
-    "faceoff",
-    "emo",
-    "man-down",
-    "transition",
-  ]),
-  formation: Schema.NullOr(Schema.String),
-  description: Schema.NullOr(Schema.String),
-  personnelNotes: Schema.NullOr(Schema.String),
-  tags: Schema.optional(Schema.Array(Schema.String)),
-  diagramUrl: Schema.NullOr(Schema.String),
-  videoUrl: Schema.NullOr(Schema.String),
-});
-
 const createPlay = createServerFn({ method: "POST" })
-  .inputValidator((data: typeof CreatePlayForm.Type) =>
-    Schema.decodeSync(CreatePlayForm)(data),
+  .inputValidator((data: typeof CreatePlayInput.Type) =>
+    Schema.decodeSync(CreatePlayInput)(data),
   )
   .handler(({ data }) =>
     runApi(
@@ -139,9 +121,7 @@ function NewPlayPage() {
             <Button variant="ghost">Cancel</Button>
           </Link>
           <Button
-            onClick={() => {
-              void handleCreate();
-            }}
+            onClick={voidAsync(handleCreate)}
             disabled={creating || !name}
           >
             {creating ? <Loader2 className="animate-spin" /> : null}

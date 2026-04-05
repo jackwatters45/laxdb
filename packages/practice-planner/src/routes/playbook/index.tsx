@@ -1,15 +1,4 @@
 import { RpcApiClient } from "@laxdb/api/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@laxdb/ui/components/ui/alert-dialog";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -23,8 +12,15 @@ import { Effect, Schema } from "effect";
 import { BookOpen, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { runApi } from "@/lib/api";
-import type { Play, PlayCategory } from "@/types";
+import { isOptionValue } from "@/lib/option-guards";
+import {
+  PLAY_CATEGORY_COLORS,
+  PLAY_CATEGORY_FILTER_OPTIONS,
+  type PlayCategoryFilter,
+} from "@/lib/play-definitions";
+import type { Play } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -67,34 +63,6 @@ export const Route = createFileRoute("/playbook/")({
 // Constants
 // ---------------------------------------------------------------------------
 
-const CATEGORIES = [
-  { value: "all", label: "All" },
-  { value: "offense", label: "Offense" },
-  { value: "defense", label: "Defense" },
-  { value: "clear", label: "Clear" },
-  { value: "ride", label: "Ride" },
-  { value: "faceoff", label: "Face-off" },
-  { value: "emo", label: "EMO" },
-  { value: "man-down", label: "Man-Down" },
-  { value: "transition", label: "Transition" },
-] as const;
-
-const categoryColors: Record<PlayCategory, string> = {
-  offense: "bg-blue-500/10 text-blue-600",
-  defense: "bg-red-500/10 text-red-600",
-  clear: "bg-teal-500/10 text-teal-600",
-  ride: "bg-orange-500/10 text-orange-600",
-  faceoff: "bg-purple-500/10 text-purple-600",
-  emo: "bg-green-500/10 text-green-600",
-  "man-down": "bg-amber-500/10 text-amber-600",
-  transition: "bg-cyan-500/10 text-cyan-600",
-};
-
-const isPlaybookCategory = (
-  value: string,
-): value is (typeof CATEGORIES)[number]["value"] =>
-  CATEGORIES.some((category) => category.value === value);
-
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
@@ -103,7 +71,7 @@ function PlaybookListPage() {
   const plays = Route.useLoaderData();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] =
-    useState<(typeof CATEGORIES)[number]["value"]>("all");
+    useState<PlayCategoryFilter>("all");
 
   const filtered = plays.filter((play) => {
     const matchesSearch =
@@ -118,7 +86,9 @@ function PlaybookListPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const grouped = CATEGORIES.filter((c) => c.value !== "all").reduce(
+  const grouped = PLAY_CATEGORY_FILTER_OPTIONS.filter(
+    (category) => category.value !== "all",
+  ).reduce(
     (acc, cat) => {
       const matching = filtered.filter((p) => p.category === cat.value);
       if (matching.length > 0) acc.push({ label: cat.label, plays: matching });
@@ -166,14 +136,16 @@ function PlaybookListPage() {
             value={[activeCategory]}
             onValueChange={(values) => {
               const next = values[0];
-              if (next && isPlaybookCategory(next)) setActiveCategory(next);
+              if (isOptionValue(PLAY_CATEGORY_FILTER_OPTIONS, next)) {
+                setActiveCategory(next);
+              }
             }}
             variant="outline"
             size="sm"
             spacing={1}
             className="flex-wrap"
           >
-            {CATEGORIES.map((cat) => (
+            {PLAY_CATEGORY_FILTER_OPTIONS.map((cat) => (
               <ToggleGroupItem key={cat.value} value={cat.value}>
                 {cat.label}
               </ToggleGroupItem>
@@ -276,7 +248,7 @@ function PlayCard({ play }: { play: Play }) {
             </span>
             <Badge
               variant="secondary"
-              className={categoryColors[play.category]}
+              className={PLAY_CATEGORY_COLORS[play.category]}
             >
               {play.category}
             </Badge>
@@ -308,43 +280,25 @@ function PlayCard({ play }: { play: Play }) {
 
       {/* Delete */}
       <div className="pr-3 opacity-0 group-hover:opacity-100 transition-opacity">
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              />
-            }
-          >
-            <Trash2 size={14} />
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Delete &quot;{play.name}&quot;?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete this play from your playbook.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                render={<Button variant="destructive" />}
-                onClick={() => {
-                  void handleDelete();
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDeleteDialog
+          title={`Delete "${play.name}"?`}
+          description={
+            <>This will permanently delete this play from your playbook.</>
+          }
+          onConfirm={handleDelete}
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          }
+        >
+          <Trash2 size={14} />
+        </ConfirmDeleteDialog>
       </div>
     </div>
   );

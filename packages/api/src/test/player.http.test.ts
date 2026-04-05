@@ -6,9 +6,8 @@
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { expectRecord, expectStringProp } from "./assertions";
 import {
-  expectRecord,
-  expectStringProp,
   post,
   startTestServer,
   truncateAllTables,

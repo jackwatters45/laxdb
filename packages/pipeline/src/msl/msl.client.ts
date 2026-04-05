@@ -2,7 +2,13 @@ import * as cheerio from "cheerio";
 import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
 
 import { MSLConfig, PipelineConfig } from "../config";
-import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
+import {
+  HttpError,
+  NetworkError,
+  type ParseError,
+  TimeoutError,
+} from "../error";
+import { mapParseError, safeParseJson, safeStringOrNull } from "../util";
 
 import {
   MSLGame,
@@ -19,29 +25,6 @@ import {
   MSLTeam,
   MSLTeamsRequest,
 } from "./msl.schema";
-
-const mapParseError = (error: Schema.SchemaError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
-
-const parseJsonResponse = <T>(
-  response: string,
-  message: string,
-): Effect.Effect<T, ParseError> =>
-  Effect.try({
-    try: () => {
-      const parsed: unknown = JSON.parse(response);
-      // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- third-party MSL APIs return loosely typed JSON that is validated lazily by field access below
-      return parsed as T;
-    },
-    catch: () =>
-      new ParseError({
-        message,
-        cause: response.slice(0, 200),
-      }),
-  });
 
 export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
   make: Effect.gen(function* () {
@@ -275,7 +258,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        const data = yield* parseJsonResponse<
+        const data = yield* safeParseJson<
           StandingsApiResponse | StandingsApiResponse[]
         >(response, `Failed to parse standings API response as JSON`);
 
@@ -392,7 +375,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          const data = yield* parseJsonResponse<PlayerApiResponse>(
+          const data = yield* safeParseJson<PlayerApiResponse>(
             response,
             `Failed to parse player API response as JSON`,
           );
@@ -447,10 +430,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
+              jersey_number: safeStringOrNull(jersey),
               position,
-              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLPlayerStats({
                 games_played: gamesPlayed,
@@ -547,7 +529,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          const data = yield* parseJsonResponse<GoalieApiResponse>(
+          const data = yield* safeParseJson<GoalieApiResponse>(
             response,
             `Failed to parse goalie API response as JSON`,
           );
@@ -599,9 +581,8 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
-              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
+              jersey_number: safeStringOrNull(jersey),
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLGoalieStats({
                 games_played: gamesPlayed,
@@ -690,7 +671,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        const data = yield* parseJsonResponse<
+        const data = yield* safeParseJson<
           StandingsApiResponse | StandingsApiResponse[]
         >(response, `Failed to parse standings API response as JSON`);
 
@@ -815,7 +796,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           game: GameInfo;
         }
 
-        const parsed = yield* parseJsonResponse<unknown>(
+        const parsed = yield* safeParseJson<unknown>(
           response,
           `Failed to parse schedule API response as JSON`,
         );

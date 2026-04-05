@@ -4,16 +4,9 @@
  * Serves the full API (HTTP routes + RPC) backed by TestDatabaseLive.
  */
 
-import {
-  createServer,
-  type IncomingMessage,
-  type Server,
-  type ServerResponse,
-} from "node:http";
-
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
-import { HttpRouter, HttpServer } from "effect/unstable/http";
+import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
@@ -27,8 +20,9 @@ import { PlayersHandlersLive } from "../player/player.handlers";
 import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
 import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
-import { emptyRequestContext } from "../request-context";
 import { LaxdbRpcV2 } from "../rpc-group";
+
+import { startNodeHttpTestServer, type TestServer } from "./http-test-server";
 
 // RPC handlers backed by test DB
 const TestRpcHandlers = Layer.mergeAll(
@@ -68,84 +62,13 @@ const AllRoutes = Layer.mergeAll(RpcRouter, HttpApiRouter, DocsRoute).pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
 );
 
-export interface TestServer {
-  url: string;
-  server: Server;
-  cleanup: () => Promise<void>;
-}
-
 /**
  * Start a test API server on a random port.
  */
-export async function startTestServer(): Promise<TestServer> {
-  const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
+export type { TestServer } from "./http-test-server";
 
-  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(req.headers)) {
-      if (value) {
-        if (Array.isArray(value)) {
-          for (const v of value) headers.append(key, v);
-        } else {
-          headers.set(key, value);
-        }
-      }
-    }
-
-    const body =
-      req.method === "GET" || req.method === "HEAD"
-        ? undefined
-        : await new Promise<Buffer>((resolve, reject) => {
-            const chunks: Buffer[] = [];
-            req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () => {
-              resolve(Buffer.concat(chunks));
-            });
-            req.on("error", reject);
-          });
-
-    const request = new Request(`http://localhost${req.url ?? "/"}`, {
-      method: req.method,
-      headers,
-      body,
-    });
-
-    const response = await handler(request, emptyRequestContext);
-    res.writeHead(response.status, Object.fromEntries(response.headers));
-    const responseBody = await response.arrayBuffer();
-    res.end(Buffer.from(responseBody));
-  };
-
-  const server = createServer((req, res) => {
-    void handleRequest(req, res).catch((error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error);
-      res.statusCode = 500;
-      res.end(message);
-    });
-  });
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, resolve);
-  });
-
-  const addr = server.address();
-  const port = typeof addr === "object" && addr ? addr.port : 0;
-  const url = `http://localhost:${String(port)}`;
-
-  return {
-    url,
-    server,
-    cleanup: async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-      await dispose();
-    },
-  };
-}
+export const startTestServer = (): Promise<TestServer> =>
+  startNodeHttpTestServer(AllRoutes);
 
 /**
  * Truncate all tables.
@@ -175,33 +98,3 @@ export async function post(
   }
   return { status: res.status, data };
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
-
-export const expectRecord = (value: unknown): Record<string, unknown> => {
-  if (!isRecord(value)) {
-    throw new Error("Expected an object response");
-  }
-  return value;
-};
-
-export const expectRecordArray = (
-  value: unknown,
-): Array<Record<string, unknown>> => {
-  if (!Array.isArray(value)) {
-    throw new TypeError("Expected an array response");
-  }
-
-  return value.map((item) => expectRecord(item));
-};
-
-export const expectString = (value: unknown, label: string): string => {
-  if (typeof value !== "string") {
-    throw new TypeError(`Expected ${label} to be a string`);
-  }
-  return value;
-};
-
-export const expectStringProp = (value: unknown, key: string): string =>
-  expectString(expectRecord(value)[key], key);
