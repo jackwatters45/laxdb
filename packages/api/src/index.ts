@@ -1,4 +1,4 @@
-import { DateTime, Layer } from "effect";
+import { DateTime, Layer, ServiceMap } from "effect";
 import {
   HttpRouter,
   HttpServer,
@@ -55,6 +55,10 @@ const AllRoutes = Layer.mergeAll(
 export default {
   fetch: (request: Request) => {
     const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
-    return handler(request).finally(dispose);
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- empty request context satisfies handlers that don't require extra services at runtime
+    const emptyContext = ServiceMap.empty() as ServiceMap.ServiceMap<unknown>;
+    return handler(request, emptyContext).finally(() => {
+      void dispose();
+    });
   },
 };

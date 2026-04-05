@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 // Redirect old /blog/{slug} URLs to /content/{slug}
 export const Route = createFileRoute("/blog/$slug")({
   beforeLoad: ({ params }) => {
+    // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing redirect()
     throw redirect({
       to: "/content/$slug",
       params: { slug: params.slug },

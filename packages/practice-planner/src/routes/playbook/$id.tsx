@@ -195,7 +195,9 @@ function PlayDetailPage() {
         videoUrl={videoUrl}
         setVideoUrl={setVideoUrl}
         saving={saving}
-        onSave={handleSave}
+        onSave={() => {
+          void handleSave();
+        }}
         onCancel={handleCancel}
       />
     );
@@ -427,8 +429,9 @@ export function PlayFormFields(props: {
             <Label>Category</Label>
             <Select
               value={props.category}
-              onValueChange={(v) => {
-                props.setCategory(v as PlayCategory);
+              onValueChange={(value) => {
+                const next = PLAY_CATEGORIES.find((cat) => cat.value === value);
+                if (next) props.setCategory(next.value);
               }}
             >
               <SelectTrigger className="w-48">

@@ -191,7 +191,7 @@ function PracticeCard({
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Delete "{practiceName(practice)}"?
+                Delete &quot;{practiceName(practice)}&quot;?
               </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this practice plan and all its
@@ -202,7 +202,9 @@ function PracticeCard({
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 render={<Button variant="destructive" />}
-                onClick={handleDelete}
+                onClick={() => {
+                  void handleDelete();
+                }}
               >
                 Delete
               </AlertDialogAction>

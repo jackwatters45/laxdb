@@ -28,6 +28,40 @@ const mapParseError = (error: Schema.SchemaError): ParseError =>
     cause: error,
   });
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const getNestedRecord = (obj: Record<string, unknown>, key: string) => {
+  const nested = obj[key];
+  return isRecord(nested) ? nested : obj;
+};
+
+const pushUniqueById = <T extends { id: string }>(
+  items: T[],
+  seenIds: Set<string>,
+  extractedItems: readonly T[],
+) => {
+  for (const item of extractedItems) {
+    if (seenIds.has(item.id)) continue;
+    seenIds.add(item.id);
+    items.push(item);
+  }
+};
+
+const pushUniqueByKey = <T>(
+  items: T[],
+  seenKeys: Set<string>,
+  extractedItems: readonly T[],
+  getKey: (item: T) => string,
+) => {
+  for (const item of extractedItems) {
+    const key = getKey(item);
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    items.push(item);
+  }
+};
+
 export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
   make: Effect.gen(function* () {
     const wlaConfig = yield* WLAConfig;
@@ -366,12 +400,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const data = JSON.parse(match[1]) as unknown;
                 // Try to extract player data from the parsed JSON
                 const extractedPlayers = extractPlayersFromData(data);
-                for (const player of extractedPlayers) {
-                  if (!seenIds.has(player.id)) {
-                    seenIds.add(player.id);
-                    players.push(player);
-                  }
-                }
+                pushUniqueById(players, seenIds, extractedPlayers);
               } catch {
                 // JSON parse failed, continue to next pattern
               }
@@ -581,12 +610,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const data = JSON.parse(match[1]) as unknown;
                 // Try to extract goalie data from the parsed JSON
                 const extractedGoalies = extractGoaliesFromData(data);
-                for (const goalie of extractedGoalies) {
-                  if (!seenIds.has(goalie.id)) {
-                    seenIds.add(goalie.id);
-                    goalies.push(goalie);
-                  }
-                }
+                pushUniqueById(goalies, seenIds, extractedGoalies);
               } catch {
                 // JSON parse failed, continue to next pattern
               }
@@ -804,7 +828,10 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       }
 
       // Handle nested structures
-      const obj = data as Record<string, unknown>;
+      if (!isRecord(data)) {
+        return goalies;
+      }
+      const obj = data;
 
       // Look for common goalie array keys
       const goalieKeys = [
@@ -831,11 +858,11 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Parses a single goalie object from JSON data.
      */
     const parseGoalieObject = (item: unknown): WLAGoalie | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a name or ID
       const id =
@@ -858,7 +885,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
-      const stats = (obj.stats ?? obj) as Record<string, unknown>;
+      const stats = getNestedRecord(obj, "stats");
       const gamesPlayed = Number(stats.games_played ?? stats.gp ?? 0) || 0;
       const wins = Number(stats.wins ?? stats.w ?? 0) || 0;
       const losses = Number(stats.losses ?? stats.l ?? 0) || 0;
@@ -921,7 +948,10 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       }
 
       // Handle nested structures
-      const obj = data as Record<string, unknown>;
+      if (!isRecord(data)) {
+        return players;
+      }
+      const obj = data;
 
       // Look for common player array keys
       const playerKeys = [
@@ -949,11 +979,11 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Parses a single player object from JSON data.
      */
     const parsePlayerObject = (item: unknown): WLAPlayer | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a name or ID
       const id =
@@ -976,18 +1006,18 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
-      const stats = (obj.stats ?? obj) as Record<string, unknown>;
+      const stats = getNestedRecord(obj, "stats");
       const gamesPlayed = Number(stats.games_played ?? stats.gp ?? 0) || 0;
       const goals = Number(stats.goals ?? stats.g ?? 0) || 0;
       const assists = Number(stats.assists ?? stats.a ?? 0) || 0;
       const points = Number(stats.points ?? stats.pts ?? 0) || 0;
       const penaltyMinutes =
         Number(stats.penalty_minutes ?? stats.pim ?? 0) || 0;
-      const ppg = stats.ppg !== null ? Number(stats.ppg) || null : null;
-      const shg = stats.shg !== null ? Number(stats.shg) || null : null;
-      const gwg = stats.gwg !== null ? Number(stats.gwg) || null : null;
+      const ppg = stats.ppg === null ? null : Number(stats.ppg) || null;
+      const shg = stats.shg === null ? null : Number(stats.shg) || null;
+      const gwg = stats.gwg === null ? null : Number(stats.gwg) || null;
       const scoringPct =
-        stats.scoring_pct !== null ? Number(stats.scoring_pct) || null : null;
+        stats.scoring_pct === null ? null : Number(stats.scoring_pct) || null;
 
       return new WLAPlayer({
         id: id || name.toLowerCase().replaceAll(/\s+/g, "-"),
@@ -1067,12 +1097,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const data = JSON.parse(match[1]) as unknown;
                 // Try to extract standings data from the parsed JSON
                 const extractedStandings = extractStandingsFromData(data);
-                for (const standing of extractedStandings) {
-                  if (!seenTeams.has(standing.team_id)) {
-                    seenTeams.add(standing.team_id);
-                    standings.push(standing);
-                  }
-                }
+                pushUniqueByKey(
+                  standings,
+                  seenTeams,
+                  extractedStandings,
+                  (standing) => standing.team_id,
+                );
               } catch {
                 // JSON parse failed, continue to next pattern
               }
@@ -1246,7 +1276,10 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       }
 
       // Handle nested structures
-      const obj = data as Record<string, unknown>;
+      if (!isRecord(data)) {
+        return standings;
+      }
+      const obj = data;
 
       // Look for common standings array keys
       const standingsKeys = [
@@ -1277,11 +1310,11 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       item: unknown,
       defaultPosition: number,
     ): WLAStanding | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a team name or ID
       const id =
@@ -1380,12 +1413,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const data = JSON.parse(match[1]) as unknown;
                 // Try to extract game data from the parsed JSON
                 const extractedGames = extractGamesFromData(data);
-                for (const game of extractedGames) {
-                  if (!seenIds.has(game.id)) {
-                    seenIds.add(game.id);
-                    games.push(game);
-                  }
-                }
+                pushUniqueById(games, seenIds, extractedGames);
               } catch {
                 // JSON parse failed, continue to next pattern
               }
@@ -1570,7 +1598,10 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       }
 
       // Handle nested structures
-      const obj = data as Record<string, unknown>;
+      if (!isRecord(data)) {
+        return games;
+      }
+      const obj = data;
 
       // Look for common game array keys
       const gameKeys = ["games", "schedule", "scores", "matches", "results"];
@@ -1592,11 +1623,11 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Parses a single game object from JSON data.
      */
     const parseGameObject = (item: unknown, index: number): WLAGame | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least some identifying info
       const id =

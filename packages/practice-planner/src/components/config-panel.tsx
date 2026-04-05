@@ -35,12 +35,7 @@ import {
 
 import { useDrills } from "@/hooks/use-drills";
 import { drillToType } from "@/lib/drill-utils";
-import type {
-  Drill,
-  PracticeNode,
-  PracticeItemType,
-  PracticeItemPriority,
-} from "@/types";
+import type { Drill, PracticeNode, PracticeItemPriority } from "@/types";
 
 import { DrillPickerPopover } from "./drill-picker";
 
@@ -213,7 +208,9 @@ export function ConfigPanel({
               <ToggleGroup
                 value={[node.priority]}
                 onValueChange={(values) => {
-                  const next = values[0] as PracticeItemPriority | undefined;
+                  const next = PRIORITY_OPTIONS.find(
+                    (option) => option.value === values[0],
+                  )?.value;
                   if (next) onUpdate(node.id, { priority: next });
                 }}
                 variant="outline"
@@ -259,7 +256,9 @@ export function ConfigPanel({
               />
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete "{node.label}"?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Delete &quot;{node.label}&quot;?
+                  </AlertDialogTitle>
                   <AlertDialogDescription className="text-pretty">
                     This block will be removed from the practice plan. Connected
                     blocks will be re-linked automatically.

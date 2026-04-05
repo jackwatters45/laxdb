@@ -34,7 +34,7 @@ import {
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
-import type { Drill, Difficulty, DrillCategory } from "@/types";
+import type { Drill, Difficulty } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -99,6 +99,16 @@ const DIFFICULTIES = [
   { value: "advanced", label: "Advanced" },
 ] as const;
 
+const isDrillListCategory = (
+  value: string,
+): value is (typeof CATEGORIES)[number]["value"] =>
+  CATEGORIES.some((category) => category.value === value);
+
+const isDifficultyFilter = (
+  value: string,
+): value is (typeof DIFFICULTIES)[number]["value"] =>
+  DIFFICULTIES.some((difficulty) => difficulty.value === value);
+
 const difficultyColors: Record<Difficulty, string> = {
   beginner: "bg-green-500/10 text-green-600",
   intermediate: "bg-amber-500/10 text-amber-600",
@@ -118,8 +128,10 @@ const intensityIcons: Record<string, typeof Zap> = {
 function DrillsListPage() {
   const drills = Route.useLoaderData();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [activeDifficulty, setActiveDifficulty] = useState("all");
+  const [activeCategory, setActiveCategory] =
+    useState<(typeof CATEGORIES)[number]["value"]>("all");
+  const [activeDifficulty, setActiveDifficulty] =
+    useState<(typeof DIFFICULTIES)[number]["value"]>("all");
 
   const filtered = drills.filter((drill) => {
     const matchesSearch =
@@ -129,8 +141,7 @@ function DrillsListPage() {
       drill.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
 
     const matchesCategory =
-      activeCategory === "all" ||
-      drill.category.includes(activeCategory as DrillCategory);
+      activeCategory === "all" || drill.category.includes(activeCategory);
 
     const matchesDifficulty =
       activeDifficulty === "all" || drill.difficulty === activeDifficulty;
@@ -177,7 +188,7 @@ function DrillsListPage() {
               value={[activeCategory]}
               onValueChange={(values) => {
                 const next = values[0];
-                if (next) setActiveCategory(next);
+                if (next && isDrillListCategory(next)) setActiveCategory(next);
               }}
               variant="outline"
               size="sm"
@@ -195,7 +206,7 @@ function DrillsListPage() {
               value={[activeDifficulty]}
               onValueChange={(values) => {
                 const next = values[0];
-                if (next) setActiveDifficulty(next);
+                if (next && isDifficultyFilter(next)) setActiveDifficulty(next);
               }}
               variant="outline"
               size="sm"
@@ -213,7 +224,7 @@ function DrillsListPage() {
 
         {/* Results count */}
         <p className="text-xs text-muted-foreground">
-          {filtered.length} drill{filtered.length !== 1 ? "s" : ""}
+          {filtered.length} drill{filtered.length === 1 ? "" : "s"}
           {search || activeCategory !== "all" || activeDifficulty !== "all"
             ? " matching filters"
             : ""}
@@ -391,7 +402,9 @@ function DrillCard({ drill }: { drill: Drill }) {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete "{drill.name}"?</AlertDialogTitle>
+              <AlertDialogTitle>
+                Delete &quot;{drill.name}&quot;?
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this drill. Any practice plans
                 referencing it will keep their items but lose the drill
@@ -402,7 +415,9 @@ function DrillCard({ drill }: { drill: Drill }) {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 render={<Button variant="destructive" />}
-                onClick={handleDelete}
+                onClick={() => {
+                  void handleDelete();
+                }}
               >
                 Delete
               </AlertDialogAction>

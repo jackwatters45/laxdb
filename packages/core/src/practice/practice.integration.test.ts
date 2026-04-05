@@ -1,6 +1,8 @@
+import type { PgClient } from "@effect/sql-pg";
 import { Effect, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
+import type { PgDrizzle } from "../drizzle/drizzle.service";
 import { TestDatabaseLive, truncateAll } from "../test/db";
 import {
   validAddItem,
@@ -17,12 +19,17 @@ const ServiceLayer = Layer.effect(PracticeService, PracticeService.make).pipe(
 );
 const TestLayer = Layer.mergeAll(ServiceLayer, TestDatabaseLive);
 
-// Helper: provide layer and run as promise.
-// Uses `any` for requirements to work around TypeScript inference limits
-// with ServiceMap.Service (12 methods exceeds inference capacity).
-// Safety: all tests verified passing at runtime.
-const run = <A, E>(effect: Effect.Effect<A, E, any>): Promise<A> =>
-  Effect.runPromise(Effect.provide(effect, TestLayer) as Effect.Effect<A>);
+const run = <A, E>(
+  effect: Effect.Effect<
+    A,
+    E,
+    PracticeService | PracticeRepo | PgClient.PgClient | PgDrizzle
+  >,
+): Promise<A> =>
+  Effect.runPromise(
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- TestLayer fully satisfies the effect requirements for these integration tests
+    Effect.provide(effect, TestLayer) as Effect.Effect<A, E>,
+  );
 
 describe("PracticeService integration", () => {
   // -----------------------------------------------------------------------

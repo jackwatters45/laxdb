@@ -32,10 +32,14 @@ describe("saveJson", () => {
       writeFileString: () => Effect.void,
     };
 
-    const MockFS = Layer.succeed(FileSystem, {
-      ...baseMock,
-      ...overrides,
-    } as unknown as FileSystem);
+    const MockFS = Layer.succeed(
+      FileSystem,
+      // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- test double only overrides the FileSystem methods used by saveJson
+      {
+        ...baseMock,
+        ...overrides,
+      } as unknown as FileSystem,
+    );
 
     return Layer.provideMerge(MockFS, BunServices.layer);
   };

@@ -7,6 +7,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  expectRecord,
+  expectStringProp,
   post,
   startTestServer,
   truncateAllTables,
@@ -67,7 +69,7 @@ describe("POST /api/drills/create", () => {
       minimalDrill,
     );
     expect(status).toBe(200);
-    const drill = data as Record<string, unknown>;
+    const drill = expectRecord(data);
     expect(drill.name).toBe("Box Passing");
     expect(drill.publicId).toHaveLength(12);
   });
@@ -88,7 +90,7 @@ describe("POST /api/drills/create", () => {
       coachNotes: "Focus on form",
     });
     expect(status).toBe(200);
-    const drill = data as Record<string, unknown>;
+    const drill = expectRecord(data);
     expect(drill.name).toBe("Full Drill");
     expect(drill.intensity).toBe("high");
     expect(drill.contact).toBe(true);
@@ -111,11 +113,11 @@ describe("POST /api/drills/get", () => {
       "/api/drills/create",
       minimalDrill,
     );
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status, data } = await post(s.url, "/api/drills/get", { publicId });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).name).toBe("Box Passing");
+    expect(expectRecord(data).name).toBe("Box Passing");
   });
 
   it("returns error for nonexistent drill", async () => {
@@ -133,14 +135,14 @@ describe("POST /api/drills/update", () => {
       "/api/drills/create",
       minimalDrill,
     );
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status, data } = await post(s.url, "/api/drills/update", {
       publicId,
       name: "Updated Drill",
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).name).toBe("Updated Drill");
+    expect(expectRecord(data).name).toBe("Updated Drill");
   });
 
   it("returns error for nonexistent drill", async () => {
@@ -159,7 +161,7 @@ describe("POST /api/drills/delete", () => {
       "/api/drills/create",
       minimalDrill,
     );
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status } = await post(s.url, "/api/drills/delete", { publicId });
     expect(status).toBe(200);

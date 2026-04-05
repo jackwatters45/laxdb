@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { PLLClient } from "./pll.client";
 
-describe("PLLClient", () => {
+const describePllIntegration =
+  process.env.PLL_REST_TOKEN && process.env.PLL_GRAPHQL_TOKEN
+    ? describe
+    : describe.skip;
+
+describePllIntegration("PLLClient", () => {
   describe("getStandings (REST)", () => {
     it("fetches 2024 standings", async () => {
       const program = Effect.gen(function* () {

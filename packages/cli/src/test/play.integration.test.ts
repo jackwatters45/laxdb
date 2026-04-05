@@ -115,7 +115,7 @@ describe("Play RPC", () => {
   });
 
   it("bulk-create smoke test creates multiple plays", async () => {
-    const [created, plays] = await run(
+    const [createdPlays, listedPlays] = await run(
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
         const created = yield* Effect.forEach(
@@ -131,8 +131,8 @@ describe("Play RPC", () => {
       }),
     );
 
-    expect(created).toHaveLength(2);
-    expect(plays).toHaveLength(2);
+    expect(createdPlays).toHaveLength(2);
+    expect(listedPlays).toHaveLength(2);
   });
 
   it("lists all plays", async () => {

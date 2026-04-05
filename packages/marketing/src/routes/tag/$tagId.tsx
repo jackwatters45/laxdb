@@ -10,6 +10,7 @@ export const Route = createFileRoute("/tag/$tagId")({
     const tagId = params.tagId.toLowerCase();
     const redirectTo = ROUTING_TAG_REDIRECTS[tagId];
     if (redirectTo) {
+      // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing redirect()
       throw redirect({ to: redirectTo });
     }
   },
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/tag/$tagId")({
     const tagId = params.tagId.toLowerCase();
     const posts = getContentByTag(publishedPosts, tagId);
     if (posts.length === 0) {
+      // oxlint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects throwing notFound()
       throw notFound();
     }
     return { tagId, posts };

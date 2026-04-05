@@ -10,7 +10,7 @@
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
     "dev": "alchemy dev",
-    "test": "turbo test",
+    "test": "turbo test --concurrency=1",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",

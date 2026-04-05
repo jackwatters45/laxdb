@@ -18,12 +18,27 @@ const isLocal = process.env.IS_LOCAL === "true";
  * that resolves the virtual `http://api/rpc` URL with zero network hops.
  * In local dev, we fall back to the global fetch hitting localhost.
  */
+const hasWorkerEnv = (value: unknown): value is { env: Env } =>
+  typeof value === "object" && value !== null && "env" in value;
+
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
   if (isLocal) {
     return { url: `http://localhost:${process.env.API_PORT ?? "1337"}/rpc` };
   }
-  const { env } = require("cloudflare:workers") as { env: Env };
-  return { fetch: env.API?.fetch.bind(env.API), url: "http://api/rpc" };
+
+  // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment
+  const workersModule: unknown = require("cloudflare:workers");
+  if (!hasWorkerEnv(workersModule)) {
+    return { url: "http://api/rpc" };
+  }
+
+  // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Env typing guarantees the binding shape once the module guard passes
+  const apiBinding = workersModule.env.API;
+  return {
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Worker service bindings expose a fetch method at runtime
+    fetch: apiBinding ? apiBinding.fetch.bind(apiBinding) : undefined,
+    url: "http://api/rpc",
+  };
 }
 
 function buildRuntime() {
@@ -58,5 +73,6 @@ export async function runApi<A, E>(
   const result = await (_runtime ??= buildRuntime()).runPromise(effect);
   // JSON round-trip strips Effect Schema.Class metadata; the shape is
   // guaranteed by Effect's schema encoder so the cast is safe.
+  // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- serialization preserves the result shape while removing class metadata
   return JSON.parse(JSON.stringify(result)) as A;
 }

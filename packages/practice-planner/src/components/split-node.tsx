@@ -66,7 +66,7 @@ export function SplitNodeModal({
 
         <div className="space-y-3 py-2">
           {groups.map((group, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={group} className="flex items-center gap-2">
               <Input
                 value={group}
                 onChange={(e) => {

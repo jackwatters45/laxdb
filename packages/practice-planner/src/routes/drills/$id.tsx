@@ -24,7 +24,13 @@ import { Check, Clock, Loader2, Pencil, Users } from "lucide-react";
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
-import type { Difficulty, DrillCategory, FieldSpace, Intensity } from "@/types";
+import type {
+  Difficulty,
+  DrillCategory,
+  FieldSpace,
+  Intensity,
+  PositionGroup,
+} from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -133,6 +139,25 @@ const POSITION_GROUPS = [
   { value: "all", label: "All" },
 ] as const;
 
+const DIFFICULTY_VALUES = ["beginner", "intermediate", "advanced"] as const;
+const INTENSITY_VALUES = ["low", "medium", "high"] as const;
+const FIELD_SPACE_VALUES = ["full-field", "half-field", "box"] as const;
+
+export const isDifficulty = (value: string | null): value is Difficulty =>
+  DIFFICULTY_VALUES.some((difficulty) => difficulty === value);
+
+export const isDrillCategory = (value: string | null): value is DrillCategory =>
+  CATEGORIES.some((category) => category.value === value);
+
+export const isFieldSpace = (value: string | null): value is FieldSpace =>
+  FIELD_SPACE_VALUES.some((fieldSpace) => fieldSpace === value);
+
+export const isIntensity = (value: string | null): value is Intensity =>
+  INTENSITY_VALUES.some((intensity) => intensity === value);
+
+export const isPositionGroup = (value: string | null): value is PositionGroup =>
+  POSITION_GROUPS.some((group) => group.value === value);
+
 const difficultyColors: Record<Difficulty, string> = {
   beginner: "bg-green-500/10 text-green-600",
   intermediate: "bg-amber-500/10 text-amber-600",
@@ -155,7 +180,7 @@ function DrillDetailPage() {
   const [description, setDescription] = useState(drill.description ?? "");
   const [difficulty, setDifficulty] = useState<Difficulty>(drill.difficulty);
   const [categories, setCategories] = useState([...drill.category]);
-  const [positionGroups, setPositionGroups] = useState<string[]>([
+  const [positionGroups, setPositionGroups] = useState([
     ...drill.positionGroup,
   ]);
   const [intensity, setIntensity] = useState<Intensity | "">(
@@ -212,13 +237,13 @@ function DrillDetailPage() {
         description: description || null,
         difficulty,
         category: categories,
-        positionGroup: positionGroups as typeof drill.positionGroup,
-        intensity: (intensity as Intensity) || null,
+        positionGroup: positionGroups,
+        intensity: intensity || null,
         contact,
         competitive,
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-        fieldSpace: (fieldSpace as FieldSpace) || null,
+        fieldSpace: fieldSpace || null,
         coachNotes: coachNotes || null,
         tags: parsedTags,
       },
@@ -266,7 +291,9 @@ function DrillDetailPage() {
         tags={tags}
         setTags={setTags}
         saving={saving}
-        onSave={handleSave}
+        onSave={() => {
+          void handleSave();
+        }}
         onCancel={handleCancel}
       />
     );
@@ -476,8 +503,8 @@ interface DrillEditViewProps {
   setDifficulty: (v: Difficulty) => void;
   categories: DrillCategory[];
   setCategories: (v: DrillCategory[]) => void;
-  positionGroups: string[];
-  setPositionGroups: (v: string[]) => void;
+  positionGroups: PositionGroup[];
+  setPositionGroups: (v: PositionGroup[]) => void;
   intensity: Intensity | "";
   setIntensity: (v: Intensity | "") => void;
   contact: boolean;
@@ -545,8 +572,8 @@ export function DrillFormFields(props: {
   setDifficulty: (v: Difficulty) => void;
   categories: DrillCategory[];
   setCategories: (v: DrillCategory[]) => void;
-  positionGroups: string[];
-  setPositionGroups: (v: string[]) => void;
+  positionGroups: PositionGroup[];
+  setPositionGroups: (v: PositionGroup[]) => void;
   intensity: Intensity | "";
   setIntensity: (v: Intensity | "") => void;
   contact: boolean;
@@ -626,8 +653,8 @@ export function DrillFormFields(props: {
             <Label>Difficulty</Label>
             <Select
               value={props.difficulty}
-              onValueChange={(v) => {
-                props.setDifficulty(v as Difficulty);
+              onValueChange={(value) => {
+                if (isDifficulty(value)) props.setDifficulty(value);
               }}
             >
               <SelectTrigger className="w-48">
@@ -646,7 +673,7 @@ export function DrillFormFields(props: {
             <ToggleGroup
               value={props.categories}
               onValueChange={(values) => {
-                props.setCategories(values as DrillCategory[]);
+                props.setCategories(values.filter(isDrillCategory));
               }}
               variant="outline"
               size="sm"
@@ -666,7 +693,7 @@ export function DrillFormFields(props: {
             <ToggleGroup
               value={props.positionGroups}
               onValueChange={(values) => {
-                props.setPositionGroups(values);
+                props.setPositionGroups(values.filter(isPositionGroup));
               }}
               variant="outline"
               size="sm"
@@ -731,8 +758,8 @@ export function DrillFormFields(props: {
             <Label>Intensity</Label>
             <Select
               value={props.intensity || undefined}
-              onValueChange={(v) => {
-                props.setIntensity(v as Intensity);
+              onValueChange={(value) => {
+                if (isIntensity(value)) props.setIntensity(value);
               }}
             >
               <SelectTrigger className="w-full">
@@ -749,8 +776,8 @@ export function DrillFormFields(props: {
             <Label>Field Space</Label>
             <Select
               value={props.fieldSpace || undefined}
-              onValueChange={(v) => {
-                props.setFieldSpace(v as FieldSpace);
+              onValueChange={(value) => {
+                if (isFieldSpace(value)) props.setFieldSpace(value);
               }}
             >
               <SelectTrigger className="w-full">
@@ -815,8 +842,8 @@ export function DrillFormFields(props: {
             placeholder="warmup, cooldown, team-building (comma-separated)"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Comma-separated. Use "warmup" or "cooldown" to categorize
-            automatically.
+            Comma-separated. Use &quot;warmup&quot; or &quot;cooldown&quot; to
+            categorize automatically.
           </p>
         </div>
       </section>

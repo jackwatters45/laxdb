@@ -138,7 +138,12 @@ function NewPlayPage() {
           <Link to="/playbook">
             <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleCreate} disabled={creating || !name}>
+          <Button
+            onClick={() => {
+              void handleCreate();
+            }}
+            disabled={creating || !name}
+          >
             {creating ? <Loader2 className="animate-spin" /> : null}
             {creating ? "Creating…" : "Create Play"}
           </Button>

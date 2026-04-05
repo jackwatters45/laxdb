@@ -34,6 +34,13 @@ const decodePracticeEdges = Schema.decodeUnknownEffect(
   Schema.Array(PracticeEdgeInput),
 );
 
+const parseJsonValue = (value: string, flagName: string) =>
+  Effect.try({
+    try: (): unknown => JSON.parse(value),
+    catch: (error: unknown) =>
+      new Error(`Failed to parse ${flagName} JSON: ${String(error)}`),
+  });
+
 // ---------------------------------------------------------------------------
 // Practice CRUD
 // ---------------------------------------------------------------------------
@@ -409,12 +416,7 @@ const replaceEdgesCommand = Command.make(
       const client = yield* RpcApiClient;
       const rawEdges = yield* Option.match(opts.edges, {
         onNone: () => readStdin,
-        onSome: (value) =>
-          Effect.try({
-            try: () => JSON.parse(value),
-            catch: (error: unknown) =>
-              new Error(`Failed to parse --edges JSON: ${String(error)}`),
-          }),
+        onSome: (value) => parseJsonValue(value, "--edges"),
       });
       const edges = yield* decodePracticeEdges(rawEdges);
       const replaced = yield* client.PracticeReplaceEdges({

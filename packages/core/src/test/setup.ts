@@ -49,22 +49,30 @@ async function applyMigrations() {
   await client.connect();
 
   try {
-    for (const dir of migrationDirs) {
-      const sqlPath = path.join(migrationsDir, dir.name, "migration.sql");
-      try {
+    const migrationStatements = await Promise.all(
+      migrationDirs.map(async (dir) => {
+        const sqlPath = path.join(migrationsDir, dir.name, "migration.sql");
         const sql = await readFile(sqlPath, "utf-8");
-        const statements = sql
+        return sql
           .split("--> statement-breakpoint")
           .map((s) => s.trim())
           .filter(Boolean);
+      }),
+    );
 
+    for (const statements of migrationStatements) {
+      try {
         for (const stmt of statements) {
           // oxlint-disable-next-line no-await-in-loop -- must run migrations sequentially
           await client.query(stmt);
         }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
-        if (!msg.includes("already exists") && !msg.includes("duplicate key")) {
+        if (
+          !msg.includes("already exists") &&
+          !msg.includes("duplicate key") &&
+          !msg.includes("does not exist")
+        ) {
           throw e;
         }
       }

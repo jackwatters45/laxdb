@@ -38,6 +38,13 @@ const valuesFlag = Flag.string("values").pipe(
 
 const decodeDefaultsValues = Schema.decodeUnknownEffect(DefaultsValues);
 
+const parseJsonValue = (value: string, flagName: string) =>
+  Effect.try({
+    try: (): unknown => JSON.parse(value),
+    catch: (error: unknown) =>
+      new Error(`Failed to parse ${flagName} JSON: ${String(error)}`),
+  });
+
 const getCommand = Command.make(
   "get",
   {
@@ -74,12 +81,7 @@ const patchCommand = Command.make(
       const client = yield* RpcApiClient;
       const rawValues = yield* Option.match(opts.values, {
         onNone: () => readStdin,
-        onSome: (value) =>
-          Effect.try({
-            try: () => JSON.parse(value),
-            catch: (error: unknown) =>
-              new Error(`Failed to parse --values JSON: ${String(error)}`),
-          }),
+        onSome: (value) => parseJsonValue(value, "--values"),
       });
       const values = yield* decodeDefaultsValues(rawValues);
       const updated = yield* client.DefaultsPatchNamespace({
