@@ -1,0 +1,64 @@
+packages/practice-planner/src/components/split-node.tsx
+  1afd96eae1e095f5 25
+packages/practice-planner/src/routes/playbook/index.tsx
+  72b1a1a6c7b08f89 173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "9b03b7d81ce1aaa01e41a6615e691d5628f6bf99",
+  "prompts": {
+    "1afd96eae1e095f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 571,
+      "total_deletions": 0,
+      "accepted_lines": 571,
+      "overriden_lines": 0
+    },
+    "72b1a1a6c7b08f89": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "637db12c-51c0-4ec4-928b-5223050d513e",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "d94c7ed80c4875ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c320e307-d33c-47e5-87a1-349cf9f556da",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 399,
+      "overriden_lines": 0
+    },
+    "ea6005f66482b74f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79ff011-fdbf-4690-8d4f-03e64d83366a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 19,
+      "overriden_lines": 0
+    }
+  }
+}
