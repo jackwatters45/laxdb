@@ -22,10 +22,11 @@ export class HttpError extends Schema.TaggedErrorClass<HttpError>()(
 export class NetworkError extends Schema.TaggedErrorClass<NetworkError>()(
   "NetworkError",
   {
-  message: Schema.String,
-  url: Schema.String,
-  cause: Schema.optional(Schema.Unknown),
-}) {}
+    message: Schema.String,
+    url: Schema.String,
+    cause: Schema.optional(Schema.Unknown),
+  },
+) {}
 
 /**
  * Request timeout error.
@@ -34,10 +35,11 @@ export class NetworkError extends Schema.TaggedErrorClass<NetworkError>()(
 export class TimeoutError extends Schema.TaggedErrorClass<TimeoutError>()(
   "TimeoutError",
   {
-  message: Schema.String,
-  url: Schema.String,
-  timeoutMs: Schema.optional(Schema.Number),
-}) {}
+    message: Schema.String,
+    url: Schema.String,
+    timeoutMs: Schema.optional(Schema.Number),
+  },
+) {}
 
 /**
  * Rate limit error (HTTP 429).
@@ -46,10 +48,11 @@ export class TimeoutError extends Schema.TaggedErrorClass<TimeoutError>()(
 export class RateLimitError extends Schema.TaggedErrorClass<RateLimitError>()(
   "RateLimitError",
   {
-  message: Schema.String,
-  url: Schema.String,
-  retryAfterMs: Schema.optional(Schema.Number),
-}) {}
+    message: Schema.String,
+    url: Schema.String,
+    retryAfterMs: Schema.optional(Schema.Number),
+  },
+) {}
 
 /**
  * Schema parsing/validation error.
@@ -73,16 +76,17 @@ export class ParseError extends Schema.TaggedErrorClass<ParseError>()(
 export class GraphQLError extends Schema.TaggedErrorClass<GraphQLError>()(
   "GraphQLError",
   {
-  message: Schema.String,
-  errors: Schema.Array(
-    Schema.Struct({
-      message: Schema.String,
-      path: Schema.optional(
-        Schema.Array(Schema.Union([Schema.String, Schema.Number])),
-      ),
-    }),
-  ),
-}) {}
+    message: Schema.String,
+    errors: Schema.Array(
+      Schema.Struct({
+        message: Schema.String,
+        path: Schema.optional(
+          Schema.Array(Schema.Union([Schema.String, Schema.Number])),
+        ),
+      }),
+    ),
+  },
+) {}
 
 export type PipelineError =
   | HttpError

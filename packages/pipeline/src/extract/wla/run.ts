@@ -11,9 +11,9 @@
  *   bun src/extract/wla/run.ts --status
  */
 
-import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
+import { Command, Flag } from "effect/unstable/cli";
 
 import {
   forceOption,

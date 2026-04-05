@@ -47,7 +47,9 @@ export class PLLStandingsRequest extends Schema.Class<PLLStandingsRequest>(
   "PLLStandingsRequest",
 )({
   year: PLLYear,
-  champSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
+  champSeries: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => false),
+  ),
 }) {}
 
 export class PLLPlayerStats extends Schema.Class<PLLPlayerStats>(
@@ -180,10 +182,18 @@ export class PLLPlayersRequest extends Schema.Class<PLLPlayersRequest>(
   "PLLPlayersRequest",
 )({
   season: PLLYear,
-  league: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "PLL" )),
-  includeReg: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
-  includePost: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
-  includeZPP: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
+  league: Schema.optional(Schema.String).pipe(
+    Schema.withDecodingDefault(() => "PLL"),
+  ),
+  includeReg: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => true),
+  ),
+  includePost: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => false),
+  ),
+  includeZPP: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => false),
+  ),
   limit: Schema.optional(PositiveLimit),
 }) {}
 
@@ -216,9 +226,9 @@ export class PLLStatLeadersRequest extends Schema.Class<PLLStatLeadersRequest>(
   "PLLStatLeadersRequest",
 )({
   year: PLLYear,
-  seasonSegment: Schema.optional(
-    Schema.Literals(["regular", "post"]),
-  ).pipe(Schema.withDecodingDefault(() => "regular" as const)),
+  seasonSegment: Schema.optional(Schema.Literals(["regular", "post"])).pipe(
+    Schema.withDecodingDefault(() => "regular" as const),
+  ),
   statList: Schema.optional(Schema.Array(Schema.String)),
   limit: Schema.optional(PositiveLimit),
 }) {}
@@ -348,8 +358,12 @@ export class PLLAdvancedPlayersRequest extends Schema.Class<PLLAdvancedPlayersRe
   "PLLAdvancedPlayersRequest",
 )({
   year: PLLYear,
-  limit: Schema.optional(PositiveLimit).pipe(Schema.withDecodingDefault(() => 250 )),
-  league: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "PLL" )),
+  limit: Schema.optional(PositiveLimit).pipe(
+    Schema.withDecodingDefault(() => 250),
+  ),
+  league: Schema.optional(Schema.String).pipe(
+    Schema.withDecodingDefault(() => "PLL"),
+  ),
 }) {}
 
 // Team stats (shared between regular, post, and champSeries)
@@ -456,9 +470,12 @@ export class PLLTeamsRequest extends Schema.Class<PLLTeamsRequest>(
   "PLLTeamsRequest",
 )({
   year: PLLYear,
-  sortBy: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "points" )),
-  includeChampSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false,
-  )),
+  sortBy: Schema.optional(Schema.String).pipe(
+    Schema.withDecodingDefault(() => "points"),
+  ),
+  includeChampSeries: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => false),
+  ),
 }) {}
 
 export class PLLCareerStatsPlayer extends Schema.Class<PLLCareerStatsPlayer>(
@@ -671,8 +688,9 @@ export class PLLTeamDetailRequest extends Schema.Class<PLLTeamDetailRequest>(
   year: Schema.optional(PLLYear),
   statsYear: Schema.optional(PLLYear),
   eventsYear: Schema.optional(PLLYear),
-  includeChampSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false,
-  )),
+  includeChampSeries: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => false),
+  ),
 }) {}
 
 export class PLLTeamStatsOnly extends Schema.Class<PLLTeamStatsOnly>(
@@ -772,8 +790,12 @@ export class PLLEventsRequest extends Schema.Class<PLLEventsRequest>(
   "PLLEventsRequest",
 )({
   year: PLLYear,
-  includeCS: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
-  includeWLL: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
+  includeCS: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => true),
+  ),
+  includeWLL: Schema.optional(Schema.Boolean).pipe(
+    Schema.withDecodingDefault(() => true),
+  ),
 }) {}
 
 export class PLLPlayLog extends Schema.Class<PLLPlayLog>("PLLPlayLog")({

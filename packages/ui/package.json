@@ -26,9 +26,11 @@
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
     "typecheck": "tsgo --build",
-    "lint": "oxlint --fix",
-    "format": "oxfmt",
-    "fix": "bun run lint && bun run format"
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

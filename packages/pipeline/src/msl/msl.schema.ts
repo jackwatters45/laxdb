@@ -8,9 +8,11 @@ import { Schema } from "effect";
 export const MSLSeasonId = Schema.Number.check(
   Schema.isInt(),
   Schema.isGreaterThan(0),
-).pipe(Schema.brand("MSLSeasonId")).annotate({
-  description: "MSL Gamesheet season ID (e.g., 9567 for 2025)",
-});
+)
+  .pipe(Schema.brand("MSLSeasonId"))
+  .annotate({
+    description: "MSL Gamesheet season ID (e.g., 9567 for 2025)",
+  });
 export type MSLSeasonId = typeof MSLSeasonId.Type;
 
 // Year to Gamesheet Season ID mapping

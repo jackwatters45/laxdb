@@ -21,7 +21,7 @@ function GraphPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [positions, setPositions] = useState<Map<string, NodePosition>>(new Map());
+  const [positions, setPositions] = useState(new Map());
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);

@@ -93,7 +93,7 @@ export function QuickPlanModal({
               <ToggleGroup
                 value={[String(duration)]}
                 onValueChange={(values) => {
-                  const next = values[0] as string | undefined;
+                  const next = values[0];
                   if (next) setDuration(parseInt(next, 10));
                 }}
                 variant="outline"

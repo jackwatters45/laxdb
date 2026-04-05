@@ -10,9 +10,9 @@
  *   bun src/extract/msl/run.ts --status
  */
 
-import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer } from "effect";
+import { Command, Flag } from "effect/unstable/cli";
 
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
 import {

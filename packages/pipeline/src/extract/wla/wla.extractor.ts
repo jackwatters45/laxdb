@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 
 import { WLAClient } from "../../wla/wla.client";
 import type {
@@ -20,10 +20,7 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type {
-  WLAExtractionManifest,
-  WLASeasonManifest,
-} from "./wla.manifest";
+import type { WLAExtractionManifest, WLASeasonManifest } from "./wla.manifest";
 import { WLAManifestService } from "./wla.manifest";
 
 // WLA seasons range from 2005 to 2025 (21 seasons)
@@ -72,7 +69,10 @@ export class WLAExtractorService extends ServiceMap.Service<WLAExtractorService>
             }
             return emptyExtractResult([] as readonly WLATeam[]);
           }
-          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(seasonId, "teams"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );

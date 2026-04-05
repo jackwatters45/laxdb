@@ -18,9 +18,11 @@
     "test:db:up": "docker compose -f ../../docker-compose.test.yml up -d",
     "test:db:down": "docker compose -f ../../docker-compose.test.yml down",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --type-aware --fix",
-    "format": "oxfmt",
-    "fix": "bun run lint && bun run format"
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.972.0",

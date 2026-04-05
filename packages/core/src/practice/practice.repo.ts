@@ -222,7 +222,10 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
               db
                 .delete(practiceEdgeTable)
                 .where(
-                  eq(practiceEdgeTable.practicePublicId, input.practicePublicId),
+                  eq(
+                    practiceEdgeTable.practicePublicId,
+                    input.practicePublicId,
+                  ),
                 ),
             );
 

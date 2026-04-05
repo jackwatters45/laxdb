@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import type { Schema } from "effect";
 
 import { ParseError } from "./error";
 
@@ -11,6 +11,22 @@ export const mapParseError = (error: Schema.SchemaError): ParseError =>
     message: `Invalid request: ${String(error)}`,
     cause: error,
   });
+
+/**
+ * Formats unknown errors without relying on Object's default stringification.
+ */
+export const formatUnknownError = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (
+    typeof error === "number" ||
+    typeof error === "boolean" ||
+    typeof error === "bigint"
+  )
+    return String(error);
+  if (typeof error === "symbol") return error.description ?? error.toString();
+  return "Unknown error";
+};
 
 /**
  * Safely converts an unknown value to a string.

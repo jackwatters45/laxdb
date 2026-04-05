@@ -14,9 +14,11 @@
     "test:msl": "bun --bun vitest run src/msl/",
     "test:wla": "bun --bun vitest run src/wla/",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --type-aware --fix",
-    "format": "oxfmt",
-    "fix": "bun run lint && bun run format"
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
     "@effect/platform-bun": "^4.0.0-beta.43",

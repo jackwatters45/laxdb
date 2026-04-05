@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
 import { BunServices } from "@effect/platform-bun";
-import { PlatformError, systemError } from "effect/PlatformError";
 import { Effect, Exit, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { type PlatformError, systemError } from "effect/PlatformError";
 import { describe, expect, it } from "vitest";
 
 import { GraphQLError } from "../api-client/graphql.service";
@@ -12,8 +12,8 @@ import {
   RateLimitError,
   TimeoutError,
 } from "../error";
-
 import { expectErrorInstance, getFailureError } from "../test-helpers";
+
 import { isCriticalError, saveJson } from "./util";
 
 describe("saveJson", () => {

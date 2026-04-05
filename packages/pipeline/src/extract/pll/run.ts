@@ -10,9 +10,9 @@
  *   infisical run --env=dev -- bun src/extract/pll/run.ts --status
  */
 
-import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, Option } from "effect";
+import { Command, Flag } from "effect/unstable/cli";
 
 import {
   forceOption,

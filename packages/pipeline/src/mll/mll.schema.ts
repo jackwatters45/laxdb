@@ -5,9 +5,11 @@ import { Schema } from "effect";
 export const MLLYear = Schema.Number.check(
   Schema.isInt(),
   Schema.isBetween({ minimum: 2001, maximum: 2020 }),
-).pipe(Schema.brand("MLLYear")).annotate({
-  description: "MLL season year (2001-2020)",
-});
+)
+  .pipe(Schema.brand("MLLYear"))
+  .annotate({
+    description: "MLL season year (2001-2020)",
+  });
 export type MLLYear = typeof MLLYear.Type;
 
 // MLL Team response schema

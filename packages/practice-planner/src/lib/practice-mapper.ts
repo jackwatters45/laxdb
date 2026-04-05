@@ -26,7 +26,9 @@ export function fromDb(
   dbItems: readonly (typeof DbItem.Type)[],
   dbEdges: readonly (typeof DbPracticeEdge.Type)[],
 ): PracticeGraph {
-  const sortedItems = [...dbItems].toSorted((a, b) => a.orderIndex - b.orderIndex);
+  const sortedItems = [...dbItems].toSorted(
+    (a, b) => a.orderIndex - b.orderIndex,
+  );
 
   const nodes: PracticeNode[] = sortedItems.map((item) => ({
     id: item.publicId,
@@ -50,7 +52,8 @@ export function fromDb(
       ? dbEdges
           .filter(
             (edge) =>
-              nodeIds.has(edge.sourcePublicId) && nodeIds.has(edge.targetPublicId),
+              nodeIds.has(edge.sourcePublicId) &&
+              nodeIds.has(edge.targetPublicId),
           )
           .map((edge) => ({
             id: edge.publicId,
@@ -60,8 +63,11 @@ export function fromDb(
           }))
       : deriveLinearEdges(nodes);
 
-  const allZero = nodes.every((node) => node.position.x === 0 && node.position.y === 0);
-  const finalNodes = allZero && nodes.length > 0 ? autoLayout(nodes, edges).nodes : nodes;
+  const allZero = nodes.every(
+    (node) => node.position.x === 0 && node.position.y === 0,
+  );
+  const finalNodes =
+    allZero && nodes.length > 0 ? autoLayout(nodes, edges).nodes : nodes;
 
   return {
     id: dbPractice.publicId,
@@ -78,7 +84,9 @@ export function fromDb(
 }
 
 /** Strip UI-only nodes/edges before persistence. */
-export function toPersistedGraph(practice: PracticeGraph): PersistedPracticeGraph {
+export function toPersistedGraph(
+  practice: PracticeGraph,
+): PersistedPracticeGraph {
   const nodes = practice.nodes.filter((node) => node.variant !== "start");
   const persistedIds = new Set(nodes.map((node) => node.id));
   const edges = practice.edges.filter(

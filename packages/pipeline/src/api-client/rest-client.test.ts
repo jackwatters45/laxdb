@@ -2,7 +2,6 @@ import { Effect, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HttpError, NetworkError, ParseError, RateLimitError } from "../error";
-
 import { expectErrorInstance, getFailureError } from "../test-helpers";
 
 import { makeRestClient } from "./rest-client.service";

@@ -22,7 +22,7 @@ export function SplitNodeModal({
   onClose,
   onConfirm,
 }: SplitNodeModalProps) {
-  const [groups, setGroups] = useState<string[]>(["Offense", "Defense"]);
+  const [groups, setGroups] = useState(["Offense", "Defense"]);
   const [newGroup, setNewGroup] = useState("");
 
   useEffect(() => {

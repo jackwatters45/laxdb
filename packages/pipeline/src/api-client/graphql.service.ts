@@ -129,7 +129,9 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       });
 
       const responseSchema = GraphQLResponse(dataSchema);
-      const decoded = yield* Schema.decodeUnknownEffect(responseSchema)(json).pipe(
+      const decoded = yield* Schema.decodeUnknownEffect(responseSchema)(
+        json,
+      ).pipe(
         Effect.mapError(
           (error) =>
             new ParseError({

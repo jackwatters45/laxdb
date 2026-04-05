@@ -19,7 +19,7 @@ export function useCanvasControls({
   panelOpen,
   setPractice,
 }: UseCanvasControlsOptions) {
-  const [transform, setTransform] = useState<CanvasTransform>({
+  const [transform, setTransform] = useState({
     x: 500,
     y: 40,
     scale: 0.75,

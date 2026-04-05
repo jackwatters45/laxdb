@@ -139,7 +139,8 @@ export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
         fetchWithRetry,
       } as const;
     }),
-}) {
+  },
+) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(PipelineConfig.layer)),
   );

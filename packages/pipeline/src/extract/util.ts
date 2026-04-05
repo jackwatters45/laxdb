@@ -1,9 +1,9 @@
 import { relative } from "node:path";
 
+import { Duration, Effect, Result, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
-import { Duration, Effect, Result, Schema } from "effect";
 
 import { type PipelineError, type RateLimitError } from "../error";
 
@@ -14,10 +14,11 @@ import { type PipelineError, type RateLimitError } from "../error";
 export class FileWriteError extends Schema.TaggedErrorClass<FileWriteError>()(
   "FileWriteError",
   {
-  message: Schema.String,
-  filePath: Schema.String,
-  cause: Schema.optional(Schema.Unknown),
-}) {}
+    message: Schema.String,
+    filePath: Schema.String,
+    cause: Schema.optional(Schema.Unknown),
+  },
+) {}
 
 /**
  * Saves data as JSON to a file path.
