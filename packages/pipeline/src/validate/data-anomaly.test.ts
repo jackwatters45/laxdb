@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const PlayerDetailSchema = Schema.Struct({
@@ -108,7 +108,16 @@ const VALID_TEAM_IDS = new Set([
   "WAT",
   "WHP",
 ]);
-const VALID_POSITIONS = new Set(["A", "M", "D", "G", "FO", "LSM", "SSDM", null]);
+const VALID_POSITIONS = new Set([
+  "A",
+  "M",
+  "D",
+  "G",
+  "FO",
+  "LSM",
+  "SSDM",
+  null,
+]);
 
 const parseJsonArray = <A>(
   content: string,
@@ -200,7 +209,9 @@ beforeAll(async () => {
 
 const requireLoadedData = (): boolean => {
   if (!hasLoadedData) {
-    console.warn("Skipping PLL anomaly assertions because local output/pll data is missing.");
+    console.warn(
+      "Skipping PLL anomaly assertions because local output/pll data is missing.",
+    );
     return false;
   }
   return true;
@@ -358,7 +369,9 @@ describe("Data Anomaly Detection", () => {
     });
 
     it("inPlayerDetails flag should be accurate", () => {
-      const playerDetailSlugs = new Set(playerDetails.map((player) => player.slug));
+      const playerDetailSlugs = new Set(
+        playerDetails.map((player) => player.slug),
+      );
       const violations: string[] = [];
 
       for (const player of careerStats) {
@@ -436,7 +449,9 @@ describe("Data Anomaly Detection", () => {
       const violations: string[] = [];
       for (const [slug, ids] of playerIdsBySlug) {
         if (ids.size > 1) {
-          violations.push(`${slug}: multiple officialIds: ${[...ids].join(", ")}`);
+          violations.push(
+            `${slug}: multiple officialIds: ${[...ids].join(", ")}`,
+          );
         }
       }
 
@@ -465,7 +480,9 @@ describe("Data Anomaly Detection", () => {
       }
 
       if (violations.length > 0) {
-        console.warn(`Team record anomalies: ${violations.slice(0, 5).join("\n")}`);
+        console.warn(
+          `Team record anomalies: ${violations.slice(0, 5).join("\n")}`,
+        );
       }
       expect(violations.length).toBeLessThan(20);
     });
@@ -500,7 +517,9 @@ describe("Data Anomaly Detection", () => {
         slugCounts.set(player.slug, (slugCounts.get(player.slug) ?? 0) + 1);
       }
 
-      const duplicates = [...slugCounts.entries()].filter(([, count]) => count > 1);
+      const duplicates = [...slugCounts.entries()].filter(
+        ([, count]) => count > 1,
+      );
       expect(duplicates).toHaveLength(0);
     });
 
@@ -508,10 +527,15 @@ describe("Data Anomaly Detection", () => {
       const idCounts = new Map<string, number>();
 
       for (const player of playerDetails) {
-        idCounts.set(player.officialId, (idCounts.get(player.officialId) ?? 0) + 1);
+        idCounts.set(
+          player.officialId,
+          (idCounts.get(player.officialId) ?? 0) + 1,
+        );
       }
 
-      const duplicates = [...idCounts.entries()].filter(([, count]) => count > 1);
+      const duplicates = [...idCounts.entries()].filter(
+        ([, count]) => count > 1,
+      );
       expect(duplicates).toHaveLength(0);
     });
 
@@ -530,7 +554,9 @@ describe("Data Anomaly Detection", () => {
           { goals: 0, assists: 0, gamesPlayed: 0 },
         );
 
-        const goalDiff = Math.abs(seasonTotals.goals - player.careerStats.goals);
+        const goalDiff = Math.abs(
+          seasonTotals.goals - player.careerStats.goals,
+        );
         const assistDiff = Math.abs(
           seasonTotals.assists - player.careerStats.assists,
         );
@@ -559,7 +585,9 @@ describe("Data Anomaly Detection", () => {
     it("should have career stats for PLL and MLL players", () => {
       if (!requireLoadedData()) return;
 
-      const pllCount = careerStats.filter((player) => player.likelySource === "pll").length;
+      const pllCount = careerStats.filter(
+        (player) => player.likelySource === "pll",
+      ).length;
       const mllCount = careerStats.filter(
         (player) => player.likelySource === "mll_or_retired",
       ).length;

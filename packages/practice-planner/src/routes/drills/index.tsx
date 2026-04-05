@@ -176,7 +176,7 @@ function DrillsListPage() {
             <ToggleGroup
               value={[activeCategory]}
               onValueChange={(values) => {
-                const next = values[0] as string | undefined;
+                const next = values[0];
                 if (next) setActiveCategory(next);
               }}
               variant="outline"
@@ -194,7 +194,7 @@ function DrillsListPage() {
             <ToggleGroup
               value={[activeDifficulty]}
               onValueChange={(values) => {
-                const next = values[0] as string | undefined;
+                const next = values[0];
                 if (next) setActiveDifficulty(next);
               }}
               variant="outline"

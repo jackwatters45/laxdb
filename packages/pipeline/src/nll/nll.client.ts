@@ -37,9 +37,9 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
         input: typeof NLLTeamsRequest.Encoded,
       ): Effect.Effect<readonly NLLTeam[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decodeUnknownEffect(NLLTeamsRequest)(input).pipe(
-            Effect.mapError(mapParseError),
-          );
+          const request = yield* Schema.decodeUnknownEffect(NLLTeamsRequest)(
+            input,
+          ).pipe(Effect.mapError(mapParseError));
           const endpoint = `?data_type=teams&season_id=${request.seasonId}`;
           return yield* restClient.get(endpoint, NLLTeamsResponse);
         }).pipe(
@@ -54,9 +54,9 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
         input: typeof NLLPlayersRequest.Encoded,
       ): Effect.Effect<readonly NLLPlayer[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decodeUnknownEffect(NLLPlayersRequest)(input).pipe(
-            Effect.mapError(mapParseError),
-          );
+          const request = yield* Schema.decodeUnknownEffect(NLLPlayersRequest)(
+            input,
+          ).pipe(Effect.mapError(mapParseError));
           const endpoint = `?data_type=players&season_id=${request.seasonId}`;
           return yield* restClient.get(endpoint, NLLPlayersResponse);
         }).pipe(
@@ -71,9 +71,9 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
         input: typeof NLLStandingsRequest.Encoded,
       ): Effect.Effect<readonly NLLStanding[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decodeUnknownEffect(NLLStandingsRequest)(input).pipe(
-            Effect.mapError(mapParseError),
-          );
+          const request = yield* Schema.decodeUnknownEffect(
+            NLLStandingsRequest,
+          )(input).pipe(Effect.mapError(mapParseError));
           const endpoint = `?data_type=standings&season_id=${request.seasonId}`;
           return yield* restClient.get(endpoint, NLLStandingsResponse);
         }).pipe(
@@ -88,9 +88,9 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
         input: typeof NLLScheduleRequest.Encoded,
       ): Effect.Effect<readonly NLLMatch[], PipelineError> =>
         Effect.gen(function* () {
-          const request = yield* Schema.decodeUnknownEffect(NLLScheduleRequest)(input).pipe(
-            Effect.mapError(mapParseError),
-          );
+          const request = yield* Schema.decodeUnknownEffect(NLLScheduleRequest)(
+            input,
+          ).pipe(Effect.mapError(mapParseError));
           const endpoint = `?data_type=schedule&season_id=${request.seasonId}`;
           return yield* restClient.get(endpoint, NLLScheduleResponse);
         }).pipe(
@@ -194,7 +194,7 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
           ),
         ),
     };
-  })
+  }),
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(NLLConfig.layer, PipelineConfig.layer)),

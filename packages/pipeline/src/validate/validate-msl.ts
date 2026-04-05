@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 
 import { ExtractConfigService } from "../extract/extract.config";
 
@@ -382,9 +382,6 @@ const program = Effect.gen(function* () {
   return report;
 });
 
-const MainLayer = Layer.mergeAll(
-  ExtractConfigService.layer,
-  BunServices.layer,
-);
+const MainLayer = Layer.mergeAll(ExtractConfigService.layer, BunServices.layer);
 
 BunRuntime.runMain(program.pipe(Effect.provide(MainLayer)));

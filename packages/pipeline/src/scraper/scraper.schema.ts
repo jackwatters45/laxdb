@@ -9,8 +9,9 @@ export class ScrapeRequest extends Schema.Class<ScrapeRequest>("ScrapeRequest")(
     ),
     headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
     timeoutMs: Schema.optional(Schema.Number),
-    followRedirects: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true,
-    )),
+    followRedirects: Schema.optional(Schema.Boolean).pipe(
+      Schema.withDecodingDefault(() => true),
+    ),
   },
 ) {}
 

@@ -1,8 +1,8 @@
+import { BunServices } from "@effect/platform-bun";
+import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
-import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
 
 import { PLLClient } from "../../pll/pll.client";
 import {
@@ -27,10 +27,7 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import {
-  type PLLExtractionManifest,
-  PLLManifestService,
-} from "./pll.manifest";
+import { type PLLExtractionManifest, PLLManifestService } from "./pll.manifest";
 
 const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
 
@@ -82,7 +79,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
             }
             return emptyExtractResult([] as readonly PLLTeam[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "teams"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "teams"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
@@ -151,7 +151,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
             }
             return emptyExtractResult([] as readonly PLLPlayer[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "players"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "players"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
@@ -253,7 +256,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
             }
             return emptyExtractResult([] as readonly PLLEvent[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "events"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "events"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} events (${result.success.durationMs}ms)`,
           );
@@ -315,7 +321,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
             }
             return emptyExtractResult([] as readonly PLLTeamStanding[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "standings"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "standings"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
@@ -402,9 +411,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
                 Effect.log(`Successfully decoded teams for ${year}`),
               ),
               Effect.catch((error) =>
-                Effect.logError(`Failed to decode teams for ${year}`, error).pipe(
-                  Effect.andThen(Effect.succeed([])),
-                ),
+                Effect.logError(
+                  `Failed to decode teams for ${year}`,
+                  error,
+                ).pipe(Effect.andThen(Effect.succeed([]))),
               ),
             );
             if (teams.length > 0) {
@@ -466,9 +476,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
                 Effect.log(`Successfully decoded players for ${year}`),
               ),
               Effect.catch((error) =>
-                Effect.logError(`Failed to decode players for ${year}`, error).pipe(
-                  Effect.andThen(Effect.succeed([])),
-                ),
+                Effect.logError(
+                  `Failed to decode players for ${year}`,
+                  error,
+                ).pipe(Effect.andThen(Effect.succeed([]))),
               ),
             );
             if (players.length > 0) {
@@ -517,9 +528,10 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
                 Effect.log(`Successfully decoded events for ${year}`),
               ),
               Effect.catch((error) =>
-                Effect.logError(`Failed to decode events for ${year}`, error).pipe(
-                  Effect.andThen(Effect.succeed([])),
-                ),
+                Effect.logError(
+                  `Failed to decode events for ${year}`,
+                  error,
+                ).pipe(Effect.andThen(Effect.succeed([]))),
               ),
             );
             if (events.length > 0) {

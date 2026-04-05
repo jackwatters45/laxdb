@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 
 import { MSLClient } from "../../msl/msl.client";
 import type {
@@ -20,10 +20,7 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type {
-  MSLExtractionManifest,
-  MSLSeasonManifest,
-} from "./msl.manifest";
+import type { MSLExtractionManifest, MSLSeasonManifest } from "./msl.manifest";
 import { MSLManifestService } from "./msl.manifest";
 
 // MSL seasons available on Gamesheet (2023-2025)
@@ -74,7 +71,10 @@ export class MSLExtractorService extends ServiceMap.Service<MSLExtractorService>
             }
             return emptyExtractResult([] as readonly MSLTeam[]);
           }
-          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(seasonId, "teams"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );

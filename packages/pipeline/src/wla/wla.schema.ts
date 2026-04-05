@@ -42,9 +42,11 @@ export const WLA_POINTSTREAK_YEARS = Object.keys(WLA_POINTSTREAK_SEASONS)
 export const WLASeasonId = Schema.Number.check(
   Schema.isInt(),
   Schema.isBetween({ minimum: 2005, maximum: 2035 }),
-).pipe(Schema.brand("WLASeasonId")).annotate({
-  description: "WLA season year (e.g., 2024 for the 2024 season)",
-});
+)
+  .pipe(Schema.brand("WLASeasonId"))
+  .annotate({
+    description: "WLA season year (e.g., 2024 for the 2024 season)",
+  });
 export type WLASeasonId = typeof WLASeasonId.Type;
 
 // WLA Team response schema

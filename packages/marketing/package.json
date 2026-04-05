@@ -10,9 +10,11 @@
     "start": "node .output/server/index.mjs",
     "serve": "vite preview",
     "typecheck": "tsgo --noEmit",
-    "lint": "oxlint --type-aware --fix",
-    "format": "oxfmt",
-    "fix": "bun run lint && bun run format"
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.19.0",

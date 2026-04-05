@@ -1,7 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env", ".env.*", "tsconfig.json"],
-  "globalEnv": ["NODE_ENV", "CI"],
+  "globalDependencies": [
+    ".env",
+    ".env.*",
+    "tsconfig.json"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI"
+  ],
   "globalPassThroughEnv": [
     "CLOUDFLARE_ACCOUNT_ID",
     "CLOUDFLARE_API_TOKEN",
@@ -11,7 +18,9 @@
   ],
   "tasks": {
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
       "inputs": [
         "src/**/*.ts",
         "src/**/*.tsx",
@@ -21,12 +30,21 @@
       "outputs": []
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".output/**"],
-      "env": ["VITE_*"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".output/**"
+      ],
+      "env": [
+        "VITE_*"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "src/**/*.ts",
         "src/**/*.tsx",
@@ -35,22 +53,53 @@
         "vitest.config.ts",
         "package.json"
       ],
-      "outputs": ["coverage/**"],
-      "env": ["DATABASE_URL", "TEST_*"]
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "TEST_*"
+      ]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ],
+      "outputs": []
     },
     "format": {
-      "dependsOn": ["^format"]
+      "dependsOn": [
+        "^format"
+      ],
+      "outputs": []
     },
     "fix": {
-      "dependsOn": ["^fix"]
+      "dependsOn": [
+        "^fix"
+      ],
+      "cache": false,
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": [
+        "^lint:fix"
+      ],
+      "cache": false,
+      "outputs": []
+    },
+    "format:fix": {
+      "dependsOn": [
+        "^format:fix"
+      ],
+      "cache": false,
+      "outputs": []
     }
   }
 }

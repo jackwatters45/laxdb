@@ -1,7 +1,7 @@
+import { BunServices } from "@effect/platform-bun";
+import { Effect, type Scope } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
-import { BunServices } from "@effect/platform-bun";
-import { Effect, Scope } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -243,7 +243,14 @@ describe("crossReference", () => {
     const target = [{ id: "A" }, { id: "B" }, { id: "C" }];
 
     const result = await Effect.runPromise(
-      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+      crossReference(
+        source,
+        target,
+        "foreignKey",
+        "id",
+        "source.json",
+        "target.json",
+      ),
     );
 
     expect(result.totalSourceRecords).toBe(2);
@@ -261,7 +268,14 @@ describe("crossReference", () => {
     const target = [{ id: "A" }, { id: "B" }];
 
     const result = await Effect.runPromise(
-      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+      crossReference(
+        source,
+        target,
+        "foreignKey",
+        "id",
+        "source.json",
+        "target.json",
+      ),
     );
 
     expect(result.totalSourceRecords).toBe(3);
@@ -275,7 +289,14 @@ describe("crossReference", () => {
     const target = [{ id: "A" }];
 
     const result = await Effect.runPromise(
-      crossReference(source, target, "foreignKey", "id", "source.json", "target.json"),
+      crossReference(
+        source,
+        target,
+        "foreignKey",
+        "id",
+        "source.json",
+        "target.json",
+      ),
     );
 
     expect(result.matchedRecords).toBe(1);

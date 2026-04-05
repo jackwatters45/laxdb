@@ -9,6 +9,8 @@
 
 import { Effect, Duration } from "effect";
 
+import { formatUnknownError } from "../util";
+
 import { PLLClient } from "./pll.client";
 import type { PLLPlayer, PLLTeam, PLLEvent } from "./pll.schema";
 
@@ -117,7 +119,9 @@ const exploreYear = (year: number) =>
       .pipe(
         Effect.catch((e) => {
           return Effect.gen(function* () {
-            yield* Effect.log(`     ⚠️ Error fetching players: ${String(e)}`);
+            yield* Effect.log(
+              `     ⚠️ Error fetching players: ${formatUnknownError(e)}`,
+            );
             return [] as readonly PLLPlayer[];
           });
         }),

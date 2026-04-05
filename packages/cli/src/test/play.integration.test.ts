@@ -17,7 +17,6 @@ let testServer: TestServer;
 const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
-
 beforeAll(async () => {
   testServer = await startTestServer();
 });
@@ -120,7 +119,10 @@ describe("Play RPC", () => {
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
         const created = yield* Effect.forEach(
-          [minimalPlay, { ...minimalPlay, name: "Clear 1", category: "clear" as const }],
+          [
+            minimalPlay,
+            { ...minimalPlay, name: "Clear 1", category: "clear" as const },
+          ],
           (item) => client.PlayCreate(item),
           { concurrency: 5 },
         );

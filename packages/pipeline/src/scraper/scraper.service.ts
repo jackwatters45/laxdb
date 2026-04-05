@@ -1,6 +1,7 @@
 import { Effect, Schema, Array as Arr, ServiceMap, Layer } from "effect";
 
 import { PipelineConfig } from "../config";
+import { formatUnknownError } from "../util";
 
 import { ScraperClient } from "./scraper.client";
 import {
@@ -20,7 +21,8 @@ export class ScraperService extends ServiceMap.Service<ScraperService>()(
       return {
         scrape: (input: ScrapeRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decodeUnknownEffect(ScrapeRequest)(input);
+            const request =
+              yield* Schema.decodeUnknownEffect(ScrapeRequest)(input);
             return yield* client.fetchWithRetry(request);
           }).pipe(
             Effect.tap((response) =>
@@ -29,13 +31,14 @@ export class ScraperService extends ServiceMap.Service<ScraperService>()(
               ),
             ),
             Effect.tapError((error) =>
-              Effect.logError(`Failed to scrape: ${String(error)}`),
+              Effect.logError(`Failed to scrape: ${formatUnknownError(error)}`),
             ),
           ),
 
         scrapeBatch: (input: BatchScrapeRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decodeUnknownEffect(BatchScrapeRequest)(input);
+            const request =
+              yield* Schema.decodeUnknownEffect(BatchScrapeRequest)(input);
             const startTime = Date.now();
 
             const concurrency = request.concurrency ?? config.maxConcurrency;
@@ -64,7 +67,7 @@ export class ScraperService extends ServiceMap.Service<ScraperService>()(
                         url,
                         success: false,
                         response: undefined,
-                        error: String(error),
+                        error: formatUnknownError(error),
                       }),
                     ),
                   ),
@@ -111,13 +114,14 @@ export class ScraperService extends ServiceMap.Service<ScraperService>()(
                 accessible: false,
                 statusCode: undefined,
                 durationMs: Date.now(),
-                error: String(error),
+                error: formatUnknownError(error),
               }),
             ),
           ),
       } as const;
     }),
-}) {
+  },
+) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(ScraperClient.layer, PipelineConfig.layer)),
   );

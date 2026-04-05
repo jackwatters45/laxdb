@@ -14,7 +14,7 @@ function nextId(prefix: string): string {
 }
 
 export function usePracticeEditor(initial: PracticeGraph) {
-  const [practice, setPracticeRaw] = useState<PracticeGraph>(initial);
+  const [practice, setPracticeRaw] = useState(initial);
   const undoStack = useRef<PracticeGraph[]>([]);
   const redoStack = useRef<PracticeGraph[]>([]);
 

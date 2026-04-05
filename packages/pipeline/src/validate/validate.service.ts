@@ -1,6 +1,6 @@
+import { Effect, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
-import { Effect, Schema } from "effect";
 
 import {
   type ValidationIssue,

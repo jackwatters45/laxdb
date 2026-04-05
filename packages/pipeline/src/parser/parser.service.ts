@@ -1,6 +1,8 @@
 import * as cheerio from "cheerio";
 import { Effect, Layer, Schema, ServiceMap } from "effect";
 
+import { formatUnknownError } from "../util";
+
 import { ParserError, SelectorError } from "./parser.error";
 import {
   type ExtractedImage,
@@ -19,7 +21,8 @@ export class ParserService extends ServiceMap.Service<ParserService>()(
       return {
         parse: (input: ParseHtmlRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decodeUnknownEffect(ParseHtmlRequest)(input);
+            const request =
+              yield* Schema.decodeUnknownEffect(ParseHtmlRequest)(input);
 
             const $ = yield* Effect.try({
               try: () => cheerio.load(request.html),
@@ -78,13 +81,16 @@ export class ParserService extends ServiceMap.Service<ParserService>()(
           }).pipe(
             Effect.tap(() => Effect.log("Parsed HTML successfully")),
             Effect.tapError((error) =>
-              Effect.logError(`Failed to parse HTML: ${String(error)}`),
+              Effect.logError(
+                `Failed to parse HTML: ${formatUnknownError(error)}`,
+              ),
             ),
           ),
 
         querySelector: (input: SelectorQuery) =>
           Effect.gen(function* () {
-            const query = yield* Schema.decodeUnknownEffect(SelectorQuery)(input);
+            const query =
+              yield* Schema.decodeUnknownEffect(SelectorQuery)(input);
 
             const $ = yield* Effect.try({
               try: () => cheerio.load(query.html),

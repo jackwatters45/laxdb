@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 
 import { NLLClient } from "../../nll/nll.client";
 import type {
@@ -65,7 +65,10 @@ export class NLLExtractorService extends ServiceMap.Service<NLLExtractorService>
             }
             return emptyExtractResult([] as readonly NLLTeam[]);
           }
-          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(seasonId, "teams"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );

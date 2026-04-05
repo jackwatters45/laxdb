@@ -27,7 +27,7 @@ jobs:
         run: bun run lint
 
       - name: Format check
-        run: bunx turbo run format -- --check
+        run: bun run format
 
   typecheck:
     name: Typecheck

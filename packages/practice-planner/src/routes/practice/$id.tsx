@@ -26,7 +26,11 @@ import { DrillsProvider } from "@/hooks/use-drills";
 import { usePracticeEditor } from "@/hooks/use-practice-editor";
 import { usePracticePersistence } from "@/hooks/use-practice-persistence";
 import { runApi } from "@/lib/api";
-import { fromDb, orderNodesByFlow, toPersistedGraph } from "@/lib/practice-mapper";
+import {
+  fromDb,
+  orderNodesByFlow,
+  toPersistedGraph,
+} from "@/lib/practice-mapper";
 import { practiceName } from "@/lib/practice-name";
 import { generateQuickPlan } from "@/lib/quick-plan";
 import type { Drill, DrillCategory, PracticeNode } from "@/types";
@@ -147,8 +151,11 @@ export const Route = createFileRoute("/practice/$id")({
 });
 
 function PracticePlannerPage() {
-  const { practice: dbPractice, items: dbItems, edges: dbEdges } =
-    Route.useLoaderData();
+  const {
+    practice: dbPractice,
+    items: dbItems,
+    edges: dbEdges,
+  } = Route.useLoaderData();
 
   const { data: drills = [] } = useQuery({
     queryKey: ["drills"],

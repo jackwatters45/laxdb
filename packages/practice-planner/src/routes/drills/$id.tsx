@@ -154,9 +154,7 @@ function DrillDetailPage() {
   const [subtitle, setSubtitle] = useState(drill.subtitle ?? "");
   const [description, setDescription] = useState(drill.description ?? "");
   const [difficulty, setDifficulty] = useState<Difficulty>(drill.difficulty);
-  const [categories, setCategories] = useState<DrillCategory[]>([
-    ...drill.category,
-  ]);
+  const [categories, setCategories] = useState([...drill.category]);
   const [positionGroups, setPositionGroups] = useState<string[]>([
     ...drill.positionGroup,
   ]);

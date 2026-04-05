@@ -5,11 +5,11 @@
  * This factory creates a manifest service given the source name and empty season manifest creator.
  */
 
+import { BunServices } from "@effect/platform-bun";
+import { Console, Effect, Layer, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
-import { BunServices } from "@effect/platform-bun";
-import { Console, Effect, Layer, Schema } from "effect";
 
 import { ExtractConfigService } from "./extract.config";
 import { isEntityStale } from "./extract.schema";
@@ -111,7 +111,9 @@ export const createManifestServiceEffect = <
         catch: (e) => new Error(`Failed to parse manifest JSON: ${String(e)}`),
       });
 
-      return yield* Schema.decodeUnknownEffect(ExtractionManifestSchema)(parsed).pipe(
+      return yield* Schema.decodeUnknownEffect(ExtractionManifestSchema)(
+        parsed,
+      ).pipe(
         Effect.catch((error) =>
           Effect.logWarning(
             `${config.source.toUpperCase()} manifest schema invalid, creating new: ${String(error)}`,

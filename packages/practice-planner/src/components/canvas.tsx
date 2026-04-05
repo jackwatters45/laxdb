@@ -109,8 +109,8 @@ export function Canvas({
               Start with your first drill
             </p>
             <p className="max-w-xs text-xs text-muted-foreground text-pretty">
-              Add a drill from your library or generate a quick plan to build the
-              practice structure.
+              Add a drill from your library or generate a quick plan to build
+              the practice structure.
             </p>
             <DrillPickerPopover onSelect={onAppendDrill}>
               <Button

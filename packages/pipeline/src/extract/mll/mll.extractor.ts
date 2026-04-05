@@ -1,7 +1,7 @@
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
 import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
 
 import { MLLClient } from "../../mll/mll.client";
 import {
@@ -21,10 +21,7 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type {
-  MLLExtractionManifest,
-  MLLSeasonManifest,
-} from "./mll.manifest";
+import type { MLLExtractionManifest, MLLSeasonManifest } from "./mll.manifest";
 import { MLLManifestService } from "./mll.manifest";
 
 // MLL operated from 2001-2020 (20 seasons)
@@ -71,7 +68,10 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
             }
             return emptyExtractResult([] as readonly MLLTeam[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "teams"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "teams"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
@@ -94,7 +94,10 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
             }
             return emptyExtractResult([] as readonly MLLPlayer[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "players"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "players"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
@@ -117,7 +120,10 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
             }
             return emptyExtractResult([] as readonly MLLGoalie[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "goalies"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "goalies"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} goalies (${result.success.durationMs}ms)`,
           );
@@ -140,7 +146,10 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
             }
             return emptyExtractResult([] as readonly MLLStanding[]);
           }
-          yield* saveOutputJson(getOutputPath(year, "standings"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "standings"),
+            result.success.data,
+          );
           yield* Effect.log(
             `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
@@ -194,7 +203,10 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
             return emptyExtractResult([] as readonly MLLGame[]);
           }
 
-          yield* saveOutputJson(getOutputPath(year, "schedule"), result.success.data);
+          yield* saveOutputJson(
+            getOutputPath(year, "schedule"),
+            result.success.data,
+          );
 
           // Get team count for coverage calculation
           const teamsPath = getOutputPath(year, "teams");

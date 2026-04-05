@@ -4,9 +4,11 @@ import { Schema, SchemaGetter } from "effect";
 export const NLLSeasonId = Schema.Number.check(
   Schema.isInt(),
   Schema.isGreaterThan(0),
-).pipe(Schema.brand("NLLSeasonId")).annotate({
-  description: "NLL season identifier (positive integer)",
-});
+)
+  .pipe(Schema.brand("NLLSeasonId"))
+  .annotate({
+    description: "NLL season identifier (positive integer)",
+  });
 export type NLLSeasonId = typeof NLLSeasonId.Type;
 
 // NLL Team response schema
@@ -218,28 +220,39 @@ const NLLPlayerMatchesRaw = Schema.Struct({
 // Note: Many fields can be missing entirely from the API response
 export class NLLPlayerRaw extends Schema.Class<NLLPlayerRaw>("NLLPlayerRaw")({
   personId: Schema.Number,
-  firstname: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  surname: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  fullname: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  dateOfBirth: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  height: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  weight: Schema.optional(Schema.NullOr(Schema.Number)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  position: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  jerseyNumber: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  team_id: Schema.optional(Schema.NullOr(Schema.Number)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  team_code: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  team_name: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  firstname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  surname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  fullname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  dateOfBirth: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  height: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  weight: Schema.optional(Schema.NullOr(Schema.Number)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  position: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  jerseyNumber: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  team_id: Schema.optional(Schema.NullOr(Schema.Number)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  team_code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  team_name: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
   matches: Schema.optional(NLLPlayerMatchesRaw),
 }) {}
 
@@ -296,7 +309,9 @@ export const PlayersMapToArray = Schema.Struct({
             team_id: player.team_id !== null ? Number(player.team_id) : null,
             team_code: player.team_code,
             team_name: player.team_name,
-            matches: player.matches ? { season: player.matches.games_played } : undefined,
+            matches: player.matches
+              ? { season: player.matches.games_played }
+              : undefined,
           },
         ]),
       ),
@@ -386,10 +401,12 @@ const NLLScheduleSquadRaw = Schema.Struct({
   id: Schema.Number,
   code: Schema.String,
   name: Schema.NullOr(Schema.String),
-  nickname: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  displayName: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  nickname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  displayName: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
   score: NLLSquadScoreRaw,
 }).annotate({ identifier: "NLLScheduleSquadRaw" });
 
@@ -402,10 +419,12 @@ const NLLScheduleSquadsRaw = Schema.Struct({
 // Raw date structure
 const NLLScheduleDateRaw = Schema.Struct({
   startDate: Schema.NullOr(Schema.String),
-  startTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  utcMatchStart: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  startTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  utcMatchStart: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
 }).annotate({ identifier: "NLLScheduleDateRaw" });
 
 // Raw status structure
@@ -413,36 +432,53 @@ const NLLScheduleStatusRaw = Schema.Struct({
   id: Schema.Number,
   name: Schema.NullOr(Schema.String),
   code: Schema.NullOr(Schema.String),
-  typeId: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0 )),
-  typeName: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  period: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0 )),
-  periodSecs: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0 )),
-  periodDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  periodTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  remainingSecs: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0 )),
-  remainingDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
-  remainingTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  typeId: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
+  typeName: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  period: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
+  periodSecs: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
+  periodDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  periodTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  remainingSecs: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
+  remainingDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  remainingTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
 }).annotate({ identifier: "NLLScheduleStatusRaw" });
 
 // Raw venue structure in schedule matches (includes timeZone)
 const NLLScheduleVenueRaw = Schema.Struct({
   id: Schema.Number,
-  code: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
   name: Schema.NullOr(Schema.String),
-  timeZone: Schema.optional(Schema.NullOr(Schema.String)).pipe(Schema.withDecodingDefault(() => null,
-  )),
+  timeZone: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
 }).annotate({ identifier: "NLLScheduleVenueRaw" });
 
 // Raw match structure in schedule response
 const NLLScheduleMatchRaw = Schema.Struct({
   id: Schema.Number,
-  weekOrder: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0 )),
+  weekOrder: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
   squads: NLLScheduleSquadsRaw,
   date: NLLScheduleDateRaw,
   status: NLLScheduleStatusRaw,
@@ -452,9 +488,7 @@ const NLLScheduleMatchRaw = Schema.Struct({
       name: Schema.NullOr(Schema.String),
       code: Schema.NullOr(Schema.String),
     }),
-  ).pipe(
-    Schema.withDecodingDefault(() => ({ id: 0, name: null, code: null })),
-  ),
+  ).pipe(Schema.withDecodingDefault(() => ({ id: 0, name: null, code: null }))),
   venue: NLLScheduleVenueRaw,
   winningSquadId: Schema.NullOr(Schema.Number),
 }).annotate({ identifier: "NLLScheduleMatchRaw" });
@@ -465,7 +499,9 @@ const NLLScheduleWeekRaw = Schema.Struct({
   code: Schema.String,
   name: Schema.NullOr(Schema.String),
   number: Schema.Number,
-  phaseNumber: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 1 )),
+  phaseNumber: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 1),
+  ),
   season_id: Schema.String,
   matches: Schema.Array(NLLScheduleMatchRaw),
 }).annotate({ identifier: "NLLScheduleWeekRaw" });

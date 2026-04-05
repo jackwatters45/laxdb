@@ -191,7 +191,9 @@ describe("PLLPlayerDetailRequest", () => {
   it("requires slug", async () => {
     const input = { statsYear: 2024 } as unknown;
     await expect(
-      Effect.runPromise(Schema.decodeUnknownEffect(PLLPlayerDetailRequest)(input)),
+      Effect.runPromise(
+        Schema.decodeUnknownEffect(PLLPlayerDetailRequest)(input),
+      ),
     ).rejects.toThrow();
   });
 });
@@ -515,7 +517,9 @@ describe("Response schemas", () => {
         ticketId: null,
         snl: null,
       };
-      const result = await Effect.runPromise(Schema.decodeUnknownEffect(PLLEvent)(input));
+      const result = await Effect.runPromise(
+        Schema.decodeUnknownEffect(PLLEvent)(input),
+      );
       expect(result.id).toBe(123);
       expect(result.year).toBe(2024);
     });

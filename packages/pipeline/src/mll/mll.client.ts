@@ -270,8 +270,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         Effect.retry({
           schedule: Schedule.exponential(pipelineConfig.retryDelay),
           times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError | ParseError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
+          while: (
+            error: HttpError | NetworkError | TimeoutError | ParseError,
+          ) => error instanceof NetworkError || error instanceof TimeoutError,
         }),
       );
 
@@ -386,9 +387,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLTeamsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MLLTeamsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Path relative to statscrewBaseUrl (https://www.statscrew.com/lacrosse)
         const path = `/l-MLL/y-${request.year}`;
@@ -486,9 +487,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLPlayersRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MLLPlayersRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // First get all teams for this year
         const teams = yield* getTeams({ year: request.year });
@@ -687,9 +688,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLStandingsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MLLStandingsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Standings are on a dedicated page, not the season overview
         const path = `/standings/l-MLL/y-${request.year}`;
@@ -1248,9 +1249,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLStatLeadersRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(
+          MLLStatLeadersRequest,
+        )(input).pipe(Effect.mapError(mapParseError));
 
         const path = `/leaders/l-MLL/y-${request.year}`;
 
@@ -1417,9 +1418,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLGoaliesRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MLLGoaliesRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // First get all teams for this year
         const teams = yield* getTeams({ year: request.year });
@@ -1613,9 +1614,9 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MLLScheduleRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MLLScheduleRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Find archived schedule snapshots for this year
         const snapshots = yield* findScheduleSnapshots(request.year);
@@ -1734,7 +1735,7 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         mapParseError,
       } as const,
     };
-  })
+  }),
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(MLLConfig.layer, PipelineConfig.layer)),

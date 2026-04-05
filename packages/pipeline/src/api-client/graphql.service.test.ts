@@ -25,14 +25,12 @@ describe("makeGraphQLClient", () => {
     vi.unstubAllGlobals();
   });
 
-  const createClient = (
-    overrides?: {
-      authHeader?: string;
-      maxRetries?: number;
-      retryDelayMs?: number;
-      timeoutMs?: number;
-    },
-  ) =>
+  const createClient = (overrides?: {
+    authHeader?: string;
+    maxRetries?: number;
+    retryDelayMs?: number;
+    timeoutMs?: number;
+  }) =>
     makeGraphQLClient({
       endpoint: "https://api.example.com/graphql",
       authHeader: overrides?.authHeader,

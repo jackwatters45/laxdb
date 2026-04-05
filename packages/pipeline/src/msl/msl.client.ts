@@ -234,9 +234,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MSLTeamsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MSLTeamsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch standings from Gamesheet internal API which contains team data
         const path = `/api/useStandings/getDivisionStandings/${request.seasonId}`;
@@ -338,9 +338,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MSLPlayersRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MSLPlayersRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch player standings from Gamesheet internal API
         // API returns paginated results, so we need to fetch all pages
@@ -503,9 +503,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MSLGoaliesRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MSLGoaliesRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch goalie standings from Gamesheet internal API
         // API returns paginated results, so we need to fetch all pages
@@ -659,9 +659,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MSLStandingsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MSLStandingsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch standings from Gamesheet internal API
         // Note: The API requires no filter[gametype] parameter to return data
@@ -792,9 +792,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(MSLScheduleRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(MSLScheduleRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch scores from Gamesheet internal API
         // Note: API returns all games at once, no pagination needed
@@ -934,7 +934,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
       getStandings,
       getSchedule,
     };
-  })
+  }),
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(MSLConfig.layer, PipelineConfig.layer)),

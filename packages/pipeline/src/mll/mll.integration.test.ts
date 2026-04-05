@@ -14,7 +14,9 @@ const runWaybackProgram = async <T, E>(
   program: Effect.Effect<T, E, MLLClient>,
 ) => {
   try {
-    return await Effect.runPromise(program.pipe(Effect.provide(MLLClient.layer)));
+    return await Effect.runPromise(
+      program.pipe(Effect.provide(MLLClient.layer)),
+    );
   } catch (error) {
     const isTransientWaybackFailure =
       error instanceof TimeoutError ||

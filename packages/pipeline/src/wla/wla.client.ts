@@ -167,9 +167,9 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(WLATeamsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(WLATeamsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Fetch the schedule page which contains team info
         const url = `${wlaConfig.baseUrl}/schedule`;
@@ -329,9 +329,9 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(WLAPlayersRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(WLAPlayersRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Get the Pointstreak season ID for the given year
         const pointstreakSeasonId = yield* getSeasonIdFromYear(
@@ -544,9 +544,9 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(WLAGoaliesRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(WLAGoaliesRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Get the Pointstreak season ID for the given year
         const pointstreakSeasonId = yield* getSeasonIdFromYear(
@@ -1030,9 +1030,9 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(WLAStandingsRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(WLAStandingsRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Get the Pointstreak season ID for the given year
         const pointstreakSeasonId = yield* getSeasonIdFromYear(
@@ -1343,9 +1343,9 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decodeUnknownEffect(WLAScheduleRequest)(input).pipe(
-          Effect.mapError(mapParseError),
-        );
+        const request = yield* Schema.decodeUnknownEffect(WLAScheduleRequest)(
+          input,
+        ).pipe(Effect.mapError(mapParseError));
 
         // Get the Pointstreak season ID for the given year
         const pointstreakSeasonId = yield* getSeasonIdFromYear(
@@ -1662,7 +1662,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       getStandings,
       getSchedule,
     };
-  })
+  }),
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(Layer.mergeAll(WLAConfig.layer, PipelineConfig.layer)),
