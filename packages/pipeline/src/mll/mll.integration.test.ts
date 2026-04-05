@@ -10,7 +10,9 @@ import { MLLClient } from "./mll.client";
 const TEAM_TIMEOUT = 15_000;
 const PLAYER_TIMEOUT = 60_000; // Players require fetching each team's stats page
 
-const runWaybackProgram = async <T>(program: Effect.Effect<T, unknown>) => {
+const runWaybackProgram = async <T, E>(
+  program: Effect.Effect<T, E, MLLClient>,
+) => {
   try {
     return await Effect.runPromise(program.pipe(Effect.provide(MLLClient.Default)));
   } catch (error) {

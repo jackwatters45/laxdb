@@ -1,7 +1,7 @@
 import { FileSystem } from "effect/FileSystem";
 import { BunServices } from "@effect/platform-bun";
 import { PlatformError, systemError } from "effect/PlatformError";
-import { Cause, Effect, Exit, Layer, Option } from "effect";
+import { Effect, Exit, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GraphQLError } from "../api-client/graphql.service";
@@ -13,20 +13,8 @@ import {
   TimeoutError,
 } from "../error";
 
+import { expectErrorInstance, getFailureError } from "../test-helpers";
 import { isCriticalError, saveJson } from "./util";
-
-const getFailureError = (exit: Exit.Exit<unknown, unknown>): unknown => {
-  if (Exit.isSuccess(exit)) {
-    throw new Error("Expected failure exit");
-  }
-
-  const error = Cause.findErrorOption(exit.cause);
-  if (Option.isNone(error)) {
-    throw new Error("Expected typed failure cause");
-  }
-
-  return error.value;
-};
 
 describe("saveJson", () => {
   const createTestLayer = (overrides: {
@@ -105,11 +93,7 @@ describe("saveJson", () => {
       ),
     );
 
-    const error = getFailureError(result);
-    expect(error).toBeInstanceOf(Error);
-    if (!(error instanceof Error)) {
-      throw new Error("Expected Error");
-    }
+    const error = expectErrorInstance(getFailureError(result), Error);
     expect(error.message).toContain("Failed to write");
   });
 
@@ -133,11 +117,7 @@ describe("saveJson", () => {
       ),
     );
 
-    const error = getFailureError(result);
-    expect(error).toBeInstanceOf(Error);
-    if (!(error instanceof Error)) {
-      throw new Error("Expected Error");
-    }
+    const error = expectErrorInstance(getFailureError(result), Error);
     expect(error.message).toContain("Failed to write");
   });
 

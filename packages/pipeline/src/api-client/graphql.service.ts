@@ -7,6 +7,7 @@ import {
   NetworkError,
   ParseError,
   type PipelineError,
+  RateLimitError,
   TimeoutError,
 } from "../error";
 
@@ -15,6 +16,8 @@ import { GraphQLResponse } from "./graphql.schema";
 
 // Re-export for backwards compatibility
 export { GraphQLError } from "../error";
+
+const MAX_RETRY_WAIT_MS = 300_000; // 5 minutes max to prevent DoS via large retry-after
 
 const isTransientError = (error: PipelineError): boolean =>
   error instanceof NetworkError || error instanceof TimeoutError;
@@ -88,6 +91,21 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         }),
       );
 
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("retry-after");
+        const retryAfterMs = retryAfter
+          ? Number.parseInt(retryAfter, 10) * 1000
+          : undefined;
+
+        return yield* Effect.fail(
+          new RateLimitError({
+            message: "Rate limited by server",
+            url,
+            retryAfterMs,
+          }),
+        );
+      }
+
       if (!response.ok) {
         return yield* Effect.fail(
           new HttpError({
@@ -135,7 +153,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       }
 
       const data = decoded.data;
-      if (data === null || data === undefined) {
+      if (data === null) {
         return yield* Effect.fail(
           new GraphQLError({
             message: "GraphQL response returned null data",
@@ -158,6 +176,22 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         times: maxRetries,
         while: isTransientError,
       }),
+      Effect.catchTag("RateLimitError", (error) =>
+        Effect.sleep(
+          Duration.millis(
+            Math.min(error.retryAfterMs ?? retryDelayMs, MAX_RETRY_WAIT_MS),
+          ),
+        ).pipe(
+          Effect.andThen(
+            execute(request, dataSchema, timeoutMs).pipe(
+              Effect.retry({
+                schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
+                times: maxRetries,
+              }),
+            ),
+          ),
+        ),
+      ),
     );
 
   return {
