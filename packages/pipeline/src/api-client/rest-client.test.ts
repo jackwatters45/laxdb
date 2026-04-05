@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Cause, Effect, Exit, Option, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HttpError, NetworkError, ParseError, RateLimitError } from "../error";
@@ -11,6 +11,19 @@ const TestResponse = Schema.Struct({
 });
 
 const mockFetch = vi.fn<typeof fetch>();
+
+const getFailureError = (exit: Exit.Exit<unknown, unknown>): unknown => {
+  if (Exit.isSuccess(exit)) {
+    throw new Error("Expected failure exit");
+  }
+
+  const error = Cause.findErrorOption(exit.cause);
+  if (Option.isNone(error)) {
+    throw new Error("Expected typed failure cause");
+  }
+
+  return error.value;
+};
 
 describe("makeRestClient", () => {
   beforeEach(() => {
@@ -101,15 +114,12 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        expect(error._tag).toBe("Fail");
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(NetworkError);
-          expect(error.error.message).toContain("Network error");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(NetworkError);
+      if (!(error instanceof NetworkError)) {
+        throw new Error("Expected NetworkError");
       }
+      expect(error.message).toContain("Network error");
     });
 
     it("returns HttpError on non-ok response", async () => {
@@ -122,13 +132,11 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/999", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof HttpError) {
-          expect(error.error.message).toContain("HTTP 404");
-          expect(error.error.statusCode).toBe(404);
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(HttpError);
+      if (error instanceof HttpError) {
+        expect(error.message).toContain("HTTP 404");
+        expect(error.statusCode).toBe(404);
       }
     });
 
@@ -145,12 +153,10 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof RateLimitError) {
-          expect(error.error.retryAfterMs).toBe(60000);
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(RateLimitError);
+      if (error instanceof RateLimitError) {
+        expect(error.retryAfterMs).toBe(60000);
       }
     });
 
@@ -164,14 +170,12 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(ParseError);
-          expect(error.error.message).toContain("Schema validation failed");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(ParseError);
+      if (!(error instanceof ParseError)) {
+        throw new Error("Expected ParseError");
       }
+      expect(error.message).toContain("Schema validation failed");
     });
 
     it("returns HttpError on invalid JSON response", async () => {
@@ -184,14 +188,12 @@ describe("makeRestClient", () => {
         client.requestOnce("GET", "/users/1", TestResponse),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(HttpError);
-          expect(error.error.message).toContain("Failed to parse JSON");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(HttpError);
+      if (!(error instanceof HttpError)) {
+        throw new Error("Expected HttpError");
       }
+      expect(error.message).toContain("Failed to parse JSON");
     });
   });
 

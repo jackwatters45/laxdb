@@ -1,7 +1,7 @@
 import { FileSystem } from "effect/FileSystem";
 import { BunServices } from "@effect/platform-bun";
-import { SystemError } from "effect/PlatformError";
-import { Effect, Exit, Layer } from "effect";
+import { PlatformError, systemError } from "effect/PlatformError";
+import { Cause, Effect, Exit, Layer, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GraphQLError } from "../api-client/graphql.service";
@@ -15,26 +15,39 @@ import {
 
 import { isCriticalError, saveJson } from "./util";
 
+const getFailureError = (exit: Exit.Exit<unknown, unknown>): unknown => {
+  if (Exit.isSuccess(exit)) {
+    throw new Error("Expected failure exit");
+  }
+
+  const error = Cause.findErrorOption(exit.cause);
+  if (Option.isNone(error)) {
+    throw new Error("Expected typed failure cause");
+  }
+
+  return error.value;
+};
+
 describe("saveJson", () => {
   const createTestLayer = (overrides: {
     makeDirectory?: (
       path: string,
-      options?: FileSystem.MakeDirectoryOptions,
-    ) => Effect.Effect<void, SystemError>;
+      options?: { recursive?: boolean },
+    ) => Effect.Effect<void, PlatformError>;
     writeFileString?: (
       path: string,
       data: string,
-    ) => Effect.Effect<void, SystemError>;
+    ) => Effect.Effect<void, PlatformError>;
   }) => {
     const baseMock = {
       makeDirectory: () => Effect.void,
       writeFileString: () => Effect.void,
     };
 
-    const MockFS = Layer.succeed(FileSystem.FileSystem, {
+    const MockFS = Layer.succeed(FileSystem, {
       ...baseMock,
       ...overrides,
-    } as unknown as FileSystem.FileSystem);
+    } as unknown as FileSystem);
 
     return Layer.provideMerge(MockFS, BunServices.layer);
   };
@@ -76,8 +89,8 @@ describe("saveJson", () => {
       makeDirectory: () => Effect.void,
       writeFileString: () =>
         Effect.fail(
-          new SystemError({
-            reason: "InvalidData",
+          systemError({
+            _tag: "InvalidData",
             module: "FileSystem",
             method: "writeFileString",
             description: "Disk full",
@@ -92,23 +105,20 @@ describe("saveJson", () => {
       ),
     );
 
-    expect(Exit.isFailure(result)).toBe(true);
-    if (Exit.isFailure(result)) {
-      const error = result.cause;
-      expect(error._tag).toBe("Fail");
-      if (error._tag === "Fail") {
-        expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain("Failed to write");
-      }
+    const error = getFailureError(result);
+    expect(error).toBeInstanceOf(Error);
+    if (!(error instanceof Error)) {
+      throw new Error("Expected Error");
     }
+    expect(error.message).toContain("Failed to write");
   });
 
   it("fails with descriptive error when directory creation fails", async () => {
     const TestLayer = createTestLayer({
       makeDirectory: () =>
         Effect.fail(
-          new SystemError({
-            reason: "PermissionDenied",
+          systemError({
+            _tag: "PermissionDenied",
             module: "FileSystem",
             method: "makeDirectory",
             description: "Permission denied",
@@ -123,15 +133,12 @@ describe("saveJson", () => {
       ),
     );
 
-    expect(Exit.isFailure(result)).toBe(true);
-    if (Exit.isFailure(result)) {
-      const error = result.cause;
-      expect(error._tag).toBe("Fail");
-      if (error._tag === "Fail") {
-        expect(error.error).toBeInstanceOf(Error);
-        expect(error.error.message).toContain("Failed to write");
-      }
+    const error = getFailureError(result);
+    expect(error).toBeInstanceOf(Error);
+    if (!(error instanceof Error)) {
+      throw new Error("Expected Error");
     }
+    expect(error.message).toContain("Failed to write");
   });
 
   it("properly serializes complex data with formatting", async () => {

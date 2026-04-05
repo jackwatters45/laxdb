@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Cause, Effect, Exit, Option, Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HttpError, NetworkError, ParseError } from "../error";
@@ -13,6 +13,19 @@ const TestDataSchema = Schema.Struct({
 });
 
 const mockFetch = vi.fn<typeof fetch>();
+
+const getFailureError = (exit: Exit.Exit<unknown, unknown>): unknown => {
+  if (Exit.isSuccess(exit)) {
+    throw new Error("Expected failure exit");
+  }
+
+  const error = Cause.findErrorOption(exit.cause);
+  if (Option.isNone(error)) {
+    throw new Error("Expected typed failure cause");
+  }
+
+  return error.value;
+};
 
 describe("makeGraphQLClient", () => {
   beforeEach(() => {
@@ -140,15 +153,12 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        expect(error._tag).toBe("Fail");
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(NetworkError);
-          expect(error.error.message).toContain("Network error");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(NetworkError);
+      if (!(error instanceof NetworkError)) {
+        throw new Error("Expected NetworkError");
       }
+      expect(error.message).toContain("Network error");
     });
 
     it("returns HttpError on non-ok response", async () => {
@@ -164,13 +174,11 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof HttpError) {
-          expect(error.error.message).toContain("HTTP 500");
-          expect(error.error.statusCode).toBe(500);
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(HttpError);
+      if (error instanceof HttpError) {
+        expect(error.message).toContain("HTTP 500");
+        expect(error.statusCode).toBe(500);
       }
     });
 
@@ -184,14 +192,12 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(HttpError);
-          expect(error.error.message).toContain("Failed to parse JSON");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(HttpError);
+      if (!(error instanceof HttpError)) {
+        throw new Error("Expected HttpError");
       }
+      expect(error.message).toContain("Failed to parse JSON");
     });
 
     it("returns ParseError on invalid response shape", async () => {
@@ -206,14 +212,12 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail") {
-          expect(error.error).toBeInstanceOf(ParseError);
-          expect(error.error.message).toContain("Schema validation failed");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(ParseError);
+      if (!(error instanceof ParseError)) {
+        throw new Error("Expected ParseError");
       }
+      expect(error.message).toContain("Schema validation failed");
     });
 
     it("returns GraphQLError when response contains errors", async () => {
@@ -233,15 +237,13 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "999" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("User not found");
-          expect(error.error.message).toContain("Access denied");
-          expect(error.error.errors).toHaveLength(2);
-          expect(error.error.errors[0]?.path).toEqual(["user"]);
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(GraphQLError);
+      if (error instanceof GraphQLError) {
+        expect(error.message).toContain("User not found");
+        expect(error.message).toContain("Access denied");
+        expect(error.errors).toHaveLength(2);
+        expect(error.errors[0]?.path).toEqual(["user"]);
       }
     });
 
@@ -255,13 +257,11 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("null data");
-          expect(error.error.errors).toHaveLength(0);
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(GraphQLError);
+      if (error instanceof GraphQLError) {
+        expect(error.message).toContain("null data");
+        expect(error.errors).toHaveLength(0);
       }
     });
 
@@ -279,13 +279,12 @@ describe("makeGraphQLClient", () => {
         client.query(TEST_QUERY, TestDataSchema, { id: "1" }),
       );
 
-      expect(result._tag).toBe("Failure");
-      if (result._tag === "Failure") {
-        const error = result.cause;
-        if (error._tag === "Fail" && error.error instanceof GraphQLError) {
-          expect(error.error.message).toContain("Deprecated field accessed");
-        }
+      const error = getFailureError(result);
+      expect(error).toBeInstanceOf(GraphQLError);
+      if (!(error instanceof GraphQLError)) {
+        throw new Error("Expected GraphQLError");
       }
+      expect(error.message).toContain("Deprecated field accessed");
     });
   });
 
