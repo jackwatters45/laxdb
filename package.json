@@ -10,7 +10,7 @@
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
     "dev": "alchemy dev",
-    "test": "turbo test --concurrency=1",
+    "test": "node ./scripts/run-workspace-tests.mjs",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
