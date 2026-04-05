@@ -2,18 +2,15 @@ import { Schema } from "effect";
 
 export class ScrapeRequest extends Schema.Class<ScrapeRequest>("ScrapeRequest")(
   {
-    url: Schema.String.pipe(
-      Schema.filter((url) => URL.canParse(url), {
-        message: () => "Invalid URL format",
+    url: Schema.String.check(
+      Schema.isPattern(/^https?:\/\//, {
+        message: "Invalid URL format",
       }),
     ),
-    headers: Schema.optional(
-      Schema.Record({ key: Schema.String, value: Schema.String }),
-    ),
+    headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
     timeoutMs: Schema.optional(Schema.Number),
-    followRedirects: Schema.optionalWith(Schema.Boolean, {
-      default: () => true,
-    }),
+    followRedirects: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true,
+    )),
   },
 ) {}
 
@@ -23,10 +20,10 @@ export class ScrapeResponse extends Schema.Class<ScrapeResponse>(
   url: Schema.String,
   finalUrl: Schema.String,
   statusCode: Schema.Number,
-  headers: Schema.Record({ key: Schema.String, value: Schema.String }),
+  headers: Schema.Record(Schema.String, Schema.String),
   body: Schema.String,
   contentType: Schema.NullOr(Schema.String),
-  fetchedAt: Schema.DateFromSelf,
+  fetchedAt: Schema.Date,
   durationMs: Schema.Number,
 }) {}
 
@@ -34,9 +31,7 @@ export class BatchScrapeRequest extends Schema.Class<BatchScrapeRequest>(
   "BatchScrapeRequest",
 )({
   urls: Schema.Array(Schema.String),
-  headers: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.String }),
-  ),
+  headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
   timeoutMs: Schema.optional(Schema.Number),
   concurrency: Schema.optional(Schema.Number),
 }) {}

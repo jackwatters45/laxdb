@@ -74,7 +74,7 @@ const exploreYear = (year: number) =>
     const teamsStart = Date.now();
     const teams = yield* pll
       .getTeams({ year, includeChampSeries: true })
-      .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLTeam[])));
+      .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLTeam[])));
     summary.timing.teamsMs = Date.now() - teamsStart;
     summary.teams.count = teams.length;
     summary.teams.withStats = teams.filter((t) => t.stats !== null).length;
@@ -115,7 +115,7 @@ const exploreYear = (year: number) =>
         limit: 500,
       })
       .pipe(
-        Effect.catchAll((e) => {
+        Effect.catch((e) => {
           return Effect.gen(function* () {
             yield* Effect.log(`     ⚠️ Error fetching players: ${String(e)}`);
             return [] as readonly PLLPlayer[];
@@ -177,7 +177,7 @@ const exploreYear = (year: number) =>
     const eventsStart = Date.now();
     const events = yield* pll
       .getEvents({ year })
-      .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLEvent[])));
+      .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLEvent[])));
     summary.timing.eventsMs = Date.now() - eventsStart;
     summary.events.count = events.length;
     summary.events.completed = events.filter((e) => e.eventStatus === 3).length;
@@ -234,7 +234,7 @@ const exploreYear = (year: number) =>
     yield* Effect.log("\n📈 Standings:");
     const standings = yield* pll
       .getStandings({ year, champSeries: false })
-      .pipe(Effect.catchAll(() => Effect.succeed([])));
+      .pipe(Effect.catch(() => Effect.succeed([])));
     summary.standings.count = standings.length;
     yield* Effect.log(`   Count: ${standings.length}`);
 
@@ -250,7 +250,7 @@ const exploreDetailEndpoints = (year: number) =>
 
     const teams = yield* pll
       .getTeams({ year })
-      .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLTeam[])));
+      .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLTeam[])));
 
     if (teams.length === 0) {
       yield* Effect.log("No teams found, skipping detail exploration");
@@ -272,7 +272,7 @@ const exploreDetailEndpoints = (year: number) =>
         eventsYear: year,
         includeChampSeries: true,
       })
-      .pipe(Effect.catchAll(() => Effect.succeed(null)));
+      .pipe(Effect.catch(() => Effect.succeed(null)));
     const teamDetailMs = Date.now() - teamDetailStart;
 
     if (teamDetail) {
@@ -289,7 +289,7 @@ const exploreDetailEndpoints = (year: number) =>
 
     const players = yield* pll
       .getPlayers({ season: year, limit: 10 })
-      .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLPlayer[])));
+      .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLPlayer[])));
 
     const samplePlayer = players[0];
     if (samplePlayer) {
@@ -305,7 +305,7 @@ const exploreDetailEndpoints = (year: number) =>
             year,
             statsYear: year,
           })
-          .pipe(Effect.catchAll(() => Effect.succeed(null)));
+          .pipe(Effect.catch(() => Effect.succeed(null)));
         const playerDetailMs = Date.now() - playerDetailStart;
 
         if (playerDetail) {
@@ -333,7 +333,7 @@ const exploreDetailEndpoints = (year: number) =>
 
     const events = yield* pll
       .getEvents({ year })
-      .pipe(Effect.catchAll(() => Effect.succeed([] as readonly PLLEvent[])));
+      .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLEvent[])));
 
     const completedEvent = events.find(
       (e) => e.eventStatus === 3 && e.slugname,
@@ -343,7 +343,7 @@ const exploreDetailEndpoints = (year: number) =>
       const eventDetailStart = Date.now();
       const eventDetail = yield* pll
         .getEventDetail({ slug: completedEvent.slugname })
-        .pipe(Effect.catchAll(() => Effect.succeed(null)));
+        .pipe(Effect.catch(() => Effect.succeed(null)));
       const eventDetailMs = Date.now() - eventDetailStart;
 
       if (eventDetail) {

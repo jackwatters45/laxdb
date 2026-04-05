@@ -1,6 +1,7 @@
+import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Either, Layer } from "effect";
+import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
 
 import { WLAClient } from "../../wla/wla.client";
 import type {
@@ -19,7 +20,10 @@ import {
 } from "../incremental.service";
 import { isCriticalError, saveJson, withRateLimitRetry } from "../util";
 
-import type { WLASeasonManifest } from "./wla.manifest";
+import type {
+  WLAExtractionManifest,
+  WLASeasonManifest,
+} from "./wla.manifest";
 import { WLAManifestService } from "./wla.manifest";
 
 // WLA seasons range from 2005 to 2025 (21 seasons)
@@ -28,43 +32,51 @@ const WLA_SEASONS = [
   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017,
   2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025,
 ] as const;
+const decodeWLASeasonId = Schema.decodeUnknownSync(WLASeasonId);
 
-export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
+export class WLAExtractorService extends ServiceMap.Service<WLAExtractorService>()(
   "WLAExtractorService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const client = yield* WLAClient;
       const config = yield* ExtractConfigService;
       const manifestService = yield* WLAManifestService;
       const incremental = yield* IncrementalExtractionService;
-      const path = yield* Path.Path;
+      const fs = yield* FileSystem;
+      const path = yield* Path;
 
       yield* Effect.log(`Output directory: ${config.outputDir}`);
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "wla", String(seasonId), `${entity}.json`);
+      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
+        ServiceMap.add(Path, path),
+      );
+
+      const saveOutputJson = <T>(filePath: string, data: T) =>
+        saveJson(filePath, data).pipe(Effect.provide(ioServices));
 
       /** Extracts teams for a season. @see isCriticalError for error handling. */
       const extractTeams = (seasonId: number) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📊 Extracting teams for season ${seasonId}...`);
           const result = yield* client
-            .getTeams({ seasonId: WLASeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getTeams({ seasonId: decodeWLASeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly WLATeam[]);
           }
-          yield* saveJson(getOutputPath(seasonId, "teams"), result.right.data);
+          yield* saveOutputJson(getOutputPath(seasonId, "teams"), result.success.data);
           yield* Effect.log(
-            `     ✓ ${result.right.count} teams (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} teams (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts players for a season. @see isCriticalError for error handling. */
@@ -74,25 +86,25 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             `  🏃 Extracting players for season ${seasonId}...`,
           );
           const result = yield* client
-            .getPlayers({ seasonId: WLASeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getPlayers({ seasonId: decodeWLASeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly WLAPlayer[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "players"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} players (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} players (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts goalies for a season. @see isCriticalError for error handling. */
@@ -102,25 +114,25 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             `  🥅 Extracting goalies for season ${seasonId}...`,
           );
           const result = yield* client
-            .getGoalies({ seasonId: WLASeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getGoalies({ seasonId: decodeWLASeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly WLAGoalie[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "goalies"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} goalies (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} goalies (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts standings for a season. @see isCriticalError for error handling. */
@@ -130,25 +142,25 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             `  🏆 Extracting standings for season ${seasonId}...`,
           );
           const result = yield* client
-            .getStandings({ seasonId: WLASeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getStandings({ seasonId: decodeWLASeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly WLAStanding[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "standings"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} standings (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} standings (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       /** Extracts schedule for a season. @see isCriticalError for error handling. */
@@ -158,31 +170,31 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
             `  📅 Extracting schedule for season ${seasonId}...`,
           );
           const result = yield* client
-            .getSchedule({ seasonId: WLASeasonId.make(seasonId) })
-            .pipe(withTiming(), withRateLimitRetry(), Effect.either);
-          if (Either.isLeft(result)) {
+            .getSchedule({ seasonId: decodeWLASeasonId(seasonId) })
+            .pipe(withTiming(), withRateLimitRetry(), Effect.result);
+          if (Result.isFailure(result)) {
             yield* Effect.log(
-              `     ✗ Failed [${result.left._tag}]: ${result.left.message}`,
+              `     ✗ Failed [${result.failure._tag}]: ${result.failure.message}`,
             );
-            if (isCriticalError(result.left)) {
-              return yield* Effect.fail(result.left);
+            if (isCriticalError(result.failure)) {
+              return yield* Effect.fail(result.failure);
             }
             return emptyExtractResult([] as readonly WLAGame[]);
           }
-          yield* saveJson(
+          yield* saveOutputJson(
             getOutputPath(seasonId, "schedule"),
-            result.right.data,
+            result.success.data,
           );
           yield* Effect.log(
-            `     ✓ ${result.right.count} games (${result.right.durationMs}ms)`,
+            `     ✓ ${result.success.count} games (${result.success.durationMs}ms)`,
           );
-          return result.right;
+          return result.success;
         });
 
       const extractSeason = (
         seasonId: number,
         options: IncrementalExtractOptions & { includeSchedule?: boolean } = {},
-      ) =>
+      ): Effect.Effect<WLAExtractionManifest, unknown> =>
         Effect.gen(function* () {
           const { includeSchedule = false } = options;
 
@@ -289,7 +301,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
           startYear?: number;
           endYear?: number;
         } = {},
-      ) =>
+      ): Effect.Effect<WLAExtractionManifest, unknown> =>
         Effect.gen(function* () {
           const includeSchedule = options.includeSchedule ?? false;
           const startYear = options.startYear ?? 2005;
@@ -353,7 +365,10 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         extractAll,
       };
     }),
-    dependencies: [
+  },
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(
       Layer.mergeAll(
         WLAClient.Default,
         ExtractConfigService.Default,
@@ -361,6 +376,7 @@ export class WLAExtractorService extends Effect.Service<WLAExtractorService>()(
         IncrementalExtractionService.Default,
         BunServices.layer,
       ),
-    ],
-  },
-) {}
+    ),
+  );
+  static readonly Default = this.layer;
+}

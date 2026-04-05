@@ -3,7 +3,7 @@ import { relative } from "node:path";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
-import { Duration, Effect, Either, Schema } from "effect";
+import { Duration, Effect, Result, Schema } from "effect";
 
 import { type PipelineError, type RateLimitError } from "../error";
 
@@ -11,9 +11,9 @@ import { type PipelineError, type RateLimitError } from "../error";
  * Error for file write failures.
  * Preserves the original platform error as cause for debugging.
  */
-export class FileWriteError extends Schema.TaggedError<FileWriteError>(
+export class FileWriteError extends Schema.TaggedErrorClass<FileWriteError>()(
   "FileWriteError",
-)("FileWriteError", {
+  {
   message: Schema.String,
   filePath: Schema.String,
   cause: Schema.optional(Schema.Unknown),
@@ -29,13 +29,13 @@ export class FileWriteError extends Schema.TaggedError<FileWriteError>(
  */
 export const saveJson = <T>(filePath: string, data: T) =>
   Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
+    const fs = yield* FileSystem;
+    const path = yield* Path;
     const dir = path.dirname(filePath);
     yield* fs.makeDirectory(dir, { recursive: true });
     yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
   }).pipe(
-    Effect.catchTag("SystemError", (e: PlatformError) =>
+    Effect.catchTag("PlatformError", (e: PlatformError) =>
       Effect.fail(
         new FileWriteError({
           message: `Failed to write ${relative(process.cwd(), filePath)}: ${e.message}`,
@@ -55,9 +55,9 @@ export const saveJson = <T>(filePath: string, data: T) =>
  * Retryable errors: Rate limits (handled separately by withRateLimitRetry)
  *
  * @example
- * if (Either.isLeft(result)) {
- *   if (isCriticalError(result.left)) {
- *     return yield* Effect.fail(result.left);
+ * if (Result.isFailure(result)) {
+ *   if (isCriticalError(result.failure)) {
+ *     return yield* Effect.fail(result.failure);
  *   }
  *   return emptyExtractResult([]);
  * }
@@ -105,7 +105,7 @@ const isRateLimitError = (error: { _tag: string }): error is RateLimitError =>
  * client.getTeams(...).pipe(
  *   withTiming(),
  *   withRateLimitRetry(),
- *   Effect.either
+ *   Effect.result
  * )
  */
 export const withRateLimitRetry =
@@ -115,16 +115,16 @@ export const withRateLimitRetry =
   ): Effect.Effect<A, E, R> =>
     Effect.gen(function* () {
       // First attempt (attempt 0)
-      const firstResult = yield* Effect.either(effect);
-      if (Either.isRight(firstResult)) {
-        return firstResult.right;
+      const firstResult = yield* Effect.result(effect);
+      if (Result.isSuccess(firstResult)) {
+        return firstResult.success;
       }
-      if (!isRateLimitError(firstResult.left)) {
-        return yield* Effect.fail(firstResult.left);
+      if (!isRateLimitError(firstResult.failure)) {
+        return yield* Effect.fail(firstResult.failure);
       }
 
       // Retry loop for rate limit errors
-      let lastRateLimitError = firstResult.left;
+      let lastRateLimitError = firstResult.failure;
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         const waitMs = Math.min(
           lastRateLimitError.retryAfterMs ?? DEFAULT_RATE_LIMIT_WAIT_MS,
@@ -135,14 +135,14 @@ export const withRateLimitRetry =
         );
         yield* Effect.sleep(Duration.millis(waitMs));
 
-        const result = yield* Effect.either(effect);
-        if (Either.isRight(result)) {
-          return result.right;
+        const result = yield* Effect.result(effect);
+        if (Result.isSuccess(result)) {
+          return result.success;
         }
-        if (!isRateLimitError(result.left)) {
-          return yield* Effect.fail(result.left);
+        if (!isRateLimitError(result.failure)) {
+          return yield* Effect.fail(result.failure);
         }
-        lastRateLimitError = result.left;
+        lastRateLimitError = result.failure;
       }
 
       // All retries exhausted - fail with the last rate limit error

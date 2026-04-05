@@ -1,6 +1,5 @@
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
-import { readJsonFile } from "@laxdb/core/util";
 import { Effect, Schema } from "effect";
 
 import {
@@ -13,11 +12,21 @@ import {
   infoIssue,
 } from "./validate.schema";
 
+export const readJsonFile = <T>(filePath: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem;
+    const content = yield* fs.readFileString(filePath, "utf-8");
+    return yield* Effect.try({
+      try: () => JSON.parse(content) as T,
+      catch: () => new Error(`Invalid JSON: ${filePath}`),
+    });
+  });
+
 const getFileStats = (filePath: string) =>
   Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem;
+    const fs = yield* FileSystem;
     return yield* fs.stat(filePath);
-  }).pipe(Effect.catchAll(() => Effect.fail(new Error("File not found"))));
+  }).pipe(Effect.catch(() => Effect.fail(new Error("File not found"))));
 
 const runCheck = <R>(
   checkName: string,
@@ -26,7 +35,7 @@ const runCheck = <R>(
   Effect.gen(function* () {
     const start = Date.now();
     const result = yield* checkFn().pipe(
-      Effect.catchAll((e) =>
+      Effect.catch((e) =>
         Effect.succeed([errorIssue("CHECK_ERROR", e.message)]),
       ),
     );
@@ -45,7 +54,7 @@ export const validateFileExists = (filePath: string) =>
   Effect.gen(function* () {
     const statsResult = yield* getFileStats(filePath).pipe(
       Effect.map((s) => ({ success: true as const, stats: s })),
-      Effect.catchAll(() =>
+      Effect.catch(() =>
         Effect.succeed({ success: false as const, stats: null }),
       ),
     );
@@ -140,7 +149,7 @@ export const validateJsonArray = <T>(
     );
 
     const data = yield* readJsonFile<T[]>(filePath).pipe(
-      Effect.catchAll(() => Effect.succeed([] as T[])),
+      Effect.catch(() => Effect.succeed([] as T[])),
     );
 
     const { filePath: fp, exists, sizeBytes, checks } = fileResult;
@@ -156,9 +165,9 @@ export const validateJsonArray = <T>(
     };
   });
 
-export const validateSchema = <T, I>(
+export const validateSchema = <T>(
   data: unknown[],
-  schema: Schema.Schema<T, I>,
+  schema: Schema.Schema<T>,
   sampleSize = 10,
 ) =>
   runCheck("schema_validation", () =>
@@ -169,11 +178,11 @@ export const validateSchema = <T, I>(
       let invalidCount = 0;
 
       for (let i = 0; i < samplesToCheck.length; i++) {
-        const result = yield* Schema.decodeUnknown(schema)(
+        const result = yield* Schema.decodeUnknownEffect(schema)(
           samplesToCheck[i],
         ).pipe(
           Effect.map(() => true),
-          Effect.catchAll(() => Effect.succeed(false)),
+          Effect.catch(() => Effect.succeed(false)),
         );
 
         if (result) {
@@ -391,7 +400,7 @@ export const buildReport = (
 
 export const printReport = (report: typeof ValidationReport.Type) =>
   Effect.gen(function* () {
-    const path = yield* Path.Path;
+    const path = yield* Path;
     yield* Effect.log(`\n${"=".repeat(70)}`);
     yield* Effect.log(`VALIDATION REPORT: ${report.source}`);
     yield* Effect.log("=".repeat(70));

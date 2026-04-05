@@ -7,6 +7,7 @@
 
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
+import type { PlatformError } from "effect/PlatformError";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect, Layer, Schema } from "effect";
 
@@ -37,8 +38,10 @@ export interface ManifestServiceConfig<
   /** Source name (e.g., "nll", "pll") */
   source: TSource;
   /** Schema for validating the season manifest */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seasonManifestSchema: Schema.Schema<TSeasonManifest, any>;
+  seasonManifestSchema: Schema.Schema<TSeasonManifest> & {
+    readonly DecodingServices: never;
+    readonly EncodingServices: never;
+  };
   /** Function to create an empty season manifest */
   createEmptySeasonManifest: () => TSeasonManifest;
 }
@@ -73,18 +76,15 @@ export const createManifestServiceEffect = <
   // Create extraction manifest schema dynamically
   const ExtractionManifestSchema = Schema.Struct({
     source: Schema.Literal(config.source),
-    seasons: Schema.Record({
-      key: Schema.String,
-      value: config.seasonManifestSchema,
-    }),
+    seasons: Schema.Record(Schema.String, config.seasonManifestSchema),
     lastRun: Schema.String,
     version: Schema.Number,
   });
 
   return Effect.gen(function* () {
     const extractConfig = yield* ExtractConfigService;
-    const fs = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
+    const fs = yield* FileSystem;
+    const path = yield* Path;
     const manifestPath = path.join(
       extractConfig.outputDir,
       config.source,
@@ -101,8 +101,8 @@ export const createManifestServiceEffect = <
       const content = yield* fs
         .readFileString(manifestPath, "utf-8")
         .pipe(
-          Effect.catchTag("SystemError", (e) =>
-            Effect.fail(new Error(`Failed to read manifest: ${e.message}`)),
+          Effect.catchTag("PlatformError", (error: PlatformError) =>
+            Effect.fail(new Error(`Failed to read manifest: ${error.message}`)),
           ),
         );
 
@@ -111,27 +111,24 @@ export const createManifestServiceEffect = <
         catch: (e) => new Error(`Failed to parse manifest JSON: ${String(e)}`),
       });
 
-      return yield* Schema.decodeUnknown(ExtractionManifestSchema)(parsed).pipe(
-        Effect.catchTag("ParseError", (error) =>
-          Effect.zipRight(
-            Effect.logWarning(
-              `${config.source.toUpperCase()} manifest schema invalid, creating new: ${error.message}`,
-            ),
-            Effect.succeed(createEmptyManifest()),
-          ),
+      return yield* Schema.decodeUnknownEffect(ExtractionManifestSchema)(parsed).pipe(
+        Effect.catch((error) =>
+          Effect.logWarning(
+            `${config.source.toUpperCase()} manifest schema invalid, creating new: ${String(error)}`,
+          ).pipe(Effect.andThen(Effect.succeed(createEmptyManifest()))),
         ),
       );
     });
 
-    const save = (manifest: Manifest) =>
+    const save = (manifest: Manifest): Effect.Effect<void, Error> =>
       Effect.gen(function* () {
         const dir = path.dirname(manifestPath);
         yield* fs.makeDirectory(dir, { recursive: true });
         const content = JSON.stringify(manifest, null, 2);
         yield* fs.writeFileString(manifestPath, content);
       }).pipe(
-        Effect.catchTag("SystemError", (e) =>
-          Effect.fail(new Error(`Failed to write manifest: ${e.message}`)),
+        Effect.catchTag("PlatformError", (error: PlatformError) =>
+          Effect.fail(new Error(`Failed to write manifest: ${error.message}`)),
         ),
       );
 
@@ -194,7 +191,7 @@ export const createManifestServiceEffect = <
       manifest: Manifest,
       json: boolean,
       seasonLabel = "Season",
-    ) =>
+    ): Effect.Effect<void> =>
       Effect.gen(function* () {
         if (json) {
           yield* Console.log(JSON.stringify(manifest, null, 2));

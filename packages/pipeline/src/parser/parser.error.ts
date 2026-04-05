@@ -1,19 +1,19 @@
 import { Schema } from "effect";
 
-export class ParserError extends Schema.TaggedError<ParserError>("ParserError")(
+export class ParserError extends Schema.TaggedErrorClass<ParserError>()(
   "ParserError",
   {
     message: Schema.String,
     cause: Schema.optional(Schema.Unknown),
-    code: Schema.optionalWith(Schema.Number, { default: () => 422 }),
+    code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 422 )),
   },
 ) {}
 
-export class SelectorError extends Schema.TaggedError<SelectorError>(
+export class SelectorError extends Schema.TaggedErrorClass<SelectorError>()(
   "SelectorError",
-)("SelectorError", {
+  {
   message: Schema.String,
   selector: Schema.optional(Schema.String),
   cause: Schema.optional(Schema.Unknown),
-  code: Schema.optionalWith(Schema.Number, { default: () => 400 }),
+  code: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 400 )),
 }) {}

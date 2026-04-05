@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -36,14 +36,18 @@ export type MSLExtractionManifest = ExtractionManifest<
 >;
 
 // MSL Manifest Service - uses generic factory
-export class MSLManifestService extends Effect.Service<MSLManifestService>()(
+export class MSLManifestService extends ServiceMap.Service<MSLManifestService>()(
   "MSLManifestService",
   {
-    effect: createManifestServiceEffect({
+    make: createManifestServiceEffect({
       source: "msl",
       seasonManifestSchema: MSLSeasonManifest,
       createEmptySeasonManifest: createEmptyMSLSeasonManifest,
     }),
-    dependencies: [ManifestServiceDependencies],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(ManifestServiceDependencies),
+  );
+  static readonly Default = this.layer;
+}

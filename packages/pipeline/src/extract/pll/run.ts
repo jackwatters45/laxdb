@@ -12,7 +12,7 @@
 
 import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer, LogLevel, Logger, Option } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import {
   forceOption,
@@ -42,76 +42,71 @@ const noDetailsOption = Flag.boolean("no-details").pipe(
   Flag.withDefault(false),
 );
 
-// Main command
-const pllCommand = Command.make(
-  "pll",
-  {
-    year: yearOption,
-    all: allOption,
-    noDetails: noDetailsOption,
-    force: forceOption,
-    incremental: incrementalOption,
-    json: jsonOption,
-    status: statusOption,
-  },
-  ({ year, all, noDetails, force, incremental, json, status }) =>
-    Effect.gen(function* () {
-      // Handle --status flag
-      if (status) {
-        const manifestService = yield* PLLManifestService;
-        const manifest = yield* manifestService.load;
-        yield* manifestService.displayStatus(manifest, json, "Year");
-        return;
-      }
+const program = Effect.gen(function* () {
+  const extractor = yield* PLLExtractorService;
+  const manifestService = yield* PLLManifestService;
 
-      const extractor = yield* PLLExtractorService;
-      const mode = getMode(force, incremental);
-      const includeDetails = !noDetails;
+  const pllCommand = Command.make(
+    "pll",
+    {
+      year: yearOption,
+      all: allOption,
+      noDetails: noDetailsOption,
+      force: forceOption,
+      incremental: incrementalOption,
+      json: jsonOption,
+      status: statusOption,
+    },
+    ({ year, all, noDetails, force, incremental, json, status }) =>
+      Effect.gen(function* () {
+        if (status) {
+          const manifest = yield* manifestService.load;
+          yield* manifestService.displayStatus(manifest, json, "Year");
+          return;
+        }
 
-      // Validate: must specify --all or --year
-      const yearValue = Option.getOrNull(year);
-      if (!all && yearValue === null) {
-        yield* Effect.logError("Error: Must specify --all or --year=YYYY");
-        return yield* Effect.fail("Missing required option");
-      }
+        const mode = getMode(force, incremental);
+        const includeDetails = !noDetails;
+        const yearValue = Option.getOrNull(year);
 
-      // Validate year range
-      if (yearValue !== null && (yearValue < 2019 || yearValue > 2030)) {
-        yield* Effect.logError(
-          `Invalid year ${Number(yearValue)}. Must be 2019-2030.`,
-        );
-        return yield* Effect.fail("Invalid year");
-      }
+        if (!all && yearValue === null) {
+          yield* Effect.logError("Error: Must specify --all or --year=YYYY");
+          return yield* Effect.fail("Missing required option");
+        }
 
-      if (!json) {
-        yield* Effect.log(`Extraction mode: ${mode}`);
-      }
+        if (yearValue !== null && (yearValue < 2019 || yearValue > 2030)) {
+          yield* Effect.logError(
+            `Invalid year ${Number(yearValue)}. Must be 2019-2030.`,
+          );
+          return yield* Effect.fail("Invalid year");
+        }
 
-      let manifest;
-      if (all) {
-        manifest = yield* extractor.extractAll({ mode, includeDetails });
-      } else if (yearValue !== null) {
-        manifest = yield* extractor.extractYear(yearValue, {
-          mode,
-          includeDetails,
-        });
-      }
-      if (json && manifest) {
-        yield* Effect.sync(() => {
-          console.log(JSON.stringify(manifest, null, 2));
-        });
-      }
-    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
-);
+        if (!json) {
+          yield* Effect.log(`Extraction mode: ${mode}`);
+        }
 
-// CLI runner
-const cli = Command.run(pllCommand, {
-  name: "PLL Extractor",
-  version: "1.0.0",
-});
+        let manifest;
+        if (all) {
+          manifest = yield* extractor.extractAll({ mode, includeDetails });
+        } else if (yearValue !== null) {
+          manifest = yield* extractor.extractYear(yearValue, {
+            mode,
+            includeDetails,
+          });
+        }
 
-// Run with dependencies
-cli(process.argv).pipe(
+        if (json && manifest) {
+          yield* Effect.sync(() => {
+            console.log(JSON.stringify(manifest, null, 2));
+          });
+        }
+      }),
+  );
+
+  return yield* Command.run(pllCommand, {
+    version: "1.0.0",
+  });
+}).pipe(
   Effect.provide(
     Layer.mergeAll(
       PLLExtractorService.Default,
@@ -119,5 +114,6 @@ cli(process.argv).pipe(
       BunServices.layer,
     ),
   ),
-  BunRuntime.runMain,
 );
+
+BunRuntime.runMain(program);

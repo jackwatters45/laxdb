@@ -1,6 +1,6 @@
-import { Path } from "effect/Path";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, Config } from "effect";
+import { Config, Effect, Layer, ServiceMap } from "effect";
+import { Path } from "effect/Path";
 
 export interface ExtractConfig {
   readonly outputDir: string;
@@ -9,11 +9,11 @@ export interface ExtractConfig {
   readonly delayBetweenBatchesMs: number;
 }
 
-export class ExtractConfigService extends Effect.Service<ExtractConfigService>()(
+export class ExtractConfigService extends ServiceMap.Service<ExtractConfigService>()(
   "ExtractConfigService",
   {
-    effect: Effect.gen(function* () {
-      const path = yield* Path.Path;
+    make: Effect.gen(function* () {
+      const path = yield* Path;
       const defaultOutputDir = path.join(process.cwd(), "output");
       const outputDir = yield* Config.string("EXTRACT_OUTPUT_DIR").pipe(
         Config.withDefault(defaultOutputDir),
@@ -35,6 +35,10 @@ export class ExtractConfigService extends Effect.Service<ExtractConfigService>()
         delayBetweenBatchesMs,
       } satisfies ExtractConfig;
     }),
-    dependencies: [BunServices.layer],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(BunServices.layer),
+  );
+  static readonly Default = this.layer;
+}

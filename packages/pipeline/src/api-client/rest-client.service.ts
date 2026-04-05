@@ -18,9 +18,9 @@ import type {
   HttpMethod,
 } from "./rest-client.schema";
 
-// RateLimitError handled separately - server provides retry-after delay
+// Retry transient transport failures only.
 const isTransientError = (error: PipelineError): boolean =>
-  error._tag === "NetworkError" || error._tag === "TimeoutError";
+  error instanceof NetworkError || error instanceof TimeoutError;
 
 export const makeRestClient = (config: RestClientConfig) => {
   const defaultTimeout =
@@ -45,13 +45,13 @@ export const makeRestClient = (config: RestClientConfig) => {
     return headers;
   };
 
-  const request = <T, I>(
+  const request = <S extends Schema.Top>(
     method: HttpMethod,
     endpoint: string,
-    schema: Schema.Schema<T, I>,
+    schema: S,
     body?: unknown,
     options?: RestRequestOptions,
-  ): Effect.Effect<T, PipelineError> =>
+  ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
     Effect.gen(function* () {
       const url = `${config.baseUrl}${endpoint}`;
       const timeoutMs = options?.timeoutMs ?? defaultTimeout;
@@ -79,16 +79,17 @@ export const makeRestClient = (config: RestClientConfig) => {
           });
         },
       }).pipe(
-        Effect.timeout(Duration.millis(timeoutMs)),
-        Effect.catchTag("TimeoutException", () =>
-          Effect.fail(
-            new TimeoutError({
-              message: `Request timed out after ${timeoutMs}ms`,
-              url,
-              timeoutMs,
-            }),
-          ),
-        ),
+        Effect.timeoutOrElse({
+          duration: Duration.millis(timeoutMs),
+          orElse: () =>
+            Effect.fail(
+              new TimeoutError({
+                message: `Request timed out after ${timeoutMs}ms`,
+                url,
+                timeoutMs,
+              }),
+            ),
+        }),
       );
 
       if (response.status === 429) {
@@ -128,7 +129,7 @@ export const makeRestClient = (config: RestClientConfig) => {
           }),
       });
 
-      const decoded = yield* Schema.decodeUnknown(schema)(json).pipe(
+      const decoded = yield* Schema.decodeUnknownEffect(schema)(json).pipe(
         Effect.mapError(
           (error) =>
             new ParseError({
@@ -142,26 +143,19 @@ export const makeRestClient = (config: RestClientConfig) => {
       return decoded;
     });
 
-  const transientRetrySchedule = Schedule.exponential(
-    Duration.millis(retryDelayMs),
-  ).pipe(
-    Schedule.compose(Schedule.recurs(maxRetries)),
-    Schedule.whileInput(isTransientError),
-  );
-
-  const rateLimitRetrySchedule = Schedule.exponential(
-    Duration.millis(retryDelayMs),
-  ).pipe(Schedule.compose(Schedule.recurs(maxRetries)));
-
-  const requestWithRetry = <T, I>(
+  const requestWithRetry = <S extends Schema.Top>(
     method: HttpMethod,
     endpoint: string,
-    schema: Schema.Schema<T, I>,
+    schema: S,
     body?: unknown,
     options?: RestRequestOptions,
-  ): Effect.Effect<T, PipelineError> =>
+  ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
     request(method, endpoint, schema, body, options).pipe(
-      Effect.retry(transientRetrySchedule),
+      Effect.retry({
+        schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
+        times: maxRetries,
+        while: isTransientError,
+      }),
       Effect.catchTag("RateLimitError", (error) =>
         Effect.sleep(
           Duration.millis(
@@ -170,7 +164,10 @@ export const makeRestClient = (config: RestClientConfig) => {
         ).pipe(
           Effect.andThen(
             request(method, endpoint, schema, body, options).pipe(
-              Effect.retry(rateLimitRetrySchedule),
+              Effect.retry({
+                schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
+                times: maxRetries,
+              }),
             ),
           ),
         ),
@@ -178,43 +175,43 @@ export const makeRestClient = (config: RestClientConfig) => {
     );
 
   return {
-    get: <T, I = T>(
+    get: <S extends Schema.Top>(
       endpoint: string,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       options?: RestRequestOptions,
     ) => requestWithRetry("GET", endpoint, schema, undefined, options),
 
-    post: <T, I = T>(
+    post: <S extends Schema.Top>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       options?: RestRequestOptions,
     ) => requestWithRetry("POST", endpoint, schema, body, options),
 
-    put: <T, I = T>(
+    put: <S extends Schema.Top>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       options?: RestRequestOptions,
     ) => requestWithRetry("PUT", endpoint, schema, body, options),
 
-    patch: <T, I = T>(
+    patch: <S extends Schema.Top>(
       endpoint: string,
       body: unknown,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       options?: RestRequestOptions,
     ) => requestWithRetry("PATCH", endpoint, schema, body, options),
 
-    delete: <T, I = T>(
+    delete: <S extends Schema.Top>(
       endpoint: string,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       options?: RestRequestOptions,
     ) => requestWithRetry("DELETE", endpoint, schema, undefined, options),
 
-    requestOnce: <T, I = T>(
+    requestOnce: <S extends Schema.Top>(
       method: HttpMethod,
       endpoint: string,
-      schema: Schema.Schema<T, I>,
+      schema: S,
       body?: unknown,
       options?: RestRequestOptions,
     ) => request(method, endpoint, schema, body, options),

@@ -1,12 +1,12 @@
-import type { ParseResult } from "effect";
+import { Schema } from "effect";
 
 import { ParseError } from "./error";
 
 /**
- * Maps a ParseResult.ParseError to a ParseError.
+ * Maps a Schema.SchemaError to a ParseError.
  * Used by clients to convert schema validation errors to typed ParseError.
  */
-export const mapParseError = (error: ParseResult.ParseError): ParseError =>
+export const mapParseError = (error: Schema.SchemaError): ParseError =>
   new ParseError({
     message: `Invalid request: ${String(error)}`,
     cause: error,

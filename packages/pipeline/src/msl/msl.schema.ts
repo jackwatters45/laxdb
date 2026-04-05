@@ -5,14 +5,12 @@ import { Schema } from "effect";
 // - Pointstreak: 2009-2018 (league ID: 832)
 // Season ID is a positive integer unique to each Gamesheet season
 
-export const MSLSeasonId = Schema.Number.pipe(
-  Schema.int(),
-  Schema.positive(),
-  Schema.brand("MSLSeasonId"),
-  Schema.annotations({
-    description: "MSL Gamesheet season ID (e.g., 9567 for 2025)",
-  }),
-);
+export const MSLSeasonId = Schema.Number.check(
+  Schema.isInt(),
+  Schema.isGreaterThan(0),
+).pipe(Schema.brand("MSLSeasonId")).annotate({
+  description: "MSL Gamesheet season ID (e.g., 9567 for 2025)",
+});
 export type MSLSeasonId = typeof MSLSeasonId.Type;
 
 // Year to Gamesheet Season ID mapping

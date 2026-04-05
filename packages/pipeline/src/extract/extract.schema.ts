@@ -18,7 +18,7 @@ export interface ExtractResult<T> {
  * Wraps an Effect and tracks execution duration.
  *
  * @example
- * client.getTeams({ year }).pipe(withTiming(), withRateLimitRetry(), Effect.either)
+ * client.getTeams({ year }).pipe(withTiming(), withRateLimitRetry(), Effect.result)
  */
 export const withTiming =
   () =>
@@ -66,7 +66,7 @@ export type SeasonManifest = typeof SeasonManifest.Type;
 
 export const ExtractionManifest = Schema.Struct({
   source: Schema.String,
-  seasons: Schema.Record({ key: Schema.String, value: SeasonManifest }),
+  seasons: Schema.Record(Schema.String, SeasonManifest),
   lastRun: Schema.String,
   version: Schema.Number,
 });

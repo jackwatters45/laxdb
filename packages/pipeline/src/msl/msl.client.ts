@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, type ParseResult, Schedule, Schema } from "effect";
+import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
 
 import { MSLConfig, PipelineConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
@@ -20,14 +20,14 @@ import {
   MSLTeamsRequest,
 } from "./msl.schema";
 
-const mapParseError = (error: ParseResult.ParseError): ParseError =>
+const mapParseError = (error: Schema.SchemaError): ParseError =>
   new ParseError({
     message: `Invalid request: ${String(error)}`,
     cause: error,
   });
 
-export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
-  effect: Effect.gen(function* () {
+export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
+  make: Effect.gen(function* () {
     const mslConfig = yield* MSLConfig;
     const pipelineConfig = yield* PipelineConfig;
 
@@ -119,15 +119,12 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       path: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
       fetchGamesheetPage(path).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -215,15 +212,12 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       path: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
       fetchMainSitePage(path).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -240,7 +234,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MSLTeamsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MSLTeamsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -344,7 +338,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MSLPlayersRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MSLPlayersRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -509,7 +503,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MSLGoaliesRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MSLGoaliesRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -665,7 +659,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MSLStandingsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MSLStandingsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -798,7 +792,7 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MSLScheduleRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MSLScheduleRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -940,6 +934,10 @@ export class MSLClient extends Effect.Service<MSLClient>()("MSLClient", {
       getStandings,
       getSchedule,
     };
-  }),
-  dependencies: [MSLConfig.Default, PipelineConfig.Default],
-}) {}
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(MSLConfig.Default, PipelineConfig.Default)),
+  );
+  static readonly Default = this.layer;
+}

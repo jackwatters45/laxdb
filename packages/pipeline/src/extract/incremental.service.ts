@@ -6,7 +6,7 @@
  * extraction options.
  */
 
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 import {
   type EntityStatusLike,
@@ -25,21 +25,12 @@ export interface IncrementalExtractOptions extends ExtractOptions {
   mode?: ExtractionMode;
 }
 
-export class IncrementalExtractionService extends Effect.Service<IncrementalExtractionService>()(
+export class IncrementalExtractionService extends ServiceMap.Service<IncrementalExtractionService>()(
   "IncrementalExtractionService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const seasonConfig = yield* SeasonConfigService;
 
-      /**
-       * Determine if an entity should be extracted based on options and current state.
-       *
-       * Logic:
-       * 1. mode="full" or skipExisting=false → always extract
-       * 2. mode="incremental" → use season-aware staleness (24h for current, never for historical)
-       * 3. mode="skip-existing" → only extract if not yet extracted
-       * 4. Explicit maxAgeHours → override automatic staleness detection
-       */
       const shouldExtract = (
         entityStatus: EntityStatusLike | undefined,
         seasonId: number,
@@ -47,13 +38,11 @@ export class IncrementalExtractionService extends Effect.Service<IncrementalExtr
       ): boolean => {
         const { mode, skipExisting = true, maxAgeHours } = options;
 
-        // Mode takes precedence
         if (mode === "full") {
           return true;
         }
 
         if (mode === "incremental") {
-          // Use season-aware staleness: 24h for current seasons, never for historical
           const autoMaxAge = seasonConfig.getMaxAgeHours(seasonId);
           return isEntityStale(entityStatus, autoMaxAge);
         }
@@ -62,45 +51,29 @@ export class IncrementalExtractionService extends Effect.Service<IncrementalExtr
           return !entityStatus?.extracted;
         }
 
-        // No mode specified - use legacy options
         if (!skipExisting) {
           return true;
         }
 
-        // Explicit maxAgeHours provided
         if (maxAgeHours !== undefined) {
           return isEntityStale(entityStatus, maxAgeHours);
         }
 
-        // Default: skip if already extracted
         return !entityStatus?.extracted;
       };
 
-      /**
-       * Get the appropriate max age for a season based on whether it's current or historical.
-       */
       const getSeasonMaxAge = (seasonId: number): number | null => {
         return seasonConfig.getMaxAgeHours(seasonId);
       };
 
-      /**
-       * Check if a season is considered "current" (actively updating).
-       */
       const isCurrentSeason = (seasonId: number): boolean => {
         return seasonConfig.isCurrentSeason(seasonId);
       };
 
-      /**
-       * Get the list of current season years (for year-based extractors).
-       */
       const getCurrentSeasons = (): number[] => {
         return seasonConfig.getCurrentSeasonYears();
       };
 
-      /**
-       * Convert legacy ExtractOptions to IncrementalExtractOptions.
-       * Handles the --force and --incremental CLI flag patterns.
-       */
       const normalizeOptions = (options: {
         force?: boolean;
         incremental?: boolean;
@@ -127,6 +100,10 @@ export class IncrementalExtractionService extends Effect.Service<IncrementalExtr
         normalizeOptions,
       };
     }),
-    dependencies: [SeasonConfigService.Default],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(SeasonConfigService.layer),
+  );
+  static readonly Default = this.layer;
+}

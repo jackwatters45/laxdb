@@ -28,8 +28,8 @@ const NLL_SEASON = "225";
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const nllDir = path.join(config.outputDir, "nll");
   const seasonDir = path.join(nllDir, NLL_SEASON);
   const startTime = Date.now();

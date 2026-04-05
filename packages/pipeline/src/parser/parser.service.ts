@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import { ParserError, SelectorError } from "./parser.error";
 import {
@@ -12,14 +12,14 @@ import {
   type SelectorResult,
 } from "./parser.schema";
 
-export class ParserService extends Effect.Service<ParserService>()(
+export class ParserService extends ServiceMap.Service<ParserService>()(
   "ParserService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       return {
         parse: (input: ParseHtmlRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decode(ParseHtmlRequest)(input);
+            const request = yield* Schema.decodeUnknownEffect(ParseHtmlRequest)(input);
 
             const $ = yield* Effect.try({
               try: () => cheerio.load(request.html),
@@ -84,7 +84,7 @@ export class ParserService extends Effect.Service<ParserService>()(
 
         querySelector: (input: SelectorQuery) =>
           Effect.gen(function* () {
-            const query = yield* Schema.decode(SelectorQuery)(input);
+            const query = yield* Schema.decodeUnknownEffect(SelectorQuery)(input);
 
             const $ = yield* Effect.try({
               try: () => cheerio.load(query.html),
@@ -161,7 +161,10 @@ export class ParserService extends Effect.Service<ParserService>()(
       } as const;
     }),
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make);
+  static readonly Default = this.layer;
+}
 
 function resolveUrl(url: string, baseUrl?: string): string {
   if (!baseUrl) return url;

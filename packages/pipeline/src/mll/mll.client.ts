@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, type ParseResult, Schedule, Schema } from "effect";
+import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
 
 import { MLLConfig, PipelineConfig } from "../config";
 import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
@@ -22,14 +22,14 @@ import {
   WaybackCDXEntry,
 } from "./mll.schema";
 
-const mapParseError = (error: ParseResult.ParseError): ParseError =>
+const mapParseError = (error: Schema.SchemaError): ParseError =>
   new ParseError({
     message: `Invalid request: ${String(error)}`,
     cause: error,
   });
 
-export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
-  effect: Effect.gen(function* () {
+export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
+  make: Effect.gen(function* () {
     const mllConfig = yield* MLLConfig;
     const pipelineConfig = yield* PipelineConfig;
 
@@ -119,15 +119,12 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       path: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
       fetchStatscrewPage(path).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -270,15 +267,12 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       queryWaybackCDX(url, params).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError | ParseError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError | ParseError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -370,15 +364,12 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       url: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
       fetchWaybackPage(timestamp, url).pipe(
-        Effect.retry(
-          Schedule.exponential(pipelineConfig.retryDelay).pipe(
-            Schedule.compose(Schedule.recurs(pipelineConfig.maxRetries)),
-            Schedule.whileInput(
-              (error: HttpError | NetworkError | TimeoutError) =>
-                error._tag === "NetworkError" || error._tag === "TimeoutError",
-            ),
-          ),
-        ),
+        Effect.retry({
+          schedule: Schedule.exponential(pipelineConfig.retryDelay),
+          times: pipelineConfig.maxRetries,
+          while: (error: HttpError | NetworkError | TimeoutError) =>
+            error instanceof NetworkError || error instanceof TimeoutError,
+        }),
       );
 
     /**
@@ -395,7 +386,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLTeamsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLTeamsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -495,7 +486,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLPlayersRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLPlayersRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -696,7 +687,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLStandingsRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLStandingsRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1257,7 +1248,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLStatLeadersRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLStatLeadersRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1426,7 +1417,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLGoaliesRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLGoaliesRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1622,7 +1613,7 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
       HttpError | NetworkError | TimeoutError | ParseError
     > =>
       Effect.gen(function* () {
-        const request = yield* Schema.decode(MLLScheduleRequest)(input).pipe(
+        const request = yield* Schema.decodeUnknownEffect(MLLScheduleRequest)(input).pipe(
           Effect.mapError(mapParseError),
         );
 
@@ -1743,6 +1734,10 @@ export class MLLClient extends Effect.Service<MLLClient>()("MLLClient", {
         mapParseError,
       } as const,
     };
-  }),
-  dependencies: [MLLConfig.Default, PipelineConfig.Default],
-}) {}
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(MLLConfig.Default, PipelineConfig.Default)),
+  );
+  static readonly Default = this.layer;
+}

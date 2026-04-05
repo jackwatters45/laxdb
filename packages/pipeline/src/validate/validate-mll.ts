@@ -42,8 +42,8 @@ interface YearScheduleCoverage {
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const mllDir = path.join(config.outputDir, "mll");
   const startTime = Date.now();
 

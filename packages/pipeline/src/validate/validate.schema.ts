@@ -5,13 +5,11 @@ export type Severity = "error" | "warning" | "info";
 export class ValidationIssue extends Schema.Class<ValidationIssue>(
   "ValidationIssue",
 )({
-  severity: Schema.Literal("error", "warning", "info"),
+  severity: Schema.Literals(["error", "warning", "info"]),
   code: Schema.String,
   message: Schema.String,
   path: Schema.optional(Schema.String),
-  context: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.Unknown }),
-  ),
+  context: Schema.optional(Schema.Record(Schema.String, Schema.Unknown)),
 }) {}
 
 export class ValidationCheckResult extends Schema.Class<ValidationCheckResult>(
@@ -48,16 +46,16 @@ export class CrossReferenceResult extends Schema.Class<CrossReferenceResult>(
 
 export class DatasetStats extends Schema.Class<DatasetStats>("DatasetStats")({
   totalRecords: Schema.Number,
-  uniqueValues: Schema.Record({ key: Schema.String, value: Schema.Number }),
-  nullCounts: Schema.Record({ key: Schema.String, value: Schema.Number }),
+  uniqueValues: Schema.Record(Schema.String, Schema.Number),
+  nullCounts: Schema.Record(Schema.String, Schema.Number),
   valueRanges: Schema.optional(
-    Schema.Record({
-      key: Schema.String,
-      value: Schema.Struct({
+    Schema.Record(
+      Schema.String,
+      Schema.Struct({
         min: Schema.Unknown,
         max: Schema.Unknown,
       }),
-    }),
+    ),
   ),
 }) {}
 

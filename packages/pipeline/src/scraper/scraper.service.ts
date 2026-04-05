@@ -1,4 +1,4 @@
-import { Effect, Schema, Array as Arr } from "effect";
+import { Effect, Schema, Array as Arr, ServiceMap, Layer } from "effect";
 
 import { PipelineConfig } from "../config";
 
@@ -10,17 +10,17 @@ import {
   type ScrapeResult,
 } from "./scraper.schema";
 
-export class ScraperService extends Effect.Service<ScraperService>()(
+export class ScraperService extends ServiceMap.Service<ScraperService>()(
   "ScraperService",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const client = yield* ScraperClient;
       const config = yield* PipelineConfig;
 
       return {
         scrape: (input: ScrapeRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decode(ScrapeRequest)(input);
+            const request = yield* Schema.decodeUnknownEffect(ScrapeRequest)(input);
             return yield* client.fetchWithRetry(request);
           }).pipe(
             Effect.tap((response) =>
@@ -35,7 +35,7 @@ export class ScraperService extends Effect.Service<ScraperService>()(
 
         scrapeBatch: (input: BatchScrapeRequest) =>
           Effect.gen(function* () {
-            const request = yield* Schema.decode(BatchScrapeRequest)(input);
+            const request = yield* Schema.decodeUnknownEffect(BatchScrapeRequest)(input);
             const startTime = Date.now();
 
             const concurrency = request.concurrency ?? config.maxConcurrency;
@@ -59,7 +59,7 @@ export class ScraperService extends Effect.Service<ScraperService>()(
                         error: undefined,
                       }),
                     ),
-                    Effect.catchAll((error) =>
+                    Effect.catch((error) =>
                       Effect.succeed<ScrapeResult>({
                         url,
                         success: false,
@@ -105,7 +105,7 @@ export class ScraperService extends Effect.Service<ScraperService>()(
               durationMs: Date.now() - startTime,
             };
           }).pipe(
-            Effect.catchAll((error) =>
+            Effect.catch((error) =>
               Effect.succeed({
                 url,
                 accessible: false,
@@ -117,6 +117,9 @@ export class ScraperService extends Effect.Service<ScraperService>()(
           ),
       } as const;
     }),
-    dependencies: [ScraperClient.Default, PipelineConfig.Default],
-  },
-) {}
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Layer.mergeAll(ScraperClient.Default, PipelineConfig.Default)),
+  );
+  static readonly Default = this.layer;
+}

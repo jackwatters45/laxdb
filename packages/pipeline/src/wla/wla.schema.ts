@@ -39,14 +39,12 @@ export const WLA_POINTSTREAK_YEARS = Object.keys(WLA_POINTSTREAK_SEASONS)
   .map(Number)
   .toSorted((a, b) => b - a); // Most recent first
 
-export const WLASeasonId = Schema.Number.pipe(
-  Schema.int(),
-  Schema.between(2005, 2035),
-  Schema.brand("WLASeasonId"),
-  Schema.annotations({
-    description: "WLA season year (e.g., 2024 for the 2024 season)",
-  }),
-);
+export const WLASeasonId = Schema.Number.check(
+  Schema.isInt(),
+  Schema.isBetween({ minimum: 2005, maximum: 2035 }),
+).pipe(Schema.brand("WLASeasonId")).annotate({
+  description: "WLA season year (e.g., 2024 for the 2024 season)",
+});
 export type WLASeasonId = typeof WLASeasonId.Type;
 
 // WLA Team response schema

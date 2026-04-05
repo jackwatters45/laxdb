@@ -61,8 +61,8 @@ const WLA_SEASONS = [
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const wlaDir = path.join(config.outputDir, "wla");
   const startTime = Date.now();
 

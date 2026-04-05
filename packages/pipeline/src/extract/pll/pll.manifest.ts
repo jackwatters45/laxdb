@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Layer, ServiceMap } from "effect";
 
 import {
   type SeasonManifest,
@@ -17,14 +17,18 @@ export type { SeasonManifest, EntityStatus };
 export type PLLExtractionManifest = ExtractionManifest<"pll", SeasonManifest>;
 
 // PLL Manifest Service - uses generic factory
-export class PLLManifestService extends Effect.Service<PLLManifestService>()(
+export class PLLManifestService extends ServiceMap.Service<PLLManifestService>()(
   "PLLManifestService",
   {
-    effect: createManifestServiceEffect({
+    make: createManifestServiceEffect({
       source: "pll",
       seasonManifestSchema: SeasonManifestSchema,
       createEmptySeasonManifest,
     }),
-    dependencies: [ManifestServiceDependencies],
   },
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(ManifestServiceDependencies),
+  );
+  static readonly Default = this.layer;
+}

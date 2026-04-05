@@ -129,8 +129,8 @@ const MSL_SEASONS = [
 
 const program = Effect.gen(function* () {
   const config = yield* ExtractConfigService;
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const fs = yield* FileSystem;
+  const path = yield* Path;
   const mslDir = path.join(config.outputDir, "msl");
   const startTime = Date.now();
 

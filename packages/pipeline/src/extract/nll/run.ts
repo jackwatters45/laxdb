@@ -12,7 +12,7 @@
 
 import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer, LogLevel, Logger } from "effect";
+import { Effect, Layer } from "effect";
 
 import {
   forceOption,
@@ -31,49 +31,46 @@ const seasonOption = Flag.integer("season").pipe(
   Flag.withDefault(225),
 );
 
-// Main command
-const nllCommand = Command.make(
-  "nll",
-  {
-    season: seasonOption,
-    force: forceOption,
-    incremental: incrementalOption,
-    json: jsonOption,
-    status: statusOption,
-  },
-  ({ season, force, incremental, json, status }) =>
-    Effect.gen(function* () {
-      // Handle --status flag
-      if (status) {
-        const manifestService = yield* NLLManifestService;
-        const manifest = yield* manifestService.load;
-        yield* manifestService.displayStatus(manifest, json);
-        return;
-      }
+const program = Effect.gen(function* () {
+  const extractor = yield* NLLExtractorService;
+  const manifestService = yield* NLLManifestService;
 
-      const extractor = yield* NLLExtractorService;
-      const mode = getMode(force, incremental);
+  const nllCommand = Command.make(
+    "nll",
+    {
+      season: seasonOption,
+      force: forceOption,
+      incremental: incrementalOption,
+      json: jsonOption,
+      status: statusOption,
+    },
+    ({ season, force, incremental, json, status }) =>
+      Effect.gen(function* () {
+        if (status) {
+          const manifest = yield* manifestService.load;
+          yield* manifestService.displayStatus(manifest, json);
+          return;
+        }
 
-      if (!json) {
-        yield* Effect.log(`Extraction mode: ${mode}`);
-      }
-      const manifest = yield* extractor.extractSeason(season, { mode });
-      if (json) {
-        yield* Effect.sync(() => {
-          console.log(JSON.stringify(manifest, null, 2));
-        });
-      }
-    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
-);
+        const mode = getMode(force, incremental);
 
-// CLI runner
-const cli = Command.run(nllCommand, {
-  name: "NLL Extractor",
-  version: "1.0.0",
-});
+        if (!json) {
+          yield* Effect.log(`Extraction mode: ${mode}`);
+        }
 
-// Run with dependencies
-cli(process.argv).pipe(
+        const manifest = yield* extractor.extractSeason(season, { mode });
+        if (json) {
+          yield* Effect.sync(() => {
+            console.log(JSON.stringify(manifest, null, 2));
+          });
+        }
+      }),
+  );
+
+  return yield* Command.run(nllCommand, {
+    version: "1.0.0",
+  });
+}).pipe(
   Effect.provide(
     Layer.mergeAll(
       NLLExtractorService.Default,
@@ -81,5 +78,6 @@ cli(process.argv).pipe(
       BunServices.layer,
     ),
   ),
-  BunRuntime.runMain,
 );
+
+BunRuntime.runMain(program);

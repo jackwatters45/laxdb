@@ -13,7 +13,7 @@
 
 import { Command, Flag } from "effect/unstable/cli";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer, LogLevel, Logger } from "effect";
+import { Effect, Layer } from "effect";
 
 import {
   forceOption,
@@ -45,63 +45,54 @@ const scheduleOption = Flag.boolean("schedule").pipe(
   Flag.withDefault(false),
 );
 
-// Main command
-const wlaCommand = Command.make(
-  "wla",
-  {
-    season: seasonOption,
-    all: allOption,
-    schedule: scheduleOption,
-    force: forceOption,
-    incremental: incrementalOption,
-    json: jsonOption,
-    status: statusOption,
-  },
-  ({ season, all, schedule, force, incremental, json, status }) =>
-    Effect.gen(function* () {
-      // Handle --status flag
-      if (status) {
-        const manifestService = yield* WLAManifestService;
-        const manifest = yield* manifestService.load;
-        yield* manifestService.displayStatus(manifest, json, "Year");
-        return;
-      }
+const program = Effect.gen(function* () {
+  const extractor = yield* WLAExtractorService;
+  const manifestService = yield* WLAManifestService;
 
-      const extractor = yield* WLAExtractorService;
-      const mode = getMode(force, incremental);
+  const wlaCommand = Command.make(
+    "wla",
+    {
+      season: seasonOption,
+      all: allOption,
+      schedule: scheduleOption,
+      force: forceOption,
+      incremental: incrementalOption,
+      json: jsonOption,
+      status: statusOption,
+    },
+    ({ season, all, schedule, force, incremental, json, status }) =>
+      Effect.gen(function* () {
+        if (status) {
+          const manifest = yield* manifestService.load;
+          yield* manifestService.displayStatus(manifest, json, "Year");
+          return;
+        }
 
-      if (!json) {
-        yield* Effect.log(`Extraction mode: ${mode}`);
-      }
+        const mode = getMode(force, incremental);
 
-      let manifest;
-      if (all) {
-        manifest = yield* extractor.extractAll({
-          mode,
-          includeSchedule: schedule,
-        });
-      } else {
-        manifest = yield* extractor.extractSeason(season, {
-          mode,
-          includeSchedule: schedule,
-        });
-      }
-      if (json) {
-        yield* Effect.sync(() => {
-          console.log(JSON.stringify(manifest, null, 2));
-        });
-      }
-    }).pipe(json ? Logger.withMinimumLogLevel(LogLevel.None) : (x) => x),
-);
+        if (!json) {
+          yield* Effect.log(`Extraction mode: ${mode}`);
+        }
 
-// CLI runner
-const cli = Command.run(wlaCommand, {
-  name: "WLA Extractor",
-  version: "1.0.0",
-});
+        const manifest = all
+          ? yield* extractor.extractAll({ mode, includeSchedule: schedule })
+          : yield* extractor.extractSeason(season, {
+              mode,
+              includeSchedule: schedule,
+            });
 
-// Run with dependencies
-cli(process.argv).pipe(
+        if (json) {
+          yield* Effect.sync(() => {
+            console.log(JSON.stringify(manifest, null, 2));
+          });
+        }
+      }),
+  );
+
+  return yield* Command.run(wlaCommand, {
+    version: "1.0.0",
+  });
+}).pipe(
   Effect.provide(
     Layer.mergeAll(
       WLAExtractorService.Default,
@@ -109,5 +100,6 @@ cli(process.argv).pipe(
       BunServices.layer,
     ),
   ),
-  BunRuntime.runMain,
 );
+
+BunRuntime.runMain(program);

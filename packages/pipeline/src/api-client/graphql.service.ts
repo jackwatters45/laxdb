@@ -16,9 +16,8 @@ import { GraphQLResponse } from "./graphql.schema";
 // Re-export for backwards compatibility
 export { GraphQLError } from "../error";
 
-// RateLimitError handled separately - server provides retry-after delay
 const isTransientError = (error: PipelineError): boolean =>
-  error._tag === "NetworkError" || error._tag === "TimeoutError";
+  error instanceof NetworkError || error instanceof TimeoutError;
 
 export const makeGraphQLClient = (config: GraphQLClientConfig) => {
   const defaultTimeout =
@@ -40,11 +39,11 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     return headers;
   };
 
-  const execute = <A, I>(
+  const execute = <S extends Schema.Top>(
     request: GraphQLRequest,
-    dataSchema: Schema.Schema<A, I>,
+    dataSchema: S,
     timeoutMs?: number,
-  ): Effect.Effect<A, PipelineError> =>
+  ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
     Effect.gen(function* () {
       const timeout = timeoutMs ?? defaultTimeout;
       const url = config.endpoint;
@@ -76,16 +75,17 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
           });
         },
       }).pipe(
-        Effect.timeout(Duration.millis(timeout)),
-        Effect.catchTag("TimeoutException", () =>
-          Effect.fail(
-            new TimeoutError({
-              message: `Request timed out after ${timeout}ms`,
-              url,
-              timeoutMs: timeout,
-            }),
-          ),
-        ),
+        Effect.timeoutOrElse({
+          duration: Duration.millis(timeout),
+          orElse: () =>
+            Effect.fail(
+              new TimeoutError({
+                message: `Request timed out after ${timeout}ms`,
+                url,
+                timeoutMs: timeout,
+              }),
+            ),
+        }),
       );
 
       if (!response.ok) {
@@ -111,7 +111,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       });
 
       const responseSchema = GraphQLResponse(dataSchema);
-      const decoded = yield* Schema.decodeUnknown(responseSchema)(json).pipe(
+      const decoded = yield* Schema.decodeUnknownEffect(responseSchema)(json).pipe(
         Effect.mapError(
           (error) =>
             new ParseError({
@@ -134,7 +134,8 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         );
       }
 
-      if (decoded.data === null) {
+      const data = decoded.data;
+      if (data === null || data === undefined) {
         return yield* Effect.fail(
           new GraphQLError({
             message: "GraphQL response returned null data",
@@ -143,49 +144,33 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         );
       }
 
-      return decoded.data;
+      return data;
     });
 
-  const transientRetrySchedule = Schedule.exponential(
-    Duration.millis(retryDelayMs),
-  ).pipe(
-    Schedule.compose(Schedule.recurs(maxRetries)),
-    Schedule.whileInput(isTransientError),
-  );
-
-  const rateLimitRetrySchedule = Schedule.exponential(
-    Duration.millis(retryDelayMs),
-  ).pipe(Schedule.compose(Schedule.recurs(maxRetries)));
-
-  const executeWithRetry = <A, I>(
+  const executeWithRetry = <S extends Schema.Top>(
     request: GraphQLRequest,
-    dataSchema: Schema.Schema<A, I>,
+    dataSchema: S,
     timeoutMs?: number,
-  ): Effect.Effect<A, PipelineError> =>
+  ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
     execute(request, dataSchema, timeoutMs).pipe(
-      Effect.retry(transientRetrySchedule),
-      Effect.catchTag("RateLimitError", (error) =>
-        Effect.sleep(Duration.millis(error.retryAfterMs ?? retryDelayMs)).pipe(
-          Effect.andThen(
-            execute(request, dataSchema, timeoutMs).pipe(
-              Effect.retry(rateLimitRetrySchedule),
-            ),
-          ),
-        ),
-      ),
+      Effect.retry({
+        schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
+        times: maxRetries,
+        while: isTransientError,
+      }),
     );
 
   return {
-    query: <A, I>(
+    query: <S extends Schema.Top>(
       query: string,
-      dataSchema: Schema.Schema<A, I>,
+      dataSchema: S,
       variables?: Record<string, unknown>,
       operationName?: string,
     ) => executeWithRetry({ query, variables, operationName }, dataSchema),
 
-    mutation: <A, I>(
+    mutation: <S extends Schema.Top>(
       mutation: string,
-      dataSchema: Schema.Schema<A, I>,
+      dataSchema: S,
       variables?: Record<string, unknown>,
       operationName?: string,
     ) =>

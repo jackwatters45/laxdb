@@ -1,17 +1,15 @@
 import { Schema } from "effect";
 
 // PLL started in 2019, allow reasonable future years
-const PLLYear = Schema.Number.pipe(
-  Schema.between(2019, 2035),
-  Schema.annotations({ description: "PLL season year (2019-2035)" }),
-);
+const PLLYear = Schema.Number.check(
+  Schema.isBetween({ minimum: 2019, maximum: 2035 }),
+).annotate({ description: "PLL season year (2019-2035)" });
 
-const PositiveLimit = Schema.Number.pipe(
-  Schema.positive(),
-  Schema.int(),
-  Schema.lessThanOrEqualTo(1000),
-  Schema.annotations({ description: "Result limit (1-1000)" }),
-);
+const PositiveLimit = Schema.Number.check(
+  Schema.isGreaterThan(0),
+  Schema.isInt(),
+  Schema.isLessThanOrEqualTo(1000),
+).annotate({ description: "Result limit (1-1000)" });
 
 export class PLLTeamStanding extends Schema.Class<PLLTeamStanding>(
   "PLLTeamStanding",
@@ -49,7 +47,7 @@ export class PLLStandingsRequest extends Schema.Class<PLLStandingsRequest>(
   "PLLStandingsRequest",
 )({
   year: PLLYear,
-  champSeries: Schema.optionalWith(Schema.Boolean, { default: () => false }),
+  champSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
 }) {}
 
 export class PLLPlayerStats extends Schema.Class<PLLPlayerStats>(
@@ -167,7 +165,9 @@ export class PLLPlayer extends Schema.Class<PLLPlayer>("PLLPlayer")({
   allTeams: Schema.Array(PLLPlayerTeam),
   stats: Schema.optional(PLLPlayerStats),
   postStats: Schema.optional(PLLPlayerStats),
-  champSeries: Schema.NullishOr(PLLChampSeries),
+  champSeries: Schema.optional(Schema.NullOr(PLLChampSeries)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
 }) {}
 
 export class PLLPlayersResponse extends Schema.Class<PLLPlayersResponse>(
@@ -180,10 +180,10 @@ export class PLLPlayersRequest extends Schema.Class<PLLPlayersRequest>(
   "PLLPlayersRequest",
 )({
   season: PLLYear,
-  league: Schema.optionalWith(Schema.String, { default: () => "PLL" }),
-  includeReg: Schema.optionalWith(Schema.Boolean, { default: () => true }),
-  includePost: Schema.optionalWith(Schema.Boolean, { default: () => false }),
-  includeZPP: Schema.optionalWith(Schema.Boolean, { default: () => false }),
+  league: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "PLL" )),
+  includeReg: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
+  includePost: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
+  includeZPP: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false )),
   limit: Schema.optional(PositiveLimit),
 }) {}
 
@@ -216,9 +216,9 @@ export class PLLStatLeadersRequest extends Schema.Class<PLLStatLeadersRequest>(
   "PLLStatLeadersRequest",
 )({
   year: PLLYear,
-  seasonSegment: Schema.optionalWith(Schema.Literal("regular", "post"), {
-    default: () => "regular" as const,
-  }),
+  seasonSegment: Schema.optional(
+    Schema.Literals(["regular", "post"]),
+  ).pipe(Schema.withDecodingDefault(() => "regular" as const)),
   statList: Schema.optional(Schema.Array(Schema.String)),
   limit: Schema.optional(PositiveLimit),
 }) {}
@@ -348,8 +348,8 @@ export class PLLAdvancedPlayersRequest extends Schema.Class<PLLAdvancedPlayersRe
   "PLLAdvancedPlayersRequest",
 )({
   year: PLLYear,
-  limit: Schema.optionalWith(PositiveLimit, { default: () => 250 }),
-  league: Schema.optionalWith(Schema.String, { default: () => "PLL" }),
+  limit: Schema.optional(PositiveLimit).pipe(Schema.withDecodingDefault(() => 250 )),
+  league: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "PLL" )),
 }) {}
 
 // Team stats (shared between regular, post, and champSeries)
@@ -456,10 +456,9 @@ export class PLLTeamsRequest extends Schema.Class<PLLTeamsRequest>(
   "PLLTeamsRequest",
 )({
   year: PLLYear,
-  sortBy: Schema.optionalWith(Schema.String, { default: () => "points" }),
-  includeChampSeries: Schema.optionalWith(Schema.Boolean, {
-    default: () => false,
-  }),
+  sortBy: Schema.optional(Schema.String).pipe(Schema.withDecodingDefault(() => "points" )),
+  includeChampSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false,
+  )),
 }) {}
 
 export class PLLCareerStatsPlayer extends Schema.Class<PLLCareerStatsPlayer>(
@@ -577,7 +576,9 @@ export class PLLPlayerDetail extends Schema.Class<PLLPlayerDetail>(
   careerStats: Schema.NullOr(PLLPlayerCareerStats),
   allSeasonStats: Schema.Array(PLLPlayerSeasonStats),
   accolades: Schema.NullOr(Schema.Array(PLLPlayerAccolade)),
-  champSeries: Schema.NullOr(PLLChampSeries),
+  champSeries: Schema.optional(Schema.NullOr(PLLChampSeries)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
   advancedSeasonStats: Schema.NullOr(PLLAdvancedSeasonStats),
 }) {}
 
@@ -670,9 +671,8 @@ export class PLLTeamDetailRequest extends Schema.Class<PLLTeamDetailRequest>(
   year: Schema.optional(PLLYear),
   statsYear: Schema.optional(PLLYear),
   eventsYear: Schema.optional(PLLYear),
-  includeChampSeries: Schema.optionalWith(Schema.Boolean, {
-    default: () => false,
-  }),
+  includeChampSeries: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => false,
+  )),
 }) {}
 
 export class PLLTeamStatsOnly extends Schema.Class<PLLTeamStatsOnly>(
@@ -692,7 +692,7 @@ export class PLLTeamStatsRequest extends Schema.Class<PLLTeamStatsRequest>(
 )({
   id: Schema.String,
   year: Schema.optional(PLLYear),
-  segment: Schema.Literal("regular", "post"),
+  segment: Schema.Literals(["regular", "post"]),
 }) {}
 
 export class PLLEventTeam extends Schema.Class<PLLEventTeam>("PLLEventTeam")({
@@ -772,8 +772,8 @@ export class PLLEventsRequest extends Schema.Class<PLLEventsRequest>(
   "PLLEventsRequest",
 )({
   year: PLLYear,
-  includeCS: Schema.optionalWith(Schema.Boolean, { default: () => true }),
-  includeWLL: Schema.optionalWith(Schema.Boolean, { default: () => true }),
+  includeCS: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
+  includeWLL: Schema.optional(Schema.Boolean).pipe(Schema.withDecodingDefault(() => true )),
 }) {}
 
 export class PLLPlayLog extends Schema.Class<PLLPlayLog>("PLLPlayLog")({
