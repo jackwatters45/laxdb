@@ -416,7 +416,7 @@ const main = Effect.gen(function* () {
 });
 
 try {
-  await Effect.runPromise(main.pipe(Effect.provide(PLLClient.Default)));
+  await Effect.runPromise(main.pipe(Effect.provide(PLLClient.layer)));
 } catch (error) {
   console.error("Failed:", error);
   process.exit(1);

@@ -463,7 +463,7 @@ const program = Effect.gen(function* () {
 });
 
 const MainLayer = Layer.mergeAll(
-  ExtractConfigService.Default,
+  ExtractConfigService.layer,
   BunServices.layer,
 );
 

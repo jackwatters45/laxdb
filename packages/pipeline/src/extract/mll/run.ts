@@ -93,8 +93,8 @@ const program = Effect.gen(function* () {
 }).pipe(
   Effect.provide(
     Layer.mergeAll(
-      MLLExtractorService.Default,
-      MLLManifestService.Default,
+      MLLExtractorService.layer,
+      MLLManifestService.layer,
       BunServices.layer,
     ),
   ),

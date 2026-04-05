@@ -325,13 +325,12 @@ export class NLLExtractorService extends ServiceMap.Service<NLLExtractorService>
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(
       Layer.mergeAll(
-        NLLClient.Default,
-        ExtractConfigService.Default,
-        NLLManifestService.Default,
-        IncrementalExtractionService.Default,
+        NLLClient.layer,
+        ExtractConfigService.layer,
+        NLLManifestService.layer,
+        IncrementalExtractionService.layer,
         BunServices.layer,
       ),
     ),
   );
-  static readonly Default = this.layer;
 }

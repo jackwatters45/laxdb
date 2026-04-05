@@ -23,7 +23,7 @@ describe("MSLClient", () => {
         });
 
         const teams = await Effect.runPromise(
-          program.pipe(Effect.provide(MSLClient.Default)),
+          program.pipe(Effect.provide(MSLClient.layer)),
         );
 
         expect(teams.length).toBeGreaterThan(0);
@@ -44,7 +44,7 @@ describe("MSLClient", () => {
         });
 
         const players = await Effect.runPromise(
-          program.pipe(Effect.provide(MSLClient.Default)),
+          program.pipe(Effect.provide(MSLClient.layer)),
         );
 
         expect(players.length).toBeGreaterThan(0);
@@ -69,7 +69,7 @@ describe("MSLClient", () => {
         });
 
         const goalies = await Effect.runPromise(
-          program.pipe(Effect.provide(MSLClient.Default)),
+          program.pipe(Effect.provide(MSLClient.layer)),
         );
 
         expect(goalies.length).toBeGreaterThan(0);
@@ -94,7 +94,7 @@ describe("MSLClient", () => {
         });
 
         const standings = await Effect.runPromise(
-          program.pipe(Effect.provide(MSLClient.Default)),
+          program.pipe(Effect.provide(MSLClient.layer)),
         );
 
         expect(standings.length).toBeGreaterThan(0);
@@ -117,7 +117,7 @@ describe("MSLClient", () => {
         });
 
         const games = await Effect.runPromise(
-          program.pipe(Effect.provide(MSLClient.Default)),
+          program.pipe(Effect.provide(MSLClient.layer)),
         );
 
         expect(games.length).toBeGreaterThan(0);

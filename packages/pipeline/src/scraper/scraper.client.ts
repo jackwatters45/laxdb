@@ -141,7 +141,6 @@ export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
     }),
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(PipelineConfig.Default)),
+    Layer.provide(Layer.mergeAll(PipelineConfig.layer)),
   );
-  static readonly Default = this.layer;
 }

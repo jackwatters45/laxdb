@@ -49,5 +49,4 @@ export class WLAManifestService extends ServiceMap.Service<WLAManifestService>()
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(ManifestServiceDependencies),
   );
-  static readonly Default = this.layer;
 }

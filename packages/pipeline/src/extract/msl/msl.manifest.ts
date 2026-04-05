@@ -49,5 +49,4 @@ export class MSLManifestService extends ServiceMap.Service<MSLManifestService>()
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(ManifestServiceDependencies),
   );
-  static readonly Default = this.layer;
 }

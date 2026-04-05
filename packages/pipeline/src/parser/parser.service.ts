@@ -163,7 +163,6 @@ export class ParserService extends ServiceMap.Service<ParserService>()(
   },
 ) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 function resolveUrl(url: string, baseUrl?: string): string {

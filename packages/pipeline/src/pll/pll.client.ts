@@ -320,7 +320,6 @@ export class PLLClient extends ServiceMap.Service<PLLClient>()("PLLClient", {
   })
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(PLLConfig.Default)),
+    Layer.provide(Layer.mergeAll(PLLConfig.layer)),
   );
-  static readonly Default = this.layer;
 }

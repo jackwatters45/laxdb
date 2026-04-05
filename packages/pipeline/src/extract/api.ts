@@ -39,7 +39,7 @@ export const extractNLL = ({ seasonId, ...options }: ExtractParams) =>
   Effect.gen(function* () {
     const extractor = yield* NLLExtractorService;
     return yield* extractor.extractSeason(seasonId, options);
-  }).pipe(Effect.provide(NLLExtractorService.Default));
+  }).pipe(Effect.provide(NLLExtractorService.layer));
 
 /**
  * Extract PLL data for a year programmatically.
@@ -48,7 +48,7 @@ export const extractPLL = ({ seasonId: year, ...options }: ExtractParams) =>
   Effect.gen(function* () {
     const extractor = yield* PLLExtractorService;
     return yield* extractor.extractYear(year, options);
-  }).pipe(Effect.provide(PLLExtractorService.Default));
+  }).pipe(Effect.provide(PLLExtractorService.layer));
 
 /**
  * Extract MLL data for a year programmatically.
@@ -57,7 +57,7 @@ export const extractMLL = ({ seasonId: year, ...options }: ExtractParams) =>
   Effect.gen(function* () {
     const extractor = yield* MLLExtractorService;
     return yield* extractor.extractSeason(year, options);
-  }).pipe(Effect.provide(MLLExtractorService.Default));
+  }).pipe(Effect.provide(MLLExtractorService.layer));
 
 /**
  * Extract MSL data for a season programmatically.
@@ -66,7 +66,7 @@ export const extractMSL = ({ seasonId, ...options }: ExtractParams) =>
   Effect.gen(function* () {
     const extractor = yield* MSLExtractorService;
     return yield* extractor.extractSeason(seasonId, options);
-  }).pipe(Effect.provide(MSLExtractorService.Default));
+  }).pipe(Effect.provide(MSLExtractorService.layer));
 
 /**
  * Extract WLA data for a year programmatically.
@@ -75,4 +75,4 @@ export const extractWLA = ({ seasonId: year, ...options }: ExtractParams) =>
   Effect.gen(function* () {
     const extractor = yield* WLAExtractorService;
     return yield* extractor.extractSeason(year, options);
-  }).pipe(Effect.provide(WLAExtractorService.Default));
+  }).pipe(Effect.provide(WLAExtractorService.layer));

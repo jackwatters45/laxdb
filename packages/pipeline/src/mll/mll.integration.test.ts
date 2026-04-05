@@ -14,7 +14,7 @@ const runWaybackProgram = async <T, E>(
   program: Effect.Effect<T, E, MLLClient>,
 ) => {
   try {
-    return await Effect.runPromise(program.pipe(Effect.provide(MLLClient.Default)));
+    return await Effect.runPromise(program.pipe(Effect.provide(MLLClient.layer)));
   } catch (error) {
     const isTransientWaybackFailure =
       error instanceof TimeoutError ||
@@ -42,7 +42,7 @@ describe("MLLClient", () => {
         });
 
         const teams = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(teams.length).toBeGreaterThan(0);
@@ -61,7 +61,7 @@ describe("MLLClient", () => {
         });
 
         const teams = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(teams[0]).toBeDefined();
@@ -80,7 +80,7 @@ describe("MLLClient", () => {
         });
 
         const teams = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(teams.length).toBe(6);
@@ -101,7 +101,7 @@ describe("MLLClient", () => {
         });
 
         const players = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(players.length).toBeGreaterThan(0);
@@ -121,7 +121,7 @@ describe("MLLClient", () => {
         });
 
         const players = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(players[0]).toBeDefined();
@@ -145,7 +145,7 @@ describe("MLLClient", () => {
         });
 
         const players = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(players.length).toBeGreaterThan(0);
@@ -167,7 +167,7 @@ describe("MLLClient", () => {
         });
 
         const goalies = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(goalies.length).toBeGreaterThan(0);
@@ -187,7 +187,7 @@ describe("MLLClient", () => {
         });
 
         const goalies = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(goalies[0]).toBeDefined();
@@ -215,7 +215,7 @@ describe("MLLClient", () => {
         });
 
         const standings = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(standings.length).toBe(6);
@@ -235,7 +235,7 @@ describe("MLLClient", () => {
         });
 
         const standings = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(standings[0]).toBeDefined();
@@ -259,7 +259,7 @@ describe("MLLClient", () => {
         });
 
         const leaders = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(leaders.length).toBeGreaterThan(0);
@@ -279,7 +279,7 @@ describe("MLLClient", () => {
         });
 
         const leaders = await Effect.runPromise(
-          program.pipe(Effect.provide(MLLClient.Default)),
+          program.pipe(Effect.provide(MLLClient.layer)),
         );
 
         expect(leaders[0]).toBeDefined();

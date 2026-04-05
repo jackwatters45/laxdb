@@ -197,9 +197,8 @@ export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
   })
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(NLLConfig.Default, PipelineConfig.Default)),
+    Layer.provide(Layer.mergeAll(NLLConfig.layer, PipelineConfig.layer)),
   );
-  static readonly Default = this.layer;
 }
 
 /**

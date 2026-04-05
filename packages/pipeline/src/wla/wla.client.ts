@@ -1665,7 +1665,6 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
   })
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(WLAConfig.Default, PipelineConfig.Default)),
+    Layer.provide(Layer.mergeAll(WLAConfig.layer, PipelineConfig.layer)),
   );
-  static readonly Default = this.layer;
 }

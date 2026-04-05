@@ -229,6 +229,6 @@ export const createManifestServiceEffect = <
 
 /** Default dependencies for manifest services */
 export const ManifestServiceDependencies = Layer.merge(
-  ExtractConfigService.Default,
+  ExtractConfigService.layer,
   BunServices.layer,
 );

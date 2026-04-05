@@ -370,13 +370,12 @@ export class WLAExtractorService extends ServiceMap.Service<WLAExtractorService>
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(
       Layer.mergeAll(
-        WLAClient.Default,
-        ExtractConfigService.Default,
-        WLAManifestService.Default,
-        IncrementalExtractionService.Default,
+        WLAClient.layer,
+        ExtractConfigService.layer,
+        WLAManifestService.layer,
+        IncrementalExtractionService.layer,
         BunServices.layer,
       ),
     ),
   );
-  static readonly Default = this.layer;
 }

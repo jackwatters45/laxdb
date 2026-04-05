@@ -1737,7 +1737,6 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
   })
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(MLLConfig.Default, PipelineConfig.Default)),
+    Layer.provide(Layer.mergeAll(MLLConfig.layer, PipelineConfig.layer)),
   );
-  static readonly Default = this.layer;
 }

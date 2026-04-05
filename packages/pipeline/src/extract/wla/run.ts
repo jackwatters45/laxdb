@@ -95,8 +95,8 @@ const program = Effect.gen(function* () {
 }).pipe(
   Effect.provide(
     Layer.mergeAll(
-      WLAExtractorService.Default,
-      WLAManifestService.Default,
+      WLAExtractorService.layer,
+      WLAManifestService.layer,
       BunServices.layer,
     ),
   ),

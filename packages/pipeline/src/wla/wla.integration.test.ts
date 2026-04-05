@@ -20,7 +20,7 @@ describe("WLAClient", () => {
     });
 
     const client = await Effect.runPromise(
-      program.pipe(Effect.provide(WLAClient.Default)),
+      program.pipe(Effect.provide(WLAClient.layer)),
     );
 
     expect(client).toBeDefined();
@@ -41,7 +41,7 @@ describe("WLAClient", () => {
         });
 
         const teams = await Effect.runPromise(
-          program.pipe(Effect.provide(WLAClient.Default)),
+          program.pipe(Effect.provide(WLAClient.layer)),
         );
 
         // WLA has 7 known teams in recent seasons
@@ -64,7 +64,7 @@ describe("WLAClient", () => {
         });
 
         const players = await Effect.runPromise(
-          program.pipe(Effect.provide(WLAClient.Default)),
+          program.pipe(Effect.provide(WLAClient.layer)),
         );
 
         // WLA uses a JavaScript SPA (Pointstreak/DigitalShift) that loads data
@@ -98,7 +98,7 @@ describe("WLAClient", () => {
         });
 
         const goalies = await Effect.runPromise(
-          program.pipe(Effect.provide(WLAClient.Default)),
+          program.pipe(Effect.provide(WLAClient.layer)),
         );
 
         // WLA uses a JavaScript SPA (Pointstreak/DigitalShift) that loads data
@@ -132,7 +132,7 @@ describe("WLAClient", () => {
         });
 
         const standings = await Effect.runPromise(
-          program.pipe(Effect.provide(WLAClient.Default)),
+          program.pipe(Effect.provide(WLAClient.layer)),
         );
 
         // WLA uses a JavaScript SPA (Pointstreak/DigitalShift) that loads data
@@ -166,7 +166,7 @@ describe("WLAClient", () => {
         });
 
         const games = await Effect.runPromise(
-          program.pipe(Effect.provide(WLAClient.Default)),
+          program.pipe(Effect.provide(WLAClient.layer)),
         );
 
         // WLA uses a JavaScript SPA (Pointstreak/DigitalShift) that loads data

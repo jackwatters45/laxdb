@@ -12,7 +12,7 @@ describe("NLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(teams.length).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ describe("NLLClient", () => {
       });
 
       const teams = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(teams[0]).toBeDefined();
@@ -45,7 +45,7 @@ describe("NLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(players.length).toBeGreaterThan(0);
@@ -61,7 +61,7 @@ describe("NLLClient", () => {
       });
 
       const players = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(players[0]).toBeDefined();
@@ -78,7 +78,7 @@ describe("NLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(standings.length).toBeGreaterThan(0);
@@ -94,7 +94,7 @@ describe("NLLClient", () => {
       });
 
       const standings = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(standings[0]).toBeDefined();
@@ -112,7 +112,7 @@ describe("NLLClient", () => {
       });
 
       const schedule = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(schedule.length).toBeGreaterThan(0);
@@ -129,7 +129,7 @@ describe("NLLClient", () => {
       });
 
       const schedule = await Effect.runPromise(
-        program.pipe(Effect.provide(NLLClient.Default)),
+        program.pipe(Effect.provide(NLLClient.layer)),
       );
 
       expect(schedule[0]).toBeDefined();

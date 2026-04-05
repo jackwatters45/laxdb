@@ -109,8 +109,8 @@ const program = Effect.gen(function* () {
 }).pipe(
   Effect.provide(
     Layer.mergeAll(
-      PLLExtractorService.Default,
-      PLLManifestService.Default,
+      PLLExtractorService.layer,
+      PLLManifestService.layer,
       BunServices.layer,
     ),
   ),

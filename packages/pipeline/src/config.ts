@@ -64,7 +64,6 @@ export class PipelineConfig extends ServiceMap.Service<PipelineConfig>()(
   },
 ) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 export class PLLConfig extends ServiceMap.Service<PLLConfig>()("PLLConfig", {
@@ -94,7 +93,6 @@ export class PLLConfig extends ServiceMap.Service<PLLConfig>()("PLLConfig", {
   }),
 }) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 export class NLLConfig extends ServiceMap.Service<NLLConfig>()("NLLConfig", {
@@ -107,7 +105,6 @@ export class NLLConfig extends ServiceMap.Service<NLLConfig>()("NLLConfig", {
   } as const),
 }) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 export class MLLConfig extends ServiceMap.Service<MLLConfig>()("MLLConfig", {
@@ -122,7 +119,6 @@ export class MLLConfig extends ServiceMap.Service<MLLConfig>()("MLLConfig", {
   } as const),
 }) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 export class MSLConfig extends ServiceMap.Service<MSLConfig>()("MSLConfig", {
@@ -136,7 +132,6 @@ export class MSLConfig extends ServiceMap.Service<MSLConfig>()("MSLConfig", {
   } as const),
 }) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }
 
 export class WLAConfig extends ServiceMap.Service<WLAConfig>()("WLAConfig", {
@@ -150,5 +145,4 @@ export class WLAConfig extends ServiceMap.Service<WLAConfig>()("WLAConfig", {
   } as const),
 }) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }

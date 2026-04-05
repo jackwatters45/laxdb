@@ -610,13 +610,12 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(
       Layer.mergeAll(
-        PLLClient.Default,
-        ExtractConfigService.Default,
-        PLLManifestService.Default,
-        IncrementalExtractionService.Default,
+        PLLClient.layer,
+        ExtractConfigService.layer,
+        PLLManifestService.layer,
+        IncrementalExtractionService.layer,
         BunServices.layer,
       ),
     ),
   );
-  static readonly Default = this.layer;
 }

@@ -417,13 +417,12 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(
       Layer.mergeAll(
-        MLLClient.Default,
-        ExtractConfigService.Default,
-        MLLManifestService.Default,
-        IncrementalExtractionService.Default,
+        MLLClient.layer,
+        ExtractConfigService.layer,
+        MLLManifestService.layer,
+        IncrementalExtractionService.layer,
         BunServices.layer,
       ),
     ),
   );
-  static readonly Default = this.layer;
 }

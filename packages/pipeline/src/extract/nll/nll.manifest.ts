@@ -49,5 +49,4 @@ export class NLLManifestService extends ServiceMap.Service<NLLManifestService>()
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(ManifestServiceDependencies),
   );
-  static readonly Default = this.layer;
 }

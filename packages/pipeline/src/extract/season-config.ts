@@ -85,5 +85,4 @@ export class SeasonConfigService extends ServiceMap.Service<SeasonConfigService>
   },
 ) {
   static readonly layer = Layer.effect(this, this.make);
-  static readonly Default = this.layer;
 }

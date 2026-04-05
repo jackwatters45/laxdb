@@ -360,13 +360,12 @@ export class MSLExtractorService extends ServiceMap.Service<MSLExtractorService>
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(
       Layer.mergeAll(
-        MSLClient.Default,
-        ExtractConfigService.Default,
-        MSLManifestService.Default,
-        IncrementalExtractionService.Default,
+        MSLClient.layer,
+        ExtractConfigService.layer,
+        MSLManifestService.layer,
+        IncrementalExtractionService.layer,
         BunServices.layer,
       ),
     ),
   );
-  static readonly Default = this.layer;
 }

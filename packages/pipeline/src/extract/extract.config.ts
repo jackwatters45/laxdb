@@ -40,5 +40,4 @@ export class ExtractConfigService extends ServiceMap.Service<ExtractConfigServic
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(BunServices.layer),
   );
-  static readonly Default = this.layer;
 }

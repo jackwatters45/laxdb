@@ -38,27 +38,34 @@ export class IncrementalExtractionService extends ServiceMap.Service<Incremental
       ): boolean => {
         const { mode, skipExisting = true, maxAgeHours } = options;
 
+        // Full mode always re-extracts, regardless of existing data.
         if (mode === "full") {
           return true;
         }
 
+        // Incremental mode uses the season-aware freshness window.
+        // Current seasons get a finite max age; historical seasons typically do not.
         if (mode === "incremental") {
           const autoMaxAge = seasonConfig.getMaxAgeHours(seasonId);
           return isEntityStale(entityStatus, autoMaxAge);
         }
 
+        // Skip-existing mode only fills gaps and never refreshes existing data.
         if (mode === "skip-existing") {
           return !entityStatus?.extracted;
         }
 
+        // Legacy escape hatch: when skipExisting is false, behave like a full extract.
         if (!skipExisting) {
           return true;
         }
 
+        // Legacy age-based mode: if the caller passed an explicit max age, respect it.
         if (maxAgeHours !== undefined) {
           return isEntityStale(entityStatus, maxAgeHours);
         }
 
+        // Default behavior matches skip-existing for backwards compatibility.
         return !entityStatus?.extracted;
       };
 
@@ -105,5 +112,4 @@ export class IncrementalExtractionService extends ServiceMap.Service<Incremental
   static readonly layer = Layer.effect(this, this.make).pipe(
     Layer.provide(SeasonConfigService.layer),
   );
-  static readonly Default = this.layer;
 }

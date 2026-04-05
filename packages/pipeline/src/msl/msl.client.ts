@@ -937,7 +937,6 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
   })
 }) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Layer.mergeAll(MSLConfig.Default, PipelineConfig.Default)),
+    Layer.provide(Layer.mergeAll(MSLConfig.layer, PipelineConfig.layer)),
   );
-  static readonly Default = this.layer;
 }
