@@ -1,7 +1,3 @@
-import type {
-  GetDefaultsNamespaceInput,
-  PatchDefaultsNamespaceInput,
-} from "@laxdb/core/defaults/defaults.schema";
 import { DefaultsService } from "@laxdb/core/defaults/defaults.service";
 import { Effect, Layer } from "effect";
 
@@ -14,10 +10,8 @@ export const DefaultsRpcHandlers = DefaultsRpcs.toLayer(
     const service = yield* DefaultsService;
 
     return withRpcLogging({
-      DefaultsGetNamespace: (payload: GetDefaultsNamespaceInput) =>
-        service.getNamespace(payload),
-      DefaultsPatchNamespace: (payload: PatchDefaultsNamespaceInput) =>
-        service.patchNamespace(payload),
+      DefaultsGetNamespace: service.getNamespace,
+      DefaultsPatchNamespace: service.patchNamespace,
     });
   }),
 ).pipe(Layer.provide(DefaultsService.layer));

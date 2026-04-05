@@ -1,9 +1,3 @@
-import type {
-  CreatePlayInput,
-  DeletePlayInput,
-  GetPlayInput,
-  UpdatePlayInput,
-} from "@laxdb/core/play/play.schema";
 import { PlayService } from "@laxdb/core/play/play.service";
 import { Effect, Layer } from "effect";
 
@@ -16,11 +10,11 @@ export const PlayRpcHandlers = PlayRpcs.toLayer(
     const service = yield* PlayService;
 
     return withRpcLogging({
-      PlayList: () => service.list(),
-      PlayGet: (payload: GetPlayInput) => service.get(payload),
-      PlayCreate: (payload: CreatePlayInput) => service.create(payload),
-      PlayUpdate: (payload: UpdatePlayInput) => service.update(payload),
-      PlayDelete: (payload: DeletePlayInput) => service.delete(payload),
+      PlayList: service.list,
+      PlayGet: service.get,
+      PlayCreate: service.create,
+      PlayUpdate: service.update,
+      PlayDelete: service.delete,
     });
   }),
 ).pipe(Layer.provide(PlayService.layer));
