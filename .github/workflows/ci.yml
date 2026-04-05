@@ -10,6 +10,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  BUN_CACHE_DIR: ~/.bun/install/cache
+
 jobs:
   lint:
     name: Lint & Format
@@ -20,8 +23,24 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Restore Bun dependency cache
+        id: bun-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.BUN_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Save Bun dependency cache
+        if: github.ref == 'refs/heads/main' && steps.bun-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ env.BUN_CACHE_DIR }}
+          key: ${{ steps.bun-cache.outputs.cache-primary-key }}
 
       - name: Lint
         run: bun run lint
@@ -37,6 +56,14 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+
+      - name: Restore Bun dependency cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.BUN_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -72,6 +99,14 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+
+      - name: Restore Bun dependency cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.BUN_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
