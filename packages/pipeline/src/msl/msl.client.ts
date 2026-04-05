@@ -8,7 +8,7 @@ import {
   type ParseError,
   TimeoutError,
 } from "../error";
-import { mapParseError, safeParseJson } from "../util";
+import { mapParseError, safeParseJson, safeStringOrNull } from "../util";
 
 import {
   MSLGame,
@@ -430,10 +430,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
+              jersey_number: safeStringOrNull(jersey),
               position,
-              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLPlayerStats({
                 games_played: gamesPlayed,
@@ -582,9 +581,8 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
-              team_id: teamInfo?.id === undefined ? null : String(teamInfo.id),
+              jersey_number: safeStringOrNull(jersey),
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLGoalieStats({
                 games_played: gamesPlayed,

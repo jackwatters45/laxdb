@@ -1,5 +1,4 @@
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
+import { isRecord } from "@laxdb/core/type-guards";
 
 export const expectRecord = (value: unknown): Record<string, unknown> => {
   if (!isRecord(value)) {

@@ -1,3 +1,4 @@
+import { isRecord } from "@laxdb/core/type-guards";
 import * as cheerio from "cheerio";
 import { Effect, Layer, Option, Schedule, Schema, ServiceMap } from "effect";
 
@@ -26,9 +27,6 @@ import {
   WLATeam,
   WLATeamsRequest,
 } from "./wla.schema";
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const getNestedRecord = (obj: Record<string, unknown>, key: string) => {
   const nested = obj[key];
@@ -59,6 +57,49 @@ const pushUniqueByKey = <T>(
     seenKeys.add(key);
     items.push(item);
   }
+};
+
+const collectParsedEntities = <T>(
+  destination: T[],
+  source: readonly unknown[],
+  parse: (item: unknown, index: number) => T | null,
+) => {
+  for (let i = 0; i < source.length; i++) {
+    const entity = parse(source[i], i);
+    if (entity) {
+      destination.push(entity);
+    }
+  }
+};
+
+const extractEntitiesFromUnknown = <T>(
+  data: unknown,
+  keys: readonly string[],
+  parse: (item: unknown, index: number) => T | null,
+): T[] => {
+  const entities: T[] = [];
+
+  if (!data || typeof data !== "object") {
+    return entities;
+  }
+
+  if (Array.isArray(data)) {
+    collectParsedEntities(entities, data, parse);
+    return entities;
+  }
+
+  if (!isRecord(data)) {
+    return entities;
+  }
+
+  for (const key of keys) {
+    const nested = data[key];
+    if (Array.isArray(nested)) {
+      collectParsedEntities(entities, nested, parse);
+    }
+  }
+
+  return entities;
 };
 
 const extractFromEmbeddedJsonPatterns = <T>(
@@ -818,50 +859,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract goalies from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractGoaliesFromData = (data: unknown): WLAGoalie[] => {
-      const goalies: WLAGoalie[] = [];
-
-      if (!data || typeof data !== "object") {
-        return goalies;
-      }
-
-      // Handle array of goalies directly
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          const goalie = parseGoalieObject(item);
-          if (goalie) {
-            goalies.push(goalie);
-          }
-        }
-        return goalies;
-      }
-
-      // Handle nested structures
-      if (!isRecord(data)) {
-        return goalies;
-      }
-      const obj = data;
-
-      // Look for common goalie array keys
-      const goalieKeys = [
-        "goalies",
-        "goaltending",
-        "goalieStats",
-        "goalkeepers",
-      ];
-      for (const key of goalieKeys) {
-        if (Array.isArray(obj[key])) {
-          for (const item of obj[key]) {
-            const goalie = parseGoalieObject(item);
-            if (goalie) {
-              goalies.push(goalie);
-            }
-          }
-        }
-      }
-
-      return goalies;
-    };
+    const extractGoaliesFromData = (data: unknown): WLAGoalie[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["goalies", "goaltending", "goalieStats", "goalkeepers"],
+        (item) => parseGoalieObject(item),
+      );
 
     /**
      * Parses a single goalie object from JSON data.
@@ -938,51 +941,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract players from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractPlayersFromData = (data: unknown): WLAPlayer[] => {
-      const players: WLAPlayer[] = [];
-
-      if (!data || typeof data !== "object") {
-        return players;
-      }
-
-      // Handle array of players directly
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          const player = parsePlayerObject(item);
-          if (player) {
-            players.push(player);
-          }
-        }
-        return players;
-      }
-
-      // Handle nested structures
-      if (!isRecord(data)) {
-        return players;
-      }
-      const obj = data;
-
-      // Look for common player array keys
-      const playerKeys = [
-        "players",
-        "leaders",
-        "stats",
-        "playerStats",
-        "scoring",
-      ];
-      for (const key of playerKeys) {
-        if (Array.isArray(obj[key])) {
-          for (const item of obj[key]) {
-            const player = parsePlayerObject(item);
-            if (player) {
-              players.push(player);
-            }
-          }
-        }
-      }
-
-      return players;
-    };
+    const extractPlayersFromData = (data: unknown): WLAPlayer[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["players", "leaders", "stats", "playerStats", "scoring"],
+        (item) => parsePlayerObject(item),
+      );
 
     /**
      * Parses a single player object from JSON data.
@@ -1258,51 +1222,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract standings from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractStandingsFromData = (data: unknown): WLAStanding[] => {
-      const standings: WLAStanding[] = [];
-
-      if (!data || typeof data !== "object") {
-        return standings;
-      }
-
-      // Handle array of standings directly
-      if (Array.isArray(data)) {
-        for (let i = 0; i < data.length; i++) {
-          const standing = parseStandingObject(data[i], i + 1);
-          if (standing) {
-            standings.push(standing);
-          }
-        }
-        return standings;
-      }
-
-      // Handle nested structures
-      if (!isRecord(data)) {
-        return standings;
-      }
-      const obj = data;
-
-      // Look for common standings array keys
-      const standingsKeys = [
-        "standings",
-        "teams",
-        "teamStandings",
-        "division",
-        "records",
-      ];
-      for (const key of standingsKeys) {
-        if (Array.isArray(obj[key])) {
-          for (let i = 0; i < obj[key].length; i++) {
-            const standing = parseStandingObject(obj[key][i], i + 1);
-            if (standing) {
-              standings.push(standing);
-            }
-          }
-        }
-      }
-
-      return standings;
-    };
+    const extractStandingsFromData = (data: unknown): WLAStanding[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["standings", "teams", "teamStandings", "division", "records"],
+        (item, index) => parseStandingObject(item, index + 1),
+      );
 
     /**
      * Parses a single standing object from JSON data.
@@ -1572,45 +1497,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract games from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractGamesFromData = (data: unknown): WLAGame[] => {
-      const games: WLAGame[] = [];
-
-      if (!data || typeof data !== "object") {
-        return games;
-      }
-
-      // Handle array of games directly
-      if (Array.isArray(data)) {
-        for (let i = 0; i < data.length; i++) {
-          const game = parseGameObject(data[i], i);
-          if (game) {
-            games.push(game);
-          }
-        }
-        return games;
-      }
-
-      // Handle nested structures
-      if (!isRecord(data)) {
-        return games;
-      }
-      const obj = data;
-
-      // Look for common game array keys
-      const gameKeys = ["games", "schedule", "scores", "matches", "results"];
-      for (const key of gameKeys) {
-        if (Array.isArray(obj[key])) {
-          for (let i = 0; i < obj[key].length; i++) {
-            const game = parseGameObject(obj[key][i], i);
-            if (game) {
-              games.push(game);
-            }
-          }
-        }
-      }
-
-      return games;
-    };
+    const extractGamesFromData = (data: unknown): WLAGame[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["games", "schedule", "scores", "matches", "results"],
+        parseGameObject,
+      );
 
     /**
      * Parses a single game object from JSON data.
