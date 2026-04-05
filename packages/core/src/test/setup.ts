@@ -32,6 +32,28 @@ async function waitForDb(maxAttempts = 10): Promise<boolean> {
   return false;
 }
 
+function isSuppressibleMigrationError(statement: string, message: string) {
+  if (message.includes("already exists") || message.includes("duplicate key")) {
+    return true;
+  }
+
+  return (
+    message.includes("does not exist") && statement.trim().startsWith("DROP ")
+  );
+}
+
+async function applyMigrationStatement(client: Client, statement: string) {
+  try {
+    await client.query(statement);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+
+    if (!isSuppressibleMigrationError(statement, msg)) {
+      throw e;
+    }
+  }
+}
+
 async function applyMigrations() {
   const migrationsDir = new URL("../../migrations", import.meta.url).pathname;
   const { readdir, readFile } = await import("node:fs/promises");
@@ -61,20 +83,9 @@ async function applyMigrations() {
     );
 
     for (const statements of migrationStatements) {
-      try {
-        for (const stmt of statements) {
-          // oxlint-disable-next-line no-await-in-loop -- must run migrations sequentially
-          await client.query(stmt);
-        }
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        if (
-          !msg.includes("already exists") &&
-          !msg.includes("duplicate key") &&
-          !msg.includes("does not exist")
-        ) {
-          throw e;
-        }
+      for (const stmt of statements) {
+        // oxlint-disable-next-line no-await-in-loop -- must run migrations sequentially
+        await applyMigrationStatement(client, stmt);
       }
     }
   } finally {

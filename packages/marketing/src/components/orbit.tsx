@@ -30,11 +30,15 @@ export const Orbit = ({
 
   const positionedObjects = orbitingItems.map((object, index) => {
     const delaySeconds = -(index * (durationSeconds / orbitingObjects.length));
+    const key =
+      React.isValidElement(object) && object.key !== null
+        ? String(object.key)
+        : `orbit-${String(index)}`;
 
     return (
       <div
         className="absolute flex items-center justify-center"
-        key={String((React.isValidElement(object) && object.key) ?? delaySeconds)}
+        key={key}
         style={{
           animationName: "spin",
           animationDuration: `${durationSeconds}s`,
