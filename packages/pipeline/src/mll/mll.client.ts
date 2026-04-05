@@ -1,8 +1,19 @@
 import * as cheerio from "cheerio";
-import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
+import { Effect, Layer, Schedule, Schema, ServiceMap } from "effect";
 
 import { MLLConfig, PipelineConfig } from "../config";
-import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
+import {
+  type HttpError,
+  NetworkError,
+  ParseError,
+  TimeoutError,
+} from "../error";
+import {
+  defaultBodyReadMessage,
+  defaultNetworkMessage,
+  fetchTextWithRetry,
+} from "../http";
+import { safeParseJson } from "../util";
 
 import {
   MLLGame,
@@ -143,96 +154,29 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
     // Re-export cheerio for HTML parsing in methods
     const $ = cheerio;
 
-    /**
-     * Fetches a page from StatsCrew with browser-like headers.
-     * Returns the HTML content as a string.
-     */
-    const fetchStatscrewPage = (
-      path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const url = `${mllConfig.statscrewBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(url, {
-              method: "GET",
-              headers: {
-                ...mllConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `Request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `Network error: ${String(error)}`,
-              url,
-              cause: error,
-            });
-          },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
-
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `HTTP ${response.status} error`,
-              url,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read response body: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a StatsCrew page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchStatscrewPageWithRetry = (
       path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchStatscrewPage(path).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> => {
+      const url = `${mllConfig.statscrewBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+
+      return fetchTextWithRetry(
+        {
+          url,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...mllConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          timeoutMessage: `Request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("Request", error),
+          httpMessage: (statusCode) => `HTTP ${statusCode} error`,
+          bodyReadMessage: (error) => defaultBodyReadMessage("response", error),
+        },
+        pipelineConfig,
       );
+    };
 
     /**
      * Queries the Wayback Machine CDX API for archived URLs.
@@ -255,65 +199,27 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
           ...params,
         });
         const cdxUrl = `${mllConfig.waybackCdxUrl}?${queryParams.toString()}`;
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(cdxUrl, {
-              method: "GET",
-              headers: {
-                ...mllConfig.headers,
-                Accept: "application/json",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `CDX request timed out after ${timeoutMs}ms`,
-                url: cdxUrl,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `CDX network error: ${String(error)}`,
-              url: cdxUrl,
-              cause: error,
-            });
+        const body = yield* fetchTextWithRetry(
+          {
+            url: cdxUrl,
+            timeoutMs: pipelineConfig.defaultTimeoutMs,
+            headers: {
+              ...mllConfig.headers,
+              Accept: "application/json",
+            },
+            timeoutMessage: `CDX request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+            networkMessage: (error) => defaultNetworkMessage("CDX", error),
+            httpMessage: (statusCode) => `CDX API HTTP ${statusCode} error`,
+            bodyReadMessage: (error) => defaultBodyReadMessage("CDX", error),
           },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
+          pipelineConfig,
         );
 
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `CDX API HTTP ${response.status} error`,
-              url: cdxUrl,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const json = yield* Effect.tryPromise({
-          try: () => response.json(),
-          catch: (error) =>
-            new ParseError({
-              message: `Failed to parse CDX JSON response: ${String(error)}`,
-              cause: error,
-            }),
-        });
+        const json = yield* safeParseJson<unknown>(
+          body,
+          "Failed to parse CDX JSON response",
+        );
 
         // CDX returns array where first row is headers, rest are data rows
         // Format: [["urlkey", "timestamp", "original", "mimetype", "statuscode", "digest", "length"], [...data...], ...]
@@ -366,102 +272,31 @@ export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
         }),
       );
 
-    /**
-     * Fetches an archived page from the Wayback Machine.
-     * Returns the HTML content as a string.
-     *
-     * @param timestamp - Wayback timestamp (e.g., "20060501120000")
-     * @param url - Original URL to fetch (e.g., "http://majorleaguelacrosse.com/schedule/")
-     */
-    const fetchWaybackPage = (
-      timestamp: string,
-      url: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const waybackUrl = `${mllConfig.waybackWebUrl}/${timestamp}/${url}`;
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(waybackUrl, {
-              method: "GET",
-              headers: {
-                ...mllConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-              redirect: "follow",
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `Wayback request timed out after ${timeoutMs}ms`,
-                url: waybackUrl,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `Wayback network error: ${String(error)}`,
-              url: waybackUrl,
-              cause: error,
-            });
-          },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
-
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `Wayback HTTP ${response.status} error`,
-              url: waybackUrl,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read Wayback response body: ${String(error)}`,
-              url: waybackUrl,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a Wayback page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchWaybackPageWithRetry = (
       timestamp: string,
       url: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchWaybackPage(timestamp, url).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> => {
+      const waybackUrl = `${mllConfig.waybackWebUrl}/${timestamp}/${url}`;
+
+      return fetchTextWithRetry(
+        {
+          url: waybackUrl,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...mllConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          redirect: "follow",
+          timeoutMessage: `Wayback request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("Wayback", error),
+          httpMessage: (statusCode) => `Wayback HTTP ${statusCode} error`,
+          bodyReadMessage: (error) => defaultBodyReadMessage("Wayback", error),
+        },
+        pipelineConfig,
       );
+    };
 
     /**
      * Fetches all teams for a given MLL season year.
