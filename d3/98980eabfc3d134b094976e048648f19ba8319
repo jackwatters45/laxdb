@@ -1,0 +1,11 @@
+packages/practice-planner/src/routes/playbook/index.tsx
+  72b1a1a6c7b08f89 173
+packages/practice-planner/src/components/split-node.tsx
+  1afd96eae1e095f5 25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d398980eabfc3d134b094976e048648f19ba8319",
+  "prompts": {}
+}
