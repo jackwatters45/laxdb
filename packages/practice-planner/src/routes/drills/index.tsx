@@ -34,7 +34,15 @@ import {
 import { useState } from "react";
 
 import { runApi } from "@/lib/api";
-import type { Drill, Difficulty } from "@/types";
+import {
+  DRILL_DIFFICULTY_COLORS,
+  DRILL_DIFFICULTY_FILTER_OPTIONS,
+  DRILL_LIST_CATEGORY_FILTER_OPTIONS,
+  type DrillDifficultyFilter,
+  type DrillListCategoryFilter,
+} from "@/lib/drill-definitions";
+import { isOptionValue } from "@/lib/option-guards";
+import type { Drill } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -77,44 +85,6 @@ export const Route = createFileRoute("/drills/")({
 // Constants
 // ---------------------------------------------------------------------------
 
-const CATEGORIES = [
-  { value: "all", label: "All" },
-  { value: "passing", label: "Passing" },
-  { value: "shooting", label: "Shooting" },
-  { value: "defense", label: "Defense" },
-  { value: "ground-balls", label: "Ground Balls" },
-  { value: "face-offs", label: "Face-offs" },
-  { value: "clearing", label: "Clearing" },
-  { value: "riding", label: "Riding" },
-  { value: "transition", label: "Transition" },
-  { value: "man-up", label: "Man-Up" },
-  { value: "man-down", label: "Man-Down" },
-  { value: "conditioning", label: "Conditioning" },
-] as const;
-
-const DIFFICULTIES = [
-  { value: "all", label: "All Levels" },
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-] as const;
-
-const isDrillListCategory = (
-  value: string,
-): value is (typeof CATEGORIES)[number]["value"] =>
-  CATEGORIES.some((category) => category.value === value);
-
-const isDifficultyFilter = (
-  value: string,
-): value is (typeof DIFFICULTIES)[number]["value"] =>
-  DIFFICULTIES.some((difficulty) => difficulty.value === value);
-
-const difficultyColors: Record<Difficulty, string> = {
-  beginner: "bg-green-500/10 text-green-600",
-  intermediate: "bg-amber-500/10 text-amber-600",
-  advanced: "bg-red-500/10 text-red-600",
-};
-
 const intensityIcons: Record<string, typeof Zap> = {
   low: Snowflake,
   medium: Flame,
@@ -129,9 +99,9 @@ function DrillsListPage() {
   const drills = Route.useLoaderData();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] =
-    useState<(typeof CATEGORIES)[number]["value"]>("all");
+    useState<DrillListCategoryFilter>("all");
   const [activeDifficulty, setActiveDifficulty] =
-    useState<(typeof DIFFICULTIES)[number]["value"]>("all");
+    useState<DrillDifficultyFilter>("all");
 
   const filtered = drills.filter((drill) => {
     const matchesSearch =
@@ -188,14 +158,16 @@ function DrillsListPage() {
               value={[activeCategory]}
               onValueChange={(values) => {
                 const next = values[0];
-                if (next && isDrillListCategory(next)) setActiveCategory(next);
+                if (isOptionValue(DRILL_LIST_CATEGORY_FILTER_OPTIONS, next)) {
+                  setActiveCategory(next);
+                }
               }}
               variant="outline"
               size="sm"
               spacing={1}
               className="flex-wrap"
             >
-              {CATEGORIES.map((cat) => (
+              {DRILL_LIST_CATEGORY_FILTER_OPTIONS.map((cat) => (
                 <ToggleGroupItem key={cat.value} value={cat.value}>
                   {cat.label}
                 </ToggleGroupItem>
@@ -206,14 +178,16 @@ function DrillsListPage() {
               value={[activeDifficulty]}
               onValueChange={(values) => {
                 const next = values[0];
-                if (next && isDifficultyFilter(next)) setActiveDifficulty(next);
+                if (isOptionValue(DRILL_DIFFICULTY_FILTER_OPTIONS, next)) {
+                  setActiveDifficulty(next);
+                }
               }}
               variant="outline"
               size="sm"
               spacing={1}
               className="flex-wrap"
             >
-              {DIFFICULTIES.map((d) => (
+              {DRILL_DIFFICULTY_FILTER_OPTIONS.map((d) => (
                 <ToggleGroupItem key={d.value} value={d.value}>
                   {d.label}
                 </ToggleGroupItem>
@@ -324,7 +298,7 @@ function DrillCard({ drill }: { drill: Drill }) {
             </span>
             <Badge
               variant="secondary"
-              className={difficultyColors[drill.difficulty]}
+              className={DRILL_DIFFICULTY_COLORS[drill.difficulty]}
             >
               {drill.difficulty}
             </Badge>
