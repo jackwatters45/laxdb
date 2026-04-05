@@ -10,6 +10,8 @@ import {
   expectRecord,
   expectRecordArray,
   expectStringProp,
+} from "./assertions";
+import {
   post,
   startTestServer,
   truncateAllTables,
