@@ -1,9 +1,19 @@
 import { isRecord } from "@laxdb/core/type-guards";
 import * as cheerio from "cheerio";
-import { Effect, Layer, Option, Schedule, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Option, Schema, ServiceMap } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
-import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
+import {
+  type HttpError,
+  type NetworkError,
+  ParseError,
+  type TimeoutError,
+} from "../error";
+import {
+  defaultBodyReadMessage,
+  defaultNetworkMessage,
+  fetchTextWithRetry,
+} from "../http";
 import {
   mapParseError,
   safeParseJson,
@@ -136,97 +146,28 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
     // Re-export cheerio for potential future HTML parsing needs
     const $ = cheerio;
 
-    /**
-     * Fetches a page from the WLA website with browser-like headers.
-     * Returns the HTML content as a string.
-     *
-     * @param url - Full URL to fetch
-     */
-    const fetchPage = (
-      url: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(url, {
-              method: "GET",
-              headers: {
-                ...wlaConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `WLA request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `WLA network error: ${String(error)}`,
-              url,
-              cause: error,
-            });
-          },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
-
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `WLA HTTP ${response.status} error`,
-              url,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read WLA response body: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a WLA page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchPageWithRetry = (
       url: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchPage(url).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
+      fetchTextWithRetry(
+        {
+          url,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...wlaConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          timeoutMessage: `WLA request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("WLA", error),
+          httpMessage: (statusCode) => `WLA HTTP ${statusCode} error`,
+          bodyReadMessage: (error) => defaultBodyReadMessage("WLA", error),
+        },
+        pipelineConfig,
       );
+
+    const fetchPage = fetchPageWithRetry;
 
     /**
      * Maps a calendar year to WLA's Pointstreak season ID.

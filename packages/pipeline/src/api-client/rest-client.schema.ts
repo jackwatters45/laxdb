@@ -1,16 +1,12 @@
 import { Schema } from "effect";
 
+import { SharedClientConfigFields } from "./config.schema";
+
 export class RestClientConfig extends Schema.Class<RestClientConfig>(
   "RestClientConfig",
 )({
   baseUrl: Schema.String,
-  defaultHeaders: Schema.optional(Schema.Record(Schema.String, Schema.String)),
-  authHeader: Schema.optional(Schema.String),
-  timeoutMs: Schema.optional(Schema.Number.check(Schema.isGreaterThan(0))),
-  maxRetries: Schema.optional(
-    Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0)),
-  ),
-  retryDelayMs: Schema.optional(Schema.Number.check(Schema.isGreaterThan(0))),
+  ...SharedClientConfigFields,
 }) {}
 
 export class RestRequestOptions extends Schema.Class<RestRequestOptions>(
