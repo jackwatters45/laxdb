@@ -1,34 +1,25 @@
-import { Effect, Schema } from "effect";
+import { Effect, type Schema } from "effect";
 
-import { DEFAULT_PIPELINE_CONFIG } from "../config";
-import { GraphQLError, ParseError, type PipelineError } from "../error";
+import { GraphQLError, type PipelineError } from "../error";
 import { fetchJson, retryPipelineRequest } from "../http";
 
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
+import {
+  buildJsonHeaders,
+  decodeClientResponse,
+  resolveClientRuntimeConfig,
+} from "./shared";
 
 // Re-export for backwards compatibility
 export { GraphQLError } from "../error";
 
 export const makeGraphQLClient = (config: GraphQLClientConfig) => {
-  const defaultTimeout =
-    config.timeoutMs ?? DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs;
-  const maxRetries = config.maxRetries ?? DEFAULT_PIPELINE_CONFIG.maxRetries;
-  const retryDelayMs =
-    config.retryDelayMs ?? DEFAULT_PIPELINE_CONFIG.retryDelayMs;
-
-  const buildHeaders = (): Record<string, string> => {
-    const headers: Record<string, string> = {
-      "content-type": "application/json",
-      ...config.defaultHeaders,
-    };
-
-    if (config.authHeader) {
-      headers.authorization = config.authHeader;
-    }
-
-    return headers;
-  };
+  const {
+    defaultTimeoutMs: defaultTimeout,
+    maxRetries,
+    retryDelayMs,
+  } = resolveClientRuntimeConfig(config);
 
   const execute = <S extends Schema.Top>(
     request: GraphQLRequest,
@@ -43,7 +34,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
         url,
         timeoutMs: timeout,
         method: "POST",
-        headers: buildHeaders(),
+        headers: buildJsonHeaders(config),
         body: JSON.stringify({
           query: request.query,
           variables: request.variables,
@@ -58,18 +49,7 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       });
 
       const responseSchema = GraphQLResponse(dataSchema);
-      const decoded = yield* Schema.decodeUnknownEffect(responseSchema)(
-        json,
-      ).pipe(
-        Effect.mapError(
-          (error) =>
-            new ParseError({
-              message: `Schema validation failed: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        ),
-      );
+      const decoded = yield* decodeClientResponse(responseSchema, json, url);
 
       if (decoded.errors && decoded.errors.length > 0) {
         return yield* Effect.fail(

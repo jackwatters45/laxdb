@@ -1,7 +1,6 @@
-import { Effect, Schema } from "effect";
+import { Effect, type Schema } from "effect";
 
-import { DEFAULT_PIPELINE_CONFIG } from "../config";
-import { ParseError, type PipelineError } from "../error";
+import type { PipelineError } from "../error";
 import { fetchJson, retryPipelineRequest } from "../http";
 
 import type {
@@ -9,29 +8,18 @@ import type {
   RestRequestOptions,
   HttpMethod,
 } from "./rest-client.schema";
+import {
+  buildJsonHeaders,
+  decodeClientResponse,
+  resolveClientRuntimeConfig,
+} from "./shared";
 
 export const makeRestClient = (config: RestClientConfig) => {
-  const defaultTimeout =
-    config.timeoutMs ?? DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs;
-  const maxRetries = config.maxRetries ?? DEFAULT_PIPELINE_CONFIG.maxRetries;
-  const retryDelayMs =
-    config.retryDelayMs ?? DEFAULT_PIPELINE_CONFIG.retryDelayMs;
-
-  const buildHeaders = (
-    options?: RestRequestOptions,
-  ): Record<string, string> => {
-    const headers: Record<string, string> = {
-      "content-type": "application/json",
-      ...config.defaultHeaders,
-      ...options?.headers,
-    };
-
-    if (config.authHeader) {
-      headers.authorization = config.authHeader;
-    }
-
-    return headers;
-  };
+  const {
+    defaultTimeoutMs: defaultTimeout,
+    maxRetries,
+    retryDelayMs,
+  } = resolveClientRuntimeConfig(config);
 
   const request = <S extends Schema.Top>(
     method: HttpMethod,
@@ -48,7 +36,7 @@ export const makeRestClient = (config: RestClientConfig) => {
         url,
         timeoutMs,
         method,
-        headers: buildHeaders(options),
+        headers: buildJsonHeaders(config, options?.headers),
         ...(body ? { body: JSON.stringify(body) } : {}),
         timeoutMessage: `Request timed out after ${timeoutMs}ms`,
         networkMessage: (error) => `Network error: ${String(error)}`,
@@ -58,18 +46,7 @@ export const makeRestClient = (config: RestClientConfig) => {
         jsonParseMessage: (error) => `Failed to parse JSON: ${String(error)}`,
       });
 
-      const decoded = yield* Schema.decodeUnknownEffect(schema)(json).pipe(
-        Effect.mapError(
-          (error) =>
-            new ParseError({
-              message: `Schema validation failed: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        ),
-      );
-
-      return decoded;
+      return yield* decodeClientResponse(schema, json, url);
     });
 
   const requestWithRetry = <S extends Schema.Top>(
