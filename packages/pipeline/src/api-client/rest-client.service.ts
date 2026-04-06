@@ -1,26 +1,14 @@
-import { Duration, Effect, Schedule, Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import { DEFAULT_PIPELINE_CONFIG } from "../config";
-
-const MAX_RETRY_WAIT_MS = 300_000; // 5 minutes max to prevent DoS via large retry-after
-import {
-  HttpError,
-  NetworkError,
-  ParseError,
-  type PipelineError,
-  RateLimitError,
-  TimeoutError,
-} from "../error";
+import { ParseError, type PipelineError } from "../error";
+import { fetchJson, retryPipelineRequest } from "../http";
 
 import type {
   RestClientConfig,
   RestRequestOptions,
   HttpMethod,
 } from "./rest-client.schema";
-
-// Retry transient transport failures only.
-const isTransientError = (error: PipelineError): boolean =>
-  error instanceof NetworkError || error instanceof TimeoutError;
 
 export const makeRestClient = (config: RestClientConfig) => {
   const defaultTimeout =
@@ -56,77 +44,18 @@ export const makeRestClient = (config: RestClientConfig) => {
       const url = `${config.baseUrl}${endpoint}`;
       const timeoutMs = options?.timeoutMs ?? defaultTimeout;
 
-      const response = yield* Effect.tryPromise({
-        try: (signal) =>
-          fetch(url, {
-            method,
-            headers: buildHeaders(options),
-            body: body ? JSON.stringify(body) : undefined,
-            signal,
-          }),
-        catch: (error) => {
-          if (error instanceof Error && error.name === "AbortError") {
-            return new TimeoutError({
-              message: `Request timed out after ${timeoutMs}ms`,
-              url,
-              timeoutMs,
-            });
-          }
-          return new NetworkError({
-            message: `Network error: ${String(error)}`,
-            url,
-            cause: error,
-          });
-        },
-      }).pipe(
-        Effect.timeoutOrElse({
-          duration: Duration.millis(timeoutMs),
-          orElse: () =>
-            Effect.fail(
-              new TimeoutError({
-                message: `Request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              }),
-            ),
-        }),
-      );
-
-      if (response.status === 429) {
-        const retryAfter = response.headers.get("retry-after");
-        const retryAfterMs = retryAfter
-          ? Number.parseInt(retryAfter, 10) * 1000
-          : undefined;
-
-        return yield* Effect.fail(
-          new RateLimitError({
-            message: "Rate limited by server",
-            url,
-            retryAfterMs,
-          }),
-        );
-      }
-
-      if (!response.ok) {
-        return yield* Effect.fail(
-          new HttpError({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-            url,
-            method,
-            statusCode: response.status,
-          }),
-        );
-      }
-
-      const json = yield* Effect.tryPromise({
-        try: () => response.json(),
-        catch: (error) =>
-          new HttpError({
-            message: `Failed to parse JSON: ${String(error)}`,
-            url,
-            method,
-            cause: error,
-          }),
+      const json = yield* fetchJson({
+        url,
+        timeoutMs,
+        method,
+        headers: buildHeaders(options),
+        ...(body ? { body: JSON.stringify(body) } : {}),
+        timeoutMessage: `Request timed out after ${timeoutMs}ms`,
+        networkMessage: (error) => `Network error: ${String(error)}`,
+        httpMessage: (statusCode, statusText) =>
+          `HTTP ${statusCode}: ${statusText}`,
+        rateLimitMessage: "Rate limited by server",
+        jsonParseMessage: (error) => `Failed to parse JSON: ${String(error)}`,
       });
 
       const decoded = yield* Schema.decodeUnknownEffect(schema)(json).pipe(
@@ -150,28 +79,12 @@ export const makeRestClient = (config: RestClientConfig) => {
     body?: unknown,
     options?: RestRequestOptions,
   ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
-    request(method, endpoint, schema, body, options).pipe(
-      Effect.retry({
-        schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
-        times: maxRetries,
-        while: isTransientError,
-      }),
-      Effect.catchTag("RateLimitError", (error) =>
-        Effect.sleep(
-          Duration.millis(
-            Math.min(error.retryAfterMs ?? retryDelayMs, MAX_RETRY_WAIT_MS),
-          ),
-        ).pipe(
-          Effect.andThen(
-            request(method, endpoint, schema, body, options).pipe(
-              Effect.retry({
-                schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
-                times: maxRetries,
-              }),
-            ),
-          ),
-        ),
-      ),
+    retryPipelineRequest(
+      () => request(method, endpoint, schema, body, options),
+      {
+        maxRetries,
+        retryDelayMs,
+      },
     );
 
   return {
