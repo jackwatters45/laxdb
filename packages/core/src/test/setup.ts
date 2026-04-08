@@ -54,6 +54,14 @@ async function applyMigrationStatement(client: Client, statement: string) {
   }
 }
 
+const MIGRATION_LOCK_ID = 42_604_008;
+
+async function resetDatabase(client: Client) {
+  await client.query(
+    "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;",
+  );
+}
+
 async function applyMigrations() {
   const migrationsDir = new URL("../../migrations", import.meta.url).pathname;
   const { readdir, readFile } = await import("node:fs/promises");
@@ -71,6 +79,9 @@ async function applyMigrations() {
   await client.connect();
 
   try {
+    await client.query("SELECT pg_advisory_lock($1)", [MIGRATION_LOCK_ID]);
+    await resetDatabase(client);
+
     const migrationStatements = await Promise.all(
       migrationDirs.map(async (dir) => {
         const sqlPath = path.join(migrationsDir, dir.name, "migration.sql");
@@ -89,7 +100,11 @@ async function applyMigrations() {
       }
     }
   } finally {
-    await client.end();
+    try {
+      await client.query("SELECT pg_advisory_unlock($1)", [MIGRATION_LOCK_ID]);
+    } finally {
+      await client.end();
+    }
   }
 }
 
