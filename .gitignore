@@ -1,6 +1,9 @@
 # dependencies
 node_modules
 
+# pi
+.pi
+
 # ts build
 *.tsbuildinfo
 
