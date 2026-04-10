@@ -484,7 +484,7 @@
 
     "@effect/language-service": ["@effect/language-service@0.62.5", "", { "bin": { "effect-language-service": "cli.js" } }, "sha512-vCMZkqbE8bQ4cmksrj2HLVhYXL6B0bs7uulALgVh6Hh46/V2WrcExgx6DTr0BE6nwBuecqbd4xWjEoPSwI8bPw=="],
 
-    "@effect/platform": ["@effect/platform@0.96.0", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.21.0" } }, "sha512-U7PLhkVzg7zzrgFvyWATOzD6reL87KG/fcdOxgLWBQ/J5CCU6qdPAVG+0o6o+IxcsLoqGwxs+rFxaFzrdtDV1A=="],
+    "@effect/platform": ["@effect/platform@0.94.5", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.19.17" } }, "sha512-z05APUiDDPbodhTkH/RJqOLoCU11bU2IZLfcwLFrld03+ob1VeqRnELQlmueLIYm6NZifHAtjl32V+GRt34y4A=="],
 
     "@effect/platform-bun": ["@effect/platform-bun@4.0.0-beta.43", "", { "dependencies": { "@effect/platform-node-shared": "^4.0.0-beta.43" }, "peerDependencies": { "effect": "^4.0.0-beta.43" } }, "sha512-nMZ9JsD6CzJNQ+5pDUFbPw7PSZdQdTQ092MbYrocVtvlf6qEFU/hji3ITvRIOX7eabyQ8AUyp55qFPQUeq+GIA=="],
 
