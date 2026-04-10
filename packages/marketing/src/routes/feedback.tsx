@@ -1,8 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { CloudUpload, Loader2, Paperclip, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 
+import {
+  FEEDBACK_ACCEPTED_TYPES,
+  MAX_FEEDBACK_FILES,
+  MAX_FEEDBACK_FILE_SIZE,
+} from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/feedback")({
@@ -11,20 +17,16 @@ export const Route = createFileRoute("/feedback")({
 
 // --- Client ---
 
+const submitFeedback = createServerFn({ method: "POST" })
+  .inputValidator((data: FormData) => data)
+  .handler(async ({ data }) => {
+    const { storeFeedbackSubmission } = await import("@/lib/feedback.server");
+    return storeFeedbackSubmission(data);
+  });
+
 interface FileWithPreview extends File {
   preview: string;
 }
-
-const MAX_FILES = 3;
-const MAX_SIZE = 10 * 1024 * 1024;
-
-const ACCEPTED_TYPES = {
-  "image/png": [".png"],
-  "image/jpeg": [".jpg", ".jpeg"],
-  "image/webp": [".webp"],
-  "video/mp4": [".mp4"],
-  "video/quicktime": [".mov"],
-};
 
 function FeedbackPage() {
   const [message, setMessage] = useState("");
@@ -52,9 +54,12 @@ function FeedbackPage() {
       setError(reasons.join(". "));
     }
     const withPreviews = accepted.map(
-      (file) => Object.assign(file, { preview: URL.createObjectURL(file) }) as FileWithPreview,
+      (file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        }) as FileWithPreview,
     );
-    setFiles((prev) => [...prev, ...withPreviews].slice(0, MAX_FILES));
+    setFiles((prev) => [...prev, ...withPreviews].slice(0, MAX_FEEDBACK_FILES));
   }, []);
 
   useEffect(() => {
@@ -68,9 +73,9 @@ function FeedbackPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: ACCEPTED_TYPES,
-    maxSize: MAX_SIZE,
-    maxFiles: MAX_FILES - files.length,
+    accept: FEEDBACK_ACCEPTED_TYPES,
+    maxSize: MAX_FEEDBACK_FILE_SIZE,
+    maxFiles: MAX_FEEDBACK_FILES - files.length,
     multiple: true,
     noClick: true,
     noKeyboard: true,
@@ -81,8 +86,14 @@ function FeedbackPage() {
     setSubmitting(true);
 
     try {
-      // TODO: Wire up to backend when marketing worker has core bindings
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const formData = new FormData();
+      formData.set("message", message.trim());
+
+      for (const file of files) {
+        formData.append("files", file);
+      }
+
+      await submitFeedback({ data: formData });
 
       setSubmitted(true);
       setMessage("");
@@ -91,7 +102,11 @@ function FeedbackPage() {
         return [];
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -126,10 +141,12 @@ function FeedbackPage() {
   return (
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
       <header className="mb-10">
-        <h1 className="font-serif text-3xl text-foreground italic md:text-4xl">Get in touch</h1>
+        <h1 className="font-serif text-3xl text-foreground italic md:text-4xl">
+          Get in touch
+        </h1>
         <p className="mt-3 text-muted-foreground">
-          Bug report, feature request, or just want to say hi &mdash; we&rsquo;d love to hear from
-          you.
+          Bug report, feature request, or just want to say hi &mdash; we&rsquo;d
+          love to hear from you.
         </p>
       </header>
 
@@ -144,7 +161,9 @@ function FeedbackPage() {
         {isDragActive && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-foreground/25 bg-background/90 backdrop-blur-xs">
             <CloudUpload className="size-10 text-muted-foreground/60" />
-            <p className="text-sm text-muted-foreground">Drop files here&hellip;</p>
+            <p className="text-sm text-muted-foreground">
+              Drop files here&hellip;
+            </p>
             <p className="text-xs text-muted-foreground/50">
               PNG, JPG, WebP, MP4, or MOV. Max 10 MB each.
             </p>
@@ -153,13 +172,18 @@ function FeedbackPage() {
 
         {/* Card header */}
         <div className="border-b border-foreground/10 px-6 py-4">
-          <span className="text-sm font-medium text-foreground">Send a message</span>
+          <span className="text-sm font-medium text-foreground">
+            Send a message
+          </span>
         </div>
 
         {/* Card body */}
         <div className="space-y-4 p-6">
           <div>
-            <label className="mb-2 block text-sm text-muted-foreground" htmlFor="feedback-message">
+            <label
+              className="mb-2 block text-sm text-muted-foreground"
+              htmlFor="feedback-message"
+            >
               Tell us what&rsquo;s on your mind.
             </label>
             <textarea
@@ -180,7 +204,7 @@ function FeedbackPage() {
           </div>
 
           {/* Click-to-browse trigger */}
-          {files.length < MAX_FILES && (
+          {files.length < MAX_FEEDBACK_FILES && (
             <button
               className="inline-flex cursor-pointer items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => fileInputRef.current?.click()}
@@ -205,7 +229,9 @@ function FeedbackPage() {
             type="file"
           />
 
-          {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
+          {error && (
+            <p className="text-xs text-red-500 dark:text-red-400">{error}</p>
+          )}
 
           {/* File previews */}
           {files.length > 0 && (
@@ -216,7 +242,11 @@ function FeedbackPage() {
                   key={file.name}
                 >
                   {file.type.startsWith("image/") ? (
-                    <img alt={file.name} className="size-full object-cover" src={file.preview} />
+                    <img
+                      alt={file.name}
+                      className="size-full object-cover"
+                      src={file.preview}
+                    />
                   ) : (
                     <video
                       className="size-full object-cover"
@@ -243,7 +273,8 @@ function FeedbackPage() {
 
           {/* Screen reader */}
           <div aria-live="polite" className="sr-only">
-            {files.length > 0 && `${files.length} file${files.length > 1 ? "s" : ""} attached.`}
+            {files.length > 0 &&
+              `${files.length} file${files.length > 1 ? "s" : ""} attached.`}
           </div>
         </div>
 

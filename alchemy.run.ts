@@ -1,8 +1,4 @@
-import { Exec } from "alchemy/os";
-import { Branch, Database, Role } from "alchemy/planetscale";
 import alchemy from "alchemy";
-import { CloudflareStateStore } from "alchemy/state";
-import { GitHubComment } from "alchemy/github";
 import {
   Hyperdrive,
   KVNamespace,
@@ -10,6 +6,10 @@ import {
   TanStackStart,
   Worker,
 } from "alchemy/cloudflare";
+import { GitHubComment } from "alchemy/github";
+import { Exec } from "alchemy/os";
+import { Branch, Database, Role } from "alchemy/planetscale";
+import { CloudflareStateStore } from "alchemy/state";
 
 export const app = await alchemy("laxdb", {
   stateStore: (scope) =>
@@ -84,7 +84,12 @@ const currentBranch =
       : personalBranch;
 
 // Schema role — stable per branch, owns tables, used for migrations/push
-const branchName = currentBranch === devBranch ? "dev" : currentBranch === personalBranch ? "personal" : "main";
+const branchName =
+  currentBranch === devBranch
+    ? "dev"
+    : currentBranch === personalBranch
+      ? "personal"
+      : "main";
 const schemaRole = await Role(`db-schema-${branchName}-v2`, {
   database,
   branch: currentBranch,
@@ -172,7 +177,9 @@ export const api = await Worker("api", {
 });
 
 export const marketing = await TanStackStart("marketing", {
-  bindings: {},
+  bindings: {
+    STORAGE: storage,
+  },
   cwd: "./packages/marketing",
   domains: [domain],
 });
