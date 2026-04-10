@@ -5,9 +5,7 @@
     "": {
       "name": "laxdb",
       "dependencies": {
-        "@effect/platform": "^0.96.0",
         "alchemy": "^0.89.0",
-        "distilled-cloudflare": "github:alchemy-run/distilled-cloudflare",
         "effect": "^3.19.19",
       },
       "devDependencies": {
@@ -1647,8 +1645,6 @@
     "devlop": ["devlop@1.1.0", "", { "dependencies": { "dequal": "^2.0.0" } }, "sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA=="],
 
     "diff": ["diff@8.0.4", "", {}, "sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw=="],
-
-    "distilled-cloudflare": ["distilled-cloudflare@github:alchemy-run/distilled-cloudflare#8ebd422", { "dependencies": { "@effect/platform": "latest", "effect": "latest" } }, "alchemy-run-distilled-cloudflare-8ebd422", "sha512-jR3hQ4RIrIiMHaGKEc96y9L+Vd9gc025auZSrXnAQAfjFZdtCqCneH9wZdeqxIsbPPER8uCKD3LJQE7rVQbwyw=="],
 
     "doctrine": ["doctrine@3.0.0", "", { "dependencies": { "esutils": "^2.0.2" } }, "sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w=="],
 

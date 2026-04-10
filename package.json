@@ -20,9 +20,7 @@
     "prepare": "effect-language-service patch"
   },
   "dependencies": {
-    "@effect/platform": "^0.96.0",
     "alchemy": "^0.89.0",
-    "distilled-cloudflare": "github:alchemy-run/distilled-cloudflare",
     "effect": "^3.19.19"
   },
   "devDependencies": {
