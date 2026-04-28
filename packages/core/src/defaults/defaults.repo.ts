@@ -1,7 +1,7 @@
 import { and, eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { PgDrizzle, query } from "../drizzle/drizzle.service";
+import { DrizzleService, headOrFail, query } from "../drizzle/drizzle.service";
 
 import type {
   GetDefaultsNamespaceInput,
@@ -13,7 +13,7 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
   "DefaultsRepo",
   {
     make: Effect.gen(function* () {
-      const db = yield* PgDrizzle;
+      const db = yield* DrizzleService;
       const { id: _id, ...cols } = getColumns(defaultsTable);
 
       return {
@@ -52,17 +52,18 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
             };
 
             if (existing) {
-              const rows = yield* query(
+              return yield* query(
                 db
                   .update(defaultsTable)
                   .set({ valuesJson: nextValues })
                   .where(eq(defaultsTable.publicId, existing.publicId))
                   .returning(cols),
+              ).pipe(
+                Effect.flatMap((rows) => headOrFail(rows).pipe(Effect.orDie)),
               );
-              return rows[0]!;
             }
 
-            const rows = yield* query(
+            return yield* query(
               db
                 .insert(defaultsTable)
                 .values({
@@ -72,8 +73,9 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
                   valuesJson: nextValues,
                 })
                 .returning(cols),
+            ).pipe(
+              Effect.flatMap((rows) => headOrFail(rows).pipe(Effect.orDie)),
             );
-            return rows[0]!;
           }),
       } as const;
     }),

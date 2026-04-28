@@ -4,7 +4,12 @@
  * Serves the full API (HTTP routes + RPC) backed by TestDatabaseLive.
  */
 
-import { createServer, type Server } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type Server,
+  type ServerResponse,
+} from "node:http";
 
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
@@ -68,46 +73,64 @@ export interface TestServer {
   cleanup: () => Promise<void>;
 }
 
+const readRequestBody = (req: IncomingMessage): Promise<Buffer> =>
+  new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on("data", (chunk: Buffer) => chunks.push(chunk));
+    req.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+    req.on("error", reject);
+  });
+
+const createHeaders = (req: IncomingMessage) => {
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      for (const item of value) headers.append(key, item);
+    } else {
+      headers.set(key, value);
+    }
+  }
+  return headers;
+};
+
+const handleNodeRequest = async (
+  handler: (request: Request) => Promise<Response>,
+  req: IncomingMessage,
+  res: ServerResponse,
+) => {
+  const body =
+    req.method === "GET" || req.method === "HEAD"
+      ? undefined
+      : await readRequestBody(req);
+
+  const request = new Request(`http://localhost${req.url ?? "/"}`, {
+    method: req.method,
+    headers: createHeaders(req),
+    body,
+  });
+
+  const response = await handler(request);
+  res.writeHead(response.status, Object.fromEntries(response.headers));
+  const responseBody = await response.arrayBuffer();
+  res.end(Buffer.from(responseBody));
+};
+
 /**
  * Start a test API server on a random port.
  */
 export async function startTestServer(): Promise<TestServer> {
   const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
 
-  const server = createServer(async (req, res) => {
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(req.headers)) {
-      if (value) {
-        if (Array.isArray(value)) {
-          for (const v of value) headers.append(key, v);
-        } else {
-          headers.set(key, value);
-        }
-      }
-    }
-
-    const body =
-      req.method === "GET" || req.method === "HEAD"
-        ? undefined
-        : await new Promise<Buffer>((resolve, reject) => {
-            const chunks: Buffer[] = [];
-            req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () => {
-              resolve(Buffer.concat(chunks));
-            });
-            req.on("error", reject);
-          });
-
-    const request = new Request(`http://localhost${req.url ?? "/"}`, {
-      method: req.method,
-      headers,
-      body,
+  const server = createServer((req, res) => {
+    void handleNodeRequest(handler, req, res).catch((cause: unknown) => {
+      const message =
+        cause instanceof Error ? cause.message : "Internal server error";
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end(message);
     });
-
-    const response = await handler(request);
-    res.writeHead(response.status, Object.fromEntries(response.headers));
-    const responseBody = await response.arrayBuffer();
-    res.end(Buffer.from(responseBody));
   });
 
   await new Promise<void>((resolve) => {
@@ -150,7 +173,7 @@ export async function post(
   const res = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
   let data: unknown;

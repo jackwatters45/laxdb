@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parsePostgresError } from "../util";
+import { decodeArguments, parseSqlError } from "../util";
 
 import { PlayerRepo } from "./player.repo";
 import {
@@ -23,9 +23,7 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
         list: () =>
           repo.list().pipe(
             Effect.map((rows) => rows.map(asPlayer)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError((e) =>
               Effect.logError("Failed to list players", e),
             ),
@@ -42,9 +40,7 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError((e) => Effect.logError("Failed to get player", e)),
           ),
 
@@ -59,9 +55,7 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
                 new NotFoundError({ domain: "Player", id: "create" }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tap((p) => Effect.log(`Created player: ${p.name}`)),
             Effect.tapError((e) =>
               Effect.logError("Failed to create player", e),
@@ -79,9 +73,7 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tap((p) => Effect.log(`Updated player: ${p.name}`)),
             Effect.tapError((e) =>
               Effect.logError("Failed to update player", e),
@@ -99,9 +91,7 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
                 new NotFoundError({ domain: "Player", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tap((p) => Effect.log(`Deleted player: ${p.name}`)),
             Effect.tapError((e) =>
               Effect.logError("Failed to delete player", e),

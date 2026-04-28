@@ -1,6 +1,6 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { decodeArguments, parsePostgresError } from "../util";
+import { decodeArguments, parseSqlError } from "../util";
 
 import { DefaultsRepo } from "./defaults.repo";
 import {
@@ -24,9 +24,7 @@ export class DefaultsService extends ServiceMap.Service<DefaultsService>()(
             const row = yield* repo.getNamespace(decoded);
             return row?.valuesJson ?? {};
           }).pipe(
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -39,9 +37,7 @@ export class DefaultsService extends ServiceMap.Service<DefaultsService>()(
             const row = yield* repo.patchNamespace(decoded);
             return row.valuesJson;
           }).pipe(
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
       } as const;

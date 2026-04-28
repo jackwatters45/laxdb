@@ -1,10 +1,9 @@
 import { Exec } from "alchemy/os";
-import { Branch, Database, Role } from "alchemy/planetscale";
 import alchemy from "alchemy";
 import { CloudflareStateStore } from "alchemy/state";
 import { GitHubComment } from "alchemy/github";
 import {
-  Hyperdrive,
+  D1Database,
   KVNamespace,
   R2Bucket,
   TanStackStart,
@@ -21,7 +20,6 @@ export const stage = app.stage;
 
 export const prodStage = "prod";
 export const devStage = "dev";
-export const isPermanentStage = [prodStage, devStage].includes(stage);
 
 export const secrets = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
@@ -45,108 +43,30 @@ const getDomain = (subdomain?: string) => {
 
 export const domain = getDomain();
 
-// DB
-const database = await Database("Database", {
-  name: "laxdb",
-  clusterSize: "PS_5",
-  kind: "postgresql",
-  organization: "johnwatt",
-  // allowDataBranching: true,
-  adopt: true,
-});
-
-// Dev/staging branch
-const devBranch = await Branch("dev-branch", {
-  name: "development",
-  organization: "johnwatt",
-  database,
-  parentBranch: "main",
-  isProduction: false,
-  adopt: true,
-});
-
-// Personal dev branch
-const personalBranch = await Branch("personal-branch", {
-  name: "personal",
-  organization: "johnwatt",
-  database,
-  parentBranch: "main",
-  isProduction: false,
-  adopt: true,
-});
-
-// Branch selection based on stage
-const currentBranch =
-  stage === prodStage
-    ? database.defaultBranch
-    : stage === devStage || stage.startsWith("pr-")
-      ? devBranch
-      : personalBranch;
-
-// Schema role — stable per branch, owns tables, used for migrations/push
-const branchName = currentBranch === devBranch ? "dev" : currentBranch === personalBranch ? "personal" : "main";
-const schemaRole = await Role(`db-schema-${branchName}-v2`, {
-  database,
-  branch: currentBranch,
-  inheritedRoles: ["postgres"],
-});
-
-// Runtime role — per stage, used by workers
-const dbRole = await Role(`db-role-${stage}-v3`, {
-  database,
-  branch: currentBranch,
-  inheritedRoles: ["postgres"],
-});
-
-// Hyperdrive connection pooling
-const db = await Hyperdrive("hyperdrive", {
-  origin: dbRole.connectionUrl,
-  adopt: true,
-});
-
-// Generate Drizzle migrations
-// Schema management: generate + push locally, migrate in CI/prod
+// Generate Drizzle migrations before D1 reads the migrations directory locally.
+// Schema management: generate locally, apply committed migrations through D1.
 if (app.local) {
   await Exec("DrizzleGenerate", {
     command: "cd packages/core && bun run db:generate",
-    env: { DATABASE_URL: schemaRole.connectionUrl },
-    memoize: {
-      patterns: ["drizzle.config.ts", "src/schema.ts"],
-    },
-  });
-
-  await Exec("DrizzlePush", {
-    command: "cd packages/core && bun run db:push",
-    env: { DATABASE_URL: schemaRole.connectionUrl },
-  });
-} else if (isPermanentStage) {
-  await Exec("DrizzleMigrate", {
-    command: `sh -c 'cd packages/core && bun run db:migrate || ( [ $? -eq 9 ] && exit 0 ); exit $?'`,
-    env: { DATABASE_URL: schemaRole.connectionUrl },
     memoize: {
       patterns: [
         "packages/core/drizzle.config.ts",
-        "packages/core/migrations/**/*.sql",
+        "packages/core/src/**/*.sql.ts",
       ],
     },
   });
-} else {
-  // PR stages share the dev branch — push is idempotent, migrate fails on existing tables
-  await Exec("DrizzlePush", {
-    command: "cd packages/core && bun run db:push",
-    env: { DATABASE_URL: schemaRole.connectionUrl },
-  });
 }
 
-// Start Drizzle Studio in local development
-if (app.local) {
-  Exec("DrizzleStudio", {
-    command: "cd packages/core && bun run db:studio",
-    env: {
-      DATABASE_URL: dbRole.connectionUrl,
-    },
-  });
+// DB
+const databaseName = stage === prodStage ? "laxdb" : `laxdb-${stage}`;
+const database = await D1Database("database", {
+  name: databaseName,
+  adopt: true,
+  migrationsDir: "./packages/core/migrations",
+  readReplication: { mode: stage === prodStage ? "auto" : "disabled" },
+});
 
+if (app.local) {
   Exec("Storybook", {
     command: "cd packages/ui && bun run storybook",
   });
@@ -163,10 +83,9 @@ export const api = await Worker("api", {
   url: true,
   compatibility: "node",
   bindings: {
-    DB: db,
+    DB: database,
     KV: kv,
     STORAGE: storage,
-    DATABASE_URL: dbRole.connectionUrl,
     ...secrets,
   },
 });

@@ -1,4 +1,4 @@
-import { DateTime, Layer } from "effect";
+import { DateTime, Layer, ServiceMap } from "effect";
 import {
   HttpRouter,
   HttpServer,
@@ -44,17 +44,17 @@ const AllRoutes = Layer.mergeAll(
 /**
  * Build handler fresh per request.
  *
- * Workerd invalidates TCP sockets between request contexts. A cached handler
- * holds a pg Pool whose connections die after each request. Rebuilding per
- * request creates a fresh Pool each time. The actual perf cost is negligible —
- * Layer wiring is sub-ms; the DB round-trip (AU → US East) dominates.
- *
- * In production, Hyperdrive handles connection pooling at the network level,
- * so a fresh Pool per request just means a fresh Hyperdrive session.
+ * The Effect layer graph is cheap to construct and keeps request-scoped
+ * resources isolated. D1 is a Cloudflare binding, so there are no TCP pools or
+ * connection lifetimes to manage.
  */
 export default {
-  fetch: (request: Request) => {
+  fetch: async (request: Request) => {
     const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
-    return handler(request).finally(dispose);
+    try {
+      return await handler(request, ServiceMap.empty());
+    } finally {
+      await dispose();
+    }
   },
 };

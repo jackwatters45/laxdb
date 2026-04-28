@@ -7,7 +7,7 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 - Runtime: Bun
 - Language: TypeScript with Effect-TS
 - Infrastructure: Cloudflare Workers via Alchemy (TypeScript IaC)
-- Database: PlanetScale (PostgreSQL) with Drizzle ORM
+- Database: Cloudflare D1 (SQLite) with Drizzle ORM
 - Authentication: better-auth with organization and team support
 - Frontend: TanStack Start (Practice Planner, Marketing Site)
 - Monorepo Management: Bun Workspaces and Turborepo
@@ -66,7 +66,7 @@ bun install
 The project uses `alchemy.run.ts` to define and manage Cloudflare resources:
 
 - Compute: Cloudflare Workers
-- Database Connectivity: PlanetScale via Hyperdrive connection pooling
+- Database: Cloudflare D1 with migrations managed by Alchemy
 - Storage: Cloudflare R2 buckets
 - Cache: Cloudflare KV namespaces
 - Deployment Stages: Production (laxdb.io), Development (dev.laxdb.io), and PR previews

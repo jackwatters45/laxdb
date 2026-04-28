@@ -1,8 +1,8 @@
-import { index, pgTable, text } from "drizzle-orm/pg-core";
+import { index, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
-export const playTable = pgTable(
+export const playTable = sqliteTable(
   "play",
   {
     ...ids,
@@ -26,7 +26,10 @@ export const playTable = pgTable(
     personnelNotes: text("personnel_notes"),
 
     // Tags
-    tags: text("tags").array().notNull().default([]),
+    tags: text("tags", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .$defaultFn(() => []),
 
     // Media
     diagramUrl: text("diagram_url"),

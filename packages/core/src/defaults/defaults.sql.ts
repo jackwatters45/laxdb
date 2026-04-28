@@ -1,8 +1,8 @@
-import { index, jsonb, pgTable, text, unique } from "drizzle-orm/pg-core";
+import { index, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
-export const defaultsTable = pgTable(
+export const defaultsTable = sqliteTable(
   "defaults",
   {
     ...ids,
@@ -12,10 +12,10 @@ export const defaultsTable = pgTable(
       .$type<"global" | "user" | "team" | "org">(),
     scopeId: text("scope_id").notNull(),
     namespace: text("namespace").notNull(),
-    valuesJson: jsonb("values_json")
+    valuesJson: text("values_json", { mode: "json" })
       .$type<Record<string, unknown>>()
       .notNull()
-      .default({}),
+      .$defaultFn(() => ({})),
 
     ...timestamps,
   },

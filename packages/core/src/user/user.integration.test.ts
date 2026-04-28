@@ -1,11 +1,12 @@
-import { PgClient } from "@effect/sql-pg";
 import { expect, layer } from "@effect/vitest";
 import { Effect, Layer } from "effect";
 
+import { DrizzleService, query } from "../drizzle/drizzle.service";
 import { TestDatabaseLive, truncateAll } from "../test/db";
 
 import { UserRepo } from "./user.repo";
 import { UserService } from "./user.service";
+import { userTable } from "./user.sql";
 
 const ServiceLayer = Layer.effect(UserService, UserService.make).pipe(
   Layer.provide(Layer.effect(UserRepo, UserRepo.make)),
@@ -13,14 +14,18 @@ const ServiceLayer = Layer.effect(UserService, UserService.make).pipe(
 );
 const TestLayer = Layer.mergeAll(ServiceLayer, TestDatabaseLive);
 
-/** Insert a test user directly via SQL (bypasses better-auth) */
+/** Insert a test user directly (bypasses better-auth) */
 const seedUser = (email: string, name = "Test User") =>
   Effect.gen(function* () {
-    const sql = yield* PgClient.PgClient;
-    yield* sql`
-      INSERT INTO "user" (id, name, email, email_verified, created_at)
-      VALUES (${`test-${email}`}, ${name}, ${email}, false, NOW())
-    `;
+    const db = yield* DrizzleService;
+    yield* query(
+      db.insert(userTable).values({
+        id: `test-${email}`,
+        name,
+        email,
+        emailVerified: false,
+      }),
+    );
   });
 
 layer(TestLayer)("UserService integration", (it) => {
@@ -69,7 +74,7 @@ layer(TestLayer)("UserService integration", (it) => {
 
       const svc = yield* UserService;
 
-      // NOTE: PostgreSQL WHERE = is case-sensitive by default.
+      // NOTE: SQLite WHERE = is case-sensitive by default.
       // If this test fails, it means the DB or query has been changed to
       // case-insensitive matching, and we should update expectations.
       const exit = yield* svc

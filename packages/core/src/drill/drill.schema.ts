@@ -3,7 +3,7 @@ import { Schema } from "effect";
 import { NanoidSchema, PublicIdSchema, TimestampsSchema } from "../schema";
 
 // ---------------------------------------------------------------------------
-// Enums — enforced at the Effect layer, stored as text in PG for flexibility
+// Enums — enforced at the Effect layer, stored as text in SQLite for flexibility
 // ---------------------------------------------------------------------------
 
 export const Difficulty = Schema.Literals([
