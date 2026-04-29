@@ -2,6 +2,8 @@ import { Effect, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
+import { safeParseJson } from "../util";
+
 import {
   type ValidationIssue,
   type FileValidationResult,
@@ -16,10 +18,7 @@ export const readJsonFile = <T>(filePath: string) =>
   Effect.gen(function* () {
     const fs = yield* FileSystem;
     const content = yield* fs.readFileString(filePath, "utf-8");
-    return yield* Effect.try({
-      try: () => JSON.parse(content) as T,
-      catch: () => new Error(`Invalid JSON: ${filePath}`),
-    });
+    return yield* safeParseJson<T>(content, `Invalid JSON: ${filePath}`);
   });
 
 const getFileStats = (filePath: string) =>

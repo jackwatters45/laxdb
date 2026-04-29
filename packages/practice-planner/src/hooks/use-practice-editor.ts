@@ -297,7 +297,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
       setPractice((prev) => {
         const sourcesSet = new Set(prev.edges.map((e) => e.source));
         const lastNode =
-          prev.nodes.filter((n) => !sourcesSet.has(n.id)).at(-1) ??
+          prev.nodes.findLast((n) => !sourcesSet.has(n.id)) ??
           prev.nodes.at(-1);
         if (!lastNode) return prev;
 

@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema, ServiceMap } from "effect";
+import { Layer, Schema, ServiceMap } from "effect";
 
 import {
   createEmptyEntityStatus,

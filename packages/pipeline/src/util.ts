@@ -1,4 +1,4 @@
-import type { Schema } from "effect";
+import { Effect, type Schema } from "effect";
 
 import { ParseError } from "./error";
 
@@ -27,6 +27,26 @@ export const formatUnknownError = (error: unknown): string => {
   if (typeof error === "symbol") return error.description ?? error.toString();
   return "Unknown error";
 };
+
+/**
+ * Parses third-party JSON into an expected shape and maps failures to ParseError.
+ */
+export const safeParseJson = <T>(
+  raw: string,
+  message: string,
+): Effect.Effect<T, ParseError> =>
+  Effect.try({
+    try: () => {
+      const parsed: unknown = JSON.parse(raw);
+      // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- third-party pipeline sources are validated lazily at their usage sites
+      return parsed as T;
+    },
+    catch: () =>
+      new ParseError({
+        message,
+        cause: raw.slice(0, 200),
+      }),
+  });
 
 /**
  * Safely converts an unknown value to a string.

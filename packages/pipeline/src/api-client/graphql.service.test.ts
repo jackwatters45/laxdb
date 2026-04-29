@@ -58,6 +58,7 @@ describe("makeGraphQLClient", () => {
         "https://api.example.com/graphql",
         expect.objectContaining({
           method: "POST",
+          // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matcher for request headers
           headers: expect.objectContaining({
             "content-type": "application/json",
           }),
@@ -109,6 +110,7 @@ describe("makeGraphQLClient", () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
+          // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matcher for auth headers
           headers: expect.objectContaining({
             authorization: "Bearer token123",
           }),
@@ -134,6 +136,7 @@ describe("makeGraphQLClient", () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
+          // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matcher for serialized request body
           body: expect.stringContaining('"operationName":"GetUser"'),
         }),
       );

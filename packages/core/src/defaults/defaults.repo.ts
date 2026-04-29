@@ -9,6 +9,11 @@ import type {
 } from "./defaults.schema";
 import { defaultsTable } from "./defaults.sql";
 
+const firstRowOrDie = <A>(rows: readonly A[]) =>
+  rows[0] === undefined
+    ? Effect.die(new Error("Expected a returned row"))
+    : Effect.succeed(rows[0]);
+
 export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
   "DefaultsRepo",
   {
@@ -52,17 +57,16 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
             };
 
             if (existing) {
-              const rows = yield* query(
+              return yield* query(
                 db
                   .update(defaultsTable)
                   .set({ valuesJson: nextValues })
                   .where(eq(defaultsTable.publicId, existing.publicId))
                   .returning(cols),
-              );
-              return rows[0]!;
+              ).pipe(Effect.flatMap(firstRowOrDie));
             }
 
-            const rows = yield* query(
+            return yield* query(
               db
                 .insert(defaultsTable)
                 .values({
@@ -72,8 +76,7 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
                   valuesJson: nextValues,
                 })
                 .returning(cols),
-            );
-            return rows[0]!;
+            ).pipe(Effect.flatMap(firstRowOrDie));
           }),
       } as const;
     }),

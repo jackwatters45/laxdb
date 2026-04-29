@@ -37,12 +37,6 @@ export function getNodeGeometry(node: PracticeNode) {
 
 type Side = "top" | "bottom" | "left" | "right";
 
-interface Anchor {
-  x: number;
-  y: number;
-  side: Side;
-}
-
 function getCenter(g: {
   left: number;
   top: number;

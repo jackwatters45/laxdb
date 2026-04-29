@@ -4,11 +4,9 @@
  * Serves the full API (HTTP routes + RPC) backed by TestDatabaseLive.
  */
 
-import { createServer, type Server } from "node:http";
-
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
-import { HttpRouter, HttpServer } from "effect/unstable/http";
+import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
@@ -23,6 +21,8 @@ import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
 import { PracticesHandlersLive } from "../practice/practice.handlers";
 import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
 import { LaxdbRpcV2 } from "../rpc-group";
+
+import { startNodeHttpTestServer, type TestServer } from "./http-test-server";
 
 // RPC handlers backed by test DB
 const TestRpcHandlers = Layer.mergeAll(
@@ -62,76 +62,13 @@ const AllRoutes = Layer.mergeAll(RpcRouter, HttpApiRouter, DocsRoute).pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
 );
 
-export interface TestServer {
-  url: string;
-  server: Server;
-  cleanup: () => Promise<void>;
-}
-
 /**
  * Start a test API server on a random port.
  */
-export async function startTestServer(): Promise<TestServer> {
-  const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
+export type { TestServer } from "./http-test-server";
 
-  const server = createServer(async (req, res) => {
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(req.headers)) {
-      if (value) {
-        if (Array.isArray(value)) {
-          for (const v of value) headers.append(key, v);
-        } else {
-          headers.set(key, value);
-        }
-      }
-    }
-
-    const body =
-      req.method === "GET" || req.method === "HEAD"
-        ? undefined
-        : await new Promise<Buffer>((resolve, reject) => {
-            const chunks: Buffer[] = [];
-            req.on("data", (chunk: Buffer) => chunks.push(chunk));
-            req.on("end", () => {
-              resolve(Buffer.concat(chunks));
-            });
-            req.on("error", reject);
-          });
-
-    const request = new Request(`http://localhost${req.url ?? "/"}`, {
-      method: req.method,
-      headers,
-      body,
-    });
-
-    const response = await handler(request);
-    res.writeHead(response.status, Object.fromEntries(response.headers));
-    const responseBody = await response.arrayBuffer();
-    res.end(Buffer.from(responseBody));
-  });
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, resolve);
-  });
-
-  const addr = server.address();
-  const port = typeof addr === "object" && addr ? addr.port : 0;
-  const url = `http://localhost:${String(port)}`;
-
-  return {
-    url,
-    server,
-    cleanup: async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-      await dispose();
-    },
-  };
-}
+export const startTestServer = (): Promise<TestServer> =>
+  startNodeHttpTestServer(AllRoutes);
 
 /**
  * Truncate all tables.
@@ -150,7 +87,7 @@ export async function post(
   const res = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
   let data: unknown;

@@ -21,7 +21,7 @@ function GraphPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [positions, setPositions] = useState(new Map());
+  const [positions, setPositions] = useState(new Map<string, NodePosition>());
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
@@ -73,7 +73,7 @@ function GraphPage() {
 
     const simulate = () => {
       setPositions((prev) => {
-        const next = new Map(prev);
+        const next = new Map<string, NodePosition>(prev);
         const { width, height } = dimensions;
 
         // Apply forces
@@ -243,7 +243,7 @@ function GraphPage() {
 
       if (isDragging && draggedNode) {
         setPositions((prev) => {
-          const next = new Map(prev);
+          const next = new Map<string, NodePosition>(prev);
           const pos = next.get(draggedNode);
           if (pos) {
             pos.x = x;

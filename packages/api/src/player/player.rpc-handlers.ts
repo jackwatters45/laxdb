@@ -10,11 +10,11 @@ export const PlayerRpcHandlers = PlayerRpcs.toLayer(
     const service = yield* PlayerService;
 
     return withRpcLogging({
-      PlayerList: () => service.list(),
-      PlayerGet: (payload) => service.getByPublicId(payload),
-      PlayerCreate: (payload) => service.create(payload),
-      PlayerUpdate: (payload) => service.update(payload),
-      PlayerDelete: (payload) => service.delete(payload),
+      PlayerList: service.list,
+      PlayerGet: service.getByPublicId,
+      PlayerCreate: service.create,
+      PlayerUpdate: service.update,
+      PlayerDelete: service.delete,
     });
   }),
 ).pipe(Layer.provide(PlayerService.layer));

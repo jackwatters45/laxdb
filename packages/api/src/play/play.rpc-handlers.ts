@@ -10,11 +10,11 @@ export const PlayRpcHandlers = PlayRpcs.toLayer(
     const service = yield* PlayService;
 
     return withRpcLogging({
-      PlayList: () => service.list(),
-      PlayGet: (payload) => service.get(payload),
-      PlayCreate: (payload) => service.create(payload),
-      PlayUpdate: (payload) => service.update(payload),
-      PlayDelete: (payload) => service.delete(payload),
+      PlayList: service.list,
+      PlayGet: service.get,
+      PlayCreate: service.create,
+      PlayUpdate: service.update,
+      PlayDelete: service.delete,
     });
   }),
 ).pipe(Layer.provide(PlayService.layer));

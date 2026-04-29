@@ -1,9 +1,25 @@
+import { isRecord } from "@laxdb/core/type-guards";
 import * as cheerio from "cheerio";
-import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
+import { Effect, Layer, Option, Schema, ServiceMap } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
-import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
-import { safeString, safeStringOrNull } from "../util";
+import {
+  type HttpError,
+  type NetworkError,
+  ParseError,
+  type TimeoutError,
+} from "../error";
+import {
+  defaultBodyReadMessage,
+  defaultNetworkMessage,
+  fetchTextWithRetry,
+} from "../http";
+import {
+  mapParseError,
+  safeParseJson,
+  safeString,
+  safeStringOrNull,
+} from "../util";
 
 import {
   WLA_LEAGUE_ID,
@@ -22,11 +38,105 @@ import {
   WLATeamsRequest,
 } from "./wla.schema";
 
-const mapParseError = (error: Schema.SchemaError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
+const getNestedRecord = (obj: Record<string, unknown>, key: string) => {
+  const nested = obj[key];
+  return isRecord(nested) ? nested : obj;
+};
+
+const pushUniqueById = <T extends { id: string }>(
+  items: T[],
+  seenIds: Set<string>,
+  extractedItems: readonly T[],
+) => {
+  for (const item of extractedItems) {
+    if (seenIds.has(item.id)) continue;
+    seenIds.add(item.id);
+    items.push(item);
+  }
+};
+
+const pushUniqueByKey = <T>(
+  items: T[],
+  seenKeys: Set<string>,
+  extractedItems: readonly T[],
+  getKey: (item: T) => string,
+) => {
+  for (const item of extractedItems) {
+    const key = getKey(item);
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    items.push(item);
+  }
+};
+
+const collectParsedEntities = <T>(
+  destination: T[],
+  source: readonly unknown[],
+  parse: (item: unknown, index: number) => T | null,
+) => {
+  for (let i = 0; i < source.length; i++) {
+    const entity = parse(source[i], i);
+    if (entity) {
+      destination.push(entity);
+    }
+  }
+};
+
+const extractEntitiesFromUnknown = <T>(
+  data: unknown,
+  keys: readonly string[],
+  parse: (item: unknown, index: number) => T | null,
+): T[] => {
+  const entities: T[] = [];
+
+  if (!data || typeof data !== "object") {
+    return entities;
+  }
+
+  if (Array.isArray(data)) {
+    collectParsedEntities(entities, data, parse);
+    return entities;
+  }
+
+  if (!isRecord(data)) {
+    return entities;
+  }
+
+  for (const key of keys) {
+    const nested = data[key];
+    if (Array.isArray(nested)) {
+      collectParsedEntities(entities, nested, parse);
+    }
+  }
+
+  return entities;
+};
+
+const extractFromEmbeddedJsonPatterns = <T>(
+  scriptContent: string,
+  patterns: readonly RegExp[],
+  extractItems: (data: unknown) => readonly T[],
+  pushItems: (items: readonly T[]) => void,
+) => {
+  for (const pattern of patterns) {
+    const match = scriptContent.match(pattern);
+    const rawJson = match?.[1];
+    if (!rawJson) {
+      continue;
+    }
+
+    const parsed = Effect.runSync(
+      safeParseJson<unknown>(rawJson, "Failed to parse embedded WLA JSON").pipe(
+        Effect.option,
+      ),
+    );
+    if (Option.isNone(parsed)) {
+      continue;
+    }
+
+    pushItems(extractItems(parsed.value));
+  }
+};
 
 export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
   make: Effect.gen(function* () {
@@ -36,97 +146,28 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
     // Re-export cheerio for potential future HTML parsing needs
     const $ = cheerio;
 
-    /**
-     * Fetches a page from the WLA website with browser-like headers.
-     * Returns the HTML content as a string.
-     *
-     * @param url - Full URL to fetch
-     */
-    const fetchPage = (
-      url: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(url, {
-              method: "GET",
-              headers: {
-                ...wlaConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `WLA request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `WLA network error: ${String(error)}`,
-              url,
-              cause: error,
-            });
-          },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
-
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `WLA HTTP ${response.status} error`,
-              url,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read WLA response body: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a WLA page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchPageWithRetry = (
       url: string,
     ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchPage(url).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
+      fetchTextWithRetry(
+        {
+          url,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...wlaConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          timeoutMessage: `WLA request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("WLA", error),
+          httpMessage: (statusCode) => `WLA HTTP ${statusCode} error`,
+          bodyReadMessage: (error) => defaultBodyReadMessage("WLA", error),
+        },
+        pipelineConfig,
       );
+
+    const fetchPage = fetchPageWithRetry;
 
     /**
      * Maps a calendar year to WLA's Pointstreak season ID.
@@ -351,32 +392,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded player data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"players"\s*:\s*(\[[\s\S]*?\])/,
-            /"leaders"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract player data from the parsed JSON
-                const extractedPlayers = extractPlayersFromData(data);
-                for (const player of extractedPlayers) {
-                  if (!seenIds.has(player.id)) {
-                    seenIds.add(player.id);
-                    players.push(player);
-                  }
-                }
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"players"\s*:\s*(\[[\s\S]*?\])/,
+              /"leaders"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractPlayersFromData,
+            (extractedPlayers) => {
+              pushUniqueById(players, seenIds, extractedPlayers);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -566,32 +594,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded goalie data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"goalies"\s*:\s*(\[[\s\S]*?\])/,
-            /"goaltending"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract goalie data from the parsed JSON
-                const extractedGoalies = extractGoaliesFromData(data);
-                for (const goalie of extractedGoalies) {
-                  if (!seenIds.has(goalie.id)) {
-                    seenIds.add(goalie.id);
-                    goalies.push(goalie);
-                  }
-                }
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"goalies"\s*:\s*(\[[\s\S]*?\])/,
+              /"goaltending"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractGoaliesFromData,
+            (extractedGoalies) => {
+              pushUniqueById(goalies, seenIds, extractedGoalies);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -785,57 +800,22 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract goalies from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractGoaliesFromData = (data: unknown): WLAGoalie[] => {
-      const goalies: WLAGoalie[] = [];
-
-      if (!data || typeof data !== "object") {
-        return goalies;
-      }
-
-      // Handle array of goalies directly
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          const goalie = parseGoalieObject(item);
-          if (goalie) {
-            goalies.push(goalie);
-          }
-        }
-        return goalies;
-      }
-
-      // Handle nested structures
-      const obj = data as Record<string, unknown>;
-
-      // Look for common goalie array keys
-      const goalieKeys = [
-        "goalies",
-        "goaltending",
-        "goalieStats",
-        "goalkeepers",
-      ];
-      for (const key of goalieKeys) {
-        if (Array.isArray(obj[key])) {
-          for (const item of obj[key]) {
-            const goalie = parseGoalieObject(item);
-            if (goalie) {
-              goalies.push(goalie);
-            }
-          }
-        }
-      }
-
-      return goalies;
-    };
+    const extractGoaliesFromData = (data: unknown): WLAGoalie[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["goalies", "goaltending", "goalieStats", "goalkeepers"],
+        (item) => parseGoalieObject(item),
+      );
 
     /**
      * Parses a single goalie object from JSON data.
      */
     const parseGoalieObject = (item: unknown): WLAGoalie | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a name or ID
       const id =
@@ -858,7 +838,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
-      const stats = (obj.stats ?? obj) as Record<string, unknown>;
+      const stats = getNestedRecord(obj, "stats");
       const gamesPlayed = Number(stats.games_played ?? stats.gp ?? 0) || 0;
       const wins = Number(stats.wins ?? stats.w ?? 0) || 0;
       const losses = Number(stats.losses ?? stats.l ?? 0) || 0;
@@ -902,58 +882,22 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract players from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractPlayersFromData = (data: unknown): WLAPlayer[] => {
-      const players: WLAPlayer[] = [];
-
-      if (!data || typeof data !== "object") {
-        return players;
-      }
-
-      // Handle array of players directly
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          const player = parsePlayerObject(item);
-          if (player) {
-            players.push(player);
-          }
-        }
-        return players;
-      }
-
-      // Handle nested structures
-      const obj = data as Record<string, unknown>;
-
-      // Look for common player array keys
-      const playerKeys = [
-        "players",
-        "leaders",
-        "stats",
-        "playerStats",
-        "scoring",
-      ];
-      for (const key of playerKeys) {
-        if (Array.isArray(obj[key])) {
-          for (const item of obj[key]) {
-            const player = parsePlayerObject(item);
-            if (player) {
-              players.push(player);
-            }
-          }
-        }
-      }
-
-      return players;
-    };
+    const extractPlayersFromData = (data: unknown): WLAPlayer[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["players", "leaders", "stats", "playerStats", "scoring"],
+        (item) => parsePlayerObject(item),
+      );
 
     /**
      * Parses a single player object from JSON data.
      */
     const parsePlayerObject = (item: unknown): WLAPlayer | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a name or ID
       const id =
@@ -976,18 +920,18 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         safeStringOrNull(obj.last_name) ?? safeStringOrNull(obj.lastName);
 
       // Parse stats
-      const stats = (obj.stats ?? obj) as Record<string, unknown>;
+      const stats = getNestedRecord(obj, "stats");
       const gamesPlayed = Number(stats.games_played ?? stats.gp ?? 0) || 0;
       const goals = Number(stats.goals ?? stats.g ?? 0) || 0;
       const assists = Number(stats.assists ?? stats.a ?? 0) || 0;
       const points = Number(stats.points ?? stats.pts ?? 0) || 0;
       const penaltyMinutes =
         Number(stats.penalty_minutes ?? stats.pim ?? 0) || 0;
-      const ppg = stats.ppg !== null ? Number(stats.ppg) || null : null;
-      const shg = stats.shg !== null ? Number(stats.shg) || null : null;
-      const gwg = stats.gwg !== null ? Number(stats.gwg) || null : null;
+      const ppg = stats.ppg === null ? null : Number(stats.ppg) || null;
+      const shg = stats.shg === null ? null : Number(stats.shg) || null;
+      const gwg = stats.gwg === null ? null : Number(stats.gwg) || null;
       const scoringPct =
-        stats.scoring_pct !== null ? Number(stats.scoring_pct) || null : null;
+        stats.scoring_pct === null ? null : Number(stats.scoring_pct) || null;
 
       return new WLAPlayer({
         id: id || name.toLowerCase().replaceAll(/\s+/g, "-"),
@@ -1052,32 +996,24 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded standings data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"standings"\s*:\s*(\[[\s\S]*?\])/,
-            /"teams"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract standings data from the parsed JSON
-                const extractedStandings = extractStandingsFromData(data);
-                for (const standing of extractedStandings) {
-                  if (!seenTeams.has(standing.team_id)) {
-                    seenTeams.add(standing.team_id);
-                    standings.push(standing);
-                  }
-                }
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"standings"\s*:\s*(\[[\s\S]*?\])/,
+              /"teams"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractStandingsFromData,
+            (extractedStandings) => {
+              pushUniqueByKey(
+                standings,
+                seenTeams,
+                extractedStandings,
+                (standing) => standing.team_id,
+              );
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -1227,48 +1163,12 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract standings from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractStandingsFromData = (data: unknown): WLAStanding[] => {
-      const standings: WLAStanding[] = [];
-
-      if (!data || typeof data !== "object") {
-        return standings;
-      }
-
-      // Handle array of standings directly
-      if (Array.isArray(data)) {
-        for (let i = 0; i < data.length; i++) {
-          const standing = parseStandingObject(data[i], i + 1);
-          if (standing) {
-            standings.push(standing);
-          }
-        }
-        return standings;
-      }
-
-      // Handle nested structures
-      const obj = data as Record<string, unknown>;
-
-      // Look for common standings array keys
-      const standingsKeys = [
-        "standings",
-        "teams",
-        "teamStandings",
-        "division",
-        "records",
-      ];
-      for (const key of standingsKeys) {
-        if (Array.isArray(obj[key])) {
-          for (let i = 0; i < obj[key].length; i++) {
-            const standing = parseStandingObject(obj[key][i], i + 1);
-            if (standing) {
-              standings.push(standing);
-            }
-          }
-        }
-      }
-
-      return standings;
-    };
+    const extractStandingsFromData = (data: unknown): WLAStanding[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["standings", "teams", "teamStandings", "division", "records"],
+        (item, index) => parseStandingObject(item, index + 1),
+      );
 
     /**
      * Parses a single standing object from JSON data.
@@ -1277,11 +1177,11 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
       item: unknown,
       defaultPosition: number,
     ): WLAStanding | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least a team name or ID
       const id =
@@ -1365,32 +1265,19 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
         doc("script").each((_index, element) => {
           const scriptContent = doc(element).html() ?? "";
 
-          // Look for embedded schedule data in various formats
-          const patterns = [
-            /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
-            /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
-            /"schedule"\s*:\s*(\[[\s\S]*?\])/,
-            /"games"\s*:\s*(\[[\s\S]*?\])/,
-          ];
-
-          for (const pattern of patterns) {
-            const match = scriptContent.match(pattern);
-            if (match?.[1]) {
-              try {
-                const data = JSON.parse(match[1]) as unknown;
-                // Try to extract game data from the parsed JSON
-                const extractedGames = extractGamesFromData(data);
-                for (const game of extractedGames) {
-                  if (!seenIds.has(game.id)) {
-                    seenIds.add(game.id);
-                    games.push(game);
-                  }
-                }
-              } catch {
-                // JSON parse failed, continue to next pattern
-              }
-            }
-          }
+          extractFromEmbeddedJsonPatterns(
+            scriptContent,
+            [
+              /window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/,
+              /window\.initialData\s*=\s*(\{[\s\S]*?\});/,
+              /"schedule"\s*:\s*(\[[\s\S]*?\])/,
+              /"games"\s*:\s*(\[[\s\S]*?\])/,
+            ],
+            extractGamesFromData,
+            (extractedGames) => {
+              pushUniqueById(games, seenIds, extractedGames);
+            },
+          );
         });
 
         // Try to parse any visible HTML tables (in case server-side rendering is enabled)
@@ -1492,7 +1379,7 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
                 const scoreCell = cells[scoreIdx];
                 const scoreText = scoreCell?.text().trim() ?? "";
                 // Score format: "5-3" or "5 - 3" or separate columns
-                const scoreMatch = scoreText.match(/(\d+)\s*[-–]\s*(\d+)/);
+                const scoreMatch = scoreText.match(/(\d+)\s*[--]\s*(\d+)/);
                 if (scoreMatch) {
                   homeScore = Number.parseInt(scoreMatch[1] ?? "0", 10);
                   awayScore = Number.parseInt(scoreMatch[2] ?? "0", 10);
@@ -1551,52 +1438,22 @@ export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
      * Helper to extract games from embedded JSON data structures.
      * Handles various formats that SPAs might use.
      */
-    const extractGamesFromData = (data: unknown): WLAGame[] => {
-      const games: WLAGame[] = [];
-
-      if (!data || typeof data !== "object") {
-        return games;
-      }
-
-      // Handle array of games directly
-      if (Array.isArray(data)) {
-        for (let i = 0; i < data.length; i++) {
-          const game = parseGameObject(data[i], i);
-          if (game) {
-            games.push(game);
-          }
-        }
-        return games;
-      }
-
-      // Handle nested structures
-      const obj = data as Record<string, unknown>;
-
-      // Look for common game array keys
-      const gameKeys = ["games", "schedule", "scores", "matches", "results"];
-      for (const key of gameKeys) {
-        if (Array.isArray(obj[key])) {
-          for (let i = 0; i < obj[key].length; i++) {
-            const game = parseGameObject(obj[key][i], i);
-            if (game) {
-              games.push(game);
-            }
-          }
-        }
-      }
-
-      return games;
-    };
+    const extractGamesFromData = (data: unknown): WLAGame[] =>
+      extractEntitiesFromUnknown(
+        data,
+        ["games", "schedule", "scores", "matches", "results"],
+        parseGameObject,
+      );
 
     /**
      * Parses a single game object from JSON data.
      */
     const parseGameObject = (item: unknown, index: number): WLAGame | null => {
-      if (!item || typeof item !== "object") {
+      if (!isRecord(item)) {
         return null;
       }
 
-      const obj = item as Record<string, unknown>;
+      const obj = item;
 
       // Need at least some identifying info
       const id =

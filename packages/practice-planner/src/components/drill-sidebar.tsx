@@ -10,7 +10,13 @@ import { Search, Clock, Flame, Target, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 
 import { useDrills } from "@/hooks/use-drills";
+import {
+  DRILL_CATEGORY_OPTIONS,
+  DRILL_LIBRARY_CATEGORY_FILTER_OPTIONS,
+  type DrillLibraryCategoryFilter,
+} from "@/lib/drill-definitions";
 import { drillToType } from "@/lib/drill-utils";
+import { isOptionValue } from "@/lib/option-guards";
 import type { Drill, PracticeItemType } from "@/types";
 
 interface DrillSidebarProps {
@@ -19,19 +25,7 @@ interface DrillSidebarProps {
   onAddDrill: (drill: Drill, type: PracticeItemType) => void;
 }
 
-const CATEGORIES = [
-  { value: "all", label: "All" },
-  { value: "warmup", label: "Warm-ups", tag: "warmup" },
-  { value: "passing", label: "Passing" },
-  { value: "shooting", label: "Shooting" },
-  { value: "defense", label: "Defense" },
-  { value: "ground-balls", label: "Ground Balls" },
-  { value: "face-offs", label: "Face-offs" },
-  { value: "transition", label: "Transition" },
-  { value: "man-up", label: "Man-Up" },
-  { value: "conditioning", label: "Conditioning" },
-  { value: "cooldown", label: "Cool-downs", tag: "cooldown" },
-] as const;
+type SidebarCategory = DrillLibraryCategoryFilter;
 
 export function DrillSidebar({
   isOpen,
@@ -40,7 +34,7 @@ export function DrillSidebar({
 }: DrillSidebarProps) {
   const drills = useDrills();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState<SidebarCategory>("all");
 
   const filtered = drills.filter((drill) => {
     const matchesSearch =
@@ -49,11 +43,17 @@ export function DrillSidebar({
       (drill.subtitle?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
       drill.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
 
-    const cat = CATEGORIES.find((c) => c.value === activeCategory);
+    const category = DRILL_LIBRARY_CATEGORY_FILTER_OPTIONS.find(
+      (option) => option.value === activeCategory,
+    );
     const matchesCategory =
-      activeCategory === "all" ||
-      drill.category.includes(activeCategory as Drill["category"][number]) ||
-      (cat && "tag" in cat && drill.tags.includes(cat.tag));
+      activeCategory === "all"
+        ? true
+        : category && "tag" in category
+          ? drill.tags.includes(category.tag)
+          : isOptionValue(DRILL_CATEGORY_OPTIONS, activeCategory)
+            ? drill.category.includes(activeCategory)
+            : false;
 
     return matchesSearch && matchesCategory;
   });
@@ -92,14 +92,16 @@ export function DrillSidebar({
           value={[activeCategory]}
           onValueChange={(values) => {
             const next = values[0];
-            if (next) setActiveCategory(next);
+            if (isOptionValue(DRILL_LIBRARY_CATEGORY_FILTER_OPTIONS, next)) {
+              setActiveCategory(next);
+            }
           }}
           variant="outline"
           size="sm"
           spacing={1}
           className="flex-wrap"
         >
-          {CATEGORIES.map((cat) => (
+          {DRILL_LIBRARY_CATEGORY_FILTER_OPTIONS.map((cat) => (
             <ToggleGroupItem key={cat.value} value={cat.value}>
               {cat.label}
             </ToggleGroupItem>

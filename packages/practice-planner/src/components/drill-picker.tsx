@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@laxdb/ui/components/ui/popover";
 import { Clock, Flame, Snowflake, Target } from "lucide-react";
-import { useState } from "react";
+import { isValidElement, useState } from "react";
 
 import { useDrills } from "@/hooks/use-drills";
 import type { Drill } from "@/types";
@@ -38,9 +38,15 @@ export function DrillPickerPopover({
   const isOpen = open ?? internalOpen;
   const setIsOpen = onOpenChange ?? setInternalOpen;
 
+  if (!isValidElement(children)) {
+    throw new TypeError(
+      "DrillPickerPopover expects a single React element child",
+    );
+  }
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger render={children as React.ReactElement} />
+      <PopoverTrigger render={children} />
       <PopoverContent className="w-[280px] p-0" side="right" align="start">
         <DrillPickerList
           onSelect={(drill) => {
