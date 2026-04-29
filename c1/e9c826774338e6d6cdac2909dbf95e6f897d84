@@ -1,0 +1,35 @@
+packages/practice-planner/types/env.d.ts
+  445a071c047e6e26 1-3,5-10
+packages/practice-planner/src/lib/api.ts
+  445a071c047e6e26 21-32,37-43
+CLAUDE.md
+  445a071c047e6e26 62
+packages/practice-planner/CLAUDE.md
+  445a071c047e6e26 7
+README.md
+  445a071c047e6e26 66,68,72
+alchemy.run.ts
+  445a071c047e6e26 1,3-9,16-24,26-35,42-43,45,47-54,56-60,62-63,65-68,71-163,166-206
+types/env.d.ts
+  445a071c047e6e26 1-2,4-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "c1e9c826774338e6d6cdac2909dbf95e6f897d84",
+  "prompts": {
+    "445a071c047e6e26": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019dd514-3920-704c-923c-ab5b9506a920",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 262,
+      "total_deletions": 168,
+      "accepted_lines": 236,
+      "overriden_lines": 0
+    }
+  }
+}
