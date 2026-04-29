@@ -1,0 +1,27 @@
+.buildkite/scripts/test.sh
+  264dfab5609cc9af 9-16
+.buildkite/README.md
+  264dfab5609cc9af 3,55-56,59,67,73,75,92-99
+.buildkite/scripts/release.sh
+  264dfab5609cc9af 95-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "864fbd60a0b6123052aedcd6446552a6b958fba9",
+  "prompts": {
+    "264dfab5609cc9af": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019dd769-ceed-72a1-bc3b-c9cb23b1df70",
+        "model": "hy3-preview-free"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 44,
+      "total_deletions": 25,
+      "accepted_lines": 44,
+      "overriden_lines": 0
+    }
+  }
+}
