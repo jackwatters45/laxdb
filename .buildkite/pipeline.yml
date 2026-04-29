@@ -91,10 +91,3 @@ steps:
       - PLANETSCALE_SERVICE_TOKEN_ID
       - GITHUB_TOKEN
 
-  - label: ":robot_face: Git AI"
-    key: "git-ai"
-    command: ".buildkite/scripts/git-ai.sh"
-    if: "build.env('LAXDB_TRIGGER') == 'github-pr-webhook'"
-    timeout_in_minutes: 15
-    secrets:
-      - GITHUB_TOKEN
