@@ -3,7 +3,7 @@ set -euo pipefail
 
 . .buildkite/scripts/setup-bun.sh
 
-if [ "${BUILDKITE_PULL_REQUEST:-false}" != "false" ] && [ -n "${BUILDKITE_PULL_REQUEST:-}" ]; then
+if [ "${BUILDKITE_PULL_REQUEST:-false}" != "false" ]; then
   STAGE="pr-${BUILDKITE_PULL_REQUEST}"
   export PULL_REQUEST="$BUILDKITE_PULL_REQUEST"
 elif [ "${BUILDKITE_BRANCH:-}" = "main" ]; then

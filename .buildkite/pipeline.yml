@@ -9,19 +9,24 @@ steps:
   - label: ":lint-roller: Lint & format"
     key: "lint-format"
     command: ".buildkite/scripts/ci.sh lint-format"
-    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook' && build.tag == null"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
     timeout_in_minutes: 20
     cancel_on_build_failing: true
 
   - label: ":typescript: Typecheck"
     key: "typecheck"
     command: ".buildkite/scripts/ci.sh typecheck"
-    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook' && build.tag == null"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
     timeout_in_minutes: 25
     cancel_on_build_failing: true
 
-  - wait: ~
-    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook' && build.tag == null"
+  - label: ":test_tube: Test"
+    key: "test"
+    command: ".buildkite/scripts/test.sh"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
+    depends_on: [lint-format, typecheck]
+    timeout_in_minutes: 20
+    cancel_on_build_failing: true
 
   - label: ":rocket: Deploy"
     key: "deploy"
@@ -33,6 +38,7 @@ steps:
           build.branch == "main" ||
           (build.pull_request.id != null && build.pull_request.repository.fork != true)
         )
+    depends_on: [lint-format, typecheck, test]
     concurrency: 1
     concurrency_group: "laxdb/deploy/${BUILDKITE_BRANCH}"
     concurrency_method: "ordered"
@@ -61,6 +67,7 @@ steps:
           build.tag =~ /^v/ ||
           (build.branch == "main" && build.pull_request.id == null)
         )
+    depends_on: [lint-format, typecheck, test]
     concurrency: 1
     concurrency_group: "laxdb/release"
     concurrency_method: "ordered"

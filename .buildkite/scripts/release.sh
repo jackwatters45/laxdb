@@ -86,8 +86,9 @@ const response = await fetch("https://api.github.com/graphql", {
 });
 
 if (!response.ok) {
-  console.log("patch");
-  process.exit(0);
+  const body = await response.text();
+  console.error("GitHub GraphQL API error:", response.status, body);
+  process.exit(1);
 }
 
 const payload = await response.json();
@@ -151,7 +152,8 @@ if [ -z "$TAG" ]; then
 
   git config user.name "buildkite[bot]"
   git config user.email "buildkite[bot]@users.noreply.github.com"
-  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${OWNER}/${NAME}.git"
+  printf 'protocol=https\nhost=github.com\nusername=x-access-token\npassword=%s\n' "$GITHUB_TOKEN" | git credential approve
+  git remote set-url origin "https://github.com/${OWNER}/${NAME}.git"
 
   if git rev-parse "$TAG" >/dev/null 2>&1; then
     echo "Tag $TAG already exists locally."
