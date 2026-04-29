@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "db69f158ab04cbec4826332bf6e088a8d3f641e0",
+  "prompts": {
+    "264dfab5609cc9af": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019dd769-ceed-72a1-bc3b-c9cb23b1df70",
+        "model": "kimi-k2.6"
+      },
+      "human_author": "jackwatters45",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 59,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
