@@ -92,6 +92,12 @@ if (!response.ok) {
 }
 
 const payload = await response.json();
+
+if (!payload?.data?.repository?.object) {
+  console.error("Unexpected GraphQL payload shape:", JSON.stringify(payload, null, 2));
+  process.exit(1);
+}
+
 const labels = payload?.data?.repository?.object?.associatedPullRequests?.nodes?.[0]?.labels?.nodes?.map((label) => label.name) ?? [];
 
 if (labels.includes("release:major")) console.log("major");

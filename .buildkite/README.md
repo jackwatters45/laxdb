@@ -1,8 +1,6 @@
 # Buildkite migration
 
-This directory replaces the repo's GitHub Actions CI/deploy/release/Git AI workflows with Buildkite.
-
-The Claude Code workflows are intentionally not ported here: they depend on `anthropics/claude-code-action`, which is a GitHub Action. Keep those enabled during the cutover unless you want a separate custom Buildkite Claude script later.
+This directory replaces the repo's GitHub Actions CI/deploy/release workflows with Buildkite.
 
 ## 1. Create the Buildkite pipeline
 
@@ -54,11 +52,11 @@ GITHUB_TOKEN
 
 `GITHUB_TOKEN` should be a fine-grained GitHub token for this repo with:
 
-- Contents: read/write (tag push + release creation + git-ai)
-- Pull requests: read/write (preview comments from Alchemy)
+- Contents: read/write
+- Pull requests: read/write
 - Issues: read/write if you keep PR comment automation
 
-## 4. PR preview cleanup + git-ai
+## 4. PR preview cleanup
 
 Buildkite's normal GitHub PR trigger does not fire cleanup builds for `pull_request.closed`, so add a pipeline trigger:
 
@@ -66,15 +64,15 @@ Buildkite's normal GitHub PR trigger does not fire cleanup builds for `pull_requ
 2. Branch: `main`
 3. Commit: `HEAD`
 4. Build message: `GitHub pull request webhook`
-5. Environment variables: `LAXDB_TRIGGER=github-pr-webhook` (required so the main pipeline can distinguish this trigger from normal GitHub push/PR builds)
+5. Environment variables: `LAXDB_TRIGGER=github-pr-webhook`
 6. Enable GitHub signature verification and copy the trigger URL.
 7. GitHub repo → Settings → Webhooks → Add webhook:
    - Payload URL: the Buildkite trigger URL
    - Content type: `application/json`
    - Secret: same signing secret configured in Buildkite
-   - Events: Pull requests
+   - Events: Pull requests (this will fire for all PR events, but cleanup script no-ops unless action is `closed`)
 
-The webhook will create builds for all PR events, but `.buildkite/scripts/cleanup-preview.sh` and `.buildkite/scripts/git-ai.sh` no-op unless the payload is `pull_request.closed`.
+The webhook will create builds for all PR events, but `.buildkite/scripts/cleanup-preview.sh` no-ops unless the payload is `pull_request.closed`.
 
 ## 5. Disable old GitHub Actions after Buildkite is green
 
@@ -91,3 +89,11 @@ Keep these only if you still want the GitHub-native Claude automation:
 - `.github/workflows/claude-pr.yml`
 
 If you truly want all GitHub Actions disabled, first replace the Claude workflows with a custom Buildkite implementation, then disable Actions in GitHub: Repo → Settings → Actions → General → Disable actions.
+
+## 6. Known regressions
+
+**Path filtering for deploys:** The old `deploy.yml` had `paths-ignore` patterns to skip deploys on documentation-only pushes. The Buildkite pipeline does not have an equivalent filter. Every commit to `main` — including doc changes — will trigger a full 45-minute deploy. This is a known regression; consider documenting it or implementing a file-diff check in the deploy step.
+
+**Test coverage:** The old `ci.yml` included a test job with Postgres 16. The Buildkite pipeline now includes a `:test_tube: Test` step with `docker compose -f docker-compose.test.yml` and `bun run test`. If tests fail, the deploy and release steps will not run (gated by `depends_on`).
+
+**Google OAuth secrets:** `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are used by the deployed app (Better Auth), but were not found in Infisical. You need to provide these values to create the Buildkite secrets.

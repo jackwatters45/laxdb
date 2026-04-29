@@ -18,7 +18,6 @@ if command -v buildkite-agent >/dev/null 2>&1; then
   WEBHOOK="$(buildkite-agent meta-data get buildkite:webhook 2>/dev/null || true)"
 fi
 
-ACTION="${BUILDKITE_GITHUB_ACTION:-}"
 PR_NUMBER=""
 MERGED=""
 
@@ -29,8 +28,6 @@ if [ -n "$WEBHOOK" ]; then
     PR_NUMBER="$(printf '%s' "$WEBHOOK" | read_webhook_field number)"
   fi
   MERGED="$(printf '%s' "$WEBHOOK" | read_webhook_field pull_request.merged)"
-elif [ "${BUILDKITE_PULL_REQUEST:-false}" != "false" ]; then
-  PR_NUMBER="${BUILDKITE_PULL_REQUEST}"
 fi
 
 if [ "$ACTION" != "closed" ]; then
