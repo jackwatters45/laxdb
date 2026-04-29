@@ -59,7 +59,7 @@ TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effec
 
 ## INFRASTRUCTURE
 
-Managed via `alchemy.run.ts`. **No wrangler** — Alchemy handles all builds, deploys, bindings, and local dev. Do not use `wrangler` commands.
+Managed via the Alchemy v2 stack in `alchemy.run.ts`. **No wrangler** — Alchemy handles all builds, deploys, bindings, and local dev. Do not use `wrangler` commands.
 
 ## REFERENCE DOCS
 

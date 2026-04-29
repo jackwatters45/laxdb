@@ -20,14 +20,16 @@
     "prepare": "effect-language-service patch"
   },
   "dependencies": {
-    "alchemy": "^0.89.0",
-    "effect": "^3.19.19"
+    "@effect/platform-bun": "4.0.0-beta.58",
+    "@effect/platform-node": "4.0.0-beta.58",
+    "alchemy": "2.0.0-beta.22",
+    "effect": "4.0.0-beta.58"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.71",
     "@cloudflare/workers-types": "^4.20260122.0",
     "@effect/language-service": "^0.62.5",
-    "@effect/vitest": "^0.27.0",
+    "@effect/vitest": "4.0.0-beta.58",
     "@tanstack/react-table": "^8.21.3",
     "@types/bun": "latest",
     "@types/node": "^24.10.9",
