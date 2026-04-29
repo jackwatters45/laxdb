@@ -4,7 +4,7 @@
 
 ## Deployment
 
-Cloudflare Workers via Alchemy. Do NOT use `wrangler` for deploys or local dev — Alchemy handles all builds, bindings, and dev server orchestration. The Wrangler CLI can still be used for ad-hoc inspection.
+Cloudflare Workers via the Alchemy v2 stack. Do NOT use `wrangler` for deploys or local dev — Alchemy handles all builds, bindings, and dev server orchestration. The Wrangler CLI can still be used for ad-hoc inspection.
 
 ## Data Fetching
 

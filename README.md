@@ -63,10 +63,11 @@ bun install
 
 ## Infrastructure
 
-The project uses `alchemy.run.ts` to define and manage Cloudflare resources:
+The project uses an Alchemy v2 stack in `alchemy.run.ts` to define and manage Cloudflare resources:
 
-- Compute: Cloudflare Workers
+- Compute: Cloudflare Workers and Vite/TanStack Start sites
 - Database: Cloudflare D1 with migrations managed by Alchemy
 - Storage: Cloudflare R2 buckets
 - Cache: Cloudflare KV namespaces
+- State: Cloudflare-managed Alchemy state store
 - Deployment Stages: Production (laxdb.io), Development (dev.laxdb.io), and PR previews
