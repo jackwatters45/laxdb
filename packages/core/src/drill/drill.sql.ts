@@ -1,8 +1,25 @@
-import { boolean, index, integer, pgTable, text } from "drizzle-orm/pg-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
-export const drillTable = pgTable(
+type Difficulty = "beginner" | "intermediate" | "advanced";
+type Category =
+  | "passing"
+  | "shooting"
+  | "defense"
+  | "ground-balls"
+  | "face-offs"
+  | "clearing"
+  | "riding"
+  | "transition"
+  | "man-up"
+  | "man-down"
+  | "conditioning";
+type PositionGroup = "attack" | "midfield" | "defense" | "goalie" | "all";
+type Intensity = "low" | "medium" | "high";
+type FieldSpace = "full-field" | "half-field" | "box";
+
+export const drillTable = sqliteTable(
   "drill",
   {
     ...ids,
@@ -16,40 +33,24 @@ export const drillTable = pgTable(
     difficulty: text("difficulty")
       .notNull()
       .default("intermediate")
-      .$type<"beginner" | "intermediate" | "advanced">(),
-    category: text("category")
-      .$type<
-        | "passing"
-        | "shooting"
-        | "defense"
-        | "ground-balls"
-        | "face-offs"
-        | "clearing"
-        | "riding"
-        | "transition"
-        | "man-up"
-        | "man-down"
-        | "conditioning"
-      >()
-      .array()
+      .$type<Difficulty>(),
+    category: text("category", { mode: "json" })
+      .$type<Category[]>()
       .notNull()
-      .default([]),
-    positionGroup: text("position_group")
-      .$type<"attack" | "midfield" | "defense" | "goalie" | "all">()
-      .array()
+      .$defaultFn(() => []),
+    positionGroup: text("position_group", { mode: "json" })
+      .$type<PositionGroup[]>()
       .notNull()
-      .default([]),
-    intensity: text("intensity").$type<"low" | "medium" | "high">(),
-    contact: boolean("contact"),
-    competitive: boolean("competitive"),
+      .$defaultFn(() => []),
+    intensity: text("intensity").$type<Intensity>(),
+    contact: integer("contact", { mode: "boolean" }),
+    competitive: integer("competitive", { mode: "boolean" }),
 
     // Logistics
     playerCount: integer("player_count"),
     durationMinutes: integer("duration_minutes"),
-    fieldSpace: text("field_space").$type<
-      "full-field" | "half-field" | "box"
-    >(),
-    equipment: text("equipment").array(),
+    fieldSpace: text("field_space").$type<FieldSpace>(),
+    equipment: text("equipment", { mode: "json" }).$type<string[] | null>(),
 
     // Media
     diagramUrl: text("diagram_url"), // Excalidraw embed URL or image
@@ -59,7 +60,10 @@ export const drillTable = pgTable(
     coachNotes: text("coach_notes"),
 
     // Tags
-    tags: text("tags").array().notNull().default([]),
+    tags: text("tags", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .$defaultFn(() => []),
 
     // Future: variations - could be a separate table or self-referencing drill FKs
     // Future: organizationId - if drills need to be org-scoped instead of public

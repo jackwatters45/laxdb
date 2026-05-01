@@ -2,7 +2,7 @@
 
 > **When to read:** First file for any laxdb task. Architecture overview, package routing, global constraints.
 
-Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via Alchemy IaC, PlanetScale PostgreSQL.
+Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via Alchemy IaC, Cloudflare D1 SQLite.
 
 ## MUST KNOW
 
@@ -16,7 +16,7 @@ Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via
 ## ARCHITECTURE OVERVIEW
 
 ```
-TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effect Services (core) → Drizzle → PlanetScale
+TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effect Services (core) → Drizzle → Cloudflare D1
                                                 ↓
                                  Cloudflare Workers (all apps deployed here)
 ```
@@ -44,7 +44,7 @@ TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effec
 | Add API endpoint      | `api`                | {domain}.rpc.ts → {domain}.api.ts → {domain}.client.ts     |
 | Add planner route     | `practice-planner`   | `src/routes/...` (file-based)                              |
 | Add UI component      | `ui`                 | `bunx --bun shadcn@latest add <component>`                 |
-| Modify DB schema      | `core`               | Edit sql.ts → `bun run db:generate` → `bun run db:migrate` |
+| Modify DB schema      | `core`               | Edit sql.ts → `bun run db:generate` → deploy via Alchemy D1 migrations |
 | Deploy infrastructure | root                 | `bun run deploy` (runs alchemy.run.ts)                     |
 
 ## ANTI-PATTERNS (BLOCKING)

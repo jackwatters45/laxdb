@@ -1,7 +1,6 @@
 import { Config } from "effect";
 
 export const AppConfig = Config.all({
-  databaseUrl: Config.redacted("DATABASE_URL"),
   apiUrl: Config.string("API_URL"),
 
   betterAuthSecret: Config.redacted("BETTER_AUTH_SECRET"),
@@ -15,10 +14,6 @@ export const AppConfig = Config.all({
   cloudflareAccountId: Config.string("CLOUDFLARE_ACCOUNT_ID"),
   cloudflareApiToken: Config.redacted("CLOUDFLARE_API_TOKEN"),
   cloudflareEmail: Config.string("CLOUDFLARE_EMAIL"),
-
-  planetscaleOrganization: Config.string("PLANETSCALE_ORGANIZATION"),
-  planetscaleServiceToken: Config.redacted("PLANETSCALE_SERVICE_TOKEN"),
-  planetscaleServiceTokenId: Config.string("PLANETSCALE_SERVICE_TOKEN_ID"),
 
   pllGraphqlToken: Config.redacted("PLL_GRAPHQL_TOKEN"),
   pllRestToken: Config.redacted("PLL_REST_TOKEN"),

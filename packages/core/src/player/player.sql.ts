@@ -1,8 +1,8 @@
-import { index, pgTable, text } from "drizzle-orm/pg-core";
+import { index, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
-export const playerTable = pgTable(
+export const playerTable = sqliteTable(
   "player",
   {
     ...ids,

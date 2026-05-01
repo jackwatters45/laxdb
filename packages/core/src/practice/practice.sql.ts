@@ -1,8 +1,14 @@
-import { index, integer, pgTable, text, unique } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  unique,
+} from "drizzle-orm/sqlite-core";
 
 import { ids, timestamp, timestamps } from "../drizzle/drizzle.type";
 
-export const practiceTable = pgTable(
+export const practiceTable = sqliteTable(
   "practice",
   {
     ...ids,
@@ -28,7 +34,7 @@ export const practiceTable = pgTable(
   ],
 );
 
-export const practiceItemTable = pgTable(
+export const practiceItemTable = sqliteTable(
   "practice_item",
   {
     ...ids,
@@ -45,7 +51,10 @@ export const practiceItemTable = pgTable(
     label: text("label"),
     durationMinutes: integer("duration_minutes"),
     notes: text("notes"),
-    groups: text("groups").array().notNull().default(["all"]),
+    groups: text("groups", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .$defaultFn(() => ["all"]),
     orderIndex: integer("order_index").notNull().default(0),
     positionX: integer("position_x"),
     positionY: integer("position_y"),
@@ -66,7 +75,7 @@ export const practiceItemTable = pgTable(
   ],
 );
 
-export const practiceEdgeTable = pgTable(
+export const practiceEdgeTable = sqliteTable(
   "practice_edge",
   {
     ...ids,
@@ -85,7 +94,7 @@ export const practiceEdgeTable = pgTable(
   ],
 );
 
-export const practiceReviewTable = pgTable(
+export const practiceReviewTable = sqliteTable(
   "practice_review",
   {
     ...ids,

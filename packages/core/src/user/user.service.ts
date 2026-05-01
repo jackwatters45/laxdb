@@ -1,7 +1,7 @@
 import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { parsePostgresError } from "../util";
+import { parseSqlError } from "../util";
 
 import { UserRepo } from "./user.repo";
 import { GetUserFromEmailInput } from "./user.schema";
@@ -26,7 +26,7 @@ export class UserService extends ServiceMap.Service<UserService>()(
               ),
             ),
             Effect.catchTag("SqlError", (error) =>
-              Effect.fail(parsePostgresError(error)),
+              Effect.fail(parseSqlError(error)),
             ),
             Effect.tap((user) => Effect.log(`Found user: ${user.email}`)),
             Effect.tapError((error) =>

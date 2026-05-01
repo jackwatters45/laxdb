@@ -34,9 +34,13 @@ function getApiFetch(): { fetch?: typeof fetch; url: string } {
 
   // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Env typing guarantees the binding shape once the module guard passes
   const apiBinding = workersModule.env.API;
+  if (!apiBinding) {
+    return { url: "http://api/rpc" };
+  }
+
   return {
     // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Worker service bindings expose a fetch method at runtime
-    fetch: apiBinding ? apiBinding.fetch.bind(apiBinding) : undefined,
+    fetch: apiBinding.fetch.bind(apiBinding),
     url: "http://api/rpc",
   };
 }

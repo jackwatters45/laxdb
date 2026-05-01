@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parsePostgresError } from "../util";
+import { decodeArguments, parseSqlError } from "../util";
 
 import { PlayRepo } from "./play.repo";
 import {
@@ -24,9 +24,7 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
         list: () =>
           repo.list().pipe(
             Effect.map((rows) => rows.map(asPlay)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -41,9 +39,7 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
                 new NotFoundError({ domain: "Play", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -56,9 +52,7 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
             Effect.catchTag("NoSuchElementError", () =>
               Effect.fail(new NotFoundError({ domain: "Play", id: "new" })),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -73,9 +67,7 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
                 new NotFoundError({ domain: "Play", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -90,9 +82,7 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
                 new NotFoundError({ domain: "Play", id: input.publicId }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
       } as const;

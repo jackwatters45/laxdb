@@ -1,7 +1,7 @@
 import { asc, eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { headOrFail, PgDrizzle, query } from "../drizzle/drizzle.service";
+import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
 import type {
   AddItemInput,
@@ -30,7 +30,7 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
   "PracticeRepo",
   {
     make: Effect.gen(function* () {
-      const db = yield* PgDrizzle;
+      const db = yield* DrizzleService;
 
       const { id: _pid, ...practiceCols } = getColumns(practiceTable);
       const { id: _iid, ...itemCols } = getColumns(practiceItemTable);

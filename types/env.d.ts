@@ -1,16 +1,12 @@
-// This file infers types for the cloudflare:workers environment from your Alchemy Worker.
+// This file infers API worker bindings from Alchemy.
 // @see https://alchemy.run/concepts/bindings/#type-safe-bindings
 
-import type { web } from "../alchemy.run.ts";
+import type { api } from "../alchemy.run.ts";
 
-export type CloudflareEnv = typeof web.Env;
-
-declare global {
-  type Env = CloudflareEnv;
-}
+export type ApiCloudflareEnv = typeof api.Env;
 
 declare module "cloudflare:workers" {
   namespace Cloudflare {
-    export interface Env extends CloudflareEnv {}
+    export interface Env extends ApiCloudflareEnv {}
   }
 }

@@ -1,6 +1,9 @@
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import {
+  drizzle,
+  type AnyD1Database,
+  type DrizzleD1Database,
+} from "drizzle-orm/d1";
 import { Array as Arr, Effect, Layer, ServiceMap } from "effect";
-import { Pool } from "pg";
 
 // ---------------------------------------------------------------------------
 // SqlError — lightweight tagged error for drizzle query failures
@@ -19,10 +22,10 @@ export class SqlError {
 // ---------------------------------------------------------------------------
 
 export const query = <T>(queryBuilder: {
-  execute(): Promise<T>;
+  execute(): T | Promise<T>;
 }): Effect.Effect<T, SqlError> =>
   Effect.tryPromise({
-    try: () => queryBuilder.execute(),
+    try: () => Promise.resolve(queryBuilder.execute()),
     catch: (cause) => new SqlError(cause),
   });
 
@@ -31,63 +34,75 @@ export const headOrFail = <A>(arr: readonly A[]) =>
   Effect.fromOption(Arr.head(arr));
 
 // ---------------------------------------------------------------------------
-// PgDrizzle service — provides a typed drizzle instance
+// DrizzleService — provides a typed Cloudflare D1 drizzle instance
 // ---------------------------------------------------------------------------
 
-export class PgDrizzle extends ServiceMap.Service<PgDrizzle, NodePgDatabase>()(
-  "PgDrizzle",
-) {}
+export class DrizzleService extends ServiceMap.Service<
+  DrizzleService,
+  DrizzleD1Database
+>()("DrizzleService") {}
 
 // ---------------------------------------------------------------------------
-// Connection config resolution
+// Cloudflare D1 binding resolution
 // ---------------------------------------------------------------------------
 
-const fromHyperdrive = Effect.try({
-  try: () => {
-    // oxlint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-type-assertion
-    const { env } = require("cloudflare:workers") as {
-      env: { DB?: { connectionString: string } };
-    };
-    return env.DB?.connectionString;
+const getProperty = (value: object, key: PropertyKey): unknown => {
+  let current: object | null = value;
+  while (current !== null) {
+    const descriptor = Object.getOwnPropertyDescriptor(current, key);
+    if (descriptor !== undefined && "value" in descriptor) {
+      const property: unknown = descriptor.value;
+      return property;
+    }
+    const prototype: unknown = Object.getPrototypeOf(current);
+    current =
+      typeof prototype === "object" && prototype !== null ? prototype : null;
+  }
+};
+
+const isRecord = (value: unknown): value is object =>
+  typeof value === "object" && value !== null;
+
+const hasFunctionProperty = (value: object, key: PropertyKey) =>
+  typeof getProperty(value, key) === "function";
+
+const isD1Binding = (value: unknown): value is AnyD1Database =>
+  isRecord(value) &&
+  hasFunctionProperty(value, "prepare") &&
+  hasFunctionProperty(value, "batch");
+
+const getD1Binding = Effect.try({
+  try: (): unknown => {
+    // oxlint-disable-next-line eslint-plugin-import/no-unassigned-import -- cloudflare:workers is only available inside Worker runtime
+    const workersModule: unknown = require("cloudflare:workers");
+    return workersModule;
   },
   catch: (cause) => new Error(String(cause)),
 }).pipe(
-  Effect.flatMap((url) =>
-    url
-      ? Effect.succeed({ url, ssl: false as const })
-      : Effect.fail(new Error("Hyperdrive binding not available")),
-  ),
-);
-
-const fromDatabaseUrl = Effect.try({
-  try: () => {
-    const url = process.env.DATABASE_URL;
-    if (!url) {
-      throw new Error("DATABASE_URL environment variable not set");
+  Effect.flatMap((workersModule) => {
+    if (!isRecord(workersModule)) {
+      return Effect.fail(new Error("cloudflare:workers module unavailable"));
     }
-    return { url, ssl: true as const };
-  },
-  catch: (cause) => new Error(String(cause)),
-});
 
-const getConnectionConfig = Effect.matchEffect(fromHyperdrive, {
-  onFailure: () => fromDatabaseUrl,
-  onSuccess: Effect.succeed,
-});
+    const workersEnv = getProperty(workersModule, "env");
+    if (!isRecord(workersEnv)) {
+      return Effect.fail(new Error("Cloudflare env unavailable"));
+    }
+
+    const binding = getProperty(workersEnv, "DB");
+    return isD1Binding(binding)
+      ? Effect.succeed(binding)
+      : Effect.fail(new Error("D1 DB binding not available"));
+  }),
+);
 
 // ---------------------------------------------------------------------------
 // Layers
 // ---------------------------------------------------------------------------
 
 const DrizzleLive = Layer.effect(
-  PgDrizzle,
-  Effect.map(getConnectionConfig, ({ url, ssl }) => {
-    const pool = new Pool({
-      connectionString: url,
-      ssl: ssl ? { rejectUnauthorized: false } : false,
-    });
-    return drizzle({ client: pool });
-  }),
+  DrizzleService,
+  Effect.map(getD1Binding, (binding) => drizzle(binding)),
 );
 
 export const DatabaseLive = DrizzleLive;

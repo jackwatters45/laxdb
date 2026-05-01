@@ -28,7 +28,7 @@ export class MyService extends Effect.Service<MyService>()("MyService", {
           const decoded = yield* decodeArguments(InputSchema, input);
           return yield* repo.operation(decoded);
         }).pipe(
-          Effect.catchTag("SqlError", (e) => Effect.fail(parsePostgresError(e))),
+          Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
           Effect.tap((result) => Effect.log(`Action completed`)),
           Effect.tapError((e) => Effect.logError("Action failed", e)),
         ),
@@ -68,7 +68,7 @@ Common validation schemas used across domains:
 
 | Pattern | Use For |
 |---------|---------|
-| `Effect.catchTag("SqlError", ...)` | Parse Postgres errors via `parsePostgresError` |
+| `Effect.catchTag("SqlError", ...)` | Parse database errors via `parseSqlError` |
 | `Effect.catchTag("NoSuchElementException", ...)` | Not found scenarios |
 | `Schema.TaggedError` | Custom domain errors |
 
@@ -92,9 +92,9 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
 
 ## ENUM STRATEGY
 
-Use **text columns in PG** + **`Schema.Literal` unions in Effect** for enumerated values. No Postgres enums.
+Use **SQLite text columns** + **`Schema.Literal` unions in Effect** for enumerated values.
 
-- **Why:** PG enums require migrations to add/remove values (`ALTER TYPE`). Removing values is especially painful. Text + schema validation lets us evolve values with a code change, no migration.
+- **Why:** Text + schema validation lets us evolve allowed values with a code change instead of database-specific enum migrations.
 - **Pattern:** Define `Schema.Literal` in `{domain}.schema.ts`, use as text column in `{domain}.sql.ts`
 - **Example:** `drill.schema.ts` — `Difficulty`, `Category`, `PositionGroup`, `Intensity`, `FieldSpace`
 
@@ -105,14 +105,14 @@ Use **text columns in PG** + **`Schema.Literal` unions in Effect** for enumerate
 | `Effect.catchAll` | Loses error type info | `Effect.catchTag` |
 | Skip `decodeArguments` | Input not validated | Always validate first |
 | Import from `drizzle-kit` | Wrong package | Use `drizzle-orm` |
-| Direct pool access | Bypasses layer | Use DrizzleService |
+| Direct DB binding access | Bypasses layer | Use DrizzleService |
 | Import from `effect/internal` | Unstable APIs | Use public exports |
 | `getTableColumns` | Deprecated in Drizzle | Use `getColumns` from `drizzle-orm` |
 
 ## CRITICAL NOTES
 
 - **Effect Schema**: Uses `Schema.Class<T>("Name")({...})` pattern, NOT Zod
-- **PlanetScale**: PostgreSQL mode, not MySQL - use pg syntax
+- **Cloudflare D1**: SQLite dialect - use SQLite-compatible schema and SQL
 - **Layer wiring lives with each package**: Services expose their own layers (for example `PlayerService.layer`) and are composed at the API boundary.
 - **Config**: Use `AppConfig` for env vars, secrets use `Config.redacted()`
 
@@ -120,4 +120,4 @@ Use **text columns in PG** + **`Schema.Literal` unions in Effect** for enumerate
 
 Only complex subsystems have dedicated Intent Nodes. Other domains (organization, team, player, game, season, feedback, email, user) follow the standard per-domain file pattern above and don't need separate documentation.
 
-- `src/drizzle/CLAUDE.md` - Database connection, Hyperdrive/PlanetScale specifics
+- `src/drizzle/CLAUDE.md` - Database connection and Cloudflare D1 specifics

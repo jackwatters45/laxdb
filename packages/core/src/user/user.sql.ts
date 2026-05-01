@@ -1,18 +1,20 @@
-import { boolean, index, pgTable, text } from "drizzle-orm/pg-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { timestamp, timestamps } from "../drizzle/drizzle.type";
 
 // Better Auth
-export const userTable = pgTable(
+export const userTable = sqliteTable(
   "user",
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    emailVerified: boolean("email_verified").default(false).notNull(),
+    emailVerified: integer("email_verified", { mode: "boolean" })
+      .default(false)
+      .notNull(),
     image: text("image"),
     role: text("role"),
-    banned: boolean("banned").default(false),
+    banned: integer("banned", { mode: "boolean" }).default(false),
     banReason: text("ban_reason"),
     banExpires: timestamp("ban_expires"),
     ...timestamps,

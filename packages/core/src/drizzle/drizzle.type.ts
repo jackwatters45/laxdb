@@ -1,12 +1,12 @@
-import { timestamp as pgTimestamp, serial, varchar } from "drizzle-orm/pg-core";
+import { integer, text } from "drizzle-orm/sqlite-core";
 import { nanoid } from "nanoid";
 
 export const ids = {
   get id() {
-    return serial("id").primaryKey();
+    return integer("id").primaryKey({ autoIncrement: true });
   },
   get publicId() {
-    return varchar("public_id", { length: 12 })
+    return text("public_id")
       .unique()
       .notNull()
       .$defaultFn(() => nanoid(12));
@@ -14,10 +14,7 @@ export const ids = {
 };
 
 export const timestamp = (name: string) =>
-  pgTimestamp(name, {
-    mode: "date",
-    precision: 3,
-  });
+  integer(name, { mode: "timestamp_ms" });
 
 export const timestamps = {
   createdAt: timestamp("created_at")

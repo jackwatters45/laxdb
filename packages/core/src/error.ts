@@ -28,7 +28,7 @@ export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
     message: Schema.String,
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number),
-    pgCode: Schema.optional(Schema.String),
+    sqlCode: Schema.optional(Schema.String),
   },
 ) {}
 
@@ -40,7 +40,7 @@ export class ConstraintViolationError extends Schema.TaggedErrorClass<Constraint
     detail: Schema.optional(Schema.String),
     message: Schema.optional(Schema.String),
     cause: Schema.optional(Schema.Unknown),
-    pgCode: Schema.optional(Schema.String),
+    sqlCode: Schema.optional(Schema.String),
   },
 ) {}
 

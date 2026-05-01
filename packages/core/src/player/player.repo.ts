@@ -1,13 +1,13 @@
 import { eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { headOrFail, PgDrizzle, query } from "../drizzle/drizzle.service";
+import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
 import { playerTable } from "./player.sql";
 
 export class PlayerRepo extends ServiceMap.Service<PlayerRepo>()("PlayerRepo", {
   make: Effect.gen(function* () {
-    const db = yield* PgDrizzle;
+    const db = yield* DrizzleService;
 
     const { id: _, ...publicColumns } = getColumns(playerTable);
 

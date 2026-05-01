@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parsePostgresError } from "../util";
+import { decodeArguments, parseSqlError } from "../util";
 
 import { PracticeRepo } from "./practice.repo";
 import {
@@ -44,9 +44,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
         list: () =>
           repo.list().pipe(
             Effect.map((rows) => rows.map(asPractice)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -64,9 +62,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -84,9 +80,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -104,9 +98,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -124,9 +116,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -140,9 +130,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             return yield* repo.listItems(decoded);
           }).pipe(
             Effect.map((rows) => rows.map(asItem)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -160,9 +148,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -180,9 +166,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -200,9 +184,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -212,9 +194,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             return yield* repo.reorderItems(decoded);
           }).pipe(
             Effect.map((rows) => rows.map(asItem)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -224,9 +204,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             return yield* repo.listEdges(decoded);
           }).pipe(
             Effect.map((rows) => rows.map(asEdge)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -236,9 +214,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
             return yield* repo.replaceEdges(decoded);
           }).pipe(
             Effect.map((rows) => rows.map(asEdge)),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -260,9 +236,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -280,9 +254,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
 
@@ -300,9 +272,7 @@ export class PracticeService extends ServiceMap.Service<PracticeService>()(
                 }),
               ),
             ),
-            Effect.catchTag("SqlError", (e) =>
-              Effect.fail(parsePostgresError(e)),
-            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
       } as const;

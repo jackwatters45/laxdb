@@ -1,7 +1,7 @@
 import { and, eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { PgDrizzle, query } from "../drizzle/drizzle.service";
+import { DrizzleService, query } from "../drizzle/drizzle.service";
 
 import type {
   GetDefaultsNamespaceInput,
@@ -18,7 +18,7 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
   "DefaultsRepo",
   {
     make: Effect.gen(function* () {
-      const db = yield* PgDrizzle;
+      const db = yield* DrizzleService;
       const { id: _id, ...cols } = getColumns(defaultsTable);
 
       return {
