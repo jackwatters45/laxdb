@@ -1,46 +1,25 @@
-import { Duration, Effect, Schedule, Schema } from "effect";
+import { Effect, type Schema } from "effect";
 
-import { DEFAULT_PIPELINE_CONFIG } from "../config";
-import {
-  GraphQLError,
-  HttpError,
-  NetworkError,
-  ParseError,
-  type PipelineError,
-  RateLimitError,
-  TimeoutError,
-} from "../error";
+import { GraphQLError, type PipelineError } from "../error";
+import { fetchJson, retryPipelineRequest } from "../http";
 
 import type { GraphQLClientConfig, GraphQLRequest } from "./graphql.schema";
 import { GraphQLResponse } from "./graphql.schema";
+import {
+  buildJsonHeaders,
+  decodeClientResponse,
+  resolveClientRuntimeConfig,
+} from "./shared";
 
 // Re-export for backwards compatibility
 export { GraphQLError } from "../error";
 
-const MAX_RETRY_WAIT_MS = 300_000; // 5 minutes max to prevent DoS via large retry-after
-
-const isTransientError = (error: PipelineError): boolean =>
-  error instanceof NetworkError || error instanceof TimeoutError;
-
 export const makeGraphQLClient = (config: GraphQLClientConfig) => {
-  const defaultTimeout =
-    config.timeoutMs ?? DEFAULT_PIPELINE_CONFIG.defaultTimeoutMs;
-  const maxRetries = config.maxRetries ?? DEFAULT_PIPELINE_CONFIG.maxRetries;
-  const retryDelayMs =
-    config.retryDelayMs ?? DEFAULT_PIPELINE_CONFIG.retryDelayMs;
-
-  const buildHeaders = (): Record<string, string> => {
-    const headers: Record<string, string> = {
-      "content-type": "application/json",
-      ...config.defaultHeaders,
-    };
-
-    if (config.authHeader) {
-      headers.authorization = config.authHeader;
-    }
-
-    return headers;
-  };
+  const {
+    defaultTimeoutMs: defaultTimeout,
+    maxRetries,
+    retryDelayMs,
+  } = resolveClientRuntimeConfig(config);
 
   const execute = <S extends Schema.Top>(
     request: GraphQLRequest,
@@ -51,96 +30,26 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
       const timeout = timeoutMs ?? defaultTimeout;
       const url = config.endpoint;
 
-      const response = yield* Effect.tryPromise({
-        try: (signal) =>
-          fetch(url, {
-            method: "POST",
-            headers: buildHeaders(),
-            body: JSON.stringify({
-              query: request.query,
-              variables: request.variables,
-              operationName: request.operationName,
-            }),
-            signal,
-          }),
-        catch: (error) => {
-          if (error instanceof Error && error.name === "AbortError") {
-            return new TimeoutError({
-              message: `Request timed out after ${timeout}ms`,
-              url,
-              timeoutMs: timeout,
-            });
-          }
-          return new NetworkError({
-            message: `Network error: ${String(error)}`,
-            url,
-            cause: error,
-          });
-        },
-      }).pipe(
-        Effect.timeoutOrElse({
-          duration: Duration.millis(timeout),
-          orElse: () =>
-            Effect.fail(
-              new TimeoutError({
-                message: `Request timed out after ${timeout}ms`,
-                url,
-                timeoutMs: timeout,
-              }),
-            ),
+      const json = yield* fetchJson({
+        url,
+        timeoutMs: timeout,
+        method: "POST",
+        headers: buildJsonHeaders(config),
+        body: JSON.stringify({
+          query: request.query,
+          variables: request.variables,
+          operationName: request.operationName,
         }),
-      );
-
-      if (response.status === 429) {
-        const retryAfter = response.headers.get("retry-after");
-        const retryAfterMs = retryAfter
-          ? Number.parseInt(retryAfter, 10) * 1000
-          : undefined;
-
-        return yield* Effect.fail(
-          new RateLimitError({
-            message: "Rate limited by server",
-            url,
-            retryAfterMs,
-          }),
-        );
-      }
-
-      if (!response.ok) {
-        return yield* Effect.fail(
-          new HttpError({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-            url,
-            method: "POST",
-            statusCode: response.status,
-          }),
-        );
-      }
-
-      const json = yield* Effect.tryPromise({
-        try: () => response.json(),
-        catch: (error) =>
-          new HttpError({
-            message: `Failed to parse JSON: ${String(error)}`,
-            url,
-            method: "POST",
-            cause: error,
-          }),
+        timeoutMessage: `Request timed out after ${timeout}ms`,
+        networkMessage: (error) => `Network error: ${String(error)}`,
+        httpMessage: (statusCode, statusText) =>
+          `HTTP ${statusCode}: ${statusText}`,
+        rateLimitMessage: "Rate limited by server",
+        jsonParseMessage: (error) => `Failed to parse JSON: ${String(error)}`,
       });
 
       const responseSchema = GraphQLResponse(dataSchema);
-      const decoded = yield* Schema.decodeUnknownEffect(responseSchema)(
-        json,
-      ).pipe(
-        Effect.mapError(
-          (error) =>
-            new ParseError({
-              message: `Schema validation failed: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        ),
-      );
+      const decoded = yield* decodeClientResponse(responseSchema, json, url);
 
       if (decoded.errors && decoded.errors.length > 0) {
         return yield* Effect.fail(
@@ -172,29 +81,10 @@ export const makeGraphQLClient = (config: GraphQLClientConfig) => {
     dataSchema: S,
     timeoutMs?: number,
   ): Effect.Effect<S["Type"], PipelineError, S["DecodingServices"]> =>
-    execute(request, dataSchema, timeoutMs).pipe(
-      Effect.retry({
-        schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
-        times: maxRetries,
-        while: isTransientError,
-      }),
-      Effect.catchTag("RateLimitError", (error) =>
-        Effect.sleep(
-          Duration.millis(
-            Math.min(error.retryAfterMs ?? retryDelayMs, MAX_RETRY_WAIT_MS),
-          ),
-        ).pipe(
-          Effect.andThen(
-            execute(request, dataSchema, timeoutMs).pipe(
-              Effect.retry({
-                schedule: Schedule.exponential(Duration.millis(retryDelayMs)),
-                times: maxRetries,
-              }),
-            ),
-          ),
-        ),
-      ),
-    );
+    retryPipelineRequest(() => execute(request, dataSchema, timeoutMs), {
+      maxRetries,
+      retryDelayMs,
+    });
 
   return {
     query: <S extends Schema.Top>(

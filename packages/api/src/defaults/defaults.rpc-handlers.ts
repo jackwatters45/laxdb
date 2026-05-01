@@ -10,8 +10,8 @@ export const DefaultsRpcHandlers = DefaultsRpcs.toLayer(
     const service = yield* DefaultsService;
 
     return withRpcLogging({
-      DefaultsGetNamespace: (payload) => service.getNamespace(payload),
-      DefaultsPatchNamespace: (payload) => service.patchNamespace(payload),
+      DefaultsGetNamespace: service.getNamespace,
+      DefaultsPatchNamespace: service.patchNamespace,
     });
   }),
 ).pipe(Layer.provide(DefaultsService.layer));

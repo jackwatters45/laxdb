@@ -1,13 +1,18 @@
 import { and, eq, getColumns } from "drizzle-orm";
 import { Effect, Layer, ServiceMap } from "effect";
 
-import { DrizzleService, headOrFail, query } from "../drizzle/drizzle.service";
+import { DrizzleService, query } from "../drizzle/drizzle.service";
 
 import type {
   GetDefaultsNamespaceInput,
   PatchDefaultsNamespaceInput,
 } from "./defaults.schema";
 import { defaultsTable } from "./defaults.sql";
+
+const firstRowOrDie = <A>(rows: readonly A[]) =>
+  rows[0] === undefined
+    ? Effect.die(new Error("Expected a returned row"))
+    : Effect.succeed(rows[0]);
 
 export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
   "DefaultsRepo",
@@ -58,9 +63,7 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
                   .set({ valuesJson: nextValues })
                   .where(eq(defaultsTable.publicId, existing.publicId))
                   .returning(cols),
-              ).pipe(
-                Effect.flatMap((rows) => headOrFail(rows).pipe(Effect.orDie)),
-              );
+              ).pipe(Effect.flatMap(firstRowOrDie));
             }
 
             return yield* query(
@@ -73,9 +76,7 @@ export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
                   valuesJson: nextValues,
                 })
                 .returning(cols),
-            ).pipe(
-              Effect.flatMap((rows) => headOrFail(rows).pipe(Effect.orDie)),
-            );
+            ).pipe(Effect.flatMap(firstRowOrDie));
           }),
       } as const;
     }),

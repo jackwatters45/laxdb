@@ -239,7 +239,9 @@ function KitchenSinkPage() {
         <div className="max-w-sm">
           <Select>
             <SelectTrigger>
-              <SelectValue>{(value) => (value as string) ?? "Select a league..."}</SelectValue>
+              <SelectValue>
+                {(value) => (typeof value === "string" ? value : "Select a league...")}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="pll">PLL</SelectItem>

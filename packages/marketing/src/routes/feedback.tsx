@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { CloudUpload, Loader2, Paperclip, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
@@ -82,7 +83,9 @@ function FeedbackPage() {
 
     try {
       // TODO: Wire up to backend when marketing worker has core bindings
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 500);
+      });
 
       setSubmitted(true);
       setMessage("");
@@ -262,7 +265,7 @@ function FeedbackPage() {
           <button
             className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!canSubmit}
-            onClick={handleSubmit}
+            onClick={voidAsync(handleSubmit)}
             type="button"
           >
             {submitting && <Loader2 className="size-3.5 animate-spin" />}

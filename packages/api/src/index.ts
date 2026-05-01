@@ -1,4 +1,4 @@
-import { DateTime, Layer, ServiceMap } from "effect";
+import { DateTime, Layer } from "effect";
 import {
   HttpRouter,
   HttpServer,
@@ -9,6 +9,7 @@ import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
+import { emptyRequestContext } from "./request-context";
 import { LaxdbRpcV2 } from "./rpc-group";
 import { LaxdbRpcV2Handlers } from "./rpc-handlers";
 
@@ -52,7 +53,7 @@ export default {
   fetch: async (request: Request) => {
     const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
     try {
-      return await handler(request, ServiceMap.empty());
+      return await handler(request, emptyRequestContext);
     } finally {
       await dispose();
     }

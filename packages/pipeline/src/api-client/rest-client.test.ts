@@ -46,6 +46,7 @@ describe("makeRestClient", () => {
         "https://api.example.com/users/1",
         expect.objectContaining({
           method: "GET",
+          // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matcher for request headers
           headers: expect.objectContaining({
             "content-type": "application/json",
           }),
@@ -85,6 +86,7 @@ describe("makeRestClient", () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
+          // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Vitest asymmetric matcher for auth headers
           headers: expect.objectContaining({
             authorization: "Bearer token123",
           }),

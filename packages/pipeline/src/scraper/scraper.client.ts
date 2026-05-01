@@ -1,6 +1,7 @@
-import { Effect, Schedule, ServiceMap, Layer } from "effect";
+import { Effect, Layer, Schedule, ServiceMap } from "effect";
 
 import { PipelineConfig } from "../config";
+import { fetchResponse, readResponseText } from "../http";
 
 import {
   ScraperHttpError,
@@ -29,43 +30,28 @@ export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
           const startTime = Date.now();
           const timeoutMs = request.timeoutMs ?? config.defaultTimeoutMs;
 
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => {
-            controller.abort();
-          }, timeoutMs);
-
-          const response = yield* Effect.tryPromise({
-            try: () =>
-              fetch(request.url, {
-                method: "GET",
-                headers: {
-                  "User-Agent": config.userAgent,
-                  ...request.headers,
-                },
-                signal: controller.signal,
-                redirect: request.followRedirects ? "follow" : "manual",
-              }),
-            catch: (error) => {
-              if (error instanceof Error && error.name === "AbortError") {
-                return new ScraperTimeoutError({
-                  message: `Request timed out after ${timeoutMs}ms`,
-                  url: request.url,
-                  timeoutMs,
-                });
-              }
-              return new ScraperNetworkError({
-                message: `Network error: ${String(error)}`,
-                url: request.url,
-                cause: error,
-              });
+          const response = yield* fetchResponse({
+            url: request.url,
+            timeoutMs,
+            method: "GET",
+            headers: {
+              "User-Agent": config.userAgent,
+              ...request.headers,
             },
-          }).pipe(
-            Effect.tap(() =>
-              Effect.sync(() => {
-                clearTimeout(timeoutId);
+            redirect: request.followRedirects ? "follow" : "manual",
+            timeoutError: (url, requestTimeoutMs) =>
+              new ScraperTimeoutError({
+                message: `Request timed out after ${requestTimeoutMs}ms`,
+                url,
+                timeoutMs: requestTimeoutMs,
               }),
-            ),
-          );
+            networkError: (url, error) =>
+              new ScraperNetworkError({
+                message: `Network error: ${String(error)}`,
+                url,
+                cause: error,
+              }),
+          });
 
           const statusCode = response.status;
 
@@ -94,12 +80,12 @@ export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
             );
           }
 
-          const body = yield* Effect.tryPromise({
-            try: () => response.text(),
-            catch: (error) =>
+          const body = yield* readResponseText(response, {
+            url: request.url,
+            bodyReadError: (url, error) =>
               new ScraperNetworkError({
                 message: `Failed to read response body: ${String(error)}`,
-                url: request.url,
+                url,
                 cause: error,
               }),
           });

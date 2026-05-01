@@ -12,6 +12,7 @@ import { Input } from "@laxdb/ui/components/ui/input";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { cn } from "@laxdb/ui/lib/utils";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
@@ -260,7 +261,7 @@ function NewPracticePage() {
           <Link to="/">
             <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleCreate} disabled={creating}>
+          <Button onClick={voidAsync(handleCreate)} disabled={creating}>
             {creating ? <Loader2 className="animate-spin" /> : null}
             {creating ? "Creating…" : "Create Practice"}
           </Button>

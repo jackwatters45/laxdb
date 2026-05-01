@@ -43,11 +43,11 @@ export default function Calendar28() {
           className="bg-background pr-10"
           id="date"
           onChange={(e) => {
-            const date = new Date(e.target.value);
+            const nextDate = new Date(e.target.value);
             setValue(e.target.value);
-            if (isValidDate(date)) {
-              setDate(date);
-              setMonth(date);
+            if (isValidDate(nextDate)) {
+              setDate(nextDate);
+              setMonth(nextDate);
             }
           }}
           onKeyDown={(e) => {
@@ -84,9 +84,9 @@ export default function Calendar28() {
               mode="single"
               {...(month !== undefined && { month })}
               onMonthChange={setMonth}
-              onSelect={(date) => {
-                setDate(date);
-                setValue(formatDate(date));
+              onSelect={(selectedDate) => {
+                setDate(selectedDate);
+                setValue(formatDate(selectedDate));
                 setOpen(false);
               }}
               {...(date !== undefined && { selected: date })}

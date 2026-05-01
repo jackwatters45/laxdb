@@ -1,23 +1,27 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
+import type { Post } from "content-collections";
 import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag } from "@/lib/graph-utils";
+import { throwRouterError } from "@/lib/router-throws";
 import { ROUTING_TAGS, ROUTING_TAG_REDIRECTS } from "@/lib/tags";
 
+type TagLoaderData = { tagId: string; posts: Post[] };
+
 export const Route = createFileRoute("/tag/$tagId")({
-  beforeLoad: ({ params }) => {
+  beforeLoad: ({ params }: { params: { tagId: string } }): void => {
     const tagId = params.tagId.toLowerCase();
     const redirectTo = ROUTING_TAG_REDIRECTS[tagId];
     if (redirectTo) {
-      throw redirect({ to: redirectTo });
+      throwRouterError(redirect({ to: redirectTo }));
     }
   },
-  loader: ({ params }: { params: { tagId: string } }) => {
+  loader: ({ params }: { params: { tagId: string } }): TagLoaderData => {
     const tagId = params.tagId.toLowerCase();
     const posts = getContentByTag(publishedPosts, tagId);
     if (posts.length === 0) {
-      throw notFound();
+      throwRouterError(notFound());
     }
     return { tagId, posts };
   },

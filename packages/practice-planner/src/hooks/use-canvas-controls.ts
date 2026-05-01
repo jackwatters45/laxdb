@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 
-import type { CanvasTransform } from "@/hooks/use-canvas-interactions";
 import { autoLayout } from "@/lib/layout";
 import type { PracticeNode, PracticeEdge, PracticeGraph } from "@/types";
 

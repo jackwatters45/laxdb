@@ -1,30 +1,22 @@
 import { RpcApiClient } from "@laxdb/api/client";
+import { UpdateDrillInput } from "@laxdb/core/drill/drill.schema";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
-import { Input } from "@laxdb/ui/components/ui/input";
-import { Label } from "@laxdb/ui/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@laxdb/ui/components/ui/select";
 import { Separator } from "@laxdb/ui/components/ui/separator";
-import { Switch } from "@laxdb/ui/components/ui/switch";
-import { Textarea } from "@laxdb/ui/components/ui/textarea";
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@laxdb/ui/components/ui/toggle-group";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { Check, Clock, Loader2, Pencil, Users } from "lucide-react";
 import { useState } from "react";
 
+import {
+  DrillFormFields,
+  type DrillFormFieldsProps,
+} from "@/components/drill-form-fields";
 import { runApi } from "@/lib/api";
-import type { Difficulty, DrillCategory, FieldSpace, Intensity } from "@/types";
+import { DRILL_DIFFICULTY_COLORS } from "@/lib/drill-definitions";
+import type { Difficulty, FieldSpace, Intensity } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -41,53 +33,9 @@ const getDrill = createServerFn({ method: "GET" })
     ),
   );
 
-const UpdateDrillForm = Schema.Struct({
-  publicId: Schema.String,
-  name: Schema.optional(Schema.String),
-  subtitle: Schema.optional(Schema.NullOr(Schema.String)),
-  description: Schema.optional(Schema.NullOr(Schema.String)),
-  difficulty: Schema.optional(
-    Schema.Literals(["beginner", "intermediate", "advanced"]),
-  ),
-  category: Schema.optional(
-    Schema.Array(
-      Schema.Literals([
-        "passing",
-        "shooting",
-        "defense",
-        "ground-balls",
-        "face-offs",
-        "clearing",
-        "riding",
-        "transition",
-        "man-up",
-        "man-down",
-        "conditioning",
-      ]),
-    ),
-  ),
-  positionGroup: Schema.optional(
-    Schema.Array(
-      Schema.Literals(["attack", "midfield", "defense", "goalie", "all"]),
-    ),
-  ),
-  intensity: Schema.optional(
-    Schema.NullOr(Schema.Literals(["low", "medium", "high"])),
-  ),
-  contact: Schema.optional(Schema.NullOr(Schema.Boolean)),
-  competitive: Schema.optional(Schema.NullOr(Schema.Boolean)),
-  playerCount: Schema.optional(Schema.NullOr(Schema.Number)),
-  durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),
-  fieldSpace: Schema.optional(
-    Schema.NullOr(Schema.Literals(["full-field", "half-field", "box"])),
-  ),
-  coachNotes: Schema.optional(Schema.NullOr(Schema.String)),
-  tags: Schema.optional(Schema.Array(Schema.String)),
-});
-
 const updateDrill = createServerFn({ method: "POST" })
-  .inputValidator((data: typeof UpdateDrillForm.Type) =>
-    Schema.decodeSync(UpdateDrillForm)(data),
+  .inputValidator((data: typeof UpdateDrillInput.Type) =>
+    Schema.decodeSync(UpdateDrillInput)(data),
   )
   .handler(({ data }) =>
     runApi(
@@ -108,38 +56,6 @@ export const Route = createFileRoute("/drills/$id")({
 });
 
 // ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const CATEGORIES: { value: DrillCategory; label: string }[] = [
-  { value: "passing", label: "Passing" },
-  { value: "shooting", label: "Shooting" },
-  { value: "defense", label: "Defense" },
-  { value: "ground-balls", label: "Ground Balls" },
-  { value: "face-offs", label: "Face-offs" },
-  { value: "clearing", label: "Clearing" },
-  { value: "riding", label: "Riding" },
-  { value: "transition", label: "Transition" },
-  { value: "man-up", label: "Man-Up" },
-  { value: "man-down", label: "Man-Down" },
-  { value: "conditioning", label: "Conditioning" },
-];
-
-const POSITION_GROUPS = [
-  { value: "attack", label: "Attack" },
-  { value: "midfield", label: "Midfield" },
-  { value: "defense", label: "Defense" },
-  { value: "goalie", label: "Goalie" },
-  { value: "all", label: "All" },
-] as const;
-
-const difficultyColors: Record<Difficulty, string> = {
-  beginner: "bg-green-500/10 text-green-600",
-  intermediate: "bg-amber-500/10 text-amber-600",
-  advanced: "bg-red-500/10 text-red-600",
-};
-
-// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -155,7 +71,7 @@ function DrillDetailPage() {
   const [description, setDescription] = useState(drill.description ?? "");
   const [difficulty, setDifficulty] = useState<Difficulty>(drill.difficulty);
   const [categories, setCategories] = useState([...drill.category]);
-  const [positionGroups, setPositionGroups] = useState<string[]>([
+  const [positionGroups, setPositionGroups] = useState([
     ...drill.positionGroup,
   ]);
   const [intensity, setIntensity] = useState<Intensity | "">(
@@ -212,13 +128,13 @@ function DrillDetailPage() {
         description: description || null,
         difficulty,
         category: categories,
-        positionGroup: positionGroups as typeof drill.positionGroup,
-        intensity: (intensity as Intensity) || null,
+        positionGroup: positionGroups,
+        intensity: intensity || null,
         contact,
         competitive,
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-        fieldSpace: (fieldSpace as FieldSpace) || null,
+        fieldSpace: fieldSpace || null,
         coachNotes: coachNotes || null,
         tags: parsedTags,
       },
@@ -266,7 +182,7 @@ function DrillDetailPage() {
         tags={tags}
         setTags={setTags}
         saving={saving}
-        onSave={handleSave}
+        onSave={voidAsync(handleSave)}
         onCancel={handleCancel}
       />
     );
@@ -301,7 +217,7 @@ function DrillDetailPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge
               variant="secondary"
-              className={difficultyColors[drill.difficulty]}
+              className={DRILL_DIFFICULTY_COLORS[drill.difficulty]}
             >
               {drill.difficulty}
             </Badge>
@@ -465,35 +381,7 @@ function DrillDetailPage() {
 // Edit View
 // ---------------------------------------------------------------------------
 
-interface DrillEditViewProps {
-  name: string;
-  setName: (v: string) => void;
-  subtitle: string;
-  setSubtitle: (v: string) => void;
-  description: string;
-  setDescription: (v: string) => void;
-  difficulty: Difficulty;
-  setDifficulty: (v: Difficulty) => void;
-  categories: DrillCategory[];
-  setCategories: (v: DrillCategory[]) => void;
-  positionGroups: string[];
-  setPositionGroups: (v: string[]) => void;
-  intensity: Intensity | "";
-  setIntensity: (v: Intensity | "") => void;
-  contact: boolean;
-  setContact: (v: boolean) => void;
-  competitive: boolean;
-  setCompetitive: (v: boolean) => void;
-  playerCount: string;
-  setPlayerCount: (v: string) => void;
-  durationMinutes: string;
-  setDurationMinutes: (v: string) => void;
-  fieldSpace: FieldSpace | "";
-  setFieldSpace: (v: FieldSpace | "") => void;
-  coachNotes: string;
-  setCoachNotes: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
+interface DrillEditViewProps extends DrillFormFieldsProps {
   saving: boolean;
   onSave: () => void;
   onCancel: () => void;
@@ -527,299 +415,5 @@ function DrillEditView(props: DrillEditViewProps) {
         <DrillFormFields {...props} />
       </div>
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared Form Fields (used by edit and create pages)
-// ---------------------------------------------------------------------------
-
-export function DrillFormFields(props: {
-  name: string;
-  setName: (v: string) => void;
-  subtitle: string;
-  setSubtitle: (v: string) => void;
-  description: string;
-  setDescription: (v: string) => void;
-  difficulty: Difficulty;
-  setDifficulty: (v: Difficulty) => void;
-  categories: DrillCategory[];
-  setCategories: (v: DrillCategory[]) => void;
-  positionGroups: string[];
-  setPositionGroups: (v: string[]) => void;
-  intensity: Intensity | "";
-  setIntensity: (v: Intensity | "") => void;
-  contact: boolean;
-  setContact: (v: boolean) => void;
-  competitive: boolean;
-  setCompetitive: (v: boolean) => void;
-  playerCount: string;
-  setPlayerCount: (v: string) => void;
-  durationMinutes: string;
-  setDurationMinutes: (v: string) => void;
-  fieldSpace: FieldSpace | "";
-  setFieldSpace: (v: FieldSpace | "") => void;
-  coachNotes: string;
-  setCoachNotes: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
-}) {
-  return (
-    <>
-      {/* Basic Info */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Basic Info</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Name is required. Everything else is optional.
-          </p>
-        </div>
-
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={props.name}
-              onChange={(e) => {
-                props.setName(e.target.value);
-              }}
-              placeholder="e.g. 3v2 Ground Ball Scoop"
-            />
-          </div>
-          <div>
-            <Label htmlFor="subtitle">Subtitle</Label>
-            <Input
-              id="subtitle"
-              value={props.subtitle}
-              onChange={(e) => {
-                props.setSubtitle(e.target.value);
-              }}
-              placeholder="Short description"
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={props.description}
-              onChange={(e) => {
-                props.setDescription(e.target.value);
-              }}
-              placeholder="Drill setup, rules, coaching points..."
-              className="min-h-[100px]"
-            />
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Classification */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">
-          Classification
-        </h2>
-
-        <div className="grid gap-4">
-          <div>
-            <Label>Difficulty</Label>
-            <Select
-              value={props.difficulty}
-              onValueChange={(v) => {
-                props.setDifficulty(v as Difficulty);
-              }}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="beginner">Beginner</SelectItem>
-                <SelectItem value="intermediate">Intermediate</SelectItem>
-                <SelectItem value="advanced">Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Categories</Label>
-            <ToggleGroup
-              value={props.categories}
-              onValueChange={(values) => {
-                props.setCategories(values as DrillCategory[]);
-              }}
-              variant="outline"
-              size="sm"
-              spacing={1}
-              className="flex-wrap justify-start"
-            >
-              {CATEGORIES.map((cat) => (
-                <ToggleGroupItem key={cat.value} value={cat.value}>
-                  {cat.label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
-
-          <div>
-            <Label>Position Groups</Label>
-            <ToggleGroup
-              value={props.positionGroups}
-              onValueChange={(values) => {
-                props.setPositionGroups(values);
-              }}
-              variant="outline"
-              size="sm"
-              spacing={1}
-              className="flex-wrap justify-start"
-            >
-              {POSITION_GROUPS.map((pg) => (
-                <ToggleGroupItem key={pg.value} value={pg.value}>
-                  {pg.label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Logistics */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Logistics</h2>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="duration">
-              <Clock size={12} className="inline mr-1.5 -mt-0.5" />
-              Duration (min)
-            </Label>
-            <Input
-              id="duration"
-              type="number"
-              value={props.durationMinutes}
-              onChange={(e) => {
-                props.setDurationMinutes(e.target.value);
-              }}
-              placeholder="15"
-              min={1}
-              max={120}
-            />
-          </div>
-          <div>
-            <Label htmlFor="playerCount">
-              <Users size={12} className="inline mr-1.5 -mt-0.5" />
-              Min Players
-            </Label>
-            <Input
-              id="playerCount"
-              type="number"
-              value={props.playerCount}
-              onChange={(e) => {
-                props.setPlayerCount(e.target.value);
-              }}
-              placeholder="6"
-              min={1}
-              max={50}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Intensity</Label>
-            <Select
-              value={props.intensity || undefined}
-              onValueChange={(v) => {
-                props.setIntensity(v as Intensity);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Field Space</Label>
-            <Select
-              value={props.fieldSpace || undefined}
-              onValueChange={(v) => {
-                props.setFieldSpace(v as FieldSpace);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="full-field">Full Field</SelectItem>
-                <SelectItem value="half-field">Half Field</SelectItem>
-                <SelectItem value="box">Box</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Switch
-              id="contact"
-              checked={props.contact}
-              onCheckedChange={props.setContact}
-            />
-            <Label htmlFor="contact">Contact</Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              id="competitive"
-              checked={props.competitive}
-              onCheckedChange={props.setCompetitive}
-            />
-            <Label htmlFor="competitive">Competitive</Label>
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Notes & Tags */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Notes & Tags</h2>
-
-        <div>
-          <Label htmlFor="coachNotes">Coach Notes</Label>
-          <Textarea
-            id="coachNotes"
-            value={props.coachNotes}
-            onChange={(e) => {
-              props.setCoachNotes(e.target.value);
-            }}
-            placeholder="Private coaching notes, variations, progressions..."
-            className="min-h-[80px]"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="tags">Tags</Label>
-          <Input
-            id="tags"
-            value={props.tags}
-            onChange={(e) => {
-              props.setTags(e.target.value);
-            }}
-            placeholder="warmup, cooldown, team-building (comma-separated)"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Comma-separated. Use "warmup" or "cooldown" to categorize
-            automatically.
-          </p>
-        </div>
-      </section>
-    </>
   );
 }

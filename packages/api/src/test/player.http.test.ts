@@ -6,6 +6,7 @@
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { expectRecord, expectStringProp } from "./assertions";
 import {
   post,
   startTestServer,
@@ -53,7 +54,7 @@ describe("POST /api/players/create", () => {
       email: "alice@test.com",
     });
     expect(status).toBe(200);
-    const player = data as Record<string, unknown>;
+    const player = expectRecord(data);
     expect(player.name).toBe("Alice");
     expect(player.email).toBe("alice@test.com");
     expect(player.publicId).toHaveLength(12);
@@ -83,13 +84,13 @@ describe("POST /api/players/get", () => {
       name: "Alice",
       email: "alice@test.com",
     });
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status, data } = await post(s.url, "/api/players/get", {
       publicId,
     });
     expect(status).toBe(200);
-    expect((data as Record<string, unknown>).name).toBe("Alice");
+    expect(expectRecord(data).name).toBe("Alice");
   });
 
   it("returns error for nonexistent player", async () => {
@@ -113,14 +114,14 @@ describe("POST /api/players/update", () => {
       name: "Original",
       email: "orig@test.com",
     });
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status, data } = await post(s.url, "/api/players/update", {
       publicId,
       name: "Updated",
     });
     expect(status).toBe(200);
-    const player = data as Record<string, unknown>;
+    const player = expectRecord(data);
     expect(player.name).toBe("Updated");
     expect(player.email).toBe("orig@test.com");
   });
@@ -140,7 +141,7 @@ describe("POST /api/players/delete", () => {
       name: "ToDelete",
       email: "del@test.com",
     });
-    const publicId = (created as Record<string, unknown>).publicId as string;
+    const publicId = expectStringProp(created, "publicId");
 
     const { status } = await post(s.url, "/api/players/delete", { publicId });
     expect(status).toBe(200);

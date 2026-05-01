@@ -56,6 +56,7 @@ export function usePracticePersistence<P>({
           knownIdsRef.current,
         );
 
+        // oxlint-disable-next-line no-await-in-loop -- queued saves must flush in order
         await onSaveRef.current(payload);
         knownIdsRef.current = new Set(persistedIds);
         setLastSaved(new Date());
