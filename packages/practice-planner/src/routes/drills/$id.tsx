@@ -88,6 +88,9 @@ function DrillDetailPage() {
   const [fieldSpace, setFieldSpace] = useState<FieldSpace | "">(
     drill.fieldSpace ?? "",
   );
+  const [equipment, setEquipment] = useState(drill.equipment?.join(", ") ?? "");
+  const [diagramUrl, setDiagramUrl] = useState(drill.diagramUrl ?? "");
+  const [videoUrl, setVideoUrl] = useState(drill.videoUrl ?? "");
   const [coachNotes, setCoachNotes] = useState(drill.coachNotes ?? "");
   const [tags, setTags] = useState(drill.tags.join(", "));
 
@@ -104,6 +107,9 @@ function DrillDetailPage() {
     setPlayerCount(drill.playerCount?.toString() ?? "");
     setDurationMinutes(drill.durationMinutes?.toString() ?? "");
     setFieldSpace(drill.fieldSpace ?? "");
+    setEquipment(drill.equipment?.join(", ") ?? "");
+    setDiagramUrl(drill.diagramUrl ?? "");
+    setVideoUrl(drill.videoUrl ?? "");
     setCoachNotes(drill.coachNotes ?? "");
     setTags(drill.tags.join(", "));
   };
@@ -118,6 +124,10 @@ function DrillDetailPage() {
     const parsedTags = tags
       .split(",")
       .map((t) => t.trim())
+      .filter(Boolean);
+    const parsedEquipment = equipment
+      .split(",")
+      .map((item) => item.trim())
       .filter(Boolean);
 
     await updateDrill({
@@ -135,6 +145,9 @@ function DrillDetailPage() {
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
         fieldSpace: fieldSpace || null,
+        equipment: parsedEquipment.length > 0 ? parsedEquipment : null,
+        diagramUrl: diagramUrl || null,
+        videoUrl: videoUrl || null,
         coachNotes: coachNotes || null,
         tags: parsedTags,
       },
@@ -177,6 +190,12 @@ function DrillDetailPage() {
         setDurationMinutes={setDurationMinutes}
         fieldSpace={fieldSpace}
         setFieldSpace={setFieldSpace}
+        equipment={equipment}
+        setEquipment={setEquipment}
+        diagramUrl={diagramUrl}
+        setDiagramUrl={setDiagramUrl}
+        videoUrl={videoUrl}
+        setVideoUrl={setVideoUrl}
         coachNotes={coachNotes}
         setCoachNotes={setCoachNotes}
         tags={tags}

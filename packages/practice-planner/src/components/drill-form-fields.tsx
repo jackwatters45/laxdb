@@ -57,6 +57,12 @@ export interface DrillFormFieldsProps {
   setDurationMinutes: (v: string) => void;
   fieldSpace: FieldSpace | "";
   setFieldSpace: (v: FieldSpace | "") => void;
+  equipment: string;
+  setEquipment: (v: string) => void;
+  diagramUrl: string;
+  setDiagramUrl: (v: string) => void;
+  videoUrl: string;
+  setVideoUrl: (v: string) => void;
   coachNotes: string;
   setCoachNotes: (v: string) => void;
   tags: string;
@@ -298,6 +304,53 @@ export function DrillFormFields(props: DrillFormFieldsProps) {
               onCheckedChange={props.setCompetitive}
             />
             <Label htmlFor="competitive">Competitive</Label>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      <section className="space-y-4">
+        <h2 className="text-sm font-semibold text-foreground">
+          Equipment & Resources
+        </h2>
+
+        <div className="grid gap-4">
+          <div>
+            <Label htmlFor="equipment">Equipment</Label>
+            <Input
+              id="equipment"
+              value={props.equipment}
+              onChange={(e) => {
+                props.setEquipment(e.target.value);
+              }}
+              placeholder="balls, cones, goals (comma-separated)"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="diagramUrl">Diagram URL</Label>
+              <Input
+                id="diagramUrl"
+                value={props.diagramUrl}
+                onChange={(e) => {
+                  props.setDiagramUrl(e.target.value);
+                }}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="videoUrl">Video URL</Label>
+              <Input
+                id="videoUrl"
+                value={props.videoUrl}
+                onChange={(e) => {
+                  props.setVideoUrl(e.target.value);
+                }}
+                placeholder="https://..."
+              />
+            </div>
           </div>
         </div>
       </section>
