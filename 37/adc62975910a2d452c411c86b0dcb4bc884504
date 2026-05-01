@@ -1,43 +1,7 @@
-packages/practice-planner/src/globals.css
-  1afd96eae1e095f5 1
-packages/practice-planner/src/data/types.ts
-  1afd96eae1e095f5 1-103
-packages/practice-planner/tsconfig.json
-  1afd96eae1e095f5 1-13
-packages/practice-planner/package.json
-  1afd96eae1e095f5 1-37
-packages/practice-planner/src/routes/__root.tsx
-  1afd96eae1e095f5 1-44
-alchemy.run.ts
-  1afd96eae1e095f5 198-203,208
-packages/practice-planner/src/data/mock-drills.ts
-  1afd96eae1e095f5 1-293
-packages/practice-planner/src/site.ts
-  1afd96eae1e095f5 1-5
-packages/practice-planner/src/router.tsx
-  1afd96eae1e095f5 1-18
-packages/practice-planner/vite.config.ts
-  1afd96eae1e095f5 1-32
-packages/practice-planner/src/routes/index.tsx
-  1afd96eae1e095f5 1-18
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.2.5",
+  "git_ai_version": "1.1.17",
   "base_commit_sha": "37adc62975910a2d452c411c86b0dcb4bc884504",
-  "prompts": {
-    "1afd96eae1e095f5": {
-      "agent_id": {
-        "tool": "claude",
-        "id": "1cf3801c-0680-45db-8ab9-0ceb42bdc70f",
-        "model": "claude-opus-4-6"
-      },
-      "human_author": "jackwatters45 <jack.watters@me.com>",
-      "messages": [],
-      "total_additions": 571,
-      "total_deletions": 0,
-      "accepted_lines": 571,
-      "overriden_lines": 0
-    }
-  }
+  "prompts": {}
 }
