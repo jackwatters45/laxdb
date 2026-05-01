@@ -3,6 +3,7 @@ import type { Post } from "content-collections";
 import { toSlug } from "./slug";
 
 export type NodeType = "blog" | "wiki" | "entity" | "tag";
+export type GraphEdgeKind = "wiki" | "tag";
 
 export interface GraphNode {
   id: string;
@@ -15,6 +16,8 @@ export interface GraphNode {
 export interface GraphEdge {
   source: string;
   target: string;
+  kind: GraphEdgeKind;
+  label: string;
 }
 
 export interface GraphData {
@@ -23,76 +26,95 @@ export interface GraphData {
 }
 
 export const NODE_COLORS: Record<NodeType, string> = {
-  blog: "#60a5fa", // blue - has blog tag
-  wiki: "#34d399", // green - has wiki tag (no blog)
-  entity: "#6b7280", // gray - referenced but no page
-  tag: "#f472b6", // pink - tag nodes
+  blog: "#7aa2f7",
+  wiki: "#9ece6a",
+  entity: "#a9b1d6",
+  tag: "#e0af68",
 };
 
 function getNodeType(post: Post): NodeType {
   if (post.tags?.includes("blog")) return "blog";
   if (post.tags?.includes("wiki")) return "wiki";
-  return "wiki"; // default for content without specific tags
+  return "wiki";
 }
 
 export function buildGraphData(posts: Post[]): GraphData {
   const nodes: GraphNode[] = [];
   const edges: GraphEdge[] = [];
   const nodeIds = new Set<string>();
-  const entityNodes = new Map<string, string>(); // slug -> label
+  const edgeIds = new Set<string>();
+  const postsBySlug = new Map(posts.map((post) => [post.slug, post]));
 
-  // Add content nodes
+  const addNode = (node: GraphNode) => {
+    if (nodeIds.has(node.id)) return;
+    nodes.push(node);
+    nodeIds.add(node.id);
+  };
+
+  const addEdge = (edge: GraphEdge) => {
+    const edgeId = `${edge.kind}:${edge.source}->${edge.target}`;
+    if (edgeIds.has(edgeId)) return;
+    edges.push(edge);
+    edgeIds.add(edgeId);
+  };
+
   for (const post of posts) {
-    const nodeId = `content:${post.slug}`;
-    nodes.push({
-      id: nodeId,
+    const sourceId = `content:${post.slug}`;
+    addNode({
+      id: sourceId,
       label: post.title,
       type: getNodeType(post),
       url: `/content/${post.slug}`,
       tags: post.tags,
     });
-    nodeIds.add(nodeId);
 
-    // Track wiki links for entity nodes
-    if (post.wikiLinks) {
-      for (const link of post.wikiLinks) {
-        entityNodes.set(toSlug(link), link);
-      }
+    for (const tag of post.tags ?? []) {
+      const normalizedTag = tag.toLowerCase();
+      const tagId = `tag:${normalizedTag}`;
+      addNode({
+        id: tagId,
+        label: `#${tag}`,
+        type: "tag",
+        url: `/tag/${normalizedTag}`,
+      });
+      addEdge({
+        source: sourceId,
+        target: tagId,
+        kind: "tag",
+        label: "tagged",
+      });
     }
   }
 
-  // Create edges from wiki links
   for (const post of posts) {
-    if (!post.wikiLinks) continue;
-
     const sourceId = `content:${post.slug}`;
 
-    for (const link of post.wikiLinks) {
+    for (const link of post.wikiLinks ?? []) {
       const targetSlug = toSlug(link);
-      const targetPost = posts.find((p) => p.slug === targetSlug);
+      const targetPost = postsBySlug.get(targetSlug);
 
       if (targetPost) {
-        // Link to existing content
-        edges.push({
+        addEdge({
           source: sourceId,
-          target: `content:${targetSlug}`,
+          target: `content:${targetPost.slug}`,
+          kind: "wiki",
+          label: "mentions",
         });
-      } else {
-        // Create entity node if doesn't exist
-        const entityId = `entity:${targetSlug}`;
-        if (!nodeIds.has(entityId)) {
-          nodes.push({
-            id: entityId,
-            label: link,
-            type: "entity",
-          });
-          nodeIds.add(entityId);
-        }
-        edges.push({
-          source: sourceId,
-          target: entityId,
-        });
+        continue;
       }
+
+      const entityId = `entity:${targetSlug}`;
+      addNode({
+        id: entityId,
+        label: link,
+        type: "entity",
+      });
+      addEdge({
+        source: sourceId,
+        target: entityId,
+        kind: "wiki",
+        label: "mentions",
+      });
     }
   }
 
@@ -123,7 +145,6 @@ export function groupBySubjectTag(posts: Post[]): Record<string, Post[]> {
   for (const post of posts) {
     const subjects = post.tags?.filter((t) => subjectTags.has(t)) ?? [];
     if (subjects.length === 0) {
-      // Put in "other" category
       grouped["other"] ??= [];
       grouped["other"].push(post);
     } else {
