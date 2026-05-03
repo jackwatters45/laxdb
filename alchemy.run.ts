@@ -1,4 +1,7 @@
 import { Exec } from "alchemy/os";
+// Keep the provider registered so Alchemy can destroy legacy PlanetScale
+// resources that still exist in state after the D1 migration.
+import "alchemy/planetscale";
 import alchemy from "alchemy";
 import { CloudflareStateStore } from "alchemy/state";
 import { GitHubComment } from "alchemy/github";
