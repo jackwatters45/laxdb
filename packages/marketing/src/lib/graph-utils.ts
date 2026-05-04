@@ -26,10 +26,10 @@ export interface GraphData {
 }
 
 export const NODE_COLORS: Record<NodeType, string> = {
-  blog: "#7aa2f7",
-  wiki: "#9ece6a",
-  entity: "#a9b1d6",
-  tag: "#e0af68",
+  blog: "oklch(var(--foreground))",
+  wiki: "oklch(var(--muted-foreground))",
+  entity: "oklch(var(--bullet))",
+  tag: "oklch(var(--orange))",
 };
 
 function getNodeType(post: Post): NodeType {

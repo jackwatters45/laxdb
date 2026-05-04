@@ -206,6 +206,46 @@ function worldToScreen(x: number, y: number, camera: Camera): { x: number; y: nu
   };
 }
 
+interface GraphCanvasPalette {
+  background: string;
+  foreground: string;
+  mutedForeground: string;
+  border: string;
+  borderStrong: string;
+  bullet: string;
+  orange: string;
+  nodes: Record<NodeType, string>;
+}
+
+function readOklchVariable(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  const value = window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return value.length > 0 ? `oklch(${value})` : fallback;
+}
+
+function getGraphCanvasPalette(): GraphCanvasPalette {
+  const foreground = readOklchVariable("--foreground", "oklch(0.17 0 0)");
+  const mutedForeground = readOklchVariable("--muted-foreground", "oklch(0.51 0 0)");
+  const bullet = readOklchVariable("--bullet", "oklch(0.82 0 0)");
+  const orange = readOklchVariable("--orange", "oklch(0.55 0.12 50)");
+
+  return {
+    background: readOklchVariable("--background", "oklch(0.96 0.007 70)"),
+    foreground,
+    mutedForeground,
+    border: readOklchVariable("--border", "oklch(0.93 0 0)"),
+    borderStrong: readOklchVariable("--border-strong", "oklch(0.89 0 0)"),
+    bullet,
+    orange,
+    nodes: {
+      blog: foreground,
+      wiki: mutedForeground,
+      entity: bullet,
+      tag: orange,
+    },
+  };
+}
+
 function GraphPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
@@ -462,15 +502,12 @@ function GraphPage() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
 
-    const background = ctx.createLinearGradient(0, 0, width, height);
-    background.addColorStop(0, "#070a12");
-    background.addColorStop(0.5, "#0d1222");
-    background.addColorStop(1, "#11131d");
-    ctx.fillStyle = background;
+    const palette = getGraphCanvasPalette();
+    ctx.fillStyle = palette.background;
     ctx.fillRect(0, 0, width, height);
 
-    ctx.globalAlpha = 0.24;
-    ctx.fillStyle = "#242b3f";
+    ctx.globalAlpha = 0.42;
+    ctx.fillStyle = palette.border;
     for (let x = ((camera.x % 34) + 34) % 34; x < width; x += 34) {
       for (let y = ((camera.y % 34) + 34) % 34; y < height; y += 34) {
         ctx.fillRect(x, y, 1, 1);
@@ -489,8 +526,8 @@ function GraphPage() {
 
       const highlighted =
         connectedIds.size === 0 || (connectedIds.has(edge.source) && connectedIds.has(edge.target));
-      ctx.globalAlpha = highlighted ? 0.42 : 0.08;
-      ctx.strokeStyle = edge.kind === "tag" ? "#e0af68" : "#6b728f";
+      ctx.globalAlpha = highlighted ? 0.46 : 0.12;
+      ctx.strokeStyle = edge.kind === "tag" ? palette.orange : palette.borderStrong;
       ctx.lineWidth = (highlighted ? 1.2 : 0.8) / camera.scale;
       ctx.setLineDash(edge.kind === "tag" ? [4 / camera.scale, 7 / camera.scale] : []);
       ctx.beginPath();
@@ -513,25 +550,25 @@ function GraphPage() {
       const radius = getNodeRadius(node, degree);
 
       if (isSelected || isHovered || isMatched) {
-        ctx.globalAlpha = isSelected ? 0.26 : 0.18;
-        ctx.fillStyle = NODE_COLORS[node.type];
+        ctx.globalAlpha = isSelected ? 0.24 : 0.18;
+        ctx.fillStyle = palette.nodes[node.type];
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, radius + (isSelected ? 14 : 10), 0, Math.PI * 2);
         ctx.fill();
       }
 
-      ctx.globalAlpha = highlighted ? 1 : 0.22;
-      ctx.fillStyle = NODE_COLORS[node.type];
+      ctx.globalAlpha = highlighted ? 1 : 0.25;
+      ctx.fillStyle = palette.nodes[node.type];
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = isSelected ? "#f8fafc" : "rgba(248,250,252,0.68)";
+      ctx.strokeStyle = isSelected ? palette.foreground : palette.background;
       ctx.lineWidth = (isSelected ? 1.6 : 0.7) / camera.scale;
       ctx.stroke();
 
       if (pos.pinned) {
-        ctx.fillStyle = "#f8fafc";
+        ctx.fillStyle = palette.foreground;
         ctx.globalAlpha = 0.82;
         ctx.beginPath();
         ctx.arc(pos.x + radius * 0.62, pos.y - radius * 0.62, 2.5 / camera.scale, 0, Math.PI * 2);
@@ -540,7 +577,7 @@ function GraphPage() {
     }
     ctx.globalAlpha = 1;
 
-    ctx.font = `${12 / camera.scale}px ui-serif, Georgia, serif`;
+    ctx.font = `${12 / camera.scale}px Newsreader, Georgia, serif`;
     ctx.textBaseline = "middle";
     for (const node of visibleGraph.nodes) {
       const pos = positions.get(node.id);
@@ -560,7 +597,7 @@ function GraphPage() {
         connectedIds.size === 0 || connectedIds.has(node.id) || matchingNodeIds.has(node.id)
           ? 0.94
           : 0.34;
-      ctx.fillStyle = "#d8deff";
+      ctx.fillStyle = palette.foreground;
       ctx.fillText(label, pos.x + radius + 7 / camera.scale, pos.y + 1 / camera.scale);
     }
     ctx.globalAlpha = 1;
@@ -721,12 +758,7 @@ function GraphPage() {
     : undefined;
 
   return (
-    <main className="relative flex h-dvh overflow-hidden bg-[#070a12] text-slate-100">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_20%_10%,rgba(122,162,247,0.14),transparent_28rem),radial-gradient(circle_at_82%_72%,rgba(224,175,104,0.12),transparent_24rem)] opacity-40"
-      />
-
+    <main className="relative flex h-dvh overflow-hidden bg-background text-foreground">
       <div ref={containerRef} className="absolute inset-0">
         <canvas
           ref={canvasRef}
@@ -743,49 +775,55 @@ function GraphPage() {
         />
       </div>
 
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-4 md:p-6">
-        <section className="pointer-events-auto max-w-md rounded-2xl border border-white/10 bg-slate-950/78 p-4 shadow-xl shadow-black/30 backdrop-blur-md">
-          <Link to="/" className="text-xs text-slate-400 transition-colors hover:text-slate-100">
+      <header className="pointer-events-none absolute inset-x-0 top-16 z-10 flex items-start justify-between px-4 py-3 md:px-6">
+        <section className="pointer-events-auto max-w-md rounded-lg border border-border bg-background/90 p-4 shadow-sm backdrop-blur">
+          <Link
+            to="/"
+            className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
             LaxDB
           </Link>
-          <h1 className="mt-1 font-serif text-2xl text-balance text-slate-50 italic md:text-3xl">
+          <h1 className="mt-1 font-serif text-2xl text-balance text-foreground italic md:text-3xl">
             Knowledge graph
           </h1>
-          <p className="mt-2 max-w-sm text-sm leading-6 text-pretty text-slate-400">
-            An Obsidian-style map of lacrosse writing, wiki links, and topic clusters.
+          <p className="mt-2 max-w-sm text-sm leading-6 text-pretty text-muted-foreground">
+            Map lacrosse writing, wiki links, and topic clusters.
           </p>
           <dl className="mt-4 grid grid-cols-3 gap-2 text-xs tabular-nums">
-            <div className="rounded-lg bg-white/[0.06] p-2">
-              <dt className="text-slate-500">visible</dt>
-              <dd className="mt-0.5 text-slate-100">{visibleGraph.nodes.length}</dd>
+            <div className="rounded-sm border border-border bg-accent/40 p-2">
+              <dt className="text-subtle">visible</dt>
+              <dd className="mt-0.5 text-foreground">{visibleGraph.nodes.length}</dd>
             </div>
-            <div className="rounded-lg bg-white/[0.06] p-2">
-              <dt className="text-slate-500">links</dt>
-              <dd className="mt-0.5 text-slate-100">{visibleGraph.edges.length}</dd>
+            <div className="rounded-sm border border-border bg-accent/40 p-2">
+              <dt className="text-subtle">links</dt>
+              <dd className="mt-0.5 text-foreground">{visibleGraph.edges.length}</dd>
             </div>
-            <div className="rounded-lg bg-white/[0.06] p-2">
-              <dt className="text-slate-500">zoom</dt>
-              <dd className="mt-0.5 text-slate-100">{Math.round(camera.scale * 100)}%</dd>
+            <div className="rounded-sm border border-border bg-accent/40 p-2">
+              <dt className="text-subtle">zoom</dt>
+              <dd className="mt-0.5 text-foreground">{Math.round(camera.scale * 100)}%</dd>
             </div>
           </dl>
         </section>
 
-        <nav className="pointer-events-auto hidden gap-3 rounded-full border border-white/10 bg-slate-950/70 px-4 py-2 text-sm shadow-xl shadow-black/20 backdrop-blur-md md:flex">
+        <nav className="pointer-events-auto hidden gap-3 rounded-full border border-border bg-background/90 px-4 py-2 text-sm shadow-sm backdrop-blur md:flex">
           <Link
             to="/blog"
             search={{ filter: undefined }}
-            className="text-slate-400 hover:text-slate-100"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Blog
           </Link>
-          <Link to="/wiki" className="text-slate-400 hover:text-slate-100">
+          <Link
+            to="/wiki"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Wiki
           </Link>
         </nav>
       </header>
 
-      <aside className="absolute bottom-4 left-4 z-10 w-[min(24rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-slate-950/82 p-4 shadow-xl shadow-black/30 backdrop-blur-md md:bottom-6 md:left-6">
-        <label className="text-sm font-medium text-slate-200" htmlFor="graph-search">
+      <aside className="absolute bottom-4 left-4 z-10 w-[min(24rem,calc(100vw-2rem))] rounded-lg border border-border bg-background/90 p-4 shadow-sm backdrop-blur md:bottom-6 md:left-6">
+        <label className="text-sm font-medium text-foreground" htmlFor="graph-search">
           Find a node
         </label>
         <input
@@ -793,7 +831,7 @@ function GraphPage() {
           value={query}
           onChange={handleQueryChange}
           placeholder="Search players, leagues, ideas…"
-          className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2 text-sm text-slate-100 transition-colors outline-none placeholder:text-slate-600 focus:border-slate-400"
+          className="mt-2 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground transition-colors outline-none placeholder:text-subtle focus:border-border-strong"
         />
 
         {searchResults.length > 0 && (
@@ -806,8 +844,8 @@ function GraphPage() {
                   selectNode(node);
                 }}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors hover:bg-white/[0.08]",
-                  focusId === node.id ? "bg-white/[0.1] text-slate-50" : "text-slate-300",
+                  "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent/70",
+                  focusId === node.id ? "bg-accent text-foreground" : "text-muted-foreground",
                 )}
               >
                 <span
@@ -834,8 +872,8 @@ function GraphPage() {
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs transition-colors active:scale-[0.98]",
               includeTags
-                ? "border-amber-300/30 bg-amber-300/10 text-amber-100"
-                : "border-white/10 text-slate-400 hover:text-slate-100",
+                ? "border-orange/40 bg-orange/10 text-foreground"
+                : "border-border text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
             tag nodes {includeTags ? "on" : "off"}
@@ -856,8 +894,8 @@ function GraphPage() {
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs transition-colors active:scale-[0.98]",
                 depth === item
-                  ? "border-slate-200/40 bg-slate-100/10 text-slate-50"
-                  : "border-white/10 text-slate-400 hover:text-slate-100",
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               {item === "all" ? "global" : `${item}-hop`}
@@ -865,13 +903,13 @@ function GraphPage() {
           ))}
         </div>
 
-        <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
+        <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
           <button
             type="button"
             onClick={() => {
               setCamera({ x: 0, y: 0, scale: 1 });
             }}
-            className="rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-slate-50 active:scale-[0.98]"
+            className="rounded-sm border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.98]"
           >
             reset view
           </button>
@@ -886,7 +924,7 @@ function GraphPage() {
                 return next;
               });
             }}
-            className="rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-slate-50 active:scale-[0.98]"
+            className="rounded-sm border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.98]"
           >
             unpin all
           </button>
@@ -896,7 +934,7 @@ function GraphPage() {
               onClick={() => {
                 selectNode(null);
               }}
-              className="ml-auto rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-slate-50 active:scale-[0.98]"
+              className="ml-auto rounded-sm border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.98]"
             >
               clear focus
             </button>
@@ -905,17 +943,17 @@ function GraphPage() {
       </aside>
 
       {focusNode && (
-        <aside className="absolute top-32 right-4 z-10 hidden w-80 rounded-2xl border border-white/10 bg-slate-950/82 p-4 shadow-xl shadow-black/30 backdrop-blur-md md:block">
+        <aside className="absolute top-32 right-4 z-10 hidden w-80 rounded-lg border border-border bg-background/90 p-4 shadow-sm backdrop-blur md:block">
           <div className="flex items-start gap-3">
             <span
               className="mt-1 size-3 shrink-0 rounded-full"
               style={{ backgroundColor: NODE_COLORS[focusNode.type] }}
             />
             <div className="min-w-0">
-              <h2 className="font-serif text-lg text-balance text-slate-50 italic">
+              <h2 className="font-serif text-lg text-balance text-foreground italic">
                 {focusNode.label}
               </h2>
-              <p className="mt-1 text-xs text-slate-500 capitalize">
+              <p className="mt-1 text-xs text-muted-foreground capitalize">
                 {focusNode.type} · {degrees.get(focusNode.id) ?? 0} connections
               </p>
             </div>
@@ -926,7 +964,7 @@ function GraphPage() {
               {focusNode.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md bg-white/[0.07] px-2 py-1 text-xs text-slate-400"
+                  className="rounded-sm border border-border bg-accent/40 px-2 py-1 text-xs text-muted-foreground"
                 >
                   {tag}
                 </span>
@@ -936,7 +974,7 @@ function GraphPage() {
 
           {focusConnections.length > 0 && (
             <section className="mt-5">
-              <h3 className="text-xs font-medium text-slate-400">Nearest links</h3>
+              <h3 className="text-xs font-medium text-muted-foreground">Nearest links</h3>
               <div className="mt-2 space-y-1">
                 {focusConnections.map((node) => (
                   <button
@@ -945,7 +983,7 @@ function GraphPage() {
                     onClick={() => {
                       selectNode(node);
                     }}
-                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-slate-50"
+                    className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground"
                   >
                     <span
                       className="size-2 shrink-0 rounded-full"
@@ -961,7 +999,7 @@ function GraphPage() {
           {focusNode.url && (
             <a
               href={focusNode.url}
-              className="mt-5 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-950 transition-opacity hover:opacity-90 active:scale-[0.98]"
+              className="mt-5 inline-flex rounded-sm bg-foreground px-3 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 active:scale-[0.98]"
             >
               Open page
             </a>
@@ -971,7 +1009,7 @@ function GraphPage() {
 
       {hoveredNode && tooltipPosition && (
         <div
-          className="pointer-events-none absolute z-20 max-w-64 rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2 text-sm text-slate-100 shadow-xl shadow-black/30"
+          className="pointer-events-none absolute z-20 max-w-64 rounded-lg border border-border bg-background/95 px-3 py-2 text-sm text-foreground shadow-sm"
           style={{ left: tooltipPosition.x + 16, top: tooltipPosition.y + 16 }}
         >
           <div className="flex items-center gap-2">
@@ -981,14 +1019,14 @@ function GraphPage() {
             />
             <span className="truncate font-medium">{hoveredNode.label}</span>
           </div>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Click to focus · drag to pin
             {hoveredNode.url ? " · double-click to open" : ""}
           </p>
         </div>
       )}
 
-      <div className="absolute right-4 bottom-4 z-10 flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/78 p-1 shadow-xl shadow-black/30 backdrop-blur-md md:right-6 md:bottom-6">
+      <div className="absolute right-4 bottom-4 z-10 hidden items-center gap-2 rounded-full border border-border bg-background/90 p-1 shadow-sm backdrop-blur md:right-6 md:bottom-6 md:flex">
         <button
           type="button"
           aria-label="Zoom out"
@@ -998,7 +1036,7 @@ function GraphPage() {
               scale: clamp(previous.scale * 0.88, MIN_ZOOM, MAX_ZOOM),
             }));
           }}
-          className="size-9 rounded-full text-lg text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-slate-50 active:scale-[0.98]"
+          className="size-9 rounded-full text-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.98]"
         >
           −
         </button>
@@ -1011,7 +1049,7 @@ function GraphPage() {
               scale: clamp(previous.scale * 1.12, MIN_ZOOM, MAX_ZOOM),
             }));
           }}
-          className="size-9 rounded-full text-lg text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-slate-50 active:scale-[0.98]"
+          className="size-9 rounded-full text-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.98]"
         >
           +
         </button>
