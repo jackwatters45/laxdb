@@ -64,6 +64,9 @@ function NewDrillPage() {
   const [playerCount, setPlayerCount] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("");
   const [fieldSpace, setFieldSpace] = useState<FieldSpace | "">("");
+  const [equipment, setEquipment] = useState("");
+  const [diagramUrl, setDiagramUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [coachNotes, setCoachNotes] = useState("");
   const [tags, setTags] = useState("");
 
@@ -74,6 +77,10 @@ function NewDrillPage() {
     const parsedTags = tags
       .split(",")
       .map((t) => t.trim())
+      .filter(Boolean);
+    const parsedEquipment = equipment
+      .split(",")
+      .map((item) => item.trim())
       .filter(Boolean);
 
     const drill = await createDrill({
@@ -90,9 +97,9 @@ function NewDrillPage() {
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
         fieldSpace: fieldSpace || null,
-        equipment: null,
-        diagramUrl: null,
-        videoUrl: null,
+        equipment: parsedEquipment.length > 0 ? parsedEquipment : null,
+        diagramUrl: diagramUrl || null,
+        videoUrl: videoUrl || null,
         coachNotes: coachNotes || null,
         tags: parsedTags,
       },
@@ -141,6 +148,12 @@ function NewDrillPage() {
           setDurationMinutes={setDurationMinutes}
           fieldSpace={fieldSpace}
           setFieldSpace={setFieldSpace}
+          equipment={equipment}
+          setEquipment={setEquipment}
+          diagramUrl={diagramUrl}
+          setDiagramUrl={setDiagramUrl}
+          videoUrl={videoUrl}
+          setVideoUrl={setVideoUrl}
           coachNotes={coachNotes}
           setCoachNotes={setCoachNotes}
           tags={tags}
