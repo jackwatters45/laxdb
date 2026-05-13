@@ -102,9 +102,11 @@ const exploreYear = (year: number) =>
         "champSeries",
       ]);
       yield* Effect.log("   Field completeness:");
-      for (const f of teamFields.filter((f) => f.percentage < 100)) {
+      for (const field of teamFields.filter(
+        (teamField) => teamField.percentage < 100,
+      )) {
         yield* Effect.log(
-          `     - ${f.field}: ${f.percentage}% (${f.populated}/${f.total})`,
+          `     - ${field.field}: ${field.percentage}% (${field.populated}/${field.total})`,
         );
       }
     }
@@ -157,9 +159,11 @@ const exploreYear = (year: number) =>
         "champSeries",
       ]);
       yield* Effect.log("   Field completeness:");
-      for (const f of playerFields.filter((f) => f.percentage < 100)) {
+      for (const field of playerFields.filter(
+        (playerField) => playerField.percentage < 100,
+      )) {
         yield* Effect.log(
-          `     - ${f.field}: ${f.percentage}% (${f.populated}/${f.total})`,
+          `     - ${field.field}: ${field.percentage}% (${field.populated}/${field.total})`,
         );
       }
 
@@ -207,9 +211,11 @@ const exploreYear = (year: number) =>
         "eventStatus",
       ]);
       yield* Effect.log("   Field completeness:");
-      for (const f of eventFields.filter((f) => f.percentage < 100)) {
+      for (const field of eventFields.filter(
+        (eventField) => eventField.percentage < 100,
+      )) {
         yield* Effect.log(
-          `     - ${f.field}: ${f.percentage}% (${f.populated}/${f.total})`,
+          `     - ${field.field}: ${field.percentage}% (${field.populated}/${field.total})`,
         );
       }
 

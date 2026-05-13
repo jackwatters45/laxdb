@@ -68,10 +68,10 @@ export function Canvas({
 
   const svgBounds = useMemo(() => {
     if (nodes.length === 0) return { minX: 0, minY: 0, w: 100, h: 100 };
-    let minX = Infinity,
-      minY = Infinity,
-      maxX = -Infinity,
-      maxY = -Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let minX = Infinity;
+    let minY = Infinity;
     for (const node of nodes) {
       const g = getNodeGeometry(node);
       minX = Math.min(minX, g.left);

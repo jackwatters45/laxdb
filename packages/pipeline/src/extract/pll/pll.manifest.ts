@@ -1,4 +1,4 @@
-import { Effect, Layer, ServiceMap } from "effect";
+import { Layer, ServiceMap } from "effect";
 
 import {
   type SeasonManifest,

@@ -2,6 +2,7 @@ import { Effect, Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { TestDatabaseLive, truncateAll } from "../test/db";
+import { makeTestRunner } from "../test/effect";
 
 import { DefaultsRepo } from "./defaults.repo";
 import { DefaultsService } from "./defaults.service";
@@ -12,8 +13,7 @@ const ServiceLayer = Layer.effect(DefaultsService, DefaultsService.make).pipe(
 );
 const TestLayer = Layer.mergeAll(ServiceLayer, TestDatabaseLive);
 
-const run = <A, E>(effect: Effect.Effect<A, E, any>): Promise<A> =>
-  Effect.runPromise(Effect.provide(effect, TestLayer) as Effect.Effect<A>);
+const run = makeTestRunner(TestLayer);
 
 describe("DefaultsService integration", () => {
   it("returns an empty object when a namespace has not been set", () =>

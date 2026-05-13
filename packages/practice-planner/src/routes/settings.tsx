@@ -13,7 +13,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { Clock, MapPin, Loader2, Check } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 
 import { runApi } from "@/lib/api";
 import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
@@ -70,32 +70,41 @@ export const Route = createFileRoute("/settings")({
 // Page
 // ---------------------------------------------------------------------------
 
+const getFormString = (value: FormDataEntryValue | null) =>
+  typeof value === "string" ? value : "";
+
 function SettingsPage() {
   const defaults = Route.useLoaderData();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: {
+    preventDefault(): void;
+    currentTarget: HTMLFormElement;
+  }) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const raw = (fd.get("durationMinutes") ?? "") as string;
-    const loc = (fd.get("location") ?? "") as string;
 
-    setSaving(true);
-    setSaved(false);
-    await saveDefaults({
-      data: {
-        durationMinutes: raw ? parseInt(raw, 10) : null,
-        location: loc || null,
-      },
-    });
-    await router.invalidate();
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => {
+    void (async () => {
+      const fd = new FormData(e.currentTarget);
+      const raw = getFormString(fd.get("durationMinutes"));
+      const loc = getFormString(fd.get("location"));
+
+      setSaving(true);
       setSaved(false);
-    }, 2000);
+      await saveDefaults({
+        data: {
+          durationMinutes: raw ? parseInt(raw, 10) : null,
+          location: loc || null,
+        },
+      });
+      await router.invalidate();
+      setSaving(false);
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+      }, 2000);
+    })();
   };
 
   return (

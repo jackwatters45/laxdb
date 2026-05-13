@@ -88,7 +88,9 @@ type MachineEvent =
 
 const canvasInteractionMachine = setup({
   types: {
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- XState's setup API requires typed placeholders here
     context: {} as MachineContext,
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- XState's setup API requires typed placeholders here
     events: {} as MachineEvent,
   },
   guards: {
@@ -369,7 +371,7 @@ export function useCanvasInteractions<N extends Positionable>({
     (e: ReactMouseEvent) => {
       if (
         e.target === e.currentTarget ||
-        (e.target as HTMLElement).dataset?.canvas
+        (e.target instanceof HTMLElement && e.target.dataset?.canvas)
       ) {
         onSelectNode(null);
       }

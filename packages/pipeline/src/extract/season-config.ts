@@ -20,6 +20,18 @@ export interface SeasonConfig {
   historicalSeasonMaxAgeHours: number | null;
 }
 
+const isTimestampStale = (
+  timestamp: string | null | undefined,
+  maxAgeHours: number | null,
+): boolean => {
+  if (!timestamp) return true;
+  if (maxAgeHours === null) return false;
+
+  const ageMs = Date.now() - new Date(timestamp).getTime();
+  const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
+  return ageMs > maxAgeMs;
+};
+
 // ============================================================================
 // Season Config Service
 // ============================================================================
@@ -59,18 +71,6 @@ export class SeasonConfigService extends ServiceMap.Service<SeasonConfigService>
           return config.currentSeasonMaxAgeHours;
         }
         return config.historicalSeasonMaxAgeHours;
-      };
-
-      const isTimestampStale = (
-        timestamp: string | null | undefined,
-        maxAgeHours: number | null,
-      ): boolean => {
-        if (!timestamp) return true;
-        if (maxAgeHours === null) return false;
-
-        const ageMs = Date.now() - new Date(timestamp).getTime();
-        const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
-        return ageMs > maxAgeMs;
       };
 
       return {

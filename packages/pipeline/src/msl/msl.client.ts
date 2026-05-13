@@ -1,8 +1,19 @@
 import * as cheerio from "cheerio";
-import { Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
 import { MSLConfig, PipelineConfig } from "../config";
-import { HttpError, NetworkError, ParseError, TimeoutError } from "../error";
+import {
+  type HttpError,
+  type NetworkError,
+  type ParseError,
+  type TimeoutError,
+} from "../error";
+import {
+  defaultBodyReadMessage,
+  defaultNetworkMessage,
+  fetchTextWithRetry,
+} from "../http";
+import { mapParseError, safeParseJson, safeStringOrNull } from "../util";
 
 import {
   MSLGame,
@@ -20,12 +31,6 @@ import {
   MSLTeamsRequest,
 } from "./msl.schema";
 
-const mapParseError = (error: Schema.SchemaError): ParseError =>
-  new ParseError({
-    message: `Invalid request: ${String(error)}`,
-    cause: error,
-  });
-
 export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
   make: Effect.gen(function* () {
     const mslConfig = yield* MSLConfig;
@@ -34,191 +39,55 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
     // Re-export cheerio for potential future HTML parsing needs
     const $ = cheerio;
 
-    /**
-     * Fetches a page from Gamesheet with browser-like headers.
-     * Returns the HTML content as a string.
-     *
-     * @param path - Path relative to gamesheetBaseUrl (e.g., "/seasons/1234/schedule")
-     */
-    const fetchGamesheetPage = (
-      path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const url = `${mslConfig.gamesheetBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(url, {
-              method: "GET",
-              headers: {
-                ...mslConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `Gamesheet request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `Gamesheet network error: ${String(error)}`,
-              url,
-              cause: error,
-            });
-          },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
-
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `Gamesheet HTTP ${response.status} error`,
-              url,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read Gamesheet response body: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a Gamesheet page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchGamesheetPageWithRetry = (
       path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchGamesheetPage(path).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
-      );
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> => {
+      const url = `${mslConfig.gamesheetBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
-    /**
-     * Fetches a page from the main MSL website with browser-like headers.
-     * Returns the HTML content as a string.
-     *
-     * @param path - Path relative to mainSiteBaseUrl (e.g., "/schedule")
-     */
-    const fetchMainSitePage = (
-      path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      Effect.gen(function* () {
-        const url = `${mslConfig.mainSiteBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
-        const timeoutMs = pipelineConfig.defaultTimeoutMs;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-
-        const response = yield* Effect.tryPromise({
-          try: () =>
-            fetch(url, {
-              method: "GET",
-              headers: {
-                ...mslConfig.headers,
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-              },
-              signal: controller.signal,
-            }),
-          catch: (error) => {
-            clearTimeout(timeoutId);
-            if (error instanceof Error && error.name === "AbortError") {
-              return new TimeoutError({
-                message: `Main site request timed out after ${timeoutMs}ms`,
-                url,
-                timeoutMs,
-              });
-            }
-            return new NetworkError({
-              message: `Main site network error: ${String(error)}`,
-              url,
-              cause: error,
-            });
+      return fetchTextWithRetry(
+        {
+          url,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...mslConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
           },
-        }).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              clearTimeout(timeoutId);
-            }),
-          ),
-        );
+          timeoutMessage: `Gamesheet request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("Gamesheet", error),
+          httpMessage: (statusCode) => `Gamesheet HTTP ${statusCode} error`,
+          bodyReadMessage: (error) =>
+            defaultBodyReadMessage("Gamesheet", error),
+        },
+        pipelineConfig,
+      );
+    };
 
-        if (response.status >= 400) {
-          return yield* Effect.fail(
-            new HttpError({
-              message: `Main site HTTP ${response.status} error`,
-              url,
-              method: "GET",
-              statusCode: response.status,
-            }),
-          );
-        }
-
-        const html = yield* Effect.tryPromise({
-          try: () => response.text(),
-          catch: (error) =>
-            new NetworkError({
-              message: `Failed to read main site response body: ${String(error)}`,
-              url,
-              cause: error,
-            }),
-        });
-
-        return html;
-      });
-
-    /**
-     * Fetches a main site page with exponential backoff retry.
-     * Retries on network and timeout errors only.
-     */
     const fetchMainSitePageWithRetry = (
       path: string,
-    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> =>
-      fetchMainSitePage(path).pipe(
-        Effect.retry({
-          schedule: Schedule.exponential(pipelineConfig.retryDelay),
-          times: pipelineConfig.maxRetries,
-          while: (error: HttpError | NetworkError | TimeoutError) =>
-            error instanceof NetworkError || error instanceof TimeoutError,
-        }),
+    ): Effect.Effect<string, HttpError | NetworkError | TimeoutError> => {
+      const url = `${mslConfig.mainSiteBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+
+      return fetchTextWithRetry(
+        {
+          url,
+          timeoutMs: pipelineConfig.defaultTimeoutMs,
+          headers: {
+            ...mslConfig.headers,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          timeoutMessage: `Main site request timed out after ${pipelineConfig.defaultTimeoutMs}ms`,
+          networkMessage: (error) => defaultNetworkMessage("Main site", error),
+          httpMessage: (statusCode) => `Main site HTTP ${statusCode} error`,
+          bodyReadMessage: (error) =>
+            defaultBodyReadMessage("main site", error),
+        },
+        pipelineConfig,
       );
+    };
 
     /**
      * Fetches all teams for a given MSL season.
@@ -258,19 +127,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        let data: StandingsApiResponse | StandingsApiResponse[];
-        try {
-          data = JSON.parse(response) as
-            | StandingsApiResponse
-            | StandingsApiResponse[];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse standings API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const data = yield* safeParseJson<
+          StandingsApiResponse | StandingsApiResponse[]
+        >(response, `Failed to parse standings API response as JSON`);
 
         // Normalize to array (single division returns object, multiple returns array)
         const divisions = Array.isArray(data) ? data : [data];
@@ -385,17 +244,10 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          let data: PlayerApiResponse;
-          try {
-            data = JSON.parse(response) as PlayerApiResponse;
-          } catch {
-            return yield* Effect.fail(
-              new ParseError({
-                message: `Failed to parse player API response as JSON`,
-                cause: response.slice(0, 200),
-              }),
-            );
-          }
+          const data = yield* safeParseJson<PlayerApiResponse>(
+            response,
+            `Failed to parse player API response as JSON`,
+          );
 
           // Check if we have data - names is directly under tableData
           const tableData = data.tableData ?? {};
@@ -447,10 +299,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
+              jersey_number: safeStringOrNull(jersey),
               position,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLPlayerStats({
                 games_played: gamesPlayed,
@@ -547,17 +398,10 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             };
           }
 
-          let data: GoalieApiResponse;
-          try {
-            data = JSON.parse(response) as GoalieApiResponse;
-          } catch {
-            return yield* Effect.fail(
-              new ParseError({
-                message: `Failed to parse goalie API response as JSON`,
-                cause: response.slice(0, 200),
-              }),
-            );
-          }
+          const data = yield* safeParseJson<GoalieApiResponse>(
+            response,
+            `Failed to parse goalie API response as JSON`,
+          );
 
           // Check if we have data - names is directly under tableData
           const tableData = data.tableData ?? {};
@@ -606,9 +450,8 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
               name: fullName,
               first_name: firstName,
               last_name: lastName,
-              jersey_number:
-                jersey !== null && jersey !== undefined ? String(jersey) : null,
-              team_id: teamInfo?.id !== undefined ? String(teamInfo.id) : null,
+              jersey_number: safeStringOrNull(jersey),
+              team_id: safeStringOrNull(teamInfo?.id),
               team_name: teamInfo?.title ?? null,
               stats: new MSLGoalieStats({
                 games_played: gamesPlayed,
@@ -697,19 +540,9 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           tableData?: StandingsTableData;
         }
 
-        let data: StandingsApiResponse | StandingsApiResponse[];
-        try {
-          data = JSON.parse(response) as
-            | StandingsApiResponse
-            | StandingsApiResponse[];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse standings API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const data = yield* safeParseJson<
+          StandingsApiResponse | StandingsApiResponse[]
+        >(response, `Failed to parse standings API response as JSON`);
 
         // Normalize to array (single division returns object, multiple returns array)
         const divisions = Array.isArray(data) ? data : [data];
@@ -748,7 +581,7 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
             const streak = streaks[i] ?? null;
 
             const standing = new MSLStanding({
-              team_id: teamId !== undefined ? String(teamId) : String(i),
+              team_id: teamId === undefined ? String(i) : String(teamId),
               team_name: teamName,
               position,
               wins: w,
@@ -832,19 +665,15 @@ export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
           game: GameInfo;
         }
 
-        let data: GameEntry[];
-        try {
-          const parsed = JSON.parse(response);
-          // API returns array of game entries
-          data = Array.isArray(parsed) ? parsed : [];
-        } catch {
-          return yield* Effect.fail(
-            new ParseError({
-              message: `Failed to parse schedule API response as JSON`,
-              cause: response.slice(0, 200),
-            }),
-          );
-        }
+        const parsed = yield* safeParseJson<unknown>(
+          response,
+          `Failed to parse schedule API response as JSON`,
+        );
+        // API returns array of game entries
+        const data: GameEntry[] = Array.isArray(parsed)
+          ? // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Gamesheet schedule endpoint returns a homogeneous array of GameEntry-like records
+            (parsed as GameEntry[])
+          : [];
 
         const allGames: MSLGame[] = [];
 

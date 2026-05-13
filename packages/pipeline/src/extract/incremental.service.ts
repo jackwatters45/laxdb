@@ -25,6 +25,24 @@ export interface IncrementalExtractOptions extends ExtractOptions {
   mode?: ExtractionMode;
 }
 
+const normalizeOptions = (options: {
+  force?: boolean;
+  incremental?: boolean;
+  maxAgeHours?: number | null;
+  skipExisting?: boolean;
+}): IncrementalExtractOptions => {
+  if (options.force) {
+    return { mode: "full" };
+  }
+  if (options.incremental) {
+    return { mode: "incremental" };
+  }
+  if (options.maxAgeHours === null || options.maxAgeHours === undefined) {
+    return { skipExisting: options.skipExisting ?? true };
+  }
+  return { maxAgeHours: options.maxAgeHours, skipExisting: true };
+};
+
 export class IncrementalExtractionService extends ServiceMap.Service<IncrementalExtractionService>()(
   "IncrementalExtractionService",
   {
@@ -79,24 +97,6 @@ export class IncrementalExtractionService extends ServiceMap.Service<Incremental
 
       const getCurrentSeasons = (): number[] => {
         return seasonConfig.getCurrentSeasonYears();
-      };
-
-      const normalizeOptions = (options: {
-        force?: boolean;
-        incremental?: boolean;
-        maxAgeHours?: number | null;
-        skipExisting?: boolean;
-      }): IncrementalExtractOptions => {
-        if (options.force) {
-          return { mode: "full" };
-        }
-        if (options.incremental) {
-          return { mode: "incremental" };
-        }
-        if (options.maxAgeHours !== undefined && options.maxAgeHours !== null) {
-          return { maxAgeHours: options.maxAgeHours, skipExisting: true };
-        }
-        return { skipExisting: options.skipExisting ?? true };
       };
 
       return {

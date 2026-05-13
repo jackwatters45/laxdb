@@ -1,14 +1,16 @@
 import { RpcApiClient } from "@laxdb/api/client";
+import { CreateDrillInput } from "@laxdb/core/drill/drill.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { DrillFormFields } from "@/components/drill-form-fields";
 import { runApi } from "@/lib/api";
-import { DrillFormFields } from "@/routes/drills/$id";
 import type {
   Difficulty,
   DrillCategory,
@@ -21,53 +23,9 @@ import type {
 // Server function
 // ---------------------------------------------------------------------------
 
-const CreateDrillForm = Schema.Struct({
-  name: Schema.String,
-  subtitle: Schema.NullOr(Schema.String),
-  description: Schema.NullOr(Schema.String),
-  difficulty: Schema.optional(
-    Schema.Literals(["beginner", "intermediate", "advanced"]),
-  ),
-  category: Schema.optional(
-    Schema.Array(
-      Schema.Literals([
-        "passing",
-        "shooting",
-        "defense",
-        "ground-balls",
-        "face-offs",
-        "clearing",
-        "riding",
-        "transition",
-        "man-up",
-        "man-down",
-        "conditioning",
-      ]),
-    ),
-  ),
-  positionGroup: Schema.optional(
-    Schema.Array(
-      Schema.Literals(["attack", "midfield", "defense", "goalie", "all"]),
-    ),
-  ),
-  intensity: Schema.NullOr(Schema.Literals(["low", "medium", "high"])),
-  contact: Schema.NullOr(Schema.Boolean),
-  competitive: Schema.NullOr(Schema.Boolean),
-  playerCount: Schema.NullOr(Schema.Number),
-  durationMinutes: Schema.NullOr(Schema.Number),
-  fieldSpace: Schema.NullOr(
-    Schema.Literals(["full-field", "half-field", "box"]),
-  ),
-  equipment: Schema.NullOr(Schema.Array(Schema.String)),
-  diagramUrl: Schema.NullOr(Schema.String),
-  videoUrl: Schema.NullOr(Schema.String),
-  coachNotes: Schema.NullOr(Schema.String),
-  tags: Schema.optional(Schema.Array(Schema.String)),
-});
-
 const createDrill = createServerFn({ method: "POST" })
-  .inputValidator((data: typeof CreateDrillForm.Type) =>
-    Schema.decodeSync(CreateDrillForm)(data),
+  .inputValidator((data: typeof CreateDrillInput.Type) =>
+    Schema.decodeSync(CreateDrillInput)(data),
   )
   .handler(({ data }) =>
     runApi(
@@ -99,7 +57,7 @@ function NewDrillPage() {
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [categories, setCategories] = useState<DrillCategory[]>([]);
-  const [positionGroups, setPositionGroups] = useState<string[]>([]);
+  const [positionGroups, setPositionGroups] = useState<PositionGroup[]>([]);
   const [intensity, setIntensity] = useState<Intensity | "">("");
   const [contact, setContact] = useState(false);
   const [competitive, setCompetitive] = useState(false);
@@ -125,13 +83,13 @@ function NewDrillPage() {
         description: description || null,
         difficulty,
         category: categories,
-        positionGroup: positionGroups as PositionGroup[],
-        intensity: (intensity as Intensity) || null,
+        positionGroup: positionGroups,
+        intensity: intensity || null,
         contact,
         competitive,
         playerCount: playerCount ? parseInt(playerCount, 10) : null,
         durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-        fieldSpace: (fieldSpace as FieldSpace) || null,
+        fieldSpace: fieldSpace || null,
         equipment: null,
         diagramUrl: null,
         videoUrl: null,
@@ -196,7 +154,10 @@ function NewDrillPage() {
           <Link to="/drills">
             <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleCreate} disabled={creating || !name}>
+          <Button
+            onClick={voidAsync(handleCreate)}
+            disabled={creating || !name}
+          >
             {creating ? <Loader2 className="animate-spin" /> : null}
             {creating ? "Creating…" : "Create Drill"}
           </Button>

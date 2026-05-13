@@ -33,16 +33,16 @@ const GameOfLife = () => {
           })),
       );
 
-    const countNeighbors = (grid: Grid, x: number, y: number): number => {
+    const countNeighbors = (cells: Grid, x: number, y: number): number => {
       let sum = 0;
       for (let i = -1; i < 2; i++) {
         for (let j = -1; j < 2; j++) {
           const row = (x + i + rows) % rows;
           const col = (y + j + cols) % cols;
-          sum += grid[row]?.[col]?.alive === true ? 1 : 0;
+          sum += cells[row]?.[col]?.alive === true ? 1 : 0;
         }
       }
-      sum -= grid[x]?.[y]?.alive === true ? 1 : 0;
+      sum -= cells[x]?.[y]?.alive === true ? 1 : 0;
       return sum;
     };
 

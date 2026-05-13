@@ -9,7 +9,7 @@
     "gen:content-collections": "content-collections build",
     "start": "node .output/server/index.mjs",
     "serve": "vite preview",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "bun run gen:content-collections && tsgo --noEmit",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --type-aware --fix --quiet",
     "format": "oxfmt --check",

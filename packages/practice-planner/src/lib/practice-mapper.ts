@@ -59,7 +59,7 @@ export function fromDb(
             id: edge.publicId,
             source: edge.sourcePublicId,
             target: edge.targetPublicId,
-            ...(edge.label !== null ? { label: edge.label } : {}),
+            ...(edge.label === null ? {} : { label: edge.label }),
           }))
       : deriveLinearEdges(nodes);
 

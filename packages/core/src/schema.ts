@@ -1,4 +1,10 @@
-import { Schema, SchemaGetter } from "effect";
+import {
+  Effect,
+  Option,
+  Schema,
+  SchemaIssue,
+  SchemaTransformation,
+} from "effect";
 
 import { NANOID_LENGTH } from "./constant";
 
@@ -19,15 +25,24 @@ export const PublicIdSchema = {
 };
 
 /** Date that serializes as an ISO string over the wire (JSON/NDJSON) */
-// Interface declaration matches Effect's own NumberFromString pattern.
-// TypeScript evaluates interface extends lazily, avoiding the `unknown`
-// pollution from declareConstructor's empty TypeParameters.
-interface DateFromString extends Schema.decodeTo<Schema.Date, Schema.String> {}
-
-export const DateFromString: DateFromString = Schema.decodeTo(Schema.Date, {
-  decode: SchemaGetter.transform((s) => new Date(s as string)),
-  encode: SchemaGetter.transform((d) => d.toISOString()),
-})(Schema.String) as DateFromString;
+export const DateFromString = Schema.String.pipe(
+  Schema.decodeTo(
+    Schema.Date,
+    SchemaTransformation.transformOrFail({
+      decode: (value) => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime())
+          ? Effect.fail(
+              new SchemaIssue.InvalidValue(Option.some(value), {
+                message: "Invalid date",
+              }),
+            )
+          : Effect.succeed(date);
+      },
+      encode: (date) => Effect.succeed(date.toISOString()),
+    }),
+  ),
+);
 
 /** Date schema — string ↔ Date, annotated for OpenAPI */
 export const DateSchema = DateFromString.annotate({

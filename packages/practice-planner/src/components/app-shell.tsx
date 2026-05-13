@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // The practice editor ($id) has its own full-screen chrome — skip the shell
   const isPracticeEditor = matches.some((m) => m.routeId === "/practice/$id");
-  if (isPracticeEditor) return <>{children}</>;
+  if (isPracticeEditor) return children;
 
   return (
     <div className="min-h-dvh bg-background">

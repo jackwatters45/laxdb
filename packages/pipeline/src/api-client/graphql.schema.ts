@@ -1,16 +1,12 @@
 import { Schema } from "effect";
 
+import { SharedClientConfigFields } from "./config.schema";
+
 export class GraphQLClientConfig extends Schema.Class<GraphQLClientConfig>(
   "GraphQLClientConfig",
 )({
   endpoint: Schema.String,
-  defaultHeaders: Schema.optional(Schema.Record(Schema.String, Schema.String)),
-  authHeader: Schema.optional(Schema.String),
-  timeoutMs: Schema.optional(Schema.Number.check(Schema.isGreaterThan(0))),
-  maxRetries: Schema.optional(
-    Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0)),
-  ),
-  retryDelayMs: Schema.optional(Schema.Number.check(Schema.isGreaterThan(0))),
+  ...SharedClientConfigFields,
 }) {}
 
 export class GraphQLRequest extends Schema.Class<GraphQLRequest>(

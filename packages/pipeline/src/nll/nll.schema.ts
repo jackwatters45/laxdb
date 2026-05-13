@@ -303,10 +303,10 @@ export const PlayersMapToArray = Schema.Struct({
             fullname: player.fullname,
             dateOfBirth: player.dateOfBirth,
             height: player.height,
-            weight: player.weight !== null ? Number(player.weight) : null,
+            weight: player.weight === null ? null : Number(player.weight),
             position: player.position,
             jerseyNumber: player.jerseyNumber,
-            team_id: player.team_id !== null ? Number(player.team_id) : null,
+            team_id: player.team_id === null ? null : Number(player.team_id),
             team_code: player.team_code,
             team_name: player.team_name,
             matches: player.matches
@@ -399,7 +399,9 @@ const NLLSquadScoreRaw = Schema.Struct({
 // Raw squad structure in schedule matches
 const NLLScheduleSquadRaw = Schema.Struct({
   id: Schema.Number,
-  code: Schema.String,
+  code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
   name: Schema.NullOr(Schema.String),
   nickname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
     Schema.withDecodingDefault(() => null),
@@ -495,15 +497,25 @@ const NLLScheduleMatchRaw = Schema.Struct({
 
 // Raw week structure in schedule response
 const NLLScheduleWeekRaw = Schema.Struct({
-  id: Schema.Number,
-  code: Schema.String,
-  name: Schema.NullOr(Schema.String),
-  number: Schema.Number,
+  id: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0)),
+  code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  name: Schema.optional(Schema.NullOr(Schema.String)).pipe(
+    Schema.withDecodingDefault(() => null),
+  ),
+  number: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(() => 0),
+  ),
   phaseNumber: Schema.optional(Schema.Number).pipe(
     Schema.withDecodingDefault(() => 1),
   ),
-  season_id: Schema.String,
-  matches: Schema.Array(NLLScheduleMatchRaw),
+  season_id: Schema.optional(Schema.String).pipe(
+    Schema.withDecodingDefault(() => "0"),
+  ),
+  matches: Schema.optional(Schema.Array(NLLScheduleMatchRaw)).pipe(
+    Schema.withDecodingDefault(() => []),
+  ),
 }).annotate({ identifier: "NLLScheduleWeekRaw" });
 
 // NLLScheduleResponse - transforms week array to flat match array
@@ -512,7 +524,7 @@ export const NLLScheduleResponse = Schema.Array(NLLScheduleWeekRaw).pipe(
   Schema.decodeTo(Schema.Array(NLLMatch), {
     decode: SchemaGetter.transform((weeks) =>
       weeks.flatMap((week) =>
-        week.matches.map((match) => ({
+        (week.matches ?? []).map((match) => ({
           id: String(match.id),
           date: match.date.startDate,
           status: match.status.name,
@@ -522,19 +534,19 @@ export const NLLScheduleResponse = Schema.Array(NLLScheduleWeekRaw).pipe(
             city: null,
           },
           winningSquadId:
-            match.winningSquadId !== null ? String(match.winningSquadId) : null,
+            match.winningSquadId === null ? null : String(match.winningSquadId),
           squads: {
             away: {
               id: String(match.squads.away.id),
               name: match.squads.away.name,
-              code: match.squads.away.code,
+              code: match.squads.away.code ?? null,
               score: match.squads.away.score.goals,
               isHome: false,
             },
             home: {
               id: String(match.squads.home.id),
               name: match.squads.home.name,
-              code: match.squads.home.code,
+              code: match.squads.home.code ?? null,
               score: match.squads.home.score.goals,
               isHome: true,
             },
@@ -600,7 +612,7 @@ export const NLLScheduleResponse = Schema.Array(NLLScheduleWeekRaw).pipe(
             timeZone: null,
           },
           winningSquadId:
-            match.winningSquadId !== null ? Number(match.winningSquadId) : null,
+            match.winningSquadId === null ? null : Number(match.winningSquadId),
         })),
       },
     ]),

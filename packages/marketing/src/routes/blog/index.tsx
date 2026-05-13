@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { publishedPosts } from "@/lib/posts";
 
 import { formatPublishedDate } from "@/lib/date";
 import { getContentByTag, getContentByTags } from "@/lib/graph-utils";
+import { isOneOf } from "@/lib/type-guards";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -13,11 +15,14 @@ const FILTERS = [
 
 type FilterKey = (typeof FILTERS)[number]["key"];
 
+const FILTER_KEYS = FILTERS.map((filter) => filter.key) as readonly FilterKey[];
+
+const isFilterKey = (value: unknown): value is FilterKey =>
+  typeof value === "string" && isOneOf(FILTER_KEYS, value);
+
 export const Route = createFileRoute("/blog/")({
   validateSearch: (search: Record<string, unknown>) => ({
-    filter: (FILTERS.some((f) => f.key === search.filter) ? search.filter : undefined) as
-      | FilterKey
-      | undefined,
+    filter: isFilterKey(search.filter) ? search.filter : undefined,
   }),
   component: BlogIndex,
 });
@@ -56,12 +61,12 @@ function BlogIndex() {
               <button
                 key={f.key}
                 type="button"
-                onClick={() =>
+                onClick={voidAsync(() =>
                   navigate({
                     to: "/blog",
                     search: { filter: f.key === "all" ? undefined : f.key },
-                  })
-                }
+                  }),
+                )}
                 className={`relative pb-2.5 text-sm tracking-wide transition-colors ${
                   active ? "text-foreground" : "text-subtle hover:text-muted-foreground"
                 }`}

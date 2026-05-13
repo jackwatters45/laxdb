@@ -40,13 +40,13 @@ export default function LineMinimap() {
         onPointerLeave={onMouseLeave}
       >
         <div className="flex items-end" style={{ gap: LINE_GAP }}>
-          {Array.from({ length: LINE_COUNT }).map((_, i) => (
+          {Array.from({ length: LINE_COUNT }, (_, lineIndex) => lineIndex).map((lineIndex) => (
             <Line
-              key={`line-${i}`}
-              index={i}
+              key={lineIndex}
+              index={lineIndex}
               scrollX={scrollX}
               mouseX={mouseX}
-              active={isActive(i, LINE_COUNT)}
+              active={isActive(lineIndex, LINE_COUNT)}
             />
           ))}
         </div>
@@ -155,8 +155,8 @@ export function useProximity(
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const distance = latest - centerX;
+    const elementCenterX = rect.left + rect.width / 2;
+    const distance = latest - elementCenterX;
     const initialValue = initialValueRef.current ?? baseValue;
     value.set(transformer(distance, initialValue, baseValue, intensity));
   });

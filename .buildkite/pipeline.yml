@@ -1,0 +1,96 @@
+# Buildkite replacement for CI/deploy/release/Git AI GitHub Actions workflows.
+#
+# In Buildkite's YAML editor, set this repo's bootstrap step to:
+#   steps:
+#     - label: ":pipeline: Upload pipeline"
+#       command: buildkite-agent pipeline upload
+
+steps:
+  - label: ":lint-roller: Lint & format"
+    key: "lint-format"
+    command: ".buildkite/scripts/ci.sh lint-format"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
+    timeout_in_minutes: 20
+    cancel_on_build_failing: true
+
+  - label: ":typescript: Typecheck"
+    key: "typecheck"
+    command: ".buildkite/scripts/ci.sh typecheck"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
+    timeout_in_minutes: 25
+    cancel_on_build_failing: true
+
+  - label: ":test_tube: Test"
+    key: "test"
+    command: ".buildkite/scripts/test.sh"
+    if: "build.env('LAXDB_TRIGGER') != 'github-pr-webhook'"
+    depends_on: [lint-format, typecheck]
+    timeout_in_minutes: 20
+    cancel_on_build_failing: true
+
+  - label: ":rocket: Deploy"
+    key: "deploy"
+    command: ".buildkite/scripts/deploy.sh"
+    if: |
+      build.env("LAXDB_TRIGGER") != "github-pr-webhook" &&
+        build.tag == null &&
+        (
+          build.branch == "main" ||
+          (build.pull_request.id != null && build.pull_request.repository.fork != true)
+        )
+    depends_on: [lint-format, typecheck, test]
+    concurrency: 1
+    concurrency_group: "laxdb/deploy/${BUILDKITE_BRANCH}"
+    concurrency_method: "ordered"
+    timeout_in_minutes: 45
+    secrets:
+      - ALCHEMY_PASSWORD
+      - ALCHEMY_STATE_TOKEN
+      - CLOUDFLARE_API_TOKEN
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_EMAIL
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
+      - BETTER_AUTH_SECRET
+      - POLAR_WEBHOOK_SECRET
+      - PLANETSCALE_ORGANIZATION
+      - PLANETSCALE_SERVICE_TOKEN
+      - PLANETSCALE_SERVICE_TOKEN_ID
+      - GITHUB_TOKEN
+
+  - label: ":github: Release"
+    key: "release"
+    command: ".buildkite/scripts/release.sh"
+    if: |
+      build.env("LAXDB_TRIGGER") != "github-pr-webhook" &&
+        (
+          build.tag =~ /^v/ ||
+          (build.branch == "main" && build.pull_request.id == null)
+        )
+    depends_on: [lint-format, typecheck, test]
+    concurrency: 1
+    concurrency_group: "laxdb/release"
+    concurrency_method: "ordered"
+    timeout_in_minutes: 15
+    secrets:
+      - GITHUB_TOKEN
+
+  - label: ":broom: Cleanup preview"
+    key: "cleanup-preview"
+    command: ".buildkite/scripts/cleanup-preview.sh"
+    if: "build.env('LAXDB_TRIGGER') == 'github-pr-webhook'"
+    concurrency: 1
+    concurrency_group: "laxdb/preview-cleanup"
+    concurrency_method: "ordered"
+    timeout_in_minutes: 30
+    secrets:
+      - ALCHEMY_PASSWORD
+      - ALCHEMY_STATE_TOKEN
+      - CLOUDFLARE_API_TOKEN
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_EMAIL
+      - PLANETSCALE_ORGANIZATION
+      - PLANETSCALE_SERVICE_TOKEN
+      - PLANETSCALE_SERVICE_TOKEN_ID
+      - GITHUB_TOKEN
+

@@ -52,7 +52,7 @@ describe("NLLClient", () => {
       expect(players[0]).toHaveProperty("personId");
       expect(players[0]).toHaveProperty("firstname");
       expect(players[0]).toHaveProperty("team_id");
-    }, 30000);
+    }, 60000);
 
     it("returns players with expected properties", async () => {
       const program = Effect.gen(function* () {
@@ -67,7 +67,7 @@ describe("NLLClient", () => {
       expect(players[0]).toBeDefined();
       expect(players[0]?.personId).toBeTypeOf("string");
       expect(players[0]?.firstname).toBeTypeOf("string");
-    }, 30000);
+    }, 60000);
   });
 
   describe("getStandings", () => {

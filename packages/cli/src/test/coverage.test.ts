@@ -13,10 +13,10 @@ const cliPkgRoot = path.join(repoRoot, "packages/cli");
 async function walk(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
-    entries.map(async (entry) => {
+    entries.map((entry) => {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) return walk(fullPath);
-      return [fullPath];
+      return Promise.resolve([fullPath]);
     }),
   );
   return files.flat();
@@ -32,58 +32,69 @@ async function walk(dir: string): Promise<string[]> {
 async function getApiRpcNames() {
   const files = await walk(apiSrcRoot);
   const rpcFiles = files.filter((file) => file.endsWith(".rpc.ts"));
+  const contents = await Promise.all(
+    rpcFiles.map(async (file) => ({
+      file,
+      content: await readFile(file, "utf8"),
+    })),
+  );
   const names = new Set<string>();
 
-  for (const file of rpcFiles) {
-    const content = await readFile(file, "utf8");
+  for (const { content } of contents) {
     for (const match of content.matchAll(/Rpc\.make\("([^"]+)"/g)) {
       names.add(match[1]);
     }
   }
 
-  return [...names].toSorted();
+  // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
+  return [...names].sort((a, b) => a.localeCompare(b));
 }
 
-function runHelp(entrypoint: string) {
-  return new Promise<{ code: number | null; stdout: string; stderr: string }>(
-    (resolve) => {
-      const child = spawn("bun", ["run", `src/${entrypoint}.ts`, "--help"], {
-        cwd: cliPkgRoot,
-      });
+async function runHelp(entrypoint: string) {
+  const child = spawn("bun", ["run", `src/${entrypoint}.ts`, "--help"], {
+    cwd: cliPkgRoot,
+  });
 
-      const timeout = setTimeout(() => {
-        child.kill("SIGTERM");
-      }, 5_000);
+  const timeout = setTimeout(() => {
+    child.kill("SIGTERM");
+  }, 5_000);
 
-      let stdout = "";
-      let stderr = "";
+  let stdout = "";
+  let stderr = "";
 
-      child.stdout.on("data", (chunk) => {
-        stdout += chunk.toString();
-      });
+  child.stdout.on("data", (chunk: Buffer) => {
+    stdout += chunk.toString();
+  });
 
-      child.stderr.on("data", (chunk) => {
-        stderr += chunk.toString();
-      });
+  child.stderr.on("data", (chunk: Buffer) => {
+    stderr += chunk.toString();
+  });
 
-      child.on("close", (code, signal) => {
-        clearTimeout(timeout);
-        resolve({
-          code,
-          stdout,
-          stderr:
-            signal === "SIGTERM"
-              ? `${stderr}\nTimed out waiting for --help output`
-              : stderr,
-        });
-      });
-    },
-  );
+  const [code, signal] = await new Promise<
+    [number | null, NodeJS.Signals | null]
+  >((resolve) => {
+    child.once("close", (exitCode, exitSignal) => {
+      resolve([exitCode, exitSignal]);
+    });
+  });
+  clearTimeout(timeout);
+
+  return {
+    code,
+    stdout,
+    stderr:
+      signal === "SIGTERM"
+        ? `${stderr}\nTimed out waiting for --help output`
+        : stderr,
+  };
 }
 
 describe("CLI coverage", () => {
   it("keeps the coverage manifest sorted", () => {
-    expect([...CLI_RPC_COVERAGE]).toEqual([...CLI_RPC_COVERAGE].toSorted());
+    expect([...CLI_RPC_COVERAGE]).toEqual(
+      // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
+      [...CLI_RPC_COVERAGE].sort((a, b) => a.localeCompare(b)),
+    );
   });
 
   it("tracks every RPC exposed by the API", async () => {

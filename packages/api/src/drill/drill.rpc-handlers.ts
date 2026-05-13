@@ -10,11 +10,11 @@ export const DrillRpcHandlers = DrillRpcs.toLayer(
     const service = yield* DrillService;
 
     return withRpcLogging({
-      DrillList: () => service.list(),
-      DrillGet: (payload) => service.get(payload),
-      DrillCreate: (payload) => service.create(payload),
-      DrillUpdate: (payload) => service.update(payload),
-      DrillDelete: (payload) => service.delete(payload),
+      DrillList: service.list,
+      DrillGet: service.get,
+      DrillCreate: service.create,
+      DrillUpdate: service.update,
+      DrillDelete: service.delete,
     });
   }),
 ).pipe(Layer.provide(DrillService.layer));

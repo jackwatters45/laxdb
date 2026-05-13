@@ -25,21 +25,26 @@ type CloudflareWorkersModule = {
   env: Env;
 };
 
-const isCloudflareWorkersModule = (
-  value: unknown,
-): value is CloudflareWorkersModule =>
+const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
   typeof value === "object" && value !== null && "env" in value;
 
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
   if (isLocal) {
     return { url: `http://localhost:${process.env.API_PORT ?? "1337"}/rpc` };
   }
-  const cloudflareWorkers: unknown = require("cloudflare:workers");
-  if (!isCloudflareWorkersModule(cloudflareWorkers)) {
-    throw new Error("cloudflare:workers env binding is unavailable");
+
+  // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment
+  const workersModule: unknown = require("cloudflare:workers");
+  if (!hasWorkerEnv(workersModule)) {
+    return { url: "http://api/rpc" };
   }
-  const apiFetch: typeof fetch = (input: FetchInput, init?: FetchInit) =>
-    cloudflareWorkers.env.API.fetch(input, init);
+
+  const apiFetch: typeof fetch = Object.assign(
+    (input: FetchInput, init?: FetchInit) =>
+      workersModule.env.API.fetch(input, init),
+    { preconnect: fetch.preconnect },
+  );
+
   return { fetch: apiFetch, url: "http://api/rpc" };
 }
 
@@ -75,5 +80,6 @@ export async function runApi<A, E>(
   const result = await (_runtime ??= buildRuntime()).runPromise(effect);
   // JSON round-trip strips Effect Schema.Class metadata; the shape is
   // guaranteed by Effect's schema encoder so the cast is safe.
+  // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- serialization preserves the result shape while removing class metadata
   return JSON.parse(JSON.stringify(result)) as A;
 }

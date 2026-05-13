@@ -43,9 +43,7 @@ export function hasMSLGamesheetData(year: number): boolean {
 
 // Helper to check if year has Pointstreak data
 export function hasMSLPointstreakData(year: number): boolean {
-  return MSL_POINTSTREAK_YEARS.includes(
-    year as (typeof MSL_POINTSTREAK_YEARS)[number],
-  );
+  return MSL_POINTSTREAK_YEARS.some((availableYear) => availableYear === year);
 }
 
 // MSL Player Stats nested schema (used in MSLPlayer)
