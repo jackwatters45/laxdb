@@ -18,7 +18,7 @@ type OrbitingObjectProps = {
 export const Orbit = ({
   radiusPx = 144,
   children,
-  orbitingObjects = [],
+  orbitingObjects,
   defaultObjectSize = 32,
   durationSeconds = 8,
   keepUpright = false,

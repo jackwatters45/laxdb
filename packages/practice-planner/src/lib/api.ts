@@ -18,7 +18,14 @@ const isLocal = process.env.IS_LOCAL === "true";
  * that resolves the virtual `http://api/rpc` URL with zero network hops.
  * In local dev, we fall back to the global fetch hitting localhost.
  */
-const hasWorkerEnv = (value: unknown): value is { env: Env } =>
+type FetchInput = Parameters<typeof fetch>[0];
+type FetchInit = Parameters<typeof fetch>[1];
+
+type CloudflareWorkersModule = {
+  env: Env;
+};
+
+const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
   typeof value === "object" && value !== null && "env" in value;
 
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
@@ -32,17 +39,13 @@ function getApiFetch(): { fetch?: typeof fetch; url: string } {
     return { url: "http://api/rpc" };
   }
 
-  // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Env typing guarantees the binding shape once the module guard passes
-  const apiBinding = workersModule.env.API;
-  if (!apiBinding) {
-    return { url: "http://api/rpc" };
-  }
+  const apiFetch: typeof fetch = Object.assign(
+    (input: FetchInput, init?: FetchInit) =>
+      workersModule.env.API.fetch(input, init),
+    { preconnect: fetch.preconnect },
+  );
 
-  return {
-    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Worker service bindings expose a fetch method at runtime
-    fetch: apiBinding.fetch.bind(apiBinding),
-    url: "http://api/rpc",
-  };
+  return { fetch: apiFetch, url: "http://api/rpc" };
 }
 
 function buildRuntime() {

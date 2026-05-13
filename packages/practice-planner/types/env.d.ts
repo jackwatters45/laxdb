@@ -1,9 +1,13 @@
-// This file infers practice-planner bindings from Alchemy.
-// @see https://alchemy.run/concepts/bindings/#type-safe-bindings
+// Practice-planner worker bindings. Keep this manual while Alchemy v2 beta
+// exports source types that do not typecheck under this repo's strict package
+// tsconfigs.
 
-import type { practicePlanner } from "../../../alchemy.run.ts";
-
-export type PracticePlannerCloudflareEnv = typeof practicePlanner.Env;
+export interface PracticePlannerCloudflareEnv {
+  ALCHEMY_STACK_NAME: string;
+  ALCHEMY_STAGE: string;
+  API: Fetcher;
+  IS_LOCAL: string;
+}
 
 declare global {
   type Env = PracticePlannerCloudflareEnv;
