@@ -1,4 +1,3 @@
-import { DatabaseLive } from "@laxdb/core/drizzle/drizzle.service";
 import { Layer } from "effect";
 
 import { DefaultsRpcHandlers } from "./defaults/defaults.rpc-handlers";
@@ -13,4 +12,4 @@ export const LaxdbRpcV2Handlers = Layer.mergeAll(
   PlayRpcHandlers,
   PlayerRpcHandlers,
   PracticeRpcHandlers,
-).pipe(Layer.provide(DatabaseLive));
+);
