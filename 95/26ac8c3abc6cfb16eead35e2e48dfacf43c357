@@ -1,0 +1,27 @@
+bun.lock
+  ai_agent 17,512
+packages/pipeline/package.json
+  s_c3f59e41c4efad::t_1e58afe253d8c0 25
+package.json
+  s_c3f59e41c4efad::t_1e58afe253d8c0 32
+packages/api/package.json
+  s_c3f59e41c4efad::t_1e58afe253d8c0 19
+packages/cli/package.json
+  s_c3f59e41c4efad::t_1e58afe253d8c0 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9526ac8c3abc6cfb16eead35e2e48dfacf43c357",
+  "prompts": {},
+  "sessions": {
+    "s_c3f59e41c4efad": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2099-068b-701b-8b3c-cb1baee968f3",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
