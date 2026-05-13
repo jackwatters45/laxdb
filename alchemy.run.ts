@@ -1,143 +1,248 @@
-import { Exec } from "alchemy/os";
-// Keep the provider registered so Alchemy can destroy legacy PlanetScale
-// resources that still exist in state after the D1 migration.
-import "alchemy/planetscale";
-import alchemy from "alchemy";
-import { CloudflareStateStore } from "alchemy/state";
-import { GitHubComment } from "alchemy/github";
-import {
-  D1Database,
-  KVNamespace,
-  R2Bucket,
-  TanStackStart,
-  Worker,
-} from "alchemy/cloudflare";
+import { spawnSync } from "node:child_process";
 
-export const app = await alchemy("laxdb", {
-  stateStore: (scope) =>
-    new CloudflareStateStore(scope, { scriptName: `app-state-${scope.stage}` }),
-});
-
-// Stage
-export const stage = app.stage;
+import * as Alchemy from "alchemy";
+import * as Cloudflare from "alchemy/Cloudflare";
+import * as GitHub from "alchemy/GitHub";
+import * as Output from "alchemy/Output";
+import * as Data from "effect/Data";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
+import * as Redacted from "effect/Redacted";
 
 export const prodStage = "prod";
 export const devStage = "dev";
 
-export const secrets = {
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
-  GOOGLE_CLIENT_SECRET: alchemy.secret(process.env.GOOGLE_CLIENT_SECRET!),
-  BETTER_AUTH_SECRET: alchemy.secret(process.env.BETTER_AUTH_SECRET!),
-  POLAR_WEBHOOK_SECRET: alchemy.secret(process.env.POLAR_WEBHOOK_SECRET!),
+const stackName = "laxdb";
+const repoRoot = new URL(".", import.meta.url);
+
+const domains = {
+  production: "laxdb.io",
+  development: "dev.laxdb.io",
+};
+
+const packageRoots = {
+  api: "packages/api/src/index.ts",
+  core: new URL("./packages/core", repoRoot),
+  marketing: "./packages/marketing",
+  practicePlanner: "./packages/practice-planner",
+};
+
+const nodeCompatibility = { flags: ["nodejs_compat"] };
+
+const currentAlchemyPhase = () => process.env.ALCHEMY_PHASE ?? "plan";
+const isLocalPhase = (phase: string) => phase === "dev";
+
+const requireEnv = (name: string): string => {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+};
+
+const requireSecret = (name: string) => Redacted.make(requireEnv(name));
+
+const apiWorkerEnv = () => ({
+  GOOGLE_CLIENT_ID: requireEnv("GOOGLE_CLIENT_ID"),
+  GOOGLE_CLIENT_SECRET: requireSecret("GOOGLE_CLIENT_SECRET"),
+  BETTER_AUTH_SECRET: requireSecret("BETTER_AUTH_SECRET"),
+  POLAR_WEBHOOK_SECRET: requireSecret("POLAR_WEBHOOK_SECRET"),
   AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
   EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
+});
+
+const domainForStage = (stage: string, subdomain?: string) => {
+  const baseDomain =
+    stage === prodStage
+      ? domains.production
+      : stage === devStage
+        ? domains.development
+        : `${stage}.${domains.development}`;
+
+  return subdomain ? `${subdomain}.${baseDomain}` : baseDomain;
 };
 
-// Domain
-const PRODUCTION = "laxdb.io";
-const DEV = "dev.laxdb.io";
+const databaseNameForStage = (stage: string) =>
+  stage === prodStage ? stackName : `${stackName}-${stage}`;
 
-const getDomain = (subdomain?: string) => {
-  const prefix = subdomain ? `${subdomain}.` : "";
-  if (stage === prodStage) return `${prefix}${PRODUCTION}`;
-  if (stage === devStage) return `${prefix}${DEV}`;
-  return `${prefix}${stage}.${DEV}`;
+const readReplicationForStage = (stage: string): "auto" | "disabled" =>
+  stage === prodStage ? "auto" : "disabled";
+
+class MigrationGenerationError extends Data.TaggedError(
+  "MigrationGenerationError",
+)<{
+  cause: unknown;
+}> {}
+
+const generateDrizzleMigrations = Effect.try({
+  try: () => {
+    const result = spawnSync("bun", ["run", "db:generate"], {
+      cwd: packageRoots.core,
+      stdio: "inherit",
+    });
+
+    if (result.status !== 0) {
+      throw new Error(
+        `Drizzle migration generation failed with exit code ${result.status ?? "unknown"}`,
+      );
+    }
+  },
+  catch: (cause) => new MigrationGenerationError({ cause }),
+}).pipe(Effect.orDie);
+
+const runLocalSetup = Effect.gen(function* () {
+  if (isLocalPhase(currentAlchemyPhase())) {
+    yield* generateDrizzleMigrations;
+  }
+});
+
+export const database = Cloudflare.D1Database(
+  "database",
+  Effect.gen(function* () {
+    const stage = yield* Alchemy.Stage;
+
+    return {
+      name: databaseNameForStage(stage),
+      migrationsDir: "./packages/core/migrations",
+      readReplication: { mode: readReplicationForStage(stage) },
+    };
+  }),
+);
+
+export const kv = Cloudflare.KVNamespace("kv");
+export const storage = Cloudflare.R2Bucket("storage");
+
+export const api = Cloudflare.Worker(
+  "api",
+  Effect.gen(function* () {
+    return {
+      main: packageRoots.api,
+      url: true,
+      compatibility: nodeCompatibility,
+      bindings: {
+        DB: yield* database,
+        KV: yield* kv,
+        STORAGE: yield* storage,
+      },
+      env: apiWorkerEnv(),
+    };
+  }),
+);
+
+export const marketing = Cloudflare.Vite(
+  "marketing",
+  Effect.gen(function* () {
+    const stage = yield* Alchemy.Stage;
+
+    return {
+      rootDir: packageRoots.marketing,
+      url: true,
+      domain: domainForStage(stage),
+      compatibility: nodeCompatibility,
+    };
+  }),
+);
+
+export const practicePlanner = Cloudflare.Vite(
+  "practice-planner",
+  Effect.gen(function* () {
+    const stage = yield* Alchemy.Stage;
+
+    return {
+      rootDir: packageRoots.practicePlanner,
+      url: true,
+      domain: domainForStage(stage, "planner"),
+      compatibility: nodeCompatibility,
+      bindings: {
+        API: api,
+      },
+      env: {
+        IS_LOCAL: isLocalPhase(currentAlchemyPhase()) ? "true" : "",
+      },
+    };
+  }),
+);
+
+type ApiWorkerVariables = {
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  BETTER_AUTH_SECRET: string;
+  POLAR_WEBHOOK_SECRET: string;
+  AWS_REGION: string;
+  EMAIL_SENDER: string;
 };
 
-export const domain = getDomain();
+type AlchemyRuntimeVariables = {
+  ALCHEMY_STACK_NAME: string;
+  ALCHEMY_STAGE: string;
+};
 
-// Generate Drizzle migrations before D1 reads the migrations directory locally.
-// Schema management: generate locally, apply committed migrations through D1.
-if (app.local) {
-  await Exec("DrizzleGenerate", {
-    command: "cd packages/core && bun run db:generate",
-    memoize: {
-      patterns: [
-        "packages/core/drizzle.config.ts",
-        "packages/core/src/**/*.sql.ts",
-      ],
-    },
+export type ApiWorkerEnv = Cloudflare.InferEnv<typeof api> &
+  ApiWorkerVariables &
+  AlchemyRuntimeVariables;
+
+export type PracticePlannerWorkerEnv = Cloudflare.InferEnv<
+  typeof practicePlanner
+> &
+  AlchemyRuntimeVariables & {
+    IS_LOCAL: string;
+  };
+
+const maybePostPreviewComment = (
+  marketingUrl: Output.Output<string | undefined>,
+) =>
+  Effect.gen(function* () {
+    const pullRequest = process.env.PULL_REQUEST;
+    if (!pullRequest) return;
+
+    yield* GitHub.Comment("preview-comment", {
+      owner: "jackwatters45",
+      repository: "laxdb",
+      issueNumber: Number(pullRequest),
+      body: Output.interpolate`
+        ## 🚀 Preview Deployed
+
+        Your changes have been deployed to a preview environment:
+
+        **🌐 Marketing:** ${marketingUrl}
+
+        Built from commit ${process.env.GITHUB_SHA?.slice(0, 7) ?? "unknown"}
+
+        ---
+        <sub>🤖 This comment updates automatically with each push.</sub>`,
+    });
   });
-}
 
-// DB
-const databaseName = stage === prodStage ? "laxdb" : `laxdb-${stage}`;
-const database = await D1Database("database", {
-  name: databaseName,
-  adopt: true,
-  migrationsDir: "./packages/core/migrations",
-  readReplication: { mode: stage === prodStage ? "auto" : "disabled" },
-});
-
-if (app.local) {
-  Exec("Storybook", {
-    command: "cd packages/ui && bun run storybook",
-  });
-}
-
-// KV
-export const kv = await KVNamespace("kv", {});
-
-// Storage
-export const storage = await R2Bucket("storage", {});
-
-export const api = await Worker("api", {
-  entrypoint: "packages/api/src/index.ts",
-  url: true,
-  compatibility: "node",
-  bindings: {
-    DB: database,
-    KV: kv,
-    STORAGE: storage,
-    ...secrets,
+export default Alchemy.Stack(
+  stackName,
+  {
+    providers: GitHub.providers().pipe(
+      Layer.provideMerge(Cloudflare.providers()),
+    ),
+    state: Cloudflare.state(),
   },
-});
+  Effect.gen(function* () {
+    yield* runLocalSetup;
 
-export const marketing = await TanStackStart("marketing", {
-  bindings: {},
-  cwd: "./packages/marketing",
-  domains: [domain],
-});
+    const stage = yield* Alchemy.Stage;
+    const db = yield* database;
+    const kvNamespace = yield* kv;
+    const bucket = yield* storage;
+    const apiWorker = yield* api;
+    const marketingWorker = yield* marketing;
+    const practicePlannerWorker = yield* practicePlanner;
 
-export const practicePlanner = await TanStackStart("practice-planner", {
-  bindings: {
-    API: api,
-    IS_LOCAL: app.local ? "true" : "",
-  },
-  cwd: "./packages/practice-planner",
-  domains: [getDomain("planner")],
-});
+    yield* maybePostPreviewComment(marketingWorker.url);
 
-console.log({
-  domain,
-  marketing: marketing.url,
-  practicePlanner: practicePlanner.url,
-  api: api.url,
-  db: database.id,
-  kv: kv.namespaceId,
-  r2: storage.name,
-  stage,
-});
-
-if (process.env.PULL_REQUEST) {
-  await GitHubComment("preview-comment", {
-    owner: "jackwatters45",
-    repository: "laxdb",
-    issueNumber: Number(process.env.PULL_REQUEST),
-    body: `
-     ## 🚀 Preview Deployed
-
-     Your changes have been deployed to a preview environment:
-
-     // **🌐 Docs:** {docs.url}
-     **🌐 Marketing:** ${marketing.url}
-     // **🌐 Website:** {web.url}
-
-     Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
-
-     ---
-     <sub>🤖 This comment updates automatically with each push.</sub>`,
-  });
-}
-
-await app.finalize();
+    return {
+      domain: domainForStage(stage),
+      marketing: marketingWorker.url,
+      practicePlanner: practicePlannerWorker.url,
+      api: apiWorker.url,
+      db: db.databaseId,
+      kv: kvNamespace.namespaceId,
+      r2: bucket.bucketName,
+      stage,
+    };
+  }),
+);

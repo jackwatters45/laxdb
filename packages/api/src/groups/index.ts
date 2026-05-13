@@ -1,4 +1,3 @@
-import { DatabaseLive } from "@laxdb/core/drizzle/drizzle.service";
 import { Layer } from "effect";
 
 import { DrillsHandlersLive } from "../drill/drill.handlers";
@@ -11,4 +10,4 @@ export const HttpGroupsLive = Layer.mergeAll(
   PlaysHandlersLive,
   PlayersHandlersLive,
   PracticesHandlersLive,
-).pipe(Layer.provide(DatabaseLive));
+);

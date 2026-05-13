@@ -43,66 +43,21 @@ export class DrizzleService extends ServiceMap.Service<
 >()("DrizzleService") {}
 
 // ---------------------------------------------------------------------------
-// Cloudflare D1 binding resolution
-// ---------------------------------------------------------------------------
-
-const getProperty = (value: object, key: PropertyKey): unknown => {
-  let current: object | null = value;
-  while (current !== null) {
-    const descriptor = Object.getOwnPropertyDescriptor(current, key);
-    if (descriptor !== undefined && "value" in descriptor) {
-      const property: unknown = descriptor.value;
-      return property;
-    }
-    const prototype: unknown = Object.getPrototypeOf(current);
-    current =
-      typeof prototype === "object" && prototype !== null ? prototype : null;
-  }
-};
-
-const isRecord = (value: unknown): value is object =>
-  typeof value === "object" && value !== null;
-
-const hasFunctionProperty = (value: object, key: PropertyKey) =>
-  typeof getProperty(value, key) === "function";
-
-const isD1Binding = (value: unknown): value is AnyD1Database =>
-  isRecord(value) &&
-  hasFunctionProperty(value, "prepare") &&
-  hasFunctionProperty(value, "batch");
-
-const getD1Binding = Effect.try({
-  try: (): unknown => {
-    // oxlint-disable-next-line eslint-plugin-import/no-unassigned-import -- cloudflare:workers is only available inside Worker runtime
-    const workersModule: unknown = require("cloudflare:workers");
-    return workersModule;
-  },
-  catch: (cause) => new Error(String(cause)),
-}).pipe(
-  Effect.flatMap((workersModule) => {
-    if (!isRecord(workersModule)) {
-      return Effect.fail(new Error("cloudflare:workers module unavailable"));
-    }
-
-    const workersEnv = getProperty(workersModule, "env");
-    if (!isRecord(workersEnv)) {
-      return Effect.fail(new Error("Cloudflare env unavailable"));
-    }
-
-    const binding = getProperty(workersEnv, "DB");
-    return isD1Binding(binding)
-      ? Effect.succeed(binding)
-      : Effect.fail(new Error("D1 DB binding not available"));
-  }),
-);
-
-// ---------------------------------------------------------------------------
 // Layers
 // ---------------------------------------------------------------------------
 
-const DrizzleLive = Layer.effect(
+export class D1DatabaseBinding extends ServiceMap.Service<
+  D1DatabaseBinding,
+  AnyD1Database
+>()("D1DatabaseBinding") {}
+
+export const DatabaseLive = Layer.effect(
   DrizzleService,
-  Effect.map(getD1Binding, (binding) => drizzle(binding)),
+  Effect.gen(function* () {
+    const binding = yield* D1DatabaseBinding;
+    return drizzle(binding);
+  }),
 );
 
-export const DatabaseLive = DrizzleLive;
+export const DatabaseLiveFromBinding = (binding: AnyD1Database) =>
+  DatabaseLive.pipe(Layer.provide(Layer.succeed(D1DatabaseBinding, binding)));

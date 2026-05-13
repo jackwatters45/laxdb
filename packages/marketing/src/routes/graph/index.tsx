@@ -265,7 +265,7 @@ function GraphPage() {
   const [dimensions, setDimensions] = useState({ width: 960, height: 640 });
   const [positions, setPositions] = useState(new Map<string, NodePosition>());
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
-  const [camera, setCamera] = useState<Camera>({ x: 0, y: 0, scale: 1 });
+  const [camera, setCamera] = useState({ x: 0, y: 0, scale: 1 });
   const [reducedMotion, setReducedMotion] = useState(false);
 
   const visibleGraph = useMemo(

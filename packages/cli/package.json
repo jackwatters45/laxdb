@@ -13,10 +13,10 @@
     "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
-    "@effect/platform-bun": "^4.0.0-beta.43",
+    "@effect/platform-bun": "4.0.0-beta.43",
     "@laxdb/api": "workspace:*",
     "@laxdb/core": "workspace:*",
-    "effect": "^4.0.0-beta.43"
+    "effect": "4.0.0-beta.43"
   },
   "devDependencies": {
     "vitest": "^3.2.1"

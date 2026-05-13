@@ -1,16 +1,12 @@
-// This file infers practice-planner bindings from Alchemy.
-// @see https://alchemy.run/concepts/bindings/#type-safe-bindings
+// Practice-planner worker bindings. Alchemy v2 provisions these bindings;
+// Cloudflare.InferEnv derives the service binding shape from alchemy.run.ts.
 
-import type { practicePlanner } from "../../../alchemy.run.ts";
-
-export type PracticePlannerCloudflareEnv = typeof practicePlanner.Env;
+import type { PracticePlannerWorkerEnv } from "../../../alchemy.run.ts";
 
 declare global {
-  type Env = PracticePlannerCloudflareEnv;
-}
-
-declare module "cloudflare:workers" {
   namespace Cloudflare {
-    export interface Env extends PracticePlannerCloudflareEnv {}
+    interface Env extends PracticePlannerWorkerEnv {}
   }
+
+  type Env = Cloudflare.Env;
 }

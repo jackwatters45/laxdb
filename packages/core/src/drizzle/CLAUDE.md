@@ -8,15 +8,15 @@ Database connection and Drizzle ORM setup for Effect-TS.
 
 | File | Purpose |
 |------|---------|
-| `drizzle.service.ts` | `DatabaseLive` layer, D1 binding resolution, query helper |
+| `drizzle.service.ts` | `DatabaseLive` layer, explicit D1 binding service, query helper |
 | `drizzle.type.ts` | Shared SQLite column helpers (ids, timestamps) |
 
 ## CONNECTION STRATEGY
 
 ```
-1. Read the Cloudflare D1 binding from cloudflare:workers env.DB
-2. Wrap it with drizzle-orm/d1
-3. Tests provide an in-memory Miniflare D1 database via TestDatabaseLive
+1. Worker entrypoints pass the Cloudflare D1 binding into `DatabaseLiveFromBinding(env.DB)`
+2. `DatabaseLive` wraps that explicit binding with `drizzle-orm/d1`
+3. Tests provide an in-memory Miniflare D1 database via `TestDatabaseLive`
 ```
 
 ## INVARIANTS
@@ -51,6 +51,6 @@ export class MyRepo extends Effect.Service<MyRepo>()("MyRepo", {
 
 ## ANTI-PATTERNS
 
-- **Creating direct DB handles**: Always use `DatabaseLive` / `DrizzleService`
+- **Creating direct DB handles**: Always use `DatabaseLiveFromBinding` at Worker boundaries and `DrizzleService` inside services
 - **Connection strings or pools**: D1 is bound through Cloudflare, no `pg` pool
 - **Non-SQLite syntax**: D1 uses SQLite syntax
