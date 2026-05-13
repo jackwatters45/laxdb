@@ -1,0 +1,39 @@
+packages/pipeline/src/extract/index.ts
+  s_dc4c81e4235a87::t_51dfb7695774af 12-15
+packages/pipeline/src/extract/nll/run.ts
+  s_dc4c81e4235a87::t_fc0c2f7570d2d6 23,48-55
+packages/pipeline/src/extract/extraction-command.ts
+  s_dc4c81e4235a87::t_807655bedbb00e 1-63
+packages/pipeline/src/extract/msl/run.ts
+  s_dc4c81e4235a87::t_832f2cc831c2c1 24,84
+  s_dc4c81e4235a87::t_da78cfa42aa48a 65-77,79,91,94
+packages/pipeline/src/extract/pll/run.ts
+  s_dc4c81e4235a87::t_7e6eac52202585 83
+  s_dc4c81e4235a87::t_81d787eaece2b0 81
+  s_dc4c81e4235a87::t_fccbcf545da17c 23,61-80,82,84-100
+packages/pipeline/src/extract/mll/run.ts
+  s_dc4c81e4235a87::t_d22093e6b39c0b 24,62-76
+packages/pipeline/src/extract/extraction-command.test.ts
+  s_dc4c81e4235a87::t_81d787eaece2b0 5
+  s_dc4c81e4235a87::t_5ddcbbeaed5a72 1-4,6-88
+packages/pipeline/src/extract/wla/run.ts
+  s_dc4c81e4235a87::t_3c547bab24affa 24,64-78
+CONTEXT.md
+  s_dc4c81e4235a87::t_06f2b84f77fcfa 9-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ec72376ad20c67fc320ca3ced057d15f0552001c",
+  "prompts": {},
+  "sessions": {
+    "s_dc4c81e4235a87": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e212f-3ed2-765f-b4c6-4c9415499f7b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
