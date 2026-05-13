@@ -16,7 +16,8 @@
     "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
-    "@laxdb/core": "workspace:*"
+    "@laxdb/core": "workspace:*",
+    "effect": "4.0.0-beta.43"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",

@@ -21,8 +21,10 @@
     "fix": "bun run lint:fix && bun run format:fix"
   },
   "dependencies": {
+    "@effect/platform-bun": "4.0.0-beta.43",
     "@laxdb/core": "*",
-    "cheerio": "^1.1.2"
+    "cheerio": "^1.1.2",
+    "effect": "4.0.0-beta.43"
   },
   "effect": {
     "generateExports": {
