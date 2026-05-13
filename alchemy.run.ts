@@ -153,12 +153,40 @@ export const practicePlanner = Cloudflare.Vite(
       url: true,
       domain: domainForStage(stage, "planner"),
       compatibility: nodeCompatibility,
+      bindings: {
+        API: api,
+      },
       env: {
         IS_LOCAL: isLocalPhase(currentAlchemyPhase()) ? "true" : "",
       },
     };
   }),
 );
+
+type ApiWorkerVariables = {
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  BETTER_AUTH_SECRET: string;
+  POLAR_WEBHOOK_SECRET: string;
+  AWS_REGION: string;
+  EMAIL_SENDER: string;
+};
+
+type AlchemyRuntimeVariables = {
+  ALCHEMY_STACK_NAME: string;
+  ALCHEMY_STAGE: string;
+};
+
+export type ApiWorkerEnv = Cloudflare.InferEnv<typeof api> &
+  ApiWorkerVariables &
+  AlchemyRuntimeVariables;
+
+export type PracticePlannerWorkerEnv = Cloudflare.InferEnv<
+  typeof practicePlanner
+> &
+  AlchemyRuntimeVariables & {
+    IS_LOCAL: string;
+  };
 
 const maybePostPreviewComment = (
   marketingUrl: Output.Output<string | undefined>,
@@ -203,16 +231,6 @@ export default Alchemy.Stack(
     const apiWorker = yield* api;
     const marketingWorker = yield* marketing;
     const practicePlannerWorker = yield* practicePlanner;
-
-    yield* practicePlannerWorker.bind`API`({
-      bindings: [
-        {
-          type: "service",
-          name: "API",
-          service: apiWorker.workerName,
-        },
-      ],
-    });
 
     yield* maybePostPreviewComment(marketingWorker.url);
 

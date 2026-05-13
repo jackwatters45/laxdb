@@ -1,16 +1,11 @@
 // Practice-planner worker bindings. Alchemy v2 provisions these bindings;
-// this file only augments Cloudflare's worker runtime types for package-local TS.
+// Cloudflare.InferEnv derives the service binding shape from alchemy.run.ts.
 
-export interface PracticePlannerCloudflareEnv {
-  ALCHEMY_STACK_NAME: string;
-  ALCHEMY_STAGE: string;
-  API: Fetcher;
-  IS_LOCAL: string;
-}
+import type { PracticePlannerWorkerEnv } from "../../../alchemy.run.ts";
 
 declare global {
   namespace Cloudflare {
-    interface Env extends PracticePlannerCloudflareEnv {}
+    interface Env extends PracticePlannerWorkerEnv {}
   }
 
   type Env = Cloudflare.Env;
