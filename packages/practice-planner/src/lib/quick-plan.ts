@@ -1,4 +1,8 @@
-import { createPersistedId, createTransientId } from "@/lib/ids";
+import {
+  connectLinearNodes,
+  defaultPracticeGraphIds,
+  type PracticeGraphIdFactory,
+} from "@/lib/practice-graph-operations";
 import type { Drill, PracticeNode, PracticeEdge, DrillCategory } from "@/types";
 
 interface QuickPlanOptions {
@@ -6,6 +10,8 @@ interface QuickPlanOptions {
   categories: DrillCategory[];
   includeWarmup: boolean;
   includeCooldown: boolean;
+  ids?: PracticeGraphIdFactory;
+  random?: () => number;
 }
 
 interface QuickPlanResult {
@@ -24,6 +30,8 @@ export function generateQuickPlan(
 ): QuickPlanResult {
   const { durationMinutes, categories, includeWarmup, includeCooldown } =
     options;
+  const ids = options.ids ?? defaultPracticeGraphIds;
+  const random = options.random ?? Math.random;
 
   const nodes: PracticeNode[] = [];
   const edges: PracticeEdge[] = [];
@@ -33,7 +41,7 @@ export function generateQuickPlan(
 
   // Start node
   const startNode: PracticeNode = {
-    id: createPersistedId(),
+    id: ids.createNodeId(),
     type: "activity",
     variant: "start",
     drillId: null,
@@ -55,7 +63,7 @@ export function generateQuickPlan(
       if (remainingMinutes <= 0) break;
       const dur = drill.durationMinutes ?? 8;
       const node: PracticeNode = {
-        id: createPersistedId(),
+        id: ids.createNodeId(),
         type: "warmup",
         variant: "default",
         drillId: drill.publicId,
@@ -81,7 +89,7 @@ export function generateQuickPlan(
   );
 
   // Shuffle and pick drills that fit
-  const shuffled = [...matchingDrills].toSorted(() => Math.random() - 0.5);
+  const shuffled = [...matchingDrills].toSorted(() => random() - 0.5);
   let drillCount = 0;
 
   for (const drill of shuffled) {
@@ -90,7 +98,7 @@ export function generateQuickPlan(
     if (dur > remainingMinutes - (includeCooldown ? 15 : 0)) continue;
 
     const node: PracticeNode = {
-      id: createPersistedId(),
+      id: ids.createNodeId(),
       type: "drill",
       variant: "default",
       drillId: drill.publicId,
@@ -109,7 +117,7 @@ export function generateQuickPlan(
     // Insert water break after every 3 drills
     if (drillCount % 3 === 0 && remainingMinutes > (includeCooldown ? 20 : 5)) {
       const water: PracticeNode = {
-        id: createPersistedId(),
+        id: ids.createNodeId(),
         type: "water-break",
         variant: "default",
         drillId: null,
@@ -131,7 +139,7 @@ export function generateQuickPlan(
     const cooldown = drills.find((d) => d.tags.includes("cooldown"));
     if (cooldown) {
       const node: PracticeNode = {
-        id: createPersistedId(),
+        id: ids.createNodeId(),
         type: "cooldown",
         variant: "default",
         drillId: cooldown.publicId,
@@ -146,17 +154,7 @@ export function generateQuickPlan(
     }
   }
 
-  // Wire edges: linear chain
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const source = nodes[i];
-    const target = nodes[i + 1];
-    if (!source || !target) continue;
-    edges.push({
-      id: createTransientId("edge"),
-      source: source.id,
-      target: target.id,
-    });
-  }
+  edges.push(...connectLinearNodes(nodes, ids));
 
   return { nodes, edges };
 }

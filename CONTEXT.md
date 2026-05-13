@@ -6,6 +6,8 @@
 - **Practice item** — one persisted block inside a Practice, such as a warmup, drill, cooldown, water break, or activity. Practice items carry ordering, position, group, priority, and optional drill linkage.
 - **Practice edge** — a persisted flow connection between two Practice items. Practice edges describe the canvas topology for a Practice.
 - **Practice aggregate** — a Practice with its full set of Practice items and Practice edges, loaded or saved as one planning unit. A Practice aggregate save represents the desired final item set and graph topology for the Practice.
+- **Practice graph** — the frontend canvas model for a Practice. It contains Practice nodes and Practice edges plus editable Practice details, and is distinct from the persisted Practice aggregate.
+- **Practice graph operation** — a pure transformation of a Practice graph, such as inserting a drill, deleting and reconnecting nodes, moving nodes through the flow, or adding a split.
 
 ## Data pipeline
 
