@@ -1,0 +1,31 @@
+packages/api/package.json
+  s_c3f59e41c4efad::t_9b9107a66324b9 19-20
+packages/cli/package.json
+  s_c3f59e41c4efad::t_b5d8d47df8106a 16
+  s_c3f59e41c4efad::t_9b9107a66324b9 18-19
+packages/core/package.json
+  s_c3f59e41c4efad::t_9b9107a66324b9 24,29
+packages/practice-planner/package.json
+  s_c3f59e41c4efad::t_9b9107a66324b9 27
+bun.lock
+  ai_agent 38,48,51,61,66,153,156,171,508,3148-3149,3180-3181,3184-3185,3188-3191,3196-3197,3200-3201,3280-3281,3540-3541,3560-3561,3580-3581,3586-3587,3592
+packages/pipeline/package.json
+  s_c3f59e41c4efad::t_9b9107a66324b9 26-27
+  s_c3f59e41c4efad::t_b5d8d47df8106a 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "840bdb70850bd60e8a8f5e43520c482828e49443",
+  "prompts": {},
+  "sessions": {
+    "s_c3f59e41c4efad": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2099-068b-701b-8b3c-cb1baee968f3",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
