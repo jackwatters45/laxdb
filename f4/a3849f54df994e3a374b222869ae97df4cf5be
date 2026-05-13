@@ -1,0 +1,31 @@
+packages/practice-planner/src/hooks/use-practice-editor.ts
+  s_dc4c81e4235a87::t_072a0b8c7345fd 150-152
+  s_dc4c81e4235a87::t_a56047fa808839 4-15,23-27,85,93,114,126,133,140
+  s_dc4c81e4235a87::t_1556c80d7c178c 148,153,163,165,173-183,188
+CONTEXT.md
+  s_dc4c81e4235a87::t_0f7c6ce2e7e46f 9-10
+packages/practice-planner/src/lib/practice-graph-operations.ts
+  s_dc4c81e4235a87::t_072a0b8c7345fd 97-98,189-192,237-238
+  s_dc4c81e4235a87::t_d3228c41f6ad0a 1-96,99-188,193-236,239-337
+packages/practice-planner/src/lib/practice-graph-operations.test.ts
+  s_dc4c81e4235a87::t_f201302cffa3d0 1-76,82-118,124-128,132-134,138-153,157-163
+  s_dc4c81e4235a87::t_20867e03456c7c 77-81,119-123,129-131,135-137,154-156
+packages/practice-planner/src/lib/quick-plan.ts
+  s_dc4c81e4235a87::t_7d327124ecc13d 1-5,13-14,33-34,44,66,92,101,120,142,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f4a3849f54df994e3a374b222869ae97df4cf5be",
+  "prompts": {},
+  "sessions": {
+    "s_dc4c81e4235a87": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e212f-3ed2-765f-b4c6-4c9415499f7b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
