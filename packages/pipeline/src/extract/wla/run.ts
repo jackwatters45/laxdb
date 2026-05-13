@@ -17,11 +17,11 @@ import { Command, Flag } from "effect/unstable/cli";
 
 import {
   forceOption,
-  getMode,
   incrementalOption,
   jsonOption,
   statusOption,
 } from "../cli-utils";
+import { runExtractionCommand } from "../extraction-command";
 
 import { WLAExtractorService } from "./wla.extractor";
 import { WLAManifestService } from "./wla.manifest";
@@ -61,31 +61,21 @@ const program = Effect.gen(function* () {
       status: statusOption,
     },
     ({ season, all, schedule, force, incremental, json, status }) =>
-      Effect.gen(function* () {
-        if (status) {
-          const manifest = yield* manifestService.load;
-          yield* manifestService.displayStatus(manifest, json, "Year");
-          return;
-        }
-
-        const mode = getMode(force, incremental);
-
-        if (!json) {
-          yield* Effect.log(`Extraction mode: ${mode}`);
-        }
-
-        const manifest = all
-          ? yield* extractor.extractAll({ mode, includeSchedule: schedule })
-          : yield* extractor.extractSeason(season, {
-              mode,
-              includeSchedule: schedule,
-            });
-
-        if (json) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
-        }
+      runExtractionCommand({
+        force,
+        incremental,
+        json,
+        status,
+        statusLabel: "Year",
+        loadManifest: manifestService.load,
+        displayStatus: manifestService.displayStatus,
+        extract: (mode) =>
+          all
+            ? extractor.extractAll({ mode, includeSchedule: schedule })
+            : extractor.extractSeason(season, {
+                mode,
+                includeSchedule: schedule,
+              }),
       }),
   );
 

@@ -16,11 +16,11 @@ import { Command, Flag } from "effect/unstable/cli";
 
 import {
   forceOption,
-  getMode,
   incrementalOption,
   jsonOption,
   statusOption,
 } from "../cli-utils";
+import { runExtractionCommand } from "../extraction-command";
 
 import { NLLExtractorService } from "./nll.extractor";
 import { NLLManifestService } from "./nll.manifest";
@@ -45,25 +45,14 @@ const program = Effect.gen(function* () {
       status: statusOption,
     },
     ({ season, force, incremental, json, status }) =>
-      Effect.gen(function* () {
-        if (status) {
-          const manifest = yield* manifestService.load;
-          yield* manifestService.displayStatus(manifest, json);
-          return;
-        }
-
-        const mode = getMode(force, incremental);
-
-        if (!json) {
-          yield* Effect.log(`Extraction mode: ${mode}`);
-        }
-
-        const manifest = yield* extractor.extractSeason(season, { mode });
-        if (json) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
-        }
+      runExtractionCommand({
+        force,
+        incremental,
+        json,
+        status,
+        loadManifest: manifestService.load,
+        displayStatus: manifestService.displayStatus,
+        extract: (mode) => extractor.extractSeason(season, { mode }),
       }),
   );
 

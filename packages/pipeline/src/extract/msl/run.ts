@@ -17,11 +17,11 @@ import { Command, Flag } from "effect/unstable/cli";
 import { MSL_GAMESHEET_SEASONS } from "../../msl/msl.schema";
 import {
   forceOption,
-  getMode,
   incrementalOption,
   jsonOption,
   statusOption,
 } from "../cli-utils";
+import { printJson, runExtractionCommand } from "../extraction-command";
 
 import { MSLExtractorService } from "./msl.extractor";
 import { MSLManifestService } from "./msl.manifest";
@@ -62,39 +62,36 @@ const program = Effect.gen(function* () {
     },
     ({ season, all, force, incremental, listSeasons, json, status }) =>
       Effect.gen(function* () {
+        const commandEffect = runExtractionCommand({
+          force,
+          incremental,
+          json,
+          status,
+          loadManifest: manifestService.load,
+          displayStatus: manifestService.displayStatus,
+          extract: (mode) =>
+            all
+              ? extractor.extractAll({ mode })
+              : extractor.extractSeason(season, { mode }),
+        });
+
         if (status) {
-          const manifest = yield* manifestService.load;
-          yield* manifestService.displayStatus(manifest, json);
-          return;
+          return yield* commandEffect;
         }
 
         if (listSeasons) {
           if (json) {
-            yield* Console.log(JSON.stringify(MSL_GAMESHEET_SEASONS, null, 2));
+            yield* printJson(MSL_GAMESHEET_SEASONS);
           } else {
             yield* Console.log("Available MSL Gamesheet Seasons:");
             for (const [year, id] of Object.entries(MSL_GAMESHEET_SEASONS)) {
               yield* Console.log(`  ${id} = ${year} season`);
             }
           }
-          return;
+          return yield* Effect.void;
         }
 
-        const mode = getMode(force, incremental);
-
-        if (!json) {
-          yield* Effect.log(`Extraction mode: ${mode}`);
-        }
-
-        const manifest = all
-          ? yield* extractor.extractAll({ mode })
-          : yield* extractor.extractSeason(season, { mode });
-
-        if (json) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
-        }
+        return yield* commandEffect;
       }),
   );
 

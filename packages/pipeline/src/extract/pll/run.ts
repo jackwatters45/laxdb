@@ -16,11 +16,11 @@ import { Command, Flag } from "effect/unstable/cli";
 
 import {
   forceOption,
-  getMode,
   incrementalOption,
   jsonOption,
   statusOption,
 } from "../cli-utils";
+import { runExtractionCommand } from "../extraction-command";
 
 import { PLLExtractorService } from "./pll.extractor";
 import { PLLManifestService } from "./pll.manifest";
@@ -58,48 +58,46 @@ const program = Effect.gen(function* () {
       status: statusOption,
     },
     ({ year, all, noDetails, force, incremental, json, status }) =>
-      Effect.gen(function* () {
-        if (status) {
-          const manifest = yield* manifestService.load;
-          yield* manifestService.displayStatus(manifest, json, "Year");
-          return;
-        }
+      runExtractionCommand({
+        force,
+        incremental,
+        json,
+        status,
+        statusLabel: "Year",
+        loadManifest: manifestService.load,
+        displayStatus: manifestService.displayStatus,
+        extract: (mode) =>
+          Effect.gen(function* () {
+            const includeDetails = !noDetails;
+            const yearValue = Option.getOrNull(year);
 
-        const mode = getMode(force, incremental);
-        const includeDetails = !noDetails;
-        const yearValue = Option.getOrNull(year);
+            if (!all && yearValue === null) {
+              yield* Effect.logError(
+                "Error: Must specify --all or --year=YYYY",
+              );
+              return yield* Effect.fail("Missing required option");
+            }
 
-        if (!all && yearValue === null) {
-          yield* Effect.logError("Error: Must specify --all or --year=YYYY");
-          return yield* Effect.fail("Missing required option");
-        }
+            if (yearValue !== null && (yearValue < 2019 || yearValue > 2030)) {
+              yield* Effect.logError(
+                `Invalid year ${yearValue}. Must be 2019-2030.`,
+              );
+              return yield* Effect.fail("Invalid year");
+            }
 
-        if (yearValue !== null && (yearValue < 2019 || yearValue > 2030)) {
-          yield* Effect.logError(
-            `Invalid year ${Number(yearValue)}. Must be 2019-2030.`,
-          );
-          return yield* Effect.fail("Invalid year");
-        }
+            if (all) {
+              return yield* extractor.extractAll({ mode, includeDetails });
+            }
 
-        if (!json) {
-          yield* Effect.log(`Extraction mode: ${mode}`);
-        }
+            if (yearValue === null) {
+              return yield* Effect.fail("Missing required option");
+            }
 
-        let manifest;
-        if (all) {
-          manifest = yield* extractor.extractAll({ mode, includeDetails });
-        } else if (yearValue !== null) {
-          manifest = yield* extractor.extractYear(yearValue, {
-            mode,
-            includeDetails,
-          });
-        }
-
-        if (json && manifest) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
-        }
+            return yield* extractor.extractYear(yearValue, {
+              mode,
+              includeDetails,
+            });
+          }),
       }),
   );
 

@@ -9,6 +9,11 @@ export {
   createEmptyEntityStatus,
 } from "./extract.schema";
 export {
+  runExtractionCommand,
+  printJson,
+  type ExtractionCommandOptions,
+} from "./extraction-command";
+export {
   IncrementalExtractionService,
   type ExtractionMode,
   type IncrementalExtractOptions,
