@@ -1,0 +1,59 @@
+packages/core/src/practice/practice.repo.ts
+  s_dc4c81e4235a87::t_c13acbc8f6d7da 125-127
+packages/core/src/practice/practice.schema.ts
+  s_dc4c81e4235a87::t_254eb27a67555c 91-98,140-151,156,168,170,182-201,244-249
+packages/practice-planner/src/hooks/use-practice-editor.ts
+  s_dc4c81e4235a87::t_8893d6d99418b4 4,145,205,232-233,245,306,335,351
+  s_dc4c81e4235a87::t_9114b6ee6514cc 276-280,320-324
+packages/practice-planner/src/lib/api.ts
+  s_dc4c81e4235a87::t_ba49c00e2649e7 25-29,33-42
+packages/practice-planner/src/lib/ids.ts
+  s_dc4c81e4235a87::t_c070980bb0b70b 1-19
+packages/cli/src/practice.ts
+  s_dc4c81e4235a87::t_2ae57bd9b834ec 10-11,24,398-429,607-608
+packages/api/src/practice/practice.rpc-handlers.ts
+  s_dc4c81e4235a87::t_5bdce2f3b96221 15-16
+packages/practice-planner/src/hooks/use-practice-persistence.ts
+  s_dc4c81e4235a87::t_dbb244941bfa58 3,11,47
+packages/core/src/practice/practice.service.ts
+  s_dc4c81e4235a87::t_3fbe76703bbcf5 37-40
+  s_dc4c81e4235a87::t_b13d44ac957f27 70-84,170-209,217-230,243-258
+  s_dc4c81e4235a87::t_f922865109d902 210-216,231-242
+  s_dc4c81e4235a87::t_5575711a4b69d8 3,9,24,35-36,41-44,46-53,55-62
+  s_dc4c81e4235a87::t_b844f527f23bad 45,54
+packages/cli/src/coverage.ts
+  s_dc4c81e4235a87::t_3d50e80776693b 38,42
+packages/core/src/practice/practice.contract.ts
+  s_dc4c81e4235a87::t_4b625807b46784 20,27,68-77
+packages/practice-planner/src/routes/practice/$id.tsx
+  s_dc4c81e4235a87::t_0eee666bbb8115 171,182,191-194
+  s_dc4c81e4235a87::t_1a38a7c032b968 8,81-82,91-92,96-97,104-105,112-122,135
+packages/practice-planner/src/lib/quick-plan.ts
+  s_dc4c81e4235a87::t_9ecfe9d3cd45cd 1,36,58,93,112,134,155
+CONTEXT.md
+  s_dc4c81e4235a87::t_935dbaafc83272 1-8
+packages/core/src/practice/practice.integration.test.ts
+  s_dc4c81e4235a87::t_ba3daefcb88072 457-600
+packages/api/src/practice/practice.rpc.ts
+  s_dc4c81e4235a87::t_004ff6bad077c1 16-25
+packages/api/src/practice/practice.api.ts
+  s_dc4c81e4235a87::t_327a5fc781f2fe 33-53
+packages/api/src/practice/practice.handlers.ts
+  s_dc4c81e4235a87::t_7efea6e0e0b1af 17-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "5d8241ff0232d1261a019f0d1f627e9e457e62e4",
+  "prompts": {},
+  "sessions": {
+    "s_dc4c81e4235a87": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e212f-3ed2-765f-b4c6-4c9415499f7b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
