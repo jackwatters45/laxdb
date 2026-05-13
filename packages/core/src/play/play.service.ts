@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodedRowOperation, listOperation } from "../service-operations";
 
 import { PlayRepo } from "./play.repo";
 import {
@@ -21,70 +21,30 @@ export class PlayService extends ServiceMap.Service<PlayService>()(
       const repo = yield* PlayRepo;
 
       return {
-        list: () =>
-          repo.list().pipe(
-            Effect.map((rows) => rows.map(asPlay)),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+        list: () => listOperation(repo.list(), asPlay),
 
         get: (input: GetPlayInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(GetPlayInput, input);
-            return yield* repo.get(decoded);
-          }).pipe(
-            Effect.map(asPlay),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Play", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(GetPlayInput, input, repo.get, asPlay, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Play", id: publicId }),
+          }),
 
         create: (input: CreatePlayInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(CreatePlayInput, input);
-            return yield* repo.create(decoded);
-          }).pipe(
-            Effect.map(asPlay),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(new NotFoundError({ domain: "Play", id: "new" })),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(CreatePlayInput, input, repo.create, asPlay, {
+            notFound: () => new NotFoundError({ domain: "Play", id: "new" }),
+          }),
 
         update: (input: UpdatePlayInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(UpdatePlayInput, input);
-            return yield* repo.update(decoded);
-          }).pipe(
-            Effect.map(asPlay),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Play", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(UpdatePlayInput, input, repo.update, asPlay, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Play", id: publicId }),
+          }),
 
         delete: (input: DeletePlayInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(DeletePlayInput, input);
-            return yield* repo.delete(decoded);
-          }).pipe(
-            Effect.map(asPlay),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Play", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(DeletePlayInput, input, repo.delete, asPlay, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Play", id: publicId }),
+          }),
       } as const;
     }),
   },

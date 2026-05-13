@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodedRowOperation, listOperation } from "../service-operations";
 
 import { PlayerRepo } from "./player.repo";
 import {
@@ -21,81 +21,64 @@ export class PlayerService extends ServiceMap.Service<PlayerService>()(
 
       return {
         list: () =>
-          repo.list().pipe(
-            Effect.map((rows) => rows.map(asPlayer)),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to list players", e),
-            ),
+          listOperation(repo.list(), asPlayer, (error) =>
+            Effect.logError("Failed to list players", error),
           ),
 
         getByPublicId: (input: PlayerByIdInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(PlayerByIdInput, input);
-            return yield* repo.getByPublicId(decoded.publicId);
-          }).pipe(
-            Effect.map(asPlayer),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Player", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError((e) => Effect.logError("Failed to get player", e)),
+          decodedRowOperation(
+            PlayerByIdInput,
+            input,
+            (decoded) => repo.getByPublicId(decoded.publicId),
+            asPlayer,
+            {
+              notFound: ({ publicId }) =>
+                new NotFoundError({ domain: "Player", id: publicId }),
+              logError: (error) =>
+                Effect.logError("Failed to get player", error),
+            },
           ),
 
         create: (input: CreatePlayerInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(CreatePlayerInput, input);
-            return yield* repo.create(decoded);
-          }).pipe(
-            Effect.map(asPlayer),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Player", id: "create" }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tap((p) => Effect.log(`Created player: ${p.name}`)),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to create player", e),
-            ),
-          ),
+          decodedRowOperation(CreatePlayerInput, input, repo.create, asPlayer, {
+            notFound: () =>
+              new NotFoundError({ domain: "Player", id: "create" }),
+            tapSuccess: (player) =>
+              Effect.log(`Created player: ${player.name}`),
+            logError: (error) =>
+              Effect.logError("Failed to create player", error),
+          }),
 
         update: (input: UpdatePlayerInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(UpdatePlayerInput, input);
-            return yield* repo.update(decoded.publicId, decoded);
-          }).pipe(
-            Effect.map(asPlayer),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Player", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tap((p) => Effect.log(`Updated player: ${p.name}`)),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to update player", e),
-            ),
+          decodedRowOperation(
+            UpdatePlayerInput,
+            input,
+            (decoded) => repo.update(decoded.publicId, decoded),
+            asPlayer,
+            {
+              notFound: ({ publicId }) =>
+                new NotFoundError({ domain: "Player", id: publicId }),
+              tapSuccess: (player) =>
+                Effect.log(`Updated player: ${player.name}`),
+              logError: (error) =>
+                Effect.logError("Failed to update player", error),
+            },
           ),
 
         delete: (input: PlayerByIdInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(PlayerByIdInput, input);
-            return yield* repo.delete(decoded.publicId);
-          }).pipe(
-            Effect.map(asPlayer),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Player", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tap((p) => Effect.log(`Deleted player: ${p.name}`)),
-            Effect.tapError((e) =>
-              Effect.logError("Failed to delete player", e),
-            ),
+          decodedRowOperation(
+            PlayerByIdInput,
+            input,
+            (decoded) => repo.delete(decoded.publicId),
+            asPlayer,
+            {
+              notFound: ({ publicId }) =>
+                new NotFoundError({ domain: "Player", id: publicId }),
+              tapSuccess: (player) =>
+                Effect.log(`Deleted player: ${player.name}`),
+              logError: (error) =>
+                Effect.logError("Failed to delete player", error),
+            },
           ),
       } as const;
     }),

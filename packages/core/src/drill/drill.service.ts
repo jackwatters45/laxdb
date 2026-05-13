@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodedRowOperation, listOperation } from "../service-operations";
 
 import { DrillRepo } from "./drill.repo";
 import {
@@ -21,70 +21,30 @@ export class DrillService extends ServiceMap.Service<DrillService>()(
       const repo = yield* DrillRepo;
 
       return {
-        list: () =>
-          repo.list().pipe(
-            Effect.map((rows) => rows.map(asDrill)),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+        list: () => listOperation(repo.list(), asDrill),
 
         get: (input: GetDrillInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(GetDrillInput, input);
-            return yield* repo.get(decoded);
-          }).pipe(
-            Effect.map(asDrill),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Drill", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(GetDrillInput, input, repo.get, asDrill, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Drill", id: publicId }),
+          }),
 
         create: (input: CreateDrillInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(CreateDrillInput, input);
-            return yield* repo.create(decoded);
-          }).pipe(
-            Effect.map(asDrill),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(new NotFoundError({ domain: "Drill", id: "new" })),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(CreateDrillInput, input, repo.create, asDrill, {
+            notFound: () => new NotFoundError({ domain: "Drill", id: "new" }),
+          }),
 
         update: (input: UpdateDrillInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(UpdateDrillInput, input);
-            return yield* repo.update(decoded);
-          }).pipe(
-            Effect.map(asDrill),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Drill", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(UpdateDrillInput, input, repo.update, asDrill, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Drill", id: publicId }),
+          }),
 
         delete: (input: DeleteDrillInput) =>
-          Effect.gen(function* () {
-            const decoded = yield* decodeArguments(DeleteDrillInput, input);
-            return yield* repo.delete(decoded);
-          }).pipe(
-            Effect.map(asDrill),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new NotFoundError({ domain: "Drill", id: input.publicId }),
-              ),
-            ),
-            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
-            Effect.tapError(Effect.logError),
-          ),
+          decodedRowOperation(DeleteDrillInput, input, repo.delete, asDrill, {
+            notFound: ({ publicId }) =>
+              new NotFoundError({ domain: "Drill", id: publicId }),
+          }),
       } as const;
     }),
   },
