@@ -1,6 +1,5 @@
-// Practice-planner worker bindings. Keep this manual while Alchemy v2 beta
-// exports source types that do not typecheck under this repo's strict package
-// tsconfigs.
+// Practice-planner worker bindings. Alchemy v2 provisions these bindings;
+// this file only augments Cloudflare's worker runtime types for package-local TS.
 
 export interface PracticePlannerCloudflareEnv {
   ALCHEMY_STACK_NAME: string;
@@ -10,11 +9,9 @@ export interface PracticePlannerCloudflareEnv {
 }
 
 declare global {
-  type Env = PracticePlannerCloudflareEnv;
-}
-
-declare module "cloudflare:workers" {
   namespace Cloudflare {
-    export interface Env extends PracticePlannerCloudflareEnv {}
+    interface Env extends PracticePlannerCloudflareEnv {}
   }
+
+  type Env = Cloudflare.Env;
 }
