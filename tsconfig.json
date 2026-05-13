@@ -39,7 +39,8 @@
         "importAliases": {
           "Array": "Arr",
           "Function": "Fn"
-        }
+        },
+        "allowedDuplicatedPackages": ["effect"]
       }
     ]
   }

@@ -4,6 +4,7 @@ import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as GitHub from "alchemy/GitHub";
 import * as Output from "alchemy/Output";
+import * as Data from "effect/Data";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Redacted from "effect/Redacted";
@@ -11,11 +12,27 @@ import * as Redacted from "effect/Redacted";
 export const prodStage = "prod";
 export const devStage = "dev";
 
-const PRODUCTION = "laxdb.io";
-const DEV = "dev.laxdb.io";
+const stackName = "laxdb";
 const repoRoot = new URL(".", import.meta.url);
 
-const requiredEnv = (name: string): string => {
+const domains = {
+  production: "laxdb.io",
+  development: "dev.laxdb.io",
+};
+
+const packageRoots = {
+  api: "packages/api/src/index.ts",
+  core: new URL("./packages/core", repoRoot),
+  marketing: "./packages/marketing",
+  practicePlanner: "./packages/practice-planner",
+};
+
+const nodeCompatibility = { flags: ["nodejs_compat"] };
+
+const currentAlchemyPhase = () => process.env.ALCHEMY_PHASE ?? "plan";
+const isLocalPhase = (phase: string) => phase === "dev";
+
+const requireEnv = (name: string): string => {
   const value = process.env[name];
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
@@ -23,33 +40,44 @@ const requiredEnv = (name: string): string => {
   return value;
 };
 
-const workerEnv = () => ({
-  GOOGLE_CLIENT_ID: requiredEnv("GOOGLE_CLIENT_ID"),
-  GOOGLE_CLIENT_SECRET: Redacted.make(requiredEnv("GOOGLE_CLIENT_SECRET")),
-  BETTER_AUTH_SECRET: Redacted.make(requiredEnv("BETTER_AUTH_SECRET")),
-  POLAR_WEBHOOK_SECRET: Redacted.make(requiredEnv("POLAR_WEBHOOK_SECRET")),
+const requireSecret = (name: string) => Redacted.make(requireEnv(name));
+
+const apiWorkerEnv = () => ({
+  GOOGLE_CLIENT_ID: requireEnv("GOOGLE_CLIENT_ID"),
+  GOOGLE_CLIENT_SECRET: requireSecret("GOOGLE_CLIENT_SECRET"),
+  BETTER_AUTH_SECRET: requireSecret("BETTER_AUTH_SECRET"),
+  POLAR_WEBHOOK_SECRET: requireSecret("POLAR_WEBHOOK_SECRET"),
   AWS_REGION: process.env.AWS_REGION ?? "us-west-2",
   EMAIL_SENDER: process.env.EMAIL_SENDER ?? "noreply@laxdb.io",
 });
 
-const getDomain = (stage: string, subdomain?: string) => {
-  const prefix = subdomain ? `${subdomain}.` : "";
-  if (stage === prodStage) return `${prefix}${PRODUCTION}`;
-  if (stage === devStage) return `${prefix}${DEV}`;
-  return `${prefix}${stage}.${DEV}`;
+const domainForStage = (stage: string, subdomain?: string) => {
+  const baseDomain =
+    stage === prodStage
+      ? domains.production
+      : stage === devStage
+        ? domains.development
+        : `${stage}.${domains.development}`;
+
+  return subdomain ? `${subdomain}.${baseDomain}` : baseDomain;
 };
 
-const databaseName = (stage: string) =>
-  stage === prodStage ? "laxdb" : `laxdb-${stage}`;
+const databaseNameForStage = (stage: string) =>
+  stage === prodStage ? stackName : `${stackName}-${stage}`;
 
-const alchemyPhase = () => process.env.ALCHEMY_PHASE ?? "plan";
+const readReplicationForStage = (stage: string): "auto" | "disabled" =>
+  stage === prodStage ? "auto" : "disabled";
 
-const isLocalPhase = (phase: string) => phase === "dev";
+class MigrationGenerationError extends Data.TaggedError(
+  "MigrationGenerationError",
+)<{
+  cause: unknown;
+}> {}
 
 const generateDrizzleMigrations = Effect.try({
   try: () => {
     const result = spawnSync("bun", ["run", "db:generate"], {
-      cwd: new URL("./packages/core", repoRoot),
+      cwd: packageRoots.core,
       stdio: "inherit",
     });
 
@@ -59,11 +87,11 @@ const generateDrizzleMigrations = Effect.try({
       );
     }
   },
-  catch: (cause) => cause,
+  catch: (cause) => new MigrationGenerationError({ cause }),
 }).pipe(Effect.orDie);
 
 const runLocalSetup = Effect.gen(function* () {
-  if (isLocalPhase(alchemyPhase())) {
+  if (isLocalPhase(currentAlchemyPhase())) {
     yield* generateDrizzleMigrations;
   }
 });
@@ -72,13 +100,11 @@ export const database = Cloudflare.D1Database(
   "database",
   Effect.gen(function* () {
     const stage = yield* Alchemy.Stage;
-    const readReplicationMode: "auto" | "disabled" =
-      stage === prodStage ? "auto" : "disabled";
 
     return {
-      name: databaseName(stage),
+      name: databaseNameForStage(stage),
       migrationsDir: "./packages/core/migrations",
-      readReplication: { mode: readReplicationMode },
+      readReplication: { mode: readReplicationForStage(stage) },
     };
   }),
 );
@@ -89,20 +115,16 @@ export const storage = Cloudflare.R2Bucket("storage");
 export const api = Cloudflare.Worker(
   "api",
   Effect.gen(function* () {
-    const db = yield* database;
-    const kvNamespace = yield* kv;
-    const bucket = yield* storage;
-
     return {
-      main: "packages/api/src/index.ts",
+      main: packageRoots.api,
       url: true,
-      compatibility: { flags: ["nodejs_compat"] },
+      compatibility: nodeCompatibility,
       bindings: {
-        DB: db,
-        KV: kvNamespace,
-        STORAGE: bucket,
+        DB: yield* database,
+        KV: yield* kv,
+        STORAGE: yield* storage,
       },
-      env: workerEnv(),
+      env: apiWorkerEnv(),
     };
   }),
 );
@@ -111,11 +133,12 @@ export const marketing = Cloudflare.Vite(
   "marketing",
   Effect.gen(function* () {
     const stage = yield* Alchemy.Stage;
+
     return {
-      rootDir: "./packages/marketing",
+      rootDir: packageRoots.marketing,
       url: true,
-      domain: getDomain(stage),
-      compatibility: { flags: ["nodejs_compat"] },
+      domain: domainForStage(stage),
+      compatibility: nodeCompatibility,
     };
   }),
 );
@@ -124,19 +147,46 @@ export const practicePlanner = Cloudflare.Vite(
   "practice-planner",
   Effect.gen(function* () {
     const stage = yield* Alchemy.Stage;
-    const phase = alchemyPhase();
 
     return {
-      rootDir: "./packages/practice-planner",
+      rootDir: packageRoots.practicePlanner,
       url: true,
-      domain: getDomain(stage, "planner"),
-      compatibility: { flags: ["nodejs_compat"] },
+      domain: domainForStage(stage, "planner"),
+      compatibility: nodeCompatibility,
+      bindings: {
+        API: api,
+      },
       env: {
-        IS_LOCAL: isLocalPhase(phase) ? "true" : "",
+        IS_LOCAL: isLocalPhase(currentAlchemyPhase()) ? "true" : "",
       },
     };
   }),
 );
+
+type ApiWorkerVariables = {
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  BETTER_AUTH_SECRET: string;
+  POLAR_WEBHOOK_SECRET: string;
+  AWS_REGION: string;
+  EMAIL_SENDER: string;
+};
+
+type AlchemyRuntimeVariables = {
+  ALCHEMY_STACK_NAME: string;
+  ALCHEMY_STAGE: string;
+};
+
+export type ApiWorkerEnv = Cloudflare.InferEnv<typeof api> &
+  ApiWorkerVariables &
+  AlchemyRuntimeVariables;
+
+export type PracticePlannerWorkerEnv = Cloudflare.InferEnv<
+  typeof practicePlanner
+> &
+  AlchemyRuntimeVariables & {
+    IS_LOCAL: string;
+  };
 
 const maybePostPreviewComment = (
   marketingUrl: Output.Output<string | undefined>,
@@ -164,9 +214,11 @@ const maybePostPreviewComment = (
   });
 
 export default Alchemy.Stack(
-  "laxdb",
+  stackName,
   {
-    providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
+    providers: GitHub.providers().pipe(
+      Layer.provideMerge(Cloudflare.providers()),
+    ),
     state: Cloudflare.state(),
   },
   Effect.gen(function* () {
@@ -180,20 +232,10 @@ export default Alchemy.Stack(
     const marketingWorker = yield* marketing;
     const practicePlannerWorker = yield* practicePlanner;
 
-    yield* practicePlannerWorker.bind`API`({
-      bindings: [
-        {
-          type: "service",
-          name: "API",
-          service: apiWorker.workerName,
-        },
-      ],
-    });
-
     yield* maybePostPreviewComment(marketingWorker.url);
 
     return {
-      domain: getDomain(stage),
+      domain: domainForStage(stage),
       marketing: marketingWorker.url,
       practicePlanner: practicePlannerWorker.url,
       api: apiWorker.url,
