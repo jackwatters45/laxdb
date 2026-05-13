@@ -14,6 +14,12 @@ export const PracticesHandlersLive = HttpApiBuilder.group(
       return handlers
         .handle("listPractices", () => service.list())
         .handle("getPractice", ({ payload }) => service.get(payload))
+        .handle("loadPracticeAggregate", ({ payload }) =>
+          service.loadAggregate(payload),
+        )
+        .handle("savePracticeAggregate", ({ payload }) =>
+          service.saveAggregate(payload),
+        )
         .handle("createPractice", ({ payload }) => service.create(payload))
         .handle("updatePractice", ({ payload }) => service.update(payload))
         .handle("deletePractice", ({ payload }) => service.delete(payload))

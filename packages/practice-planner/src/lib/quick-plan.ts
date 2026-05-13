@@ -1,8 +1,5 @@
+import { createPersistedId, createTransientId } from "@/lib/ids";
 import type { Drill, PracticeNode, PracticeEdge, DrillCategory } from "@/types";
-
-function nextId(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
 
 interface QuickPlanOptions {
   durationMinutes: number;
@@ -36,7 +33,7 @@ export function generateQuickPlan(
 
   // Start node
   const startNode: PracticeNode = {
-    id: nextId("node"),
+    id: createPersistedId(),
     type: "activity",
     variant: "start",
     drillId: null,
@@ -58,7 +55,7 @@ export function generateQuickPlan(
       if (remainingMinutes <= 0) break;
       const dur = drill.durationMinutes ?? 8;
       const node: PracticeNode = {
-        id: nextId("node"),
+        id: createPersistedId(),
         type: "warmup",
         variant: "default",
         drillId: drill.publicId,
@@ -93,7 +90,7 @@ export function generateQuickPlan(
     if (dur > remainingMinutes - (includeCooldown ? 15 : 0)) continue;
 
     const node: PracticeNode = {
-      id: nextId("node"),
+      id: createPersistedId(),
       type: "drill",
       variant: "default",
       drillId: drill.publicId,
@@ -112,7 +109,7 @@ export function generateQuickPlan(
     // Insert water break after every 3 drills
     if (drillCount % 3 === 0 && remainingMinutes > (includeCooldown ? 20 : 5)) {
       const water: PracticeNode = {
-        id: nextId("node"),
+        id: createPersistedId(),
         type: "water-break",
         variant: "default",
         drillId: null,
@@ -134,7 +131,7 @@ export function generateQuickPlan(
     const cooldown = drills.find((d) => d.tags.includes("cooldown"));
     if (cooldown) {
       const node: PracticeNode = {
-        id: nextId("node"),
+        id: createPersistedId(),
         type: "cooldown",
         variant: "default",
         drillId: cooldown.publicId,
@@ -155,7 +152,7 @@ export function generateQuickPlan(
     const target = nodes[i + 1];
     if (!source || !target) continue;
     edges.push({
-      id: nextId("edge"),
+      id: createTransientId("edge"),
       source: source.id,
       target: target.id,
     });

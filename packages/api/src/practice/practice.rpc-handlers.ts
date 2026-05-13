@@ -12,6 +12,8 @@ export const PracticeRpcHandlers = PracticeRpcs.toLayer(
     return withRpcLogging({
       PracticeList: service.list,
       PracticeGet: service.get,
+      PracticeLoadAggregate: service.loadAggregate,
+      PracticeSaveAggregate: service.saveAggregate,
       PracticeCreate: service.create,
       PracticeUpdate: service.update,
       PracticeDelete: service.delete,

@@ -17,12 +17,14 @@ import {
   ListEdgesInput,
   ListItemsInput,
   Practice,
+  PracticeAggregate,
   PracticeEdge,
   PracticeItem,
   PracticeReview,
   RemoveItemInput,
   ReorderItemsInput,
   ReplaceEdgesInput,
+  SavePracticeAggregateInput,
   UpdateItemInput,
   UpdatePracticeInput,
   UpdateReviewInput,
@@ -61,6 +63,18 @@ export const PracticeContract = {
     success: Practice,
     error: PracticeErrors,
     payload: DeletePracticeInput,
+  },
+
+  // Practice aggregate
+  loadAggregate: {
+    success: PracticeAggregate,
+    error: PracticeErrors,
+    payload: GetPracticeInput,
+  },
+  saveAggregate: {
+    success: PracticeAggregate,
+    error: PracticeErrors,
+    payload: SavePracticeAggregateInput,
   },
 
   // Practice items

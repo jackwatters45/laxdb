@@ -88,6 +88,14 @@ export class PracticeReview extends Schema.Class<PracticeReview>(
   ...TimestampsSchema,
 }) {}
 
+export class PracticeAggregate extends Schema.Class<PracticeAggregate>(
+  "PracticeAggregate",
+)({
+  practice: Practice,
+  items: Schema.Array(PracticeItem),
+  edges: Schema.Array(PracticeEdge),
+}) {}
+
 // ---------------------------------------------------------------------------
 // Practice inputs
 // ---------------------------------------------------------------------------
@@ -129,12 +137,23 @@ export class DeletePracticeInput extends Schema.Class<DeletePracticeInput>(
   publicId: NanoidSchema,
 }) {}
 
+export class PracticeAggregatePatchInput extends Schema.Class<PracticeAggregatePatchInput>(
+  "PracticeAggregatePatchInput",
+)({
+  name: Schema.optional(Schema.NullOr(Schema.String)),
+  date: Schema.optional(Schema.NullOr(DateSchema)),
+  description: Schema.optional(Schema.NullOr(Schema.String)),
+  notes: Schema.optional(Schema.NullOr(Schema.String)),
+  durationMinutes: Schema.optional(Schema.NullOr(Schema.Number)),
+  location: Schema.optional(Schema.NullOr(Schema.String)),
+  status: Schema.optional(PracticeStatus),
+}) {}
+
 // ---------------------------------------------------------------------------
 // Practice item inputs
 // ---------------------------------------------------------------------------
 
-export class AddItemInput extends Schema.Class<AddItemInput>("AddItemInput")({
-  practicePublicId: NanoidSchema,
+const PracticeItemCreateFields = {
   type: PracticeItemType,
   variant: Schema.optional(PracticeItemVariant),
   drillPublicId: Schema.optional(Schema.NullOr(NanoidSchema)),
@@ -146,12 +165,9 @@ export class AddItemInput extends Schema.Class<AddItemInput>("AddItemInput")({
   positionX: Schema.optional(Schema.NullOr(Schema.Number)),
   positionY: Schema.optional(Schema.NullOr(Schema.Number)),
   priority: Schema.optional(PracticeItemPriority),
-}) {}
+};
 
-export class UpdateItemInput extends Schema.Class<UpdateItemInput>(
-  "UpdateItemInput",
-)({
-  publicId: NanoidSchema,
+const PracticeItemUpdateFields = {
   type: Schema.optional(PracticeItemType),
   variant: Schema.optional(PracticeItemVariant),
   drillPublicId: Schema.optional(Schema.NullOr(NanoidSchema)),
@@ -163,6 +179,26 @@ export class UpdateItemInput extends Schema.Class<UpdateItemInput>(
   positionX: Schema.optional(Schema.NullOr(Schema.Number)),
   positionY: Schema.optional(Schema.NullOr(Schema.Number)),
   priority: Schema.optional(PracticeItemPriority),
+};
+
+export class AddItemInput extends Schema.Class<AddItemInput>("AddItemInput")({
+  practicePublicId: NanoidSchema,
+  publicId: Schema.optional(NanoidSchema),
+  ...PracticeItemCreateFields,
+}) {}
+
+export class SavePracticeAggregateItemInput extends Schema.Class<SavePracticeAggregateItemInput>(
+  "SavePracticeAggregateItemInput",
+)({
+  publicId: NanoidSchema,
+  ...PracticeItemCreateFields,
+}) {}
+
+export class UpdateItemInput extends Schema.Class<UpdateItemInput>(
+  "UpdateItemInput",
+)({
+  publicId: NanoidSchema,
+  ...PracticeItemUpdateFields,
 }) {}
 
 export class RemoveItemInput extends Schema.Class<RemoveItemInput>(
@@ -202,6 +238,15 @@ export class ReplaceEdgesInput extends Schema.Class<ReplaceEdgesInput>(
   "ReplaceEdgesInput",
 )({
   practicePublicId: NanoidSchema,
+  edges: Schema.Array(PracticeEdgeInput),
+}) {}
+
+export class SavePracticeAggregateInput extends Schema.Class<SavePracticeAggregateInput>(
+  "SavePracticeAggregateInput",
+)({
+  practicePublicId: NanoidSchema,
+  practice: PracticeAggregatePatchInput,
+  items: Schema.Array(SavePracticeAggregateItemInput),
   edges: Schema.Array(PracticeEdgeInput),
 }) {}
 

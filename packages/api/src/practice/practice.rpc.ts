@@ -13,6 +13,16 @@ export class PracticeRpcs extends RpcGroup.make(
     error: PracticeContract.get.error,
     payload: PracticeContract.get.payload,
   }),
+  Rpc.make("PracticeLoadAggregate", {
+    success: PracticeContract.loadAggregate.success,
+    error: PracticeContract.loadAggregate.error,
+    payload: PracticeContract.loadAggregate.payload,
+  }),
+  Rpc.make("PracticeSaveAggregate", {
+    success: PracticeContract.saveAggregate.success,
+    error: PracticeContract.saveAggregate.error,
+    payload: PracticeContract.saveAggregate.payload,
+  }),
   Rpc.make("PracticeCreate", {
     success: PracticeContract.create.success,
     error: PracticeContract.create.error,

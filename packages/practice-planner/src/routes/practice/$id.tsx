@@ -5,6 +5,7 @@ import {
   PracticeItemVariant as PracticeItemVariantSchema,
   PracticeStatus as PracticeStatusSchema,
 } from "@laxdb/core/practice/practice.schema";
+import { NanoidSchema } from "@laxdb/core/schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
@@ -77,8 +78,8 @@ const nodeToItem = (node: PracticeNode, orderIndex: number) => {
   };
 };
 
-const SavePracticeInput = Schema.Struct({
-  practiceId: Schema.String,
+const SavePracticePayload = Schema.Struct({
+  practicePublicId: NanoidSchema,
   practice: Schema.Struct({
     date: Schema.NullOr(Schema.String),
     description: Schema.NullOr(Schema.String),
@@ -87,61 +88,38 @@ const SavePracticeInput = Schema.Struct({
     location: Schema.NullOr(Schema.String),
     status: PracticeStatusSchema,
   }),
-  addedItems: Schema.Array(Schema.Struct(SaveItemFields)),
-  updatedItems: Schema.Array(
-    Schema.Struct({ publicId: Schema.String, ...SaveItemFields }),
+  items: Schema.Array(
+    Schema.Struct({ publicId: NanoidSchema, ...SaveItemFields }),
   ),
-  removedItemIds: Schema.Array(Schema.String),
   edges: Schema.Array(
     Schema.Struct({
-      sourcePublicId: Schema.String,
-      targetPublicId: Schema.String,
+      sourcePublicId: NanoidSchema,
+      targetPublicId: NanoidSchema,
       label: Schema.NullOr(Schema.String),
     }),
   ),
 });
 
 const savePractice = createServerFn({ method: "POST" })
-  .inputValidator((data: typeof SavePracticeInput.Type) =>
-    Schema.decodeSync(SavePracticeInput)(data),
+  .inputValidator((data: typeof SavePracticePayload.Type) =>
+    Schema.decodeSync(SavePracticePayload)(data),
   )
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
 
-        // Update practice metadata
-        yield* client.PracticeUpdate({
-          publicId: data.practiceId,
-          date: data.practice.date ? new Date(data.practice.date) : undefined,
-          description: data.practice.description,
-          notes: data.practice.notes,
-          durationMinutes: data.practice.durationMinutes,
-          location: data.practice.location,
-          status: data.practice.status,
-        });
-
-        // Remove deleted items
-        for (const id of data.removedItemIds) {
-          yield* client.PracticeRemoveItem({ publicId: id });
-        }
-
-        // Add new items
-        for (const item of data.addedItems) {
-          yield* client.PracticeAddItem({
-            practicePublicId: data.practiceId,
-            ...item,
-          });
-        }
-
-        // Update existing items
-        for (const item of data.updatedItems) {
-          yield* client.PracticeUpdateItem(item);
-        }
-
-        // Replace graph edges after items exist in their latest shape
-        yield* client.PracticeReplaceEdges({
-          practicePublicId: data.practiceId,
+        return yield* client.PracticeSaveAggregate({
+          practicePublicId: data.practicePublicId,
+          practice: {
+            date: data.practice.date ? new Date(data.practice.date) : null,
+            description: data.practice.description,
+            notes: data.practice.notes,
+            durationMinutes: data.practice.durationMinutes,
+            location: data.practice.location,
+            status: data.practice.status,
+          },
+          items: data.items,
           edges: data.edges,
         });
       }),
@@ -154,12 +132,7 @@ const loadPractice = createServerFn({ method: "GET" })
     runApi(
       Effect.gen(function* () {
         const client = yield* RpcApiClient;
-        const [practice, items, edges] = yield* Effect.all([
-          client.PracticeGet({ publicId: data.id }),
-          client.PracticeListItems({ practicePublicId: data.id }),
-          client.PracticeListEdges({ practicePublicId: data.id }),
-        ]);
-        return { practice, items, edges };
+        return yield* client.PracticeLoadAggregate({ publicId: data.id });
       }),
     ),
   );
@@ -195,8 +168,7 @@ function PracticePlannerPage() {
   // Auto-save
   const { saving, lastSaved } = usePracticePersistence({
     practice,
-    initialNodes: initialGraph.nodes,
-    buildPayload: (current, knownIds) => {
+    buildPayload: (current) => {
       const { nodes: persistedNodes, edges: persistedEdges } =
         toPersistedGraph(current);
       const orderedNodes = orderNodesByFlow(persistedNodes, persistedEdges);
@@ -204,12 +176,10 @@ function PracticePlannerPage() {
         node,
         orderIndex,
       }));
-      const persistedIds = persistedNodes.map((node) => node.id);
-      const persistedIdSet = new Set(persistedIds);
 
       return {
         payload: {
-          practiceId: current.id,
+          practicePublicId: current.id,
           practice: {
             date: current.date,
             description: current.description,
@@ -218,23 +188,16 @@ function PracticePlannerPage() {
             location: current.location,
             status: current.status,
           },
-          addedItems: orderedEntries
-            .filter(({ node }) => !knownIds.has(node.id))
-            .map(({ node, orderIndex }) => nodeToItem(node, orderIndex)),
-          updatedItems: orderedEntries
-            .filter(({ node }) => knownIds.has(node.id))
-            .map(({ node, orderIndex }) => ({
-              publicId: node.id,
-              ...nodeToItem(node, orderIndex),
-            })),
-          removedItemIds: [...knownIds].filter((id) => !persistedIdSet.has(id)),
+          items: orderedEntries.map(({ node, orderIndex }) => ({
+            publicId: node.id,
+            ...nodeToItem(node, orderIndex),
+          })),
           edges: persistedEdges.map((edge) => ({
             sourcePublicId: edge.source,
             targetPublicId: edge.target,
             label: edge.label ?? null,
           })),
         },
-        persistedIds,
       };
     },
     onSave: (payload) => savePractice({ data: payload }),

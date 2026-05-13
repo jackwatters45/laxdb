@@ -122,6 +122,9 @@ export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
             db
               .insert(practiceItemTable)
               .values({
+                ...(input.publicId !== undefined && {
+                  publicId: input.publicId,
+                }),
                 practicePublicId: input.practicePublicId,
                 type: input.type,
                 variant: input.variant ?? "default",

@@ -454,6 +454,150 @@ describe("PracticeService integration", () => {
       }),
     ));
 
+  it("loads a practice aggregate", () =>
+    run(
+      Effect.gen(function* () {
+        yield* truncateAll;
+        const svc = yield* PracticeService;
+
+        const practice = yield* svc.create(validCreatePractice());
+        const warmup = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "warmup", orderIndex: 0 }),
+        );
+        const drill = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "drill", orderIndex: 1 }),
+        );
+        yield* svc.replaceEdges({
+          practicePublicId: practice.publicId,
+          edges: [
+            {
+              sourcePublicId: warmup.publicId,
+              targetPublicId: drill.publicId,
+              label: null,
+            },
+          ],
+        });
+
+        const aggregate = yield* svc.loadAggregate({
+          publicId: practice.publicId,
+        });
+
+        expect(aggregate.practice.publicId).toBe(practice.publicId);
+        expect(aggregate.items.map((item) => item.publicId)).toEqual([
+          warmup.publicId,
+          drill.publicId,
+        ]);
+        expect(aggregate.edges).toHaveLength(1);
+      }),
+    ));
+
+  it("saves a practice aggregate as the desired final graph", () =>
+    run(
+      Effect.gen(function* () {
+        yield* truncateAll;
+        const svc = yield* PracticeService;
+        const newItemId = "AbCdEfGhIjKl";
+
+        const practice = yield* svc.create(validCreatePractice());
+        const warmup = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "warmup", orderIndex: 0 }),
+        );
+        const removed = yield* svc.addItem(
+          validAddItem(practice.publicId, { type: "cooldown", orderIndex: 1 }),
+        );
+
+        const aggregate = yield* svc.saveAggregate({
+          practicePublicId: practice.publicId,
+          practice: {
+            durationMinutes: 75,
+            status: "scheduled",
+          },
+          items: [
+            {
+              publicId: warmup.publicId,
+              type: "warmup",
+              variant: "default",
+              drillPublicId: null,
+              label: "Dynamic warmup",
+              durationMinutes: 10,
+              notes: null,
+              groups: ["all"],
+              orderIndex: 0,
+              positionX: 0,
+              positionY: 0,
+              priority: "required",
+            },
+            {
+              publicId: newItemId,
+              type: "drill",
+              variant: "default",
+              drillPublicId: null,
+              label: "Ground balls",
+              durationMinutes: 20,
+              notes: null,
+              groups: ["defense"],
+              orderIndex: 1,
+              positionX: 120,
+              positionY: 240,
+              priority: "optional",
+            },
+          ],
+          edges: [
+            {
+              sourcePublicId: warmup.publicId,
+              targetPublicId: newItemId,
+              label: "next",
+            },
+          ],
+        });
+
+        expect(aggregate.practice.durationMinutes).toBe(75);
+        expect(aggregate.practice.status).toBe("scheduled");
+        expect(aggregate.items.map((item) => item.publicId)).toEqual([
+          warmup.publicId,
+          newItemId,
+        ]);
+        expect(aggregate.items.map((item) => item.label)).toEqual([
+          "Dynamic warmup",
+          "Ground balls",
+        ]);
+        expect(aggregate.edges).toHaveLength(1);
+
+        const items = yield* svc.listItems({
+          practicePublicId: practice.publicId,
+        });
+        expect(items.some((item) => item.publicId === removed.publicId)).toBe(
+          false,
+        );
+      }),
+    ));
+
+  it("rejects practice aggregate edges outside the final item set", () =>
+    run(
+      Effect.gen(function* () {
+        yield* truncateAll;
+        const svc = yield* PracticeService;
+
+        const practice = yield* svc.create(validCreatePractice());
+        const exit = yield* svc
+          .saveAggregate({
+            practicePublicId: practice.publicId,
+            practice: {},
+            items: [],
+            edges: [
+              {
+                sourcePublicId: "AbCdEfGhIjKl",
+                targetPublicId: "LmNoPqRsTuVw",
+                label: null,
+              },
+            ],
+          })
+          .pipe(Effect.exit);
+
+        expect(exit._tag).toBe("Failure");
+      }),
+    ));
+
   // NOTE: No FK cascade — deleting a practice does NOT auto-remove its items.
   // Items are orphaned. Consider adding ON DELETE CASCADE to the FK constraint
   // or implementing application-level cleanup in PracticeService.delete.

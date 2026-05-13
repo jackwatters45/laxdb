@@ -7,6 +7,8 @@
  *   bun src/practice.ts create --duration 120 --location "Main Field"
  *   bun src/practice.ts add-item <practiceId> --type drill --drill <drillId>
  *   bun src/practice.ts list-items <practiceId>
+ *   bun src/practice.ts load-aggregate <practiceId>
+ *   bun src/practice.ts save-aggregate < aggregate.json
  *   bun src/practice.ts review <practiceId> --went-well "Good energy"
  *   bun src/practice.ts --base-url https://api.laxdb.io list
  *   LAXDB_API_URL=https://api.laxdb.io bun src/practice.ts list
@@ -19,6 +21,7 @@ import { RpcApiClient } from "@laxdb/api/client";
 import {
   CreatePracticeInput,
   PracticeEdgeInput,
+  SavePracticeAggregateInput,
   UpdatePracticeInput,
 } from "@laxdb/core/practice/practice.schema";
 import { Effect, Option, Schema } from "effect";
@@ -392,6 +395,38 @@ const listEdgesCommand = Command.make(
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
 
+const loadAggregateCommand = Command.make(
+  "load-aggregate",
+  {
+    practiceId: Argument.string("practiceId"),
+    pretty: prettyFlag,
+    baseUrl: baseUrlFlag,
+  },
+  ({ practiceId, pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const aggregate = yield* client.PracticeLoadAggregate({
+        publicId: practiceId,
+      });
+      yield* output(aggregate, pretty);
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
+);
+
+const saveAggregateCommand = Command.make(
+  "save-aggregate",
+  { pretty: prettyFlag, baseUrl: baseUrlFlag },
+  ({ pretty, baseUrl }) =>
+    Effect.gen(function* () {
+      const client = yield* RpcApiClient;
+      const raw = yield* readStdin;
+      const input = yield* Schema.decodeUnknownEffect(
+        SavePracticeAggregateInput,
+      )(raw);
+      const aggregate = yield* client.PracticeSaveAggregate(input);
+      yield* output(aggregate, pretty);
+    }).pipe(Effect.provide(apiLayer(baseUrl))),
+);
+
 const replaceEdgesCommand = Command.make(
   "replace-edges",
   {
@@ -569,6 +604,8 @@ const practiceCommand = Command.make("practice").pipe(
     listItemsCommand,
     reorderItemsCommand,
     listEdgesCommand,
+    loadAggregateCommand,
+    saveAggregateCommand,
     replaceEdgesCommand,
     reviewCommand,
     getReviewCommand,

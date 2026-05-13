@@ -22,11 +22,24 @@ type FetchInput = Parameters<typeof fetch>[0];
 type FetchInit = Parameters<typeof fetch>[1];
 
 type CloudflareWorkersModule = {
-  env: Env;
+  env: {
+    API: {
+      fetch: typeof fetch;
+    };
+  };
 };
 
 const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
-  typeof value === "object" && value !== null && "env" in value;
+  typeof value === "object" &&
+  value !== null &&
+  "env" in value &&
+  typeof value.env === "object" &&
+  value.env !== null &&
+  "API" in value.env &&
+  typeof value.env.API === "object" &&
+  value.env.API !== null &&
+  "fetch" in value.env.API &&
+  typeof value.env.API.fetch === "function";
 
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
   if (isLocal) {

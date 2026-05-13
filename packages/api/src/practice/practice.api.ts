@@ -30,6 +30,28 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
     }),
   )
   .add(
+    HttpApiEndpoint.post(
+      "loadPracticeAggregate",
+      "/api/practices/aggregate/load",
+      {
+        success: PracticeContract.loadAggregate.success,
+        error: errors,
+        payload: PracticeContract.loadAggregate.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      "savePracticeAggregate",
+      "/api/practices/aggregate/save",
+      {
+        success: PracticeContract.saveAggregate.success,
+        error: errors,
+        payload: PracticeContract.saveAggregate.payload,
+      },
+    ),
+  )
+  .add(
     HttpApiEndpoint.post("createPractice", "/api/practices/create", {
       success: PracticeContract.create.success,
       error: errors,

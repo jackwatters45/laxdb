@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
 import { drillToType } from "@/lib/drill-utils";
+import { createPersistedId, createTransientId } from "@/lib/ids";
 import type {
   PracticeGraph,
   PracticeNode,
@@ -8,10 +9,6 @@ import type {
   PracticeItemType,
   Drill,
 } from "@/types";
-
-function nextId(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
 
 export function usePracticeEditor(initial: PracticeGraph) {
   const [practice, setPracticeRaw] = useState(initial);
@@ -145,7 +142,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
         for (const ie of incomingEdges) {
           for (const oe of outgoingEdges) {
             newEdges.push({
-              id: nextId("edge"),
+              id: createTransientId("edge"),
               source: ie.source,
               target: oe.target,
             });
@@ -205,7 +202,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
   const addDrillBetween = useCallback(
     (afterId: string, beforeId: string, drill: Drill) => {
-      const nodeId = nextId("node");
+      const nodeId = createPersistedId();
 
       setPractice((prev) => {
         const afterNode = prev.nodes.find((n) => n.id === afterId);
@@ -232,8 +229,8 @@ export function usePracticeEditor(initial: PracticeGraph) {
           (e) => !(e.source === afterId && e.target === beforeId),
         );
         newEdges.push(
-          { id: nextId("edge"), source: afterId, target: nodeId },
-          { id: nextId("edge"), source: nodeId, target: beforeId },
+          { id: createTransientId("edge"), source: afterId, target: nodeId },
+          { id: createTransientId("edge"), source: nodeId, target: beforeId },
         );
         return { ...prev, nodes: [...prev.nodes, newNode], edges: newEdges };
       });
@@ -245,7 +242,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
   const addDrillFromSidebar = useCallback(
     (drill: Drill, type: PracticeItemType) => {
-      const nodeId = nextId("node");
+      const nodeId = createPersistedId();
 
       setPractice((prev) => {
         const sourcesSet = new Set(prev.edges.map((e) => e.source));
@@ -276,7 +273,11 @@ export function usePracticeEditor(initial: PracticeGraph) {
           edges: lastNode
             ? [
                 ...prev.edges,
-                { id: nextId("edge"), source: lastNode.id, target: nodeId },
+                {
+                  id: createTransientId("edge"),
+                  source: lastNode.id,
+                  target: nodeId,
+                },
               ]
             : prev.edges,
         };
@@ -302,7 +303,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
         if (!lastNode) return prev;
 
         const splitNode: PracticeNode = {
-          id: nextId("node"),
+          id: createPersistedId(),
           type: "activity",
           variant: "split",
           drillId: null,
@@ -316,7 +317,11 @@ export function usePracticeEditor(initial: PracticeGraph) {
 
         const newNodes: PracticeNode[] = [splitNode];
         const newEdges: PracticeEdge[] = [
-          { id: nextId("edge"), source: lastNode.id, target: splitNode.id },
+          {
+            id: createTransientId("edge"),
+            source: lastNode.id,
+            target: splitNode.id,
+          },
         ];
 
         const laneWidth = 280;
@@ -327,7 +332,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
           const group = groups[i];
           if (!group) continue;
           const laneNode: PracticeNode = {
-            id: nextId("node"),
+            id: createPersistedId(),
             type: "drill",
             variant: "default",
             drillId: null,
@@ -343,7 +348,7 @@ export function usePracticeEditor(initial: PracticeGraph) {
           };
           newNodes.push(laneNode);
           newEdges.push({
-            id: nextId("edge"),
+            id: createTransientId("edge"),
             source: splitNode.id,
             target: laneNode.id,
             label: group,
