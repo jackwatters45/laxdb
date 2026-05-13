@@ -1,3 +1,4 @@
+import { DatabaseLiveFromBinding } from "@laxdb/core/drizzle/drizzle.service";
 import { DateTime, Layer } from "effect";
 import {
   HttpRouter,
@@ -6,6 +7,8 @@ import {
 } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
+
+import type { ApiWorkerEnv } from "../../../alchemy.run";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
@@ -42,6 +45,9 @@ const AllRoutes = Layer.mergeAll(
   HealthCheckRoute,
 ).pipe(Layer.provide(DateTime.layerCurrentZoneLocal));
 
+const routesForEnv = (env: ApiWorkerEnv) =>
+  AllRoutes.pipe(Layer.provide(DatabaseLiveFromBinding(env.DB)));
+
 /**
  * Build handler fresh per request.
  *
@@ -50,8 +56,8 @@ const AllRoutes = Layer.mergeAll(
  * connection lifetimes to manage.
  */
 export default {
-  fetch: async (request: Request) => {
-    const { handler, dispose } = HttpRouter.toWebHandler(AllRoutes);
+  fetch: async (request: Request, env: ApiWorkerEnv) => {
+    const { handler, dispose } = HttpRouter.toWebHandler(routesForEnv(env));
     try {
       return await handler(request, emptyRequestContext);
     } finally {
