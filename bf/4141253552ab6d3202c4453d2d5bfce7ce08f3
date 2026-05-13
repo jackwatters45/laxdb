@@ -1,0 +1,19 @@
+packages/practice-planner/types/env.d.ts
+  s_c3f59e41c4efad::t_0e7aef4259a240 1-2,13,15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "bf4141253552ab6d3202c4453d2d5bfce7ce08f3",
+  "prompts": {},
+  "sessions": {
+    "s_c3f59e41c4efad": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2099-068b-701b-8b3c-cb1baee968f3",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
