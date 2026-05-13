@@ -4,6 +4,7 @@ import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as GitHub from "alchemy/GitHub";
 import * as Output from "alchemy/Output";
+import * as Data from "effect/Data";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Redacted from "effect/Redacted";
@@ -67,6 +68,12 @@ const databaseNameForStage = (stage: string) =>
 const readReplicationForStage = (stage: string): "auto" | "disabled" =>
   stage === prodStage ? "auto" : "disabled";
 
+class MigrationGenerationError extends Data.TaggedError(
+  "MigrationGenerationError",
+)<{
+  cause: unknown;
+}> {}
+
 const generateDrizzleMigrations = Effect.try({
   try: () => {
     const result = spawnSync("bun", ["run", "db:generate"], {
@@ -80,7 +87,7 @@ const generateDrizzleMigrations = Effect.try({
       );
     }
   },
-  catch: (cause) => cause,
+  catch: (cause) => new MigrationGenerationError({ cause }),
 }).pipe(Effect.orDie);
 
 const runLocalSetup = Effect.gen(function* () {
@@ -181,7 +188,9 @@ const maybePostPreviewComment = (
 export default Alchemy.Stack(
   stackName,
   {
-    providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
+    providers: GitHub.providers().pipe(
+      Layer.provideMerge(Cloudflare.providers()),
+    ),
     state: Cloudflare.state(),
   },
   Effect.gen(function* () {
