@@ -29,7 +29,7 @@
     "@cloudflare/vitest-pool-workers": "^0.8.71",
     "@cloudflare/workers-types": "^4.20260122.0",
     "@effect/language-service": "^0.62.5",
-    "@effect/vitest": "4.0.0-beta.58",
+    "@effect/vitest": "4.0.0-beta.66",
     "@tanstack/react-table": "^8.21.3",
     "@types/bun": "latest",
     "@types/node": "^24.10.9",
