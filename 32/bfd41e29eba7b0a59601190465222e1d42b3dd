@@ -1,0 +1,26 @@
+packages/api/src/rpc-handlers.ts
+  s_c3f59e41c4efad::t_2f1f28c4f2dc78 15
+packages/api/src/index.ts
+  s_c3f59e41c4efad::t_779cfa62fb2733 1,11-12,48-50,59-60
+packages/core/src/drizzle/drizzle.service.ts
+  s_c3f59e41c4efad::t_d512ec4ec9ea97 49-54,62-63
+  s_c3f59e41c4efad::t_d4324b83134d85 56-59
+packages/api/src/groups/index.ts
+  s_c3f59e41c4efad::t_0473fded4a147c 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "32bfd41e29eba7b0a59601190465222e1d42b3dd",
+  "prompts": {},
+  "sessions": {
+    "s_c3f59e41c4efad": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2099-068b-701b-8b3c-cb1baee968f3",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
