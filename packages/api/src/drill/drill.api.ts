@@ -1,69 +1,59 @@
-import { DrillContract } from "@laxdb/core/drill/drill.contract";
-import {
-  ConstraintViolationError,
-  DatabaseError,
-  NotFoundError,
-  ValidationError,
-} from "@laxdb/core/error";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
+
+import { DrillHttpErrors, DrillOperations } from "./drill.operations";
 
 export const DrillsGroup = HttpApiGroup.make("Drills")
   .add(
-    HttpApiEndpoint.post("listDrills", "/api/drills", {
-      success: DrillContract.list.success,
-      error: [
-        NotFoundError,
-        ValidationError,
-        DatabaseError,
-        ConstraintViolationError,
-      ],
-    }),
+    HttpApiEndpoint.post(
+      DrillOperations.list.httpName,
+      DrillOperations.list.path,
+      {
+        success: DrillOperations.list.contract.success,
+        error: DrillHttpErrors,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("getDrill", "/api/drills/get", {
-      success: DrillContract.get.success,
-      error: [
-        NotFoundError,
-        ValidationError,
-        DatabaseError,
-        ConstraintViolationError,
-      ],
-      payload: DrillContract.get.payload,
-    }),
+    HttpApiEndpoint.post(
+      DrillOperations.get.httpName,
+      DrillOperations.get.path,
+      {
+        success: DrillOperations.get.contract.success,
+        error: DrillHttpErrors,
+        payload: DrillOperations.get.contract.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("createDrill", "/api/drills/create", {
-      success: DrillContract.create.success,
-      error: [
-        NotFoundError,
-        ValidationError,
-        DatabaseError,
-        ConstraintViolationError,
-      ],
-      payload: DrillContract.create.payload,
-    }),
+    HttpApiEndpoint.post(
+      DrillOperations.create.httpName,
+      DrillOperations.create.path,
+      {
+        success: DrillOperations.create.contract.success,
+        error: DrillHttpErrors,
+        payload: DrillOperations.create.contract.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("updateDrill", "/api/drills/update", {
-      success: DrillContract.update.success,
-      error: [
-        NotFoundError,
-        ValidationError,
-        DatabaseError,
-        ConstraintViolationError,
-      ],
-      payload: DrillContract.update.payload,
-    }),
+    HttpApiEndpoint.post(
+      DrillOperations.update.httpName,
+      DrillOperations.update.path,
+      {
+        success: DrillOperations.update.contract.success,
+        error: DrillHttpErrors,
+        payload: DrillOperations.update.contract.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("deleteDrill", "/api/drills/delete", {
-      success: DrillContract.delete.success,
-      error: [
-        NotFoundError,
-        ValidationError,
-        DatabaseError,
-        ConstraintViolationError,
-      ],
-      payload: DrillContract.delete.payload,
-    }),
+    HttpApiEndpoint.post(
+      DrillOperations.delete.httpName,
+      DrillOperations.delete.path,
+      {
+        success: DrillOperations.delete.contract.success,
+        error: DrillHttpErrors,
+        payload: DrillOperations.delete.contract.payload,
+      },
+    ),
   );

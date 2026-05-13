@@ -4,6 +4,8 @@ import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
 
+import { PracticeOperations } from "./practice.operations";
+
 export const PracticesHandlersLive = HttpApiBuilder.group(
   LaxdbApiV2,
   "Practices",
@@ -12,43 +14,53 @@ export const PracticesHandlersLive = HttpApiBuilder.group(
       const service = yield* PracticeService;
 
       return handlers
-        .handle("listPractices", () => service.list())
-        .handle("getPractice", ({ payload }) => service.get(payload))
-        .handle("loadPracticeAggregate", ({ payload }) =>
+        .handle(PracticeOperations.list.httpName, () => service.list())
+        .handle(PracticeOperations.get.httpName, ({ payload }) =>
+          service.get(payload),
+        )
+        .handle(PracticeOperations.loadAggregate.httpName, ({ payload }) =>
           service.loadAggregate(payload),
         )
-        .handle("savePracticeAggregate", ({ payload }) =>
+        .handle(PracticeOperations.saveAggregate.httpName, ({ payload }) =>
           service.saveAggregate(payload),
         )
-        .handle("createPractice", ({ payload }) => service.create(payload))
-        .handle("updatePractice", ({ payload }) => service.update(payload))
-        .handle("deletePractice", ({ payload }) => service.delete(payload))
-        .handle("listPracticeItems", ({ payload }) =>
+        .handle(PracticeOperations.create.httpName, ({ payload }) =>
+          service.create(payload),
+        )
+        .handle(PracticeOperations.update.httpName, ({ payload }) =>
+          service.update(payload),
+        )
+        .handle(PracticeOperations.delete.httpName, ({ payload }) =>
+          service.delete(payload),
+        )
+        .handle(PracticeOperations.listItems.httpName, ({ payload }) =>
           service.listItems(payload),
         )
-        .handle("addPracticeItem", ({ payload }) => service.addItem(payload))
-        .handle("updatePracticeItem", ({ payload }) =>
+        .handle(PracticeOperations.addItem.httpName, ({ payload }) =>
+          service.addItem(payload),
+        )
+        .handle(PracticeOperations.updateItem.httpName, ({ payload }) =>
           service.updateItem(payload),
         )
-        .handle("removePracticeItem", ({ payload }) =>
+        .handle(PracticeOperations.removeItem.httpName, ({ payload }) =>
           service.removeItem(payload),
         )
-        .handle("reorderPracticeItems", ({ payload }) =>
+        .handle(PracticeOperations.reorderItems.httpName, ({ payload }) =>
           service.reorderItems(payload),
         )
-        .handle("listPracticeEdges", ({ payload }) =>
+        .handle(PracticeOperations.listEdges.httpName, ({ payload }) =>
           service.listEdges(payload),
         )
-        .handle("replacePracticeEdges", ({ payload }) =>
+        .handle(PracticeOperations.replaceEdges.httpName, ({ payload }) =>
           service.replaceEdges(payload),
         )
-        .handle("getPracticeReview", ({ payload }) =>
+        .handle(PracticeOperations.getReview.httpName, ({ payload }) =>
           service.getReview(payload),
         )
-        .handle("createPracticeReview", ({ payload }) =>
+        .handle(PracticeOperations.createReview.httpName, ({ payload }) =>
           service.createReview(payload),
         )
-        .handle("updatePracticeReview", ({ payload }) =>
+        .handle(PracticeOperations.updateReview.httpName, ({ payload }) =>
           service.updateReview(payload),
         );
     }),

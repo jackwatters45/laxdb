@@ -1,3 +1,5 @@
+import { ApiRpcNames } from "@laxdb/api/operation-catalog";
+
 export const CLI_ENTRYPOINTS = [
   "defaults",
   "drill",
@@ -6,41 +8,7 @@ export const CLI_ENTRYPOINTS = [
   "practice",
 ] as const;
 
-// Must stay alphabetically sorted and be updated whenever a new API RPC is
-// intentionally exposed through the CLI. coverage.test.ts enforces both.
-export const CLI_RPC_COVERAGE = [
-  "DefaultsGetNamespace",
-  "DefaultsPatchNamespace",
-  "DrillCreate",
-  "DrillDelete",
-  "DrillGet",
-  "DrillList",
-  "DrillUpdate",
-  "PlayCreate",
-  "PlayDelete",
-  "PlayerCreate",
-  "PlayerDelete",
-  "PlayerGet",
-  "PlayerList",
-  "PlayerUpdate",
-  "PlayGet",
-  "PlayList",
-  "PlayUpdate",
-  "PracticeAddItem",
-  "PracticeCreate",
-  "PracticeCreateReview",
-  "PracticeDelete",
-  "PracticeGet",
-  "PracticeGetReview",
-  "PracticeList",
-  "PracticeListEdges",
-  "PracticeListItems",
-  "PracticeLoadAggregate",
-  "PracticeRemoveItem",
-  "PracticeReorderItems",
-  "PracticeReplaceEdges",
-  "PracticeSaveAggregate",
-  "PracticeUpdate",
-  "PracticeUpdateItem",
-  "PracticeUpdateReview",
-] as const;
+// API RPC names are sourced from the operation catalog so the CLI coverage
+// test checks generated RPC definitions against the same catalog used by API
+// adapters.
+export const CLI_RPC_COVERAGE = ApiRpcNames;

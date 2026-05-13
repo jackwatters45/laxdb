@@ -1,30 +1,11 @@
-import { DrillContract } from "@laxdb/core/drill/drill.contract";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 
+import { DrillOperations } from "./drill.operations";
+
 export class DrillRpcs extends RpcGroup.make(
-  Rpc.make("DrillList", {
-    success: DrillContract.list.success,
-    error: DrillContract.list.error,
-    payload: DrillContract.list.payload,
-  }),
-  Rpc.make("DrillGet", {
-    success: DrillContract.get.success,
-    error: DrillContract.get.error,
-    payload: DrillContract.get.payload,
-  }),
-  Rpc.make("DrillCreate", {
-    success: DrillContract.create.success,
-    error: DrillContract.create.error,
-    payload: DrillContract.create.payload,
-  }),
-  Rpc.make("DrillUpdate", {
-    success: DrillContract.update.success,
-    error: DrillContract.update.error,
-    payload: DrillContract.update.payload,
-  }),
-  Rpc.make("DrillDelete", {
-    success: DrillContract.delete.success,
-    error: DrillContract.delete.error,
-    payload: DrillContract.delete.payload,
-  }),
+  Rpc.make(DrillOperations.list.rpcName, DrillOperations.list.contract),
+  Rpc.make(DrillOperations.get.rpcName, DrillOperations.get.contract),
+  Rpc.make(DrillOperations.create.rpcName, DrillOperations.create.contract),
+  Rpc.make(DrillOperations.update.rpcName, DrillOperations.update.contract),
+  Rpc.make(DrillOperations.delete.rpcName, DrillOperations.delete.contract),
 ) {}

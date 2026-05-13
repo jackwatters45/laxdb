@@ -3,6 +3,7 @@ import { Effect, Layer } from "effect";
 
 import { withRpcLogging } from "../rpc-logging";
 
+import { PlayOperations } from "./play.operations";
 import { PlayRpcs } from "./play.rpc";
 
 export const PlayRpcHandlers = PlayRpcs.toLayer(
@@ -10,11 +11,11 @@ export const PlayRpcHandlers = PlayRpcs.toLayer(
     const service = yield* PlayService;
 
     return withRpcLogging({
-      PlayList: service.list,
-      PlayGet: service.get,
-      PlayCreate: service.create,
-      PlayUpdate: service.update,
-      PlayDelete: service.delete,
+      [PlayOperations.list.rpcName]: service.list,
+      [PlayOperations.get.rpcName]: service.get,
+      [PlayOperations.create.rpcName]: service.create,
+      [PlayOperations.update.rpcName]: service.update,
+      [PlayOperations.delete.rpcName]: service.delete,
     });
   }),
 ).pipe(Layer.provide(PlayService.layer));

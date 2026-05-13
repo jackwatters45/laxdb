@@ -1,164 +1,196 @@
-import {
-  ConstraintViolationError,
-  DatabaseError,
-  NotFoundError,
-  ValidationError,
-} from "@laxdb/core/error";
-import { PracticeContract } from "@laxdb/core/practice/practice.contract";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
-const errors = [
-  NotFoundError,
-  ValidationError,
-  DatabaseError,
-  ConstraintViolationError,
-] as const;
+import { PracticeHttpErrors, PracticeOperations } from "./practice.operations";
 
 export const PracticesGroup = HttpApiGroup.make("Practices")
   // Practice CRUD
   .add(
-    HttpApiEndpoint.post("listPractices", "/api/practices", {
-      success: PracticeContract.list.success,
-      error: errors,
-    }),
-  )
-  .add(
-    HttpApiEndpoint.post("getPractice", "/api/practices/get", {
-      success: PracticeContract.get.success,
-      error: errors,
-      payload: PracticeContract.get.payload,
-    }),
-  )
-  .add(
     HttpApiEndpoint.post(
-      "loadPracticeAggregate",
-      "/api/practices/aggregate/load",
+      PracticeOperations.list.httpName,
+      PracticeOperations.list.path,
       {
-        success: PracticeContract.loadAggregate.success,
-        error: errors,
-        payload: PracticeContract.loadAggregate.payload,
+        success: PracticeOperations.list.contract.success,
+        error: PracticeHttpErrors,
       },
     ),
   )
   .add(
     HttpApiEndpoint.post(
-      "savePracticeAggregate",
-      "/api/practices/aggregate/save",
+      PracticeOperations.get.httpName,
+      PracticeOperations.get.path,
       {
-        success: PracticeContract.saveAggregate.success,
-        error: errors,
-        payload: PracticeContract.saveAggregate.payload,
+        success: PracticeOperations.get.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.get.contract.payload,
       },
     ),
   )
   .add(
-    HttpApiEndpoint.post("createPractice", "/api/practices/create", {
-      success: PracticeContract.create.success,
-      error: errors,
-      payload: PracticeContract.create.payload,
-    }),
+    HttpApiEndpoint.post(
+      PracticeOperations.loadAggregate.httpName,
+      PracticeOperations.loadAggregate.path,
+      {
+        success: PracticeOperations.loadAggregate.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.loadAggregate.contract.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("updatePractice", "/api/practices/update", {
-      success: PracticeContract.update.success,
-      error: errors,
-      payload: PracticeContract.update.payload,
-    }),
+    HttpApiEndpoint.post(
+      PracticeOperations.saveAggregate.httpName,
+      PracticeOperations.saveAggregate.path,
+      {
+        success: PracticeOperations.saveAggregate.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.saveAggregate.contract.payload,
+      },
+    ),
   )
   .add(
-    HttpApiEndpoint.post("deletePractice", "/api/practices/delete", {
-      success: PracticeContract.delete.success,
-      error: errors,
-      payload: PracticeContract.delete.payload,
-    }),
+    HttpApiEndpoint.post(
+      PracticeOperations.create.httpName,
+      PracticeOperations.create.path,
+      {
+        success: PracticeOperations.create.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.create.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.update.httpName,
+      PracticeOperations.update.path,
+      {
+        success: PracticeOperations.update.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.update.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.delete.httpName,
+      PracticeOperations.delete.path,
+      {
+        success: PracticeOperations.delete.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.delete.contract.payload,
+      },
+    ),
   )
 
   // Practice items
   .add(
-    HttpApiEndpoint.post("listPracticeItems", "/api/practices/items", {
-      success: PracticeContract.listItems.success,
-      error: errors,
-      payload: PracticeContract.listItems.payload,
-    }),
-  )
-  .add(
-    HttpApiEndpoint.post("addPracticeItem", "/api/practices/items/add", {
-      success: PracticeContract.addItem.success,
-      error: errors,
-      payload: PracticeContract.addItem.payload,
-    }),
-  )
-  .add(
-    HttpApiEndpoint.post("updatePracticeItem", "/api/practices/items/update", {
-      success: PracticeContract.updateItem.success,
-      error: errors,
-      payload: PracticeContract.updateItem.payload,
-    }),
-  )
-  .add(
-    HttpApiEndpoint.post("removePracticeItem", "/api/practices/items/remove", {
-      success: PracticeContract.removeItem.success,
-      error: errors,
-      payload: PracticeContract.removeItem.payload,
-    }),
-  )
-  .add(
     HttpApiEndpoint.post(
-      "reorderPracticeItems",
-      "/api/practices/items/reorder",
+      PracticeOperations.listItems.httpName,
+      PracticeOperations.listItems.path,
       {
-        success: PracticeContract.reorderItems.success,
-        error: errors,
-        payload: PracticeContract.reorderItems.payload,
+        success: PracticeOperations.listItems.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.listItems.contract.payload,
       },
     ),
   )
   .add(
-    HttpApiEndpoint.post("listPracticeEdges", "/api/practices/edges", {
-      success: PracticeContract.listEdges.success,
-      error: errors,
-      payload: PracticeContract.listEdges.payload,
-    }),
+    HttpApiEndpoint.post(
+      PracticeOperations.addItem.httpName,
+      PracticeOperations.addItem.path,
+      {
+        success: PracticeOperations.addItem.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.addItem.contract.payload,
+      },
+    ),
   )
   .add(
     HttpApiEndpoint.post(
-      "replacePracticeEdges",
-      "/api/practices/edges/replace",
+      PracticeOperations.updateItem.httpName,
+      PracticeOperations.updateItem.path,
       {
-        success: PracticeContract.replaceEdges.success,
-        error: errors,
-        payload: PracticeContract.replaceEdges.payload,
+        success: PracticeOperations.updateItem.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.updateItem.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.removeItem.httpName,
+      PracticeOperations.removeItem.path,
+      {
+        success: PracticeOperations.removeItem.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.removeItem.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.reorderItems.httpName,
+      PracticeOperations.reorderItems.path,
+      {
+        success: PracticeOperations.reorderItems.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.reorderItems.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.listEdges.httpName,
+      PracticeOperations.listEdges.path,
+      {
+        success: PracticeOperations.listEdges.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.listEdges.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.replaceEdges.httpName,
+      PracticeOperations.replaceEdges.path,
+      {
+        success: PracticeOperations.replaceEdges.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.replaceEdges.contract.payload,
       },
     ),
   )
 
   // Practice review
   .add(
-    HttpApiEndpoint.post("getPracticeReview", "/api/practices/review/get", {
-      success: PracticeContract.getReview.success,
-      error: errors,
-      payload: PracticeContract.getReview.payload,
-    }),
-  )
-  .add(
     HttpApiEndpoint.post(
-      "createPracticeReview",
-      "/api/practices/review/create",
+      PracticeOperations.getReview.httpName,
+      PracticeOperations.getReview.path,
       {
-        success: PracticeContract.createReview.success,
-        error: errors,
-        payload: PracticeContract.createReview.payload,
+        success: PracticeOperations.getReview.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.getReview.contract.payload,
       },
     ),
   )
   .add(
     HttpApiEndpoint.post(
-      "updatePracticeReview",
-      "/api/practices/review/update",
+      PracticeOperations.createReview.httpName,
+      PracticeOperations.createReview.path,
       {
-        success: PracticeContract.updateReview.success,
-        error: errors,
-        payload: PracticeContract.updateReview.payload,
+        success: PracticeOperations.createReview.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.createReview.contract.payload,
+      },
+    ),
+  )
+  .add(
+    HttpApiEndpoint.post(
+      PracticeOperations.updateReview.httpName,
+      PracticeOperations.updateReview.path,
+      {
+        success: PracticeOperations.updateReview.contract.success,
+        error: PracticeHttpErrors,
+        payload: PracticeOperations.updateReview.contract.payload,
       },
     ),
   );

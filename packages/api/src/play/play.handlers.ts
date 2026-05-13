@@ -4,6 +4,8 @@ import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApiV2 } from "../definition";
 
+import { PlayOperations } from "./play.operations";
+
 export const PlaysHandlersLive = HttpApiBuilder.group(
   LaxdbApiV2,
   "Plays",
@@ -12,10 +14,18 @@ export const PlaysHandlersLive = HttpApiBuilder.group(
       const service = yield* PlayService;
 
       return handlers
-        .handle("listPlays", () => service.list())
-        .handle("getPlay", ({ payload }) => service.get(payload))
-        .handle("createPlay", ({ payload }) => service.create(payload))
-        .handle("updatePlay", ({ payload }) => service.update(payload))
-        .handle("deletePlay", ({ payload }) => service.delete(payload));
+        .handle(PlayOperations.list.httpName, () => service.list())
+        .handle(PlayOperations.get.httpName, ({ payload }) =>
+          service.get(payload),
+        )
+        .handle(PlayOperations.create.httpName, ({ payload }) =>
+          service.create(payload),
+        )
+        .handle(PlayOperations.update.httpName, ({ payload }) =>
+          service.update(payload),
+        )
+        .handle(PlayOperations.delete.httpName, ({ payload }) =>
+          service.delete(payload),
+        );
     }),
 ).pipe(Layer.provide(PlayService.layer));

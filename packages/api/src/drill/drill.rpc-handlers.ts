@@ -3,6 +3,7 @@ import { Effect, Layer } from "effect";
 
 import { withRpcLogging } from "../rpc-logging";
 
+import { DrillOperations } from "./drill.operations";
 import { DrillRpcs } from "./drill.rpc";
 
 export const DrillRpcHandlers = DrillRpcs.toLayer(
@@ -10,11 +11,11 @@ export const DrillRpcHandlers = DrillRpcs.toLayer(
     const service = yield* DrillService;
 
     return withRpcLogging({
-      DrillList: service.list,
-      DrillGet: service.get,
-      DrillCreate: service.create,
-      DrillUpdate: service.update,
-      DrillDelete: service.delete,
+      [DrillOperations.list.rpcName]: service.list,
+      [DrillOperations.get.rpcName]: service.get,
+      [DrillOperations.create.rpcName]: service.create,
+      [DrillOperations.update.rpcName]: service.update,
+      [DrillOperations.delete.rpcName]: service.delete,
     });
   }),
 ).pipe(Layer.provide(DrillService.layer));
