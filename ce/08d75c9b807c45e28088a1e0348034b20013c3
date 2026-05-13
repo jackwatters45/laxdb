@@ -1,0 +1,76 @@
+packages/api/src/drill/drill.rpc-handlers.ts
+  s_dc4c81e4235a87::t_c3daa97538faf2 6,14-18
+packages/api/src/defaults/defaults.rpc-handlers.ts
+  s_dc4c81e4235a87::t_91433e4020df3e 6,14-15
+packages/api/src/play/play.rpc-handlers.ts
+  s_dc4c81e4235a87::t_0fec2b6557040b 6,14-18
+packages/api/src/test/operation-catalog.test.ts
+  s_dc4c81e4235a87::t_903becfbbe199a 1-20
+packages/api/src/practice/practice.operations.ts
+  s_dc4c81e4235a87::t_28464ffc41cbe5 1-123
+packages/api/src/defaults/defaults.operations.ts
+  s_dc4c81e4235a87::t_527c47b57eda24 1-16
+packages/api/src/drill/drill.operations.ts
+  s_dc4c81e4235a87::t_82c522b96b48e1 1-51
+packages/api/src/play/play.api.ts
+  s_dc4c81e4235a87::t_ec43a51dc9b8a8 7-14
+  s_dc4c81e4235a87::t_859cf64099ef5e 3-4,17-20,24-32,35-43,46-54
+packages/api/src/player/player.operations.ts
+  s_dc4c81e4235a87::t_677896496610cc 1-51
+packages/api/src/player/player.handlers.ts
+  s_dc4c81e4235a87::t_d53fb55629e488 7-8,17-29
+packages/api/src/play/play.rpc.ts
+  s_dc4c81e4235a87::t_8d9a6c36f4930c 3-4,6-10
+packages/api/src/practice/practice.rpc-handlers.ts
+  s_dc4c81e4235a87::t_7807f115b72515 6,14-30
+packages/cli/src/coverage.ts
+  s_dc4c81e4235a87::t_2f00554992873c 1-2,11-14
+packages/api/src/practice/practice.api.ts
+  s_dc4c81e4235a87::t_4e9655403b1219 3,8-15,18-26,30-31,33-35,41-42,44-46,51-59,62-70,73-81,86-94,97-105,108-116,119-127,131-132,134-136,141-149,153-154,156-158,165-173,177-178,180-182,188-189,191-193
+packages/cli/src/test/coverage.test.ts
+  s_dc4c81e4235a87::t_049b6a96566903 4,59-60
+packages/api/src/play/play.operations.ts
+  ai_agent 1-51
+packages/api/src/operation-catalog.ts
+  s_dc4c81e4235a87::t_077283380ad16d 1-13
+packages/api/src/drill/drill.handlers.ts
+  s_dc4c81e4235a87::t_70c6cfaeb3fbf3 7-8,17,21-29
+  s_dc4c81e4235a87::t_ec43a51dc9b8a8 18-20
+packages/api/src/play/play.handlers.ts
+  s_dc4c81e4235a87::t_ec43a51dc9b8a8 18-20
+  s_dc4c81e4235a87::t_248741cb76b022 7-8,17,21-29
+packages/api/src/drill/drill.api.ts
+  s_dc4c81e4235a87::t_1b5074974ded25 3-4,28-36,39-47,50-58
+  s_dc4c81e4235a87::t_ec43a51dc9b8a8 7-14,17-25
+packages/api/src/player/player.rpc.ts
+  s_dc4c81e4235a87::t_8412b32d5a0b85 3-4,6-10
+packages/api/src/drill/drill.rpc.ts
+  s_dc4c81e4235a87::t_cf4ef3e1c0dbe4 3-4,6-10
+packages/api/src/practice/practice.rpc.ts
+  s_dc4c81e4235a87::t_f99515af2f3715 3,5-67
+packages/api/src/player/player.rpc-handlers.ts
+  s_dc4c81e4235a87::t_a9b1739defeb3b 6,14-18
+packages/api/src/player/player.api.ts
+  s_dc4c81e4235a87::t_fa253160dea9ba 3-4,7-14,28-36,39-47,50-58
+  s_dc4c81e4235a87::t_ec43a51dc9b8a8 17-25
+packages/api/src/defaults/defaults.rpc.ts
+  s_dc4c81e4235a87::t_2e92861b77d8be 3-4,6-13
+packages/api/src/practice/practice.handlers.ts
+  ai_agent 7-8,17-21,24,27-36,39-42,45,48,51,54,57,60,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ce08d75c9b807c45e28088a1e0348034b20013c3",
+  "prompts": {},
+  "sessions": {
+    "s_dc4c81e4235a87": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e212f-3ed2-765f-b4c6-4c9415499f7b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
