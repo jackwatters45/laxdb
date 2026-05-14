@@ -1,53 +1,42 @@
-import {
-  ConstraintViolationError,
-  DatabaseError,
-  NotFoundError,
-  ValidationError,
-} from "@laxdb/core/error";
 import { PracticeContract } from "@laxdb/core/practice/practice.contract";
 import { Schema } from "effect";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
-const errors = [
-  NotFoundError,
-  ValidationError,
-  DatabaseError,
-  ConstraintViolationError,
-] as const;
+import { DomainErrors } from "../errors";
 
 export const PracticesGroup = HttpApiGroup.make("Practices")
   // Practice CRUD
   .add(
     HttpApiEndpoint.post("listPractices", "/api/practices", {
       success: PracticeContract.list.success,
-      error: errors,
+      error: DomainErrors,
     }),
   )
   .add(
     HttpApiEndpoint.post("getPractice", "/api/practices/get", {
       success: PracticeContract.get.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.get.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("createPractice", "/api/practices/create", {
       success: PracticeContract.create.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.create.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("updatePractice", "/api/practices/update", {
       success: PracticeContract.update.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.update.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("deletePractice", "/api/practices/delete", {
       success: PracticeContract.delete.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.delete.payload),
     }),
   )
@@ -56,28 +45,28 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
   .add(
     HttpApiEndpoint.post("listPracticeItems", "/api/practices/items", {
       success: PracticeContract.listItems.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.listItems.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("addPracticeItem", "/api/practices/items/add", {
       success: PracticeContract.addItem.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.addItem.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("updatePracticeItem", "/api/practices/items/update", {
       success: PracticeContract.updateItem.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.updateItem.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("removePracticeItem", "/api/practices/items/remove", {
       success: PracticeContract.removeItem.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.removeItem.payload),
     }),
   )
@@ -87,7 +76,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       "/api/practices/items/reorder",
       {
         success: PracticeContract.reorderItems.success,
-        error: errors,
+        error: DomainErrors,
         payload: Schema.toEncoded(PracticeContract.reorderItems.payload),
       },
     ),
@@ -95,7 +84,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
   .add(
     HttpApiEndpoint.post("listPracticeEdges", "/api/practices/edges", {
       success: PracticeContract.listEdges.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.listEdges.payload),
     }),
   )
@@ -105,7 +94,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       "/api/practices/edges/replace",
       {
         success: PracticeContract.replaceEdges.success,
-        error: errors,
+        error: DomainErrors,
         payload: Schema.toEncoded(PracticeContract.replaceEdges.payload),
       },
     ),
@@ -115,7 +104,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
   .add(
     HttpApiEndpoint.post("getPracticeReview", "/api/practices/review/get", {
       success: PracticeContract.getReview.success,
-      error: errors,
+      error: DomainErrors,
       payload: Schema.toEncoded(PracticeContract.getReview.payload),
     }),
   )
@@ -125,7 +114,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       "/api/practices/review/create",
       {
         success: PracticeContract.createReview.success,
-        error: errors,
+        error: DomainErrors,
         payload: Schema.toEncoded(PracticeContract.createReview.payload),
       },
     ),
@@ -136,7 +125,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       "/api/practices/review/update",
       {
         success: PracticeContract.updateReview.success,
-        error: errors,
+        error: DomainErrors,
         payload: Schema.toEncoded(PracticeContract.updateReview.payload),
       },
     ),
