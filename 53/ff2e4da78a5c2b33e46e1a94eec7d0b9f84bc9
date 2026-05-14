@@ -1,0 +1,67 @@
+packages/marketing/package.json
+  s_4cd700457fcb19::t_e0842dcf44ac3e 14-15
+packages/fines/src/routes/_app.fines.tsx
+  s_4cd700457fcb19::t_9fc470a50c86d1 36
+packages/fines/src/lib/session.ts
+  s_4cd700457fcb19::t_ca974f61738a5a 14
+packages/fines/src/core/fine/fine.service.ts
+  s_4cd700457fcb19::t_abcb1e66cbc372 131-235
+  s_4cd700457fcb19::t_d5ff52ef1f3fa8 302-328
+  s_4cd700457fcb19::t_1c03ecac9312c6 86-92
+packages/fines/src/core/auth/auth.ts
+  s_4cd700457fcb19::t_ca305b8e50656d 74
+packages/fines/src/core/auth/resolveMe.ts
+  s_4cd700457fcb19::t_da52c701bc6271 1-24
+packages/fines/src/routes/_app.admin.tsx
+  s_4cd700457fcb19::t_62b84394038b32 31-217
+packages/fines/src/core/db.ts
+  s_39b3a64600c19a::t_1b9ee8ddfd4559 5
+packages/fines/src/routes/login.tsx
+  s_4cd700457fcb19::t_a2d03a9dc414a6 17-30
+packages/fines/src/routes/onboarding.tsx
+  s_4cd700457fcb19::t_03aed159df283a 17-94
+packages/fines/src/server.ts
+  s_39b3a64600c19a::t_aca2e61b3ac887 6-19,21-26
+  s_4cd700457fcb19::t_187965510dd2dc 20,28
+packages/fines/package.json
+  s_39b3a64600c19a::t_97b4d8322913cd 10-38
+packages/fines/src/lib/auth.server.ts
+  s_4cd700457fcb19::t_60fb24058a67f0 37
+  s_4cd700457fcb19::t_b49836b1072392 13-36,38
+packages/fines/src/api/index.ts
+  s_4cd700457fcb19::t_f41c1e306d8926 36-273
+packages/fines/src/lib/api.ts
+  s_4cd700457fcb19::t_dab8b96709866c 2-24
+README.md
+  s_39b3a64600c19a::t_8bc9d32cb1f6fd 21
+packages/fines/src/routes/_app.audit.tsx
+  s_4cd700457fcb19::t_33c782066f3d28 32
+packages/fines/tsconfig.json
+  s_4cd700457fcb19::t_4b7851bad0e29d 8
+packages/fines/drizzle.config.ts
+  s_4cd700457fcb19::t_175aee49efc5af 3-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "53ff2e4da78a5c2b33e46e1a94eec7d0b9f84bc9",
+  "prompts": {},
+  "sessions": {
+    "s_39b3a64600c19a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2589-b8bf-758c-9d59-628f01490320",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_4cd700457fcb19": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2673-de81-7649-af07-264122723ede",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
