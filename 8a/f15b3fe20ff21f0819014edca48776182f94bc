@@ -1,0 +1,22 @@
+packages/marketing/package.json
+  s_3c447743d87c53::t_5912b7b51cec06 10
+packages/marketing/vite.config.ts
+  s_3c447743d87c53::t_9e105024eaf405 21-25,78-83
+  s_3c447743d87c53::t_70a9054aed9216 1-3,11-20,26-61,63-77,84-87,99-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "8af15b3fe20ff21f0819014edca48776182f94bc",
+  "prompts": {},
+  "sessions": {
+    "s_3c447743d87c53": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2557-0aa6-7622-a513-f26338a27f95",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
