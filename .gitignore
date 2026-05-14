@@ -10,6 +10,10 @@ node_modules
 # content collections
 .content-collections
 
+# local marketing vault settings
+packages/marketing/src/content/**/.*
+packages/marketing/src/content/Templates
+
 # fumadocs
 .source
 
