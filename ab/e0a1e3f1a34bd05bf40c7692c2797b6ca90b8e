@@ -1,0 +1,23 @@
+packages/marketing/package.json
+  s_31d685aba3cc5d::t_99c09e0ca7753a 8-10
+packages/marketing/src/lib/marketing-prerender.ts
+  s_31d685aba3cc5d::t_bb976e8f7a3410 20
+packages/marketing/src/content/lacrosse-basics.md
+  s_31d685aba3cc5d::t_f1d8f730440990 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "abe0a1e3f1a34bd05bf40c7692c2797b6ca90b8e",
+  "prompts": {},
+  "sessions": {
+    "s_31d685aba3cc5d": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2551-dee4-7658-b8b6-64ce778e6b0c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
