@@ -55,8 +55,8 @@ export const storage = Cloudflare.R2Bucket("storage");
 export default Alchemy.Stack(
   config.stack,
   {
-    providers: GitHub.providers().pipe(
-      Layer.provideMerge(Cloudflare.providers()),
+    providers: Cloudflare.providers().pipe(
+      Layer.provideMerge(GitHub.providers()),
     ),
     state: Cloudflare.state(),
   },
@@ -71,8 +71,10 @@ export default Alchemy.Stack(
         Effect.flatMap((result) =>
           result.status === 0
             ? Effect.void
-            : Effect.dieMessage(
-                `Drizzle migration generation failed with exit code ${result.status ?? "unknown"}`,
+            : Effect.die(
+                new Error(
+                  `Drizzle migration generation failed with exit code ${result.status ?? "unknown"}`,
+                ),
               ),
         ),
       );

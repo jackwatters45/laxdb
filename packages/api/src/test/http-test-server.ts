@@ -35,16 +35,33 @@ function createHeaders(req: IncomingMessage) {
   return headers;
 }
 
-function readRequestBody(req: IncomingMessage): Promise<Buffer | null> {
+function readRequestBody(
+  req: IncomingMessage,
+): Promise<Uint8Array<ArrayBuffer> | null> {
   if (req.method === "GET" || req.method === "HEAD") {
     return Promise.resolve(null);
   }
 
-  return new Promise<Buffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    req.on("data", (chunk: Buffer) => chunks.push(chunk));
+  return new Promise<Uint8Array<ArrayBuffer>>((resolve, reject) => {
+    const chunks: Uint8Array<ArrayBuffer>[] = [];
+
+    req.on("data", (chunk: Buffer) => {
+      chunks.push(new Uint8Array(chunk));
+    });
     req.on("end", () => {
-      resolve(Buffer.concat(chunks));
+      const length = chunks.reduce(
+        (total, chunk) => total + chunk.byteLength,
+        0,
+      );
+      const body = new Uint8Array(length);
+      let offset = 0;
+
+      for (const chunk of chunks) {
+        body.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+
+      resolve(body);
     });
     req.on("error", reject);
   });
@@ -57,7 +74,7 @@ export async function startNodeHttpTestServer(
 
   const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     const request = new Request(`http://localhost${req.url ?? "/"}`, {
-      method: req.method,
+      method: req.method ?? "GET",
       headers: createHeaders(req),
       body: await readRequestBody(req),
     });
