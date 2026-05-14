@@ -10,7 +10,7 @@ import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 
 import { LaxdbApi } from "../definition";
-import { HttpGroupsLive } from "../groups";
+import { HttpGroupsLive } from "../layers";
 
 import { startNodeHttpTestServer, type TestServer } from "./http-test-server";
 

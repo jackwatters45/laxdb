@@ -1,10 +1,10 @@
 import { PlayerService } from "@laxdb/core/player/player.service";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApi } from "../definition";
 
-export const PlayersHandlersLive = HttpApiBuilder.group(
+export const PlayersHandlers = HttpApiBuilder.group(
   LaxdbApi,
   "Players",
   (handlers) =>
@@ -18,4 +18,4 @@ export const PlayersHandlersLive = HttpApiBuilder.group(
         .handle("updatePlayer", ({ payload }) => service.update(payload))
         .handle("deletePlayer", ({ payload }) => service.delete(payload));
     }),
-).pipe(Layer.provide(PlayerService.layer));
+);

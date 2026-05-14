@@ -1,10 +1,10 @@
 import { PracticeService } from "@laxdb/core/practice/practice.service";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { LaxdbApi } from "../definition";
 
-export const PracticesHandlersLive = HttpApiBuilder.group(
+export const PracticesHandlers = HttpApiBuilder.group(
   LaxdbApi,
   "Practices",
   (handlers) =>
@@ -46,4 +46,4 @@ export const PracticesHandlersLive = HttpApiBuilder.group(
           service.updateReview(payload),
         );
     }),
-).pipe(Layer.provide(PracticeService.layer));
+);

@@ -25,7 +25,7 @@ type ApiServiceBinding = {
 };
 
 type CloudflareWorkersModule = {
-  env: Omit<Env, "API"> & { readonly API?: ApiServiceBinding };
+  env: { readonly API?: ApiServiceBinding };
 };
 
 const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>

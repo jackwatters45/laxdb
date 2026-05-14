@@ -7,7 +7,7 @@
  */
 
 import { LaxdbApi } from "@laxdb/api/definition";
-import { HttpGroupsLive } from "@laxdb/api/groups/index";
+import { HttpGroupsLive } from "@laxdb/api/layers";
 import {
   startNodeHttpTestServer,
   type TestServer,
