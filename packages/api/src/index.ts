@@ -9,13 +9,13 @@ import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 
 import type { ApiWorkerEnv } from "../../../alchemy.run";
 
-import { LaxdbApiV2 } from "./definition";
+import { LaxdbApi } from "./definition";
 import { HttpGroupsLive } from "./groups";
 import { emptyRequestContext } from "./request-context";
 
-const DocsRoute = HttpApiScalar.layer(LaxdbApiV2);
+const DocsRoute = HttpApiScalar.layer(LaxdbApi);
 
-const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
+const HttpApiRouter = HttpApiBuilder.layer(LaxdbApi).pipe(
   Layer.provide(HttpGroupsLive),
   Layer.provide(HttpServer.layerServices),
 );

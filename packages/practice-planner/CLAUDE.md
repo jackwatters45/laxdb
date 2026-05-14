@@ -59,7 +59,7 @@ All API calls go through `runApi()` in `lib/api.ts`, which must only be called i
 
 ## HTTP API Client
 
-Uses a generated `ApiClient` from `@laxdb/api/client`, derived from `LaxdbApiV2`. The client mirrors API groups (`client.Drills`, `client.Practices`, `client.Defaults`, etc.) and endpoint names.
+Uses a generated `ApiClient` from `@laxdb/api/client`, derived from `LaxdbApi`. The client mirrors API groups (`client.Drills`, `client.Practices`, `client.Defaults`, etc.) and endpoint names.
 
 ## Composability
 

@@ -9,19 +9,19 @@ import { DateTime, Effect, Layer } from "effect";
 import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 
-import { LaxdbApiV2 } from "../definition";
+import { LaxdbApi } from "../definition";
 import { HttpGroupsLive } from "../groups";
 
 import { startNodeHttpTestServer, type TestServer } from "./http-test-server";
 
 const TestHttpHandlers = HttpGroupsLive.pipe(Layer.provide(TestDatabaseLive));
 
-const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
+const HttpApiRouter = HttpApiBuilder.layer(LaxdbApi).pipe(
   Layer.provide(TestHttpHandlers),
   Layer.provide(HttpServer.layerServices),
 );
 
-const DocsRoute = HttpApiScalar.layer(LaxdbApiV2);
+const DocsRoute = HttpApiScalar.layer(LaxdbApi);
 
 const AllRoutes = Layer.mergeAll(HttpApiRouter, DocsRoute).pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
