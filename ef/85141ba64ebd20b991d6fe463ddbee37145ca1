@@ -1,0 +1,78 @@
+packages/docs/CLAUDE.md
+  s_e5834b4d00442b::t_7d59e4cf711b4a 7-8
+packages/marketing/src/routes/wiki/index.tsx
+  s_e5834b4d00442b::t_1c2daa0a75d51f 11,21
+packages/marketing/CLAUDE.md
+  s_31d685aba3cc5d::t_3f91be092be47c 44
+  ai_agent 55-57,59
+  s_31d685aba3cc5d::t_33eb27b3144a0c 9,11-13,24,36-43,58
+packages/marketing/package.json
+  s_31d685aba3cc5d::t_abb104be1dcf41 8-10
+  s_3c447743d87c53::t_16e4cfe85f621d 11
+.oxlintrc.json
+  s_31d685aba3cc5d::t_5077e1e96c7db9 39
+packages/marketing/.oxfmtrc.json
+  s_31d685aba3cc5d::t_b5c2378718621f 2-9
+.oxfmtrc.json
+  s_31d685aba3cc5d::t_339b77b8acfa6d 24
+packages/marketing/vite.config.ts
+  s_3c447743d87c53::t_097bc39a248a73 1-3,11-19,25-56,58-72,79-81,95,99
+  s_3c447743d87c53::t_99ce2769bc5288 94,96-98,100-102
+  s_3c447743d87c53::t_70ce164a50b806 20-24,57,73-78,82
+packages/marketing/scripts/sync-content-assets.ts
+  s_31d685aba3cc5d::t_4d5d5292d94772 14
+  s_31d685aba3cc5d::t_a8ffe0d5373183 1-13,15-60
+packages/marketing/src/content/lacrosse-basics.md
+  s_31d685aba3cc5d::t_ba35b31a6ca913 66
+packages/ui/src/globals.css
+  s_17bf0c4ecd1bf8::t_bdf367bfcb47c3 331-342
+packages/marketing/src/lib/graph-utils.ts
+  s_e5834b4d00442b::t_eccfc4d7c5bf90 142
+packages/marketing/tsconfig.json
+  s_31d685aba3cc5d::t_2be86f871d70a0 9
+packages/marketing/content-collections.ts
+  s_31d685aba3cc5d::t_38991e2f68de32 11-13,16-56,58,61,63-64,66-70,72,76-98,102-126,128-135,139-140,152,155,157,163,166-169,177,186,196-200
+  s_31d685aba3cc5d::t_6a5ee5c887fd35 2,14-15,127
+.gitignore
+  s_31d685aba3cc5d::t_e31bba89fe9f87 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ef85141ba64ebd20b991d6fe463ddbee37145ca1",
+  "prompts": {},
+  "sessions": {
+    "s_17bf0c4ecd1bf8": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2539-ce12-76fc-88ac-1aaaf8123dc5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_31d685aba3cc5d": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2551-dee4-7658-b8b6-64ce778e6b0c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_3c447743d87c53": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2557-0aa6-7622-a513-f26338a27f95",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_e5834b4d00442b": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2536-31d8-74cf-8d28-91afbb913673",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
