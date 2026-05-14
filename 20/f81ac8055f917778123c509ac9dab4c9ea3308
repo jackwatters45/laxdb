@@ -1,0 +1,21 @@
+alchemy.run.ts
+  s_24c7eaa0bdcfb7::t_edbad3c6a45eff 58-59,74-77
+packages/api/src/test/http-test-server.ts
+  s_24c7eaa0bdcfb7::t_edbad3c6a45eff 38-40,45-50,52-64,77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "20f81ac8055f917778123c509ac9dab4c9ea3308",
+  "prompts": {},
+  "sessions": {
+    "s_24c7eaa0bdcfb7": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e250b-80aa-76cc-a816-d76089cd7b87",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
