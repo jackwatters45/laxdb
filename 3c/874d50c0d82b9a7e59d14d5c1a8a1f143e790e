@@ -1,0 +1,19 @@
+packages/marketing/content-collections.ts
+  s_1b5b28e6a99212::t_dc869016efb7e6 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "3c874d50c0d82b9a7e59d14d5c1a8a1f143e790e",
+  "prompts": {},
+  "sessions": {
+    "s_1b5b28e6a99212": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2662-91c4-710d-a906-249539135503",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
