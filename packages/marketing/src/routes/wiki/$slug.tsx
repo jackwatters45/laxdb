@@ -23,6 +23,7 @@ function WikiPage() {
   const wikiPosts = getWikiPosts();
   const section = getWikiSection(post);
   const displayDate = post.updated ?? post.published;
+  const pagefindDescription = post.description ?? post.excerpt;
 
   return (
     <WikiLayout posts={wikiPosts} currentSlug={post.slug} tableOfContents={post.tableOfContents}>
@@ -48,7 +49,19 @@ function WikiPage() {
 
         <MobileWikiTableOfContents items={post.tableOfContents} />
 
-        <MDXContent code={post.mdx} className="prose-blog prose-wiki prose max-w-none" />
+        <div className="sr-only" data-pagefind-ignore="">
+          <span data-pagefind-filter="type:wiki" />
+          {post.tags?.map((tag) => (
+            <span key={tag} data-pagefind-filter={`tag:${tag}`} />
+          ))}
+          {pagefindDescription ? (
+            <span data-pagefind-meta="description">{pagefindDescription}</span>
+          ) : null}
+        </div>
+
+        <div data-pagefind-body="">
+          <MDXContent code={post.mdx} className="prose-blog prose-wiki prose max-w-none" />
+        </div>
 
         <footer className="mt-12 border-t border-border pt-6">
           <nav className="flex flex-wrap gap-4 text-sm">

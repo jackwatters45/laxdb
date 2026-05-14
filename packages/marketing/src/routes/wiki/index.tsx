@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { WikiLayout } from "@/components/wiki-layout";
+import { WikiSearch } from "@/components/wiki-search";
 import { getWikiPosts, groupWikiPostsBySection, WIKI_SECTIONS } from "@/lib/wiki";
 
 export const Route = createFileRoute("/wiki/")({
@@ -35,6 +36,8 @@ function WikiIndex() {
           </Link>
         </nav>
       </header>
+
+      <WikiSearch />
 
       {visibleSections.length === 0 ? (
         <p className="text-muted-foreground">No wiki content yet.</p>
