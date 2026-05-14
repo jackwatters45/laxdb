@@ -1,0 +1,49 @@
+packages/api/src/test/definition.contract.test.ts
+  s_416eb8e63f6edb::t_7c2f410d5ea039 1-76
+packages/pipeline/package.json
+  s_416eb8e63f6edb::t_a3f28047d4c293 9-12
+packages/api/src/test/server.ts
+  s_416eb8e63f6edb::t_a6bbe59630c548 9-13,30-34
+scripts/run-workspace-integration-tests.mjs
+  s_416eb8e63f6edb::t_a7fd8ff8744d0d 1-105
+packages/api/vitest.config.ts
+  s_416eb8e63f6edb::t_3f69027fb16f28 6,8
+packages/cli/vitest.integration.config.ts
+  s_416eb8e63f6edb::t_12a0bde8a454e9 1-12
+packages/pipeline/vitest.integration.config.ts
+  s_416eb8e63f6edb::t_2a9fb6604be361 1-9
+packages/cli/package.json
+  s_416eb8e63f6edb::t_8445b03aa0551a 8-9
+package.json
+  s_416eb8e63f6edb::t_3b3920e5f79d7b 15
+  s_416eb8e63f6edb::t_bdfe3259dbd6b0 14
+packages/api/src/test/health.http.test.ts
+  s_416eb8e63f6edb::t_a9bdd007482430 1-29
+packages/cli/vitest.config.ts
+  s_416eb8e63f6edb::t_6d560eda04d5d3 6,8
+packages/pipeline/vitest.config.ts
+  s_416eb8e63f6edb::t_aae05a1f35d81e 7
+  s_416eb8e63f6edb::t_801f35ea864ec9 8
+packages/api/vitest.integration.config.ts
+  s_416eb8e63f6edb::t_57c5b5a5a61904 1-12
+scripts/run-workspace-tests.mjs
+  s_416eb8e63f6edb::t_3bc94b88b5c83f 6
+.github/workflows/deploy.yml
+  s_416eb8e63f6edb::t_3275fe7fec2216 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "dd6a03e8118bfde45069a4626c8ae23bed424e54",
+  "prompts": {},
+  "sessions": {
+    "s_416eb8e63f6edb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e26cd-c074-7177-8dad-d9c796c949c6",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
