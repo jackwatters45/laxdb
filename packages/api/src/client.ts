@@ -1,17 +1,17 @@
 import { Context, Layer, type Effect } from "effect";
 import { HttpApiClient } from "effect/unstable/httpapi";
 
-import { LaxdbApiV2 } from "./definition";
+import { LaxdbApi } from "./definition";
 
 /**
  * Generated HTTP client for the LaxDB API.
  *
- * The shape is derived directly from `LaxdbApiV2`, so consumers call
+ * The shape is derived directly from `LaxdbApi`, so consumers call
  * `client.Drills.listDrills()` / `client.Practices.updatePractice(...)` and
  * get the same schema-checked request and response types as the server.
  */
 const makeGeneratedClient = (baseUrl: string) =>
-  HttpApiClient.make(LaxdbApiV2, { baseUrl });
+  HttpApiClient.make(LaxdbApi, { baseUrl });
 
 type GeneratedApiClient = Effect.Success<
   ReturnType<typeof makeGeneratedClient>

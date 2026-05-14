@@ -14,7 +14,7 @@ Effect-based API using `HttpApi` for schema-first server handlers and a generate
 
 ## CLIENT SHAPE
 
-`ApiClient` is generated from `LaxdbApiV2`. Calls are grouped by `HttpApiGroup` name:
+`ApiClient` is generated from `LaxdbApi`. Calls are grouped by `HttpApiGroup` name:
 
 ```ts
 const client = yield* ApiClient;
@@ -22,4 +22,4 @@ const drills = yield* client.Drills.listDrills();
 const drill = yield* client.Drills.getDrill({ payload: { publicId } });
 ```
 
-Do not hand-write fetch wrappers for API routes; derive from `HttpApiClient.make(LaxdbApiV2)` so request/response types stay tied to the server definition.
+Do not hand-write fetch wrappers for API routes; derive from `HttpApiClient.make(LaxdbApi)` so request/response types stay tied to the server definition.

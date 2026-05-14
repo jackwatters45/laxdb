@@ -6,7 +6,7 @@
  * level and it flows through handlers → services → repos.
  */
 
-import { LaxdbApiV2 } from "@laxdb/api/definition";
+import { LaxdbApi } from "@laxdb/api/definition";
 import { HttpGroupsLive } from "@laxdb/api/groups/index";
 import {
   startNodeHttpTestServer,
@@ -17,7 +17,7 @@ import { DateTime, Effect, Layer } from "effect";
 import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
+const HttpApiRouter = HttpApiBuilder.layer(LaxdbApi).pipe(
   Layer.provide(HttpGroupsLive.pipe(Layer.provide(TestDatabaseLive))),
   Layer.provide(HttpServer.layerServices),
 );

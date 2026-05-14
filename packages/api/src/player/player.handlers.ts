@@ -2,10 +2,10 @@ import { PlayerService } from "@laxdb/core/player/player.service";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { LaxdbApiV2 } from "../definition";
+import { LaxdbApi } from "../definition";
 
 export const PlayersHandlersLive = HttpApiBuilder.group(
-  LaxdbApiV2,
+  LaxdbApi,
   "Players",
   (handlers) =>
     Effect.gen(function* () {
