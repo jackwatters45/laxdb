@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WikiSearch } from "@/components/wiki-search";
 import { publishedPosts } from "@/lib/posts";
 
 import { getContentByTag, groupBySubjectTag } from "@/lib/graph-utils";
@@ -46,6 +47,8 @@ function WikiIndex() {
           </Link>
         </nav>
       </header>
+
+      <WikiSearch />
 
       {sortedGroups.length === 0 ? (
         <p className="text-muted-foreground">No wiki content yet.</p>
