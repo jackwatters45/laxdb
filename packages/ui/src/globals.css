@@ -205,8 +205,13 @@
   }
 
   html {
+    scroll-behavior: smooth;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
+  }
+
+  [id] {
+    scroll-margin-top: 5rem;
   }
 
   body {
