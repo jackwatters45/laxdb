@@ -1,0 +1,19 @@
+packages/pipeline/src/test-helpers.ts
+  s_416eb8e63f6edb::t_f2f04b8ef0b4ab 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "85b2416c40418cb147723daa503854804239e816",
+  "prompts": {},
+  "sessions": {
+    "s_416eb8e63f6edb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e26cd-c074-7177-8dad-d9c796c949c6",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
