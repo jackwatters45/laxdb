@@ -1,0 +1,31 @@
+packages/marketing/src/routes/content/$slug.tsx
+  ai_agent 27,53-64
+packages/marketing/src/routes/wiki/index.tsx
+  ai_agent 2,51
+packages/marketing/vite.config.ts
+  ai_agent 1,9-23,35-42,44-48
+packages/marketing/src/components/wiki-search.tsx
+  s_24c7eaa0bdcfb7::t_ce9af3f62b76f2 1-281
+packages/marketing/package.json
+  ai_agent 36
+bun.lock
+  ai_agent 122,838-851,2370
+packages/marketing/vite/pagefind.ts
+  s_24c7eaa0bdcfb7::t_ce9af3f62b76f2 1-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4278f1f7e01976f3512c31145d910cb5afe37f62",
+  "prompts": {},
+  "sessions": {
+    "s_24c7eaa0bdcfb7": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e250b-80aa-76cc-a816-d76089cd7b87",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
