@@ -4,6 +4,8 @@
 
 Fumadocs-powered documentation site. TanStack Start + MDX. Deployed to Cloudflare Workers.
 
+**Important scope note:** This package is for internal/project documentation only. Public lacrosse wiki content belongs in `packages/marketing/src/content` and is surfaced through the marketing site's `/wiki` routes.
+
 ## ADDING DOCS
 
 **Page structure:**

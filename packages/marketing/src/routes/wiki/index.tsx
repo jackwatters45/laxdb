@@ -1,43 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { publishedPosts } from "@/lib/posts";
 
-import { getContentByTag, groupBySubjectTag } from "@/lib/graph-utils";
+import { WikiLayout } from "@/components/wiki-layout";
+import { getWikiPosts, groupWikiPostsBySection, WIKI_SECTIONS } from "@/lib/wiki";
 
 export const Route = createFileRoute("/wiki/")({
   component: WikiIndex,
 });
 
-const SUBJECT_LABELS: Record<string, string> = {
-  player: "Players",
-  team: "Teams",
-  league: "Leagues",
-  skill: "Skills & Techniques",
-  media: "Media & Coverage",
-  event: "Events",
-  other: "Other",
-};
-
-const SUBJECT_ORDER = ["league", "team", "player", "skill", "media", "event", "other"];
-
 function WikiIndex() {
-  const wikiPosts = getContentByTag(publishedPosts, "wiki");
-  const grouped = groupBySubjectTag(wikiPosts);
-
-  // Sort groups by predefined order
-  const sortedGroups = SUBJECT_ORDER.filter((key) => grouped[key]?.length).map((key) => ({
-    key,
-    label: SUBJECT_LABELS[key] ?? key,
-    posts: grouped[key] ?? [],
-  }));
+  const wikiPosts = getWikiPosts();
+  const groupedPosts = groupWikiPostsBySection(wikiPosts);
+  const visibleSections = WIKI_SECTIONS.map((section) => ({
+    section,
+    posts: groupedPosts.get(section) ?? [],
+  })).filter(({ posts }) => posts.length > 0);
 
   return (
-    <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
-      <header className="mb-8">
-        <h1 className="font-serif text-2xl text-foreground italic">Wiki</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Knowledge base for lacrosse players, teams, leagues, and more.
+    <WikiLayout posts={wikiPosts}>
+      <header className="mb-10 border-b border-border pb-8">
+        <p className="text-xs font-medium tracking-[0.18em] text-subtle uppercase">LaxDB Wiki</p>
+        <h1 className="mt-3 font-serif text-4xl text-foreground italic md:text-5xl">
+          Learn lacrosse.
+        </h1>
+        <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
+          A field guide for players, parents, coaches, and curious fans. Start with the basics or
+          jump into the graph when you want to follow connections across the sport.
         </p>
-        <nav className="mt-4 flex gap-4 text-sm">
+        <nav className="mt-5 flex flex-wrap gap-4 text-sm">
           <Link
             to="/graph"
             className="text-muted-foreground transition-colors hover:text-foreground"
@@ -47,42 +36,42 @@ function WikiIndex() {
         </nav>
       </header>
 
-      {sortedGroups.length === 0 ? (
+      {visibleSections.length === 0 ? (
         <p className="text-muted-foreground">No wiki content yet.</p>
       ) : (
         <div className="space-y-12">
-          {sortedGroups.map(({ key, label, posts }) => (
-            <section key={key}>
-              <h2 className="mb-4 font-serif text-lg text-foreground italic">{label}</h2>
+          {visibleSections.map(({ section, posts }) => (
+            <section key={section.key}>
+              <div className="mb-4">
+                <h2 className="font-serif text-2xl text-foreground italic">{section.label}</h2>
+                {section.description && (
+                  <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
+                )}
+              </div>
               <ul className="grid gap-3">
-                {posts
-                  .toSorted((a, b) => a.title.localeCompare(b.title))
-                  .map((post) => (
-                    <li key={post.slug}>
-                      <Link
-                        to="/content/$slug"
-                        params={{ slug: post.slug }}
-                        className="group flex items-baseline justify-between border-b border-border/50 pb-2"
-                      >
-                        <span className="font-serif text-foreground group-hover:text-muted-foreground">
-                          {post.title}
-                        </span>
-                        {post.tags && post.tags.some((t) => !["wiki", key].includes(t)) && (
-                          <span className="text-xs text-subtle">
-                            {post.tags
-                              .filter((t) => !["wiki", key].includes(t))
-                              .slice(0, 2)
-                              .join(", ")}
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
+                {posts.map((post) => (
+                  <li key={post.slug}>
+                    <Link
+                      to="/wiki/$slug"
+                      params={{ slug: post.slug }}
+                      className="group block rounded-xl border border-border/70 bg-card/30 p-4 transition-colors hover:border-border hover:bg-card/60"
+                    >
+                      <span className="font-serif text-lg text-foreground italic group-hover:text-muted-foreground">
+                        {post.title}
+                      </span>
+                      {post.description && (
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                          {post.description}
+                        </p>
+                      )}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </section>
           ))}
         </div>
       )}
-    </main>
+    </WikiLayout>
   );
 }

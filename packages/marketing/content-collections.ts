@@ -22,12 +22,52 @@ function extractWikiLinks(content: string): string[] {
 }
 
 /**
- * Transform [[wiki-links]] to markdown links in content
+ * Transform [[wiki-links]] to public wiki links in content.
  */
 function transformWikiLinks(content: string): string {
-  return content.replaceAll(/\[\[([^\]]+)\]\]/g, (_, label: string) => {
-    return `[${label}](/content/${toSlug(label)})`;
+  return content.replaceAll(/\[\[([^\]]+)\]\]/gu, (_, label: string) => {
+    return `[${label}](/wiki/${toSlug(label)})`;
   });
+}
+
+interface TableOfContentsItem {
+  [key: string]: string | number;
+  title: string;
+  slug: string;
+  depth: number;
+}
+
+function extractTableOfContents(content: string): TableOfContentsItem[] {
+  const headings: TableOfContentsItem[] = [];
+  const lines = content.replace(/^---[\s\S]*?---\s*/u, "").split("\n");
+  let inCodeFence = false;
+
+  for (const line of lines) {
+    if (line.trimStart().startsWith("```")) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+
+    if (inCodeFence) continue;
+
+    const match = /^(#{2,3})\s+(.+)$/u.exec(line);
+    if (!match) continue;
+
+    const marker = match[1];
+    const rawTitle = match[2];
+    if (!marker || !rawTitle) continue;
+
+    const title = rawTitle.replace(/\s+#$/u, "").trim();
+    if (title.length === 0) continue;
+
+    headings.push({
+      title,
+      slug: toSlug(title),
+      depth: marker.length,
+    });
+  }
+
+  return headings;
 }
 
 const posts = defineCollection({
@@ -42,6 +82,9 @@ const posts = defineCollection({
     description: z.string().optional(),
     authors: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
+    section: z.string().optional(),
+    order: z.number().int().optional(),
+    updated: z.iso.date().optional(),
     content: z.string(),
   }),
   transform: async (document, context) => {
@@ -61,15 +104,15 @@ const posts = defineCollection({
       ],
     });
 
-    const headerImageMatch = document.content.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+    const headerImageMatch = document.content.match(/!\[([^\]]*)\]\(([^)]+)\)/u);
     const headerImage = headerImageMatch ? headerImageMatch[2] : undefined;
 
     const excerpt =
       document.content
-        .replace(/^---[\s\S]*?---\s*/, "")
-        .replace(/^!\[[^\]]*]\([^)]+\)\s*/, "")
+        .replace(/^---[\s\S]*?---\s*/u, "")
+        .replace(/^!\[[^\]]*\]\([^)]+\)\s*/u, "")
         .split("\n\n")[0]
-        ?.replaceAll(/\[\[([^\]]+)\]\]/g, "$1")
+        ?.replaceAll(/\[\[([^\]]+)\]\]/gu, "$1")
         .trim() ?? undefined;
 
     return {
@@ -77,6 +120,7 @@ const posts = defineCollection({
       slug: document._meta.path,
       excerpt,
       headerImage,
+      tableOfContents: extractTableOfContents(document.content),
       wikiLinks, // Links for graph view
       mdx,
     };
