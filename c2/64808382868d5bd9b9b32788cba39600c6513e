@@ -1,0 +1,27 @@
+packages/ui/src/globals.css
+  s_17bf0c4ecd1bf8::t_09551a4577cd3a 208,213-214
+packages/marketing/src/components/mdx-content.tsx
+  s_17bf0c4ecd1bf8::t_d244b803977282 8,18-26
+  s_17bf0c4ecd1bf8::t_9dbb12b10fcaf0 2,9-10
+packages/ui/src/hooks/use-smooth-hash-link.ts
+  s_17bf0c4ecd1bf8::t_bd628905cd3c73 1-47
+packages/ui/src/lib/smooth-scroll.ts
+  s_17bf0c4ecd1bf8::t_b6c424afcc78ea 1-70,72-81
+  ai_agent 71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c264808382868d5bd9b9b32788cba39600c6513e",
+  "prompts": {},
+  "sessions": {
+    "s_17bf0c4ecd1bf8": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2539-ce12-76fc-88ac-1aaaf8123dc5",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
