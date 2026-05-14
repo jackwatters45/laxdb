@@ -1,0 +1,27 @@
+packages/api/src/errors.ts
+  s_5cccc733b82eb6::t_a0fdbb10b9815d 1-8,13,15,17-24,27-31
+  s_5cccc733b82eb6::t_9133af8521aaab 9-10,12,14,16
+  s_5cccc733b82eb6::t_ac86e65a31347e 25-26
+packages/cli/src/test/practice.integration.test.ts
+  s_5cccc733b82eb6::t_5f45dc940099d2 202-210,78,80,83-84
+  s_5cccc733b82eb6::t_140f97e4646a76 75-77,79,81-82,85-90
+packages/api/src/test/defaults.http.test.ts
+  s_5cccc733b82eb6::t_5bf032c2d45ed0 7-42,52-73,47,49,51
+  s_5cccc733b82eb6::t_9a3d56996adb1f 43,45-46,48,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4860a974f6f8c0e9e36d1a84aee0025a9c0df0b9",
+  "prompts": {},
+  "sessions": {
+    "s_5cccc733b82eb6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2452-ca31-747e-b951-bd32a940eb1e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}

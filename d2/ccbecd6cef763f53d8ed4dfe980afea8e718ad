@@ -1,0 +1,35 @@
+packages/api/src/test/player.http.test.ts
+  s_5cccc733b82eb6::t_387ade449e4ed9 69,77,100,107,134,157
+packages/api/src/player/player.api.ts
+  s_5cccc733b82eb6::t_8d1c9f9563c27a 5-6,11,17,24,31,38
+packages/api/src/drill/drill.api.ts
+  s_5cccc733b82eb6::t_35d36d10643c4f 5-6,11,17,24,31,38
+packages/api/src/play/play.api.ts
+  s_5cccc733b82eb6::t_3b8d6463dcc4a9 5-6,11,17,24,31,38
+packages/api/src/errors.ts
+  s_5cccc733b82eb6::t_a0fdbb10b9815d 1-8,13,15,17-29
+  s_5cccc733b82eb6::t_9133af8521aaab 9-10,12,14,16
+packages/api/src/test/practice.http.test.ts
+  s_5cccc733b82eb6::t_5878bd1866697f 135,297
+packages/api/src/test/drill.http.test.ts
+  s_5cccc733b82eb6::t_67fc6b9708e412 104,126,152,176
+packages/api/src/defaults/defaults.api.ts
+  s_5cccc733b82eb6::t_371153128d956a 1-4,7-10,13-17,20-21
+  s_5cccc733b82eb6::t_605f5b677593ee 5-6,11,18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "d2ccbecd6cef763f53d8ed4dfe980afea8e718ad",
+  "prompts": {},
+  "sessions": {
+    "s_5cccc733b82eb6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2452-ca31-747e-b951-bd32a940eb1e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}

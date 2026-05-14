@@ -1,0 +1,20 @@
+packages/api/src/test/defaults.http.test.ts
+  s_5cccc733b82eb6::t_5bf032c2d45ed0 1-36,46-67,41,43,45
+  s_5cccc733b82eb6::t_9a3d56996adb1f 37,39-40,42,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "097827295ba7e4f0096aed82872a945f669aff3f",
+  "prompts": {},
+  "sessions": {
+    "s_5cccc733b82eb6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2452-ca31-747e-b951-bd32a940eb1e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
