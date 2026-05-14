@@ -1,11 +1,11 @@
 import { DrillService } from "@laxdb/core/drill/drill.service";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { LaxdbApiV2 } from "../definition";
+import { LaxdbApi } from "../definition";
 
-export const DrillsHandlersLive = HttpApiBuilder.group(
-  LaxdbApiV2,
+export const DrillsHandlers = HttpApiBuilder.group(
+  LaxdbApi,
   "Drills",
   (handlers) =>
     Effect.gen(function* () {
@@ -18,4 +18,4 @@ export const DrillsHandlersLive = HttpApiBuilder.group(
         .handle("updateDrill", ({ payload }) => service.update(payload))
         .handle("deleteDrill", ({ payload }) => service.delete(payload));
     }),
-).pipe(Layer.provide(DrillService.layer));
+);

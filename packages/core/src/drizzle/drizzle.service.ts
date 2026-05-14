@@ -61,3 +61,11 @@ export const DatabaseLive = Layer.effect(
 
 export const DatabaseLiveFromBinding = (binding: AnyD1Database) =>
   DatabaseLive.pipe(Layer.provide(Layer.succeed(D1DatabaseBinding, binding)));
+
+export const DatabaseLiveFromBindingEffect = (
+  binding: Effect.Effect<AnyD1Database>,
+) =>
+  Layer.effect(
+    DrizzleService,
+    Effect.map(binding, (db) => drizzle(db)),
+  );

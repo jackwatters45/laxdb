@@ -5,9 +5,10 @@ import {
   type ServerResponse,
 } from "node:http";
 
+import { Context } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 
-import { emptyRequestContext } from "../request-context";
+const emptyRequestContext = Context.empty() as Context.Context<unknown>;
 
 export interface TestServer {
   url: string;

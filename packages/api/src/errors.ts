@@ -7,6 +7,7 @@ import {
 import { HttpApiSchema } from "effect/unstable/httpapi";
 
 export const ApiNotFoundError = NotFoundError.pipe(HttpApiSchema.status(404));
+
 export const ApiValidationError = ValidationError.pipe(
   HttpApiSchema.status(400),
 );

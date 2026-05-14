@@ -1,11 +1,11 @@
 import { DefaultsService } from "@laxdb/core/defaults/defaults.service";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { LaxdbApiV2 } from "../definition";
+import { LaxdbApi } from "../definition";
 
-export const DefaultsHandlersLive = HttpApiBuilder.group(
-  LaxdbApiV2,
+export const DefaultsHandlers = HttpApiBuilder.group(
+  LaxdbApi,
   "Defaults",
   (handlers) =>
     Effect.gen(function* () {
@@ -17,4 +17,4 @@ export const DefaultsHandlersLive = HttpApiBuilder.group(
           service.patchNamespace(payload),
         );
     }),
-).pipe(Layer.provide(DefaultsService.layer));
+);
