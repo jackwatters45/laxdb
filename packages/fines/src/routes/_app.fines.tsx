@@ -33,7 +33,9 @@ function Board() {
         setMembers(m);
         return null;
       })
-      .catch((cause) => setErr(String(cause)));
+      .catch((cause) => {
+        setErr(String(cause));
+      });
   };
 
   useEffect(load, []);
@@ -129,7 +131,9 @@ function Board() {
               <button
                 key={f}
                 className={filter === f ? "primary" : ""}
-                onClick={() => setFilter(f)}
+                onClick={() => {
+                  setFilter(f);
+                }}
               >
                 {f}
               </button>

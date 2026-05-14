@@ -16,7 +16,7 @@ function Accept() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const session = await authClient.getSession();
         if (!session.data) {
@@ -26,7 +26,7 @@ function Accept() {
         await authClient.organization.acceptInvitation({ invitationId: id });
         await router.invalidate();
         setState("ok");
-        router.navigate({ to: "/fines" });
+        await router.navigate({ to: "/fines" });
       } catch (e) {
         setErr(String(e));
         setState("error");

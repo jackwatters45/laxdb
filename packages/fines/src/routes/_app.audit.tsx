@@ -29,7 +29,9 @@ function Audit() {
         setMembers(m);
         return null;
       })
-      .catch((cause) => setErr(String(cause)));
+      .catch((cause) => {
+        setErr(String(cause));
+      });
   }, []);
 
   const membersById = useMemo(
@@ -65,7 +67,9 @@ function Audit() {
             <button
               key={k}
               className={kind === k ? "primary" : ""}
-              onClick={() => setKind(k)}
+              onClick={() => {
+                setKind(k);
+              }}
             >
               {k}
             </button>

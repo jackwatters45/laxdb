@@ -28,7 +28,9 @@ function Admin() {
         setTemplates(t);
         return null;
       })
-      .catch((cause) => setErr(String(cause)));
+      .catch((cause) => {
+        setErr(String(cause));
+      });
   };
 
   useEffect(load, []);
@@ -110,7 +112,9 @@ function IssueFine({
         <div className="row">
           <select
             value={memberId}
-            onChange={(e) => setMemberId(e.currentTarget.value)}
+            onChange={(e) => {
+              setMemberId(e.currentTarget.value);
+            }}
             style={{ flex: 1 }}
           >
             <option value="">— player —</option>
@@ -146,7 +150,9 @@ function IssueFine({
           <input
             placeholder="Reason"
             value={reason}
-            onChange={(e) => setReason(e.currentTarget.value)}
+            onChange={(e) => {
+              setReason(e.currentTarget.value);
+            }}
             style={{ flex: 2 }}
           />
           <input
@@ -155,7 +161,9 @@ function IssueFine({
             step="0.01"
             placeholder="Amount $"
             value={amount}
-            onChange={(e) => setAmount(e.currentTarget.value)}
+            onChange={(e) => {
+              setAmount(e.currentTarget.value);
+            }}
             style={{ flex: 1 }}
           />
           <button className="primary" type="submit">
@@ -204,7 +212,9 @@ function Invite({
           type="email"
           placeholder="player@example.com"
           value={email}
-          onChange={(e) => setEmail(e.currentTarget.value)}
+          onChange={(e) => {
+            setEmail(e.currentTarget.value);
+          }}
           style={{ flex: 1 }}
         />
         <select
@@ -309,7 +319,9 @@ function Templates({
         <input
           placeholder='e.g. "Late to practice"'
           value={label}
-          onChange={(e) => setLabel(e.currentTarget.value)}
+          onChange={(e) => {
+            setLabel(e.currentTarget.value);
+          }}
           style={{ flex: 2 }}
         />
         <input
@@ -318,7 +330,9 @@ function Templates({
           step="0.01"
           placeholder="Amount $"
           value={amount}
-          onChange={(e) => setAmount(e.currentTarget.value)}
+          onChange={(e) => {
+            setAmount(e.currentTarget.value);
+          }}
           style={{ flex: 1 }}
         />
         <button className="primary" type="submit">

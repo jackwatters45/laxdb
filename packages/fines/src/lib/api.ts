@@ -9,13 +9,12 @@ export const formatDate = (d: Date | string | number) =>
   });
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
+  const headers = new Headers(init?.headers);
+  headers.set("content-type", "application/json");
   const res = await fetch(path, {
     ...init,
     credentials: "include",
-    headers: {
-      "content-type": "application/json",
-      ...init?.headers,
-    },
+    headers,
   });
   if (!res.ok) {
     const msg = await res.text().catch(() => res.statusText);

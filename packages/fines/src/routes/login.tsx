@@ -54,7 +54,9 @@ function Login() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
+              onChange={(e) => {
+                setEmail(e.currentTarget.value);
+              }}
               required
             />
             <button
