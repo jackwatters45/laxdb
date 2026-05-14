@@ -6,7 +6,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import { NotFound } from "../components/NotFound";
+import { NotFound } from "../components/not-found";
 import { getMe } from "../lib/session";
 import appCss from "../styles.css?url";
 

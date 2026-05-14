@@ -8,7 +8,7 @@ import {
 import { Effect, Layer } from "effect";
 
 import { createAuth, type Auth } from "../core/auth/auth";
-import { resolveMe } from "../core/auth/resolveMe";
+import { resolveMe } from "../core/auth/resolve-me";
 import type { Me } from "../core/auth/schema";
 import { FineService } from "../core/fine/fine.service";
 

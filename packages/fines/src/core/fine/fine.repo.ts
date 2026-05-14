@@ -10,6 +10,8 @@ import { nanoid } from "nanoid";
 
 import { members, users } from "../auth/auth.sql";
 
+import { fineEvents } from "./fine-event.sql";
+import { fineTemplates } from "./fine-template.sql";
 import type {
   AdjustFineInput,
   ApplyFineDoublingsInput,
@@ -25,8 +27,6 @@ import type {
   FineEventKind,
 } from "./fine.schema";
 import { fines } from "./fine.sql";
-import { fineEvents } from "./fineEvent.sql";
-import { fineTemplates } from "./fineTemplate.sql";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 

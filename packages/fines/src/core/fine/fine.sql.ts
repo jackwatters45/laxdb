@@ -4,8 +4,8 @@ import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { members, organizations, users } from "../auth/auth.sql";
 
+import { fineTemplates } from "./fine-template.sql";
 import type { FineStatus } from "./fine.schema";
-import { fineTemplates } from "./fineTemplate.sql";
 
 export const fines = sqliteTable(
   "fines",
