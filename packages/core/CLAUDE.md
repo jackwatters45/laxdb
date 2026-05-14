@@ -12,7 +12,7 @@ Effect-TS services, Drizzle ORM schemas, domain logic for lacrosse management.
 ├── {domain}.sql.ts       # Drizzle table definitions
 ├── {domain}.repo.ts      # Database operations (Effect)
 ├── {domain}.service.ts   # Business logic (Effect.Service)
-├── {domain}.contract.ts  # RPC contract definitions
+├── {domain}.contract.ts  # API contract definitions
 └── {domain}.error.ts     # Domain-specific errors (optional)
 ```
 

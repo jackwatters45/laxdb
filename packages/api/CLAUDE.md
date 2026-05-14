@@ -1,13 +1,25 @@
-# @laxdb/api - Effect RPC API
+# @laxdb/api - Effect HTTP API
 
-> **When to read:** Adding/modifying API endpoints, RPC handlers, HTTP routes.
+> **When to read:** Adding/modifying API endpoints, generated clients, HTTP routes.
 
-Effect-based API using `HttpApi` + `RpcGroup` for type-safe client-server communication.
+Effect-based API using `HttpApi` for schema-first server handlers and a generated `HttpApiClient`.
 
 ## ADDING AN ENDPOINT
 
-1. Define RPC request/response in `{domain}.rpc.ts`
-2. Implement handler in `{domain}.handlers.ts`
-3. Add client method in `{domain}.client.ts`
-4. If REST, add route in `{domain}.api.ts` and register in `definition.ts`
-5. Register RPC in `rpc-group.ts` and handler in `rpc-handlers.ts`
+1. Define request/response schemas in `@laxdb/core/{domain}/{domain}.contract.ts`
+2. Add route in `{domain}.api.ts` and register it in `definition.ts`
+3. Implement handler in `{domain}.handlers.ts`
+4. Register the handler layer in `groups/index.ts`
+5. Consume via `ApiClient` from `@laxdb/api/client`
+
+## CLIENT SHAPE
+
+`ApiClient` is generated from `LaxdbApiV2`. Calls are grouped by `HttpApiGroup` name:
+
+```ts
+const client = yield* ApiClient;
+const drills = yield* client.Drills.listDrills();
+const drill = yield* client.Drills.getDrill({ payload: { publicId } });
+```
+
+Do not hand-write fetch wrappers for API routes; derive from `HttpApiClient.make(LaxdbApiV2)` so request/response types stay tied to the server definition.

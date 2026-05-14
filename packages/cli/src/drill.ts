@@ -14,7 +14,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import {
   Category,
   CreateDrillInput,
@@ -122,8 +122,8 @@ const listCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const drills = yield* client.DrillList();
+      const client = yield* ApiClient;
+      const drills = yield* client.Drills.listDrills();
       yield* output(drills, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -137,8 +137,8 @@ const getCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const drill = yield* client.DrillGet({ publicId });
+      const client = yield* ApiClient;
+      const drill = yield* client.Drills.getDrill({ payload: { publicId } });
       yield* output(drill, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -168,7 +168,7 @@ const createCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const category = Option.isSome(opts.category)
         ? decodeCategories(parseCsv(opts.category.value))
         : undefined;
@@ -188,24 +188,26 @@ const createCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const drill = yield* client.DrillCreate({
-        name: opts.name,
-        subtitle: Option.getOrNull(opts.subtitle),
-        description: Option.getOrNull(opts.description),
-        difficulty: Option.getOrUndefined(opts.difficulty),
-        category,
-        positionGroup,
-        intensity: Option.getOrNull(opts.intensity),
-        contact: Option.getOrNull(opts.contact),
-        competitive: Option.getOrNull(opts.competitive),
-        playerCount: Option.getOrNull(opts.playerCount),
-        durationMinutes: Option.getOrNull(opts.duration),
-        fieldSpace: Option.getOrNull(opts.fieldSpace),
-        equipment: Option.getOrNull(equipmentValues),
-        diagramUrl: Option.getOrNull(opts.diagramUrl),
-        videoUrl: Option.getOrNull(opts.videoUrl),
-        coachNotes: Option.getOrNull(opts.coachNotes),
-        tags: Option.getOrUndefined(tagValues),
+      const drill = yield* client.Drills.createDrill({
+        payload: {
+          name: opts.name,
+          subtitle: Option.getOrNull(opts.subtitle),
+          description: Option.getOrNull(opts.description),
+          difficulty: Option.getOrUndefined(opts.difficulty),
+          category,
+          positionGroup,
+          intensity: Option.getOrNull(opts.intensity),
+          contact: Option.getOrNull(opts.contact),
+          competitive: Option.getOrNull(opts.competitive),
+          playerCount: Option.getOrNull(opts.playerCount),
+          durationMinutes: Option.getOrNull(opts.duration),
+          fieldSpace: Option.getOrNull(opts.fieldSpace),
+          equipment: Option.getOrNull(equipmentValues),
+          diagramUrl: Option.getOrNull(opts.diagramUrl),
+          videoUrl: Option.getOrNull(opts.videoUrl),
+          coachNotes: Option.getOrNull(opts.coachNotes),
+          tags: Option.getOrUndefined(tagValues),
+        },
       });
       yield* output(drill, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -240,7 +242,7 @@ const updateCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const category = Option.isSome(opts.category)
         ? decodeCategories(parseCsv(opts.category.value))
         : undefined;
@@ -260,25 +262,27 @@ const updateCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const drill = yield* client.DrillUpdate({
-        publicId: opts.publicId,
-        name: Option.getOrUndefined(opts.name),
-        subtitle: Option.getOrUndefined(opts.subtitle),
-        description: Option.getOrUndefined(opts.description),
-        difficulty: Option.getOrUndefined(opts.difficulty),
-        category,
-        positionGroup,
-        intensity: Option.getOrUndefined(opts.intensity),
-        contact: Option.getOrUndefined(opts.contact),
-        competitive: Option.getOrUndefined(opts.competitive),
-        playerCount: Option.getOrUndefined(opts.playerCount),
-        durationMinutes: Option.getOrUndefined(opts.duration),
-        fieldSpace: Option.getOrUndefined(opts.fieldSpace),
-        equipment: Option.getOrUndefined(equipmentValues),
-        diagramUrl: Option.getOrUndefined(opts.diagramUrl),
-        videoUrl: Option.getOrUndefined(opts.videoUrl),
-        coachNotes: Option.getOrUndefined(opts.coachNotes),
-        tags: Option.getOrUndefined(tagValues),
+      const drill = yield* client.Drills.updateDrill({
+        payload: {
+          publicId: opts.publicId,
+          name: Option.getOrUndefined(opts.name),
+          subtitle: Option.getOrUndefined(opts.subtitle),
+          description: Option.getOrUndefined(opts.description),
+          difficulty: Option.getOrUndefined(opts.difficulty),
+          category,
+          positionGroup,
+          intensity: Option.getOrUndefined(opts.intensity),
+          contact: Option.getOrUndefined(opts.contact),
+          competitive: Option.getOrUndefined(opts.competitive),
+          playerCount: Option.getOrUndefined(opts.playerCount),
+          durationMinutes: Option.getOrUndefined(opts.duration),
+          fieldSpace: Option.getOrUndefined(opts.fieldSpace),
+          equipment: Option.getOrUndefined(equipmentValues),
+          diagramUrl: Option.getOrUndefined(opts.diagramUrl),
+          videoUrl: Option.getOrUndefined(opts.videoUrl),
+          coachNotes: Option.getOrUndefined(opts.coachNotes),
+          tags: Option.getOrUndefined(tagValues),
+        },
       });
       yield* output(drill, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -293,8 +297,8 @@ const deleteCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const drill = yield* client.DrillDelete({ publicId });
+      const client = yield* ApiClient;
+      const drill = yield* client.Drills.deleteDrill({ payload: { publicId } });
       yield* output(drill, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -308,14 +312,14 @@ const bulkCreateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreateDrillInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const drill = yield* client.DrillCreate(item);
+        const drill = yield* client.Drills.createDrill({ payload: item });
         results.push(drill);
       }
       yield* output(results, pretty);
@@ -327,14 +331,16 @@ const bulkDeleteCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
       const results = [];
       for (const publicId of ids) {
-        const drill = yield* client.DrillDelete({ publicId });
+        const drill = yield* client.Drills.deleteDrill({
+          payload: { publicId },
+        });
         results.push(drill);
       }
       yield* output(results, pretty);
@@ -346,14 +352,14 @@ const bulkUpdateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdateDrillInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const drill = yield* client.DrillUpdate(item);
+        const drill = yield* client.Drills.updateDrill({ payload: item });
         results.push(drill);
       }
       yield* output(results, pretty);

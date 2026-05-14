@@ -1,17 +1,13 @@
 /**
- * Test server helper
+ * Test server helper.
  *
- * Spins up the API v2 RPC server in-process using the test database.
- * Since repos no longer bundle DatabaseLive, we provide TestDatabaseLive
- * at the top level and it flows through handlers → services → repos.
+ * Spins up the generated HTTP API in-process using the test database. Since
+ * repos no longer bundle DatabaseLive, we provide TestDatabaseLive at the top
+ * level and it flows through handlers → services → repos.
  */
 
-import { DefaultsRpcHandlers } from "@laxdb/api/defaults/defaults.rpc-handlers";
-import { DrillRpcHandlers } from "@laxdb/api/drill/drill.rpc-handlers";
-import { PlayRpcHandlers } from "@laxdb/api/play/play.rpc-handlers";
-import { PlayerRpcHandlers } from "@laxdb/api/player/player.rpc-handlers";
-import { PracticeRpcHandlers } from "@laxdb/api/practice/practice.rpc-handlers";
-import { LaxdbRpcV2 } from "@laxdb/api/rpc-group";
+import { LaxdbApiV2 } from "@laxdb/api/definition";
+import { HttpGroupsLive } from "@laxdb/api/groups/index";
 import {
   startNodeHttpTestServer,
   type TestServer,
@@ -19,29 +15,14 @@ import {
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
 import { HttpServer } from "effect/unstable/http";
-import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
+import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-// Handler layers with test database instead of production DatabaseLive
-const TestHandlers = Layer.mergeAll(
-  DefaultsRpcHandlers,
-  DrillRpcHandlers,
-  PlayRpcHandlers,
-  PlayerRpcHandlers,
-  PracticeRpcHandlers,
-).pipe(Layer.provide(TestDatabaseLive));
-
-const RpcRouter = RpcServer.layerHttp({
-  group: LaxdbRpcV2,
-  path: "/rpc",
-  protocol: "http",
-  spanPrefix: "rpc",
-}).pipe(
-  Layer.provide(TestHandlers),
-  Layer.provide(RpcSerialization.layerNdjson),
+const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
+  Layer.provide(HttpGroupsLive.pipe(Layer.provide(TestDatabaseLive))),
+  Layer.provide(HttpServer.layerServices),
 );
 
-const AllRoutes = RpcRouter.pipe(
-  Layer.provide(HttpServer.layerServices),
+const AllRoutes = HttpApiRouter.pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
 );
 

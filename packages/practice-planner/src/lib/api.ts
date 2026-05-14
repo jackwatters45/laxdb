@@ -1,21 +1,20 @@
 /**
- * Effect RPC client for the api worker.
+ * Effect HTTP API client for the api worker.
  *
  * Production: uses `API` service binding (Worker-to-Worker, no network hop).
  * Local dev: uses fetch to the api dev server (Alchemy runs it separately).
  *
  * Only call runApi() from inside createServerFn handlers.
  */
-import { RpcApiClient } from "@laxdb/api/client";
+import { makeApiClientLayer, type ApiClient } from "@laxdb/api/client";
 import { type Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
-import { RpcClient, RpcSerialization } from "effect/unstable/rpc";
 
 const isLocal = process.env.IS_LOCAL === "true";
 
 /**
  * In production, the API service binding gives us a Worker-to-Worker fetch
- * that resolves the virtual `http://api/rpc` URL with zero network hops.
+ * that resolves the virtual `http://api` URL with zero network hops.
  * In local dev, we fall back to the global fetch hitting localhost.
  */
 type FetchInput = Parameters<typeof fetch>[0];
@@ -34,13 +33,13 @@ const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
 
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
   if (isLocal) {
-    return { url: `http://localhost:${process.env.API_PORT ?? "1337"}/rpc` };
+    return { url: `http://localhost:${process.env.API_PORT ?? "1337"}` };
   }
 
   // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment
   const workersModule: unknown = require("cloudflare:workers");
   if (!hasWorkerEnv(workersModule)) {
-    return { url: "http://api/rpc" };
+    return { url: "http://api" };
   }
 
   const apiFetch: typeof fetch = Object.assign(
@@ -49,7 +48,7 @@ function getApiFetch(): { fetch?: typeof fetch; url: string } {
     { preconnect: fetch.preconnect },
   );
 
-  return { fetch: apiFetch, url: "http://api/rpc" };
+  return { fetch: apiFetch, url: "http://api" };
 }
 
 function buildRuntime() {
@@ -61,29 +60,24 @@ function buildRuntime() {
       )
     : FetchHttpClient.layer;
 
-  const protocol = RpcClient.layerProtocolHttp({ url: api.url }).pipe(
-    Layer.provide([http, RpcSerialization.layerNdjson]),
+  return ManagedRuntime.make(
+    makeApiClientLayer(api.url).pipe(Layer.provide(http)),
   );
-
-  return ManagedRuntime.make(RpcApiClient.layer.pipe(Layer.provide(protocol)));
 }
 
 let _runtime: ReturnType<typeof buildRuntime> | undefined;
 
 /**
- * Run an Effect that depends on the RPC client.
+ * Run an Effect that depends on the generated HTTP API client.
  * Only call from inside createServerFn handlers.
  *
- * Results are round-tripped through JSON to convert Effect Schema.Class
- * instances into plain objects — seroval (TanStack Start's dehydration
- * serializer) rejects class instances.
+ * Results are structured-cloned to convert Effect Schema.Class instances into
+ * plain objects — seroval (TanStack Start's dehydration serializer) rejects
+ * class instances.
  */
 export async function runApi<A, E>(
-  effect: Effect.Effect<A, E, RpcApiClient>,
+  effect: Effect.Effect<A, E, ApiClient>,
 ): Promise<A> {
   const result = await (_runtime ??= buildRuntime()).runPromise(effect);
-  // JSON round-trip strips Effect Schema.Class metadata; the shape is
-  // guaranteed by Effect's schema encoder so the cast is safe.
-  // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- serialization preserves the result shape while removing class metadata
-  return JSON.parse(JSON.stringify(result)) as A;
+  return structuredClone(result);
 }

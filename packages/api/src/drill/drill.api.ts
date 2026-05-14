@@ -5,6 +5,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@laxdb/core/error";
+import { Schema } from "effect";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
 export const DrillsGroup = HttpApiGroup.make("Drills")
@@ -28,7 +29,7 @@ export const DrillsGroup = HttpApiGroup.make("Drills")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: DrillContract.get.payload,
+      payload: Schema.toEncoded(DrillContract.get.payload),
     }),
   )
   .add(
@@ -40,7 +41,7 @@ export const DrillsGroup = HttpApiGroup.make("Drills")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: DrillContract.create.payload,
+      payload: Schema.toEncoded(DrillContract.create.payload),
     }),
   )
   .add(
@@ -52,7 +53,7 @@ export const DrillsGroup = HttpApiGroup.make("Drills")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: DrillContract.update.payload,
+      payload: Schema.toEncoded(DrillContract.update.payload),
     }),
   )
   .add(
@@ -64,6 +65,6 @@ export const DrillsGroup = HttpApiGroup.make("Drills")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: DrillContract.delete.payload,
+      payload: Schema.toEncoded(DrillContract.delete.payload),
     }),
   );

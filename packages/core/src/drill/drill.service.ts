@@ -1,7 +1,7 @@
 import { Effect, Layer, Context } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
 
 import { DrillRepo } from "./drill.repo";
 import {
@@ -28,7 +28,7 @@ export class DrillService extends Context.Service<DrillService>()(
             Effect.tapError(Effect.logError),
           ),
 
-        get: (input: GetDrillInput) =>
+        get: (input: SchemaInput<typeof GetDrillInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(GetDrillInput, input);
             return yield* repo.get(decoded);
@@ -43,7 +43,7 @@ export class DrillService extends Context.Service<DrillService>()(
             Effect.tapError(Effect.logError),
           ),
 
-        create: (input: CreateDrillInput) =>
+        create: (input: SchemaInput<typeof CreateDrillInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(CreateDrillInput, input);
             return yield* repo.create(decoded);
@@ -56,7 +56,7 @@ export class DrillService extends Context.Service<DrillService>()(
             Effect.tapError(Effect.logError),
           ),
 
-        update: (input: UpdateDrillInput) =>
+        update: (input: SchemaInput<typeof UpdateDrillInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(UpdateDrillInput, input);
             return yield* repo.update(decoded);
@@ -71,7 +71,7 @@ export class DrillService extends Context.Service<DrillService>()(
             Effect.tapError(Effect.logError),
           ),
 
-        delete: (input: DeleteDrillInput) =>
+        delete: (input: SchemaInput<typeof DeleteDrillInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(DeleteDrillInput, input);
             return yield* repo.delete(decoded);

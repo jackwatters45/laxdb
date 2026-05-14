@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
@@ -20,8 +20,8 @@ import { practiceName } from "@/lib/practice-name";
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      return yield* client.PracticeList();
+      const client = yield* ApiClient;
+      return yield* client.Practices.listPractices();
     }),
   ),
 );
@@ -35,8 +35,10 @@ const deletePractice = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PracticeDelete({ publicId: data.publicId });
+        const client = yield* ApiClient;
+        return yield* client.Practices.deletePractice({
+          payload: { publicId: data.publicId },
+        });
       }),
     ),
   );

@@ -6,27 +6,14 @@ import {
   HttpServerResponse,
 } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
-import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import type { ApiWorkerEnv } from "../../../alchemy.run";
 
 import { LaxdbApiV2 } from "./definition";
 import { HttpGroupsLive } from "./groups";
 import { emptyRequestContext } from "./request-context";
-import { LaxdbRpcV2 } from "./rpc-group";
-import { LaxdbRpcV2Handlers } from "./rpc-handlers";
 
 const DocsRoute = HttpApiScalar.layer(LaxdbApiV2);
-
-const RpcRouter = RpcServer.layerHttp({
-  group: LaxdbRpcV2,
-  path: "/rpc",
-  protocol: "http",
-  spanPrefix: "rpc",
-}).pipe(
-  Layer.provide(LaxdbRpcV2Handlers),
-  Layer.provide(RpcSerialization.layerNdjson),
-);
 
 const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
   Layer.provide(HttpGroupsLive),
@@ -39,7 +26,6 @@ const HealthCheckRoute = HttpRouter.use((router) =>
 );
 
 const AllRoutes = Layer.mergeAll(
-  RpcRouter,
   HttpApiRouter,
   DocsRoute,
   HealthCheckRoute,

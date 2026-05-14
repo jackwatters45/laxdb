@@ -5,6 +5,7 @@ import {
   ValidationError,
 } from "@laxdb/core/error";
 import { PracticeContract } from "@laxdb/core/practice/practice.contract";
+import { Schema } from "effect";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
 const errors = [
@@ -26,28 +27,28 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
     HttpApiEndpoint.post("getPractice", "/api/practices/get", {
       success: PracticeContract.get.success,
       error: errors,
-      payload: PracticeContract.get.payload,
+      payload: Schema.toEncoded(PracticeContract.get.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("createPractice", "/api/practices/create", {
       success: PracticeContract.create.success,
       error: errors,
-      payload: PracticeContract.create.payload,
+      payload: Schema.toEncoded(PracticeContract.create.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("updatePractice", "/api/practices/update", {
       success: PracticeContract.update.success,
       error: errors,
-      payload: PracticeContract.update.payload,
+      payload: Schema.toEncoded(PracticeContract.update.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("deletePractice", "/api/practices/delete", {
       success: PracticeContract.delete.success,
       error: errors,
-      payload: PracticeContract.delete.payload,
+      payload: Schema.toEncoded(PracticeContract.delete.payload),
     }),
   )
 
@@ -56,28 +57,28 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
     HttpApiEndpoint.post("listPracticeItems", "/api/practices/items", {
       success: PracticeContract.listItems.success,
       error: errors,
-      payload: PracticeContract.listItems.payload,
+      payload: Schema.toEncoded(PracticeContract.listItems.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("addPracticeItem", "/api/practices/items/add", {
       success: PracticeContract.addItem.success,
       error: errors,
-      payload: PracticeContract.addItem.payload,
+      payload: Schema.toEncoded(PracticeContract.addItem.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("updatePracticeItem", "/api/practices/items/update", {
       success: PracticeContract.updateItem.success,
       error: errors,
-      payload: PracticeContract.updateItem.payload,
+      payload: Schema.toEncoded(PracticeContract.updateItem.payload),
     }),
   )
   .add(
     HttpApiEndpoint.post("removePracticeItem", "/api/practices/items/remove", {
       success: PracticeContract.removeItem.success,
       error: errors,
-      payload: PracticeContract.removeItem.payload,
+      payload: Schema.toEncoded(PracticeContract.removeItem.payload),
     }),
   )
   .add(
@@ -87,7 +88,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       {
         success: PracticeContract.reorderItems.success,
         error: errors,
-        payload: PracticeContract.reorderItems.payload,
+        payload: Schema.toEncoded(PracticeContract.reorderItems.payload),
       },
     ),
   )
@@ -95,7 +96,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
     HttpApiEndpoint.post("listPracticeEdges", "/api/practices/edges", {
       success: PracticeContract.listEdges.success,
       error: errors,
-      payload: PracticeContract.listEdges.payload,
+      payload: Schema.toEncoded(PracticeContract.listEdges.payload),
     }),
   )
   .add(
@@ -105,7 +106,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       {
         success: PracticeContract.replaceEdges.success,
         error: errors,
-        payload: PracticeContract.replaceEdges.payload,
+        payload: Schema.toEncoded(PracticeContract.replaceEdges.payload),
       },
     ),
   )
@@ -115,7 +116,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
     HttpApiEndpoint.post("getPracticeReview", "/api/practices/review/get", {
       success: PracticeContract.getReview.success,
       error: errors,
-      payload: PracticeContract.getReview.payload,
+      payload: Schema.toEncoded(PracticeContract.getReview.payload),
     }),
   )
   .add(
@@ -125,7 +126,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       {
         success: PracticeContract.createReview.success,
         error: errors,
-        payload: PracticeContract.createReview.payload,
+        payload: Schema.toEncoded(PracticeContract.createReview.payload),
       },
     ),
   )
@@ -136,7 +137,7 @@ export const PracticesGroup = HttpApiGroup.make("Practices")
       {
         success: PracticeContract.updateReview.success,
         error: errors,
-        payload: PracticeContract.updateReview.payload,
+        payload: Schema.toEncoded(PracticeContract.updateReview.payload),
       },
     ),
   );

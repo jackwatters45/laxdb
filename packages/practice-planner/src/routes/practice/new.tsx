@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Field,
@@ -29,15 +29,17 @@ import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
 const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const values = yield* client.DefaultsGetNamespace(practiceDefaultsScope);
+      const client = yield* ApiClient;
+      const values = yield* client.Defaults.getNamespace({
+        payload: practiceDefaultsScope,
+      });
       return decodePracticeDefaults(values);
     }),
   ),
 );
 
-// Client form shape — date is a string here, converted to Date in the handler.
-// The RPC uses core's CreatePracticeInput which expects Date.
+// Client form shape — date stays as an ISO-ish string because the generated
+// HTTP client accepts the API schema's encoded wire type.
 const CreatePracticeForm = Schema.Struct({
   date: Schema.NullOr(Schema.String),
   description: Schema.NullOr(Schema.String),
@@ -52,14 +54,16 @@ const createPractice = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PracticeCreate({
-          name: null,
-          date: data.date ? new Date(data.date) : null,
-          description: data.description ?? null,
-          notes: null,
-          durationMinutes: data.durationMinutes,
-          location: data.location ?? null,
+        const client = yield* ApiClient;
+        return yield* client.Practices.createPractice({
+          payload: {
+            name: null,
+            date: data.date,
+            description: data.description ?? null,
+            notes: null,
+            durationMinutes: data.durationMinutes,
+            location: data.location ?? null,
+          },
         });
       }),
     ),

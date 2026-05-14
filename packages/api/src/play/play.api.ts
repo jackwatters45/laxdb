@@ -5,6 +5,7 @@ import {
   ValidationError,
 } from "@laxdb/core/error";
 import { PlayContract } from "@laxdb/core/play/play.contract";
+import { Schema } from "effect";
 import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi";
 
 export const PlaysGroup = HttpApiGroup.make("Plays")
@@ -28,7 +29,7 @@ export const PlaysGroup = HttpApiGroup.make("Plays")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: PlayContract.get.payload,
+      payload: Schema.toEncoded(PlayContract.get.payload),
     }),
   )
   .add(
@@ -40,7 +41,7 @@ export const PlaysGroup = HttpApiGroup.make("Plays")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: PlayContract.create.payload,
+      payload: Schema.toEncoded(PlayContract.create.payload),
     }),
   )
   .add(
@@ -52,7 +53,7 @@ export const PlaysGroup = HttpApiGroup.make("Plays")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: PlayContract.update.payload,
+      payload: Schema.toEncoded(PlayContract.update.payload),
     }),
   )
   .add(
@@ -64,6 +65,6 @@ export const PlaysGroup = HttpApiGroup.make("Plays")
         DatabaseError,
         ConstraintViolationError,
       ],
-      payload: PlayContract.delete.payload,
+      payload: Schema.toEncoded(PlayContract.delete.payload),
     }),
   );

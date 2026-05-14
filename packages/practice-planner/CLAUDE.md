@@ -13,8 +13,8 @@ Use route loaders for data the user sees immediately:
 ```tsx
 const listPractices = createServerFn({ method: "GET" }).handler(() =>
   runApi(Effect.gen(function* () {
-    const client = yield* RpcApiClient;
-    return yield* client.PracticeList();
+    const client = yield* ApiClient;
+    return yield* client.Practices.listPractices();
   })),
 );
 
@@ -33,8 +33,8 @@ Use `useQuery` with the same `createServerFn` pattern for data that loads after 
 ```tsx
 const loadDrills = createServerFn({ method: "GET" }).handler(() =>
   runApi(Effect.gen(function* () {
-    const client = yield* RpcApiClient;
-    return yield* client.DrillList();
+    const client = yield* ApiClient;
+    return yield* client.Drills.listDrills();
   })),
 );
 
@@ -55,11 +55,11 @@ const { data: drills = [] } = useQuery({
 
 ### `runApi` boundary
 
-All RPC calls go through `runApi()` in `lib/api.ts`, which must only be called inside `createServerFn` handlers — never from client components. `runApi` manages a `ManagedRuntime` singleton, uses NDJSON serialization matching the api server, and JSON round-trips results to strip Effect `Schema.Class` instances (seroval can't serialize them).
+All API calls go through `runApi()` in `lib/api.ts`, which must only be called inside `createServerFn` handlers — never from client components. `runApi` manages a `ManagedRuntime` singleton backed by the generated Effect `HttpApiClient`, and JSON round-trips results to strip Effect `Schema.Class` instances (seroval can't serialize them).
 
-## RPC Client
+## HTTP API Client
 
-Uses a single `RpcApiClient` backed by the merged `LaxdbRpcV2` group. All domains (drills, practices, players) are on one client. Do NOT create per-group clients — Effect's `withRun` semaphore only allows one active `run` callback per Protocol; multiple `RpcClient.make` calls sharing one Protocol will deadlock.
+Uses a generated `ApiClient` from `@laxdb/api/client`, derived from `LaxdbApiV2`. The client mirrors API groups (`client.Drills`, `client.Practices`, `client.Defaults`, etc.) and endpoint names.
 
 ## Composability
 
@@ -73,7 +73,7 @@ Scalar types (`Difficulty`, `DrillCategory`, `PracticeItemType`, etc.) are deriv
 
 | Don't | Do instead |
 |-------|------------|
-| Create per-group RPC clients | Single `RpcApiClient` |
+| Hand-write fetch wrappers | Use generated `ApiClient` |
 | Call `runApi()` from client components | Wrap in `createServerFn` |
 | Duplicate types from core | Derive via `Schema.Schema.Type<>` |
 | Pass shared data as props through layers | Context provider + hook |

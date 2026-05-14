@@ -1,7 +1,7 @@
 import { Effect, Layer, Context } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
 
 import { PlayerRepo } from "./player.repo";
 import {
@@ -29,7 +29,7 @@ export class PlayerService extends Context.Service<PlayerService>()(
             ),
           ),
 
-        getByPublicId: (input: PlayerByIdInput) =>
+        getByPublicId: (input: SchemaInput<typeof PlayerByIdInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.getByPublicId(decoded.publicId);
@@ -44,7 +44,7 @@ export class PlayerService extends Context.Service<PlayerService>()(
             Effect.tapError((e) => Effect.logError("Failed to get player", e)),
           ),
 
-        create: (input: CreatePlayerInput) =>
+        create: (input: SchemaInput<typeof CreatePlayerInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(CreatePlayerInput, input);
             return yield* repo.create(decoded);
@@ -62,7 +62,7 @@ export class PlayerService extends Context.Service<PlayerService>()(
             ),
           ),
 
-        update: (input: UpdatePlayerInput) =>
+        update: (input: SchemaInput<typeof UpdatePlayerInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(UpdatePlayerInput, input);
             return yield* repo.update(decoded.publicId, decoded);
@@ -80,7 +80,7 @@ export class PlayerService extends Context.Service<PlayerService>()(
             ),
           ),
 
-        delete: (input: PlayerByIdInput) =>
+        delete: (input: SchemaInput<typeof PlayerByIdInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(PlayerByIdInput, input);
             return yield* repo.delete(decoded.publicId);
