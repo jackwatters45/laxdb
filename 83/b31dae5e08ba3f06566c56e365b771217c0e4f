@@ -1,0 +1,19 @@
+scripts/run-workspace-tests.mjs
+  s_314c3a0dcb8fca::t_e52fb5c44cef1d 2,107-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "83b31dae5e08ba3f06566c56e365b771217c0e4f",
+  "prompts": {},
+  "sessions": {
+    "s_314c3a0dcb8fca": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e25ae-a28f-724b-ac85-da09b5ab47a2",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
