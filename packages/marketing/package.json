@@ -5,8 +5,9 @@
   "sideEffects": false,
   "scripts": {
     "dev": "vite dev --port 3002",
-    "build": "vite build",
-    "gen:content-collections": "content-collections build",
+    "build": "bun run sync:content-assets && vite build",
+    "gen:content-collections": "bun run sync:content-assets && content-collections build",
+    "sync:content-assets": "bun scripts/sync-content-assets.ts",
     "start": "node .output/server/index.mjs",
     "serve": "vite preview",
     "typecheck": "bun run gen:content-collections && tsgo --noEmit",
