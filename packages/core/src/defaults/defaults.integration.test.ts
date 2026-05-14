@@ -1,5 +1,5 @@
+import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
-import { describe, expect, it } from "vitest";
 
 import { TestDatabaseLive, truncateAll } from "../test/db";
 import { makeTestRunner } from "../test/effect";

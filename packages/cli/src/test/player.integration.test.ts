@@ -4,9 +4,16 @@
  * Tests the full generated HTTP client round-trip: client → HTTP → handler → service → DB
  */
 
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "@effect/vitest";
 import { ApiClient } from "@laxdb/api/client";
 import { Effect } from "effect";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { apiLayer } from "../shared";
 

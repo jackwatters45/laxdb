@@ -1,21 +1,16 @@
-import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Layer } from "effect";
-import { FileSystem } from "effect/FileSystem";
-import { Path } from "effect/Path";
+import { Effect } from "effect";
 
-const getApiEndpointNames = Effect.gen(function* () {
-  const fs = yield* FileSystem;
-  const path = yield* Path;
-  const apiSrcRoot = path.join(import.meta.dirname, "..");
-  const files = yield* fs.readDirectory(apiSrcRoot, { recursive: true });
-  const apiFiles = files.filter((file) => file.endsWith(".api.ts"));
-  const contents = yield* Effect.all(
-    apiFiles.map((file) => fs.readFileString(path.join(apiSrcRoot, file))),
-  );
+const apiSourceFiles = import.meta.glob<string>("../**/*.api.ts", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+});
+
+const getApiEndpointNames = Effect.sync(() => {
   const names = new Set<string>();
 
-  for (const content of contents) {
+  for (const content of Object.values(apiSourceFiles)) {
     for (const match of content.matchAll(
       /HttpApiEndpoint\.\w+\(\s*"([^"]+)"/g,
     )) {
@@ -68,6 +63,6 @@ describe("API definition contract", () => {
         "updatePracticeItem",
         "updatePracticeReview",
       ]);
-    }).pipe(Effect.provide(Layer.merge(NodeFileSystem.layer, NodePath.layer))),
+    }),
   );
 });

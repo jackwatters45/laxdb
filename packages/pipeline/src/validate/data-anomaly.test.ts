@@ -1,8 +1,8 @@
 import { BunServices } from "@effect/platform-bun";
+import { beforeAll, describe, expect, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
-import { beforeAll, describe, expect, it } from "vitest";
 
 const PlayerDetailSchema = Schema.Struct({
   slug: Schema.String,

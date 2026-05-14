@@ -4,7 +4,14 @@
  * Tests the REST endpoints: POST /api/players/*
  */
 
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "@effect/vitest";
 
 import { expectRecord, expectStringProp } from "./assertions";
 import {

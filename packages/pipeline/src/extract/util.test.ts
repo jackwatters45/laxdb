@@ -1,8 +1,8 @@
 import { BunServices } from "@effect/platform-bun";
+import { describe, expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { type PlatformError, systemError } from "effect/PlatformError";
-import { describe, expect, it } from "vitest";
 
 import { GraphQLError } from "../api-client/graphql.service";
 import {

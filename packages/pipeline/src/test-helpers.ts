@@ -1,5 +1,5 @@
+import { expect } from "@effect/vitest";
 import { Cause, Exit, Option } from "effect";
-import { expect } from "vitest";
 
 export const getFailureError = (exit: Exit.Exit<unknown, unknown>): unknown => {
   if (Exit.isSuccess(exit)) {
