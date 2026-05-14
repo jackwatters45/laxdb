@@ -1,0 +1,20 @@
+packages/marketing/vite.config.ts
+  s_3c447743d87c53::t_70a9054aed9216 3,11-13,15,20-22,24-25,29,35-36,39,42,44-45,57,59-61,63,65-66
+  s_3c447743d87c53::t_73c782aa3af12d 1-2,14,16-19,23,26-28,30-34,37-38,40-41,43,58,62,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c6824b8ba348bbdc3fddf4208fc7110ee30a6603",
+  "prompts": {},
+  "sessions": {
+    "s_3c447743d87c53": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2557-0aa6-7622-a513-f26338a27f95",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
