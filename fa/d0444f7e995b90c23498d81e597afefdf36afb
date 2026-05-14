@@ -1,0 +1,28 @@
+package.json
+  s_24c7eaa0bdcfb7::t_7e46d0cd84ef8f 30-31,48
+.github/workflows/deploy.yml
+  s_24c7eaa0bdcfb7::t_2f5f07c792ec45 1-73
+stacks/github.ts
+  s_24c7eaa0bdcfb7::t_8c07b89093cf69 19-21
+  s_24c7eaa0bdcfb7::t_40bd9ae04a7743 9-11,47-48,54-57
+  s_24c7eaa0bdcfb7::t_5f7b099949cce6 15,36
+  s_24c7eaa0bdcfb7::t_5f717749a16a60 1-8,12-14,16-18,22-35,37-46,49-53,58-60
+bun.lock
+  ai_agent 16,466-467,634-635,1516-1517,1628-1629,1952-1953,2116-2119,2268,2532-2535,2690-2691,2808,2964-2965,3188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "fad0444f7e995b90c23498d81e597afefdf36afb",
+  "prompts": {},
+  "sessions": {
+    "s_24c7eaa0bdcfb7": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e250b-80aa-76cc-a816-d76089cd7b87",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
