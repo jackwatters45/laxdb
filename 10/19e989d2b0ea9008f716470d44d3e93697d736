@@ -1,0 +1,24 @@
+packages/marketing/src/lib/marketing-prerender.ts
+  s_3c447743d87c53::t_a5018c5d257227 2-40,42-43,45-46,73-74
+  s_3c447743d87c53::t_750929ccd92e0a 1,41,44,47-72,75-90
+packages/marketing/vite.config.ts
+  s_3c447743d87c53::t_73c782aa3af12d 31
+  s_3c447743d87c53::t_ecce39d3e1215f 5,9,11-13,27,33
+  s_3c447743d87c53::t_70a9054aed9216 10,14,26,28-30,32,34-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1019e989d2b0ea9008f716470d44d3e93697d736",
+  "prompts": {},
+  "sessions": {
+    "s_3c447743d87c53": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2557-0aa6-7622-a513-f26338a27f95",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
