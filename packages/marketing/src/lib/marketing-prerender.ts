@@ -8,6 +8,11 @@ type PrerenderPage = { path: string };
 type PrerenderCandidate = { path: string };
 type PrerenderServices = FileSystem | Path;
 
+type ContentRoute = {
+  slug: string;
+  isWiki: boolean;
+};
+
 interface MarketingPrerenderConfig {
   pages: PrerenderPage[];
   filter: (candidate: PrerenderCandidate) => boolean;
@@ -55,15 +60,35 @@ function slugForContentPath(contentDirectory: string, filePath: string) {
   });
 }
 
-function readContentSlugs(
+function contentHasWikiTag(content: string): boolean {
+  const frontmatterMatch = /^---\s*([\s\S]*?)\s*---/u.exec(content);
+  const frontmatter = frontmatterMatch?.[1];
+  if (!frontmatter) return false;
+
+  const tagsBlockMatch = /^tags:\s*\n((?:\s+-\s+[^\n]+\n?)*)/mu.exec(frontmatter);
+  if (tagsBlockMatch?.[1]) {
+    return tagsBlockMatch[1].split("\n").some((line) => /^\s+-\s+["']?wiki["']?\s*$/u.test(line));
+  }
+
+  const inlineTagsMatch = /^tags:\s*\[([^\]]*)\]/mu.exec(frontmatter);
+  if (inlineTagsMatch?.[1]) {
+    return inlineTagsMatch[1]
+      .split(",")
+      .some((tag) => tag.trim().replaceAll(/["']/gu, "") === "wiki");
+  }
+
+  return /^tags:\s+["']?wiki["']?\s*$/mu.test(frontmatter);
+}
+
+function readContentRoutes(
   contentDirectory: string,
   directory = contentDirectory,
-): Effect.Effect<string[], PlatformError, PrerenderServices> {
+): Effect.Effect<ContentRoute[], PlatformError, PrerenderServices> {
   return Effect.gen(function* () {
     const fs = yield* FileSystem;
     const path = yield* Path;
     const entries = yield* fs.readDirectory(directory);
-    const slugs = yield* Effect.all(
+    const routes = yield* Effect.all(
       entries.map((entry) =>
         Effect.gen(function* () {
           const entryPath = path.join(directory, entry);
@@ -75,11 +100,17 @@ function readContentSlugs(
           const fileInfo = yield* fs.stat(entryPath);
 
           if (fileInfo.type === "Directory") {
-            return yield* readContentSlugs(contentDirectory, entryPath);
+            return yield* readContentRoutes(contentDirectory, entryPath);
           }
 
           if (fileInfo.type === "File" && (yield* isContentFilePath(entryPath))) {
-            return [yield* slugForContentPath(contentDirectory, entryPath)];
+            const content = yield* fs.readFileString(entryPath, "utf-8");
+            return [
+              {
+                slug: yield* slugForContentPath(contentDirectory, entryPath),
+                isWiki: contentHasWikiTag(content),
+              },
+            ];
           }
 
           return [];
@@ -87,14 +118,20 @@ function readContentSlugs(
       ),
     );
 
-    return slugs.flat();
+    return routes.flat();
   });
 }
 
-function shouldPrerenderPath(contentPathSet: ReadonlySet<string>, routePath: string) {
+function shouldPrerenderPath(
+  contentPathSet: ReadonlySet<string>,
+  wikiPathSet: ReadonlySet<string>,
+  routePath: string,
+) {
   return Effect.gen(function* () {
     const pathname = yield* normalizeRoutePath(routePath);
-    return !pathname.startsWith("/content/") || contentPathSet.has(pathname);
+    if (pathname.startsWith("/content/")) return contentPathSet.has(pathname);
+    if (pathname.startsWith("/wiki/") && pathname !== "/wiki") return wikiPathSet.has(pathname);
+    return true;
   });
 }
 
@@ -108,16 +145,20 @@ export function marketingPrerenderConfig({
   return Effect.gen(function* () {
     const path = yield* Path;
     const contentDirectory = path.join(rootDirectory, "src/content");
-    const contentSlugs = yield* readContentSlugs(contentDirectory);
-    const contentPaths = contentSlugs.map((slug) => `/content/${slug}`);
+    const contentRoutes = yield* readContentRoutes(contentDirectory);
+    const contentPaths = contentRoutes.map(({ slug }) => `/content/${slug}`);
+    const wikiPaths = contentRoutes
+      .filter(({ isWiki }) => isWiki)
+      .map(({ slug }) => `/wiki/${slug}`);
     const contentPathSet = new Set(contentPaths);
+    const wikiPathSet = new Set(wikiPaths);
     const services = yield* Effect.context<PrerenderServices>();
     const runWithServices = Effect.runSyncWith(services);
 
     return {
-      pages: contentPaths.map((pagePath) => ({ path: pagePath })),
+      pages: [...contentPaths, ...wikiPaths].map((pagePath) => ({ path: pagePath })),
       filter: ({ path: routePath }: PrerenderCandidate) =>
-        runWithServices(shouldPrerenderPath(contentPathSet, routePath)),
+        runWithServices(shouldPrerenderPath(contentPathSet, wikiPathSet, routePath)),
     };
   });
 }

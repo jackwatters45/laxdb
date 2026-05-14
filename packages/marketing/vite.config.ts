@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 
 import { runMarketingPrerenderConfig } from "./src/lib/marketing-prerender";
+import { pagefindSearch } from "./vite/pagefind";
 
 const cssModuleLocalsConvention = "camelCase" as const;
 
@@ -36,6 +37,11 @@ export default defineConfig(async () => {
         },
       }),
       viteReact(),
+      pagefindSearch({
+        index: {
+          forceLanguage: "en",
+        },
+      }),
     ],
     server: {
       watch: {

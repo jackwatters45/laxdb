@@ -89,7 +89,7 @@ function focusElement(target: HTMLElement) {
 
 export function scrollToHash(hash: string, options: SmoothScrollOptions & HighlightOptions = {}) {
   const id = decodeURIComponent(hash.startsWith("#") ? hash.slice(1) : hash);
-  const target = document.getElementById(id);
+  const target = document.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
 
   if (!target) {
     return false;

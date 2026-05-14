@@ -37,7 +37,7 @@ function basename(path: string): string {
       .split("/")
       .filter((segment) => segment.length > 0)
       .at(-1) ?? path;
-  return lastSegment.replace(/\.[^.]+$/, "");
+  return lastSegment.replace(/\.[^.]+$/u, "");
 }
 
 function isImagePath(path: string): boolean {
@@ -45,9 +45,9 @@ function isImagePath(path: string): boolean {
   return extension !== undefined && imageExtensions.has(extension);
 }
 
-function toContentHref(target: string, heading?: string): string {
+function toWikiHref(target: string, heading?: string): string {
   const headingHash = heading ? `#${toSlug(heading)}` : "";
-  return `/content/${toSlug(target)}${headingHash}`;
+  return `/wiki/${toSlug(target)}${headingHash}`;
 }
 
 function toAssetHref(target: string): string {
@@ -74,20 +74,20 @@ function extractWikiLinks(content: string): string[] {
 }
 
 function transformObsidianEmbeds(content: string): string {
-  return content.replaceAll(/!\[\[([^\]]+)\]\]/g, (_, rawValue: string) => {
+  return content.replaceAll(/!\[\[([^\]]+)\]\]/gu, (_, rawValue: string) => {
     const { target, label } = parseObsidianTarget(rawValue);
     if (!isImagePath(target)) {
       const text = label && label.length > 0 ? label : target;
-      return `[${text}](${toContentHref(target)})`;
+      return `[${text}](${toWikiHref(target)})`;
     }
 
-    const alt = label && !/^\d+(x\d+)?$/.test(label) ? label : basename(target);
+    const alt = label && !/^\d+(x\d+)?$/u.test(label) ? label : basename(target);
     return `![${alt}](${toAssetHref(target)})`;
   });
 }
 
 function transformObsidianWikiLinks(content: string): string {
-  return content.replaceAll(/\[\[([^\]]+)\]\]/g, (_, rawValue: string) => {
+  return content.replaceAll(/\[\[([^\]]+)\]\]/gu, (_, rawValue: string) => {
     const { target, heading, label } = parseObsidianTarget(rawValue);
     const text =
       label && label.length > 0
@@ -95,7 +95,7 @@ function transformObsidianWikiLinks(content: string): string {
         : heading && heading.length > 0
           ? `${target} > ${heading}`
           : target;
-    return `[${text}](${toContentHref(target, heading)})`;
+    return `[${text}](${toWikiHref(target, heading)})`;
   });
 }
 
@@ -104,7 +104,7 @@ function transformObsidianCallouts(content: string): string {
   const transformed: string[] = [];
 
   for (const line of lines) {
-    const calloutMatch = line.match(/^> \[!(\w+)]\s*(.*)$/);
+    const calloutMatch = line.match(/^> \[!(\w+)\]\s*(.*)$/u);
     if (!calloutMatch) {
       transformed.push(line);
       continue;
@@ -122,6 +122,46 @@ function transformObsidianCallouts(content: string): string {
 
 function transformObsidianMarkdown(content: string): string {
   return transformObsidianWikiLinks(transformObsidianEmbeds(transformObsidianCallouts(content)));
+}
+
+interface TableOfContentsItem {
+  [key: string]: string | number;
+  title: string;
+  slug: string;
+  depth: number;
+}
+
+function extractTableOfContents(content: string): TableOfContentsItem[] {
+  const headings: TableOfContentsItem[] = [];
+  const lines = content.replace(/^---[\s\S]*?---\s*/u, "").split("\n");
+  let inCodeFence = false;
+
+  for (const line of lines) {
+    if (line.trimStart().startsWith("```")) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+
+    if (inCodeFence) continue;
+
+    const match = /^(#{2,3})\s+(.+)$/u.exec(line);
+    if (!match) continue;
+
+    const marker = match[1];
+    const rawTitle = match[2];
+    if (!marker || !rawTitle) continue;
+
+    const title = rawTitle.replace(/\s+#$/u, "").trim();
+    if (title.length === 0) continue;
+
+    headings.push({
+      title,
+      slug: toSlug(title),
+      depth: marker.length,
+    });
+  }
+
+  return headings;
 }
 
 const mdxOptions: Options = {
@@ -145,6 +185,9 @@ const posts = defineCollection({
     description: z.string().optional(),
     authors: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
+    section: z.string().optional(),
+    order: z.number().int().optional(),
+    updated: z.iso.date().optional(),
     content: z.string(),
   }),
   transform: async (document, context) => {
@@ -154,17 +197,17 @@ const posts = defineCollection({
 
     const mdx = await compileMDX(context, transformedDocument, mdxOptions);
 
-    const headerImageMatch = transformedContent.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+    const headerImageMatch = transformedContent.match(/!\[([^\]]*)\]\(([^)]+)\)/u);
     const headerImage = headerImageMatch ? headerImageMatch[2] : undefined;
 
     const excerpt =
       document.content
-        .replace(/^---[\s\S]*?---\s*/, "")
-        .replace(/^!\[\[[^\]]+\]\]\s*/, "")
-        .replace(/^!\[[^\]]*]\([^)]+\)\s*/, "")
+        .replace(/^---[\s\S]*?---\s*/u, "")
+        .replace(/^!\[\[[^\]]+\]\]\s*/u, "")
+        .replace(/^!\[[^\]]*\]\([^)]+\)\s*/u, "")
         .split("\n\n")[0]
         ?.replaceAll(
-          /\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g,
+          /\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/gu,
           (_, target: string, label: string | undefined) => label ?? target,
         )
         .trim() ?? undefined;
@@ -174,6 +217,7 @@ const posts = defineCollection({
       slug: document._meta.path,
       excerpt,
       headerImage,
+      tableOfContents: extractTableOfContents(transformedContent),
       wikiLinks,
       mdx,
     };

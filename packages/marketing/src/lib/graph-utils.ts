@@ -139,7 +139,7 @@ export function getContentByTags(
 }
 
 export function groupBySubjectTag(posts: Post[]): Record<string, Post[]> {
-  const subjectTags = new Set(["player", "team", "league", "skill", "media", "event"]);
+  const subjectTags = new Set(["basics", "player", "team", "league", "skill", "media", "event"]);
   const grouped: Record<string, Post[]> = {};
 
   for (const post of posts) {

@@ -24,6 +24,7 @@ function ContentPage() {
   // Determine content type based on tags
   const isWiki = post.tags?.includes("wiki");
   const isBlog = post.tags?.includes("blog");
+  const pagefindDescription = post.description ?? post.excerpt;
 
   return (
     <main className="mx-auto max-w-screen-sm px-4 py-16 md:py-32">
@@ -49,7 +50,18 @@ function ContentPage() {
             </div>
           )}
         </header>
-        <MDXContent code={post.mdx} className="prose-blog prose max-w-none" />
+        <div className="sr-only" data-pagefind-ignore="">
+          <span data-pagefind-filter={`type:${isWiki ? "wiki" : "post"}`} />
+          {post.tags?.map((tag) => (
+            <span key={tag} data-pagefind-filter={`tag:${tag}`} />
+          ))}
+          {pagefindDescription ? (
+            <span data-pagefind-meta="description">{pagefindDescription}</span>
+          ) : null}
+        </div>
+        <div data-pagefind-body="">
+          <MDXContent code={post.mdx} className="prose-blog prose max-w-none" />
+        </div>
         <footer className="mt-12 border-t border-border pt-6">
           <nav className="flex gap-4 text-sm">
             {isBlog && (
