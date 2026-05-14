@@ -41,6 +41,14 @@ describe("POST /api/defaults/get", () => {
     expect(status).toBe(200);
     expect(data).toEqual({});
   });
+
+  it("returns 400 for an invalid scope type", async () => {
+    const { status } = await post(s.url, "/api/defaults/get", {
+      ...practiceScope,
+      scopeType: "league",
+    });
+    expect(status).toBe(400);
+  });
 });
 
 describe("POST /api/defaults/patch", () => {

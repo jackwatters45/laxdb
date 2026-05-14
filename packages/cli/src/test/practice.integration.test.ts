@@ -72,6 +72,22 @@ describe("Practice HTTP API", () => {
     expect(practice.publicId).toHaveLength(12);
   });
 
+  it("round-trips an encoded date string", async () => {
+    const practice = await run(
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Practices.createPractice({
+          payload: {
+            ...minimalPractice,
+            date: "2026-03-14T15:30:00.000Z",
+          },
+        });
+      }),
+    );
+    expect(practice.date).toBeInstanceOf(Date);
+    expect(practice.date?.toISOString()).toBe("2026-03-14T15:30:00.000Z");
+  });
+
   it("gets a practice by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {

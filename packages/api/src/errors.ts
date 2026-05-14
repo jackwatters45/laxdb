@@ -22,6 +22,8 @@ export const DomainErrors = [
   ApiConstraintViolationError,
 ] as const;
 
+// Defaults lookups create an empty namespace when absent, so they do not
+// surface NotFoundError like the domain CRUD groups do.
 export const DefaultsErrors = [
   ApiValidationError,
   ApiDatabaseError,
