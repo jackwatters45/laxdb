@@ -1,7 +1,8 @@
+import { timestamp } from "@laxdb/core/drizzle/drizzle.type";
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import { organizations } from "../auth/auth.sql.ts";
+import { organizations } from "../auth/auth.sql";
 
 export const fineTemplates = sqliteTable(
   "fine_templates",
@@ -12,13 +13,11 @@ export const fineTemplates = sqliteTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     label: text("label").notNull(),
     amountCents: integer("amount_cents").notNull(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
+    createdAt: timestamp("created_at")
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
   },
-  (t) => ({
-    orgIdx: index("fine_templates_org_idx").on(t.organizationId),
-  }),
+  (table) => [index("fine_templates_org_idx").on(table.organizationId)],
 );
 
 export type FineTemplate = typeof fineTemplates.$inferSelect;

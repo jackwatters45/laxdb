@@ -1,9 +1,11 @@
+import { timestamp } from "@laxdb/core/drizzle/drizzle.type";
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import { members, organizations, users } from "../auth/auth.sql.ts";
+import { members, organizations, users } from "../auth/auth.sql";
 
-import { fineTemplates } from "./fineTemplate.sql.ts";
+import { fineTemplates } from "./fine-template.sql";
+import type { FineStatus } from "./fine.schema";
 
 export const fines = sqliteTable(
   "fines",
@@ -21,25 +23,22 @@ export const fines = sqliteTable(
     reason: text("reason").notNull(),
     originalAmountCents: integer("original_amount_cents").notNull(),
     amountCents: integer("amount_cents").notNull(),
-    status: text("status", { enum: ["unpaid", "paid", "forgiven"] })
-      .notNull()
-      .default("unpaid"),
-    issuedAt: integer("issued_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-    dueAt: integer("due_at", { mode: "timestamp_ms" }).notNull(),
-    paidAt: integer("paid_at", { mode: "timestamp_ms" }),
+    status: text("status").$type<FineStatus>().notNull().default("unpaid"),
+    issuedAt: timestamp("issued_at")
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+    dueAt: timestamp("due_at").notNull(),
+    paidAt: timestamp("paid_at"),
     issuedByUserId: text("issued_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
   },
-  (t) => ({
-    orgIdx: index("fines_org_idx").on(t.organizationId),
-    memberIdx: index("fines_member_idx").on(t.memberId),
-    statusDueIdx: index("fines_status_due_idx").on(t.status, t.dueAt),
-  }),
+  (table) => [
+    index("fines_org_idx").on(table.organizationId),
+    index("fines_member_idx").on(table.memberId),
+    index("fines_status_due_idx").on(table.status, table.dueAt),
+  ],
 );
 
 export type Fine = typeof fines.$inferSelect;
 export type NewFine = typeof fines.$inferInsert;
-export type FineStatus = Fine["status"];

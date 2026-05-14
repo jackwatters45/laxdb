@@ -19,7 +19,7 @@ function AppShell() {
   const signOut = async () => {
     await authClient.signOut();
     await router.invalidate();
-    router.navigate({ to: "/login" });
+    await router.navigate({ to: "/login" });
   };
 
   if (!me) return null;
@@ -37,7 +37,13 @@ function AppShell() {
             {me.userName}
             {me.memberRole && ` · ${me.memberRole}`}
           </span>
-          <button onClick={signOut}>Sign out</button>
+          <button
+            onClick={() => {
+              void signOut();
+            }}
+          >
+            Sign out
+          </button>
         </div>
       </header>
 

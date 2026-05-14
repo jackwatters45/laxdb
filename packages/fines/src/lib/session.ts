@@ -9,7 +9,7 @@ export const getMe = createServerFn({ method: "GET" }).handler(
   async (): Promise<MeCtx> => {
     const [{ getAuth }, { resolveMe }] = await Promise.all([
       import("./auth.server"),
-      import("../core/auth/resolveMe"),
+      import("../core/auth/resolve-me"),
     ]);
     const headers = new Headers(getRequestHeaders());
     return resolveMe(getAuth(), headers);

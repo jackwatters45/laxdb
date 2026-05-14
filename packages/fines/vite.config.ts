@@ -12,12 +12,15 @@ export default defineConfig({
   },
   plugins: [
     tsConfigPaths(),
-    tanstackStart({ server: { entry: "./src/server.ts" } }),
+    tanstackStart({
+      router: { generatedRouteTree: "./route-tree.gen.ts" },
+      server: { entry: "./src/server.ts" },
+    }),
     react(),
   ],
   server: {
     watch: {
-      ignored: ["**/routeTree.gen.ts", "**/.tanstack/**"],
+      ignored: ["**/route-tree.gen.ts", "**/.tanstack/**"],
     },
   },
 });

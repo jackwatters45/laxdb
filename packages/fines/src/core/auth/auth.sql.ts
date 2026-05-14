@@ -1,8 +1,11 @@
+import { timestamp } from "@laxdb/core/drizzle/drizzle.type";
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+import type { Role } from "./schema";
+
 const ts = (col: string) =>
-  integer(col, { mode: "timestamp_ms" })
+  timestamp(col)
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull();
 
@@ -22,7 +25,7 @@ export const sessions = sqliteTable(
   "session",
   {
     id: text("id").primaryKey(),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
     createdAt: ts("created_at"),
     updatedAt: ts("updated_at").$onUpdate(() => new Date()),
@@ -33,9 +36,7 @@ export const sessions = sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     activeOrganizationId: text("active_organization_id"),
   },
-  (t) => ({
-    userIdx: index("session_user_idx").on(t.userId),
-  }),
+  (table) => [index("session_user_idx").on(table.userId)],
 );
 
 export const accounts = sqliteTable(
@@ -50,20 +51,14 @@ export const accounts = sqliteTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: integer("access_token_expires_at", {
-      mode: "timestamp_ms",
-    }),
-    refreshTokenExpiresAt: integer("refresh_token_expires_at", {
-      mode: "timestamp_ms",
-    }),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
     scope: text("scope"),
     password: text("password"),
     createdAt: ts("created_at"),
     updatedAt: ts("updated_at").$onUpdate(() => new Date()),
   },
-  (t) => ({
-    userIdx: index("account_user_idx").on(t.userId),
-  }),
+  (table) => [index("account_user_idx").on(table.userId)],
 );
 
 export const verifications = sqliteTable(
@@ -72,13 +67,11 @@ export const verifications = sqliteTable(
     id: text("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
     createdAt: ts("created_at"),
     updatedAt: ts("updated_at").$onUpdate(() => new Date()),
   },
-  (t) => ({
-    identifierIdx: index("verification_identifier_idx").on(t.identifier),
-  }),
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
 export const organizations = sqliteTable("organization", {
@@ -100,13 +93,13 @@ export const members = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    role: text("role").notNull().default("member"),
+    role: text("role").$type<Role>().notNull().default("member"),
     createdAt: ts("created_at"),
   },
-  (t) => ({
-    orgIdx: index("member_org_idx").on(t.organizationId),
-    userIdx: index("member_user_idx").on(t.userId),
-  }),
+  (table) => [
+    index("member_org_idx").on(table.organizationId),
+    index("member_user_idx").on(table.userId),
+  ],
 );
 
 export const invitations = sqliteTable(
@@ -119,15 +112,15 @@ export const invitations = sqliteTable(
     email: text("email").notNull(),
     role: text("role"),
     status: text("status").notNull().default("pending"),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
     inviterId: text("inviter_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
   },
-  (t) => ({
-    orgIdx: index("invitation_org_idx").on(t.organizationId),
-    emailIdx: index("invitation_email_idx").on(t.email),
-  }),
+  (table) => [
+    index("invitation_org_idx").on(table.organizationId),
+    index("invitation_email_idx").on(table.email),
+  ],
 );
 
 export type User = typeof users.$inferSelect;

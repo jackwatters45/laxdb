@@ -29,7 +29,7 @@ function Onboarding() {
         await authClient.organization.setActive({ organizationId });
       }
       await router.invalidate();
-      router.navigate({ to: "/fines" });
+      await router.navigate({ to: "/fines" });
     } catch (cause) {
       setErr(String(cause));
     } finally {
@@ -53,7 +53,9 @@ function Onboarding() {
             </span>
             <input
               value={name}
-              onChange={(e) => setName(e.currentTarget.value)}
+              onChange={(e) => {
+                setName(e.currentTarget.value);
+              }}
               placeholder="LaxDB Fines Mustangs"
               required
             />
@@ -64,7 +66,9 @@ function Onboarding() {
             </span>
             <input
               value={slug}
-              onChange={(e) => setSlug(e.currentTarget.value)}
+              onChange={(e) => {
+                setSlug(e.currentTarget.value);
+              }}
               placeholder="laxdb-fines-mustangs"
             />
           </label>

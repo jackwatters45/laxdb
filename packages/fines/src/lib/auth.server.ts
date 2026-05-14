@@ -4,11 +4,22 @@ import { env } from "cloudflare:workers";
 import { createAuth, type Auth } from "../core/auth/auth";
 
 type Env = {
-  DB: D1Database;
-  BETTER_AUTH_SECRET: string;
-  BETTER_AUTH_URL: string;
-  TRUSTED_ORIGINS?: string;
+  readonly DB: D1Database;
+  readonly BETTER_AUTH_SECRET: string;
+  readonly BETTER_AUTH_URL: string;
+  readonly TRUSTED_ORIGINS?: string;
 };
+
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === "object" && value !== null;
+
+const isEnv = (value: unknown): value is Env =>
+  isRecord(value) &&
+  isRecord(value.DB) &&
+  typeof value.BETTER_AUTH_SECRET === "string" &&
+  typeof value.BETTER_AUTH_URL === "string" &&
+  (value.TRUSTED_ORIGINS === undefined ||
+    typeof value.TRUSTED_ORIGINS === "string");
 
 let cachedAuth: Auth | undefined;
 
@@ -34,6 +45,7 @@ const createWorkerAuth = (workerEnv: Env): Auth =>
 
 export const getAuth = (): Auth => {
   if (cachedAuth) return cachedAuth;
-  cachedAuth = createWorkerAuth(env as Env);
+  if (!isEnv(env)) throw new Error("Fines worker environment is invalid");
+  cachedAuth = createWorkerAuth(env);
   return cachedAuth;
 };
