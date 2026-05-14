@@ -3,7 +3,7 @@ import {
   type AnyD1Database,
   type DrizzleD1Database,
 } from "drizzle-orm/d1";
-import { Array as Arr, Effect, Layer, ServiceMap } from "effect";
+import { Array as Arr, Effect, Layer, Context } from "effect";
 
 // ---------------------------------------------------------------------------
 // SqlError — lightweight tagged error for drizzle query failures
@@ -37,7 +37,7 @@ export const headOrFail = <A>(arr: readonly A[]) =>
 // DrizzleService — provides a typed Cloudflare D1 drizzle instance
 // ---------------------------------------------------------------------------
 
-export class DrizzleService extends ServiceMap.Service<
+export class DrizzleService extends Context.Service<
   DrizzleService,
   DrizzleD1Database
 >()("DrizzleService") {}
@@ -46,7 +46,7 @@ export class DrizzleService extends ServiceMap.Service<
 // Layers
 // ---------------------------------------------------------------------------
 
-export class D1DatabaseBinding extends ServiceMap.Service<
+export class D1DatabaseBinding extends Context.Service<
   D1DatabaseBinding,
   AnyD1Database
 >()("D1DatabaseBinding") {}

@@ -5,7 +5,7 @@
  * and staleness thresholds for incremental scraping.
  */
 
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 // ============================================================================
 // Configuration Types
@@ -36,7 +36,7 @@ const isTimestampStale = (
 // Season Config Service
 // ============================================================================
 
-export class SeasonConfigService extends ServiceMap.Service<SeasonConfigService>()(
+export class SeasonConfigService extends Context.Service<SeasonConfigService>()(
   "SeasonConfigService",
   {
     make: Effect.gen(function* () {

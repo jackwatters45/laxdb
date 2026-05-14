@@ -1,4 +1,4 @@
-import { Layer, Schema, ServiceMap } from "effect";
+import { Layer, Schema, Context } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -36,7 +36,7 @@ export type MSLExtractionManifest = ExtractionManifest<
 >;
 
 // MSL Manifest Service - uses generic factory
-export class MSLManifestService extends ServiceMap.Service<MSLManifestService>()(
+export class MSLManifestService extends Context.Service<MSLManifestService>()(
   "MSLManifestService",
   {
     make: createManifestServiceEffect({

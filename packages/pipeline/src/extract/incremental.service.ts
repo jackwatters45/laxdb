@@ -6,7 +6,7 @@
  * extraction options.
  */
 
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import {
   type EntityStatusLike,
@@ -43,7 +43,7 @@ const normalizeOptions = (options: {
   return { maxAgeHours: options.maxAgeHours, skipExisting: true };
 };
 
-export class IncrementalExtractionService extends ServiceMap.Service<IncrementalExtractionService>()(
+export class IncrementalExtractionService extends Context.Service<IncrementalExtractionService>()(
   "IncrementalExtractionService",
   {
     make: Effect.gen(function* () {

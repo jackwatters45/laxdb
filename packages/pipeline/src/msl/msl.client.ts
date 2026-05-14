@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, Layer, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Schema, Context } from "effect";
 
 import { MSLConfig, PipelineConfig } from "../config";
 import {
@@ -31,7 +31,7 @@ import {
   MSLTeamsRequest,
 } from "./msl.schema";
 
-export class MSLClient extends ServiceMap.Service<MSLClient>()("MSLClient", {
+export class MSLClient extends Context.Service<MSLClient>()("MSLClient", {
   make: Effect.gen(function* () {
     const mslConfig = yield* MSLConfig;
     const pipelineConfig = yield* PipelineConfig;

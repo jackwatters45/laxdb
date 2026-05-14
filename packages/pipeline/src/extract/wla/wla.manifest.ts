@@ -1,4 +1,4 @@
-import { Layer, Schema, ServiceMap } from "effect";
+import { Layer, Schema, Context } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -36,7 +36,7 @@ export type WLAExtractionManifest = ExtractionManifest<
 >;
 
 // WLA Manifest Service - uses generic factory
-export class WLAManifestService extends ServiceMap.Service<WLAManifestService>()(
+export class WLAManifestService extends Context.Service<WLAManifestService>()(
   "WLAManifestService",
   {
     make: createManifestServiceEffect({

@@ -1,4 +1,4 @@
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { decodeArguments, parseSqlError } from "../util";
 
@@ -8,7 +8,7 @@ import {
   PatchDefaultsNamespaceInput,
 } from "./defaults.schema";
 
-export class DefaultsService extends ServiceMap.Service<DefaultsService>()(
+export class DefaultsService extends Context.Service<DefaultsService>()(
   "DefaultsService",
   {
     make: Effect.gen(function* () {

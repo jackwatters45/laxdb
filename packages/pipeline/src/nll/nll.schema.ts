@@ -1,4 +1,4 @@
-import { Schema, SchemaGetter } from "effect";
+import { Schema, SchemaGetter, Effect } from "effect";
 
 // NLL season ID - positive integer (e.g., 225 = 2025-26 season)
 export const NLLSeasonId = Schema.Number.check(
@@ -221,37 +221,37 @@ const NLLPlayerMatchesRaw = Schema.Struct({
 export class NLLPlayerRaw extends Schema.Class<NLLPlayerRaw>("NLLPlayerRaw")({
   personId: Schema.Number,
   firstname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   surname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   fullname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   dateOfBirth: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   height: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   weight: Schema.optional(Schema.NullOr(Schema.Number)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   position: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   jerseyNumber: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   team_id: Schema.optional(Schema.NullOr(Schema.Number)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   team_code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   team_name: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   matches: Schema.optional(NLLPlayerMatchesRaw),
 }) {}
@@ -400,14 +400,14 @@ const NLLSquadScoreRaw = Schema.Struct({
 const NLLScheduleSquadRaw = Schema.Struct({
   id: Schema.Number,
   code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   name: Schema.NullOr(Schema.String),
   nickname: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   displayName: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   score: NLLSquadScoreRaw,
 }).annotate({ identifier: "NLLScheduleSquadRaw" });
@@ -422,10 +422,10 @@ const NLLScheduleSquadsRaw = Schema.Struct({
 const NLLScheduleDateRaw = Schema.Struct({
   startDate: Schema.NullOr(Schema.String),
   startTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   utcMatchStart: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
 }).annotate({ identifier: "NLLScheduleDateRaw" });
 
@@ -435,31 +435,31 @@ const NLLScheduleStatusRaw = Schema.Struct({
   name: Schema.NullOr(Schema.String),
   code: Schema.NullOr(Schema.String),
   typeId: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   typeName: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   period: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   periodSecs: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   periodDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   periodTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   remainingSecs: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   remainingDisplay: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   remainingTime: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
 }).annotate({ identifier: "NLLScheduleStatusRaw" });
 
@@ -467,11 +467,11 @@ const NLLScheduleStatusRaw = Schema.Struct({
 const NLLScheduleVenueRaw = Schema.Struct({
   id: Schema.Number,
   code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   name: Schema.NullOr(Schema.String),
   timeZone: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
 }).annotate({ identifier: "NLLScheduleVenueRaw" });
 
@@ -479,7 +479,7 @@ const NLLScheduleVenueRaw = Schema.Struct({
 const NLLScheduleMatchRaw = Schema.Struct({
   id: Schema.Number,
   weekOrder: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   squads: NLLScheduleSquadsRaw,
   date: NLLScheduleDateRaw,
@@ -490,31 +490,37 @@ const NLLScheduleMatchRaw = Schema.Struct({
       name: Schema.NullOr(Schema.String),
       code: Schema.NullOr(Schema.String),
     }),
-  ).pipe(Schema.withDecodingDefault(() => ({ id: 0, name: null, code: null }))),
+  ).pipe(
+    Schema.withDecodingDefault(
+      Effect.succeed({ id: 0, name: null, code: null }),
+    ),
+  ),
   venue: NLLScheduleVenueRaw,
   winningSquadId: Schema.NullOr(Schema.Number),
 }).annotate({ identifier: "NLLScheduleMatchRaw" });
 
 // Raw week structure in schedule response
 const NLLScheduleWeekRaw = Schema.Struct({
-  id: Schema.optional(Schema.Number).pipe(Schema.withDecodingDefault(() => 0)),
+  id: Schema.optional(Schema.Number).pipe(
+    Schema.withDecodingDefault(Effect.succeed(0)),
+  ),
   code: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   name: Schema.optional(Schema.NullOr(Schema.String)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   number: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 0),
+    Schema.withDecodingDefault(Effect.succeed(0)),
   ),
   phaseNumber: Schema.optional(Schema.Number).pipe(
-    Schema.withDecodingDefault(() => 1),
+    Schema.withDecodingDefault(Effect.succeed(1)),
   ),
   season_id: Schema.optional(Schema.String).pipe(
-    Schema.withDecodingDefault(() => "0"),
+    Schema.withDecodingDefault(Effect.succeed("0")),
   ),
   matches: Schema.optional(Schema.Array(NLLScheduleMatchRaw)).pipe(
-    Schema.withDecodingDefault(() => []),
+    Schema.withDecodingDefault(Effect.succeed([])),
   ),
 }).annotate({ identifier: "NLLScheduleWeekRaw" });
 

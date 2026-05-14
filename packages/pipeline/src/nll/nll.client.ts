@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Duration, Effect, Schedule, Schema, ServiceMap, Layer } from "effect";
+import { Duration, Effect, Schedule, Schema, Context, Layer } from "effect";
 
 import { makeRestClient } from "../api-client/rest-client.service";
 import { NLLConfig, PipelineConfig } from "../config";
@@ -22,7 +22,7 @@ import {
   NLLTeamsResponse,
 } from "./nll.schema";
 
-export class NLLClient extends ServiceMap.Service<NLLClient>()("NLLClient", {
+export class NLLClient extends Context.Service<NLLClient>()("NLLClient", {
   make: Effect.gen(function* () {
     const config = yield* NLLConfig;
     const pipelineConfig = yield* PipelineConfig;

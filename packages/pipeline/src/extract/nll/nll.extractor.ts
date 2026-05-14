@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
+import { Duration, Effect, Result, Layer, Context } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -27,7 +27,7 @@ import {
 
 const NLL_SEASONS = [225] as const;
 
-export class NLLExtractorService extends ServiceMap.Service<NLLExtractorService>()(
+export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
   "NLLExtractorService",
   {
     make: Effect.gen(function* () {
@@ -42,8 +42,8 @@ export class NLLExtractorService extends ServiceMap.Service<NLLExtractorService>
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "nll", String(seasonId), `${entity}.json`);
-      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
-        ServiceMap.add(Path, path),
+      const ioServices = Context.make(FileSystem, fs).pipe(
+        Context.add(Path, path),
       );
 
       const saveOutputJson = <T>(filePath: string, data: T) =>

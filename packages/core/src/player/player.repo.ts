@@ -1,11 +1,11 @@
 import { eq, getColumns } from "drizzle-orm";
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
 import { playerTable } from "./player.sql";
 
-export class PlayerRepo extends ServiceMap.Service<PlayerRepo>()("PlayerRepo", {
+export class PlayerRepo extends Context.Service<PlayerRepo>()("PlayerRepo", {
   make: Effect.gen(function* () {
     const db = yield* DrizzleService;
 

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, Layer, Schedule, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Schedule, Schema, Context } from "effect";
 
 import { MLLConfig, PipelineConfig } from "../config";
 import {
@@ -146,7 +146,7 @@ const mergeMllGame = (
   allGames.push(game);
 };
 
-export class MLLClient extends ServiceMap.Service<MLLClient>()("MLLClient", {
+export class MLLClient extends Context.Service<MLLClient>()("MLLClient", {
   make: Effect.gen(function* () {
     const mllConfig = yield* MLLConfig;
     const pipelineConfig = yield* PipelineConfig;

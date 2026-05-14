@@ -1,5 +1,5 @@
 import { asc, eq, getColumns } from "drizzle-orm";
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
@@ -26,7 +26,7 @@ import {
   practiceTable,
 } from "./practice.sql";
 
-export class PracticeRepo extends ServiceMap.Service<PracticeRepo>()(
+export class PracticeRepo extends Context.Service<PracticeRepo>()(
   "PracticeRepo",
   {
     make: Effect.gen(function* () {

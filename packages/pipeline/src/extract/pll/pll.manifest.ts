@@ -1,4 +1,4 @@
-import { Layer, ServiceMap } from "effect";
+import { Layer, Context } from "effect";
 
 import {
   type SeasonManifest,
@@ -17,7 +17,7 @@ export type { SeasonManifest, EntityStatus };
 export type PLLExtractionManifest = ExtractionManifest<"pll", SeasonManifest>;
 
 // PLL Manifest Service - uses generic factory
-export class PLLManifestService extends ServiceMap.Service<PLLManifestService>()(
+export class PLLManifestService extends Context.Service<PLLManifestService>()(
   "PLLManifestService",
   {
     make: createManifestServiceEffect({

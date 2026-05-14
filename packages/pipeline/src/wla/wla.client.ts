@@ -1,6 +1,6 @@
 import { isRecord } from "@laxdb/core/type-guards";
 import * as cheerio from "cheerio";
-import { Effect, Layer, Option, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Option, Schema, Context } from "effect";
 
 import { PipelineConfig, WLAConfig } from "../config";
 import {
@@ -138,7 +138,7 @@ const extractFromEmbeddedJsonPatterns = <T>(
   }
 };
 
-export class WLAClient extends ServiceMap.Service<WLAClient>()("WLAClient", {
+export class WLAClient extends Context.Service<WLAClient>()("WLAClient", {
   make: Effect.gen(function* () {
     const wlaConfig = yield* WLAConfig;
     const pipelineConfig = yield* PipelineConfig;
