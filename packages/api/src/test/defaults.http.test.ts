@@ -1,9 +1,3 @@
-/**
- * Defaults HTTP API integration tests.
- *
- * Tests the defaults endpoints: POST /api/defaults/*
- */
-
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
