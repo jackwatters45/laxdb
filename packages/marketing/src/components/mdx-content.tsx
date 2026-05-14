@@ -1,10 +1,13 @@
 import { useMDXComponent } from "@content-collections/mdx/react";
+import { useSmoothHashLink } from "@laxdb/ui/hooks/use-smooth-hash-link";
 import { Link } from "@tanstack/react-router";
 import type { ComponentPropsWithoutRef } from "react";
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 
-function Anchor({ href, children, ...props }: AnchorProps) {
+function Anchor({ href, children, onClick, ...props }: AnchorProps) {
+  const handleHashClick = useSmoothHashLink({ href, onClick });
+
   if (href?.startsWith("/")) {
     return (
       <Link to={href} {...props}>
@@ -12,6 +15,15 @@ function Anchor({ href, children, ...props }: AnchorProps) {
       </Link>
     );
   }
+
+  if (href?.startsWith("#")) {
+    return (
+      <a href={href} onClick={handleHashClick} {...props}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <a href={href} rel="noopener noreferrer" target="_blank" {...props}>
       {children}
