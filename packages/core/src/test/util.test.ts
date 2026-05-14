@@ -1,5 +1,5 @@
+import { describe, expect, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
-import { describe, expect, it } from "vitest";
 
 import { ConstraintViolationError, DatabaseError } from "../error";
 import { decodeArguments, parseSqlError } from "../util";

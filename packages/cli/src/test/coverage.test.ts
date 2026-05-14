@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 
 import { CLI_ENTRYPOINTS, CLI_HTTP_COVERAGE } from "../coverage";
 

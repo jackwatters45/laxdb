@@ -1,8 +1,8 @@
 import { BunServices } from "@effect/platform-bun";
+import { describe, expect, it } from "@effect/vitest";
 import { Effect, type Scope } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
-import { describe, expect, it } from "vitest";
 
 import {
   buildReport,
