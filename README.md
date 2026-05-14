@@ -18,6 +18,7 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 - `packages/core`: Shared business logic, database schemas, and core services
 - `packages/cli`: HTTP API-driven developer CLI
 - `packages/docs`: Documentation site built with Fumadocs
+- `packages/fines`: Fines management app imported from Malvern as a temporary standalone feature package
 - `packages/marketing`: Marketing website built with TanStack Start
 - `packages/pipeline`: Effect-based web scraping and HTML parsing pipeline
 - `packages/practice-planner`: Practice planning app built with TanStack Start

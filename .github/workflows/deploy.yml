@@ -106,7 +106,17 @@ jobs:
           fi
 
       - name: Deploy
-        run: bun alchemy deploy --stage ${{ env.STAGE }}
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "Skipping preview deploy because Cloudflare secrets are not available."
+              exit 0
+            fi
+            echo "ERROR: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are required for deploys."
+            exit 1
+          fi
+
+          bun alchemy deploy --stage ${{ env.STAGE }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
