@@ -1,0 +1,27 @@
+packages/marketing/src/components/mdx-content.tsx
+  s_17bf0c4ecd1bf8::t_9dbb12b10fcaf0 2,9-10
+  s_17bf0c4ecd1bf8::t_d244b803977282 8,18-26
+packages/ui/src/lib/smooth-scroll.ts
+  s_17bf0c4ecd1bf8::t_75c68a45d9142f 16-17,30-34,49-50,52-53,56,77-87,92,98
+  s_17bf0c4ecd1bf8::t_b6c424afcc78ea 1-15,18-29,35-48,51,54-55,57-76,88-91,93-97,99-103
+packages/ui/src/hooks/use-smooth-hash-link.ts
+  s_17bf0c4ecd1bf8::t_bd628905cd3c73 1-47
+packages/ui/src/globals.css
+  s_17bf0c4ecd1bf8::t_09551a4577cd3a 208,213-214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "5514a59dc543e9643071df6e6ae3598284c22b37",
+  "prompts": {},
+  "sessions": {
+    "s_17bf0c4ecd1bf8": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2539-ce12-76fc-88ac-1aaaf8123dc5",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
