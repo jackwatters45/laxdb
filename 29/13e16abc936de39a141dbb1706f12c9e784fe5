@@ -1,0 +1,26 @@
+packages/ui/src/lib/smooth-scroll.ts
+  s_17bf0c4ecd1bf8::t_b6c424afcc78ea 1-70,72-81
+  s_17bf0c4ecd1bf8::t_923a01e260b41f 71
+packages/ui/src/globals.css
+  s_17bf0c4ecd1bf8::t_09551a4577cd3a 208,213-214
+packages/marketing/src/components/mdx-content.tsx
+  s_17bf0c4ecd1bf8::t_d244b803977282 4,8,16-31,33-36,38-46
+  s_17bf0c4ecd1bf8::t_0362b6a8774d0f 37
+  s_17bf0c4ecd1bf8::t_2e2fafb0382f0c 2,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2913e16abc936de39a141dbb1706f12c9e784fe5",
+  "prompts": {},
+  "sessions": {
+    "s_17bf0c4ecd1bf8": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2539-ce12-76fc-88ac-1aaaf8123dc5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
