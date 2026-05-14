@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     globals: true,
     testTimeout: 30000,
+    include: ["src/**/*.test.ts"],
+    exclude: ["src/**/*.integration.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json"],

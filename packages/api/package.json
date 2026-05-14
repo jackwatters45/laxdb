@@ -8,6 +8,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration:watch": "vitest --config vitest.integration.config.ts",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --type-aware --fix --quiet",
@@ -19,8 +21,7 @@
     "@laxdb/core": "workspace:*"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241218.0",
-    "vitest": "^3.2.1"
+    "@cloudflare/workers-types": "^4.20241218.0"
   },
   "effect": {
     "generateExports": {

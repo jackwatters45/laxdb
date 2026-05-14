@@ -1,81 +1,55 @@
-import { spawn } from "node:child_process";
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
-import process from "node:process";
-
-const SERIAL_TEST_PACKAGES = new Set([
-  "@laxdb/core",
-  "@laxdb/api",
-  "@laxdb/cli",
-]);
+const SERIAL_TEST_PACKAGES = new Set(["@laxdb/core"]);
 
 async function discoverTestPackages() {
-  const packagesDir = path.join(process.cwd(), "packages");
-  const entries = await readdir(packagesDir, { withFileTypes: true });
+  const packageJsonGlob = new Bun.Glob("packages/*/package.json");
+  const packages = [];
 
-  const packages = await Promise.all(
-    entries
-      .filter((entry) => entry.isDirectory())
-      .map(async (entry) => {
-        const dir = path.join(packagesDir, entry.name);
-        const packageJsonPath = path.join(dir, "package.json");
+  for await (const packageJsonPath of packageJsonGlob.scan({ cwd: Bun.cwd })) {
+    const packageJson = await Bun.file(packageJsonPath).json();
+    const testScript = packageJson.scripts?.test;
 
-        try {
-          const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
-          return typeof packageJson.scripts?.test === "string"
-            ? {
-                name:
-                  typeof packageJson.name === "string"
-                    ? packageJson.name
-                    : entry.name,
-                dir,
-                script:
-                  typeof packageJson.scripts?.["test:run"] === "string"
-                    ? "test:run"
-                    : "test",
-              }
-            : null;
-        } catch (error) {
-          if (
-            typeof error === "object" &&
-            error !== null &&
-            "code" in error &&
-            error.code === "ENOENT"
-          ) {
-            return null;
-          }
-          throw error;
-        }
-      }),
-  );
+    if (typeof testScript !== "string") continue;
 
-  return packages.filter((pkg) => pkg !== null).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+    const name =
+      typeof packageJson.name === "string"
+        ? packageJson.name
+        : packageJsonPath.split("/").at(-2);
+    const script =
+      typeof packageJson.scripts?.["test:run"] === "string"
+        ? "test:run"
+        : "test";
+
+    packages.push({
+      name,
+      dir: packageJsonPath.replace(/\/package\.json$/u, ""),
+      script,
+    });
+  }
+
+  return packages.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function runPackageTest(pkg) {
-  return new Promise((resolve) => {
-    console.log(`\n=== ${pkg.name}: test ===`);
+async function runPackageTest(pkg) {
+  console.log(`\n=== ${pkg.name}: test ===`);
 
-    const child = spawn("bun", ["run", pkg.script], {
+  try {
+    const subprocess = Bun.spawn(["bun", "run", pkg.script], {
       cwd: pkg.dir,
-      stdio: "inherit",
-      env: process.env,
+      stdin: "inherit",
+      stdout: "inherit",
+      stderr: "inherit",
     });
 
-    child.once("error", (error) => {
-      resolve({ pkg, code: 1, error });
-    });
-
-    child.once("close", (code) => {
-      resolve({ pkg, code: code ?? 1, error: null });
-    });
-  });
+    return { pkg, code: await subprocess.exited, error: null };
+  } catch (error) {
+    return { pkg, code: 1, error };
+  }
 }
 
 const packages = await discoverTestPackages();
-const serialPackages = packages.filter((pkg) => SERIAL_TEST_PACKAGES.has(pkg.name));
+const serialPackages = packages.filter((pkg) =>
+  SERIAL_TEST_PACKAGES.has(pkg.name),
+);
 const parallelPackages = packages.filter(
   (pkg) => !SERIAL_TEST_PACKAGES.has(pkg.name),
 );
@@ -104,7 +78,9 @@ if (serialPackages.length > 0) {
 }
 
 const failures = [];
-const parallelResultsPromise = Promise.all(parallelPackages.map(runPackageTest));
+const parallelResultsPromise = Promise.all(
+  parallelPackages.map(runPackageTest),
+);
 
 for (const pkg of serialPackages) {
   const result = await runPackageTest(pkg);

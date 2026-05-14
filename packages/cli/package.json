@@ -5,6 +5,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration:watch": "vitest --config vitest.integration.config.ts",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --type-aware --fix --quiet",
@@ -15,8 +17,5 @@
   "dependencies": {
     "@laxdb/api": "workspace:*",
     "@laxdb/core": "workspace:*"
-  },
-  "devDependencies": {
-    "vitest": "^3.2.1"
   }
 }
