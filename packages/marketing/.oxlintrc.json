@@ -1,8 +1,14 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
   "extends": ["../../.oxlintrc.json"],
+  "plugins": ["typescript", "react", "import", "unicorn", "promise"],
   "rules": {
     "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/only-throw-error": "off"
+    "@typescript-eslint/only-throw-error": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/self-closing-comp": "error",
+    "react/jsx-key": "error"
   }
 }

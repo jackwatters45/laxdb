@@ -3,8 +3,6 @@
   "extends": ["../../.oxlintrc.json"],
   "plugins": ["typescript", "react", "import", "unicorn", "promise"],
   "rules": {
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/only-throw-error": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react/react-in-jsx-scope": "off",
