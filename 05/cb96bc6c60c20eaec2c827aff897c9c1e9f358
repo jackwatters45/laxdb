@@ -1,0 +1,39 @@
+packages/marketing/CLAUDE.md
+  s_31d685aba3cc5d::t_717fadfd967d1d 44
+packages/marketing/src/lib/marketing-prerender.ts
+  s_31d685aba3cc5d::t_24eea1e950b6cd 20
+packages/marketing/src/content/lacrosse-basics.md
+  s_31d685aba3cc5d::t_f1d8f730440990 1-73
+.oxfmtrc.json
+  s_31d685aba3cc5d::t_775cd07f735912 24
+packages/marketing/content-collections.ts
+  s_31d685aba3cc5d::t_63b376d0c8538f 140
+packages/marketing/.oxfmtrc.json
+  s_31d685aba3cc5d::t_2b4eb09a2bd419 4
+.gitignore
+  s_31d685aba3cc5d::t_61473ed5161a67 13-14
+packages/marketing/package.json
+  s_31d685aba3cc5d::t_99c09e0ca7753a 8-10
+.oxlintrc.json
+  s_31d685aba3cc5d::t_4c3b98efb70d3d 39
+packages/marketing/scripts/sync-content-assets.ts
+  s_31d685aba3cc5d::t_05ddc02b60952e 17
+packages/marketing/tsconfig.json
+  s_31d685aba3cc5d::t_2e55779e9df513 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "05cb96bc6c60c20eaec2c827aff897c9c1e9f358",
+  "prompts": {},
+  "sessions": {
+    "s_31d685aba3cc5d": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2551-dee4-7658-b8b6-64ce778e6b0c",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
