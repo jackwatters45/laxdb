@@ -1,0 +1,19 @@
+packages/marketing/src/lib/marketing-prerender.ts
+  s_1b5b28e6a99212::t_f5fefc9b76596d 11-15,63-83,86,91,103,107-113,121,125-129,132-134,148-152,154,159,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "45f69c9d15d753e24f4978313851dc81c23ba082",
+  "prompts": {},
+  "sessions": {
+    "s_1b5b28e6a99212": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2662-91c4-710d-a906-249539135503",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
