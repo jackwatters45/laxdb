@@ -11,8 +11,8 @@
     "start": "node .output/server/index.mjs",
     "serve": "vite preview",
     "typecheck": "bun run gen:content-collections && tsgo --noEmit",
-    "lint": "oxlint --type-aware",
-    "lint:fix": "oxlint --type-aware --fix --quiet",
+    "lint": "bun run gen:content-collections && oxlint --type-aware",
+    "lint:fix": "bun run gen:content-collections && oxlint --type-aware --fix --quiet",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "fix": "bun run lint:fix && bun run format:fix"
