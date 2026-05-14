@@ -1,0 +1,30 @@
+packages/marketing/src/lib/marketing-prerender.ts
+  s_3c447743d87c53::t_a5018c5d257227 6-8,10-21,57,59-60,102
+  s_3c447743d87c53::t_9a6b72448dce32 22-30,34-41,44-53,55-56,94-101,103-113,116-119,121-123
+  s_3c447743d87c53::t_356e7fc3ce8b5c 5,58,61-88,90-93
+  s_3c447743d87c53::t_9354c33df05039 9,33,42-43,54
+  s_3c447743d87c53::t_2c08490d77cef3 114-115,120
+  s_3c447743d87c53::t_7f0732d1503102 126-129
+  s_3c447743d87c53::t_2c5e217fcb8bc6 1-4,89,124-125
+packages/marketing/vite.config.ts
+  s_3c447743d87c53::t_37a4d47a81b2d3 11,47
+  s_3c447743d87c53::t_767b6eeb98b6e3 8
+  s_3c447743d87c53::t_70a9054aed9216 9,43
+  s_3c447743d87c53::t_9f661e318463b5 12-22,24-42,45-46,48,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "54ae83c57f5b9f7813c5043814864c2353d207a3",
+  "prompts": {},
+  "sessions": {
+    "s_3c447743d87c53": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2557-0aa6-7622-a513-f26338a27f95",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
