@@ -19,7 +19,6 @@ concurrency:
 
 env:
   STAGE: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || (github.ref == 'refs/heads/main' && 'prod' || github.ref_name) }}
-  INFISICAL_ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
 
 jobs:
   lint-format:
@@ -96,12 +95,6 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install Infisical CLI
-        run: |
-          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
-          sudo apt-get update
-          sudo apt-get install -y infisical
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -113,15 +106,10 @@ jobs:
           fi
 
       - name: Deploy
-        run: |
-          infisical run --env="${{ env.INFISICAL_ENV }}" -- sh -c '
-            test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo "CLOUDFLARE_API_TOKEN missing from Infisical" >&2; exit 1; }
-            test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "CLOUDFLARE_ACCOUNT_ID missing from Infisical" >&2; exit 1; }
-            bun alchemy deploy --stage "${STAGE}"
-          '
+        run: bun alchemy deploy --stage ${{ env.STAGE }}
         env:
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
-          STAGE: ${{ env.STAGE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PULL_REQUEST: ${{ github.event.number }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -251,12 +239,6 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install Infisical CLI
-        run: |
-          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
-          sudo apt-get update
-          sudo apt-get install -y infisical
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -268,13 +250,8 @@ jobs:
           fi
 
       - name: Destroy preview environment
-        run: |
-          infisical run --env="${{ env.INFISICAL_ENV }}" -- sh -c '
-            test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo "CLOUDFLARE_API_TOKEN missing from Infisical" >&2; exit 1; }
-            test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "CLOUDFLARE_ACCOUNT_ID missing from Infisical" >&2; exit 1; }
-            bun alchemy destroy --stage "${STAGE}"
-          '
+        run: bun alchemy destroy --stage ${{ env.STAGE }}
         env:
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
-          STAGE: ${{ env.STAGE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PULL_REQUEST: ${{ github.event.number }}
