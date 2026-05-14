@@ -1,0 +1,20 @@
+packages/practice-planner/src/lib/api.ts
+  s_44a5960ce854ef::t_08425872848f30 29
+  s_44a5960ce854ef::t_cff40abb51272e 24-27,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "93bb4a5cc5ddfe99d84f572ce22e524da753b12e",
+  "prompts": {},
+  "sessions": {
+    "s_44a5960ce854ef": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e249f-2c03-7378-95fb-23cfb5ec36b6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
