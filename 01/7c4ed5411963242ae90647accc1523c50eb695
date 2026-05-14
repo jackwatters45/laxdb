@@ -1,0 +1,19 @@
+packages/api/src/client.ts
+  s_5cccc733b82eb6::t_e000db0dbca169 1,13-14,16,19-22,24-25,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "017c4ed5411963242ae90647accc1523c50eb695",
+  "prompts": {},
+  "sessions": {
+    "s_5cccc733b82eb6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2452-ca31-747e-b951-bd32a940eb1e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
