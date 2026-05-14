@@ -198,7 +198,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
 
           let manifest = yield* manifestService.load;
 
-          const shouldExtract = (entity: keyof NLLSeasonManifest): boolean => {
+          const shouldExtract = (entity: keyof NLLSeasonManifest) => {
             const seasonManifest = manifestService.getSeasonManifest(
               manifest,
               seasonId,
@@ -208,7 +208,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
           };
 
           // Extract teams
-          if (shouldExtract("teams")) {
+          if (yield* shouldExtract("teams")) {
             const result = yield* extractTeams(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -223,7 +223,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
           }
 
           // Extract players
-          if (shouldExtract("players")) {
+          if (yield* shouldExtract("players")) {
             const result = yield* extractPlayers(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -238,7 +238,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
           }
 
           // Extract standings
-          if (shouldExtract("standings")) {
+          if (yield* shouldExtract("standings")) {
             const result = yield* extractStandings(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -253,7 +253,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
           }
 
           // Extract schedule
-          if (shouldExtract("schedule")) {
+          if (yield* shouldExtract("schedule")) {
             const result = yield* extractSchedule(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -268,7 +268,7 @@ export class NLLExtractorService extends Context.Service<NLLExtractorService>()(
           }
 
           // Extract player stats (scraped from nll.com)
-          if (shouldExtract("playerStats")) {
+          if (yield* shouldExtract("playerStats")) {
             const result = yield* extractPlayerStats(seasonId);
             manifest = manifestService.markComplete(
               manifest,

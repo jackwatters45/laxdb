@@ -1,5 +1,13 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Schema, Context } from "effect";
+import {
+  Clock,
+  Duration,
+  Effect,
+  Result,
+  Layer,
+  Schema,
+  Context,
+} from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
@@ -92,7 +100,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
       const extractTeamDetails = (year: number, teams: readonly PLLTeam[]) =>
         Effect.gen(function* () {
           yield* Effect.log(`  🏟️ Extracting team details for ${year}...`);
-          const start = Date.now();
+          const start = yield* Clock.currentTimeMillis;
 
           const results = yield* Effect.forEach(
             teams,
@@ -120,7 +128,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             .filter((r) => Result.isSuccess(r))
             .map((r) => r.success);
 
-          const durationMs = Date.now() - start;
+          const durationMs = (yield* Clock.currentTimeMillis) - start;
           yield* saveOutputJson(getOutputPath(year, "team-details"), details);
           yield* Effect.log(
             `     ✓ ${details.length} team details (${durationMs}ms)`,
@@ -197,7 +205,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
       ) =>
         Effect.gen(function* () {
           yield* Effect.log(`  👤 Extracting player details for ${year}...`);
-          const start = Date.now();
+          const start = yield* Clock.currentTimeMillis;
 
           const playersWithSlug = players.filter(
             (p): p is PLLPlayer & { slug: string } => p.slug !== null,
@@ -231,7 +239,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             .map((r) => r.success)
             .filter((d): d is PLLPlayerDetail => d !== null);
 
-          const durationMs = Date.now() - start;
+          const durationMs = (yield* Clock.currentTimeMillis) - start;
           yield* saveOutputJson(getOutputPath(year, "player-details"), details);
           yield* Effect.log(
             `     ✓ ${details.length} player details (${durationMs}ms)`,
@@ -269,7 +277,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
       const extractEventDetails = (year: number, events: readonly PLLEvent[]) =>
         Effect.gen(function* () {
           yield* Effect.log(`  📋 Extracting event details for ${year}...`);
-          const start = Date.now();
+          const start = yield* Clock.currentTimeMillis;
 
           const completedEvents = events.filter(
             (e): e is PLLEvent & { slugname: string } =>
@@ -296,7 +304,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             .map((r) => r.success)
             .filter((d): d is PLLEventDetail => d !== null);
 
-          const durationMs = Date.now() - start;
+          const durationMs = (yield* Clock.currentTimeMillis) - start;
           yield* saveOutputJson(getOutputPath(year, "event-details"), details);
           yield* Effect.log(
             `     ✓ ${details.length} event details (${durationMs}ms)`,
@@ -372,7 +380,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
 
           let manifest = yield* manifestService.load;
 
-          const shouldExtract = (entity: keyof SeasonManifest): boolean => {
+          const shouldExtract = (entity: keyof SeasonManifest) => {
             const seasonManifest = manifestService.getSeasonManifest(
               manifest,
               year,
@@ -381,7 +389,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             return incremental.shouldExtract(entityStatus, year, options);
           };
 
-          if (shouldExtract("teams")) {
+          if (yield* shouldExtract("teams")) {
             const result = yield* extractTeams(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -394,7 +402,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             yield* Effect.log("  📊 Teams: skipped (already extracted)");
           }
 
-          if (includeDetails && shouldExtract("teamDetails")) {
+          if (includeDetails && (yield* shouldExtract("teamDetails"))) {
             const teamsPath = getOutputPath(year, "teams");
             const teamsData = yield* readJsonFile(teamsPath);
             const teams = yield* Effect.try({
@@ -431,7 +439,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             yield* Effect.log("  🏟️ Team details: skipped (already extracted)");
           }
 
-          if (shouldExtract("players")) {
+          if (yield* shouldExtract("players")) {
             const result = yield* extractPlayers(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -444,7 +452,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             yield* Effect.log("  👥 Players: skipped (already extracted)");
           }
 
-          if (shouldExtract("advancedPlayers")) {
+          if (yield* shouldExtract("advancedPlayers")) {
             const result = yield* extractAdvancedPlayers(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -459,7 +467,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             );
           }
 
-          if (includeDetails && shouldExtract("playerDetails")) {
+          if (includeDetails && (yield* shouldExtract("playerDetails"))) {
             const playersPath = getOutputPath(year, "players");
             const playersData = yield* readJsonFile(playersPath);
             const players = yield* Effect.try({
@@ -498,7 +506,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             );
           }
 
-          if (shouldExtract("events")) {
+          if (yield* shouldExtract("events")) {
             const result = yield* extractEvents(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -511,7 +519,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             yield* Effect.log("  🎮 Events: skipped (already extracted)");
           }
 
-          if (includeDetails && shouldExtract("eventDetails")) {
+          if (includeDetails && (yield* shouldExtract("eventDetails"))) {
             const eventsPath = getOutputPath(year, "events");
             const eventsData = yield* readJsonFile(eventsPath);
             const events = yield* Effect.try({
@@ -550,7 +558,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             );
           }
 
-          if (shouldExtract("standings")) {
+          if (yield* shouldExtract("standings")) {
             const result = yield* extractStandings(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -563,7 +571,7 @@ export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
             yield* Effect.log("  📈 Standings: skipped (already extracted)");
           }
 
-          if (shouldExtract("standingsCS")) {
+          if (yield* shouldExtract("standingsCS")) {
             const result = yield* extractStandingsCS(year);
             manifest = manifestService.markComplete(
               manifest,

@@ -1,4 +1,12 @@
-import { Effect, Schema, Array as Arr, Context, Layer } from "effect";
+import {
+  Clock,
+  Effect,
+  Schema,
+  Array as Arr,
+  Context,
+  Layer,
+  Result,
+} from "effect";
 
 import { PipelineConfig } from "../config";
 import { formatUnknownError } from "../util";
@@ -39,7 +47,7 @@ export class ScraperService extends Context.Service<ScraperService>()(
           Effect.gen(function* () {
             const request =
               yield* Schema.decodeUnknownEffect(BatchScrapeRequest)(input);
-            const startTime = Date.now();
+            const startTime = yield* Clock.currentTimeMillis;
 
             const concurrency = request.concurrency ?? config.maxConcurrency;
 
@@ -62,21 +70,44 @@ export class ScraperService extends Context.Service<ScraperService>()(
                         error: undefined,
                       }),
                     ),
-                    Effect.catch((error) =>
-                      Effect.succeed<ScrapeResult>({
-                        url,
-                        success: false,
-                        response: undefined,
-                        error: formatUnknownError(error),
-                      }),
-                    ),
+                    Effect.catchTags({
+                      ScraperHttpError: (error) =>
+                        Effect.succeed<ScrapeResult>({
+                          url,
+                          success: false,
+                          response: undefined,
+                          error: formatUnknownError(error),
+                        }),
+                      ScraperTimeoutError: (error) =>
+                        Effect.succeed<ScrapeResult>({
+                          url,
+                          success: false,
+                          response: undefined,
+                          error: formatUnknownError(error),
+                        }),
+                      ScraperRateLimitError: (error) =>
+                        Effect.succeed<ScrapeResult>({
+                          url,
+                          success: false,
+                          response: undefined,
+                          error: formatUnknownError(error),
+                        }),
+                      ScraperNetworkError: (error) =>
+                        Effect.succeed<ScrapeResult>({
+                          url,
+                          success: false,
+                          response: undefined,
+                          error: formatUnknownError(error),
+                        }),
+                    }),
                   ),
               { concurrency },
             );
 
             const successCount = Arr.filter(results, (r) => r.success).length;
             const failureCount = results.length - successCount;
-            const totalDurationMs = Date.now() - startTime;
+            const endTime = yield* Clock.currentTimeMillis;
+            const totalDurationMs = endTime - startTime;
 
             return {
               results,
@@ -95,29 +126,34 @@ export class ScraperService extends Context.Service<ScraperService>()(
 
         ping: (url: string) =>
           Effect.gen(function* () {
-            const startTime = Date.now();
-            const response = yield* client.fetch({
-              url,
-              timeoutMs: 5000,
-              followRedirects: true,
-            });
+            const startTime = yield* Clock.currentTimeMillis;
+            const result = yield* client
+              .fetch({
+                url,
+                timeoutMs: 5000,
+                followRedirects: true,
+              })
+              .pipe(Effect.result);
+            const endTime = yield* Clock.currentTimeMillis;
+            const durationMs = endTime - startTime;
+
+            if (Result.isSuccess(result)) {
+              return {
+                url,
+                accessible: true,
+                statusCode: result.success.statusCode,
+                durationMs,
+              };
+            }
+
             return {
               url,
-              accessible: true,
-              statusCode: response.statusCode,
-              durationMs: Date.now() - startTime,
+              accessible: false,
+              statusCode: undefined,
+              durationMs,
+              error: formatUnknownError(result.failure),
             };
-          }).pipe(
-            Effect.catch((error) =>
-              Effect.succeed({
-                url,
-                accessible: false,
-                statusCode: undefined,
-                durationMs: Date.now(),
-                error: formatUnknownError(error),
-              }),
-            ),
-          ),
+          }),
       } as const;
     }),
   },

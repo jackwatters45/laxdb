@@ -3,26 +3,44 @@
  * Run: bun packages/pipeline/src/pll/extract-queries.ts
  */
 
-const PLL_STATS_URL = "https://stats.premierlacrosseleague.com";
+import { BunRuntime } from "@effect/platform-bun";
+import { Console, Effect } from "effect";
 
-async function extractQueries() {
-  const html = await fetch(PLL_STATS_URL).then((r) => r.text());
+import { fetchText } from "../http";
+
+const PLL_STATS_URL = "https://stats.premierlacrosseleague.com";
+const REQUEST_TIMEOUT_MS = 30_000;
+
+const fetchPllText = (url: string) =>
+  fetchText({
+    url,
+    timeoutMs: REQUEST_TIMEOUT_MS,
+    timeoutMessage: `Timed out fetching ${url}`,
+    networkMessage: (error) =>
+      `Network error fetching ${url}: ${String(error)}`,
+    httpMessage: (statusCode) => `HTTP ${statusCode} fetching ${url}`,
+    bodyReadMessage: (error) =>
+      `Failed to read response body from ${url}: ${String(error)}`,
+  });
+
+const program = Effect.gen(function* () {
+  const html = yield* fetchPllText(PLL_STATS_URL);
 
   const jsMatch = html.match(/src="(\/static\/js\/main\.[^"]+\.js)"/);
   if (!jsMatch) {
-    console.error("Could not find main JS bundle");
+    yield* Console.error("Could not find main JS bundle");
     return;
   }
 
   const jsUrl = `${PLL_STATS_URL}${jsMatch[1]}`;
-  console.log(`Fetching: ${jsUrl}\n`);
+  yield* Console.log(`Fetching: ${jsUrl}\n`);
 
-  const js = await fetch(jsUrl).then((r) => r.text());
+  const js = yield* fetchPllText(jsUrl);
 
   const queryPattern = /"\\nquery\(\$[^"]+"/g;
   const matches = js.match(queryPattern) ?? [];
 
-  console.log(`Found ${matches.length} queries:\n`);
+  yield* Console.log(`Found ${matches.length} queries:\n`);
 
   const seen = new Set<string>();
   for (const match of matches) {
@@ -37,10 +55,10 @@ async function extractQueries() {
     const varsMatch = clean.match(/query\(([^)]+)\)/);
     const vars = varsMatch?.[1] ?? "";
 
-    console.log(`=== ${opName} ===`);
-    console.log(`Variables: ${vars}`);
-    console.log(clean.slice(0, 600) + "...\n");
+    yield* Console.log(`=== ${opName} ===`);
+    yield* Console.log(`Variables: ${vars}`);
+    yield* Console.log(`${clean.slice(0, 600)}...\n`);
   }
-}
+});
 
-await extractQueries();
+BunRuntime.runMain(program);

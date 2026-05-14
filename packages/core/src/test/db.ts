@@ -1,5 +1,9 @@
+import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { drizzle } from "drizzle-orm/d1";
 import { Effect, Layer } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import type { PlatformError } from "effect/PlatformError";
 import { Miniflare } from "miniflare";
 
 import { defaultsTable } from "../defaults/defaults.sql";
@@ -22,24 +26,33 @@ const TEST_DATABASE_ID = "laxdb-test";
 let miniflare: Miniflare | undefined;
 let databasePromise: Promise<TestD1Database> | undefined;
 
-const collectSqlFiles = async (directory: string): Promise<string[]> => {
-  const { readdir } = await import("node:fs/promises");
-  const path = await import("node:path");
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files: string[] = [];
+type MigrationServices = FileSystem | Path;
 
-  for (const entry of entries) {
-    const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      // oxlint-disable-next-line no-await-in-loop -- recurse directory tree deterministically
-      files.push(...(await collectSqlFiles(fullPath)));
-    } else if (entry.isFile() && entry.name.endsWith(".sql")) {
-      files.push(fullPath);
-    }
-  }
+const MigrationPlatformLive = Layer.merge(NodeFileSystem.layer, NodePath.layer);
 
-  return files.toSorted((a, b) => a.localeCompare(b));
-};
+const collectSqlFiles = (
+  directory: string,
+): Effect.Effect<string[], PlatformError, MigrationServices> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem;
+    const path = yield* Path;
+    const entries = yield* fs.readDirectory(directory);
+    const files = yield* Effect.all(
+      entries.map((entry) =>
+        Effect.gen(function* () {
+          const fullPath = path.join(directory, entry);
+          const info = yield* fs.stat(fullPath);
+
+          if (info.type === "Directory")
+            return yield* collectSqlFiles(fullPath);
+          if (info.type === "File" && entry.endsWith(".sql")) return [fullPath];
+          return [];
+        }),
+      ),
+    );
+
+    return files.flat().toSorted((a, b) => a.localeCompare(b));
+  });
 
 const splitStatements = (sql: string) =>
   sql
@@ -47,20 +60,21 @@ const splitStatements = (sql: string) =>
     .map((statement) => statement.trim())
     .filter((statement) => statement !== "");
 
-const applyMigrations = async (db: TestD1Database) => {
-  const { readFile } = await import("node:fs/promises");
-  const migrationsDir = new URL("../../migrations", import.meta.url).pathname;
-  const files = await collectSqlFiles(migrationsDir);
+const applyMigrations = (
+  db: TestD1Database,
+): Effect.Effect<void, PlatformError, MigrationServices> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem;
+    const migrationsDir = new URL("../../migrations", import.meta.url).pathname;
+    const files = yield* collectSqlFiles(migrationsDir);
 
-  for (const file of files) {
-    // oxlint-disable-next-line no-await-in-loop -- migrations must load and run sequentially
-    const sql = await readFile(file, "utf-8");
-    for (const statement of splitStatements(sql)) {
-      // oxlint-disable-next-line no-await-in-loop -- migrations must run in order
-      await db.prepare(statement).run();
+    for (const file of files) {
+      const sql = yield* fs.readFileString(file);
+      for (const statement of splitStatements(sql)) {
+        yield* Effect.promise(() => db.prepare(statement).run());
+      }
     }
-  }
-};
+  });
 
 export const getTestD1Database = () => {
   if (databasePromise === undefined) {
@@ -71,7 +85,10 @@ export const getTestD1Database = () => {
     });
 
     databasePromise = miniflare.getD1Database("DB").then(async (db) => {
-      await applyMigrations(db);
+      await applyMigrations(db).pipe(
+        Effect.provide(MigrationPlatformLive),
+        Effect.runPromise,
+      );
       return db;
     });
   }

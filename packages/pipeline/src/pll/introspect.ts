@@ -1,8 +1,12 @@
 /**
- * Run with: infisical run --env=dev -- bun packages/pipeline/src/pll/introspect.ts
+ * Run with: infisical run --env=dev -- bun packages/pipeline/src/pll/introspect.ts --slug=2024_game_1
  */
 
-import { Config, Effect, Redacted } from "effect";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
+import { Config, Console, Effect, Redacted } from "effect";
+import { Command, Flag } from "effect/unstable/cli";
+
+import { fetchJson } from "../http";
 
 const EVENT_QUERY = `
 query($slug: ID!) {
@@ -27,34 +31,46 @@ query($slug: ID!) {
 }
 `;
 
+const slugOption = Flag.string("slug").pipe(
+  Flag.withDescription("PLL event slug to fetch"),
+  Flag.withDefault("2024_game_1"),
+);
+
 const program = Effect.gen(function* () {
   const token = yield* Config.redacted("PLL_GRAPHQL_TOKEN");
-  const slug = process.argv[2] ?? "2024_game_1";
 
-  console.log(`Fetching event: ${slug}\n`);
+  const command = Command.make(
+    "pll-introspect",
+    { slug: slugOption },
+    ({ slug }) =>
+      Effect.gen(function* () {
+        yield* Console.log(`Fetching event: ${slug}\n`);
 
-  const response = yield* Effect.tryPromise({
-    try: () =>
-      fetch("https://api.stats.premierlacrosseleague.com/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Redacted.value(token)}`,
-          Origin: "https://stats.premierlacrosseleague.com",
-          Referer: "https://stats.premierlacrosseleague.com/",
-        },
-        body: JSON.stringify({ query: EVENT_QUERY, variables: { slug } }),
+        const result = yield* fetchJson({
+          url: "https://api.stats.premierlacrosseleague.com/graphql",
+          timeoutMs: 30_000,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Redacted.value(token)}`,
+            Origin: "https://stats.premierlacrosseleague.com",
+            Referer: "https://stats.premierlacrosseleague.com/",
+          },
+          body: JSON.stringify({ query: EVENT_QUERY, variables: { slug } }),
+          timeoutMessage: `Timed out fetching event ${slug}`,
+          networkMessage: (error) => `Fetch failed: ${String(error)}`,
+          httpMessage: (statusCode, statusText) =>
+            `HTTP ${statusCode}: ${statusText}`,
+          rateLimitMessage: "Rate limited by PLL GraphQL API",
+          jsonParseMessage: (error) =>
+            `Failed to parse response JSON: ${String(error)}`,
+        });
+
+        yield* Console.log(JSON.stringify(result, null, 2));
       }),
-    catch: (e) => new Error(`Fetch failed: ${String(e)}`),
-  });
+  );
 
-  if (!response.ok) {
-    const text = yield* Effect.tryPromise(() => response.text());
-    return yield* Effect.fail(new Error(`HTTP ${response.status}: ${text}`));
-  }
-
-  const result = yield* Effect.tryPromise(() => response.json());
-  console.log(JSON.stringify(result, null, 2));
+  return yield* Command.run(command, { version: "1.0.0" });
 });
 
-await Effect.runPromise(program).catch(console.error);
+BunRuntime.runMain(program.pipe(Effect.provide(BunServices.layer)));

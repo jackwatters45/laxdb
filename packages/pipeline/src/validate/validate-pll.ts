@@ -1,5 +1,5 @@
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Clock, Effect, Layer } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -77,7 +77,7 @@ const program = Effect.gen(function* () {
   const fs = yield* FileSystem;
   const path = yield* Path;
   const pllDir = path.join(config.outputDir, "pll");
-  const startTime = Date.now();
+  const startTime = yield* Clock.currentTimeMillis;
 
   yield* Effect.log(`\nValidating PLL extracted data...`);
   yield* Effect.log(`Output directory: ${pllDir}\n`);
@@ -321,7 +321,13 @@ const program = Effect.gen(function* () {
     });
   }
 
-  const report = buildReport("PLL", fileResults, crossRefs, startTime);
+  const report = buildReport(
+    "PLL",
+    fileResults,
+    crossRefs,
+    startTime,
+    yield* Clock.currentTimeMillis,
+  );
   yield* printReport(report);
 
   const reportPath = path.join(pllDir, "validation-report.json");

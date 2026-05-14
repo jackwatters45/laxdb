@@ -6,12 +6,12 @@
  * extraction options.
  */
 
-import { Effect, Layer, Context } from "effect";
+import { Clock, Effect, Layer, Context } from "effect";
 
 import {
   type EntityStatusLike,
   type ExtractOptions,
-  isEntityStale,
+  isEntityStaleAt,
 } from "./extract.schema";
 import { SeasonConfigService } from "./season-config";
 
@@ -53,39 +53,42 @@ export class IncrementalExtractionService extends Context.Service<IncrementalExt
         entityStatus: EntityStatusLike | undefined,
         seasonId: number,
         options: IncrementalExtractOptions = {},
-      ): boolean => {
-        const { mode, skipExisting = true, maxAgeHours } = options;
+      ): Effect.Effect<boolean> =>
+        Effect.gen(function* () {
+          const { mode, skipExisting = true, maxAgeHours } = options;
 
-        // Full mode always re-extracts, regardless of existing data.
-        if (mode === "full") {
-          return true;
-        }
+          // Full mode always re-extracts, regardless of existing data.
+          if (mode === "full") {
+            return true;
+          }
 
-        // Incremental mode uses the season-aware freshness window.
-        // Current seasons get a finite max age; historical seasons typically do not.
-        if (mode === "incremental") {
-          const autoMaxAge = seasonConfig.getMaxAgeHours(seasonId);
-          return isEntityStale(entityStatus, autoMaxAge);
-        }
+          // Incremental mode uses the season-aware freshness window.
+          // Current seasons get a finite max age; historical seasons typically do not.
+          if (mode === "incremental") {
+            const autoMaxAge = seasonConfig.getMaxAgeHours(seasonId);
+            const nowMs = yield* Clock.currentTimeMillis;
+            return isEntityStaleAt(entityStatus, autoMaxAge, nowMs);
+          }
 
-        // Skip-existing mode only fills gaps and never refreshes existing data.
-        if (mode === "skip-existing") {
+          // Skip-existing mode only fills gaps and never refreshes existing data.
+          if (mode === "skip-existing") {
+            return !entityStatus?.extracted;
+          }
+
+          // Legacy escape hatch: when skipExisting is false, behave like a full extract.
+          if (!skipExisting) {
+            return true;
+          }
+
+          // Legacy age-based mode: if the caller passed an explicit max age, respect it.
+          if (maxAgeHours !== undefined) {
+            const nowMs = yield* Clock.currentTimeMillis;
+            return isEntityStaleAt(entityStatus, maxAgeHours, nowMs);
+          }
+
+          // Default behavior matches skip-existing for backwards compatibility.
           return !entityStatus?.extracted;
-        }
-
-        // Legacy escape hatch: when skipExisting is false, behave like a full extract.
-        if (!skipExisting) {
-          return true;
-        }
-
-        // Legacy age-based mode: if the caller passed an explicit max age, respect it.
-        if (maxAgeHours !== undefined) {
-          return isEntityStale(entityStatus, maxAgeHours);
-        }
-
-        // Default behavior matches skip-existing for backwards compatibility.
-        return !entityStatus?.extracted;
-      };
+        });
 
       const getSeasonMaxAge = (seasonId: number): number | null => {
         return seasonConfig.getMaxAgeHours(seasonId);

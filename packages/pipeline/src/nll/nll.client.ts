@@ -4,6 +4,7 @@ import { Duration, Effect, Schedule, Schema, Context, Layer } from "effect";
 import { makeRestClient } from "../api-client/rest-client.service";
 import { NLLConfig, PipelineConfig } from "../config";
 import { ParseError, type PipelineError } from "../error";
+import { fetchText } from "../http";
 import { mapParseError } from "../util";
 
 import {
@@ -126,38 +127,22 @@ export class NLLClient extends Context.Service<NLLClient>()("NLLClient", {
 
             yield* Effect.log(`  Scraping page ${page}: ${url}`);
 
-            const response = yield* Effect.tryPromise({
-              try: () =>
-                fetch(url, {
-                  headers: {
-                    "User-Agent": pipelineConfig.userAgent,
-                    Accept: "text/html",
-                    Origin: "https://www.nll.com",
-                    Referer: "https://www.nll.com/stats/",
-                  },
-                }),
-              catch: (error) =>
-                new ParseError({
-                  message: `Failed to fetch stats page: ${String(error)}`,
-                  cause: error,
-                }),
-            });
-
-            if (!response.ok) {
-              return yield* Effect.fail(
-                new ParseError({
-                  message: `HTTP ${response.status} fetching stats page`,
-                }),
-              );
-            }
-
-            const html = yield* Effect.tryPromise({
-              try: () => response.text(),
-              catch: (error) =>
-                new ParseError({
-                  message: `Failed to read response: ${String(error)}`,
-                  cause: error,
-                }),
+            const html = yield* fetchText({
+              url,
+              timeoutMs: pipelineConfig.defaultTimeoutMs,
+              headers: {
+                "User-Agent": pipelineConfig.userAgent,
+                Accept: "text/html",
+                Origin: "https://www.nll.com",
+                Referer: "https://www.nll.com/stats/",
+              },
+              timeoutMessage: `Timed out fetching stats page: ${url}`,
+              networkMessage: (error) =>
+                `Failed to fetch stats page: ${String(error)}`,
+              httpMessage: (statusCode) =>
+                `HTTP ${statusCode} fetching stats page`,
+              bodyReadMessage: (error) =>
+                `Failed to read response: ${String(error)}`,
             });
 
             const pageStats = parseStatsTable(html);

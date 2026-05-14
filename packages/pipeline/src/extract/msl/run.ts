@@ -91,9 +91,7 @@ const program = Effect.gen(function* () {
           : yield* extractor.extractSeason(season, { mode });
 
         if (json) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
+          yield* Console.log(JSON.stringify(manifest, null, 2));
         }
       }),
   );

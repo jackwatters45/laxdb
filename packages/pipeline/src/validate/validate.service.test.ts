@@ -326,7 +326,7 @@ describe("buildReport", () => {
       },
     ];
 
-    const report = buildReport("TestSource", files, [], Date.now() - 100);
+    const report = buildReport("TestSource", files, [], 900, 1000);
 
     expect(report.source).toBe("TestSource");
     expect(report.summary.totalChecks).toBe(2);
@@ -361,7 +361,7 @@ describe("buildReport", () => {
       },
     ];
 
-    const report = buildReport("TestSource", files, [], Date.now());
+    const report = buildReport("TestSource", files, [], 1000, 1000);
 
     expect(report.overallValid).toBe(true);
     expect(report.summary.warningCount).toBe(1);
@@ -381,7 +381,7 @@ describe("buildReport", () => {
       },
     ];
 
-    const report = buildReport("TestSource", [], crossRefs, Date.now());
+    const report = buildReport("TestSource", [], crossRefs, 1000, 1000);
 
     expect(report.crossReferences).toHaveLength(1);
     expect(report.crossReferences?.[0]?.matchedRecords).toBe(90);

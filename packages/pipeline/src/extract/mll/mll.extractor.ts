@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Context } from "effect";
+import { Clock, Duration, Effect, Result, Layer, Context } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -253,7 +253,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
 
           let manifest = yield* manifestService.load;
 
-          const shouldExtract = (entity: keyof MLLSeasonManifest): boolean => {
+          const shouldExtract = (entity: keyof MLLSeasonManifest) => {
             const seasonManifest = manifestService.getSeasonManifest(
               manifest,
               year,
@@ -263,7 +263,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           };
 
           // Extract teams
-          if (shouldExtract("teams")) {
+          if (yield* shouldExtract("teams")) {
             const result = yield* extractTeams(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -278,7 +278,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           }
 
           // Extract players
-          if (shouldExtract("players")) {
+          if (yield* shouldExtract("players")) {
             const result = yield* extractPlayers(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -293,7 +293,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           }
 
           // Extract goalies
-          if (shouldExtract("goalies")) {
+          if (yield* shouldExtract("goalies")) {
             const result = yield* extractGoalies(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -308,7 +308,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           }
 
           // Extract standings
-          if (shouldExtract("standings")) {
+          if (yield* shouldExtract("standings")) {
             const result = yield* extractStandings(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -323,7 +323,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           }
 
           // Extract stat leaders
-          if (shouldExtract("statLeaders")) {
+          if (yield* shouldExtract("statLeaders")) {
             const result = yield* extractStatLeaders(year);
             manifest = manifestService.markComplete(
               manifest,
@@ -337,7 +337,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           }
 
           // Optionally extract schedule (slower due to Wayback)
-          if (includeSchedule && shouldExtract("schedule")) {
+          if (includeSchedule && (yield* shouldExtract("schedule"))) {
             yield* Effect.log("  ⏳ Waiting before Wayback request...");
             yield* Effect.sleep(Duration.millis(config.delayBetweenBatchesMs));
             const result = yield* extractSchedule(year);
@@ -386,7 +386,7 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
           );
           yield* Effect.log("#".repeat(60));
 
-          const overallStart = Date.now();
+          const overallStart = yield* Clock.currentTimeMillis;
           let lastManifest = yield* manifestService.load;
 
           for (const [i, year] of yearsToExtract.entries()) {
@@ -397,7 +397,8 @@ export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
             });
           }
 
-          const totalDurationMs = Date.now() - overallStart;
+          const totalDurationMs =
+            (yield* Clock.currentTimeMillis) - overallStart;
           const minutes = Math.floor(totalDurationMs / 60000);
           const seconds = Math.floor((totalDurationMs % 60000) / 1000);
 

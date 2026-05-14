@@ -1,5 +1,3 @@
-import { relative } from "node:path";
-
 import { Duration, Effect, Result, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
@@ -33,19 +31,23 @@ export const saveJson = <T>(filePath: string, data: T) =>
     const fs = yield* FileSystem;
     const path = yield* Path;
     const dir = path.dirname(filePath);
-    yield* fs.makeDirectory(dir, { recursive: true });
-    yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
-  }).pipe(
-    Effect.catchTag("PlatformError", (e: PlatformError) =>
-      Effect.fail(
-        new FileWriteError({
-          message: `Failed to write ${relative(process.cwd(), filePath)}: ${e.message}`,
-          filePath: relative(process.cwd(), filePath),
-          cause: e,
-        }),
+    const displayPath = path.relative(process.cwd(), filePath);
+
+    return yield* Effect.gen(function* () {
+      yield* fs.makeDirectory(dir, { recursive: true });
+      yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
+    }).pipe(
+      Effect.catchTag("PlatformError", (e: PlatformError) =>
+        Effect.fail(
+          new FileWriteError({
+            message: `Failed to write ${displayPath}: ${e.message}`,
+            filePath: displayPath,
+            cause: e,
+          }),
+        ),
       ),
-    ),
-  );
+    );
+  });
 
 /**
  * Determines if an error is critical (transient) and should fail-fast,

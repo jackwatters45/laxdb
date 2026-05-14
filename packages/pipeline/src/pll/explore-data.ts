@@ -7,7 +7,9 @@
  *   infisical run --env=dev -- bun src/pll/explore-data.ts --full
  */
 
-import { Effect, Duration } from "effect";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
+import { Clock, Effect, Duration, Layer, Option } from "effect";
+import { Command, Flag } from "effect/unstable/cli";
 
 import { formatUnknownError } from "../util";
 
@@ -73,11 +75,11 @@ const exploreYear = (year: number) =>
     };
 
     yield* Effect.log("\n📊 Teams:");
-    const teamsStart = Date.now();
+    const teamsStart = yield* Clock.currentTimeMillis;
     const teams = yield* pll
       .getTeams({ year, includeChampSeries: true })
       .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLTeam[])));
-    summary.timing.teamsMs = Date.now() - teamsStart;
+    summary.timing.teamsMs = (yield* Clock.currentTimeMillis) - teamsStart;
     summary.teams.count = teams.length;
     summary.teams.withStats = teams.filter((t) => t.stats !== null).length;
     summary.teams.withCoaches = teams.filter(
@@ -112,7 +114,7 @@ const exploreYear = (year: number) =>
     }
 
     yield* Effect.log("\n👥 Players:");
-    const playersStart = Date.now();
+    const playersStart = yield* Clock.currentTimeMillis;
     const players = yield* pll
       .getPlayers({
         season: year,
@@ -128,7 +130,7 @@ const exploreYear = (year: number) =>
           });
         }),
       );
-    summary.timing.playersMs = Date.now() - playersStart;
+    summary.timing.playersMs = (yield* Clock.currentTimeMillis) - playersStart;
     summary.players.count = players.length;
     summary.players.withStats = players.filter(
       (p) => p.stats !== undefined,
@@ -182,11 +184,11 @@ const exploreYear = (year: number) =>
     }
 
     yield* Effect.log("\n🎮 Events:");
-    const eventsStart = Date.now();
+    const eventsStart = yield* Clock.currentTimeMillis;
     const events = yield* pll
       .getEvents({ year })
       .pipe(Effect.catch(() => Effect.succeed([] as readonly PLLEvent[])));
-    summary.timing.eventsMs = Date.now() - eventsStart;
+    summary.timing.eventsMs = (yield* Clock.currentTimeMillis) - eventsStart;
     summary.events.count = events.length;
     summary.events.completed = events.filter((e) => e.eventStatus === 3).length;
     summary.events.withScores = events.filter(
@@ -273,7 +275,7 @@ const exploreDetailEndpoints = (year: number) =>
       return;
     }
     yield* Effect.log(`\n🏟️ Team Detail (${sampleTeam.fullName}):`);
-    const teamDetailStart = Date.now();
+    const teamDetailStart = yield* Clock.currentTimeMillis;
     const teamDetail = yield* pll
       .getTeamDetail({
         id: sampleTeam.officialId,
@@ -283,7 +285,7 @@ const exploreDetailEndpoints = (year: number) =>
         includeChampSeries: true,
       })
       .pipe(Effect.catch(() => Effect.succeed(null)));
-    const teamDetailMs = Date.now() - teamDetailStart;
+    const teamDetailMs = (yield* Clock.currentTimeMillis) - teamDetailStart;
 
     if (teamDetail) {
       yield* Effect.log(`   Fetch time: ${formatMs(teamDetailMs)}`);
@@ -308,7 +310,7 @@ const exploreDetailEndpoints = (year: number) =>
         yield* Effect.log(
           `\n👤 Player Detail (${samplePlayer.firstName} ${samplePlayer.lastName}):`,
         );
-        const playerDetailStart = Date.now();
+        const playerDetailStart = yield* Clock.currentTimeMillis;
         const playerDetail = yield* pll
           .getPlayerDetail({
             slug,
@@ -316,7 +318,8 @@ const exploreDetailEndpoints = (year: number) =>
             statsYear: year,
           })
           .pipe(Effect.catch(() => Effect.succeed(null)));
-        const playerDetailMs = Date.now() - playerDetailStart;
+        const playerDetailMs =
+          (yield* Clock.currentTimeMillis) - playerDetailStart;
 
         if (playerDetail) {
           yield* Effect.log(`   Fetch time: ${formatMs(playerDetailMs)}`);
@@ -350,11 +353,11 @@ const exploreDetailEndpoints = (year: number) =>
     );
     if (completedEvent?.slugname) {
       yield* Effect.log(`\n🎮 Event Detail (${completedEvent.slugname}):`);
-      const eventDetailStart = Date.now();
+      const eventDetailStart = yield* Clock.currentTimeMillis;
       const eventDetail = yield* pll
         .getEventDetail({ slug: completedEvent.slugname })
         .pipe(Effect.catch(() => Effect.succeed(null)));
-      const eventDetailMs = Date.now() - eventDetailStart;
+      const eventDetailMs = (yield* Clock.currentTimeMillis) - eventDetailStart;
 
       if (eventDetail) {
         yield* Effect.log(`   Fetch time: ${formatMs(eventDetailMs)}`);
@@ -367,67 +370,84 @@ const exploreDetailEndpoints = (year: number) =>
     }
   });
 
+const yearOption = Flag.integer("year").pipe(
+  Flag.withDescription("Explore one PLL season year"),
+  Flag.optional,
+);
+
+const fullOption = Flag.boolean("full").pipe(
+  Flag.withDescription("Include detail endpoint exploration"),
+  Flag.withDefault(false),
+);
+
+const detailOption = Flag.boolean("detail").pipe(
+  Flag.withDescription("Explore detail endpoints for the selected year"),
+  Flag.withDefault(false),
+);
+
 const main = Effect.gen(function* () {
-  const args = process.argv.slice(2);
-  const yearArg = args.find((a) => a.startsWith("--year="));
-  const fullMode = args.includes("--full");
-  const detailMode = args.includes("--detail");
+  const command = Command.make(
+    "pll-explore",
+    { year: yearOption, full: fullOption, detail: detailOption },
+    ({ year, full, detail }) =>
+      Effect.gen(function* () {
+        const yearValue = Option.getOrNull(year);
 
-  yield* Effect.log("🏈 PLL Data Exploration");
-  yield* Effect.log("========================\n");
+        yield* Effect.log("🏈 PLL Data Exploration");
+        yield* Effect.log("========================\n");
 
-  const summaries: YearSummary[] = [];
+        const summaries: YearSummary[] = [];
 
-  if (yearArg) {
-    const year = parseInt(yearArg.split("=")[1] ?? "", 10);
-    if (year < 2019 || year > 2030) {
-      yield* Effect.log(`Invalid year: ${year}. Must be 2019-2030.`);
-      return;
-    }
-    const summary = yield* exploreYear(year);
-    summaries.push(summary);
+        if (yearValue !== null) {
+          if (yearValue < 2019 || yearValue > 2030) {
+            yield* Effect.log(`Invalid year: ${yearValue}. Must be 2019-2030.`);
+            return;
+          }
+          const summary = yield* exploreYear(yearValue);
+          summaries.push(summary);
 
-    if (detailMode || fullMode) {
-      yield* exploreDetailEndpoints(year);
-    }
-  } else {
-    for (const year of PLL_YEARS) {
-      const summary = yield* exploreYear(year);
-      summaries.push(summary);
-      yield* Effect.sleep(Duration.millis(500));
-    }
+          if (detail || full) {
+            yield* exploreDetailEndpoints(yearValue);
+          }
+        } else {
+          for (const pllYear of PLL_YEARS) {
+            const summary = yield* exploreYear(pllYear);
+            summaries.push(summary);
+            yield* Effect.sleep(Duration.millis(500));
+          }
 
-    if (fullMode) {
-      yield* exploreDetailEndpoints(2024);
-    }
-  }
+          if (full) {
+            yield* exploreDetailEndpoints(2024);
+          }
+        }
 
-  yield* Effect.log(`\n${"=".repeat(60)}`);
-  yield* Effect.log("SUMMARY");
-  yield* Effect.log("=".repeat(60));
-  yield* Effect.log("\nYear | Teams | Players | Events | Standings");
-  yield* Effect.log("-----|-------|---------|--------|----------");
-  for (const s of summaries) {
-    yield* Effect.log(
-      `${s.year} | ${String(s.teams.count).padStart(5)} | ${String(s.players.count).padStart(7)} | ${String(s.events.count).padStart(6)} | ${String(s.standings.count).padStart(9)}`,
-    );
-  }
+        yield* Effect.log(`\n${"=".repeat(60)}`);
+        yield* Effect.log("SUMMARY");
+        yield* Effect.log("=".repeat(60));
+        yield* Effect.log("\nYear | Teams | Players | Events | Standings");
+        yield* Effect.log("-----|-------|---------|--------|----------");
+        for (const summary of summaries) {
+          yield* Effect.log(
+            `${summary.year} | ${String(summary.teams.count).padStart(5)} | ${String(summary.players.count).padStart(7)} | ${String(summary.events.count).padStart(6)} | ${String(summary.standings.count).padStart(9)}`,
+          );
+        }
 
-  yield* Effect.log("\nAPI Response Times (ms):");
-  yield* Effect.log("Year | Teams  | Players | Events");
-  yield* Effect.log("-----|--------|---------|-------");
-  for (const s of summaries) {
-    yield* Effect.log(
-      `${s.year} | ${String(s.timing.teamsMs).padStart(6)} | ${String(s.timing.playersMs).padStart(7)} | ${String(s.timing.eventsMs).padStart(6)}`,
-    );
-  }
+        yield* Effect.log("\nAPI Response Times (ms):");
+        yield* Effect.log("Year | Teams  | Players | Events");
+        yield* Effect.log("-----|--------|---------|-------");
+        for (const summary of summaries) {
+          yield* Effect.log(
+            `${summary.year} | ${String(summary.timing.teamsMs).padStart(6)} | ${String(summary.timing.playersMs).padStart(7)} | ${String(summary.timing.eventsMs).padStart(6)}`,
+          );
+        }
 
-  yield* Effect.log("\n✅ Exploration complete!");
+        yield* Effect.log("\n✅ Exploration complete!");
+      }),
+  );
+
+  return yield* Command.run(command, { version: "1.0.0" });
 });
 
-try {
-  await Effect.runPromise(main.pipe(Effect.provide(PLLClient.layer)));
-} catch (error) {
-  console.error("Failed:", error);
-  process.exit(1);
-}
+BunRuntime.runMain(
+  main.pipe(Effect.provide(Layer.mergeAll(PLLClient.layer, BunServices.layer))),
+);

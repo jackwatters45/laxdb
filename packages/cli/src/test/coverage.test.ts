@@ -1,25 +1,62 @@
-import { spawn } from "node:child_process";
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
-
+import { NodeServices } from "@effect/platform-node";
+import { Effect, Stream } from "effect";
+import { FileSystem } from "effect/FileSystem";
+import { Path } from "effect/Path";
+import type { PlatformError } from "effect/PlatformError";
+import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import { describe, expect, it } from "vitest";
 
 import { CLI_ENTRYPOINTS, CLI_HTTP_COVERAGE } from "../coverage";
 
-const repoRoot = path.resolve(import.meta.dirname, "../../../..");
-const apiSrcRoot = path.join(repoRoot, "packages/api/src");
-const cliPkgRoot = path.join(repoRoot, "packages/cli");
+type TestPlatform = FileSystem | Path | ChildProcessSpawner.ChildProcessSpawner;
 
-async function walk(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files = await Promise.all(
-    entries.map((entry) => {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) return walk(fullPath);
-      return Promise.resolve([fullPath]);
-    }),
-  );
-  return files.flat();
+const repoRoot = new URL("../../../..", import.meta.url).pathname;
+
+const TestPlatformLive = NodeServices.layer;
+
+function collectText(
+  stream: Stream.Stream<Uint8Array, PlatformError>,
+): Effect.Effect<string, PlatformError> {
+  return Effect.gen(function* () {
+    const chunks = yield* Stream.runCollect(stream);
+    const totalLength = chunks.reduce(
+      (total, chunk) => total + chunk.length,
+      0,
+    );
+    const bytes = new Uint8Array(totalLength);
+    let offset = 0;
+
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    return new TextDecoder().decode(bytes);
+  });
+}
+
+function walk(
+  dir: string,
+): Effect.Effect<string[], PlatformError, FileSystem | Path> {
+  return Effect.gen(function* () {
+    const fs = yield* FileSystem;
+    const path = yield* Path;
+    const entries = yield* fs.readDirectory(dir);
+    const files = yield* Effect.all(
+      entries.map((entry) =>
+        Effect.gen(function* () {
+          const fullPath = path.join(dir, entry);
+          const info = yield* fs.stat(fullPath);
+
+          if (info.type === "Directory") return yield* walk(fullPath);
+          if (info.type === "File") return [fullPath];
+          return [];
+        }),
+      ),
+    );
+
+    return files.flat();
+  });
 }
 
 /**
@@ -31,67 +68,62 @@ async function walk(dir: string): Promise<string[]> {
  * literals or re-exported endpoint definitions this regex will miss them and
  * the test will fail — update the pattern accordingly.
  */
-async function getApiEndpointNames() {
-  const files = await walk(apiSrcRoot);
-  const apiFiles = files.filter((file) => file.endsWith(".api.ts"));
-  const contents = await Promise.all(
-    apiFiles.map(async (file) => ({
-      file,
-      content: await readFile(file, "utf8"),
-    })),
-  );
-  const names = new Set<string>();
+function getApiEndpointNames(): Effect.Effect<
+  string[],
+  PlatformError,
+  FileSystem | Path
+> {
+  return Effect.gen(function* () {
+    const fs = yield* FileSystem;
+    const path = yield* Path;
+    const apiSrcRoot = path.join(repoRoot, "packages/api/src");
+    const files = yield* walk(apiSrcRoot);
+    const apiFiles = files.filter((file) => file.endsWith(".api.ts"));
+    const contents = yield* Effect.all(
+      apiFiles.map((file) => fs.readFileString(file)),
+    );
+    const names = new Set<string>();
 
-  for (const { content } of contents) {
-    for (const match of content.matchAll(
-      /HttpApiEndpoint\.\w+\(\s*"([^"]+)"/g,
-    )) {
-      names.add(match[1]);
+    for (const content of contents) {
+      for (const match of content.matchAll(
+        /HttpApiEndpoint\.\w+\(\s*"([^"]+)"/g,
+      )) {
+        names.add(match[1]);
+      }
     }
-  }
 
-  // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
-  return [...names].sort((a, b) => a.localeCompare(b));
+    // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
+    return [...names].sort((a, b) => a.localeCompare(b));
+  });
 }
 
-async function runHelp(entrypoint: string) {
-  const child = spawn("bun", ["run", `src/${entrypoint}.ts`, "--help"], {
-    cwd: cliPkgRoot,
-  });
+function runHelp(entrypoint: string) {
+  return Effect.gen(function* () {
+    const path = yield* Path;
+    const cliPkgRoot = path.join(repoRoot, "packages/cli");
+    const handle = yield* ChildProcess.make(
+      "bun",
+      ["run", `src/${entrypoint}.ts`, "--help"],
+      { cwd: cliPkgRoot },
+    );
+    const [stdout, stderr, code] = yield* Effect.all(
+      [collectText(handle.stdout), collectText(handle.stderr), handle.exitCode],
+      { concurrency: "unbounded" },
+    );
 
-  const timeout = setTimeout(() => {
-    child.kill("SIGTERM");
-  }, 5_000);
-
-  let stdout = "";
-  let stderr = "";
-
-  child.stdout.on("data", (chunk: Buffer) => {
-    stdout += chunk.toString();
-  });
-
-  child.stderr.on("data", (chunk: Buffer) => {
-    stderr += chunk.toString();
-  });
-
-  const [code, signal] = await new Promise<
-    [number | null, NodeJS.Signals | null]
-  >((resolve) => {
-    child.once("close", (exitCode, exitSignal) => {
-      resolve([exitCode, exitSignal]);
-    });
-  });
-  clearTimeout(timeout);
-
-  return {
-    code,
-    stdout,
-    stderr:
-      signal === "SIGTERM"
-        ? `${stderr}\nTimed out waiting for --help output`
-        : stderr,
-  };
+    return { code, stdout, stderr };
+  }).pipe(
+    Effect.scoped,
+    Effect.timeoutOrElse({
+      duration: "5 seconds",
+      orElse: () =>
+        Effect.fail(new Error("Timed out waiting for --help output")),
+    }),
+  );
 }
+
+const runTestEffect = <A, E>(effect: Effect.Effect<A, E, TestPlatform>) =>
+  effect.pipe(Effect.provide(TestPlatformLive), Effect.runPromise);
 
 describe("CLI coverage", () => {
   it("keeps the coverage manifest sorted", () => {
@@ -102,7 +134,7 @@ describe("CLI coverage", () => {
   });
 
   it("tracks every HTTP endpoint exposed by the API", async () => {
-    await expect(getApiEndpointNames()).resolves.toEqual([
+    await expect(runTestEffect(getApiEndpointNames())).resolves.toEqual([
       ...CLI_HTTP_COVERAGE,
     ]);
   });
@@ -110,8 +142,8 @@ describe("CLI coverage", () => {
   it.each(CLI_ENTRYPOINTS)(
     "%s entrypoint boots with --help",
     async (entrypoint) => {
-      const result = await runHelp(entrypoint);
-      expect(result.code).toBe(0);
+      const result = await runTestEffect(runHelp(entrypoint));
+      expect(result.code).toBe(ChildProcessSpawner.ExitCode(0));
       expect(result.stdout + result.stderr).toContain(entrypoint);
     },
   );

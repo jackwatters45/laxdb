@@ -1,11 +1,11 @@
-import { spawnSync } from "node:child_process";
-
+import { NodeChildProcessSpawner } from "@effect/platform-node";
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as GitHub from "alchemy/GitHub";
 import * as Output from "alchemy/Output";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
+import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 import Api from "./packages/api/src/index.ts";
 
@@ -20,6 +20,30 @@ const config = {
     development: "dev.laxdb.io",
   },
 };
+
+const runDrizzleMigrationGeneration = ChildProcess.make(
+  "bun",
+  ["run", "db:generate"],
+  {
+    cwd: "packages/core",
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  },
+).pipe(
+  Effect.scoped,
+  Effect.flatMap((handle) => handle.exitCode),
+  Effect.flatMap((exitCode) =>
+    exitCode === ChildProcessSpawner.ExitCode(0)
+      ? Effect.void
+      : Effect.die(
+          new Error(
+            `Drizzle migration generation failed with exit code ${String(exitCode)}`,
+          ),
+        ),
+  ),
+  Effect.provide(NodeChildProcessSpawner.layer),
+);
 
 const baseDomainForStage = (stage: string) =>
   stage === config.stages.prod
@@ -62,22 +86,7 @@ export default Alchemy.Stack(
   },
   Effect.gen(function* () {
     if ((process.env.ALCHEMY_PHASE ?? "plan") === "dev") {
-      yield* Effect.sync(() =>
-        spawnSync("bun", ["run", "db:generate"], {
-          cwd: "packages/core",
-          stdio: "inherit",
-        }),
-      ).pipe(
-        Effect.flatMap((result) =>
-          result.status === 0
-            ? Effect.void
-            : Effect.die(
-                new Error(
-                  `Drizzle migration generation failed with exit code ${result.status ?? "unknown"}`,
-                ),
-              ),
-        ),
-      );
+      yield* runDrizzleMigrationGeneration;
     }
 
     const stage = yield* Alchemy.Stage;

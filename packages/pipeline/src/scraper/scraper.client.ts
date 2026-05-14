@@ -1,4 +1,4 @@
-import { Effect, Layer, Schedule, Context } from "effect";
+import { Clock, Effect, Layer, Schedule, Context } from "effect";
 
 import { PipelineConfig } from "../config";
 import { fetchResponse, readResponseText } from "../http";
@@ -27,7 +27,7 @@ export class ScraperClient extends Context.Service<ScraperClient>()(
         request: ScrapeRequest,
       ): Effect.Effect<ScrapeResponse, ScraperError> =>
         Effect.gen(function* () {
-          const startTime = Date.now();
+          const startTime = yield* Clock.currentTimeMillis;
           const timeoutMs = request.timeoutMs ?? config.defaultTimeoutMs;
 
           const response = yield* fetchResponse({
@@ -90,7 +90,8 @@ export class ScraperClient extends Context.Service<ScraperClient>()(
               }),
           });
 
-          const durationMs = Date.now() - startTime;
+          const endTime = yield* Clock.currentTimeMillis;
+          const durationMs = endTime - startTime;
 
           const headers: Record<string, string> = {};
           response.headers.forEach((value, key) => {
@@ -104,7 +105,7 @@ export class ScraperClient extends Context.Service<ScraperClient>()(
             headers,
             body,
             contentType: response.headers.get("content-type"),
-            fetchedAt: new Date(),
+            fetchedAt: new Date(endTime),
             durationMs,
           } as ScrapeResponse;
         });

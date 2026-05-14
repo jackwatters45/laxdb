@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Clock, Effect, Schema } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -32,13 +32,13 @@ const runCheck = <R>(
   checkFn: () => Effect.Effect<(typeof ValidationIssue.Type)[], Error, R>,
 ) =>
   Effect.gen(function* () {
-    const start = Date.now();
+    const start = yield* Clock.currentTimeMillis;
     const result = yield* checkFn().pipe(
       Effect.catch((e) =>
         Effect.succeed([errorIssue("CHECK_ERROR", e.message)]),
       ),
     );
-    const durationMs = Date.now() - start;
+    const durationMs = (yield* Clock.currentTimeMillis) - start;
     const hasErrors = result.some((i) => i.severity === "error");
 
     return {
@@ -359,6 +359,7 @@ export const buildReport = (
   files: (typeof FileValidationResult.Type)[],
   crossRefs: (typeof CrossReferenceResult.Type)[],
   startTime: number,
+  endTime: number,
 ): typeof ValidationReport.Type => {
   let totalChecks = 0;
   let passedChecks = 0;
@@ -381,8 +382,8 @@ export const buildReport = (
 
   return {
     source,
-    timestamp: new Date().toISOString(),
-    durationMs: Date.now() - startTime,
+    timestamp: new Date(endTime).toISOString(),
+    durationMs: endTime - startTime,
     summary: {
       totalChecks,
       passedChecks,

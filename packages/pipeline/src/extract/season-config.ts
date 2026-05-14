@@ -5,7 +5,7 @@
  * and staleness thresholds for incremental scraping.
  */
 
-import { Effect, Layer, Context } from "effect";
+import { Clock, Effect, Layer, Context } from "effect";
 
 // ============================================================================
 // Configuration Types
@@ -20,17 +20,27 @@ export interface SeasonConfig {
   historicalSeasonMaxAgeHours: number | null;
 }
 
-const isTimestampStale = (
+const isTimestampStaleAt = (
   timestamp: string | null | undefined,
   maxAgeHours: number | null,
+  nowMs: number,
 ): boolean => {
   if (!timestamp) return true;
   if (maxAgeHours === null) return false;
 
-  const ageMs = Date.now() - new Date(timestamp).getTime();
+  const ageMs = nowMs - new Date(timestamp).getTime();
   const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
   return ageMs > maxAgeMs;
 };
+
+const isTimestampStale = (
+  timestamp: string | null | undefined,
+  maxAgeHours: number | null,
+): Effect.Effect<boolean> =>
+  Effect.gen(function* () {
+    const nowMs = yield* Clock.currentTimeMillis;
+    return isTimestampStaleAt(timestamp, maxAgeHours, nowMs);
+  });
 
 // ============================================================================
 // Season Config Service

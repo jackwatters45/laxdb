@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Clock, Effect, Schema } from "effect";
 
 import type { PipelineError } from "../error";
 
@@ -26,11 +26,11 @@ export const withTiming =
     effect: Effect.Effect<T, E, R>,
   ): Effect.Effect<ExtractResult<T>, E, R> =>
     Effect.gen(function* () {
-      const start = Date.now();
+      const start = yield* Clock.currentTimeMillis;
       const data = yield* effect;
-      const durationMs = Date.now() - start;
+      const end = yield* Clock.currentTimeMillis;
       const count = Array.isArray(data) ? data.length : 1;
-      return { data, count, durationMs };
+      return { data, count, durationMs: end - start };
     });
 
 /**
@@ -115,9 +115,10 @@ export interface EntityStatusLike {
  *
  * If maxAgeHours is null, staleness is never triggered (for historical data).
  */
-export const isEntityStale = (
+export const isEntityStaleAt = (
   status: EntityStatusLike | undefined,
   maxAgeHours: number | null,
+  nowMs: number,
 ): boolean => {
   // Not extracted or no status = always stale
   if (!status?.extracted) return true;
@@ -126,10 +127,19 @@ export const isEntityStale = (
   // No max age = never stale (historical data)
   if (maxAgeHours === null) return false;
 
-  const ageMs = Date.now() - new Date(status.timestamp).getTime();
+  const ageMs = nowMs - new Date(status.timestamp).getTime();
   const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
   return ageMs > maxAgeMs;
 };
+
+export const isEntityStale = (
+  status: EntityStatusLike | undefined,
+  maxAgeHours: number | null,
+): Effect.Effect<boolean> =>
+  Effect.gen(function* () {
+    const nowMs = yield* Clock.currentTimeMillis;
+    return isEntityStaleAt(status, maxAgeHours, nowMs);
+  });
 
 export const ExtractOptions = Schema.Struct({
   skipExisting: Schema.optional(Schema.Boolean),

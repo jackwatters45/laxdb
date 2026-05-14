@@ -1,5 +1,13 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Schema, Context } from "effect";
+import {
+  Clock,
+  Duration,
+  Effect,
+  Result,
+  Layer,
+  Schema,
+  Context,
+} from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -208,7 +216,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
 
           let manifest = yield* manifestService.load;
 
-          const shouldExtract = (entity: keyof MSLSeasonManifest): boolean => {
+          const shouldExtract = (entity: keyof MSLSeasonManifest) => {
             const seasonManifest = manifestService.getSeasonManifest(
               manifest,
               seasonId,
@@ -218,7 +226,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           };
 
           // Extract teams
-          if (shouldExtract("teams")) {
+          if (yield* shouldExtract("teams")) {
             const result = yield* extractTeams(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -233,7 +241,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           }
 
           // Extract players
-          if (shouldExtract("players")) {
+          if (yield* shouldExtract("players")) {
             const result = yield* extractPlayers(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -248,7 +256,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           }
 
           // Extract goalies
-          if (shouldExtract("goalies")) {
+          if (yield* shouldExtract("goalies")) {
             const result = yield* extractGoalies(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -263,7 +271,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           }
 
           // Extract standings
-          if (shouldExtract("standings")) {
+          if (yield* shouldExtract("standings")) {
             const result = yield* extractStandings(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -278,7 +286,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           }
 
           // Extract schedule
-          if (shouldExtract("schedule")) {
+          if (yield* shouldExtract("schedule")) {
             const result = yield* extractSchedule(seasonId);
             manifest = manifestService.markComplete(
               manifest,
@@ -319,7 +327,7 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
           yield* Effect.log(`Options: mode=${options.mode ?? "skip-existing"}`);
           yield* Effect.log("#".repeat(60));
 
-          const overallStart = Date.now();
+          const overallStart = yield* Clock.currentTimeMillis;
           let lastManifest = yield* manifestService.load;
 
           for (const [i, season] of seasonsToExtract.entries()) {
@@ -329,7 +337,8 @@ export class MSLExtractorService extends Context.Service<MSLExtractorService>()(
             lastManifest = yield* extractSeason(season.seasonId, options);
           }
 
-          const totalDurationMs = Date.now() - overallStart;
+          const totalDurationMs =
+            (yield* Clock.currentTimeMillis) - overallStart;
           const minutes = Math.floor(totalDurationMs / 60000);
           const seconds = Math.floor((totalDurationMs % 60000) / 1000);
 

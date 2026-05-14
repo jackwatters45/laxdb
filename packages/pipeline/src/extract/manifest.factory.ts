@@ -114,7 +114,7 @@ export const createManifestServiceEffect = <
       return yield* Schema.decodeUnknownEffect(ExtractionManifestSchema)(
         parsed,
       ).pipe(
-        Effect.catch((error) =>
+        Effect.catchTag("SchemaError", (error) =>
           Effect.logWarning(
             `${config.source.toUpperCase()} manifest schema invalid, creating new: ${String(error)}`,
           ).pipe(Effect.andThen(Effect.succeed(createEmptyManifest()))),
@@ -184,7 +184,7 @@ export const createManifestServiceEffect = <
       seasonId: number,
       entity: keyof TSeasonManifest,
       maxAgeHours: number | null,
-    ): boolean => {
+    ): Effect.Effect<boolean> => {
       const seasonManifest = getSeasonManifest(manifest, seasonId);
       return isEntityStale(seasonManifest[entity], maxAgeHours);
     };

@@ -1,5 +1,5 @@
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Clock, Effect, Layer } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -32,7 +32,7 @@ const program = Effect.gen(function* () {
   const path = yield* Path;
   const nllDir = path.join(config.outputDir, "nll");
   const seasonDir = path.join(nllDir, NLL_SEASON);
-  const startTime = Date.now();
+  const startTime = yield* Clock.currentTimeMillis;
 
   yield* Effect.log(`\nValidating NLL extracted data...`);
   yield* Effect.log(`Output directory: ${nllDir}\n`);
@@ -194,7 +194,13 @@ const program = Effect.gen(function* () {
     crossRefs.push(standingsToTeams);
   }
 
-  const report = buildReport("NLL", fileResults, crossRefs, startTime);
+  const report = buildReport(
+    "NLL",
+    fileResults,
+    crossRefs,
+    startTime,
+    yield* Clock.currentTimeMillis,
+  );
   yield* printReport(report);
 
   const reportPath = path.join(nllDir, "validation-report.json");

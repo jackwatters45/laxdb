@@ -1,4 +1,4 @@
-import { Duration, Effect, Schedule } from "effect";
+import { Context, Duration, Effect, Layer, Schedule } from "effect";
 
 import type { PipelineConfigValues } from "./config";
 import {
@@ -9,6 +9,18 @@ import {
   TimeoutError,
 } from "./error";
 import { formatUnknownError } from "./util";
+
+export class PipelineFetch extends Context.Service<PipelineFetch>()(
+  "PipelineFetch",
+  {
+    make: Effect.sync(() => ({
+      fetch: (...args: Parameters<typeof globalThis.fetch>) =>
+        globalThis.fetch(...args),
+    })),
+  },
+) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 
 export interface FetchResponseRequest<ETimeout, ENetwork> {
   readonly url: string;
@@ -63,36 +75,25 @@ export const fetchResponse = <ETimeout, ENetwork>(
   },
 ): Effect.Effect<Response, ETimeout | ENetwork> =>
   Effect.gen(function* () {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, request.timeoutMs);
-
+    const pipelineFetch = yield* PipelineFetch;
     const requestInit = {
       method: request.method ?? "GET",
       ...(request.headers ? { headers: request.headers } : {}),
       ...(request.body ? { body: request.body } : {}),
-      signal: controller.signal,
       ...(request.redirect ? { redirect: request.redirect } : {}),
     };
 
     return yield* Effect.tryPromise({
-      try: () => fetch(request.url, requestInit),
-      catch: (error) => {
-        if (error instanceof Error && error.name === "AbortError") {
-          return request.timeoutError(request.url, request.timeoutMs);
-        }
-
-        return request.networkError(request.url, error);
-      },
+      try: () => pipelineFetch.fetch(request.url, requestInit),
+      catch: (error) => request.networkError(request.url, error),
     }).pipe(
-      Effect.ensuring(
-        Effect.sync(() => {
-          clearTimeout(timeoutId);
-        }),
-      ),
+      Effect.timeoutOrElse({
+        duration: Duration.millis(request.timeoutMs),
+        orElse: () =>
+          Effect.fail(request.timeoutError(request.url, request.timeoutMs)),
+      }),
     );
-  });
+  }).pipe(Effect.provide(PipelineFetch.layer));
 
 export const readResponseText = <EBodyRead>(
   response: Response,

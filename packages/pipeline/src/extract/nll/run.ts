@@ -11,7 +11,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
+import { Console, Effect, Layer } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
 
 import {
@@ -60,9 +60,7 @@ const program = Effect.gen(function* () {
 
         const manifest = yield* extractor.extractSeason(season, { mode });
         if (json) {
-          yield* Effect.sync(() => {
-            console.log(JSON.stringify(manifest, null, 2));
-          });
+          yield* Console.log(JSON.stringify(manifest, null, 2));
         }
       }),
   );

@@ -5,7 +5,7 @@
  */
 
 import { makeApiClientLayer } from "@laxdb/api/client";
-import { Effect, Layer } from "effect";
+import { Console, Effect, Layer } from "effect";
 import { Flag } from "effect/unstable/cli";
 import { FetchHttpClient } from "effect/unstable/http";
 
@@ -20,9 +20,7 @@ export const baseUrlFlag = Flag.string("base-url").pipe(
 );
 
 export const output = (data: unknown, pretty: boolean) =>
-  Effect.sync(() => {
-    console.log(pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data));
-  });
+  Console.log(pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data));
 
 export const readStdin: Effect.Effect<unknown, Error> = Effect.tryPromise({
   try: () => Bun.stdin.text().then((text): unknown => JSON.parse(text)),
