@@ -13,7 +13,9 @@ import { LaxdbApiV2 } from "./definition";
 const makeGeneratedClient = (baseUrl: string) =>
   HttpApiClient.make(LaxdbApiV2, { baseUrl });
 
-type GeneratedApiClient = Effect.Success<ReturnType<typeof makeGeneratedClient>>;
+type GeneratedApiClient = Effect.Success<
+  ReturnType<typeof makeGeneratedClient>
+>;
 
 export class ApiClient extends Context.Service<ApiClient, GeneratedApiClient>()(
   "ApiClient",
