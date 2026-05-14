@@ -1,0 +1,62 @@
+packages/pipeline/src/validate/validate.service.ts
+  s_314c3a0dcb8fca::t_330985135564be 1,35,41,385-386
+  s_314c3a0dcb8fca::t_51cf25839d4301 362
+packages/pipeline/src/pll/explore-data.ts
+  s_314c3a0dcb8fca::t_57aa9d1f2bdb80 10-12,78,82,117,133,187,191,278,288,313,321-322,356,360,373-376,378-381,383-386,388-422,424-433,435-442,444-448,451-453
+packages/cli/src/shared.ts
+  s_314c3a0dcb8fca::t_9da35080963d3c 8,23
+packages/pipeline/src/scraper/scraper.client.ts
+  s_314c3a0dcb8fca::t_196fdfb2bf9417 1,30,93-94,108
+packages/pipeline/src/pll/extract-queries.ts
+  s_314c3a0dcb8fca::t_6194faa5946f57 6-10,12-24,26-27,31,36,38,43,58-60,62,64
+packages/pipeline/src/validate/validate.service.test.ts
+  s_314c3a0dcb8fca::t_ba529f810525f1 329,364,384
+packages/pipeline/src/scraper/scraper.service.ts
+  s_314c3a0dcb8fca::t_f996ea20f5e401 50,73-102,109-110,129,137
+  s_314c3a0dcb8fca::t_0a371e93eadc8b 130-136,138-139,141-143,145-148,151-153,156
+  s_314c3a0dcb8fca::t_3ca73e334eecd0 1-9,140,144,154
+packages/pipeline/src/extract/season-config.ts
+  s_314c3a0dcb8fca::t_a4ac02764fd080 8,23,26,31,36-43
+packages/pipeline/src/extract/extract.schema.ts
+  s_314c3a0dcb8fca::t_fe62ff0006297c 118,121,130,135-142
+scripts/run-workspace-tests.mjs
+  s_314c3a0dcb8fca::t_4146800ec62e88 64
+  s_314c3a0dcb8fca::t_ede2829566b6b3 1-5,13-15,17,19-24,26-41,43,46-49,51-53,55,57-59,61,66-67,69-70,72-75,77-78,81-88,90-93,96-101,103-118,120,123-132
+alchemy.run.ts
+  s_314c3a0dcb8fca::t_e06d0b13f91ec2 1,8,24-47,89
+packages/pipeline/src/extract/manifest.factory.ts
+  s_314c3a0dcb8fca::t_7a7988b0cc5df2 187
+  s_314c3a0dcb8fca::t_6a0fdfb5a80940 117
+packages/pipeline/src/extract/incremental.service.ts
+  s_314c3a0dcb8fca::t_5cd7d5199b355e 9,14,56-89,91
+packages/pipeline/src/extract/util.ts
+  s_314c3a0dcb8fca::t_c403e7ba91d01e 34-47,49-50
+packages/pipeline/src/nll/nll.client.ts
+  s_314c3a0dcb8fca::t_a68b449333dac8 130-145
+packages/pipeline/src/http.ts
+  s_314c3a0dcb8fca::t_c329c7957070dd 1,13-16,19-24,78,87-88,90-94,96
+  s_314c3a0dcb8fca::t_a0e56d1dc7cf3d 17-18
+packages/pipeline/src/pll/introspect.ts
+  s_314c3a0dcb8fca::t_5f116e596fcddf 2,6-9,34-38,42-71,73
+  s_314c3a0dcb8fca::t_bed0f75db5e024 5,76
+packages/cli/src/test/coverage.test.ts
+  s_314c3a0dcb8fca::t_32140a5f0e9ba5 117-120
+  s_314c3a0dcb8fca::t_a92c8aee892852 1,15
+  s_314c3a0dcb8fca::t_8e19529b0b0b22 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "666dc776ac444e29c01c8a2e5ccce93c7cdf5ba8",
+  "prompts": {},
+  "sessions": {
+    "s_314c3a0dcb8fca": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e25ae-a28f-724b-ac85-da09b5ab47a2",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
