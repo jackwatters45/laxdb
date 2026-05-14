@@ -1,0 +1,25 @@
+packages/api/src/play/play.api.ts
+  s_44a5960ce854ef::t_eb3882125f41c4 7-35,37-41
+packages/api/src/player/player.api.ts
+  s_44a5960ce854ef::t_34f151d22f8478 7-47,49-53
+packages/api/src/practice/practice.api.ts
+  s_44a5960ce854ef::t_e522e0b057b102 7-147,149-163
+packages/api/src/defaults/defaults.api.ts
+  s_44a5960ce854ef::t_5e506f5774f1b6 7-22,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f4f37d333d42b0e6d6334f16c53aa9ed7ad274e8",
+  "prompts": {},
+  "sessions": {
+    "s_44a5960ce854ef": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e249f-2c03-7378-95fb-23cfb5ec36b6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
