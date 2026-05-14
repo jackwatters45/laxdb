@@ -1,5 +1,5 @@
 import { NodeServices } from "@effect/platform-node";
-import { Console, Effect, Fiber } from "effect";
+import { Console, Effect } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
@@ -101,15 +101,12 @@ const program = Effect.gen(function* () {
     );
   }
 
-  const parallelResultsFiber = yield* Effect.all(
-    parallelPackages.map(runPackageTest),
-    { concurrency: "unbounded" },
-  ).pipe(Effect.fork);
-
   const serialResults = yield* Effect.all(serialPackages.map(runPackageTest), {
     concurrency: 1,
   });
-  const parallelResults = yield* Fiber.join(parallelResultsFiber);
+  const parallelResults = yield* Effect.all(parallelPackages.map(runPackageTest), {
+    concurrency: "unbounded",
+  });
   const failures = [...serialResults, ...parallelResults].filter(isFailure);
 
   if (failures.length > 0) {
