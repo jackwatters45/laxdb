@@ -1,0 +1,19 @@
+.github/workflows/deploy.yml
+  s_b670998b2f6544::t_79a0bee4e2046a 109,111-112,253,255-256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "99f09cbb8704c6fd701e52c05318af55cb17b4fb",
+  "prompts": {},
+  "sessions": {
+    "s_b670998b2f6544": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e252a-a8bf-75ca-b462-ab4ae5291872",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
