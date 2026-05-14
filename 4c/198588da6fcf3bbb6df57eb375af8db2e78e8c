@@ -1,0 +1,26 @@
+packages/api-v2/src/drill/drill.rpc-handlers.ts
+  f089a8dfab6efd0e 4-5,12,18
+packages/api-v2/src/player/player.rpc-handlers.ts
+  f089a8dfab6efd0e 4-5,12,18
+packages/api-v2/src/practice/practice.rpc-handlers.ts
+  f089a8dfab6efd0e 4-5,12,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4c198588da6fcf3bbb6df57eb375af8db2e78e8c",
+  "prompts": {
+    "f089a8dfab6efd0e": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "0de87e87-5022-4036-90dc-b78066495a25",
+        "model": "custom:Claude-Opus-4.6-0"
+      },
+      "human_author": "jackwatters45",
+      "total_additions": 1509,
+      "total_deletions": 25,
+      "accepted_lines": 12,
+      "overriden_lines": 0
+    }
+  }
+}
