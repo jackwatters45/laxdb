@@ -1,0 +1,19 @@
+packages/ui/src/lib/smooth-scroll.ts
+  s_1b5b28e6a99212::t_563d0836174dff 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "0131b5497030fda9465e8b4b9174428e988963ef",
+  "prompts": {},
+  "sessions": {
+    "s_1b5b28e6a99212": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2662-91c4-710d-a906-249539135503",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
