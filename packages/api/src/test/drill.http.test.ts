@@ -101,7 +101,7 @@ describe("POST /api/drills/create", () => {
       ...minimalDrill,
       name: "",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(400);
   });
 });
 
@@ -123,7 +123,7 @@ describe("POST /api/drills/get", () => {
     const { status } = await post(s.url, "/api/drills/get", {
       publicId: "AbCdEfGhIjKl",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });
 
@@ -149,7 +149,7 @@ describe("POST /api/drills/update", () => {
       publicId: "AbCdEfGhIjKl",
       name: "X",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });
 
@@ -173,6 +173,6 @@ describe("POST /api/drills/delete", () => {
     const { status } = await post(s.url, "/api/drills/delete", {
       publicId: "AbCdEfGhIjKl",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });

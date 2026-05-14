@@ -16,7 +16,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import {
   CreatePlayInput,
   PlayCategory,
@@ -66,8 +66,8 @@ const listCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const plays = yield* client.PlayList();
+      const client = yield* ApiClient;
+      const plays = yield* client.Plays.listPlays();
       yield* output(plays, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -81,8 +81,8 @@ const getCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const play = yield* client.PlayGet({ publicId });
+      const client = yield* ApiClient;
+      const play = yield* client.Plays.getPlay({ payload: { publicId } });
       yield* output(play, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -105,18 +105,20 @@ const createCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const tagValues = Option.map(opts.tags, parseCsv);
       // Create uses getOrNull: schema requires string | null (null = "no value")
-      const play = yield* client.PlayCreate({
-        name: opts.name,
-        category: opts.category,
-        formation: Option.getOrNull(opts.formation),
-        description: Option.getOrNull(opts.description),
-        personnelNotes: Option.getOrNull(opts.personnelNotes),
-        tags: Option.getOrUndefined(tagValues),
-        diagramUrl: Option.getOrNull(opts.diagramUrl),
-        videoUrl: Option.getOrNull(opts.videoUrl),
+      const play = yield* client.Plays.createPlay({
+        payload: {
+          name: opts.name,
+          category: opts.category,
+          formation: Option.getOrNull(opts.formation),
+          description: Option.getOrNull(opts.description),
+          personnelNotes: Option.getOrNull(opts.personnelNotes),
+          tags: Option.getOrUndefined(tagValues),
+          diagramUrl: Option.getOrNull(opts.diagramUrl),
+          videoUrl: Option.getOrNull(opts.videoUrl),
+        },
       });
       yield* output(play, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -145,19 +147,21 @@ const updateCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const tagValues = Option.map(opts.tags, parseCsv);
       // Update uses getOrUndefined: undefined = "leave unchanged", null = "clear field"
-      const play = yield* client.PlayUpdate({
-        publicId: opts.publicId,
-        name: Option.getOrUndefined(opts.name),
-        category: Option.getOrUndefined(opts.category),
-        formation: Option.getOrUndefined(opts.formation),
-        description: Option.getOrUndefined(opts.description),
-        personnelNotes: Option.getOrUndefined(opts.personnelNotes),
-        tags: Option.getOrUndefined(tagValues),
-        diagramUrl: Option.getOrUndefined(opts.diagramUrl),
-        videoUrl: Option.getOrUndefined(opts.videoUrl),
+      const play = yield* client.Plays.updatePlay({
+        payload: {
+          publicId: opts.publicId,
+          name: Option.getOrUndefined(opts.name),
+          category: Option.getOrUndefined(opts.category),
+          formation: Option.getOrUndefined(opts.formation),
+          description: Option.getOrUndefined(opts.description),
+          personnelNotes: Option.getOrUndefined(opts.personnelNotes),
+          tags: Option.getOrUndefined(tagValues),
+          diagramUrl: Option.getOrUndefined(opts.diagramUrl),
+          videoUrl: Option.getOrUndefined(opts.videoUrl),
+        },
       });
       yield* output(play, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -172,8 +176,8 @@ const deleteCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const play = yield* client.PlayDelete({ publicId });
+      const client = yield* ApiClient;
+      const play = yield* client.Plays.deletePlay({ payload: { publicId } });
       yield* output(play, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -183,14 +187,14 @@ const bulkCreateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePlayInput),
       )(raw);
       const results = yield* Effect.forEach(
         items,
-        (item) => client.PlayCreate(item),
+        (item) => client.Plays.createPlay({ payload: item }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);
@@ -202,14 +206,14 @@ const bulkUpdateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePlayInput),
       )(raw);
       const results = yield* Effect.forEach(
         items,
-        (item) => client.PlayUpdate(item),
+        (item) => client.Plays.updatePlay({ payload: item }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);
@@ -221,14 +225,14 @@ const bulkDeleteCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
       const results = yield* Effect.forEach(
         ids,
-        (publicId) => client.PlayDelete({ publicId }),
+        (publicId) => client.Plays.deletePlay({ payload: { publicId } }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);

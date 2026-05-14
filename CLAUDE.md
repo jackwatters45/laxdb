@@ -16,7 +16,7 @@ Bun monorepo. Effect-TS backend, TanStack Start frontend, Cloudflare Workers via
 ## ARCHITECTURE OVERVIEW
 
 ```
-TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effect Services (core) → Drizzle → Cloudflare D1
+TanStack Start apps (marketing, practice-planner) → Effect HTTP API (api) → Effect Services (core) → Drizzle → Cloudflare D1
                                                 ↓
                                  Cloudflare Workers (all apps deployed here)
 ```
@@ -28,12 +28,12 @@ TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effec
 | Package              | Purpose                                     | Key Files                    |
 | -------------------- | ------------------------------------------- | ---------------------------- |
 | `packages/core`             | Business logic, DB schemas, domain services | `CLAUDE.md` has full details |
-| `packages/api`              | Effect RPC + REST API (CF Worker)           | `CLAUDE.md` has patterns     |
+| `packages/api`              | Effect HttpApi + generated client (CF Worker) | `CLAUDE.md` has patterns     |
 | `packages/practice-planner` | Planner app UI                              | `CLAUDE.md`                  |
 | `packages/ui`               | shadcn/Base UI components                   | `CLAUDE.md` has API diffs    |
 | `packages/marketing`        | Marketing site                              | `CLAUDE.md`                  |
 | `packages/docs`             | Fumadocs documentation                      | `CLAUDE.md`                  |
-| `packages/cli`              | RPC CLI tools                               | `CLAUDE.md`                  |
+| `packages/cli`              | HTTP API CLI tools                          | `CLAUDE.md`                  |
 | `packages/pipeline`         | Data ingestion (PLL API, scraping)          | `CLAUDE.md` has API guide    |
 
 ## COMMON TASKS
@@ -41,7 +41,7 @@ TanStack Start apps (marketing, practice-planner) → Effect RPC (api) → Effec
 | Task                  | Package              | Pattern                                                    |
 | --------------------- | -------------------- | ---------------------------------------------------------- |
 | Add domain entity     | `core`               | schema.ts → {domain}.sql.ts → repo → service → contract    |
-| Add API endpoint      | `api`                | {domain}.rpc.ts → {domain}.api.ts → {domain}.client.ts     |
+| Add API endpoint      | `api`                | core contract → {domain}.api.ts → {domain}.handlers.ts     |
 | Add planner route     | `practice-planner`   | `src/routes/...` (file-based)                              |
 | Add UI component      | `ui`                 | `bunx --bun shadcn@latest add <component>`                 |
 | Modify DB schema      | `core`               | Edit sql.ts → `bun run db:generate` → deploy via Alchemy D1 migrations |
@@ -84,7 +84,7 @@ Never guess at Effect patterns - check the guide first.
 ## CHILD INTENT NODES
 
 - `packages/core/CLAUDE.md` - Domain logic, services, DB (CRITICAL - read first for backend work)
-- `packages/api/CLAUDE.md` - RPC/HTTP API patterns
+- `packages/api/CLAUDE.md` - HttpApi/generated client patterns
 - `packages/ui/CLAUDE.md` - Base UI component APIs
 - `packages/pipeline/CLAUDE.md` - Data ingestion, external APIs, scraping patterns
 - `packages/cli/CLAUDE.md` - CLI tools for API interaction

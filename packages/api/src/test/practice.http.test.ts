@@ -132,7 +132,7 @@ describe("POST /api/practices (CRUD)", () => {
     const { status } = await post(s.url, "/api/practices/get", {
       publicId: "AbCdEfGhIjKl",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });
 
@@ -294,6 +294,6 @@ describe("POST /api/practices/review", () => {
     const { status } = await post(s.url, "/api/practices/review/get", {
       practicePublicId: publicId,
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });

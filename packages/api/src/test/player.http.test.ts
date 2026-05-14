@@ -66,7 +66,7 @@ describe("POST /api/players/create", () => {
       name: "",
       email: "a@b.com",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(400);
   });
 
   it("returns error for name > 100 chars", async () => {
@@ -74,7 +74,7 @@ describe("POST /api/players/create", () => {
       name: "A".repeat(101),
       email: "a@b.com",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(400);
   });
 });
 
@@ -97,14 +97,14 @@ describe("POST /api/players/get", () => {
     const { status } = await post(s.url, "/api/players/get", {
       publicId: "AbCdEfGhIjKl",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 
   it("returns error for invalid nanoid", async () => {
     const { status } = await post(s.url, "/api/players/get", {
       publicId: "bad",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(400);
   });
 });
 
@@ -131,7 +131,7 @@ describe("POST /api/players/update", () => {
       publicId: "AbCdEfGhIjKl",
       name: "X",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });
 
@@ -154,6 +154,6 @@ describe("POST /api/players/delete", () => {
     const { status } = await post(s.url, "/api/players/delete", {
       publicId: "AbCdEfGhIjKl",
     });
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 });

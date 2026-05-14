@@ -1,10 +1,10 @@
 /**
  * Defaults CLI integration tests
  *
- * Tests the full RPC round-trip: client → HTTP → handler → service → DB
+ * Tests the full generated HTTP client round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -14,7 +14,7 @@ import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
-const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, ApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
@@ -29,15 +29,17 @@ beforeEach(async () => {
   await truncateAllTables();
 });
 
-describe("Defaults RPC", () => {
+describe("Defaults HTTP API", () => {
   it("gets an empty namespace by default", async () => {
     const values = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.DefaultsGetNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
+        const client = yield* ApiClient;
+        return yield* client.Defaults.getNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+          },
         });
       }),
     );
@@ -47,14 +49,16 @@ describe("Defaults RPC", () => {
   it("patches a namespace", async () => {
     const values = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.DefaultsPatchNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
-          values: {
-            durationMinutes: 90,
-            location: "Main Field",
+        const client = yield* ApiClient;
+        return yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+            values: {
+              durationMinutes: 90,
+              location: "Main Field",
+            },
           },
         });
       }),
@@ -68,21 +72,25 @@ describe("Defaults RPC", () => {
   it("merges namespace updates", async () => {
     const values = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        yield* client.DefaultsPatchNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
-          values: {
-            durationMinutes: 90,
+        const client = yield* ApiClient;
+        yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+            values: {
+              durationMinutes: 90,
+            },
           },
         });
-        return yield* client.DefaultsPatchNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
-          values: {
-            location: "Indoor",
+        return yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+            values: {
+              location: "Indoor",
+            },
           },
         });
       }),
@@ -96,17 +104,21 @@ describe("Defaults RPC", () => {
   it("get returns patched values", async () => {
     const values = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        yield* client.DefaultsPatchNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
-          values: { durationMinutes: 120 },
+        const client = yield* ApiClient;
+        yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+            values: { durationMinutes: 120 },
+          },
         });
-        return yield* client.DefaultsGetNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
+        return yield* client.Defaults.getNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+          },
         });
       }),
     );
@@ -116,28 +128,36 @@ describe("Defaults RPC", () => {
   it("different scopes are independent", async () => {
     const [global, user] = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        yield* client.DefaultsPatchNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
-          values: { durationMinutes: 90 },
+        const client = yield* ApiClient;
+        yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+            values: { durationMinutes: 90 },
+          },
         });
-        yield* client.DefaultsPatchNamespace({
-          scopeType: "user",
-          scopeId: "usr123",
-          namespace: "practice",
-          values: { durationMinutes: 120 },
+        yield* client.Defaults.patchNamespace({
+          payload: {
+            scopeType: "user",
+            scopeId: "usr123",
+            namespace: "practice",
+            values: { durationMinutes: 120 },
+          },
         });
-        const g = yield* client.DefaultsGetNamespace({
-          scopeType: "global",
-          scopeId: "global",
-          namespace: "practice",
+        const g = yield* client.Defaults.getNamespace({
+          payload: {
+            scopeType: "global",
+            scopeId: "global",
+            namespace: "practice",
+          },
         });
-        const u = yield* client.DefaultsGetNamespace({
-          scopeType: "user",
-          scopeId: "usr123",
-          namespace: "practice",
+        const u = yield* client.Defaults.getNamespace({
+          payload: {
+            scopeType: "user",
+            scopeId: "usr123",
+            namespace: "practice",
+          },
         });
         return [g, u] as const;
       }),

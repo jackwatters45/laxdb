@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Field,
@@ -25,8 +25,10 @@ import { decodePracticeDefaults, practiceDefaultsScope } from "@/lib/defaults";
 const loadDefaults = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const values = yield* client.DefaultsGetNamespace(practiceDefaultsScope);
+      const client = yield* ApiClient;
+      const values = yield* client.Defaults.getNamespace({
+        payload: practiceDefaultsScope,
+      });
       return decodePracticeDefaults(values);
     }),
   ),
@@ -44,12 +46,14 @@ const saveDefaults = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const values = yield* client.DefaultsPatchNamespace({
-          ...practiceDefaultsScope,
-          values: {
-            durationMinutes: data.durationMinutes,
-            location: data.location,
+        const client = yield* ApiClient;
+        const values = yield* client.Defaults.patchNamespace({
+          payload: {
+            ...practiceDefaultsScope,
+            values: {
+              durationMinutes: data.durationMinutes,
+              location: data.location,
+            },
           },
         });
         return decodePracticeDefaults(values);

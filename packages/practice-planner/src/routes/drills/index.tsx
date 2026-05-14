@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -41,8 +41,8 @@ import type { Drill } from "@/types";
 const listDrills = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      return yield* client.DrillList();
+      const client = yield* ApiClient;
+      return yield* client.Drills.listDrills();
     }),
   ),
 );
@@ -56,8 +56,10 @@ const deleteDrill = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.DrillDelete({ publicId: data.publicId });
+        const client = yield* ApiClient;
+        return yield* client.Drills.deleteDrill({
+          payload: { publicId: data.publicId },
+        });
       }),
     ),
   );

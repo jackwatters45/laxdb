@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { CreatePlayInput } from "@laxdb/core/play/play.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
@@ -24,8 +24,8 @@ const createPlay = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayCreate(data);
+        const client = yield* ApiClient;
+        return yield* client.Plays.createPlay({ payload: data });
       }),
     ),
   );

@@ -15,7 +15,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import {
   CreatePracticeInput,
   PracticeEdgeInput,
@@ -44,8 +44,8 @@ const listCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const practices = yield* client.PracticeList();
+      const client = yield* ApiClient;
+      const practices = yield* client.Practices.listPractices();
       yield* output(practices, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -59,8 +59,10 @@ const getCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const practice = yield* client.PracticeGet({ publicId });
+      const client = yield* ApiClient;
+      const practice = yield* client.Practices.getPractice({
+        payload: { publicId },
+      });
       yield* output(practice, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -112,18 +114,17 @@ const createCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const practice = yield* client.PracticeCreate({
-        name: Option.getOrNull(opts.name),
-        date: Option.match(opts.date, {
-          onNone: () => null,
-          onSome: (d) => new Date(d),
-        }),
-        description: Option.getOrNull(opts.description),
-        notes: Option.getOrNull(opts.notes),
-        durationMinutes: Option.getOrNull(opts.duration),
-        location: Option.getOrNull(opts.location),
-        status: Option.getOrUndefined(opts.status),
+      const client = yield* ApiClient;
+      const practice = yield* client.Practices.createPractice({
+        payload: {
+          name: Option.getOrNull(opts.name),
+          date: Option.getOrNull(opts.date),
+          description: Option.getOrNull(opts.description),
+          notes: Option.getOrNull(opts.notes),
+          durationMinutes: Option.getOrNull(opts.duration),
+          location: Option.getOrNull(opts.location),
+          status: Option.getOrUndefined(opts.status),
+        },
       });
       yield* output(practice, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -145,19 +146,18 @@ const updateCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const practice = yield* client.PracticeUpdate({
-        publicId: opts.publicId,
-        name: Option.getOrUndefined(opts.name),
-        date: Option.match(opts.date, {
-          onNone: (): Date | undefined => undefined,
-          onSome: (d) => new Date(d),
-        }),
-        description: Option.getOrUndefined(opts.description),
-        notes: Option.getOrUndefined(opts.notes),
-        durationMinutes: Option.getOrUndefined(opts.duration),
-        location: Option.getOrUndefined(opts.location),
-        status: Option.getOrUndefined(opts.status),
+      const client = yield* ApiClient;
+      const practice = yield* client.Practices.updatePractice({
+        payload: {
+          publicId: opts.publicId,
+          name: Option.getOrUndefined(opts.name),
+          date: Option.getOrUndefined(opts.date),
+          description: Option.getOrUndefined(opts.description),
+          notes: Option.getOrUndefined(opts.notes),
+          durationMinutes: Option.getOrUndefined(opts.duration),
+          location: Option.getOrUndefined(opts.location),
+          status: Option.getOrUndefined(opts.status),
+        },
       });
       yield* output(practice, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -172,8 +172,10 @@ const deleteCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const practice = yield* client.PracticeDelete({ publicId });
+      const client = yield* ApiClient;
+      const practice = yield* client.Practices.deletePractice({
+        payload: { publicId },
+      });
       yield* output(practice, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -227,7 +229,7 @@ const addItemCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const groupValues = Option.map(opts.groups, (csv) =>
         csv
           .split(",")
@@ -235,16 +237,18 @@ const addItemCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const item = yield* client.PracticeAddItem({
-        practicePublicId: opts.practiceId,
-        type: opts.type,
-        drillPublicId: Option.getOrUndefined(opts.drill),
-        label: Option.getOrUndefined(opts.label),
-        durationMinutes: Option.getOrUndefined(opts.duration),
-        notes: Option.getOrUndefined(opts.itemNotes),
-        groups: Option.getOrUndefined(groupValues),
-        orderIndex: Option.getOrUndefined(opts.order),
-        priority: Option.getOrUndefined(opts.priority),
+      const item = yield* client.Practices.addPracticeItem({
+        payload: {
+          practicePublicId: opts.practiceId,
+          type: opts.type,
+          drillPublicId: Option.getOrUndefined(opts.drill),
+          label: Option.getOrUndefined(opts.label),
+          durationMinutes: Option.getOrUndefined(opts.duration),
+          notes: Option.getOrUndefined(opts.itemNotes),
+          groups: Option.getOrUndefined(groupValues),
+          orderIndex: Option.getOrUndefined(opts.order),
+          priority: Option.getOrUndefined(opts.priority),
+        },
       });
       yield* output(item, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -295,7 +299,7 @@ const updateItemCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const groupValues = Option.map(opts.groups, (csv) =>
         csv
           .split(",")
@@ -303,16 +307,18 @@ const updateItemCommand = Command.make(
           .filter((s) => s.length > 0),
       );
 
-      const item = yield* client.PracticeUpdateItem({
-        publicId: opts.itemId,
-        type: Option.getOrUndefined(opts.type),
-        drillPublicId: Option.getOrUndefined(opts.drill),
-        label: Option.getOrUndefined(opts.label),
-        durationMinutes: Option.getOrUndefined(opts.duration),
-        notes: Option.getOrUndefined(opts.itemNotes),
-        groups: Option.getOrUndefined(groupValues),
-        orderIndex: Option.getOrUndefined(opts.order),
-        priority: Option.getOrUndefined(opts.priority),
+      const item = yield* client.Practices.updatePracticeItem({
+        payload: {
+          publicId: opts.itemId,
+          type: Option.getOrUndefined(opts.type),
+          drillPublicId: Option.getOrUndefined(opts.drill),
+          label: Option.getOrUndefined(opts.label),
+          durationMinutes: Option.getOrUndefined(opts.duration),
+          notes: Option.getOrUndefined(opts.itemNotes),
+          groups: Option.getOrUndefined(groupValues),
+          orderIndex: Option.getOrUndefined(opts.order),
+          priority: Option.getOrUndefined(opts.priority),
+        },
       });
       yield* output(item, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -327,8 +333,10 @@ const removeItemCommand = Command.make(
   },
   ({ itemId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const item = yield* client.PracticeRemoveItem({ publicId: itemId });
+      const client = yield* ApiClient;
+      const item = yield* client.Practices.removePracticeItem({
+        payload: { publicId: itemId },
+      });
       yield* output(item, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -342,9 +350,11 @@ const listItemsCommand = Command.make(
   },
   ({ practiceId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const items = yield* client.PracticeListItems({
-        practicePublicId: practiceId,
+      const client = yield* ApiClient;
+      const items = yield* client.Practices.listPracticeItems({
+        payload: {
+          practicePublicId: practiceId,
+        },
       });
       yield* output(items, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
@@ -362,14 +372,16 @@ const reorderItemsCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const orderedIds = opts.order
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
-      const items = yield* client.PracticeReorderItems({
-        practicePublicId: opts.practiceId,
-        orderedIds,
+      const items = yield* client.Practices.reorderPracticeItems({
+        payload: {
+          practicePublicId: opts.practiceId,
+          orderedIds,
+        },
       });
       yield* output(items, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -384,9 +396,11 @@ const listEdgesCommand = Command.make(
   },
   ({ practiceId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const edges = yield* client.PracticeListEdges({
-        practicePublicId: practiceId,
+      const client = yield* ApiClient;
+      const edges = yield* client.Practices.listPracticeEdges({
+        payload: {
+          practicePublicId: practiceId,
+        },
       });
       yield* output(edges, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
@@ -407,15 +421,17 @@ const replaceEdgesCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const rawEdges = yield* Option.match(opts.edges, {
         onNone: () => readStdin,
         onSome: (value) => parseJsonValue(value, "--edges"),
       });
       const edges = yield* decodePracticeEdges(rawEdges);
-      const replaced = yield* client.PracticeReplaceEdges({
-        practicePublicId: opts.practiceId,
-        edges,
+      const replaced = yield* client.Practices.replacePracticeEdges({
+        payload: {
+          practicePublicId: opts.practiceId,
+          edges,
+        },
       });
       yield* output(replaced, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -446,27 +462,31 @@ const reviewCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
 
       // Try to get existing review first; create if not found
-      const existing = yield* client
-        .PracticeGetReview({ practicePublicId: opts.practiceId })
-        .pipe(Effect.option);
+      const existing = yield* client.Practices.getPracticeReview({
+        payload: { practicePublicId: opts.practiceId },
+      }).pipe(Effect.option);
 
       const review = yield* Option.match(existing, {
         onNone: () =>
-          client.PracticeCreateReview({
-            practicePublicId: opts.practiceId,
-            wentWell: Option.getOrNull(opts.wentWell),
-            needsImprovement: Option.getOrNull(opts.needsImprovement),
-            notes: Option.getOrNull(opts.reviewNotes),
+          client.Practices.createPracticeReview({
+            payload: {
+              practicePublicId: opts.practiceId,
+              wentWell: Option.getOrNull(opts.wentWell),
+              needsImprovement: Option.getOrNull(opts.needsImprovement),
+              notes: Option.getOrNull(opts.reviewNotes),
+            },
           }),
         onSome: () =>
-          client.PracticeUpdateReview({
-            practicePublicId: opts.practiceId,
-            wentWell: Option.getOrUndefined(opts.wentWell),
-            needsImprovement: Option.getOrUndefined(opts.needsImprovement),
-            notes: Option.getOrUndefined(opts.reviewNotes),
+          client.Practices.updatePracticeReview({
+            payload: {
+              practicePublicId: opts.practiceId,
+              wentWell: Option.getOrUndefined(opts.wentWell),
+              needsImprovement: Option.getOrUndefined(opts.needsImprovement),
+              notes: Option.getOrUndefined(opts.reviewNotes),
+            },
           }),
       });
 
@@ -483,9 +503,11 @@ const getReviewCommand = Command.make(
   },
   ({ practiceId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const review = yield* client.PracticeGetReview({
-        practicePublicId: practiceId,
+      const client = yield* ApiClient;
+      const review = yield* client.Practices.getPracticeReview({
+        payload: {
+          practicePublicId: practiceId,
+        },
       });
       yield* output(review, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
@@ -500,14 +522,14 @@ const bulkCreateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
-        Schema.Array(CreatePracticeInput),
+        Schema.Array(Schema.toEncoded(CreatePracticeInput)),
       )(raw);
       const results = yield* Effect.forEach(
         items,
-        (item) => client.PracticeCreate(item),
+        (item) => client.Practices.createPractice({ payload: item }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);
@@ -519,14 +541,14 @@ const bulkUpdateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
-        Schema.Array(UpdatePracticeInput),
+        Schema.Array(Schema.toEncoded(UpdatePracticeInput)),
       )(raw);
       const results = yield* Effect.forEach(
         items,
-        (item) => client.PracticeUpdate(item),
+        (item) => client.Practices.updatePractice({ payload: item }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);
@@ -538,14 +560,15 @@ const bulkDeleteCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
       const results = yield* Effect.forEach(
         ids,
-        (publicId) => client.PracticeDelete({ publicId }),
+        (publicId) =>
+          client.Practices.deletePractice({ payload: { publicId } }),
         { concurrency: 5 },
       );
       yield* output(results, pretty);

@@ -14,9 +14,9 @@ laxdb is a suite of management tools designed specifically for lacrosse teams an
 
 ## Project Structure
 
-- `packages/api`: Effect-based HTTP API with RPC support
+- `packages/api`: Effect HttpApi server with generated typed client
 - `packages/core`: Shared business logic, database schemas, and core services
-- `packages/cli`: RPC-driven developer CLI
+- `packages/cli`: HTTP API-driven developer CLI
 - `packages/docs`: Documentation site built with Fumadocs
 - `packages/marketing`: Marketing website built with TanStack Start
 - `packages/pipeline`: Effect-based web scraping and HTML parsing pipeline

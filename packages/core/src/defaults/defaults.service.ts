@@ -1,6 +1,6 @@
 import { Effect, Layer, Context } from "effect";
 
-import { decodeArguments, parseSqlError } from "../util";
+import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
 
 import { DefaultsRepo } from "./defaults.repo";
 import {
@@ -15,7 +15,7 @@ export class DefaultsService extends Context.Service<DefaultsService>()(
       const repo = yield* DefaultsRepo;
 
       return {
-        getNamespace: (input: GetDefaultsNamespaceInput) =>
+        getNamespace: (input: SchemaInput<typeof GetDefaultsNamespaceInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               GetDefaultsNamespaceInput,
@@ -28,7 +28,9 @@ export class DefaultsService extends Context.Service<DefaultsService>()(
             Effect.tapError(Effect.logError),
           ),
 
-        patchNamespace: (input: PatchDefaultsNamespaceInput) =>
+        patchNamespace: (
+          input: SchemaInput<typeof PatchDefaultsNamespaceInput>,
+        ) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(
               PatchDefaultsNamespaceInput,

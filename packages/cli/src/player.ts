@@ -16,7 +16,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import {
   CreatePlayerInput,
   UpdatePlayerInput,
@@ -39,8 +39,8 @@ const listCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const players = yield* client.PlayerList();
+      const client = yield* ApiClient;
+      const players = yield* client.Players.listPlayers();
       yield* output(players, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -54,8 +54,8 @@ const getCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const player = yield* client.PlayerGet({ publicId });
+      const client = yield* ApiClient;
+      const player = yield* client.Players.getPlayer({ payload: { publicId } });
       yield* output(player, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -70,10 +70,12 @@ const createCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const player = yield* client.PlayerCreate({
-        name: opts.name,
-        email: opts.email,
+      const client = yield* ApiClient;
+      const player = yield* client.Players.createPlayer({
+        payload: {
+          name: opts.name,
+          email: opts.email,
+        },
       });
       yield* output(player, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -96,11 +98,13 @@ const updateCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const player = yield* client.PlayerUpdate({
-        publicId: opts.publicId,
-        name: Option.getOrUndefined(opts.name),
-        email: Option.getOrUndefined(opts.email),
+      const client = yield* ApiClient;
+      const player = yield* client.Players.updatePlayer({
+        payload: {
+          publicId: opts.publicId,
+          name: Option.getOrUndefined(opts.name),
+          email: Option.getOrUndefined(opts.email),
+        },
       });
       yield* output(player, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),
@@ -115,8 +119,10 @@ const deleteCommand = Command.make(
   },
   ({ publicId, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const player = yield* client.PlayerDelete({ publicId });
+      const client = yield* ApiClient;
+      const player = yield* client.Players.deletePlayer({
+        payload: { publicId },
+      });
       yield* output(player, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
 );
@@ -130,14 +136,14 @@ const bulkCreateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(CreatePlayerInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const player = yield* client.PlayerCreate(item);
+        const player = yield* client.Players.createPlayer({ payload: item });
         results.push(player);
       }
       yield* output(results, pretty);
@@ -149,14 +155,14 @@ const bulkUpdateCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const items = yield* Schema.decodeUnknownEffect(
         Schema.Array(UpdatePlayerInput),
       )(raw);
       const results = [];
       for (const item of items) {
-        const player = yield* client.PlayerUpdate(item);
+        const player = yield* client.Players.updatePlayer({ payload: item });
         results.push(player);
       }
       yield* output(results, pretty);
@@ -168,14 +174,16 @@ const bulkDeleteCommand = Command.make(
   { pretty: prettyFlag, baseUrl: baseUrlFlag },
   ({ pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const raw = yield* readStdin;
       const ids = yield* Schema.decodeUnknownEffect(
         Schema.Array(Schema.String),
       )(raw);
       const results = [];
       for (const publicId of ids) {
-        const player = yield* client.PlayerDelete({ publicId });
+        const player = yield* client.Players.deletePlayer({
+          payload: { publicId },
+        });
         results.push(player);
       }
       yield* output(results, pretty);

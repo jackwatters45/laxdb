@@ -1,7 +1,7 @@
-import { Effect, Layer, Context } from "effect";
+import { Context, Effect, Layer } from "effect";
 
 import { NotFoundError } from "../error";
-import { decodeArguments, parseSqlError } from "../util";
+import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
 
 import { PlayRepo } from "./play.repo";
 import {
@@ -26,7 +26,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
           Effect.tapError(Effect.logError),
         ),
 
-      get: (input: GetPlayInput) =>
+      get: (input: SchemaInput<typeof GetPlayInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(GetPlayInput, input);
           return yield* repo.get(decoded);
@@ -41,7 +41,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
           Effect.tapError(Effect.logError),
         ),
 
-      create: (input: CreatePlayInput) =>
+      create: (input: SchemaInput<typeof CreatePlayInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(CreatePlayInput, input);
           return yield* repo.create(decoded);
@@ -54,7 +54,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
           Effect.tapError(Effect.logError),
         ),
 
-      update: (input: UpdatePlayInput) =>
+      update: (input: SchemaInput<typeof UpdatePlayInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(UpdatePlayInput, input);
           return yield* repo.update(decoded);
@@ -69,7 +69,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
           Effect.tapError(Effect.logError),
         ),
 
-      delete: (input: DeletePlayInput) =>
+      delete: (input: SchemaInput<typeof DeletePlayInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(DeletePlayInput, input);
           return yield* repo.delete(decoded);

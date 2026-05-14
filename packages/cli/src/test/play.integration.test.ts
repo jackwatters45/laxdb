@@ -1,10 +1,10 @@
 /**
  * Play CLI integration tests
  *
- * Tests the full RPC round-trip: client → HTTP → handler → service → DB
+ * Tests the full generated HTTP client round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -14,7 +14,7 @@ import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
-const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, ApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
@@ -29,7 +29,7 @@ beforeEach(async () => {
   await truncateAllTables();
 });
 
-describe("Play RPC", () => {
+describe("Play HTTP API", () => {
   const minimalPlay = {
     name: "2-3-1 Motion",
     category: "offense" as const,
@@ -44,8 +44,8 @@ describe("Play RPC", () => {
   it("lists plays (empty)", async () => {
     const plays = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayList();
+        const client = yield* ApiClient;
+        return yield* client.Plays.listPlays();
       }),
     );
     expect(plays).toEqual([]);
@@ -54,8 +54,8 @@ describe("Play RPC", () => {
   it("creates a play", async () => {
     const play = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayCreate(minimalPlay);
+        const client = yield* ApiClient;
+        return yield* client.Plays.createPlay({ payload: minimalPlay });
       }),
     );
     expect(play.name).toBe("2-3-1 Motion");
@@ -66,9 +66,13 @@ describe("Play RPC", () => {
   it("gets a play by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PlayCreate(minimalPlay);
-        return yield* client.PlayGet({ publicId: created.publicId });
+        const client = yield* ApiClient;
+        const created = yield* client.Plays.createPlay({
+          payload: minimalPlay,
+        });
+        return yield* client.Plays.getPlay({
+          payload: { publicId: created.publicId },
+        });
       }),
     );
     expect(found.name).toBe("2-3-1 Motion");
@@ -77,12 +81,16 @@ describe("Play RPC", () => {
   it("updates a play", async () => {
     const updated = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PlayCreate(minimalPlay);
-        return yield* client.PlayUpdate({
-          publicId: created.publicId,
-          formation: "1-4-1",
-          tags: ["invert"],
+        const client = yield* ApiClient;
+        const created = yield* client.Plays.createPlay({
+          payload: minimalPlay,
+        });
+        return yield* client.Plays.updatePlay({
+          payload: {
+            publicId: created.publicId,
+            formation: "1-4-1",
+            tags: ["invert"],
+          },
         });
       }),
     );
@@ -93,17 +101,19 @@ describe("Play RPC", () => {
   it("creates a play with all fields", async () => {
     const play = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayCreate({
-          ...minimalPlay,
-          name: "Full Play",
-          category: "emo",
-          formation: "2-2-2",
-          description: "Extra man offense play",
-          personnelNotes: "Need strong shooters",
-          tags: ["emo", "settled"],
-          diagramUrl: "https://example.com/diagram.png",
-          videoUrl: "https://example.com/video.mp4",
+        const client = yield* ApiClient;
+        return yield* client.Plays.createPlay({
+          payload: {
+            ...minimalPlay,
+            name: "Full Play",
+            category: "emo",
+            formation: "2-2-2",
+            description: "Extra man offense play",
+            personnelNotes: "Need strong shooters",
+            tags: ["emo", "settled"],
+            diagramUrl: "https://example.com/diagram.png",
+            videoUrl: "https://example.com/video.mp4",
+          },
         });
       }),
     );
@@ -117,16 +127,16 @@ describe("Play RPC", () => {
   it("bulk-create smoke test creates multiple plays", async () => {
     const [createdPlays, listedPlays] = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
+        const client = yield* ApiClient;
         const created = yield* Effect.forEach(
           [
             minimalPlay,
             { ...minimalPlay, name: "Clear 1", category: "clear" as const },
           ],
-          (item) => client.PlayCreate(item),
+          (item) => client.Plays.createPlay({ payload: item }),
           { concurrency: 5 },
         );
-        const plays = yield* client.PlayList();
+        const plays = yield* client.Plays.listPlays();
         return [created, plays] as const;
       }),
     );
@@ -138,10 +148,12 @@ describe("Play RPC", () => {
   it("lists all plays", async () => {
     const plays = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        yield* client.PlayCreate(minimalPlay);
-        yield* client.PlayCreate({ ...minimalPlay, name: "Clear 1" });
-        return yield* client.PlayList();
+        const client = yield* ApiClient;
+        yield* client.Plays.createPlay({ payload: minimalPlay });
+        yield* client.Plays.createPlay({
+          payload: { ...minimalPlay, name: "Clear 1" },
+        });
+        return yield* client.Plays.listPlays();
       }),
     );
     expect(plays).toHaveLength(2);
@@ -150,10 +162,14 @@ describe("Play RPC", () => {
   it("deletes a play", async () => {
     const remaining = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PlayCreate(minimalPlay);
-        yield* client.PlayDelete({ publicId: created.publicId });
-        return yield* client.PlayList();
+        const client = yield* ApiClient;
+        const created = yield* client.Plays.createPlay({
+          payload: minimalPlay,
+        });
+        yield* client.Plays.deletePlay({
+          payload: { publicId: created.publicId },
+        });
+        return yield* client.Plays.listPlays();
       }),
     );
     expect(remaining).toHaveLength(0);
@@ -163,8 +179,10 @@ describe("Play RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcApiClient;
-          return yield* client.PlayGet({ publicId: "AbCdEfGhIjKl" });
+          const client = yield* ApiClient;
+          return yield* client.Plays.getPlay({
+            payload: { publicId: "AbCdEfGhIjKl" },
+          });
         }),
       ),
     ).rejects.toMatchObject({ _tag: "NotFoundError", domain: "Play" });

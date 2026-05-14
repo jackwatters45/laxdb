@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import {
   PracticeItemPriority as PracticeItemPrioritySchema,
   PracticeItemType as PracticeItemTypeSchema,
@@ -38,8 +38,8 @@ import type { Drill, DrillCategory, PracticeNode } from "@/types";
 const loadDrills = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      return yield* client.DrillList();
+      const client = yield* ApiClient;
+      return yield* client.Drills.listDrills();
     }),
   ),
 );
@@ -108,41 +108,49 @@ const savePractice = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
+        const client = yield* ApiClient;
 
         // Update practice metadata
-        yield* client.PracticeUpdate({
-          publicId: data.practiceId,
-          date: data.practice.date ? new Date(data.practice.date) : undefined,
-          description: data.practice.description,
-          notes: data.practice.notes,
-          durationMinutes: data.practice.durationMinutes,
-          location: data.practice.location,
-          status: data.practice.status,
+        yield* client.Practices.updatePractice({
+          payload: {
+            publicId: data.practiceId,
+            date: data.practice.date ?? undefined,
+            description: data.practice.description,
+            notes: data.practice.notes,
+            durationMinutes: data.practice.durationMinutes,
+            location: data.practice.location,
+            status: data.practice.status,
+          },
         });
 
         // Remove deleted items
         for (const id of data.removedItemIds) {
-          yield* client.PracticeRemoveItem({ publicId: id });
+          yield* client.Practices.removePracticeItem({
+            payload: { publicId: id },
+          });
         }
 
         // Add new items
         for (const item of data.addedItems) {
-          yield* client.PracticeAddItem({
-            practicePublicId: data.practiceId,
-            ...item,
+          yield* client.Practices.addPracticeItem({
+            payload: {
+              practicePublicId: data.practiceId,
+              ...item,
+            },
           });
         }
 
         // Update existing items
         for (const item of data.updatedItems) {
-          yield* client.PracticeUpdateItem(item);
+          yield* client.Practices.updatePracticeItem({ payload: item });
         }
 
         // Replace graph edges after items exist in their latest shape
-        yield* client.PracticeReplaceEdges({
-          practicePublicId: data.practiceId,
-          edges: data.edges,
+        yield* client.Practices.replacePracticeEdges({
+          payload: {
+            practicePublicId: data.practiceId,
+            edges: data.edges,
+          },
         });
       }),
     ),
@@ -153,11 +161,15 @@ const loadPractice = createServerFn({ method: "GET" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
+        const client = yield* ApiClient;
         const [practice, items, edges] = yield* Effect.all([
-          client.PracticeGet({ publicId: data.id }),
-          client.PracticeListItems({ practicePublicId: data.id }),
-          client.PracticeListEdges({ practicePublicId: data.id }),
+          client.Practices.getPractice({ payload: { publicId: data.id } }),
+          client.Practices.listPracticeItems({
+            payload: { practicePublicId: data.id },
+          }),
+          client.Practices.listPracticeEdges({
+            payload: { practicePublicId: data.id },
+          }),
         ]);
         return { practice, items, edges };
       }),
@@ -371,7 +383,9 @@ function PracticePlannerPage() {
               onDragNode={editor.updateNodeRaw}
               onDragEnd={editor.commitDrag}
               onAddDrill={handleAddDrillBetween}
-              onAppendDrill={editor.appendDrill}
+              onAppendDrill={(drill) => {
+                editor.appendDrill(drill);
+              }}
             />
           </div>
 

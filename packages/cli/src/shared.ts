@@ -4,10 +4,10 @@
  * Common flags and helpers used across all CLI subcommands.
  */
 
-import { RpcApiClient } from "@laxdb/api/client";
-import { makeRpcProtocol } from "@laxdb/api/protocol";
+import { makeApiClientLayer } from "@laxdb/api/client";
 import { Effect, Layer } from "effect";
 import { Flag } from "effect/unstable/cli";
+import { FetchHttpClient } from "effect/unstable/http";
 
 export const prettyFlag = Flag.boolean("pretty").pipe(
   Flag.withDescription("Pretty-print JSON output"),
@@ -31,4 +31,4 @@ export const readStdin: Effect.Effect<unknown, Error> = Effect.tryPromise({
 });
 
 export const apiLayer = (baseUrl: string) =>
-  RpcApiClient.layer.pipe(Layer.provide(makeRpcProtocol(baseUrl)));
+  makeApiClientLayer(baseUrl).pipe(Layer.provide(FetchHttpClient.layer));

@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
@@ -29,8 +29,8 @@ import type { Play } from "@/types";
 const listPlays = createServerFn({ method: "GET" }).handler(() =>
   runApi(
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      return yield* client.PlayList();
+      const client = yield* ApiClient;
+      return yield* client.Plays.listPlays();
     }),
   ),
 );
@@ -44,8 +44,10 @@ const deletePlay = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayDelete({ publicId: data.publicId });
+        const client = yield* ApiClient;
+        return yield* client.Plays.deletePlay({
+          payload: { publicId: data.publicId },
+        });
       }),
     ),
   );

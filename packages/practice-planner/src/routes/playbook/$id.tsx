@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { UpdatePlayInput } from "@laxdb/core/play/play.schema";
 import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
@@ -27,8 +27,8 @@ const getPlay = createServerFn({ method: "GET" })
   .handler(({ data: publicId }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayGet({ publicId });
+        const client = yield* ApiClient;
+        return yield* client.Plays.getPlay({ payload: { publicId } });
       }),
     ),
   );
@@ -40,8 +40,8 @@ const updatePlay = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PlayUpdate(data);
+        const client = yield* ApiClient;
+        return yield* client.Plays.updatePlay({ payload: data });
       }),
     ),
   );

@@ -10,7 +10,7 @@
  */
 
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { DefaultsValues } from "@laxdb/core/defaults/defaults.schema";
 import { Effect, Option, Schema } from "effect";
 import { Command, Flag } from "effect/unstable/cli";
@@ -50,11 +50,13 @@ const getCommand = Command.make(
   },
   ({ scopeType, scopeId, namespace, pretty, baseUrl }) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
-      const values = yield* client.DefaultsGetNamespace({
-        scopeType,
-        scopeId,
-        namespace,
+      const client = yield* ApiClient;
+      const values = yield* client.Defaults.getNamespace({
+        payload: {
+          scopeType,
+          scopeId,
+          namespace,
+        },
       });
       yield* output(values, pretty);
     }).pipe(Effect.provide(apiLayer(baseUrl))),
@@ -72,17 +74,19 @@ const patchCommand = Command.make(
   },
   (opts) =>
     Effect.gen(function* () {
-      const client = yield* RpcApiClient;
+      const client = yield* ApiClient;
       const rawValues = yield* Option.match(opts.values, {
         onNone: () => readStdin,
         onSome: (value) => parseJsonValue(value, "--values"),
       });
       const values = yield* decodeDefaultsValues(rawValues);
-      const updated = yield* client.DefaultsPatchNamespace({
-        scopeType: opts.scopeType,
-        scopeId: opts.scopeId,
-        namespace: opts.namespace,
-        values,
+      const updated = yield* client.Defaults.patchNamespace({
+        payload: {
+          scopeType: opts.scopeType,
+          scopeId: opts.scopeId,
+          namespace: opts.namespace,
+          values,
+        },
       });
       yield* output(updated, opts.pretty);
     }).pipe(Effect.provide(apiLayer(opts.baseUrl))),

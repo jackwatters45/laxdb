@@ -1,55 +1,20 @@
 /**
- * Test server for api HTTP + RPC integration tests.
+ * Test server for api HTTP integration tests.
  *
- * Serves the full API (HTTP routes + RPC) backed by TestDatabaseLive.
+ * Serves the full generated HTTP API backed by TestDatabaseLive.
  */
 
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
 import { HttpServer } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
-import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
-import { DefaultsRpcHandlers } from "../defaults/defaults.rpc-handlers";
 import { LaxdbApiV2 } from "../definition";
-import { DrillsHandlersLive } from "../drill/drill.handlers";
-import { DrillRpcHandlers } from "../drill/drill.rpc-handlers";
-import { PlaysHandlersLive } from "../play/play.handlers";
-import { PlayRpcHandlers } from "../play/play.rpc-handlers";
-import { PlayersHandlersLive } from "../player/player.handlers";
-import { PlayerRpcHandlers } from "../player/player.rpc-handlers";
-import { PracticesHandlersLive } from "../practice/practice.handlers";
-import { PracticeRpcHandlers } from "../practice/practice.rpc-handlers";
-import { LaxdbRpcV2 } from "../rpc-group";
+import { HttpGroupsLive } from "../groups";
 
 import { startNodeHttpTestServer, type TestServer } from "./http-test-server";
 
-// RPC handlers backed by test DB
-const TestRpcHandlers = Layer.mergeAll(
-  DefaultsRpcHandlers,
-  DrillRpcHandlers,
-  PlayRpcHandlers,
-  PlayerRpcHandlers,
-  PracticeRpcHandlers,
-).pipe(Layer.provide(TestDatabaseLive));
-
-// HTTP API handlers backed by test DB
-const TestHttpHandlers = Layer.mergeAll(
-  DrillsHandlersLive,
-  PlaysHandlersLive,
-  PlayersHandlersLive,
-  PracticesHandlersLive,
-).pipe(Layer.provide(TestDatabaseLive));
-
-const RpcRouter = RpcServer.layerHttp({
-  group: LaxdbRpcV2,
-  path: "/rpc",
-  protocol: "http",
-  spanPrefix: "rpc",
-}).pipe(
-  Layer.provide(TestRpcHandlers),
-  Layer.provide(RpcSerialization.layerNdjson),
-);
+const TestHttpHandlers = HttpGroupsLive.pipe(Layer.provide(TestDatabaseLive));
 
 const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
   Layer.provide(TestHttpHandlers),
@@ -58,7 +23,7 @@ const HttpApiRouter = HttpApiBuilder.layer(LaxdbApiV2).pipe(
 
 const DocsRoute = HttpApiScalar.layer(LaxdbApiV2);
 
-const AllRoutes = Layer.mergeAll(RpcRouter, HttpApiRouter, DocsRoute).pipe(
+const AllRoutes = Layer.mergeAll(HttpApiRouter, DocsRoute).pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
 );
 

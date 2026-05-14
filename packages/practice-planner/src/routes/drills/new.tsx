@@ -1,4 +1,4 @@
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { CreateDrillInput } from "@laxdb/core/drill/drill.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
 import { Separator } from "@laxdb/ui/components/ui/separator";
@@ -30,8 +30,8 @@ const createDrill = createServerFn({ method: "POST" })
   .handler(({ data }) =>
     runApi(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.DrillCreate(data);
+        const client = yield* ApiClient;
+        return yield* client.Drills.createDrill({ payload: data });
       }),
     ),
   );

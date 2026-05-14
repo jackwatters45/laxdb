@@ -1,21 +1,26 @@
-import { Layer, Context } from "effect";
-import { RpcClient } from "effect/unstable/rpc";
+import { Context, Layer, type Effect } from "effect";
+import { HttpApiClient } from "effect/unstable/httpapi";
 
-import { LaxdbRpcV2 } from "./rpc-group";
+import { LaxdbApiV2 } from "./definition";
 
 /**
- * Single RPC client for all api groups (Drill, Player, Practice).
+ * Generated HTTP client for the LaxDB API.
  *
- * Uses one RpcClient.make with the merged group — mirrors the server's
- * single RpcServer.layerHttp({ group: LaxdbRpcV2 }). This is required
- * because each RpcClient.make call needs its own Protocol (withRun's
- * semaphore only allows one active `run` callback).
+ * The shape is derived directly from `LaxdbApiV2`, so consumers call
+ * `client.Drills.listDrills()` / `client.Practices.updatePractice(...)` and
+ * get the same schema-checked request and response types as the server.
  */
-export class RpcApiClient extends Context.Service<RpcApiClient>()(
-  "RpcApiClient",
-  {
-    make: RpcClient.make(LaxdbRpcV2),
-  },
-) {
-  static readonly layer = Layer.effect(this, this.make);
-}
+const makeGeneratedClient = (baseUrl: string) =>
+  HttpApiClient.make(LaxdbApiV2, { baseUrl });
+
+type GeneratedApiClient = Effect.Success<
+  ReturnType<typeof makeGeneratedClient>
+>;
+
+export class ApiClient extends Context.Service<ApiClient, GeneratedApiClient>()(
+  "ApiClient",
+) {}
+
+/** Every generated HTTP client layer must declare its target base URL. */
+export const makeApiClientLayer = (baseUrl: string) =>
+  Layer.effect(ApiClient, makeGeneratedClient(baseUrl));

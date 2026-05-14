@@ -6,6 +6,8 @@ import {
   ValidationError,
 } from "./error";
 
+export type SchemaInput<S extends Schema.Top> = S["Type"] | S["Encoded"];
+
 export const decodeArguments = <S extends Schema.Top>(
   schema: S,
   input: unknown,

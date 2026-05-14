@@ -1,10 +1,10 @@
 /**
  * Practice CLI integration tests
  *
- * Tests the full RPC round-trip: client → HTTP → handler → service → DB
+ * Tests the full generated HTTP client round-trip: client → HTTP → handler → service → DB
  */
 
-import { RpcApiClient } from "@laxdb/api/client";
+import { ApiClient } from "@laxdb/api/client";
 import { Effect } from "effect";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -14,10 +14,10 @@ import { startTestServer, truncateAllTables, type TestServer } from "./server";
 
 let testServer: TestServer;
 
-const run = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, ApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
-const runDrill = <A, E>(effect: Effect.Effect<A, E, RpcApiClient>) =>
+const runDrill = <A, E>(effect: Effect.Effect<A, E, ApiClient>) =>
   effect.pipe(Effect.provide(apiLayer(testServer.url)), Effect.runPromise);
 
 beforeAll(async () => {
@@ -32,7 +32,7 @@ beforeEach(async () => {
   await truncateAllTables();
 });
 
-describe("Practice RPC", () => {
+describe("Practice HTTP API", () => {
   const minimalPractice = {
     name: null,
     date: null,
@@ -45,8 +45,8 @@ describe("Practice RPC", () => {
   it("lists practices (empty)", async () => {
     const practices = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PracticeList();
+        const client = yield* ApiClient;
+        return yield* client.Practices.listPractices();
       }),
     );
     expect(practices).toEqual([]);
@@ -55,12 +55,14 @@ describe("Practice RPC", () => {
   it("creates a practice", async () => {
     const practice = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.PracticeCreate({
-          ...minimalPractice,
-          name: "Morning Practice",
-          durationMinutes: 90,
-          location: "Main Field",
+        const client = yield* ApiClient;
+        return yield* client.Practices.createPractice({
+          payload: {
+            ...minimalPractice,
+            name: "Morning Practice",
+            durationMinutes: 90,
+            location: "Main Field",
+          },
         });
       }),
     );
@@ -70,12 +72,32 @@ describe("Practice RPC", () => {
     expect(practice.publicId).toHaveLength(12);
   });
 
+  it("round-trips an encoded date string", async () => {
+    const practice = await run(
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Practices.createPractice({
+          payload: {
+            ...minimalPractice,
+            date: "2026-03-14T15:30:00.000Z",
+          },
+        });
+      }),
+    );
+    expect(practice.date).toBeInstanceOf(Date);
+    expect(practice.date?.toISOString()).toBe("2026-03-14T15:30:00.000Z");
+  });
+
   it("gets a practice by publicId", async () => {
     const found = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeGet({ publicId: created.publicId });
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.getPractice({
+          payload: { publicId: created.publicId },
+        });
       }),
     );
     expect(found.publicId).toBeTruthy();
@@ -84,13 +106,15 @@ describe("Practice RPC", () => {
   it("lists all practices", async () => {
     const practices = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        yield* client.PracticeCreate(minimalPractice);
-        yield* client.PracticeCreate({
-          ...minimalPractice,
-          name: "Afternoon",
+        const client = yield* ApiClient;
+        yield* client.Practices.createPractice({ payload: minimalPractice });
+        yield* client.Practices.createPractice({
+          payload: {
+            ...minimalPractice,
+            name: "Afternoon",
+          },
         });
-        return yield* client.PracticeList();
+        return yield* client.Practices.listPractices();
       }),
     );
     expect(practices).toHaveLength(2);
@@ -99,12 +123,16 @@ describe("Practice RPC", () => {
   it("updates a practice", async () => {
     const updated = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeUpdate({
-          publicId: created.publicId,
-          name: "Updated Practice",
-          location: "Indoor Facility",
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.updatePractice({
+          payload: {
+            publicId: created.publicId,
+            name: "Updated Practice",
+            location: "Indoor Facility",
+          },
         });
       }),
     );
@@ -115,10 +143,14 @@ describe("Practice RPC", () => {
   it("deletes a practice", async () => {
     const remaining = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        yield* client.PracticeDelete({ publicId: created.publicId });
-        return yield* client.PracticeList();
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        yield* client.Practices.deletePractice({
+          payload: { publicId: created.publicId },
+        });
+        return yield* client.Practices.listPractices();
       }),
     );
     expect(remaining).toHaveLength(0);
@@ -128,15 +160,17 @@ describe("Practice RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcApiClient;
-          return yield* client.PracticeGet({ publicId: "AbCdEfGhIjKl" });
+          const client = yield* ApiClient;
+          return yield* client.Practices.getPractice({
+            payload: { publicId: "AbCdEfGhIjKl" },
+          });
         }),
       ),
     ).rejects.toThrow();
   });
 });
 
-describe("Practice Items RPC", () => {
+describe("Practice Items HTTP API", () => {
   const minimalPractice = {
     name: null,
     date: null,
@@ -165,11 +199,15 @@ describe("Practice Items RPC", () => {
   it("adds an item to a practice", async () => {
     const item = await run(
       Effect.gen(function* () {
-        const practice = yield* RpcApiClient;
-        const created = yield* practice.PracticeCreate(minimalPractice);
-        return yield* practice.PracticeAddItem({
-          practicePublicId: created.publicId,
-          type: "warmup",
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: created.publicId,
+            type: "warmup",
+          },
         });
       }),
     );
@@ -178,21 +216,25 @@ describe("Practice Items RPC", () => {
   });
 
   it("adds a drill item to a practice", async () => {
-    // Create drill separately to avoid multiplexing two RPC groups on one connection
+    // Create drill separately for clearer fixture setup
     const createdDrill = await runDrill(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        return yield* client.DrillCreate(minimalDrill);
+        const client = yield* ApiClient;
+        return yield* client.Drills.createDrill({ payload: minimalDrill });
       }),
     );
     const item = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const createdPractice = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeAddItem({
-          practicePublicId: createdPractice.publicId,
-          type: "drill",
-          drillPublicId: createdDrill.publicId,
+        const client = yield* ApiClient;
+        const createdPractice = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: createdPractice.publicId,
+            type: "drill",
+            drillPublicId: createdDrill.publicId,
+          },
         });
       }),
     );
@@ -202,18 +244,26 @@ describe("Practice Items RPC", () => {
   it("lists items for a practice", async () => {
     const items = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        yield* client.PracticeAddItem({
-          practicePublicId: created.publicId,
-          type: "warmup",
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        yield* client.PracticeAddItem({
-          practicePublicId: created.publicId,
-          type: "cooldown",
+        yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: created.publicId,
+            type: "warmup",
+          },
         });
-        return yield* client.PracticeListItems({
-          practicePublicId: created.publicId,
+        yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: created.publicId,
+            type: "cooldown",
+          },
+        });
+        return yield* client.Practices.listPracticeItems({
+          payload: {
+            practicePublicId: created.publicId,
+          },
         });
       }),
     );
@@ -223,15 +273,23 @@ describe("Practice Items RPC", () => {
   it("removes an item from a practice", async () => {
     const items = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        const item = yield* client.PracticeAddItem({
-          practicePublicId: created.publicId,
-          type: "warmup",
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        yield* client.PracticeRemoveItem({ publicId: item.publicId });
-        return yield* client.PracticeListItems({
-          practicePublicId: created.publicId,
+        const item = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: created.publicId,
+            type: "warmup",
+          },
+        });
+        yield* client.Practices.removePracticeItem({
+          payload: { publicId: item.publicId },
+        });
+        return yield* client.Practices.listPracticeItems({
+          payload: {
+            practicePublicId: created.publicId,
+          },
         });
       }),
     );
@@ -239,7 +297,7 @@ describe("Practice Items RPC", () => {
   });
 });
 
-describe("Practice Edges RPC", () => {
+describe("Practice Edges HTTP API", () => {
   const minimalPractice = {
     name: null,
     date: null,
@@ -252,10 +310,14 @@ describe("Practice Edges RPC", () => {
   it("lists edges (empty)", async () => {
     const edges = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const practice = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeListEdges({
-          practicePublicId: practice.publicId,
+        const client = yield* ApiClient;
+        const practice = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.listPracticeEdges({
+          payload: {
+            practicePublicId: practice.publicId,
+          },
         });
       }),
     );
@@ -265,28 +327,38 @@ describe("Practice Edges RPC", () => {
   it("lists edges for a practice", async () => {
     const edges = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const practice = yield* client.PracticeCreate(minimalPractice);
-        const source = yield* client.PracticeAddItem({
-          practicePublicId: practice.publicId,
-          type: "warmup",
+        const client = yield* ApiClient;
+        const practice = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        const target = yield* client.PracticeAddItem({
-          practicePublicId: practice.publicId,
-          type: "cooldown",
+        const source = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: practice.publicId,
+            type: "warmup",
+          },
         });
-        yield* client.PracticeReplaceEdges({
-          practicePublicId: practice.publicId,
-          edges: [
-            {
-              sourcePublicId: source.publicId,
-              targetPublicId: target.publicId,
-              label: "then",
-            },
-          ],
+        const target = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: practice.publicId,
+            type: "cooldown",
+          },
         });
-        return yield* client.PracticeListEdges({
-          practicePublicId: practice.publicId,
+        yield* client.Practices.replacePracticeEdges({
+          payload: {
+            practicePublicId: practice.publicId,
+            edges: [
+              {
+                sourcePublicId: source.publicId,
+                targetPublicId: target.publicId,
+                label: "then",
+              },
+            ],
+          },
+        });
+        return yield* client.Practices.listPracticeEdges({
+          payload: {
+            practicePublicId: practice.publicId,
+          },
         });
       }),
     );
@@ -297,42 +369,54 @@ describe("Practice Edges RPC", () => {
   it("replaces edges for a practice", async () => {
     const edges = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const practice = yield* client.PracticeCreate(minimalPractice);
-        const first = yield* client.PracticeAddItem({
-          practicePublicId: practice.publicId,
-          type: "warmup",
+        const client = yield* ApiClient;
+        const practice = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        const second = yield* client.PracticeAddItem({
-          practicePublicId: practice.publicId,
-          type: "drill",
-          label: "Stickwork",
+        const first = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: practice.publicId,
+            type: "warmup",
+          },
         });
-        const third = yield* client.PracticeAddItem({
-          practicePublicId: practice.publicId,
-          type: "cooldown",
+        const second = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: practice.publicId,
+            type: "drill",
+            label: "Stickwork",
+          },
         });
-
-        yield* client.PracticeReplaceEdges({
-          practicePublicId: practice.publicId,
-          edges: [
-            {
-              sourcePublicId: first.publicId,
-              targetPublicId: second.publicId,
-              label: "start",
-            },
-          ],
+        const third = yield* client.Practices.addPracticeItem({
+          payload: {
+            practicePublicId: practice.publicId,
+            type: "cooldown",
+          },
         });
 
-        return yield* client.PracticeReplaceEdges({
-          practicePublicId: practice.publicId,
-          edges: [
-            {
-              sourcePublicId: second.publicId,
-              targetPublicId: third.publicId,
-              label: "finish",
-            },
-          ],
+        yield* client.Practices.replacePracticeEdges({
+          payload: {
+            practicePublicId: practice.publicId,
+            edges: [
+              {
+                sourcePublicId: first.publicId,
+                targetPublicId: second.publicId,
+                label: "start",
+              },
+            ],
+          },
+        });
+
+        return yield* client.Practices.replacePracticeEdges({
+          payload: {
+            practicePublicId: practice.publicId,
+            edges: [
+              {
+                sourcePublicId: second.publicId,
+                targetPublicId: third.publicId,
+                label: "finish",
+              },
+            ],
+          },
         });
       }),
     );
@@ -341,7 +425,7 @@ describe("Practice Edges RPC", () => {
   });
 });
 
-describe("Practice Review RPC", () => {
+describe("Practice Review HTTP API", () => {
   const minimalPractice = {
     name: null,
     date: null,
@@ -354,13 +438,17 @@ describe("Practice Review RPC", () => {
   it("creates a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        return yield* client.PracticeCreateReview({
-          practicePublicId: created.publicId,
-          wentWell: "Good energy",
-          needsImprovement: "Transitions",
-          notes: null,
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
+        });
+        return yield* client.Practices.createPracticeReview({
+          payload: {
+            practicePublicId: created.publicId,
+            wentWell: "Good energy",
+            needsImprovement: "Transitions",
+            notes: null,
+          },
         });
       }),
     );
@@ -371,16 +459,22 @@ describe("Practice Review RPC", () => {
   it("gets a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        yield* client.PracticeCreateReview({
-          practicePublicId: created.publicId,
-          wentWell: "Passing",
-          needsImprovement: null,
-          notes: null,
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        return yield* client.PracticeGetReview({
-          practicePublicId: created.publicId,
+        yield* client.Practices.createPracticeReview({
+          payload: {
+            practicePublicId: created.publicId,
+            wentWell: "Passing",
+            needsImprovement: null,
+            notes: null,
+          },
+        });
+        return yield* client.Practices.getPracticeReview({
+          payload: {
+            practicePublicId: created.publicId,
+          },
         });
       }),
     );
@@ -390,17 +484,23 @@ describe("Practice Review RPC", () => {
   it("updates a review", async () => {
     const review = await run(
       Effect.gen(function* () {
-        const client = yield* RpcApiClient;
-        const created = yield* client.PracticeCreate(minimalPractice);
-        yield* client.PracticeCreateReview({
-          practicePublicId: created.publicId,
-          wentWell: "Original",
-          needsImprovement: null,
-          notes: null,
+        const client = yield* ApiClient;
+        const created = yield* client.Practices.createPractice({
+          payload: minimalPractice,
         });
-        return yield* client.PracticeUpdateReview({
-          practicePublicId: created.publicId,
-          wentWell: "Updated",
+        yield* client.Practices.createPracticeReview({
+          payload: {
+            practicePublicId: created.publicId,
+            wentWell: "Original",
+            needsImprovement: null,
+            notes: null,
+          },
+        });
+        return yield* client.Practices.updatePracticeReview({
+          payload: {
+            practicePublicId: created.publicId,
+            wentWell: "Updated",
+          },
         });
       }),
     );
@@ -411,10 +511,14 @@ describe("Practice Review RPC", () => {
     await expect(
       run(
         Effect.gen(function* () {
-          const client = yield* RpcApiClient;
-          const created = yield* client.PracticeCreate(minimalPractice);
-          return yield* client.PracticeGetReview({
-            practicePublicId: created.publicId,
+          const client = yield* ApiClient;
+          const created = yield* client.Practices.createPractice({
+            payload: minimalPractice,
+          });
+          return yield* client.Practices.getPracticeReview({
+            payload: {
+              practicePublicId: created.publicId,
+            },
           });
         }),
       ),

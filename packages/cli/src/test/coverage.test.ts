@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { CLI_ENTRYPOINTS, CLI_RPC_COVERAGE } from "../coverage";
+import { CLI_ENTRYPOINTS, CLI_HTTP_COVERAGE } from "../coverage";
 
 const repoRoot = path.resolve(import.meta.dirname, "../../../..");
 const apiSrcRoot = path.join(repoRoot, "packages/api/src");
@@ -23,17 +23,19 @@ async function walk(dir: string): Promise<string[]> {
 }
 
 /**
- * Extract all RPC names from the API source by matching Rpc.make("...") calls.
+ * Extract all endpoint names from the API source by matching
+ * HttpApiEndpoint.method("...") calls.
  *
- * Assumption: all RPCs use the string literal form `Rpc.make("Name", ...)`. If
- * the codebase ever uses template literals or re-exported Rpc definitions this
- * regex will miss them and the test will fail — update the pattern accordingly.
+ * Assumption: all endpoints use the string literal form
+ * `HttpApiEndpoint.post("name", ...)`. If the codebase ever uses template
+ * literals or re-exported endpoint definitions this regex will miss them and
+ * the test will fail — update the pattern accordingly.
  */
-async function getApiRpcNames() {
+async function getApiEndpointNames() {
   const files = await walk(apiSrcRoot);
-  const rpcFiles = files.filter((file) => file.endsWith(".rpc.ts"));
+  const apiFiles = files.filter((file) => file.endsWith(".api.ts"));
   const contents = await Promise.all(
-    rpcFiles.map(async (file) => ({
+    apiFiles.map(async (file) => ({
       file,
       content: await readFile(file, "utf8"),
     })),
@@ -41,7 +43,9 @@ async function getApiRpcNames() {
   const names = new Set<string>();
 
   for (const { content } of contents) {
-    for (const match of content.matchAll(/Rpc\.make\("([^"]+)"/g)) {
+    for (const match of content.matchAll(
+      /HttpApiEndpoint\.\w+\(\s*"([^"]+)"/g,
+    )) {
       names.add(match[1]);
     }
   }
@@ -91,14 +95,16 @@ async function runHelp(entrypoint: string) {
 
 describe("CLI coverage", () => {
   it("keeps the coverage manifest sorted", () => {
-    expect([...CLI_RPC_COVERAGE]).toEqual(
+    expect([...CLI_HTTP_COVERAGE]).toEqual(
       // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
-      [...CLI_RPC_COVERAGE].sort((a, b) => a.localeCompare(b)),
+      [...CLI_HTTP_COVERAGE].sort((a, b) => a.localeCompare(b)),
     );
   });
 
-  it("tracks every RPC exposed by the API", async () => {
-    await expect(getApiRpcNames()).resolves.toEqual([...CLI_RPC_COVERAGE]);
+  it("tracks every HTTP endpoint exposed by the API", async () => {
+    await expect(getApiEndpointNames()).resolves.toEqual([
+      ...CLI_HTTP_COVERAGE,
+    ]);
   });
 
   it.each(CLI_ENTRYPOINTS)(
