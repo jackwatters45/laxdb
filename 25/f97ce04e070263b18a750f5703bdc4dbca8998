@@ -1,0 +1,48 @@
+packages/fines/src/api/index.ts
+  s_2739e020b44332::t_03351fd3f5613c 11
+packages/fines/src/routes/__root.tsx
+  s_2739e020b44332::t_03351fd3f5613c 9
+packages/fines/src/core/fine/fine-template.sql.ts
+  s_2739e020b44332::t_03351fd3f5613c 1-24
+packages/fines/src/core/fine/fine.repo.ts
+  s_416eb8e63f6edb::t_eacd607cdc5c0a 13-14
+packages/fines/src/components/not-found.tsx
+  s_2739e020b44332::t_03351fd3f5613c 1-11
+packages/fines/src/core/fine/fine-event.sql.ts
+  s_2739e020b44332::t_03351fd3f5613c 1-35
+packages/fines/src/router.tsx
+  s_2739e020b44332::t_521113350114b8 3
+packages/fines/vite.config.ts
+  s_2739e020b44332::t_521113350114b8 15,17-18,23
+  s_2739e020b44332::t_da6ae2acf13271 16
+packages/fines/src/core/fine/fine.sql.ts
+  s_2739e020b44332::t_03351fd3f5613c 7
+packages/fines/src/lib/session.ts
+  s_2739e020b44332::t_03351fd3f5613c 12
+packages/fines/src/core/auth/resolve-me.ts
+  s_2739e020b44332::t_03351fd3f5613c 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "25f97ce04e070263b18a750f5703bdc4dbca8998",
+  "prompts": {},
+  "sessions": {
+    "s_2739e020b44332": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2695-8526-7159-9d53-62947e83b635",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_416eb8e63f6edb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e26cd-c074-7177-8dad-d9c796c949c6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
