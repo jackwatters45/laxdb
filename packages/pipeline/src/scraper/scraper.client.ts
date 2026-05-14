@@ -1,4 +1,4 @@
-import { Effect, Layer, Schedule, ServiceMap } from "effect";
+import { Effect, Layer, Schedule, Context } from "effect";
 
 import { PipelineConfig } from "../config";
 import { fetchResponse, readResponseText } from "../http";
@@ -17,7 +17,7 @@ type ScraperError =
   | ScraperRateLimitError
   | ScraperNetworkError;
 
-export class ScraperClient extends ServiceMap.Service<ScraperClient>()(
+export class ScraperClient extends Context.Service<ScraperClient>()(
   "ScraperClient",
   {
     make: Effect.gen(function* () {

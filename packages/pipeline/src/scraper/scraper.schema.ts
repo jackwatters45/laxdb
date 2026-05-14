@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Schema, Effect } from "effect";
 
 export class ScrapeRequest extends Schema.Class<ScrapeRequest>("ScrapeRequest")(
   {
@@ -10,7 +10,7 @@ export class ScrapeRequest extends Schema.Class<ScrapeRequest>("ScrapeRequest")(
     headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
     timeoutMs: Schema.optional(Schema.Number),
     followRedirects: Schema.optional(Schema.Boolean).pipe(
-      Schema.withDecodingDefault(() => true),
+      Schema.withDecodingDefault(Effect.succeed(true)),
     ),
   },
 ) {}

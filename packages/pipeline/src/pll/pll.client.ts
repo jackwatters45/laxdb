@@ -1,4 +1,4 @@
-import { Effect, Schema, ServiceMap, Layer } from "effect";
+import { Effect, Schema, Context, Layer } from "effect";
 
 import { makeGraphQLClient } from "../api-client/graphql.service";
 import { makeRestClient } from "../api-client/rest-client.service";
@@ -43,7 +43,7 @@ import {
   PLLTeamsResponse,
 } from "./pll.schema";
 
-export class PLLClient extends ServiceMap.Service<PLLClient>()("PLLClient", {
+export class PLLClient extends Context.Service<PLLClient>()("PLLClient", {
   make: Effect.gen(function* () {
     const config = yield* PLLConfig;
 

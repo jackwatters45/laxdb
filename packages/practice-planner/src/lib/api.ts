@@ -21,8 +21,12 @@ const isLocal = process.env.IS_LOCAL === "true";
 type FetchInput = Parameters<typeof fetch>[0];
 type FetchInit = Parameters<typeof fetch>[1];
 
+type ApiServiceBinding = {
+  readonly fetch: typeof fetch;
+};
+
 type CloudflareWorkersModule = {
-  env: Env;
+  env: Omit<Env, "API"> & { readonly API?: ApiServiceBinding };
 };
 
 const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
@@ -41,7 +45,7 @@ function getApiFetch(): { fetch?: typeof fetch; url: string } {
 
   const apiFetch: typeof fetch = Object.assign(
     (input: FetchInput, init?: FetchInit) =>
-      workersModule.env.API.fetch(input, init),
+      workersModule.env.API?.fetch(input, init) ?? fetch(input, init),
     { preconnect: fetch.preconnect },
   );
 

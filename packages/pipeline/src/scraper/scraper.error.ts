@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Schema, Effect } from "effect";
 
 export class ScraperError extends Schema.TaggedErrorClass<ScraperError>()(
   "ScraperError",
@@ -7,7 +7,7 @@ export class ScraperError extends Schema.TaggedErrorClass<ScraperError>()(
     url: Schema.optional(Schema.String),
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number).pipe(
-      Schema.withDecodingDefault(() => 500),
+      Schema.withDecodingDefault(Effect.succeed(500)),
     ),
   },
 ) {}
@@ -20,7 +20,7 @@ export class ScraperHttpError extends Schema.TaggedErrorClass<ScraperHttpError>(
     statusCode: Schema.Number,
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number).pipe(
-      Schema.withDecodingDefault(() => 502),
+      Schema.withDecodingDefault(Effect.succeed(502)),
     ),
   },
 ) {}
@@ -33,7 +33,7 @@ export class ScraperTimeoutError extends Schema.TaggedErrorClass<ScraperTimeoutE
     timeoutMs: Schema.Number,
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number).pipe(
-      Schema.withDecodingDefault(() => 408),
+      Schema.withDecodingDefault(Effect.succeed(408)),
     ),
   },
 ) {}
@@ -46,7 +46,7 @@ export class ScraperRateLimitError extends Schema.TaggedErrorClass<ScraperRateLi
     retryAfterMs: Schema.optional(Schema.Number),
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number).pipe(
-      Schema.withDecodingDefault(() => 429),
+      Schema.withDecodingDefault(Effect.succeed(429)),
     ),
   },
 ) {}
@@ -58,7 +58,7 @@ export class ScraperNetworkError extends Schema.TaggedErrorClass<ScraperNetworkE
     url: Schema.optional(Schema.String),
     cause: Schema.optional(Schema.Unknown),
     code: Schema.optional(Schema.Number).pipe(
-      Schema.withDecodingDefault(() => 503),
+      Schema.withDecodingDefault(Effect.succeed(503)),
     ),
   },
 ) {}

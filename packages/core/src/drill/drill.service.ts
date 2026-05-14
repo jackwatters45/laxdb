@@ -1,4 +1,4 @@
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError } from "../util";
@@ -14,7 +14,7 @@ import {
 
 const asDrill = (row: typeof Drill.Type) => new Drill(row);
 
-export class DrillService extends ServiceMap.Service<DrillService>()(
+export class DrillService extends Context.Service<DrillService>()(
   "DrillService",
   {
     make: Effect.gen(function* () {

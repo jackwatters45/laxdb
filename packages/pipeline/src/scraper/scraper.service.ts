@@ -1,4 +1,4 @@
-import { Effect, Schema, Array as Arr, ServiceMap, Layer } from "effect";
+import { Effect, Schema, Array as Arr, Context, Layer } from "effect";
 
 import { PipelineConfig } from "../config";
 import { formatUnknownError } from "../util";
@@ -11,7 +11,7 @@ import {
   type ScrapeResult,
 } from "./scraper.schema";
 
-export class ScraperService extends ServiceMap.Service<ScraperService>()(
+export class ScraperService extends Context.Service<ScraperService>()(
   "ScraperService",
   {
     make: Effect.gen(function* () {

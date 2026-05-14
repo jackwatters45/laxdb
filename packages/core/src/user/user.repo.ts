@@ -1,12 +1,12 @@
 import { eq } from "drizzle-orm";
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
 import type { GetUserFromEmailInput } from "./user.schema";
 import { type UserSelect, userTable } from "./user.sql";
 
-export class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
+export class UserRepo extends Context.Service<UserRepo>()("UserRepo", {
   make: Effect.gen(function* () {
     const db = yield* DrizzleService;
 

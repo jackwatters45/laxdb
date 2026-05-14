@@ -1,5 +1,5 @@
 import { and, eq, getColumns } from "drizzle-orm";
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { DrizzleService, query } from "../drizzle/drizzle.service";
 
@@ -14,7 +14,7 @@ const firstRowOrDie = <A>(rows: readonly A[]) =>
     ? Effect.die(new Error("Expected a returned row"))
     : Effect.succeed(rows[0]);
 
-export class DefaultsRepo extends ServiceMap.Service<DefaultsRepo>()(
+export class DefaultsRepo extends Context.Service<DefaultsRepo>()(
   "DefaultsRepo",
   {
     make: Effect.gen(function* () {

@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
+import { Duration, Effect, Result, Layer, Schema, Context } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 import type { PlatformError } from "effect/PlatformError";
@@ -31,7 +31,7 @@ import { type PLLExtractionManifest, PLLManifestService } from "./pll.manifest";
 
 const PLL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025] as const;
 
-export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>()(
+export class PLLExtractorService extends Context.Service<PLLExtractorService>()(
   "PLLExtractorService",
   {
     make: Effect.gen(function* () {
@@ -45,8 +45,8 @@ export class PLLExtractorService extends ServiceMap.Service<PLLExtractorService>
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "pll", String(year), `${entity}.json`);
-      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
-        ServiceMap.add(Path, path),
+      const ioServices = Context.make(FileSystem, fs).pipe(
+        Context.add(Path, path),
       );
 
       const saveOutputJson = <T>(filePath: string, data: T) =>

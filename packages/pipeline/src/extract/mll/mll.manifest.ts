@@ -1,4 +1,4 @@
-import { Layer, Schema, ServiceMap } from "effect";
+import { Layer, Schema, Context } from "effect";
 
 import {
   createEmptyEntityStatus,
@@ -38,7 +38,7 @@ export type MLLExtractionManifest = ExtractionManifest<
 >;
 
 // MLL Manifest Service - uses generic factory
-export class MLLManifestService extends ServiceMap.Service<MLLManifestService>()(
+export class MLLManifestService extends Context.Service<MLLManifestService>()(
   "MLLManifestService",
   {
     make: createManifestServiceEffect({

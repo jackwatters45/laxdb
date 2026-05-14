@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, ServiceMap } from "effect";
+import { Duration, Effect, Result, Layer, Context } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -30,7 +30,7 @@ const MLL_YEARS = [
   2014, 2015, 2016, 2017, 2018, 2019, 2020,
 ] as const;
 
-export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>()(
+export class MLLExtractorService extends Context.Service<MLLExtractorService>()(
   "MLLExtractorService",
   {
     make: Effect.gen(function* () {
@@ -45,8 +45,8 @@ export class MLLExtractorService extends ServiceMap.Service<MLLExtractorService>
 
       const getOutputPath = (year: number, entity: string) =>
         path.join(config.outputDir, "mll", String(year), `${entity}.json`);
-      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
-        ServiceMap.add(Path, path),
+      const ioServices = Context.make(FileSystem, fs).pipe(
+        Context.add(Path, path),
       );
 
       const saveOutputJson = <T>(filePath: string, data: T) =>

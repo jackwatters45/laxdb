@@ -1,4 +1,4 @@
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError } from "../util";
@@ -30,7 +30,7 @@ const asItem = (row: typeof PracticeItem.Type) => new PracticeItem(row);
 const asEdge = (row: typeof PracticeEdge.Type) => new PracticeEdge(row);
 const asReview = (row: typeof PracticeReview.Type) => new PracticeReview(row);
 
-export class PracticeService extends ServiceMap.Service<PracticeService>()(
+export class PracticeService extends Context.Service<PracticeService>()(
   "PracticeService",
   {
     make: Effect.gen(function* () {

@@ -1,4 +1,4 @@
-import { Layer, ServiceMap } from "effect";
+import { Layer, Context } from "effect";
 import { RpcClient } from "effect/unstable/rpc";
 
 import { LaxdbRpcV2 } from "./rpc-group";
@@ -11,7 +11,7 @@ import { LaxdbRpcV2 } from "./rpc-group";
  * because each RpcClient.make call needs its own Protocol (withRun's
  * semaphore only allows one active `run` callback).
  */
-export class RpcApiClient extends ServiceMap.Service<RpcApiClient>()(
+export class RpcApiClient extends Context.Service<RpcApiClient>()(
   "RpcApiClient",
   {
     make: RpcClient.make(LaxdbRpcV2),

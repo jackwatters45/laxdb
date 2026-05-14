@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Duration, Effect, Result, Layer, Schema, ServiceMap } from "effect";
+import { Duration, Effect, Result, Layer, Schema, Context } from "effect";
 import { FileSystem } from "effect/FileSystem";
 import { Path } from "effect/Path";
 
@@ -31,7 +31,7 @@ const WLA_SEASONS = [
 ] as const;
 const decodeWLASeasonId = Schema.decodeUnknownSync(WLASeasonId);
 
-export class WLAExtractorService extends ServiceMap.Service<WLAExtractorService>()(
+export class WLAExtractorService extends Context.Service<WLAExtractorService>()(
   "WLAExtractorService",
   {
     make: Effect.gen(function* () {
@@ -46,8 +46,8 @@ export class WLAExtractorService extends ServiceMap.Service<WLAExtractorService>
 
       const getOutputPath = (seasonId: number, entity: string) =>
         path.join(config.outputDir, "wla", String(seasonId), `${entity}.json`);
-      const ioServices = ServiceMap.make(FileSystem, fs).pipe(
-        ServiceMap.add(Path, path),
+      const ioServices = Context.make(FileSystem, fs).pipe(
+        Context.add(Path, path),
       );
 
       const saveOutputJson = <T>(filePath: string, data: T) =>

@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Schema, Effect } from "effect";
 
 // PLL started in 2019, allow reasonable future years
 const PLLYear = Schema.Number.check(
@@ -48,7 +48,7 @@ export class PLLStandingsRequest extends Schema.Class<PLLStandingsRequest>(
 )({
   year: PLLYear,
   champSeries: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => false),
+    Schema.withDecodingDefault(Effect.succeed(false)),
   ),
 }) {}
 
@@ -168,7 +168,7 @@ export class PLLPlayer extends Schema.Class<PLLPlayer>("PLLPlayer")({
   stats: Schema.optional(PLLPlayerStats),
   postStats: Schema.optional(PLLPlayerStats),
   champSeries: Schema.optional(Schema.NullOr(PLLChampSeries)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
 }) {}
 
@@ -183,16 +183,16 @@ export class PLLPlayersRequest extends Schema.Class<PLLPlayersRequest>(
 )({
   season: PLLYear,
   league: Schema.optional(Schema.String).pipe(
-    Schema.withDecodingDefault(() => "PLL"),
+    Schema.withDecodingDefault(Effect.succeed("PLL")),
   ),
   includeReg: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => true),
+    Schema.withDecodingDefault(Effect.succeed(true)),
   ),
   includePost: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => false),
+    Schema.withDecodingDefault(Effect.succeed(false)),
   ),
   includeZPP: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => false),
+    Schema.withDecodingDefault(Effect.succeed(false)),
   ),
   limit: Schema.optional(PositiveLimit),
 }) {}
@@ -227,7 +227,7 @@ export class PLLStatLeadersRequest extends Schema.Class<PLLStatLeadersRequest>(
 )({
   year: PLLYear,
   seasonSegment: Schema.optional(Schema.Literals(["regular", "post"])).pipe(
-    Schema.withDecodingDefault(() => "regular" as const),
+    Schema.withDecodingDefault(Effect.succeed("regular" as const)),
   ),
   statList: Schema.optional(Schema.Array(Schema.String)),
   limit: Schema.optional(PositiveLimit),
@@ -359,10 +359,10 @@ export class PLLAdvancedPlayersRequest extends Schema.Class<PLLAdvancedPlayersRe
 )({
   year: PLLYear,
   limit: Schema.optional(PositiveLimit).pipe(
-    Schema.withDecodingDefault(() => 250),
+    Schema.withDecodingDefault(Effect.succeed(250)),
   ),
   league: Schema.optional(Schema.String).pipe(
-    Schema.withDecodingDefault(() => "PLL"),
+    Schema.withDecodingDefault(Effect.succeed("PLL")),
   ),
 }) {}
 
@@ -471,10 +471,10 @@ export class PLLTeamsRequest extends Schema.Class<PLLTeamsRequest>(
 )({
   year: PLLYear,
   sortBy: Schema.optional(Schema.String).pipe(
-    Schema.withDecodingDefault(() => "points"),
+    Schema.withDecodingDefault(Effect.succeed("points")),
   ),
   includeChampSeries: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => false),
+    Schema.withDecodingDefault(Effect.succeed(false)),
   ),
 }) {}
 
@@ -594,7 +594,7 @@ export class PLLPlayerDetail extends Schema.Class<PLLPlayerDetail>(
   allSeasonStats: Schema.Array(PLLPlayerSeasonStats),
   accolades: Schema.NullOr(Schema.Array(PLLPlayerAccolade)),
   champSeries: Schema.optional(Schema.NullOr(PLLChampSeries)).pipe(
-    Schema.withDecodingDefault(() => null),
+    Schema.withDecodingDefault(Effect.succeed(null)),
   ),
   advancedSeasonStats: Schema.NullOr(PLLAdvancedSeasonStats),
 }) {}
@@ -689,7 +689,7 @@ export class PLLTeamDetailRequest extends Schema.Class<PLLTeamDetailRequest>(
   statsYear: Schema.optional(PLLYear),
   eventsYear: Schema.optional(PLLYear),
   includeChampSeries: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => false),
+    Schema.withDecodingDefault(Effect.succeed(false)),
   ),
 }) {}
 
@@ -791,10 +791,10 @@ export class PLLEventsRequest extends Schema.Class<PLLEventsRequest>(
 )({
   year: PLLYear,
   includeCS: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => true),
+    Schema.withDecodingDefault(Effect.succeed(true)),
   ),
   includeWLL: Schema.optional(Schema.Boolean).pipe(
-    Schema.withDecodingDefault(() => true),
+    Schema.withDecodingDefault(Effect.succeed(true)),
   ),
 }) {}
 

@@ -1,5 +1,5 @@
 import { BunServices } from "@effect/platform-bun";
-import { Config, Effect, Layer, ServiceMap } from "effect";
+import { Config, Effect, Layer, Context } from "effect";
 import { Path } from "effect/Path";
 
 export interface ExtractConfig {
@@ -9,7 +9,7 @@ export interface ExtractConfig {
   readonly delayBetweenBatchesMs: number;
 }
 
-export class ExtractConfigService extends ServiceMap.Service<ExtractConfigService>()(
+export class ExtractConfigService extends Context.Service<ExtractConfigService>()(
   "ExtractConfigService",
   {
     make: Effect.gen(function* () {

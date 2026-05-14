@@ -1,5 +1,5 @@
 import { eq, getColumns } from "drizzle-orm";
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { headOrFail, DrizzleService, query } from "../drizzle/drizzle.service";
 
@@ -11,7 +11,7 @@ import type {
 } from "./drill.schema";
 import { drillTable } from "./drill.sql";
 
-export class DrillRepo extends ServiceMap.Service<DrillRepo>()("DrillRepo", {
+export class DrillRepo extends Context.Service<DrillRepo>()("DrillRepo", {
   make: Effect.gen(function* () {
     const db = yield* DrizzleService;
 

@@ -1,4 +1,4 @@
-import { Config, Duration, Effect, Layer, Redacted, ServiceMap } from "effect";
+import { Config, Duration, Effect, Layer, Redacted, Context } from "effect";
 
 export interface PipelineConfigValues {
   readonly userAgent: string;
@@ -22,7 +22,7 @@ export const DEFAULT_PIPELINE_CONFIG: PipelineConfigValues = {
   defaultTimeout: Duration.millis(30000),
 };
 
-export class PipelineConfig extends ServiceMap.Service<PipelineConfig>()(
+export class PipelineConfig extends Context.Service<PipelineConfig>()(
   "PipelineConfig",
   {
     make: Effect.gen(function* () {
@@ -66,7 +66,7 @@ export class PipelineConfig extends ServiceMap.Service<PipelineConfig>()(
   static readonly layer = Layer.effect(this, this.make);
 }
 
-export class PLLConfig extends ServiceMap.Service<PLLConfig>()("PLLConfig", {
+export class PLLConfig extends Context.Service<PLLConfig>()("PLLConfig", {
   make: Effect.gen(function* () {
     const restToken = yield* Config.redacted("PLL_REST_TOKEN");
     const graphqlToken = yield* Config.redacted("PLL_GRAPHQL_TOKEN");
@@ -95,7 +95,7 @@ export class PLLConfig extends ServiceMap.Service<PLLConfig>()("PLLConfig", {
   static readonly layer = Layer.effect(this, this.make);
 }
 
-export class NLLConfig extends ServiceMap.Service<NLLConfig>()("NLLConfig", {
+export class NLLConfig extends Context.Service<NLLConfig>()("NLLConfig", {
   make: Effect.succeed({
     baseUrl: "https://nllstatsapp.aordev.com/",
     headers: {
@@ -107,7 +107,7 @@ export class NLLConfig extends ServiceMap.Service<NLLConfig>()("NLLConfig", {
   static readonly layer = Layer.effect(this, this.make);
 }
 
-export class MLLConfig extends ServiceMap.Service<MLLConfig>()("MLLConfig", {
+export class MLLConfig extends Context.Service<MLLConfig>()("MLLConfig", {
   make: Effect.succeed({
     statscrewBaseUrl: "https://www.statscrew.com/lacrosse",
     waybackCdxUrl: "https://web.archive.org/cdx/search/cdx",
@@ -121,7 +121,7 @@ export class MLLConfig extends ServiceMap.Service<MLLConfig>()("MLLConfig", {
   static readonly layer = Layer.effect(this, this.make);
 }
 
-export class MSLConfig extends ServiceMap.Service<MSLConfig>()("MSLConfig", {
+export class MSLConfig extends Context.Service<MSLConfig>()("MSLConfig", {
   make: Effect.succeed({
     gamesheetBaseUrl: "https://gamesheetstats.com",
     mainSiteBaseUrl: "https://www.majorserieslacrosse.ca",
@@ -134,7 +134,7 @@ export class MSLConfig extends ServiceMap.Service<MSLConfig>()("MSLConfig", {
   static readonly layer = Layer.effect(this, this.make);
 }
 
-export class WLAConfig extends ServiceMap.Service<WLAConfig>()("WLAConfig", {
+export class WLAConfig extends Context.Service<WLAConfig>()("WLAConfig", {
   make: Effect.succeed({
     baseUrl: "https://www.wlalacrosse.com",
     statsUrl: "https://www.wlalacrosse.com/stats",

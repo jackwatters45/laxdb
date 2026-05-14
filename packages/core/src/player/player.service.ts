@@ -1,4 +1,4 @@
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError } from "../util";
@@ -13,7 +13,7 @@ import {
 
 const asPlayer = (row: typeof Player.Type) => new Player(row);
 
-export class PlayerService extends ServiceMap.Service<PlayerService>()(
+export class PlayerService extends Context.Service<PlayerService>()(
   "PlayerService",
   {
     make: Effect.gen(function* () {

@@ -1,17 +1,17 @@
 import type { KVNamespace } from "@cloudflare/workers-types";
-import { Data, Effect, Layer, ServiceMap } from "effect";
+import { Data, Effect, Layer, Context } from "effect";
 
 export class KVError extends Data.TaggedError("KVError")<{
   cause: unknown;
   msg: string;
 }> {}
 
-export class KVNamespaceBinding extends ServiceMap.Service<
+export class KVNamespaceBinding extends Context.Service<
   KVNamespaceBinding,
   KVNamespace
 >()("KVNamespaceBinding") {}
 
-export class KVService extends ServiceMap.Service<KVService>()("KVService", {
+export class KVService extends Context.Service<KVService>()("KVService", {
   make: Effect.gen(function* () {
     const kv = yield* KVNamespaceBinding;
 

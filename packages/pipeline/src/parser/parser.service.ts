@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Effect, Layer, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Schema, Context } from "effect";
 
 import { formatUnknownError } from "../util";
 
@@ -14,7 +14,7 @@ import {
   type SelectorResult,
 } from "./parser.schema";
 
-export class ParserService extends ServiceMap.Service<ParserService>()(
+export class ParserService extends Context.Service<ParserService>()(
   "ParserService",
   {
     make: Effect.gen(function* () {
