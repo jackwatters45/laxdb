@@ -1,0 +1,29 @@
+packages/practice-planner/package.json
+  s_70621284467179::t_a55d1e1c937951 11-12
+packages/ui/.oxlintrc.json
+  s_70621284467179::t_bdad6d058805fb 1-12
+.oxlintrc.json
+  s_70621284467179::t_6723d067db0c8f 3,29-30,32-33
+packages/docs/.oxlintrc.json
+  s_70621284467179::t_7f98b9dadd1edf 4,7-12
+packages/marketing/.oxlintrc.json
+  s_70621284467179::t_8994bf535af884 4,7-12
+packages/practice-planner/.oxlintrc.json
+  s_70621284467179::t_2ec451bd23d411 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "61a87308ccc93abdf8894c7ddd1b893d58b6b1ac",
+  "prompts": {},
+  "sessions": {
+    "s_70621284467179": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e24fd-f420-720f-a112-263621dfe4fe",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
