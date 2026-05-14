@@ -1,0 +1,27 @@
+packages/fines/src/core/db.ts
+  s_39b3a64600c19a::t_1b9ee8ddfd4559 5
+README.md
+  s_39b3a64600c19a::t_8bc9d32cb1f6fd 21
+packages/ui/src/lib/smooth-scroll.ts
+  s_39b3a64600c19a::t_d5746b30e9bc7f 92
+packages/fines/package.json
+  s_39b3a64600c19a::t_97b4d8322913cd 10-38
+packages/fines/src/server.ts
+  s_39b3a64600c19a::t_aca2e61b3ac887 6-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f1607ff489ee00a03216dbac8dc299c359f9f6ac",
+  "prompts": {},
+  "sessions": {
+    "s_39b3a64600c19a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2589-b8bf-758c-9d59-628f01490320",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
