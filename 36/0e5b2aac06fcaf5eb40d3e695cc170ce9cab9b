@@ -1,0 +1,21 @@
+packages/marketing/scripts/sync-content-assets.ts
+  s_31d685aba3cc5d::t_add321139941eb 1-9,11-17,20,22-24,29-32,35-71,77-80
+  s_31d685aba3cc5d::t_749bb7b3497f0e 21,26
+  s_31d685aba3cc5d::t_f52053525a7886 72-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "360e5b2aac06fcaf5eb40d3e695cc170ce9cab9b",
+  "prompts": {},
+  "sessions": {
+    "s_31d685aba3cc5d": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2551-dee4-7658-b8b6-64ce778e6b0c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
