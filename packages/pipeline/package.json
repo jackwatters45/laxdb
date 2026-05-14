@@ -6,7 +6,10 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "test": "bun --bun vitest",
+    "test": "bun --bun vitest run",
+    "test:watch": "bun --bun vitest",
+    "test:integration": "bun --bun vitest run --config vitest.integration.config.ts",
+    "test:integration:watch": "bun --bun vitest --config vitest.integration.config.ts",
     "test:coverage": "bun --bun vitest run --coverage",
     "test:pll": "bun --bun vitest run src/pll/",
     "test:nll": "bun --bun vitest run src/nll/",

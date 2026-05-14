@@ -6,7 +6,11 @@
 
 import { TestDatabaseLive, truncateAll } from "@laxdb/core/test/db";
 import { DateTime, Effect, Layer } from "effect";
-import { HttpServer } from "effect/unstable/http";
+import {
+  HttpRouter,
+  HttpServer,
+  HttpServerResponse,
+} from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 
 import { LaxdbApi } from "../definition";
@@ -23,7 +27,11 @@ const HttpApiRouter = HttpApiBuilder.layer(LaxdbApi).pipe(
 
 const DocsRoute = HttpApiScalar.layer(LaxdbApi);
 
-const AllRoutes = Layer.mergeAll(HttpApiRouter, DocsRoute).pipe(
+const HealthRoute = HttpRouter.use((router) =>
+  router.add("GET", "/health", HttpServerResponse.text("OK")),
+);
+
+const AllRoutes = Layer.mergeAll(HttpApiRouter, DocsRoute, HealthRoute).pipe(
   Layer.provide(DateTime.layerCurrentZoneLocal),
 );
 
