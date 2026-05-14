@@ -1,0 +1,33 @@
+packages/marketing/.oxfmtrc.json
+  s_31d685aba3cc5d::t_f5ad85c8f80c34 5
+packages/marketing/CLAUDE.md
+  s_31d685aba3cc5d::t_8ee3337dd23583 44
+.oxlintrc.json
+  s_31d685aba3cc5d::t_e89c49c47f1d7b 40
+packages/marketing/content-collections.ts
+  s_31d685aba3cc5d::t_1cfcb3174332bd 140
+.oxfmtrc.json
+  s_31d685aba3cc5d::t_0536bd2ccd2c5d 25
+.gitignore
+  s_31d685aba3cc5d::t_59d25b6724a7f1 15
+packages/marketing/scripts/sync-content-assets.ts
+  s_31d685aba3cc5d::t_294549dcc8150b 6
+packages/marketing/tsconfig.json
+  s_31d685aba3cc5d::t_7322d47fe37b14 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ed38190d412079dd6098c53ef15e2317b1e9d0b2",
+  "prompts": {},
+  "sessions": {
+    "s_31d685aba3cc5d": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2551-dee4-7658-b8b6-64ce778e6b0c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
