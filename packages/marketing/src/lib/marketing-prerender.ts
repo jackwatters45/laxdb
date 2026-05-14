@@ -17,7 +17,7 @@ interface MarketingPrerenderOptions {
   rootDirectory: string;
 }
 
-const ignoredContentDirectories = new Set(["changelog", "attachments"]);
+const ignoredContentDirectories = new Set(["Templates", "attachments", "changelog"]);
 
 function isIgnoredContentPath(filePath: string) {
   return Effect.gen(function* () {

@@ -6,9 +6,11 @@ TanStack Start marketing site. Deployed to Cloudflare Workers.
 
 ## CONTENT COLLECTIONS
 
-Two collections using `@content-collections/core` with MDX:
+Two collections using `@content-collections/core`. Source files are Obsidian-compatible Markdown; compiled to MDX at build time.
 
-**Blog posts** (`src/content/*.mdx`):
+**Vault root**: `src/content` can be opened directly as an Obsidian vault.
+
+**Blog posts/wiki notes** (`src/content/*.md`):
 
 ```yaml
 ---
@@ -19,7 +21,7 @@ authors: ["Author Name"]
 ---
 ```
 
-**Changelog entries** (`src/content/changelog/*.mdx`):
+**Changelog entries** (`src/content/changelog/*.md`):
 
 ```yaml
 ---
@@ -31,6 +33,16 @@ description: "Optional description"
 
 **After adding/modifying content**: `bun run gen:content-collections`
 
+Obsidian syntax supported in content:
+
+- `[[Page Name]]` → `/content/page-name`
+- `[[Page Name|Custom Label]]` → custom link text
+- `[[Page Name#Heading]]` → heading link
+- `![[attachments/image.png]]` → `/content-assets/attachments/image.png`
+- `> [!NOTE]` callouts render as Markdown blockquotes
+
+Put Obsidian attachments under `src/content/attachments`. `bun run sync:content-assets` copies non-Markdown assets to `public/content-assets`. Any dot-prefixed file/folder in the content vault plus the symlinked `Templates` folder are ignored by git, linting, formatting, typechecking, content collections, prerendering, and asset sync.
+
 ## TAILWIND V4 BETA
 
 Uses Tailwind CSS v4 beta with `@tailwindcss/postcss`. Syntax differs from v3:
@@ -40,10 +52,11 @@ Uses Tailwind CSS v4 beta with `@tailwindcss/postcss`. Syntax differs from v3:
 
 ## ANTI-PATTERNS
 
-| Pattern                  | Why Bad           | Do Instead             |
-| ------------------------ | ----------------- | ---------------------- |
-| Edit routeTree.gen.ts    | Auto-generated    | Let router generate it |
-| Skip content-collections | MDX won't compile | Run after changes      |
+| Pattern                  | Why Bad                       | Do Instead                                    |
+| ------------------------ | ----------------------------- | --------------------------------------------- |
+| Edit routeTree.gen.ts    | Auto-generated                | Let router generate it                        |
+| Skip content-collections | Markdown won't compile        | Run after changes                             |
+| Raw JSX in notes         | Breaks Obsidian compatibility | Use Markdown or compiler-supported shortcodes |
 
 ## NOTES
 

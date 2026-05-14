@@ -36,6 +36,8 @@
   },
   "ignorePatterns": [
     "node_modules/**",
+    "packages/marketing/src/content/**/.*",
+    "packages/marketing/src/content/Templates/**",
     "**/dist/**",
     "**/*.gen.ts",
     "**/migrations/**",
