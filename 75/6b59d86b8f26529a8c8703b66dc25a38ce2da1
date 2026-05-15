@@ -1,0 +1,31 @@
+packages/core/src/auth/auth.service.ts
+  ai_agent 37-39
+  s_ff41a240aafdeb::t_2aa2fff2acf596 1,9-36,40-45
+packages/api/src/auth/auth.ts
+  ai_agent 4
+  s_ff41a240aafdeb::t_19bf7bf826c708 52-68,89,98,111
+  s_ff41a240aafdeb::t_34a23b6d35a906 49-51,86,95,104
+packages/api/src/layers.ts
+  s_ff41a240aafdeb::t_de915e57e2db1c 1,22
+packages/api/src/auth/auth.handlers.ts
+  s_ff41a240aafdeb::t_af89354f43f971 1,11-12
+packages/api/src/fine/fines.handlers.ts
+  s_ff41a240aafdeb::t_b97cdbf9f54df0 1,19,23,28,35,42,47,59,67,76,85,95,106,111
+  ai_agent 52-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "756b59d86b8f26529a8c8703b66dc25a38ce2da1",
+  "prompts": {},
+  "sessions": {
+    "s_ff41a240aafdeb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2718-076c-73a4-b12e-b81b912216a6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
