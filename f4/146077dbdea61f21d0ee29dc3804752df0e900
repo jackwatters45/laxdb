@@ -1,0 +1,19 @@
+packages/fines/src/routes/_app.fines.tsx
+  s_ff41a240aafdeb::t_0e8105370c9253 26,62-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f4146077dbdea61f21d0ee29dc3804752df0e900",
+  "prompts": {},
+  "sessions": {
+    "s_ff41a240aafdeb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2718-076c-73a4-b12e-b81b912216a6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
