@@ -219,6 +219,7 @@ const posts = defineCollection({
       headerImage,
       tableOfContents: extractTableOfContents(transformedContent),
       wikiLinks,
+      markdown: transformedContent,
       mdx,
     };
   },
