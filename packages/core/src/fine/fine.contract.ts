@@ -33,6 +33,40 @@ export const FineErrors = Schema.Union([
   ConstraintViolationError,
 ]);
 
+export const FineApiPayload = {
+  createTemplate: Schema.Struct({
+    label: Schema.String,
+    amountCents: Schema.Number,
+  }),
+  updateTemplate: Schema.Struct({
+    id: Schema.String,
+    label: Schema.optional(Schema.String),
+    amountCents: Schema.optional(Schema.Number),
+  }),
+  fineAction: Schema.Struct({ id: Schema.String }),
+  forgiveFine: Schema.Struct({
+    id: Schema.String,
+    note: Schema.NullOr(Schema.String),
+  }),
+  adjustFine: Schema.Struct({
+    id: Schema.String,
+    amountCents: Schema.Number,
+    note: Schema.NullOr(Schema.String),
+  }),
+  listAudit: Schema.Struct({
+    limit: Schema.optional(Schema.Number),
+  }),
+  memberFines: Schema.Struct({ memberId: Schema.String }),
+  issueFine: Schema.Struct({
+    memberId: Schema.String,
+    templateId: Schema.optional(Schema.NullOr(Schema.String)),
+    reason: Schema.optional(Schema.NullOr(Schema.String)),
+    amountCents: Schema.optional(Schema.Number),
+    dueAt: Schema.optional(Schema.DateFromString),
+  }),
+  fineById: Schema.Struct({ id: Schema.String }),
+} as const;
+
 export const FineContract = {
   list: {
     success: Schema.Array(Fine),

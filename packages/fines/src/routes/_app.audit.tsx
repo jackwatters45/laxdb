@@ -1,7 +1,16 @@
+import { DisplayCurrencyFromCents } from "@laxdb/core/schema";
 import { createFileRoute } from "@tanstack/react-router";
+import { Schema } from "effect";
 import { useEffect, useMemo, useState } from "react";
 
-import { api, formatCents, type AuditEntry, type Member } from "../lib/api";
+import {
+  listAudit,
+  listMembers,
+  type AuditEntry,
+  type Member,
+} from "../lib/fines";
+
+const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
 
 export const Route = createFileRoute("/_app/audit")({
   component: Audit,
@@ -17,13 +26,13 @@ const KIND_ORDER = [
 ] as const;
 
 function Audit() {
-  const [entries, setEntries] = useState<AuditEntry[] | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
+  const [entries, setEntries] = useState<readonly AuditEntry[] | null>(null);
+  const [members, setMembers] = useState<readonly Member[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [kind, setKind] = useState<(typeof KIND_ORDER)[number]>("all");
 
   useEffect(() => {
-    Promise.all([api.listAudit(200), api.listMembers()])
+    Promise.all([listAudit({ data: { limit: 200 } }), listMembers()])
       .then(([a, m]) => {
         setEntries(a);
         setMembers(m);

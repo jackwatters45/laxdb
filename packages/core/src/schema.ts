@@ -49,6 +49,31 @@ export const DateSchema = DateFromString.annotate({
   jsonSchema: { type: "string", format: "date-time" },
 });
 
+export const DisplayCurrencyFromCents = Schema.Number.pipe(
+  Schema.decodeTo(
+    Schema.String,
+    SchemaTransformation.transform({
+      decode: (cents) => `$${(cents / 100).toFixed(2).replace(/\.00$/u, "")}`,
+      encode: (value) => Number(value.replaceAll(/[^0-9.-]/gu, "")) * 100,
+    }),
+  ),
+);
+
+export const DisplayDateFromDate = Schema.Date.pipe(
+  Schema.decodeTo(
+    Schema.String,
+    SchemaTransformation.transform({
+      decode: (date) =>
+        date.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+      encode: (value) => new Date(value),
+    }),
+  ),
+);
+
 export const CreatedAtSchema = DateFromString;
 export const UpdatedAtSchema = Schema.UndefinedOr(
   Schema.NullOr(DateFromString),

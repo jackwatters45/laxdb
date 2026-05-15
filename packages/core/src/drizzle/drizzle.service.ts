@@ -3,19 +3,16 @@ import {
   type AnyD1Database,
   type DrizzleD1Database,
 } from "drizzle-orm/d1";
-import { Array as Arr, Effect, Layer, Context } from "effect";
+import { Array as Arr, Data, Effect, Layer, Context } from "effect";
 
 // ---------------------------------------------------------------------------
 // SqlError — lightweight tagged error for drizzle query failures
 // ---------------------------------------------------------------------------
 
-export class SqlError {
-  readonly _tag = "SqlError" as const;
-  constructor(
-    readonly cause: unknown,
-    readonly message: string = "Query failed",
-  ) {}
-}
+export class SqlError extends Data.TaggedError("SqlError")<{
+  readonly cause: unknown;
+  readonly message: string;
+}> {}
 
 // ---------------------------------------------------------------------------
 // Drizzle query helper — wraps a drizzle query builder into an Effect
@@ -26,7 +23,7 @@ export const query = <T>(queryBuilder: {
 }): Effect.Effect<T, SqlError> =>
   Effect.tryPromise({
     try: () => Promise.resolve(queryBuilder.execute()),
-    catch: (cause) => new SqlError(cause),
+    catch: (cause) => new SqlError({ cause, message: "Query failed" }),
   });
 
 /** Take first element from array as Effect — fails with NoSuchElementError */

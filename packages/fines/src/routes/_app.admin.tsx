@@ -1,8 +1,20 @@
+import { DisplayCurrencyFromCents } from "@laxdb/core/schema";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Schema } from "effect";
 import { useEffect, useState } from "react";
 
-import { api, formatCents, type FineTemplate, type Member } from "../lib/api";
 import { authClient } from "../lib/auth-client";
+import {
+  createTemplate,
+  deleteTemplate,
+  issueFine,
+  listMembers,
+  listTemplates,
+  type FineTemplateView,
+  type Member,
+} from "../lib/fines";
+
+const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
 
 export const Route = createFileRoute("/_app/admin")({
   beforeLoad: ({ context }) => {
@@ -17,12 +29,12 @@ export const Route = createFileRoute("/_app/admin")({
 });
 
 function Admin() {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [templates, setTemplates] = useState<FineTemplate[]>([]);
+  const [members, setMembers] = useState<readonly Member[]>([]);
+  const [templates, setTemplates] = useState<readonly FineTemplateView[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = () => {
-    Promise.all([api.listMembers(), api.listTemplates()])
+    Promise.all([listMembers(), listTemplates()])
       .then(([m, t]) => {
         setMembers(m);
         setTemplates(t);
@@ -76,8 +88,8 @@ function IssueFine({
   onDone,
   onError,
 }: {
-  members: Member[];
-  templates: FineTemplate[];
+  members: readonly Member[];
+  templates: readonly FineTemplateView[];
   onDone: () => void;
   onError: (s: string) => void;
 }) {
@@ -90,11 +102,13 @@ function IssueFine({
     event.preventDefault();
     if (!memberId) return;
     try {
-      await api.issueFine({
-        memberId,
-        templateId: templateId || null,
-        reason: reason || null,
-        ...(amount ? { amountCents: Math.round(Number(amount) * 100) } : {}),
+      await issueFine({
+        data: {
+          memberId,
+          templateId: templateId || null,
+          reason: reason || null,
+          ...(amount ? { amountCents: Math.round(Number(amount) * 100) } : {}),
+        },
       });
       setReason("");
       setAmount("");
@@ -179,7 +193,7 @@ function Invite({
   members,
   onChange,
 }: {
-  members: Member[];
+  members: readonly Member[];
   onChange: (fn: () => Promise<unknown>) => void;
 }) {
   const [email, setEmail] = useState("");
@@ -285,7 +299,7 @@ function Templates({
   templates,
   onChange,
 }: {
-  templates: FineTemplate[];
+  templates: readonly FineTemplateView[];
   onChange: (fn: () => Promise<unknown>) => void;
 }) {
   const [label, setLabel] = useState("");
@@ -303,16 +317,16 @@ function Templates({
           e.preventDefault();
           if (!label.trim() || !amount) return;
           onChange(() =>
-            api
-              .createTemplate({
+            createTemplate({
+              data: {
                 label: label.trim(),
                 amountCents: Math.round(Number(amount) * 100),
-              })
-              .then(() => {
-                setLabel("");
-                setAmount("");
-                return null;
-              }),
+              },
+            }).then(() => {
+              setLabel("");
+              setAmount("");
+              return null;
+            }),
           );
         }}
       >
@@ -359,7 +373,7 @@ function Templates({
                     className="danger"
                     onClick={() => {
                       if (confirm(`Delete "${t.label}"?`))
-                        onChange(() => api.deleteTemplate(t.id));
+                        onChange(() => deleteTemplate({ data: { id: t.id } }));
                     }}
                   >
                     Remove

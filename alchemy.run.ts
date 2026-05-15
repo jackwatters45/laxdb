@@ -108,6 +108,16 @@ export default Alchemy.Stack(
       },
     });
 
+    const fines = yield* Cloudflare.Vite("fines", {
+      rootDir: "./packages/fines",
+      url: true,
+      domain: `fines.${baseDomain}`,
+      compatibility: { flags: ["nodejs_compat"] },
+      bindings: {
+        API: api,
+      },
+    });
+
     if (process.env.PULL_REQUEST) {
       yield* GitHub.Comment("preview-comment", {
         owner: "jackwatters45",
@@ -131,6 +141,7 @@ export default Alchemy.Stack(
       domain: baseDomain,
       marketing: marketing.url,
       practicePlanner: practicePlanner.url,
+      fines: fines.url,
       api: api.url,
       db: db.databaseId,
       kv: kvNamespace.namespaceId,
