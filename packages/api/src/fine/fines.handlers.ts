@@ -1,3 +1,4 @@
+import { AuthService } from "@laxdb/core/auth/auth.service";
 import type { FineApiPayload } from "@laxdb/core/fine/fine.contract";
 import { FineService } from "@laxdb/core/fine/fine.service";
 import { Effect } from "effect";
@@ -15,44 +16,47 @@ export const FinesHandlers = HttpApiBuilder.group(
   "Fines",
   (handlers) =>
     Effect.gen(function* () {
+      const authService = yield* AuthService;
       const service = yield* FineService;
 
       const listMembers = () =>
-        withOrganization((orgId) =>
+        withOrganization(authService, (orgId) =>
           service.listMembers({ organizationId: orgId }),
         );
 
       const listTemplates = () =>
-        withOrganization((orgId) =>
+        withOrganization(authService, (orgId) =>
           service.listTemplates({ organizationId: orgId }),
         );
 
       const createTemplate = (
         payload: typeof FineApiPayload.createTemplate.Type,
       ) =>
-        withAdminOrganization((orgId) =>
+        withAdminOrganization(authService, (orgId) =>
           service.createTemplate({ organizationId: orgId, ...payload }),
         );
 
       const updateTemplate = (
         payload: typeof FineApiPayload.updateTemplate.Type,
       ) =>
-        withAdminOrganization((orgId) =>
+        withAdminOrganization(authService, (orgId) =>
           service.updateTemplate({ organizationId: orgId, ...payload }),
         );
 
       const deleteTemplate = (payload: typeof FineApiPayload.fineById.Type) =>
-        withAdminOrganization((orgId) =>
+        withAdminOrganization(authService, (orgId) =>
           service.deleteTemplate({ organizationId: orgId, id: payload.id }),
         );
 
       const listFines = () =>
-        withOrganization((orgId) => service.list({ organizationId: orgId }));
+        withOrganization(authService, (orgId) =>
+          service.list({ organizationId: orgId }),
+        );
 
       const listMemberFines = (
         payload: typeof FineApiPayload.memberFines.Type,
       ) =>
-        withOrganization((orgId) =>
+        withOrganization(authService, (orgId) =>
           service.listForMember({
             organizationId: orgId,
             memberId: payload.memberId,
@@ -60,7 +64,7 @@ export const FinesHandlers = HttpApiBuilder.group(
         );
 
       const issueFine = (payload: typeof FineApiPayload.issueFine.Type) =>
-        withAdminSession(({ organizationId: orgId, userId }) =>
+        withAdminSession(authService, ({ organizationId: orgId, userId }) =>
           service.issue({
             organizationId: orgId,
             issuedByUserId: userId,
@@ -69,7 +73,7 @@ export const FinesHandlers = HttpApiBuilder.group(
         );
 
       const payFine = (payload: typeof FineApiPayload.fineAction.Type) =>
-        withAdminSession(({ organizationId: orgId, userId }) =>
+        withAdminSession(authService, ({ organizationId: orgId, userId }) =>
           service.pay({
             organizationId: orgId,
             id: payload.id,
@@ -78,7 +82,7 @@ export const FinesHandlers = HttpApiBuilder.group(
         );
 
       const forgiveFine = (payload: typeof FineApiPayload.forgiveFine.Type) =>
-        withAdminSession(({ organizationId: orgId, userId }) =>
+        withAdminSession(authService, ({ organizationId: orgId, userId }) =>
           service.forgive({
             organizationId: orgId,
             id: payload.id,
@@ -88,7 +92,7 @@ export const FinesHandlers = HttpApiBuilder.group(
         );
 
       const adjustFine = (payload: typeof FineApiPayload.adjustFine.Type) =>
-        withAdminSession(({ organizationId: orgId, userId }) =>
+        withAdminSession(authService, ({ organizationId: orgId, userId }) =>
           service.adjust({
             organizationId: orgId,
             id: payload.id,
@@ -99,12 +103,12 @@ export const FinesHandlers = HttpApiBuilder.group(
         );
 
       const listFineEvents = (payload: typeof FineApiPayload.fineById.Type) =>
-        withOrganization((orgId) =>
+        withOrganization(authService, (orgId) =>
           service.listEvents({ organizationId: orgId, id: payload.id }),
         );
 
       const listAudit = (payload: typeof FineApiPayload.listAudit.Type) =>
-        withOrganization((orgId) =>
+        withOrganization(authService, (orgId) =>
           service.listAudit({
             organizationId: orgId,
             limit: payload.limit ?? 100,

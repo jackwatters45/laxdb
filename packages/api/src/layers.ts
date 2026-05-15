@@ -1,3 +1,4 @@
+import { AuthService } from "@laxdb/core/auth/auth.service";
 import { DefaultsService } from "@laxdb/core/defaults/defaults.service";
 import { DrillService } from "@laxdb/core/drill/drill.service";
 import { DatabaseLiveFromBindingEffect } from "@laxdb/core/drizzle/drizzle.service";
@@ -18,6 +19,7 @@ import { PlayersHandlers } from "./player/player.handlers";
 import { PracticesHandlers } from "./practice/practice.handlers";
 
 export const CoreServicesLive = Layer.mergeAll(
+  AuthService.layer,
   DefaultsService.layer,
   DrillService.layer,
   FineService.layer,

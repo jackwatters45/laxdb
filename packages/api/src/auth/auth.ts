@@ -1,7 +1,7 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import { createAuth, type Auth } from "@laxdb/core/auth/auth";
 import type { Me } from "@laxdb/core/auth/auth.schema";
-import { resolveMe } from "@laxdb/core/auth/auth.service";
+import type { AuthService } from "@laxdb/core/auth/auth.service";
 import { AuthenticationError, AuthorizationError } from "@laxdb/core/error";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Effect } from "effect";
@@ -46,20 +46,26 @@ export const makeAuth = (env: AuthEnv): Auth =>
     },
   });
 
-export const currentSession = Effect.gen(function* () {
-  const env = yield* Cloudflare.WorkerEnvironment;
-  const request = yield* HttpServerRequest.HttpServerRequest;
-  if (!isAuthEnv(env)) {
-    return yield* new AuthenticationError({
-      message: "auth environment is invalid",
-    });
-  }
-  const session = yield* resolveMe(makeAuth(env), new Headers(request.headers));
-  if (session === null) {
-    return yield* new AuthenticationError({ message: "unauthorized" });
-  }
-  return session;
-});
+type AuthServiceImpl = typeof AuthService.Service;
+
+export const currentSession = (authService: AuthServiceImpl) =>
+  Effect.gen(function* () {
+    const env = yield* Cloudflare.WorkerEnvironment;
+    const request = yield* HttpServerRequest.HttpServerRequest;
+    if (!isAuthEnv(env)) {
+      return yield* new AuthenticationError({
+        message: "auth environment is invalid",
+      });
+    }
+    const session = yield* authService.resolveMe(
+      makeAuth(env),
+      new Headers(request.headers),
+    );
+    if (session === null) {
+      return yield* new AuthenticationError({ message: "unauthorized" });
+    }
+    return session;
+  });
 
 const isAdmin = (session: Me) =>
   session.memberRole === "owner" || session.memberRole === "admin";
@@ -77,29 +83,32 @@ export const adminOrganizationId = (session: Me) =>
     : Effect.fail(new AuthorizationError({ message: "admin role required" }));
 
 export const withOrganization = <A, E, R>(
+  authService: AuthServiceImpl,
   useOrganization: (orgId: string) => Effect.Effect<A, E, R>,
 ) =>
-  currentSession.pipe(
+  currentSession(authService).pipe(
     Effect.flatMap((session) => organizationId(session)),
     Effect.flatMap(useOrganization),
   );
 
 export const withAdminOrganization = <A, E, R>(
+  authService: AuthServiceImpl,
   useOrganization: (orgId: string) => Effect.Effect<A, E, R>,
 ) =>
-  currentSession.pipe(
+  currentSession(authService).pipe(
     Effect.flatMap((session) => adminOrganizationId(session)),
     Effect.flatMap(useOrganization),
   );
 
 export const withAdminSession = <A, E, R>(
+  authService: AuthServiceImpl,
   useSession: (context: {
     readonly organizationId: string;
     readonly userId: string;
   }) => Effect.Effect<A, E, R>,
 ) =>
   Effect.gen(function* () {
-    const session = yield* currentSession;
+    const session = yield* currentSession(authService);
     const orgId = yield* adminOrganizationId(session);
     return yield* useSession({ organizationId: orgId, userId: session.userId });
   });
