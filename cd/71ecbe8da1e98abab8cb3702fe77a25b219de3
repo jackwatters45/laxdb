@@ -1,0 +1,125 @@
+packages/core/src/fine/fine.sql.ts
+  s_ff41a240aafdeb::t_246efbe90d5c59 8,79-81
+  s_ff41a240aafdeb::t_b19d43ecee4cd1 7,9-23,58-78,84-87
+packages/fines/package.json
+  s_ff41a240aafdeb::t_c9a3dada602931 18
+packages/core/src/auth/auth.service.ts
+  s_ff41a240aafdeb::t_7d0411b93cca78 1,3-4,9-22,26-37
+  s_ff41a240aafdeb::t_660198209e96fa 23-25
+packages/api/src/auth/auth.ts
+  s_ff41a240aafdeb::t_1e6d2df317ebcd 20,52-56
+  s_ff41a240aafdeb::t_660198209e96fa 2-4
+  s_ff41a240aafdeb::t_7bb88687efc1fe 28-29
+  s_ff41a240aafdeb::t_1960904ef7a5fb 57
+  s_ff41a240aafdeb::t_246efbe90d5c59 5-8,32-36,38,49-51,58-105
+  s_ff41a240aafdeb::t_6ce5e2e6977c51 1
+  s_ff41a240aafdeb::t_3e662c2777d39d 10,30
+packages/core/src/auth/auth.ts
+  s_ff41a240aafdeb::t_9c94d21310d35e 1
+packages/fines/src/lib/fines.ts
+  s_ff41a240aafdeb::t_9afaa7ae652272 1-36,38-47,49-67,69-78,80-96,98-107,109-118,121-131,133-140
+  s_ff41a240aafdeb::t_5867f9b3cb55ac 37,48,68,79,97,108,132
+  s_ff41a240aafdeb::t_660198209e96fa 119-120
+packages/api/src/fine/fines.api.ts
+  s_ff41a240aafdeb::t_1a4d96d67ce610 27-100,106-128,130-142
+  s_ff41a240aafdeb::t_660198209e96fa 101-105
+  s_ff41a240aafdeb::t_b1bae93f5c503c 9,16
+  s_ff41a240aafdeb::t_246efbe90d5c59 1-8,10-15,17-26,129
+packages/core/src/fine/fine.contract.ts
+  s_ff41a240aafdeb::t_00c50c6b545a1c 36-69
+packages/fines/src/server.ts
+  s_ff41a240aafdeb::t_718063fe704166 8-9,11
+packages/core/src/fine/fine.schema.ts
+  s_ff41a240aafdeb::t_9755e33fde6f1e 3
+packages/api/src/auth/auth.handlers.ts
+  s_ff41a240aafdeb::t_246efbe90d5c59 1-3,6-7,9-12
+  s_ff41a240aafdeb::t_243d9072c7235b 4,8
+  s_ff41a240aafdeb::t_660198209e96fa 5
+packages/core/src/fine/fine.service.ts
+  s_ff41a240aafdeb::t_246efbe90d5c59 1-189,193-283
+  s_ff41a240aafdeb::t_9e90fbc7d3ceb5 190-192
+packages/fines/src/routes/_app.fines.tsx
+  s_ff41a240aafdeb::t_54033b095ecaff 26-40,77-88
+  s_ff41a240aafdeb::t_7a310576efb988 10-14,16,54
+  s_ff41a240aafdeb::t_660198209e96fa 1-4,6,234-236,241-247
+  s_ff41a240aafdeb::t_5867f9b3cb55ac 46-47
+  s_ff41a240aafdeb::t_68259c3e4b97e5 17-20
+bun.lock
+  ai_agent 103
+packages/core/src/drizzle/drizzle.service.ts
+  ai_agent 6,12-15,26
+packages/api/src/auth/auth.api.ts
+  s_ff41a240aafdeb::t_9755e33fde6f1e 1
+  s_ff41a240aafdeb::t_85251f0c663ef8 15-20,22
+  s_ff41a240aafdeb::t_660198209e96fa 2
+  s_ff41a240aafdeb::t_246efbe90d5c59 3-8,10-14,21
+  s_ff41a240aafdeb::t_d7e2995a13b8fb 9
+packages/core/src/schema.ts
+  s_ff41a240aafdeb::t_68d63889b6add0 52-56,58-76
+  ai_agent 57
+packages/api/src/shared/payload.ts
+  s_ff41a240aafdeb::t_5516690c62db2d 1-3
+packages/core/src/fine/fine.repo.ts
+  s_ff41a240aafdeb::t_660198209e96fa 199
+  s_ff41a240aafdeb::t_0bc61a25924768 26,204,222,245,256,276,287,306,317,368-390
+packages/api/src/index.ts
+  s_ff41a240aafdeb::t_660198209e96fa 25-42
+  s_ff41a240aafdeb::t_700b833ae1368c 24,43-44
+  s_ff41a240aafdeb::t_65d811cb4b4a15 21-23
+  s_ff41a240aafdeb::t_2dc9773b65f4af 12
+packages/fines/src/lib/api-client.ts
+  s_ff41a240aafdeb::t_8a7f5ef6690c78 1-4,6-7,10-11,17-18,30-35,38-39,41,43-48
+  s_ff41a240aafdeb::t_cd7c042e319f38 20-23,25-27
+TODO.md
+  ai_agent 5
+  s_ff41a240aafdeb::t_17208de64ad1a2 1-4
+packages/fines/src/routes/_app.audit.tsx
+  s_ff41a240aafdeb::t_5867f9b3cb55ac 29-30
+  s_ff41a240aafdeb::t_7a310576efb988 6-11,35
+  s_ff41a240aafdeb::t_660198209e96fa 1,3
+  s_ff41a240aafdeb::t_68259c3e4b97e5 12-13
+packages/fines/src/lib/session.ts
+  s_ff41a240aafdeb::t_9755e33fde6f1e 2
+  s_ff41a240aafdeb::t_422f55c3d27f7b 11-21
+  s_ff41a240aafdeb::t_8b24878169ff48 1,4,6
+packages/api/src/layers.ts
+  s_ff41a240aafdeb::t_80c38978c9c393 4,12,15,23,39,42
+packages/core/src/auth/auth.sql.ts
+  s_ff41a240aafdeb::t_9755e33fde6f1e 5
+packages/fines/src/routes/_app.admin.tsx
+  s_ff41a240aafdeb::t_7a310576efb988 7-15,37,320-321,324,376
+  s_ff41a240aafdeb::t_5867f9b3cb55ac 32-33,91-92,196,302
+  s_ff41a240aafdeb::t_660198209e96fa 1,3,105-111,325-329
+  s_ff41a240aafdeb::t_68259c3e4b97e5 16-17
+alchemy.run.ts
+  s_ff41a240aafdeb::t_a9b7eba9409989 144
+  s_ff41a240aafdeb::t_729177c1fd91b8 111-116
+  s_ff41a240aafdeb::t_28c793c928e34f 117
+packages/api/src/definition.ts
+  s_ff41a240aafdeb::t_c750965865fbe8 3,6,12,15
+packages/fines/src/routes/api.auth.$.tsx
+  s_ff41a240aafdeb::t_660198209e96fa 2
+  s_ff41a240aafdeb::t_5ab55cedbafc35 4-13,18-19
+packages/api/src/fine/fines.handlers.ts
+  s_ff41a240aafdeb::t_660198209e96fa 2,30-32,37-39,52-54,108-111
+  s_ff41a240aafdeb::t_d6388aff9a4184 1
+  s_ff41a240aafdeb::t_409a774a42aebc 11,14
+  s_ff41a240aafdeb::t_4b05843484f702 44,62,71,80,90,101,106
+  s_ff41a240aafdeb::t_246efbe90d5c59 3-10,12-13,15-29,33-36,40-43,45-51,55-61,63-70,72-79,81-89,91-100,102-105,107,112-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "cd71ecbe8da1e98abab8cb3702fe77a25b219de3",
+  "prompts": {},
+  "sessions": {
+    "s_ff41a240aafdeb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2718-076c-73a4-b12e-b81b912216a6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
