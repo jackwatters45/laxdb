@@ -1,0 +1,25 @@
+packages/api/src/test/definition.contract.test.ts
+  s_ff41a240aafdeb::t_50335d2320fab5 12
+  s_ff41a240aafdeb::t_304b746b9bf498 3,11,14-15,17-23,27-28
+  s_ff41a240aafdeb::t_3a36ce41d7ce6c 1,24,29
+packages/core/src/test/db.ts
+  s_ff41a240aafdeb::t_6f49886bd99f65 31,33-38,51
+packages/core/src/test/schema.sql
+  s_ff41a240aafdeb::t_d8a8f42d3fe8c5 1-288
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9cca93eb1dcd49f788ee59837b1c460e1324f2a0",
+  "prompts": {},
+  "sessions": {
+    "s_ff41a240aafdeb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2718-076c-73a4-b12e-b81b912216a6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
