@@ -1,0 +1,21 @@
+packages/cli/src/test/coverage.test.ts
+  s_ff41a240aafdeb::t_3cc30bba6b8b7c 72
+  s_ff41a240aafdeb::t_9c92f5ff33b0b8 7-19,21-22,68-70,74,76,78-79
+  ai_agent 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "180152d5c7e864844714ec3e58993b946373d452",
+  "prompts": {},
+  "sessions": {
+    "s_ff41a240aafdeb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2718-076c-73a4-b12e-b81b912216a6",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
