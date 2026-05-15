@@ -1,4 +1,12 @@
+import { createMiddleware } from "@tanstack/react-start";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+
+import {
+  markdownResponseForContentSlug,
+  negotiateAcceptHeader,
+  notAcceptableResponse,
+  setAcceptVary,
+} from "@/lib/accept-markdown";
 import { throwRouterError } from "@/lib/router-throws";
 import type { Post } from "content-collections";
 
@@ -7,7 +15,28 @@ import { publishedPosts } from "@/lib/posts";
 import { formatPublishedDate } from "@/lib/date";
 import { MDXContent } from "@/components/mdx-content";
 
+const contentNegotiationMiddleware = createMiddleware().server(async ({ request, next }) => {
+  const url = new URL(request.url);
+  const slug = url.pathname.replace(/^\/content\//u, "");
+  const negotiatedContent = negotiateAcceptHeader(request.headers.get("Accept"));
+
+  if (negotiatedContent === "markdown") {
+    throw markdownResponseForContentSlug(decodeURIComponent(slug));
+  }
+
+  if (negotiatedContent === "not-acceptable") {
+    throw notAcceptableResponse();
+  }
+
+  const result = await next();
+  setAcceptVary(result.response.headers);
+  return result;
+});
+
 export const Route = createFileRoute("/content/$slug")({
+  server: {
+    middleware: [contentNegotiationMiddleware],
+  },
   loader: ({ params }: { params: { slug: string } }): Post => {
     const post = publishedPosts.find((p) => p.slug === params.slug);
     if (!post) {
