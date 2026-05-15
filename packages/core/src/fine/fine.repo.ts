@@ -2,7 +2,6 @@ import {
   DrizzleService,
   headOrFail,
   query,
-  SqlError,
 } from "@laxdb/core/drizzle/drizzle.service";
 import { and, desc, eq, getColumns, lte } from "drizzle-orm";
 import { Context, Effect, Layer } from "effect";
@@ -10,8 +9,6 @@ import { nanoid } from "nanoid";
 
 import { members, users } from "../auth/auth.sql";
 
-import { fineEvents } from "./fine-event.sql";
-import { fineTemplates } from "./fine-template.sql";
 import type {
   AdjustFineInput,
   ApplyFineDoublingsInput,
@@ -26,15 +23,9 @@ import type {
   UpdateFineTemplateInput,
   FineEventKind,
 } from "./fine.schema";
-import { fines } from "./fine.sql";
+import { fineEvents, fines, fineTemplates } from "./fine.sql";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-const tryDb = <A>(fn: () => Promise<A>) =>
-  Effect.tryPromise({
-    try: fn,
-    catch: (cause) => new SqlError(cause),
-  });
 
 export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
   make: Effect.gen(function* () {
@@ -205,12 +196,12 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
             input.amountCents ?? template?.amountCents ?? null;
 
           if (reason === null || amountCents === null) {
-            return yield* Effect.fail(new SqlError("missing fine amount"));
+            return yield* Effect.die("missing fine amount");
           }
 
           const issuedAt = new Date();
           const dueAt = input.dueAt ?? new Date(issuedAt.getTime() + WEEK_MS);
-          const [fine] = yield* query(
+          const fine = yield* query(
             db
               .insert(fines)
               .values({
@@ -228,11 +219,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
                 issuedByUserId: input.issuedByUserId ?? null,
               })
               .returning(fineColumns),
-          );
-
-          if (fine === undefined) {
-            return yield* Effect.fail(new SqlError("insert"));
-          }
+          ).pipe(Effect.flatMap(headOrFail));
 
           yield* query(
             db.insert(fineEvents).values(
@@ -255,7 +242,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
           const fine = yield* getFine(input);
           if (fine.status !== "unpaid") return fine;
           const now = new Date();
-          const [updated] = yield* query(
+          const updated = yield* query(
             db
               .update(fines)
               .set({ status: "paid", paidAt: now })
@@ -266,10 +253,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
                 ),
               )
               .returning(fineColumns),
-          );
-          if (updated === undefined) {
-            return yield* Effect.fail(new SqlError("update"));
-          }
+          ).pipe(Effect.flatMap(headOrFail));
           yield* query(
             db.insert(fineEvents).values(
               makeEvent({
@@ -289,7 +273,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
         Effect.gen(function* () {
           const fine = yield* getFine(input);
           if (fine.status !== "unpaid") return fine;
-          const [updated] = yield* query(
+          const updated = yield* query(
             db
               .update(fines)
               .set({ status: "forgiven" })
@@ -300,10 +284,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
                 ),
               )
               .returning(fineColumns),
-          );
-          if (updated === undefined) {
-            return yield* Effect.fail(new SqlError("update"));
-          }
+          ).pipe(Effect.flatMap(headOrFail));
           yield* query(
             db.insert(fineEvents).values(
               makeEvent({
@@ -322,7 +303,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
       adjust: (input: AdjustFineInput) =>
         Effect.gen(function* () {
           const fine = yield* getFine(input);
-          const [updated] = yield* query(
+          const updated = yield* query(
             db
               .update(fines)
               .set({ amountCents: input.amountCents })
@@ -333,10 +314,7 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
                 ),
               )
               .returning(fineColumns),
-          );
-          if (updated === undefined) {
-            return yield* Effect.fail(new SqlError("update"));
-          }
+          ).pipe(Effect.flatMap(headOrFail));
           yield* query(
             db.insert(fineEvents).values(
               makeEvent({
@@ -387,33 +365,29 @@ export class FineRepo extends Context.Service<FineRepo>()("FineRepo", {
 
           if (due.length === 0) return { doubled: 0 };
 
-          yield* tryDb(() =>
-            Promise.all(
-              due.flatMap((fine) => {
-                const amountCents = fine.amountCents * 2;
-                const dueAt = new Date(now.getTime() + WEEK_MS);
-                return [
-                  db
-                    .update(fines)
-                    .set({ amountCents, dueAt })
-                    .where(eq(fines.id, fine.id))
-                    .execute(),
-                  db
-                    .insert(fineEvents)
-                    .values(
-                      makeEvent({
-                        fineId: fine.id,
-                        kind: "doubled",
-                        amountCents,
-                        deltaCents: amountCents - fine.amountCents,
-                        at: now,
-                      }),
-                    )
-                    .execute(),
-                ];
-              }),
-            ),
-          );
+          yield* Effect.forEach(due, (fine) => {
+            const amountCents = fine.amountCents * 2;
+            const dueAt = new Date(now.getTime() + WEEK_MS);
+            return Effect.all([
+              query(
+                db
+                  .update(fines)
+                  .set({ amountCents, dueAt })
+                  .where(eq(fines.id, fine.id)),
+              ),
+              query(
+                db.insert(fineEvents).values(
+                  makeEvent({
+                    fineId: fine.id,
+                    kind: "doubled",
+                    amountCents,
+                    deltaCents: amountCents - fine.amountCents,
+                    at: now,
+                  }),
+                ),
+              ),
+            ]);
+          });
 
           return { doubled: due.length };
         }),

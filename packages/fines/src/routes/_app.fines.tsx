@@ -1,33 +1,57 @@
+import {
+  DisplayCurrencyFromCents,
+  DisplayDateFromDate,
+} from "@laxdb/core/schema";
 import { createFileRoute } from "@tanstack/react-router";
+import { Schema } from "effect";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  api,
-  formatCents,
-  formatDate,
-  type Fine,
+  forgiveFine,
+  listFines,
+  listMembers,
+  payFine,
+  type FineView,
   type Member,
-} from "../lib/api";
+} from "../lib/fines";
+
+const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
+const formatDate = (value: Date | string | number) =>
+  Schema.decodeSync(DisplayDateFromDate)(new Date(value));
 
 export const Route = createFileRoute("/_app/fines")({
   component: Board,
 });
 
-type Row = Fine & { memberName: string };
+type Row = {
+  readonly id: string;
+  readonly organizationId: string;
+  readonly memberId: string;
+  readonly templateId: string | null;
+  readonly reason: string;
+  readonly originalAmountCents: number;
+  readonly amountCents: number;
+  readonly status: FineView["status"];
+  readonly issuedAt: Date;
+  readonly dueAt: Date;
+  readonly paidAt: Date | null;
+  readonly issuedByUserId: string | null;
+  readonly memberName: string;
+};
 
 function Board() {
   const { me } = Route.useRouteContext();
   const isAdmin = me?.memberRole === "owner" || me?.memberRole === "admin";
 
-  const [fines, setFines] = useState<Fine[] | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
+  const [fines, setFines] = useState<readonly FineView[] | null>(null);
+  const [members, setMembers] = useState<readonly Member[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "unpaid" | "paid" | "forgiven">(
     "unpaid",
   );
 
   const load = () => {
-    Promise.all([api.listFines(), api.listMembers()])
+    Promise.all([listFines(), listMembers()])
       .then(([f, m]) => {
         setFines(f);
         setMembers(m);
@@ -50,7 +74,18 @@ function Board() {
       (fines ?? [])
         .filter((f) => filter === "all" || f.status === filter)
         .map((f) => ({
-          ...f,
+          id: f.id,
+          organizationId: f.organizationId,
+          memberId: f.memberId,
+          templateId: f.templateId,
+          reason: f.reason,
+          originalAmountCents: f.originalAmountCents,
+          amountCents: f.amountCents,
+          status: f.status,
+          issuedAt: f.issuedAt,
+          dueAt: f.dueAt,
+          paidAt: f.paidAt,
+          issuedByUserId: f.issuedByUserId,
           memberName: membersById.get(f.memberId)?.name ?? "Unknown",
         })),
     [fines, filter, membersById],
@@ -196,12 +231,20 @@ function Board() {
                           <>
                             <button
                               className="primary"
-                              onClick={() => act(() => api.payFine(r.id))}
+                              onClick={() =>
+                                act(() => payFine({ data: { id: r.id } }))
+                              }
                             >
                               Pay
                             </button>
                             <button
-                              onClick={() => act(() => api.forgiveFine(r.id))}
+                              onClick={() =>
+                                act(() =>
+                                  forgiveFine({
+                                    data: { id: r.id, note: null },
+                                  }),
+                                )
+                              }
                             >
                               Forgive
                             </button>

@@ -1,17 +1,22 @@
+import { ApiClient } from "@laxdb/api/client";
+import type { Me } from "@laxdb/core/auth/auth.schema";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
+import { Effect } from "effect";
 
-import type { Me } from "../core/auth/schema";
+import { runApi } from "./api-client";
 
 export type MeCtx = Me | null;
 
 export const getMe = createServerFn({ method: "GET" }).handler(
-  async (): Promise<MeCtx> => {
-    const [{ getAuth }, { resolveMe }] = await Promise.all([
-      import("./auth.server"),
-      import("../core/auth/resolve-me"),
-    ]);
-    const headers = new Headers(getRequestHeaders());
-    return resolveMe(getAuth(), headers);
-  },
+  (): Promise<MeCtx> =>
+    runApi(
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Auth.me({ payload: {} });
+      }).pipe(
+        Effect.catchTag("AuthenticationError", () => Effect.succeed(null)),
+        // TODO(auth): decide whether authorization/auth transport failures should
+        // also become null once Better Auth integration is finalized.
+      ),
+    ),
 );

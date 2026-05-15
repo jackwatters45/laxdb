@@ -2,7 +2,7 @@ import { timestamp } from "@laxdb/core/drizzle/drizzle.type";
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import type { Role } from "./schema";
+import type { Role } from "./auth.schema";
 
 const ts = (col: string) =>
   timestamp(col)

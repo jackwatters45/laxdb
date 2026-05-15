@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-import { Role } from "../auth/schema";
+import { Role } from "../auth/auth.schema";
 
 export const FineStatus = Schema.Literals(["unpaid", "paid", "forgiven"]);
 export type FineStatus = typeof FineStatus.Type;

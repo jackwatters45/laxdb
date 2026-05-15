@@ -9,6 +9,7 @@ import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
 import * as HttpApiBuilder from "effect/unstable/httpapi/HttpApiBuilder";
 import * as HttpApiScalar from "effect/unstable/httpapi/HttpApiScalar";
 
+import { isAuthEnv, makeAuth } from "./auth/auth";
 import { LaxdbApi } from "./definition";
 import { HttpGroups, ServicesLive } from "./layers";
 
@@ -17,6 +18,30 @@ const routes = Layer.mergeAll(
     Layer.provide(HttpGroups.pipe(Layer.provide(ServicesLive))),
   ),
   HttpApiScalar.layer(LaxdbApi),
+  // TODO(auth): review this raw Better Auth passthrough when auth is revisited.
+  // HttpApi covers schema-driven app endpoints; Better Auth still owns its own
+  // request/response protocol under /api/auth/*.
+  HttpRouter.use((router) =>
+    router.add("*", "/api/auth/*", (request) =>
+      Effect.gen(function* () {
+        const env = yield* Cloudflare.WorkerEnvironment;
+        const source = request.source;
+        if (!isAuthEnv(env)) {
+          return HttpServerResponse.text("Auth environment is invalid", {
+            status: 500,
+          });
+        }
+        if (!(source instanceof globalThis.Request)) {
+          return HttpServerResponse.text("Unsupported request source", {
+            status: 500,
+          });
+        }
+        return HttpServerResponse.raw(
+          yield* Effect.promise(() => makeAuth(env).handler(source)),
+        );
+      }),
+    ),
+  ),
   HttpRouter.use((router) =>
     router.add("GET", "/health", HttpServerResponse.text("OK")),
   ),
