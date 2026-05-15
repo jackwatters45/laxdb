@@ -22,43 +22,20 @@ const TEST_DATABASE_ID = "laxdb-test";
 let miniflare: Miniflare | undefined;
 let databasePromise: Promise<TestD1Database> | undefined;
 
-const collectSqlFiles = async (directory: string): Promise<string[]> => {
-  const { readdir } = await import("node:fs/promises");
-  const path = await import("node:path");
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files: string[] = [];
-
-  for (const entry of entries) {
-    const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      // oxlint-disable-next-line no-await-in-loop -- recurse directory tree deterministically
-      files.push(...(await collectSqlFiles(fullPath)));
-    } else if (entry.isFile() && entry.name.endsWith(".sql")) {
-      files.push(fullPath);
-    }
-  }
-
-  return files.toSorted((a, b) => a.localeCompare(b));
-};
-
 const splitStatements = (sql: string) =>
   sql
     .split("--> statement-breakpoint")
     .map((statement) => statement.trim())
     .filter((statement) => statement !== "");
 
-const applyMigrations = async (db: TestD1Database) => {
+const applyTestSchema = async (db: TestD1Database) => {
   const { readFile } = await import("node:fs/promises");
-  const migrationsDir = new URL("../../migrations", import.meta.url).pathname;
-  const files = await collectSqlFiles(migrationsDir);
+  const schemaFile = new URL("./schema.sql", import.meta.url).pathname;
+  const sql = await readFile(schemaFile, "utf-8");
 
-  for (const file of files) {
-    // oxlint-disable-next-line no-await-in-loop -- migrations must load and run sequentially
-    const sql = await readFile(file, "utf-8");
-    for (const statement of splitStatements(sql)) {
-      // oxlint-disable-next-line no-await-in-loop -- migrations must run in order
-      await db.prepare(statement).run();
-    }
+  for (const statement of splitStatements(sql)) {
+    // oxlint-disable-next-line no-await-in-loop -- schema statements must run in order
+    await db.prepare(statement).run();
   }
 };
 
@@ -71,7 +48,7 @@ export const getTestD1Database = () => {
     });
 
     databasePromise = miniflare.getD1Database("DB").then(async (db) => {
-      await applyMigrations(db);
+      await applyTestSchema(db);
       return db;
     });
   }
