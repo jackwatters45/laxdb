@@ -15,6 +15,8 @@
     "test:ci": "bun run test && bun run test:integration",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
+    "design:lint": "bunx @google/design.md lint DESIGN.md",
+    "design:export": "bunx @google/design.md export --format css-tailwind DESIGN.md > packages/ui/src/design.generated.css",
     "lint:fix": "turbo lint:fix",
     "format": "turbo format",
     "format:fix": "turbo format:fix",
