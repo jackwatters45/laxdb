@@ -2,9 +2,19 @@ import { drizzle } from "drizzle-orm/d1";
 import { Effect, Layer } from "effect";
 import { Miniflare } from "miniflare";
 
+import {
+  accounts,
+  invitations,
+  members,
+  organizations,
+  sessions,
+  users,
+  verifications,
+} from "../auth/auth.sql";
 import { defaultsTable } from "../defaults/defaults.sql";
 import { drillTable } from "../drill/drill.sql";
 import { DrizzleService, query } from "../drizzle/drizzle.service";
+import { fineEvents, fines, fineTemplates } from "../fine/fine.sql";
 import { playTable } from "../play/play.sql";
 import { playerTable } from "../player/player.sql";
 import {
@@ -71,6 +81,9 @@ export const truncateAll = Effect.gen(function* () {
   const db = yield* DrizzleService;
 
   yield* query(db.delete(defaultsTable));
+  yield* query(db.delete(fineEvents));
+  yield* query(db.delete(fines));
+  yield* query(db.delete(fineTemplates));
   yield* query(db.delete(practiceEdgeTable));
   yield* query(db.delete(practiceReviewTable));
   yield* query(db.delete(practiceItemTable));
@@ -78,6 +91,13 @@ export const truncateAll = Effect.gen(function* () {
   yield* query(db.delete(playTable));
   yield* query(db.delete(drillTable));
   yield* query(db.delete(playerTable));
+  yield* query(db.delete(invitations));
+  yield* query(db.delete(members));
+  yield* query(db.delete(organizations));
+  yield* query(db.delete(sessions));
+  yield* query(db.delete(accounts));
+  yield* query(db.delete(verifications));
+  yield* query(db.delete(users));
   yield* query(db.delete(userTable));
 });
 

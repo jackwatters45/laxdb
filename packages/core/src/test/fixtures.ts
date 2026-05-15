@@ -1,4 +1,5 @@
 import type { CreateDrillInput } from "../drill/drill.schema";
+import type { CreatePlayInput } from "../play/play.schema";
 import type { CreatePlayerInput } from "../player/player.schema";
 import type {
   AddItemInput,
@@ -30,6 +31,19 @@ export const validCreateDrill = (
   diagramUrl: null,
   videoUrl: null,
   coachNotes: null,
+  ...overrides,
+});
+
+export const validCreatePlay = (
+  overrides?: Partial<CreatePlayInput>,
+): CreatePlayInput => ({
+  name: "Test Play",
+  category: "offense",
+  formation: null,
+  description: null,
+  personnelNotes: null,
+  diagramUrl: null,
+  videoUrl: null,
   ...overrides,
 });
 
