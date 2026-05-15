@@ -23,21 +23,7 @@ export const Route = createFileRoute("/_app/fines")({
   component: Board,
 });
 
-type Row = {
-  readonly id: string;
-  readonly organizationId: string;
-  readonly memberId: string;
-  readonly templateId: string | null;
-  readonly reason: string;
-  readonly originalAmountCents: number;
-  readonly amountCents: number;
-  readonly status: FineView["status"];
-  readonly issuedAt: Date;
-  readonly dueAt: Date;
-  readonly paidAt: Date | null;
-  readonly issuedByUserId: string | null;
-  readonly memberName: string;
-};
+type Row = FineView & { readonly memberName: string };
 
 function Board() {
   const { me } = Route.useRouteContext();
@@ -73,21 +59,11 @@ function Board() {
     () =>
       (fines ?? [])
         .filter((f) => filter === "all" || f.status === filter)
-        .map((f) => ({
-          id: f.id,
-          organizationId: f.organizationId,
-          memberId: f.memberId,
-          templateId: f.templateId,
-          reason: f.reason,
-          originalAmountCents: f.originalAmountCents,
-          amountCents: f.amountCents,
-          status: f.status,
-          issuedAt: f.issuedAt,
-          dueAt: f.dueAt,
-          paidAt: f.paidAt,
-          issuedByUserId: f.issuedByUserId,
-          memberName: membersById.get(f.memberId)?.name ?? "Unknown",
-        })),
+        .map((f) =>
+          Object.assign({}, f, {
+            memberName: membersById.get(f.memberId)?.name ?? "Unknown",
+          }),
+        ),
     [fines, filter, membersById],
   );
 
