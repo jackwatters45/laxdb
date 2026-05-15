@@ -1,0 +1,23 @@
+DESIGN.md
+  s_7669d71fc33ac9::t_68d7bd07e01962 1-127
+CLAUDE.md
+  s_7669d71fc33ac9::t_e6536d1106aacd 14-15
+package.json
+  s_7669d71fc33ac9::t_5a4d45bc9724ac 18-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "cad21887c1ba448e4c23c634b543278211ee6f6e",
+  "prompts": {},
+  "sessions": {
+    "s_7669d71fc33ac9": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019e2ab1-af61-75ef-8050-597618f656d7",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
