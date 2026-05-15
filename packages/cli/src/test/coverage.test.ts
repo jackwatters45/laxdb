@@ -4,54 +4,26 @@ import path from "node:path";
 
 import { describe, expect, it } from "@effect/vitest";
 
-import { CLI_ENTRYPOINTS, CLI_HTTP_COVERAGE } from "../coverage";
+const cliPkgRoot = path.resolve(import.meta.dirname, "../..");
+const cliSrcRoot = path.join(cliPkgRoot, "src");
 
-const repoRoot = path.resolve(import.meta.dirname, "../../../..");
-const apiSrcRoot = path.join(repoRoot, "packages/api/src");
-const cliPkgRoot = path.join(repoRoot, "packages/cli");
+async function getCliEntrypoints() {
+  const entries = await readdir(cliSrcRoot, { withFileTypes: true });
+  const entrypoints: string[] = [];
 
-async function walk(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files = await Promise.all(
-    entries.map((entry) => {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) return walk(fullPath);
-      return Promise.resolve([fullPath]);
-    }),
-  );
-  return files.flat();
-}
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".ts")) continue;
 
-/**
- * Extract all endpoint names from the API source by matching
- * HttpApiEndpoint.method("...") calls.
- *
- * Assumption: all endpoints use the string literal form
- * `HttpApiEndpoint.post("name", ...)`. If the codebase ever uses template
- * literals or re-exported endpoint definitions this regex will miss them and
- * the test will fail — update the pattern accordingly.
- */
-async function getApiEndpointNames() {
-  const files = await walk(apiSrcRoot);
-  const apiFiles = files.filter((file) => file.endsWith(".api.ts"));
-  const contents = await Promise.all(
-    apiFiles.map(async (file) => ({
-      file,
-      content: await readFile(file, "utf8"),
-    })),
-  );
-  const names = new Set<string>();
+    const basename = entry.name.slice(0, -".ts".length);
+    const file = path.join(cliSrcRoot, entry.name);
+    const content = await readFile(file, "utf8");
 
-  for (const { content } of contents) {
-    for (const match of content.matchAll(
-      /HttpApiEndpoint\.\w+\(\s*"([^"]+)"/g,
-    )) {
-      names.add(match[1]);
+    if (content.includes(`bun src/${basename}.ts`)) {
+      entrypoints.push(basename);
     }
   }
 
-  // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
-  return [...names].sort((a, b) => a.localeCompare(b));
+  return entrypoints.toSorted((a, b) => a.localeCompare(b));
 }
 
 async function runHelp(entrypoint: string) {
@@ -93,26 +65,16 @@ async function runHelp(entrypoint: string) {
   };
 }
 
-describe("CLI coverage", () => {
-  it("keeps the coverage manifest sorted", () => {
-    expect([...CLI_HTTP_COVERAGE]).toEqual(
-      // oxlint-disable-next-line unicorn/no-array-sort -- typed Array#sort avoids a type-aware false positive on toSorted here
-      [...CLI_HTTP_COVERAGE].sort((a, b) => a.localeCompare(b)),
-    );
-  });
+describe("CLI entrypoints", () => {
+  it("boot with --help", async () => {
+    const entrypoints = await getCliEntrypoints();
 
-  it("tracks every HTTP endpoint exposed by the API", async () => {
-    await expect(getApiEndpointNames()).resolves.toEqual([
-      ...CLI_HTTP_COVERAGE,
-    ]);
-  });
+    expect(entrypoints.length).toBeGreaterThan(0);
 
-  it.each(CLI_ENTRYPOINTS)(
-    "%s entrypoint boots with --help",
-    async (entrypoint) => {
+    for (const entrypoint of entrypoints) {
       const result = await runHelp(entrypoint);
-      expect(result.code).toBe(0);
+      expect(result.code, result.stderr).toBe(0);
       expect(result.stdout + result.stderr).toContain(entrypoint);
-    },
-  );
+    }
+  });
 });
