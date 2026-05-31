@@ -6,10 +6,11 @@ import type {
   CreatePracticeInput,
   CreateReviewInput,
 } from "../practice/practice.schema";
+import type { SchemaInput } from "../util";
 
 export const validCreatePlayer = (
-  overrides?: Partial<CreatePlayerInput>,
-): CreatePlayerInput => ({
+  overrides?: Partial<SchemaInput<typeof CreatePlayerInput>>,
+): SchemaInput<typeof CreatePlayerInput> => ({
   name: "Test Player",
   email: "test@example.com",
   ...overrides,
@@ -60,18 +61,22 @@ export const validCreatePractice = (
 });
 
 export const validAddItem = (
-  practicePublicId: string,
-  overrides?: Partial<Omit<AddItemInput, "practicePublicId">>,
-): AddItemInput => ({
+  practicePublicId: SchemaInput<typeof AddItemInput>["practicePublicId"],
+  overrides?: Partial<
+    Omit<SchemaInput<typeof AddItemInput>, "practicePublicId">
+  >,
+): SchemaInput<typeof AddItemInput> => ({
   practicePublicId,
   type: "drill",
   ...overrides,
 });
 
 export const validCreateReview = (
-  practicePublicId: string,
-  overrides?: Partial<Omit<CreateReviewInput, "practicePublicId">>,
-): CreateReviewInput => ({
+  practicePublicId: SchemaInput<typeof CreateReviewInput>["practicePublicId"],
+  overrides?: Partial<
+    Omit<SchemaInput<typeof CreateReviewInput>, "practicePublicId">
+  >,
+): SchemaInput<typeof CreateReviewInput> => ({
   practicePublicId,
   wentWell: null,
   needsImprovement: null,

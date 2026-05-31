@@ -1,7 +1,7 @@
 import { Effect, Layer, Schema, Context } from "effect";
 
 import { NotFoundError } from "../error";
-import { parseSqlError } from "../util";
+import { parseSqlError, type SchemaInput } from "../util";
 
 import { UserRepo } from "./user.repo";
 import { GetUserFromEmailInput } from "./user.schema";
@@ -11,7 +11,7 @@ export class UserService extends Context.Service<UserService>()("UserService", {
     const userRepo = yield* UserRepo;
 
     return {
-      fromEmail: (input: GetUserFromEmailInput) =>
+      fromEmail: (input: SchemaInput<typeof GetUserFromEmailInput>) =>
         Effect.gen(function* () {
           const decoded = yield* Schema.decodeUnknownEffect(
             GetUserFromEmailInput,

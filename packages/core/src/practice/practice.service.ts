@@ -1,4 +1,4 @@
-import { Effect, Layer, Context } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
@@ -25,10 +25,10 @@ import {
   UpdateReviewInput,
 } from "./practice.schema";
 
-const asPractice = (row: typeof Practice.Type) => new Practice(row);
-const asItem = (row: typeof PracticeItem.Type) => new PracticeItem(row);
-const asEdge = (row: typeof PracticeEdge.Type) => new PracticeEdge(row);
-const asReview = (row: typeof PracticeReview.Type) => new PracticeReview(row);
+const asPractice = Schema.decodeUnknownSync(Practice);
+const asItem = Schema.decodeUnknownSync(PracticeItem);
+const asEdge = Schema.decodeUnknownSync(PracticeEdge);
+const asReview = Schema.decodeUnknownSync(PracticeReview);
 
 export class PracticeService extends Context.Service<PracticeService>()(
   "PracticeService",
@@ -43,7 +43,7 @@ export class PracticeService extends Context.Service<PracticeService>()(
 
         list: () =>
           repo.list().pipe(
-            Effect.map((rows) => rows.map(asPractice)),
+            Effect.map((rows) => rows.map((row) => asPractice(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
@@ -129,7 +129,7 @@ export class PracticeService extends Context.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ListItemsInput, input);
             return yield* repo.listItems(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asItem)),
+            Effect.map((rows) => rows.map((row) => asItem(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
@@ -193,7 +193,7 @@ export class PracticeService extends Context.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ReorderItemsInput, input);
             return yield* repo.reorderItems(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asItem)),
+            Effect.map((rows) => rows.map((row) => asItem(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
@@ -203,7 +203,7 @@ export class PracticeService extends Context.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ListEdgesInput, input);
             return yield* repo.listEdges(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asEdge)),
+            Effect.map((rows) => rows.map((row) => asEdge(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),
@@ -213,7 +213,7 @@ export class PracticeService extends Context.Service<PracticeService>()(
             const decoded = yield* decodeArguments(ReplaceEdgesInput, input);
             return yield* repo.replaceEdges(decoded);
           }).pipe(
-            Effect.map((rows) => rows.map(asEdge)),
+            Effect.map((rows) => rows.map((row) => asEdge(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),

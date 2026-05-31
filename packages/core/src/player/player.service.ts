@@ -1,4 +1,4 @@
-import { Effect, Layer, Context } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
@@ -11,7 +11,7 @@ import {
   UpdatePlayerInput,
 } from "./player.schema";
 
-const asPlayer = (row: typeof Player.Type) => new Player(row);
+const asPlayer = Schema.decodeUnknownSync(Player);
 
 export class PlayerService extends Context.Service<PlayerService>()(
   "PlayerService",
@@ -22,7 +22,7 @@ export class PlayerService extends Context.Service<PlayerService>()(
       return {
         list: () =>
           repo.list().pipe(
-            Effect.map((rows) => rows.map(asPlayer)),
+            Effect.map((rows) => rows.map((row) => asPlayer(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError((e) =>
               Effect.logError("Failed to list players", e),
