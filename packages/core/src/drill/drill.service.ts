@@ -1,4 +1,4 @@
-import { Effect, Layer, Context } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
@@ -12,7 +12,7 @@ import {
   UpdateDrillInput,
 } from "./drill.schema";
 
-const asDrill = (row: typeof Drill.Type) => new Drill(row);
+const asDrill = Schema.decodeUnknownSync(Drill);
 
 export class DrillService extends Context.Service<DrillService>()(
   "DrillService",
@@ -23,7 +23,7 @@ export class DrillService extends Context.Service<DrillService>()(
       return {
         list: () =>
           repo.list().pipe(
-            Effect.map((rows) => rows.map(asDrill)),
+            Effect.map((rows) => rows.map((row) => asDrill(row))),
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError(Effect.logError),
           ),

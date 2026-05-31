@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { NotFoundError } from "../error";
 import { decodeArguments, parseSqlError, type SchemaInput } from "../util";
@@ -12,7 +12,7 @@ import {
   UpdatePlayInput,
 } from "./play.schema";
 
-const asPlay = (row: typeof Play.Type) => new Play(row);
+const asPlay = Schema.decodeUnknownSync(Play);
 
 export class PlayService extends Context.Service<PlayService>()("PlayService", {
   make: Effect.gen(function* () {
@@ -21,7 +21,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
     return {
       list: () =>
         repo.list().pipe(
-          Effect.map((rows) => rows.map(asPlay)),
+          Effect.map((rows) => rows.map((row) => asPlay(row))),
           Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
           Effect.tapError(Effect.logError),
         ),
