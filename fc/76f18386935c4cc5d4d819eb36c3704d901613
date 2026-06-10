@@ -1,0 +1,97 @@
+packages/malvern/package.json
+  s_e4db9c8adb5628::t_56b0af0fa8876e 20-21
+  s_e4db9c8adb5628::t_e937c2b2699a6a 27,35
+packages/malvern/src/routes/_app.fines.tsx
+  s_ff34d2acf8e6fb::t_2d54af6496c47c 227
+  s_e4db9c8adb5628::t_7d9b7f420c7932 5-24,27,47-54,58,60-84,86-91,93-94,133-138,142-144,147-182,184,190,192-226,228-239,241-277
+packages/core/src/match/gameday.ts
+  s_e4db9c8adb5628::t_2f448646405b79 252-282,285-290
+packages/core/migrations/20260610120046_glamorous_micromacro/migration.sql
+  s_ff34d2acf8e6fb::t_9a9d65905f3ede 1-358
+packages/core/src/match/match.service.ts
+  s_e4db9c8adb5628::t_746e71a92f6f9c 355
+  s_e4db9c8adb5628::t_5fb4cfe52eaee0 314,325
+packages/malvern/src/routes/_app.report.$fixtureId.tsx
+  s_e4db9c8adb5628::t_c985c5775e13f3 1-20,22,48-52,56-118,120-173,175-178,180,183-203,214,217,222-227,229-250,256-260,266-268,271-273,275-283,286-316,318-333,335-367,369-370,376-382
+  s_e4db9c8adb5628::t_ca5c11b182cad8 119
+packages/malvern/src/routes/_app.audit.tsx
+  s_e4db9c8adb5628::t_ad3b097a51864d 2-16,19,21,38-45,50-57,59-61,79-84,86,88-90,93-153,155-172
+  s_ff34d2acf8e6fb::t_2d54af6496c47c 46,58
+packages/malvern/src/routes/accept-invitation.$id.tsx
+  s_e4db9c8adb5628::t_f4abe3158bb17a 1-4,6,18-25,28-40,43-75
+  s_e4db9c8adb5628::t_0ac6c41e8f54c2 26
+packages/malvern/src/routes/_app.fixtures.tsx
+  s_e4db9c8adb5628::t_60342bb09fbbae 1-26,28,30,64-66,68-69,71-76,78-96,98-102,104-109,115,138-139,142-146,151,153-157,159-160,163-173,175-176,178,180,182-183,189-196,199-201,204-205,209-239,242-309
+packages/malvern/src/routes/_app.tsx
+  s_e4db9c8adb5628::t_9b88dc42d2651c 1,15-17,34-40,44-45,51,55-56,59,62,66,70
+packages/core/src/email/email.service.ts
+  s_e4db9c8adb5628::t_85668927b7eeae 1
+  s_e4db9c8adb5628::t_782c470c6a6918 94-95,100
+packages/malvern/src/router.tsx
+  s_e4db9c8adb5628::t_032cc7d54caa8b 1,7-19
+packages/malvern/src/routes/_app.admin.tsx
+  s_e4db9c8adb5628::t_ca5c11b182cad8 632-633
+  s_e4db9c8adb5628::t_bd6cc0ad751be5 2-38,41-42,85-124,126-133,135-162,165-168,172,174-176,179,181,183,185,187,199,205-212,216-231,235-325,329-330,335-354,357,361-367,369-408,410-455,459-460,464-478,480-495,497-559,563-569,577,579-625,628-631,634-643,646-712,722-723,727,730-731,736-742,744-751,753-755,758-769,771-773,781-784,787,789-798,800-802,805-836,847,852-870,878-898,901-973,975-986
+  s_ff34d2acf8e6fb::t_4361acd4b75d7a 871
+packages/core/src/club/club.repo.ts
+  s_e4db9c8adb5628::t_3fc4bf70caf177 10,17
+  s_e4db9c8adb5628::t_ca5c11b182cad8 11
+  s_e4db9c8adb5628::t_0a8e4c15698dc7 58-70
+packages/core/src/match/gameday.test.ts
+  s_e4db9c8adb5628::t_87c0e284d88e74 38,43-56
+bun.lock
+  s_e4db9c8adb5628::t_0ac6c41e8f54c2 105-106,112,120,2168,3036
+packages/malvern/src/styles.css
+  s_e4db9c8adb5628::t_7a5457c74c24f1 1-2
+packages/malvern/src/routes/login.tsx
+  s_e4db9c8adb5628::t_23276d5a43cd2c 38
+  s_e4db9c8adb5628::t_d81f0a6e3d2224 1-12,25-28,31-37,39-42,46-86
+packages/core/src/club/club.schema.ts
+  s_e4db9c8adb5628::t_d8a6fac0054e8f 136-142
+packages/malvern/src/routes/onboarding.tsx
+  s_e4db9c8adb5628::t_4fb37c65b1c2f3 48
+  s_e4db9c8adb5628::t_7e6391f8270e2c 1-13,28-29,31-32,34-36,41-42,45-47,49-52,56-102
+packages/malvern/vite.config.ts
+  s_e4db9c8adb5628::t_dba15dcbdd7c89 1,16
+packages/malvern/src/routes/_app.roster.tsx
+  s_e4db9c8adb5628::t_62850d0ed4ac20 1-32,34-35,49-81,83,85-88,92-97,99-104,106-115,118-138,140-147,151-155,160-161,163-164,167-177,182-184,187-195,197-249,251-277,279-290
+packages/malvern/src/routes/__root.tsx
+  s_e4db9c8adb5628::t_edbe7cd51aac33 1-2,4,19-21,44,46,50-53
+packages/malvern/src/components/not-found.tsx
+  s_e4db9c8adb5628::t_af8700a6ddba60 5-6,10-15
+  s_e4db9c8adb5628::t_ca5c11b182cad8 7-9
+packages/core/migrations/20260610120046_glamorous_micromacro/snapshot.json
+  s_ff34d2acf8e6fb::t_9a9d65905f3ede 1-3641
+packages/core/src/club/club.service.ts
+  s_e4db9c8adb5628::t_bf6a6bb2b5427e 241-243
+  s_e4db9c8adb5628::t_1238d4be8c922b 175-181
+  s_e4db9c8adb5628::t_d514d97d974dcb 91-93
+  s_e4db9c8adb5628::t_f491b6340eb315 34-36,41-59
+  s_e4db9c8adb5628::t_1d6b6d06cf43bc 1
+  s_e4db9c8adb5628::t_aa9925eab96558 107-117
+  s_e4db9c8adb5628::t_5d1f59cd0953b5 154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "fc76f18386935c4cc5d4d819eb36c3704d901613",
+  "prompts": {},
+  "sessions": {
+    "s_e4db9c8adb5628": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f8c0493-2514-48d8-9c70-d9a9044ad9de",
+        "model": "claude-fable-5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_ff34d2acf8e6fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c2c593b7-d783-457d-b4ff-721cb868ea58",
+        "model": "claude-fable-5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
