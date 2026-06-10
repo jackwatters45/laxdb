@@ -56,7 +56,7 @@ function Onboarding() {
               onChange={(e) => {
                 setName(e.currentTarget.value);
               }}
-              placeholder="LaxDB Fines Mustangs"
+              placeholder="Malvern Lacrosse Club"
               required
             />
           </label>
@@ -69,7 +69,7 @@ function Onboarding() {
               onChange={(e) => {
                 setSlug(e.currentTarget.value);
               }}
-              placeholder="laxdb-fines-mustangs"
+              placeholder="malvern-lacrosse"
             />
           </label>
           <button className="primary" type="submit" disabled={busy}>

@@ -100,6 +100,24 @@ export const withAdminOrganization = <A, E, R>(
     Effect.flatMap(useOrganization),
   );
 
+export const withMemberSession = <A, E, R>(
+  authService: AuthServiceImpl,
+  useSession: (context: {
+    readonly organizationId: string;
+    readonly userId: string;
+    readonly userName: string;
+  }) => Effect.Effect<A, E, R>,
+) =>
+  Effect.gen(function* () {
+    const session = yield* currentSession(authService);
+    const orgId = yield* organizationId(session);
+    return yield* useSession({
+      organizationId: orgId,
+      userId: session.userId,
+      userName: session.userName,
+    });
+  });
+
 export const withAdminSession = <A, E, R>(
   authService: AuthServiceImpl,
   useSession: (context: {

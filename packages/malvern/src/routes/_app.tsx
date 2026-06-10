@@ -30,7 +30,7 @@ function AppShell() {
     <main className="page stack">
       <header className="row" style={{ justifyContent: "space-between" }}>
         <div className="row">
-          <strong>LaxDB Fines Fines</strong>
+          <strong>Malvern Lacrosse</strong>
         </div>
         <div className="row" style={{ gap: "0.75rem" }}>
           <span className="muted" style={{ fontSize: "0.85rem" }}>
@@ -48,8 +48,14 @@ function AppShell() {
       </header>
 
       <nav className="team-nav">
+        <Link to="/fixtures" activeProps={{ className: "active" }}>
+          Fixtures
+        </Link>
+        <Link to="/roster" activeProps={{ className: "active" }}>
+          Roster
+        </Link>
         <Link to="/fines" activeProps={{ className: "active" }}>
-          Board
+          Fines
         </Link>
         {isAdmin && (
           <Link to="/admin" activeProps={{ className: "active" }}>

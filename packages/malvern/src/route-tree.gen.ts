@@ -14,10 +14,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
+import { Route as AppRosterRouteImport } from './routes/_app.roster'
+import { Route as AppFixturesRouteImport } from './routes/_app.fixtures'
 import { Route as AppFinesRouteImport } from './routes/_app.fines'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as AppReportFixtureIdRouteImport } from './routes/_app.report.$fixtureId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -43,6 +46,16 @@ const AcceptInvitationIdRoute = AcceptInvitationIdRouteImport.update({
   path: '/accept-invitation/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRosterRoute = AppRosterRouteImport.update({
+  id: '/roster',
+  path: '/roster',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFixturesRoute = AppFixturesRouteImport.update({
+  id: '/fixtures',
+  path: '/fixtures',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinesRoute = AppFinesRouteImport.update({
   id: '/fines',
   path: '/fines',
@@ -63,6 +76,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppReportFixtureIdRoute = AppReportFixtureIdRouteImport.update({
+  id: '/report/$fixtureId',
+  path: '/report/$fixtureId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,7 +89,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRoute
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
+  '/fixtures': typeof AppFixturesRoute
+  '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
+  '/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -81,7 +102,10 @@ export interface FileRoutesByTo {
   '/admin': typeof AppAdminRoute
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
+  '/fixtures': typeof AppFixturesRoute
+  '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
+  '/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -93,7 +117,10 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/fines': typeof AppFinesRoute
+  '/_app/fixtures': typeof AppFixturesRoute
+  '/_app/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
+  '/_app/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -105,7 +132,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit'
     | '/fines'
+    | '/fixtures'
+    | '/roster'
     | '/accept-invitation/$id'
+    | '/report/$fixtureId'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -115,7 +145,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit'
     | '/fines'
+    | '/fixtures'
+    | '/roster'
     | '/accept-invitation/$id'
+    | '/report/$fixtureId'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -126,7 +159,10 @@ export interface FileRouteTypes {
     | '/_app/admin'
     | '/_app/audit'
     | '/_app/fines'
+    | '/_app/fixtures'
+    | '/_app/roster'
     | '/accept-invitation/$id'
+    | '/_app/report/$fixtureId'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -176,6 +212,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AcceptInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/roster': {
+      id: '/_app/roster'
+      path: '/roster'
+      fullPath: '/roster'
+      preLoaderRoute: typeof AppRosterRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/fixtures': {
+      id: '/_app/fixtures'
+      path: '/fixtures'
+      fullPath: '/fixtures'
+      preLoaderRoute: typeof AppFixturesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/fines': {
       id: '/_app/fines'
       path: '/fines'
@@ -204,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/report/$fixtureId': {
+      id: '/_app/report/$fixtureId'
+      path: '/report/$fixtureId'
+      fullPath: '/report/$fixtureId'
+      preLoaderRoute: typeof AppReportFixtureIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -211,12 +268,18 @@ interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
   AppFinesRoute: typeof AppFinesRoute
+  AppFixturesRoute: typeof AppFixturesRoute
+  AppRosterRoute: typeof AppRosterRoute
+  AppReportFixtureIdRoute: typeof AppReportFixtureIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
   AppFinesRoute: AppFinesRoute,
+  AppFixturesRoute: AppFixturesRoute,
+  AppRosterRoute: AppRosterRoute,
+  AppReportFixtureIdRoute: AppReportFixtureIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

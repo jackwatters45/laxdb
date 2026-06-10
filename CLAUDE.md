@@ -31,6 +31,7 @@ TanStack Start apps (marketing, practice-planner) → Effect HTTP API (api) → 
 | `packages/core`             | Business logic, DB schemas, domain services | `CLAUDE.md` has full details |
 | `packages/api`              | Effect HttpApi + generated client (CF Worker) | `CLAUDE.md` has patterns     |
 | `packages/practice-planner` | Planner app UI                              | `CLAUDE.md`                  |
+| `packages/malvern`          | Malvern club app: match reports (top 3 + blurb → email) + fines | `src/routes/`, core `club`/`match` domains |
 | `packages/ui`               | shadcn/Base UI components                   | `CLAUDE.md` has API diffs    |
 | `packages/marketing`        | Marketing site                              | `CLAUDE.md`                  |
 | `packages/docs`             | Fumadocs documentation                      | `CLAUDE.md`                  |
