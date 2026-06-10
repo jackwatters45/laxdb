@@ -1,0 +1,33 @@
+packages/api/src/layers.ts
+  s_ff34d2acf8e6fb::t_2f314f8cce5c64 16
+  s_ff34d2acf8e6fb::t_a87fac8f3d23c9 46-55
+  s_ff34d2acf8e6fb::t_4b2741a73e2363 69-74
+  s_ff34d2acf8e6fb::t_5dea3041da2dbe 6
+packages/api/src/auth/auth.ts
+  s_ff34d2acf8e6fb::t_ea428e015ebf28 5-9
+  s_ff34d2acf8e6fb::t_321a51a9ca9251 35-37,39-66,68-82,94-105,107-114
+  s_ff34d2acf8e6fb::t_9ecba74e43494f 20-21
+packages/api/src/index.ts
+  s_ff34d2acf8e6fb::t_e19940a96365c0 52-60
+  s_ff34d2acf8e6fb::t_54aa9d53c6bb71 2
+packages/core/src/match/match.service.ts
+  s_ff34d2acf8e6fb::t_86f8fb43613fd8 387-388,390
+packages/core/src/email/email.service.ts
+  s_ff34d2acf8e6fb::t_851e6daef3ac41 16-22,26-88,99-100,102,107-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f407cde7284eb3a393a6722e84b7bf75cc2a3eb6",
+  "prompts": {},
+  "sessions": {
+    "s_ff34d2acf8e6fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c2c593b7-d783-457d-b4ff-721cb868ea58",
+        "model": "claude-fable-5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
