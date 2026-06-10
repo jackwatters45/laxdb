@@ -1,14 +1,24 @@
 import { DisplayCurrencyFromCents } from "@laxdb/core/schema";
+import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Card, CardContent, CardHeader } from "@laxdb/ui/components/ui/card";
+import { Spinner } from "@laxdb/ui/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@laxdb/ui/components/ui/table";
+import { cn } from "@laxdb/ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Schema } from "effect";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  listAudit,
-  listMembers,
-  type AuditEntry,
-  type Member,
-} from "../lib/fines";
+import { listAudit, listMembers, type AuditEntry } from "../lib/fines";
 
 const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
 
@@ -25,23 +35,30 @@ const KIND_ORDER = [
   "adjusted",
 ] as const;
 
+const kindBadgeClass = (kind: AuditEntry["event"]["kind"]) =>
+  kind === "paid"
+    ? "bg-success/15 text-success"
+    : kind === "issued"
+      ? "bg-warning/15 text-warning"
+      : kind === "doubled"
+        ? "bg-destructive/15 text-destructive"
+        : "bg-muted text-muted-foreground";
+
 function Audit() {
-  const [entries, setEntries] = useState<readonly AuditEntry[] | null>(null);
-  const [members, setMembers] = useState<readonly Member[]>([]);
-  const [err, setErr] = useState<string | null>(null);
   const [kind, setKind] = useState<(typeof KIND_ORDER)[number]>("all");
 
-  useEffect(() => {
-    Promise.all([listAudit({ data: { limit: 200 } }), listMembers()])
-      .then(([a, m]) => {
-        setEntries(a);
-        setMembers(m);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  }, []);
+  const auditQuery = useQuery({
+    queryKey: ["audit"],
+    queryFn: () => listAudit({ data: { limit: 200 } }),
+  });
+  const membersQuery = useQuery({
+    queryKey: ["fine-members"],
+    queryFn: () => listMembers(),
+  });
+
+  const err = auditQuery.error ?? membersQuery.error;
+  const entries = auditQuery.data;
+  const members = membersQuery.data ?? [];
 
   const membersById = useMemo(
     () => new Map(members.map((m) => [m.id, m])),
@@ -59,99 +76,100 @@ function Audit() {
   );
 
   return (
-    <div className="stack" style={{ gap: "2rem" }}>
-      <header>
-        <h1>Audit</h1>
-        <p className="muted">Every fine event in one place.</p>
+    <div className="flex flex-col gap-8">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Audit</h1>
+        <p className="text-sm text-muted-foreground">
+          Every fine event in one place.
+        </p>
       </header>
+
       {err && (
-        <div className="panel" style={{ color: "var(--danger)" }}>
-          {err}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{err.message}</AlertDescription>
+        </Alert>
       )}
 
-      <section className="panel stack">
-        <div className="row">
-          {KIND_ORDER.map((k) => (
-            <button
-              key={k}
-              className={kind === k ? "primary" : ""}
-              onClick={() => {
-                setKind(k);
-              }}
-            >
-              {k}
-            </button>
-          ))}
-        </div>
-
-        {entries === null ? (
-          <p className="muted">Loading…</p>
-        ) : filtered.length === 0 ? (
-          <p className="muted">No events.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>When</th>
-                <th>Player</th>
-                <th>Event</th>
-                <th>Reason</th>
-                <th>Amount</th>
-                <th>Δ</th>
-                <th>Actor</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(({ event, fine }) => (
-                <tr key={event.id}>
-                  <td className="muted">
-                    {new Date(event.at).toLocaleString()}
-                  </td>
-                  <td>{membersById.get(fine.memberId)?.name ?? "—"}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        event.kind === "paid"
-                          ? "paid"
-                          : event.kind === "issued"
-                            ? "unpaid"
-                            : event.kind === "doubled"
-                              ? "overdue"
-                              : "forgiven"
-                      }`}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap gap-1">
+            {KIND_ORDER.map((k) => (
+              <Button
+                key={k}
+                variant={kind === k ? "default" : "ghost"}
+                onClick={() => {
+                  setKind(k);
+                }}
+              >
+                {k}
+              </Button>
+            ))}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {auditQuery.isPending ? (
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Spinner />
+              Loading…
+            </p>
+          ) : filtered.length === 0 ? (
+            <p className="text-muted-foreground">No events.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>When</TableHead>
+                  <TableHead>Player</TableHead>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Δ</TableHead>
+                  <TableHead>Actor</TableHead>
+                  <TableHead>Note</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map(({ event, fine }) => (
+                  <TableRow key={event.id}>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(event.at).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {membersById.get(fine.memberId)?.name ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={kindBadgeClass(event.kind)}>
+                        {event.kind}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="whitespace-normal">
+                      {fine.reason}
+                    </TableCell>
+                    <TableCell>{formatCents(event.amountCents)}</TableCell>
+                    <TableCell
+                      className={cn(
+                        event.deltaCents > 0 && "text-warning",
+                        event.deltaCents < 0 && "text-success",
+                      )}
                     >
-                      {event.kind}
-                    </span>
-                  </td>
-                  <td>{fine.reason}</td>
-                  <td>{formatCents(event.amountCents)}</td>
-                  <td
-                    style={{
-                      color:
-                        event.deltaCents > 0
-                          ? "var(--warn)"
-                          : event.deltaCents < 0
-                            ? "var(--success)"
-                            : undefined,
-                    }}
-                  >
-                    {event.deltaCents > 0 ? "+" : ""}
-                    {formatCents(event.deltaCents)}
-                  </td>
-                  <td>
-                    {event.actorUserId
-                      ? (membersByUserId.get(event.actorUserId)?.name ?? "—")
-                      : "system"}
-                  </td>
-                  <td className="muted">{event.note ?? ""}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                      {event.deltaCents > 0 ? "+" : ""}
+                      {formatCents(event.deltaCents)}
+                    </TableCell>
+                    <TableCell>
+                      {event.actorUserId
+                        ? (membersByUserId.get(event.actorUserId)?.name ?? "—")
+                        : "system"}
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-muted-foreground">
+                      {event.note ?? ""}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

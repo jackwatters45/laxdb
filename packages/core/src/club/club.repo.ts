@@ -7,11 +7,14 @@ import { and, asc, eq, getColumns, isNull, or } from "drizzle-orm";
 import { Context, Effect, Layer } from "effect";
 import { nanoid } from "nanoid";
 
+import { members } from "../auth/auth.sql";
+
 import type {
   AddRecipientInput,
   AddRosterPlayerInput,
   ClubOrganizationScopedInput,
   CreateTeamInput,
+  MemberByIdInput,
   RecipientByIdInput,
   RosterPlayerByIdInput,
   TeamByIdInput,
@@ -48,6 +51,19 @@ export class ClubRepo extends Context.Service<ClubRepo>()("ClubRepo", {
               and(
                 eq(clubTeams.organizationId, input.organizationId),
                 eq(clubTeams.id, input.id),
+              ),
+            ),
+        ).pipe(Effect.flatMap(headOrFail)),
+
+      getMember: (input: MemberByIdInput) =>
+        query(
+          db
+            .select(getColumns(members))
+            .from(members)
+            .where(
+              and(
+                eq(members.organizationId, input.organizationId),
+                eq(members.id, input.id),
               ),
             ),
         ).pipe(Effect.flatMap(headOrFail)),

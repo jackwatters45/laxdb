@@ -311,6 +311,7 @@ export class MatchService extends Context.Service<MatchService>()(
             const playersById = new Map(
               players.map((player) => [player.id, player]),
             );
+            const topPlayers: RosterPlayer[] = [];
             for (const id of playerIds) {
               const player = playersById.get(id);
               if (player === undefined || player.teamId !== fixture.teamId) {
@@ -321,6 +322,7 @@ export class MatchService extends Context.Service<MatchService>()(
                   }),
                 );
               }
+              topPlayers.push(player);
             }
 
             const blurb = decoded.blurb ?? null;
@@ -350,10 +352,7 @@ export class MatchService extends Context.Service<MatchService>()(
             const message = buildReportEmail({
               team,
               fixture,
-              topPlayers: playerIds.map(
-                // verified present above
-                (id) => playersById.get(id) as RosterPlayer,
-              ),
+              topPlayers,
               blurb,
               submitterName: decoded.submitterName ?? null,
             });

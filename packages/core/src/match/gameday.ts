@@ -249,11 +249,45 @@ export const gamedayMatchName = (
   return decodeEntities(name).trim();
 };
 
-/** GameDay datetimes are Melbourne local; the winter season runs in AEST. */
+const MELBOURNE_TZ = "Australia/Melbourne";
+
+const melbourneOffsetMs = (instant: Date): number => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: MELBOURNE_TZ,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(instant);
+  const get = (type: Intl.DateTimeFormatPartTypes) => {
+    const part = parts.find((p) => p.type === type);
+    return part === undefined ? 0 : Number(part.value);
+  };
+  const wallClockAsUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour") % 24,
+    get("minute"),
+  );
+  return wallClockAsUtc - instant.getTime();
+};
+
+/**
+ * GameDay datetimes are Melbourne local. The winter season runs in AEST
+ * (+10:00) but early/late rounds can fall in AEDT (+11:00), so the offset is
+ * resolved per-date via Intl rather than hardcoded.
+ */
 export const gamedayDate = (raw?: string): Date | null => {
   if (raw === undefined || raw === "") return null;
-  const date = new Date(`${raw.replace(" ", "T")}+10:00`);
-  return Number.isNaN(date.getTime()) ? null : date;
+  const wallClock = new Date(`${raw.replace(" ", "T")}Z`);
+  if (Number.isNaN(wallClock.getTime())) return null;
+  // First pass guesses the offset from the wall-clock instant; the second
+  // re-evaluates at the guessed UTC instant to settle DST boundary dates.
+  const guess = wallClock.getTime() - melbourneOffsetMs(wallClock);
+  return new Date(wallClock.getTime() - melbourneOffsetMs(new Date(guess)));
 };
 
 export const gamedayScore = (raw?: string): number | null => {

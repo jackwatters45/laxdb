@@ -117,19 +117,6 @@ export class MatchRepo extends Context.Service<MatchRepo>()("MatchRepo", {
             .orderBy(desc(matchReports.createdAt)),
         ),
 
-      getReportForFixture: (input: FixtureByIdInput) =>
-        query(
-          db
-            .select(reportColumns)
-            .from(matchReports)
-            .where(
-              and(
-                eq(matchReports.organizationId, input.organizationId),
-                eq(matchReports.fixtureId, input.id),
-              ),
-            ),
-        ),
-
       upsertReport: (input: UpsertReport) =>
         query(
           db

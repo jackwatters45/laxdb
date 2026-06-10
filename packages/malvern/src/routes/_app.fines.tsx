@@ -2,9 +2,29 @@ import {
   DisplayCurrencyFromCents,
   DisplayDateFromDate,
 } from "@laxdb/core/schema";
+import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import { Spinner } from "@laxdb/ui/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@laxdb/ui/components/ui/table";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Schema } from "effect";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   forgiveFine,
@@ -12,7 +32,6 @@ import {
   listMembers,
   payFine,
   type FineView,
-  type Member,
 } from "../lib/fines";
 
 const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
@@ -25,30 +44,54 @@ export const Route = createFileRoute("/_app/fines")({
 
 type Row = FineView & { readonly memberName: string };
 
+const STATUS_BADGE_CLASS: Record<FineView["status"], string> = {
+  unpaid: "bg-warning/15 text-warning",
+  paid: "bg-success/15 text-success",
+  forgiven: "bg-muted text-muted-foreground",
+};
+
+const FILTERS = ["all", "unpaid", "paid", "forgiven"] as const;
+
 function Board() {
   const { me } = Route.useRouteContext();
   const isAdmin = me?.memberRole === "owner" || me?.memberRole === "admin";
+  const queryClient = useQueryClient();
 
-  const [fines, setFines] = useState<readonly FineView[] | null>(null);
-  const [members, setMembers] = useState<readonly Member[]>([]);
-  const [err, setErr] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "unpaid" | "paid" | "forgiven">(
-    "unpaid",
-  );
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("unpaid");
 
-  const load = () => {
-    Promise.all([listFines(), listMembers()])
-      .then(([f, m]) => {
-        setFines(f);
-        setMembers(m);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  };
+  const finesQuery = useQuery({
+    queryKey: ["fines"],
+    queryFn: () => listFines(),
+  });
+  const membersQuery = useQuery({
+    queryKey: ["fine-members"],
+    queryFn: () => listMembers(),
+  });
 
-  useEffect(load, []);
+  const invalidate = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["fines"] }),
+      queryClient.invalidateQueries({ queryKey: ["audit"] }),
+    ]);
+
+  const payMutation = useMutation({
+    mutationFn: (id: string) => payFine({ data: { id } }),
+    onSuccess: invalidate,
+  });
+  const forgiveMutation = useMutation({
+    mutationFn: (id: string) => forgiveFine({ data: { id, note: null } }),
+    onSuccess: invalidate,
+  });
+
+  const err =
+    finesQuery.error ??
+    membersQuery.error ??
+    payMutation.error ??
+    forgiveMutation.error;
+  const acting = payMutation.isPending || forgiveMutation.isPending;
+
+  const fines = finesQuery.data;
+  const members = membersQuery.data ?? [];
 
   const membersById = useMemo(
     () => new Map(members.map((m) => [m.id, m])),
@@ -86,155 +129,152 @@ function Board() {
 
   const now = Date.now();
 
-  const act = async (fn: () => Promise<unknown>) => {
-    try {
-      await fn();
-      load();
-    } catch (e) {
-      setErr(String(e));
-    }
-  };
-
   return (
-    <div className="stack" style={{ gap: "2rem" }}>
-      <header>
-        <h1>Fines Board</h1>
-        <p className="muted">Unpaid fines double every week.</p>
+    <div className="flex flex-col gap-8">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Fines Board</h1>
+        <p className="text-sm text-muted-foreground">
+          Unpaid fines double every week.
+        </p>
       </header>
 
       {err && (
-        <div className="panel" style={{ color: "var(--danger)" }}>
-          {err}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{err.message}</AlertDescription>
+        </Alert>
       )}
 
-      <section className="panel stack">
-        <h2>Leaderboard (unpaid)</h2>
-        {totals.length === 0 ? (
-          <p className="muted">Nobody owes. For now.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th style={{ textAlign: "right" }}>Owed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {totals.map((t) => (
-                <tr key={t.name}>
-                  <td>{t.name}</td>
-                  <td style={{ textAlign: "right", fontWeight: 600 }}>
-                    {formatCents(t.cents)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Leaderboard (unpaid)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {totals.length === 0 ? (
+            <p className="text-muted-foreground">Nobody owes. For now.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Player</TableHead>
+                  <TableHead className="text-right">Owed</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {totals.map((t) => (
+                  <TableRow key={t.name}>
+                    <TableCell>{t.name}</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {formatCents(t.cents)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
-      <section className="panel stack">
-        <div className="row" style={{ justifyContent: "space-between" }}>
-          <h2 style={{ margin: 0 }}>All Fines</h2>
-          <div className="row">
-            {(["all", "unpaid", "paid", "forgiven"] as const).map((f) => (
-              <button
+      <Card>
+        <CardHeader>
+          <CardTitle>All Fines</CardTitle>
+          <CardAction className="flex gap-1">
+            {FILTERS.map((f) => (
+              <Button
                 key={f}
-                className={filter === f ? "primary" : ""}
+                variant={filter === f ? "default" : "ghost"}
                 onClick={() => {
                   setFilter(f);
                 }}
               >
                 {f}
-              </button>
+              </Button>
             ))}
-          </div>
-        </div>
-
-        {fines === null ? (
-          <p className="muted">Loading…</p>
-        ) : rows.length === 0 ? (
-          <p className="muted">No fines match.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Reason</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Due</th>
-                {isAdmin && <th />}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                const overdue =
-                  r.status === "unpaid" && new Date(r.dueAt).getTime() < now;
-                return (
-                  <tr key={r.id}>
-                    <td>{r.memberName}</td>
-                    <td>
-                      {r.reason}
-                      {r.amountCents !== r.originalAmountCents && (
-                        <span className="muted" style={{ marginLeft: 6 }}>
-                          (from {formatCents(r.originalAmountCents)})
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ fontWeight: 600 }}>
-                      {formatCents(r.amountCents)}
-                    </td>
-                    <td>
-                      <span className={`badge ${r.status}`}>{r.status}</span>
-                      {overdue && (
-                        <span
-                          className="badge overdue"
-                          style={{ marginLeft: 4 }}
-                        >
-                          overdue
-                        </span>
-                      )}
-                    </td>
-                    <td className="muted">{formatDate(r.dueAt)}</td>
-                    {isAdmin && (
-                      <td
-                        className="row"
-                        style={{ justifyContent: "flex-end" }}
-                      >
-                        {r.status === "unpaid" && (
-                          <>
-                            <button
-                              className="primary"
-                              onClick={() =>
-                                act(() => payFine({ data: { id: r.id } }))
-                              }
-                            >
-                              Pay
-                            </button>
-                            <button
-                              onClick={() =>
-                                act(() =>
-                                  forgiveFine({
-                                    data: { id: r.id, note: null },
-                                  }),
-                                )
-                              }
-                            >
-                              Forgive
-                            </button>
-                          </>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          {finesQuery.isPending ? (
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Spinner />
+              Loading…
+            </p>
+          ) : rows.length === 0 ? (
+            <p className="text-muted-foreground">No fines match.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Player</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Due</TableHead>
+                  {isAdmin && <TableHead />}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => {
+                  const overdue =
+                    r.status === "unpaid" && new Date(r.dueAt).getTime() < now;
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell>{r.memberName}</TableCell>
+                      <TableCell className="whitespace-normal">
+                        {r.reason}
+                        {r.amountCents !== r.originalAmountCents && (
+                          <span className="ml-1.5 text-muted-foreground">
+                            (from {formatCents(r.originalAmountCents)})
+                          </span>
                         )}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
+                      </TableCell>
+                      <TableCell className="font-semibold">
+                        {formatCents(r.amountCents)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={STATUS_BADGE_CLASS[r.status]}>
+                          {r.status}
+                        </Badge>
+                        {overdue && (
+                          <Badge variant="destructive" className="ml-1">
+                            overdue
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDate(r.dueAt)}
+                      </TableCell>
+                      {isAdmin && (
+                        <TableCell>
+                          {r.status === "unpaid" && (
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                disabled={acting}
+                                onClick={() => {
+                                  payMutation.mutate(r.id);
+                                }}
+                              >
+                                Pay
+                              </Button>
+                              <Button
+                                variant="outline"
+                                disabled={acting}
+                                onClick={() => {
+                                  forgiveMutation.mutate(r.id);
+                                }}
+                              >
+                                Forgive
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

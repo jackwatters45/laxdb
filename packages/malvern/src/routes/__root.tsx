@@ -1,5 +1,7 @@
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
@@ -14,7 +16,9 @@ const PUBLIC_PATHS = ["/login", "/accept-invitation"];
 const isPublic = (path: string) =>
   PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -37,13 +41,16 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body>
-        <Outlet />
+      <body className="min-h-screen bg-background font-mono text-foreground antialiased">
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>

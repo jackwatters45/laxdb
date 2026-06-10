@@ -1,13 +1,38 @@
+import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import { Badge } from "@laxdb/ui/components/ui/badge";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@laxdb/ui/components/ui/select";
+import { Spinner } from "@laxdb/ui/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@laxdb/ui/components/ui/table";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { listTeams, type TeamView } from "../lib/club";
+import { listTeams } from "../lib/club";
 import {
   listFixtures,
   listReports,
   syncFixtures,
   type FixtureView,
-  type MatchReportView,
 } from "../lib/matches";
 
 export const Route = createFileRoute("/_app/fixtures")({
@@ -36,52 +61,58 @@ const resultOf = (fixture: FixtureView) => {
   return `${outcome} ${ours}–${theirs}`;
 };
 
+const reportLinkClass =
+  "underline underline-offset-2 hover:text-muted-foreground";
+
 function Fixtures() {
-  const [teams, setTeams] = useState<readonly TeamView[]>([]);
-  const [teamId, setTeamId] = useState("");
-  const [fixtures, setFixtures] = useState<readonly FixtureView[] | null>(null);
-  const [reports, setReports] = useState<readonly MatchReportView[]>([]);
-  const [err, setErr] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [selectedTeamId, setSelectedTeamId] = useState("");
 
-  useEffect(() => {
-    listTeams()
-      .then((loaded) => {
-        setTeams(loaded);
-        if (loaded.length > 0 && loaded[0]) setTeamId(loaded[0].id);
-        else setFixtures([]);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  }, []);
+  const teamsQuery = useQuery({
+    queryKey: ["teams"],
+    queryFn: () => listTeams(),
+  });
+  const teams = teamsQuery.data ?? [];
+  const teamId = selectedTeamId !== "" ? selectedTeamId : (teams[0]?.id ?? "");
 
-  const loadFixtures = (id: string) => {
-    Promise.all([
-      listFixtures({ data: { teamId: id } }),
-      listReports({ data: { teamId: id } }),
-    ])
-      .then(([f, r]) => {
-        setFixtures(f);
-        setReports(r);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  };
+  const fixturesQuery = useQuery({
+    queryKey: ["fixtures", teamId],
+    queryFn: () => listFixtures({ data: { teamId } }),
+    enabled: teamId !== "",
+  });
+  const reportsQuery = useQuery({
+    queryKey: ["reports", teamId],
+    queryFn: () => listReports({ data: { teamId } }),
+    enabled: teamId !== "",
+  });
 
-  useEffect(() => {
-    if (teamId) loadFixtures(teamId);
-  }, [teamId]);
+  const syncMutation = useMutation({
+    mutationFn: (id: string) => syncFixtures({ data: { teamId: id } }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["fixtures", teamId] }),
+        queryClient.invalidateQueries({ queryKey: ["reports", teamId] }),
+      ]),
+  });
 
+  const err =
+    teamsQuery.error ??
+    fixturesQuery.error ??
+    reportsQuery.error ??
+    syncMutation.error;
+
+  const syncResult = syncMutation.isPending ? undefined : syncMutation.data;
+  const syncMsg = syncResult
+    ? `Synced ${syncResult.synced} fixtures${syncResult.compName ? ` from ${syncResult.compName}` : ""}.`
+    : null;
+
+  const reports = reportsQuery.data ?? [];
   const reportByFixture = useMemo(
     () => new Map(reports.map((report) => [report.fixtureId, report])),
     [reports],
   );
 
+  const fixtures = fixturesQuery.data;
   const now = Date.now();
   const { upcoming, played } = useMemo(() => {
     const all = fixtures ?? [];
@@ -104,161 +135,178 @@ function Fixtures() {
     return { upcoming: upcomingList, played: playedList };
   }, [fixtures, now]);
 
-  const sync = async () => {
-    if (!teamId) return;
-    setSyncing(true);
-    setSyncMsg(null);
-    setErr(null);
-    try {
-      const result = await syncFixtures({ data: { teamId } });
-      setSyncMsg(
-        `Synced ${result.synced} fixtures${result.compName ? ` from ${result.compName}` : ""}.`,
-      );
-      loadFixtures(teamId);
-    } catch (cause) {
-      setErr(String(cause));
-    } finally {
-      setSyncing(false);
-    }
-  };
+  const fixturesLoading =
+    teamsQuery.isPending || (teamId !== "" && fixturesQuery.isPending);
 
   return (
-    <div className="stack" style={{ gap: "2rem" }}>
-      <header className="row" style={{ justifyContent: "space-between" }}>
-        <div>
-          <h1>Fixtures</h1>
-          <p className="muted">
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Fixtures</h1>
+          <p className="text-sm text-muted-foreground">
             Pulled from Lacrosse Victoria (GameDay). Submit your top three after
             each game.
           </p>
         </div>
-        <div className="row" style={{ gap: "0.5rem" }}>
+        <div className="flex items-center gap-2">
           {teams.length > 1 && (
-            <select
+            <Select
+              items={teams.map((team) => ({
+                value: team.id,
+                label: team.name,
+              }))}
               value={teamId}
-              onChange={(e) => {
-                setTeamId(e.currentTarget.value);
+              onValueChange={(value) => {
+                if (value !== null) setSelectedTeamId(value);
               }}
             >
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="min-w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
-          {teamId && (
-            <button
+          {teamId !== "" && (
+            <Button
               onClick={() => {
-                void sync();
+                syncMutation.mutate(teamId);
               }}
-              disabled={syncing}
+              disabled={syncMutation.isPending}
             >
-              {syncing ? "Syncing…" : "Sync fixtures"}
-            </button>
+              {syncMutation.isPending ? "Syncing…" : "Sync fixtures"}
+            </Button>
           )}
         </div>
       </header>
 
       {err && (
-        <div className="panel" style={{ color: "var(--danger)" }}>
-          {err}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{err.message}</AlertDescription>
+        </Alert>
       )}
-      {syncMsg && <div className="panel muted">{syncMsg}</div>}
+      {syncMsg && (
+        <Alert>
+          <AlertDescription>{syncMsg}</AlertDescription>
+        </Alert>
+      )}
 
-      {teams.length === 0 && fixtures !== null && (
-        <section className="panel stack">
-          <p className="muted">
+      {teamsQuery.isSuccess && teams.length === 0 && (
+        <Card size="sm">
+          <CardContent className="text-muted-foreground">
             No teams set up yet. An admin needs to create your team (and its
             GameDay competition) under Admin.
-          </p>
-        </section>
+          </CardContent>
+        </Card>
       )}
 
       {upcoming.length > 0 && (
-        <section className="panel stack">
-          <h2>Upcoming</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Rd</th>
-                <th>When</th>
-                <th>Opponent</th>
-                <th>Venue</th>
-                <th>H/A</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upcoming.map((fixture) => (
-                <tr key={fixture.id}>
-                  <td>{fixture.round ?? "—"}</td>
-                  <td>{formatKickoff(fixture)}</td>
-                  <td>{opponentOf(fixture)}</td>
-                  <td className="muted">{fixture.venueName ?? "TBC"}</td>
-                  <td>{fixture.isHome ? "Home" : "Away"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Rd</TableHead>
+                  <TableHead>When</TableHead>
+                  <TableHead>Opponent</TableHead>
+                  <TableHead>Venue</TableHead>
+                  <TableHead>H/A</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {upcoming.map((fixture) => (
+                  <TableRow key={fixture.id}>
+                    <TableCell>{fixture.round ?? "—"}</TableCell>
+                    <TableCell>{formatKickoff(fixture)}</TableCell>
+                    <TableCell>{opponentOf(fixture)}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {fixture.venueName ?? "TBC"}
+                    </TableCell>
+                    <TableCell>{fixture.isHome ? "Home" : "Away"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
 
-      <section className="panel stack">
-        <h2>Played</h2>
-        {fixtures === null ? (
-          <p className="muted">Loading…</p>
-        ) : played.length === 0 ? (
-          <p className="muted">
-            No past fixtures yet. Use “Sync fixtures” to pull the season from
-            GameDay.
-          </p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Rd</th>
-                <th>When</th>
-                <th>Opponent</th>
-                <th>Result</th>
-                <th>Report</th>
-              </tr>
-            </thead>
-            <tbody>
-              {played.map((fixture) => {
-                const report = reportByFixture.get(fixture.id);
-                return (
-                  <tr key={fixture.id}>
-                    <td>{fixture.round ?? "—"}</td>
-                    <td className="muted">{formatKickoff(fixture)}</td>
-                    <td>{opponentOf(fixture)}</td>
-                    <td>{resultOf(fixture) ?? "—"}</td>
-                    <td>
-                      {report?.sentAt ? (
-                        <span className="badge paid">sent</span>
-                      ) : report ? (
-                        <Link
-                          to="/report/$fixtureId"
-                          params={{ fixtureId: fixture.id }}
-                        >
-                          draft — finish
-                        </Link>
-                      ) : (
-                        <Link
-                          to="/report/$fixtureId"
-                          params={{ fixtureId: fixture.id }}
-                        >
-                          submit
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Played</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {fixturesLoading ? (
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Spinner />
+              Loading…
+            </p>
+          ) : played.length === 0 ? (
+            <p className="text-muted-foreground">
+              No past fixtures yet. Use “Sync fixtures” to pull the season from
+              GameDay.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Rd</TableHead>
+                  <TableHead>When</TableHead>
+                  <TableHead>Opponent</TableHead>
+                  <TableHead>Result</TableHead>
+                  <TableHead>Report</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {played.map((fixture) => {
+                  const report = reportByFixture.get(fixture.id);
+                  return (
+                    <TableRow key={fixture.id}>
+                      <TableCell>{fixture.round ?? "—"}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatKickoff(fixture)}
+                      </TableCell>
+                      <TableCell>{opponentOf(fixture)}</TableCell>
+                      <TableCell>{resultOf(fixture) ?? "—"}</TableCell>
+                      <TableCell>
+                        {report?.sentAt ? (
+                          <Badge className="bg-success/15 text-success">
+                            sent
+                          </Badge>
+                        ) : report ? (
+                          <Link
+                            to="/report/$fixtureId"
+                            params={{ fixtureId: fixture.id }}
+                            className={reportLinkClass}
+                          >
+                            draft — finish
+                          </Link>
+                        ) : (
+                          <Link
+                            to="/report/$fixtureId"
+                            params={{ fixtureId: fixture.id }}
+                            className={reportLinkClass}
+                          >
+                            submit
+                          </Link>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

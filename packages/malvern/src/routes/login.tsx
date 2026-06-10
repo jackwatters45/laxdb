@@ -1,3 +1,15 @@
+import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import { Button } from "@laxdb/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@laxdb/ui/components/ui/card";
+import { Input } from "@laxdb/ui/components/ui/input";
+import { Spinner } from "@laxdb/ui/components/ui/spinner";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -9,67 +21,69 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
-    "idle",
-  );
-  const [err, setErr] = useState<string | null>(null);
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!email.trim()) return;
-    setStatus("sending");
-    setErr(null);
-    try {
-      await authClient.signIn.magicLink({
-        email: email.trim(),
+  const sendLink = useMutation({
+    mutationFn: async (address: string) => {
+      const result = await authClient.signIn.magicLink({
+        email: address,
         callbackURL: "/",
       });
-      setStatus("sent");
-    } catch (cause) {
-      setStatus("error");
-      setErr(String(cause));
-    }
+      if (result.error) {
+        throw new Error(result.error.message ?? "Failed to send magic link");
+      }
+      return address;
+    },
+  });
+
+  const submit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || sendLink.isPending) return;
+    sendLink.mutate(trimmed);
   };
 
   return (
-    <main className="page stack" style={{ maxWidth: 480 }}>
-      <header>
-        <h1>Sign in</h1>
-        <p className="muted">We'll email you a magic link.</p>
-      </header>
-
-      <section className="panel stack">
-        {status === "sent" ? (
-          <>
-            <p>
-              Check your inbox — link sent to <strong>{email}</strong>.
-            </p>
-            <p className="muted" style={{ fontSize: "0.85rem" }}>
-              (Dev mode: check the api worker logs for the link.)
-            </p>
-          </>
-        ) : (
-          <form className="stack" onSubmit={submit}>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.currentTarget.value);
-              }}
-              required
-            />
-            <button
-              className="primary"
-              type="submit"
-              disabled={status === "sending"}
-            >
-              {status === "sending" ? "Sending…" : "Send magic link"}
-            </button>
-            {err && <p style={{ color: "var(--danger)" }}>{err}</p>}
-          </form>
-        )}
-      </section>
+    <main className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Sign in</CardTitle>
+          <CardDescription>We'll email you a magic link.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {sendLink.isSuccess ? (
+            <div className="flex flex-col gap-2">
+              <p>
+                Check your inbox — link sent to <strong>{sendLink.data}</strong>
+                .
+              </p>
+              <p className="text-muted-foreground">
+                (Dev mode: check the api worker logs for the link.)
+              </p>
+            </div>
+          ) : (
+            <form className="flex flex-col gap-3" onSubmit={submit}>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+                required
+              />
+              <Button type="submit" size="lg" disabled={sendLink.isPending}>
+                {sendLink.isPending && <Spinner />}
+                {sendLink.isPending ? "Sending…" : "Send magic link"}
+              </Button>
+              {sendLink.isError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{sendLink.error.message}</AlertDescription>
+                </Alert>
+              )}
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { Config, Context, Effect, Layer } from "effect";
+import { Config, Context, Effect, Layer, Redacted } from "effect";
 
 import { EmailDeliveryError } from "./email.error";
 
@@ -91,15 +91,13 @@ export class EmailService extends Context.Service<EmailService>()(
   "EmailService",
   {
     make: Effect.gen(function* () {
-      const apiKey = yield* Config.string("RESEND_API_KEY").pipe(
-        Config.withDefault(""),
-        Effect.orElseSucceed(() => ""),
+      const apiKey = yield* Config.redacted("RESEND_API_KEY").pipe(
+        Config.withDefault(Redacted.make("")),
       );
       const sender = yield* Config.string("EMAIL_SENDER").pipe(
         Config.withDefault(DEFAULT_EMAIL_SENDER),
-        Effect.orElseSucceed(() => DEFAULT_EMAIL_SENDER),
       );
-      return makeService({ apiKey, sender });
+      return makeService({ apiKey: Redacted.value(apiKey), sender });
     }),
   },
 ) {

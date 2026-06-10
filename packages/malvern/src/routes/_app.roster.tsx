@@ -1,5 +1,38 @@
+import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@laxdb/ui/components/ui/alert-dialog";
+import { Button } from "@laxdb/ui/components/ui/button";
+import { Card, CardContent } from "@laxdb/ui/components/ui/card";
+import { Input } from "@laxdb/ui/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@laxdb/ui/components/ui/select";
+import { Spinner } from "@laxdb/ui/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@laxdb/ui/components/ui/table";
+import { cn } from "@laxdb/ui/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { ReactElement } from "react";
 
 import {
   addRosterPlayer,
@@ -7,198 +40,254 @@ import {
   listTeams,
   removeRosterPlayer,
   updateRosterPlayer,
-  type RosterPlayerView,
-  type TeamView,
 } from "../lib/club";
 
 export const Route = createFileRoute("/_app/roster")({
   component: Roster,
 });
 
-function Roster() {
-  const [teams, setTeams] = useState<readonly TeamView[]>([]);
-  const [teamId, setTeamId] = useState("");
-  const [roster, setRoster] = useState<readonly RosterPlayerView[] | null>(
-    null,
+function ConfirmDialog({
+  title,
+  actionLabel,
+  trigger,
+  onConfirm,
+}: {
+  title: string;
+  actionLabel: string;
+  trigger: ReactElement;
+  onConfirm: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger render={trigger} />
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={() => {
+              setOpen(false);
+              onConfirm();
+            }}
+          >
+            {actionLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
-  const [err, setErr] = useState<string | null>(null);
+}
 
+function Roster() {
+  const queryClient = useQueryClient();
+
+  const [pickedTeamId, setPickedTeamId] = useState("");
   const [name, setName] = useState("");
   const [jersey, setJersey] = useState("");
 
-  useEffect(() => {
-    listTeams()
-      .then((loaded) => {
-        setTeams(loaded);
-        if (loaded.length > 0 && loaded[0]) setTeamId(loaded[0].id);
-        else setRoster([]);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  }, []);
+  const teamsQuery = useQuery({
+    queryKey: ["teams"],
+    queryFn: () => listTeams(),
+  });
+  const teams = teamsQuery.data ?? [];
+  const teamId = pickedTeamId === "" ? (teams.at(0)?.id ?? "") : pickedTeamId;
 
-  const load = (id: string) => {
-    listRoster({ data: { teamId: id } })
-      .then((players) => {
-        setRoster(players);
-        return null;
-      })
-      .catch((cause) => {
-        setErr(String(cause));
-      });
-  };
+  const rosterQuery = useQuery({
+    queryKey: ["roster", teamId],
+    queryFn: () => listRoster({ data: { teamId } }),
+    enabled: teamId !== "",
+  });
+  const roster = rosterQuery.data ?? [];
 
-  useEffect(() => {
-    if (teamId) load(teamId);
-  }, [teamId]);
+  const invalidateRoster = () =>
+    queryClient.invalidateQueries({ queryKey: ["roster", teamId] });
 
-  const add = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!name.trim() || !teamId) return;
-    try {
-      await addRosterPlayer({
-        data: {
-          teamId,
-          name: name.trim(),
-          jerseyNumber: jersey === "" ? null : Number(jersey),
-        },
-      });
+  const addPlayer = useMutation({
+    mutationFn: (vars: {
+      teamId: string;
+      name: string;
+      jerseyNumber: number | null;
+    }) => addRosterPlayer({ data: vars }),
+    onSuccess: () => {
       setName("");
       setJersey("");
-      load(teamId);
-    } catch (cause) {
-      setErr(String(cause));
-    }
-  };
+      return invalidateRoster();
+    },
+  });
 
-  const act = async (fn: () => Promise<unknown>) => {
-    try {
-      await fn();
-      load(teamId);
-    } catch (cause) {
-      setErr(String(cause));
-    }
+  const togglePlayer = useMutation({
+    mutationFn: (vars: { id: string; active: boolean }) =>
+      updateRosterPlayer({ data: vars }),
+    onSuccess: invalidateRoster,
+  });
+
+  const removePlayer = useMutation({
+    mutationFn: (vars: { id: string }) => removeRosterPlayer({ data: vars }),
+    onSuccess: invalidateRoster,
+  });
+
+  const err =
+    teamsQuery.error ??
+    rosterQuery.error ??
+    addPlayer.error ??
+    togglePlayer.error ??
+    removePlayer.error;
+
+  const add = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!name.trim() || teamId === "") return;
+    addPlayer.mutate({
+      teamId,
+      name: name.trim(),
+      jerseyNumber: jersey === "" ? null : Number(jersey),
+    });
   };
 
   return (
-    <div className="stack" style={{ gap: "2rem" }}>
-      <header className="row" style={{ justifyContent: "space-between" }}>
-        <div>
-          <h1>Roster</h1>
-          <p className="muted">
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Roster</h1>
+          <p className="text-sm text-muted-foreground">
             Players available when submitting match reports.
           </p>
         </div>
         {teams.length > 1 && (
-          <select
+          <Select
+            items={teams.map((team) => ({ value: team.id, label: team.name }))}
             value={teamId}
-            onChange={(e) => {
-              setTeamId(e.currentTarget.value);
+            onValueChange={(value: string | null) => {
+              if (value !== null) setPickedTeamId(value);
             }}
           >
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="min-w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {teams.map((team) => (
+                <SelectItem key={team.id} value={team.id}>
+                  {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
       </header>
 
       {err && (
-        <div className="panel" style={{ color: "var(--danger)" }}>
-          {err}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{err.message}</AlertDescription>
+        </Alert>
       )}
 
-      {teams.length === 0 && roster !== null ? (
-        <section className="panel stack">
-          <p className="muted">
-            No teams set up yet. An admin needs to create your team under Admin.
-          </p>
-        </section>
+      {teamsQuery.isSuccess && teams.length === 0 ? (
+        <Card>
+          <CardContent>
+            <p className="text-muted-foreground">
+              No teams set up yet. An admin needs to create your team under
+              Admin.
+            </p>
+          </CardContent>
+        </Card>
       ) : (
-        <section className="panel stack">
-          <form className="row" onSubmit={add}>
-            <input
-              placeholder="Player name"
-              value={name}
-              onChange={(e) => {
-                setName(e.currentTarget.value);
-              }}
-              style={{ flex: 2 }}
-            />
-            <input
-              type="number"
-              min="0"
-              placeholder="#"
-              value={jersey}
-              onChange={(e) => {
-                setJersey(e.currentTarget.value);
-              }}
-              style={{ flex: 1 }}
-            />
-            <button className="primary" type="submit">
-              Add player
-            </button>
-          </form>
+        <Card>
+          <CardContent className="flex flex-col gap-4">
+            <form className="flex flex-wrap items-center gap-2" onSubmit={add}>
+              <Input
+                placeholder="Player name"
+                value={name}
+                onChange={(e) => {
+                  setName(e.currentTarget.value);
+                }}
+                className="min-w-48 flex-[2]"
+              />
+              <Input
+                type="number"
+                min="0"
+                placeholder="#"
+                value={jersey}
+                onChange={(e) => {
+                  setJersey(e.currentTarget.value);
+                }}
+                className="min-w-16 flex-1"
+              />
+              <Button type="submit" disabled={addPlayer.isPending}>
+                Add player
+              </Button>
+            </form>
 
-          {roster === null ? (
-            <p className="muted">Loading…</p>
-          ) : roster.length === 0 ? (
-            <p className="muted">No players yet.</p>
-          ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Status</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {roster.map((player) => (
-                  <tr key={player.id}>
-                    <td>{player.jerseyNumber ?? "—"}</td>
-                    <td className={player.active ? "" : "muted"}>
-                      {player.name}
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          void act(() =>
-                            updateRosterPlayer({
-                              data: { id: player.id, active: !player.active },
-                            }),
-                          );
-                        }}
+            {rosterQuery.isPending ? (
+              <p className="flex items-center gap-2 text-muted-foreground">
+                <Spinner />
+                Loading…
+              </p>
+            ) : roster.length === 0 ? (
+              <p className="text-muted-foreground">No players yet.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {roster.map((player) => (
+                    <TableRow key={player.id}>
+                      <TableCell className="text-muted-foreground">
+                        {player.jerseyNumber ?? "—"}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          !player.active && "text-muted-foreground",
+                        )}
                       >
-                        {player.active ? "active" : "inactive"}
-                      </button>
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <button
-                        className="danger"
-                        onClick={() => {
-                          if (confirm(`Remove ${player.name}?`)) {
-                            void act(() =>
-                              removeRosterPlayer({ data: { id: player.id } }),
-                            );
+                        {player.name}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          disabled={togglePlayer.isPending}
+                          onClick={() => {
+                            togglePlayer.mutate({
+                              id: player.id,
+                              active: !player.active,
+                            });
+                          }}
+                        >
+                          {player.active ? "active" : "inactive"}
+                        </Button>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <ConfirmDialog
+                          title={`Remove ${player.name}?`}
+                          actionLabel="Remove"
+                          trigger={
+                            <Button
+                              variant="destructive"
+                              disabled={removePlayer.isPending}
+                            >
+                              Remove
+                            </Button>
                           }
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
+                          onConfirm={() => {
+                            removePlayer.mutate({ id: player.id });
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

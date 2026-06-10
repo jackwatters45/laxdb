@@ -35,9 +35,25 @@ describe("extractArrayLiteral", () => {
 });
 
 describe("gamedayDate", () => {
-  it("parses Melbourne local time as AEST", () => {
+  it("parses winter-season Melbourne local time as AEST (+10)", () => {
     const date = gamedayDate("2026-08-19 14:45:00");
     expect(date?.toISOString()).toBe("2026-08-19T04:45:00.000Z");
+  });
+
+  it("parses daylight-saving Melbourne local time as AEDT (+11)", () => {
+    // Late March is before the first Sunday of April: still AEDT.
+    const date = gamedayDate("2026-03-28 15:00:00");
+    expect(date?.toISOString()).toBe("2026-03-28T04:00:00.000Z");
+  });
+
+  it("handles the spring DST transition", () => {
+    // First Sunday of October 2026 is the 4th; AEDT starts 02:00 that day.
+    expect(gamedayDate("2026-10-03 15:00:00")?.toISOString()).toBe(
+      "2026-10-03T05:00:00.000Z",
+    );
+    expect(gamedayDate("2026-10-04 15:00:00")?.toISOString()).toBe(
+      "2026-10-04T04:00:00.000Z",
+    );
   });
 
   it("returns null for empty or invalid values", () => {

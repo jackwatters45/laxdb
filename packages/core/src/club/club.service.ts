@@ -1,4 +1,4 @@
-import { NotFoundError } from "@laxdb/core/error";
+import { NotFoundError, ValidationError } from "@laxdb/core/error";
 import {
   decodeArguments,
   parseSqlError,
@@ -31,9 +31,32 @@ const asRecipient = (row: typeof ReportRecipient.Type) =>
 const notFound = (domain: string, id: string | number) =>
   new NotFoundError({ domain, id });
 
+const emptyUpdate = (domain: string) =>
+  new ValidationError({ domain, message: "No fields to update" });
+
 export class ClubService extends Context.Service<ClubService>()("ClubService", {
   make: Effect.gen(function* () {
     const repo = yield* ClubRepo;
+
+    /** Fails with NotFoundError when the member is not part of the org. */
+    const checkMember = (organizationId: string, memberId: string) =>
+      repo
+        .getMember({ organizationId, id: memberId })
+        .pipe(
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(notFound("Member", memberId)),
+          ),
+        );
+
+    /** Fails with NotFoundError when the team is not part of the org. */
+    const checkTeam = (organizationId: string, teamId: string) =>
+      repo
+        .getTeam({ organizationId, id: teamId })
+        .pipe(
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(notFound("ClubTeam", teamId)),
+          ),
+        );
 
     return {
       listTeams: (input: SchemaInput<typeof ClubOrganizationScopedInput>) =>
@@ -65,6 +88,9 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
       createTeam: (input: SchemaInput<typeof CreateTeamInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(CreateTeamInput, input);
+          if (decoded.coachMemberId != null) {
+            yield* checkMember(decoded.organizationId, decoded.coachMemberId);
+          }
           return yield* repo.createTeam(decoded);
         }).pipe(
           Effect.map(asTeam),
@@ -78,6 +104,17 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
       updateTeam: (input: SchemaInput<typeof UpdateTeamInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(UpdateTeamInput, input);
+          if (
+            decoded.name === undefined &&
+            decoded.gamedayCompId === undefined &&
+            decoded.gamedayTeamId === undefined &&
+            decoded.coachMemberId === undefined
+          ) {
+            return yield* Effect.fail(emptyUpdate("ClubTeam"));
+          }
+          if (decoded.coachMemberId != null) {
+            yield* checkMember(decoded.organizationId, decoded.coachMemberId);
+          }
           return yield* repo.updateTeam(decoded);
         }).pipe(
           Effect.map(asTeam),
@@ -114,6 +151,7 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
       addRosterPlayer: (input: SchemaInput<typeof AddRosterPlayerInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(AddRosterPlayerInput, input);
+          yield* checkTeam(decoded.organizationId, decoded.teamId);
           return yield* repo.addRosterPlayer(decoded);
         }).pipe(
           Effect.map(asPlayer),
@@ -134,6 +172,13 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
             UpdateRosterPlayerInput,
             input,
           );
+          if (
+            decoded.name === undefined &&
+            decoded.jerseyNumber === undefined &&
+            decoded.active === undefined
+          ) {
+            return yield* Effect.fail(emptyUpdate("RosterPlayer"));
+          }
           return yield* repo.updateRosterPlayer(decoded);
         }).pipe(
           Effect.map(asPlayer),
@@ -193,6 +238,9 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
       addRecipient: (input: SchemaInput<typeof AddRecipientInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(AddRecipientInput, input);
+          if (decoded.teamId != null) {
+            yield* checkTeam(decoded.organizationId, decoded.teamId);
+          }
           return yield* repo.addRecipient(decoded);
         }).pipe(
           Effect.map(asRecipient),

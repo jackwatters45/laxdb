@@ -133,3 +133,10 @@ export class RecipientByIdInput extends Schema.Class<RecipientByIdInput>(
   organizationId: Id,
   id: Id,
 }) {}
+
+export class MemberByIdInput extends Schema.Class<MemberByIdInput>(
+  "MemberByIdInput",
+)({
+  organizationId: Id,
+  id: Id,
+}) {}
