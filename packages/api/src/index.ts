@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare";
-import { DateTime } from "effect";
+import { DateTime, Redacted } from "effect";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Etag from "effect/unstable/http/Etag";
@@ -49,7 +49,15 @@ const routes = Layer.mergeAll(
 
 export default Cloudflare.Worker(
   "api",
-  { main: import.meta.filename },
+  {
+    main: import.meta.filename,
+    env: {
+      // Sourced from Infisical at deploy time (`infisical run -- bun run deploy`).
+      // Empty values keep EmailService in log-only mode.
+      RESEND_API_KEY: Redacted.make(process.env.RESEND_API_KEY ?? ""),
+      EMAIL_SENDER: process.env.EMAIL_SENDER ?? "",
+    },
+  },
   Effect.gen(function* () {
     return {
       fetch: routes.pipe(

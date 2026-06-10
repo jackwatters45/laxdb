@@ -3,6 +3,7 @@ import { ClubService } from "@laxdb/core/club/club.service";
 import { DefaultsService } from "@laxdb/core/defaults/defaults.service";
 import { DrillService } from "@laxdb/core/drill/drill.service";
 import { DatabaseLiveFromBindingEffect } from "@laxdb/core/drizzle/drizzle.service";
+import { EmailService } from "@laxdb/core/email/email.service";
 import { FineService } from "@laxdb/core/fine/fine.service";
 import { MatchService } from "@laxdb/core/match/match.service";
 import { PlayService } from "@laxdb/core/play/play.service";
@@ -12,6 +13,7 @@ import * as Cloudflare from "alchemy/Cloudflare";
 import { Layer } from "effect";
 import * as Effect from "effect/Effect";
 
+import { emailConfigFromEnv } from "./auth/auth";
 import { AuthHandlers } from "./auth/auth.handlers";
 import { ClubHandlers } from "./club/club.handlers";
 import { DefaultsHandlers } from "./defaults/defaults.handlers";
@@ -41,7 +43,16 @@ export const DatabaseLive = Layer.unwrap(
   }),
 );
 
-export const ServicesLive = CoreServicesLive.pipe(Layer.provide(DatabaseLive));
+export const EmailLive = Layer.unwrap(
+  Effect.gen(function* () {
+    const env = yield* Cloudflare.WorkerEnvironment;
+    return EmailService.layerFromConfig(emailConfigFromEnv(env));
+  }),
+);
+
+export const ServicesLive = CoreServicesLive.pipe(
+  Layer.provide([DatabaseLive, EmailLive]),
+);
 
 export const HttpGroups = Layer.mergeAll(
   AuthHandlers,
@@ -55,4 +66,9 @@ export const HttpGroups = Layer.mergeAll(
   PracticesHandlers,
 );
 
-export const HttpGroupsLive = HttpGroups.pipe(Layer.provide(CoreServicesLive));
+// Test/server harness wiring: Config-based EmailService (log-only without a
+// key) instead of the worker-env EmailLive used by the deployed worker.
+export const HttpGroupsLive = HttpGroups.pipe(
+  Layer.provide(CoreServicesLive),
+  Layer.provide(EmailService.layer),
+);

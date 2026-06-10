@@ -384,12 +384,9 @@ export class MatchService extends Context.Service<MatchService>()(
     }),
   },
 ) {
+  // EmailService is intentionally not provided here — the API layer supplies
+  // it from the worker environment (see EmailLive in @laxdb/api layers).
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide([
-      MatchRepo.layer,
-      ClubRepo.layer,
-      GamedayClient.layer,
-      EmailService.layer,
-    ]),
+    Layer.provide([MatchRepo.layer, ClubRepo.layer, GamedayClient.layer]),
   );
 }
