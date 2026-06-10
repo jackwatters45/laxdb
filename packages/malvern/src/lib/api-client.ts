@@ -20,7 +20,7 @@ const isApiEnv = (value: unknown): value is ApiEnv =>
 const getApiFetch = (): typeof globalThis.fetch => {
   const workerEnv: unknown = env;
   if (!isApiEnv(workerEnv)) {
-    throw new Error("Fines worker API binding is invalid");
+    throw new Error("Malvern worker API binding is invalid");
   }
   const apiFetch: typeof globalThis.fetch = (input, init) =>
     workerEnv.API.fetch(input, init);

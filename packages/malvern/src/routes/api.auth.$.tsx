@@ -8,7 +8,7 @@ const isApiEnv = (value: unknown): value is { readonly API: Fetcher } =>
   isRecord(value) && isRecord(value.API) && "fetch" in value.API;
 
 const forwardAuthRequest = (request: Request) => {
-  if (!isApiEnv(env)) throw new Error("Fines worker API binding is invalid");
+  if (!isApiEnv(env)) throw new Error("Malvern worker API binding is invalid");
   return env.API.fetch(request);
 };
 

@@ -25,8 +25,8 @@ export const isAuthEnv = (value: unknown): value is AuthEnv =>
   (value.TRUSTED_ORIGINS === undefined ||
     typeof value.TRUSTED_ORIGINS === "string");
 
-// TODO(auth): this is a direct lift from the fines prototype. Rework into a
-// shared auth service/layer before expanding auth beyond the fines app.
+// TODO(auth): this is a direct lift from the Malvern prototype. Rework into a
+// shared auth service/layer before expanding auth beyond the Malvern app.
 export const makeAuth = (env: AuthEnv): Auth =>
   createAuth({
     db: env.DB,

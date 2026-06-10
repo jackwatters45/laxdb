@@ -19,7 +19,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LaxDB Fines Fines" },
+      { title: "Malvern Lacrosse Ops" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

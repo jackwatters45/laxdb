@@ -108,10 +108,10 @@ export default Alchemy.Stack(
       },
     });
 
-    const fines = yield* Cloudflare.Vite("fines", {
-      rootDir: "./packages/fines",
+    const malvern = yield* Cloudflare.Vite("malvern", {
+      rootDir: "./packages/malvern",
       url: true,
-      domain: `fines.${baseDomain}`,
+      domain: `malvern.${baseDomain}`,
       compatibility: { flags: ["nodejs_compat"] },
       bindings: {
         API: api,
@@ -141,7 +141,7 @@ export default Alchemy.Stack(
       domain: baseDomain,
       marketing: marketing.url,
       practicePlanner: practicePlanner.url,
-      fines: fines.url,
+      malvern: malvern.url,
       api: api.url,
       db: db.databaseId,
       kv: kvNamespace.namespaceId,

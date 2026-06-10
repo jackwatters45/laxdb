@@ -26,7 +26,7 @@ function Accept() {
         await authClient.organization.acceptInvitation({ invitationId: id });
         await router.invalidate();
         setState("ok");
-        await router.navigate({ to: "/fines" });
+        await router.navigate({ to: "/top-three" });
       } catch (e) {
         setErr(String(e));
         setState("error");

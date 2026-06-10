@@ -14,6 +14,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
+import { Route as AppTopThreeRouteImport } from './routes/_app.top-three'
+import { Route as AppGameDayAdminRouteImport } from './routes/_app.game-day-admin'
+import { Route as AppFixturesRouteImport } from './routes/_app.fixtures'
 import { Route as AppFinesRouteImport } from './routes/_app.fines'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
@@ -43,6 +46,21 @@ const AcceptInvitationIdRoute = AcceptInvitationIdRouteImport.update({
   path: '/accept-invitation/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTopThreeRoute = AppTopThreeRouteImport.update({
+  id: '/top-three',
+  path: '/top-three',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGameDayAdminRoute = AppGameDayAdminRouteImport.update({
+  id: '/game-day-admin',
+  path: '/game-day-admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFixturesRoute = AppFixturesRouteImport.update({
+  id: '/fixtures',
+  path: '/fixtures',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinesRoute = AppFinesRouteImport.update({
   id: '/fines',
   path: '/fines',
@@ -71,6 +89,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRoute
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
+  '/fixtures': typeof AppFixturesRoute
+  '/game-day-admin': typeof AppGameDayAdminRoute
+  '/top-three': typeof AppTopThreeRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -81,6 +102,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AppAdminRoute
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
+  '/fixtures': typeof AppFixturesRoute
+  '/game-day-admin': typeof AppGameDayAdminRoute
+  '/top-three': typeof AppTopThreeRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -93,6 +117,9 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/fines': typeof AppFinesRoute
+  '/_app/fixtures': typeof AppFixturesRoute
+  '/_app/game-day-admin': typeof AppGameDayAdminRoute
+  '/_app/top-three': typeof AppTopThreeRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -105,6 +132,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit'
     | '/fines'
+    | '/fixtures'
+    | '/game-day-admin'
+    | '/top-three'
     | '/accept-invitation/$id'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
@@ -115,6 +145,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit'
     | '/fines'
+    | '/fixtures'
+    | '/game-day-admin'
+    | '/top-three'
     | '/accept-invitation/$id'
     | '/api/auth/$'
   id:
@@ -126,6 +159,9 @@ export interface FileRouteTypes {
     | '/_app/admin'
     | '/_app/audit'
     | '/_app/fines'
+    | '/_app/fixtures'
+    | '/_app/game-day-admin'
+    | '/_app/top-three'
     | '/accept-invitation/$id'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -176,6 +212,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AcceptInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/top-three': {
+      id: '/_app/top-three'
+      path: '/top-three'
+      fullPath: '/top-three'
+      preLoaderRoute: typeof AppTopThreeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/game-day-admin': {
+      id: '/_app/game-day-admin'
+      path: '/game-day-admin'
+      fullPath: '/game-day-admin'
+      preLoaderRoute: typeof AppGameDayAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/fixtures': {
+      id: '/_app/fixtures'
+      path: '/fixtures'
+      fullPath: '/fixtures'
+      preLoaderRoute: typeof AppFixturesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/fines': {
       id: '/_app/fines'
       path: '/fines'
@@ -211,12 +268,18 @@ interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
   AppFinesRoute: typeof AppFinesRoute
+  AppFixturesRoute: typeof AppFixturesRoute
+  AppGameDayAdminRoute: typeof AppGameDayAdminRoute
+  AppTopThreeRoute: typeof AppTopThreeRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
   AppFinesRoute: AppFinesRoute,
+  AppFixturesRoute: AppFixturesRoute,
+  AppGameDayAdminRoute: AppGameDayAdminRoute,
+  AppTopThreeRoute: AppTopThreeRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

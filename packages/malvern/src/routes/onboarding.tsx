@@ -29,7 +29,7 @@ function Onboarding() {
         await authClient.organization.setActive({ organizationId });
       }
       await router.invalidate();
-      await router.navigate({ to: "/fines" });
+      await router.navigate({ to: "/top-three" });
     } catch (cause) {
       setErr(String(cause));
     } finally {
@@ -42,7 +42,8 @@ function Onboarding() {
       <header>
         <h1>Create your team</h1>
         <p className="muted">
-          You're the first one here — set up the team, then invite players.
+          You're the first one here — set up Malvern, then invite coaches and
+          players.
         </p>
       </header>
       <section className="panel stack">
@@ -56,7 +57,7 @@ function Onboarding() {
               onChange={(e) => {
                 setName(e.currentTarget.value);
               }}
-              placeholder="LaxDB Fines Mustangs"
+              placeholder="Malvern Lacrosse Club"
               required
             />
           </label>
@@ -69,7 +70,7 @@ function Onboarding() {
               onChange={(e) => {
                 setSlug(e.currentTarget.value);
               }}
-              placeholder="laxdb-fines-mustangs"
+              placeholder="malvern-lacrosse"
             />
           </label>
           <button className="primary" type="submit" disabled={busy}>

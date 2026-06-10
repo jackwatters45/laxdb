@@ -59,8 +59,8 @@ function Admin() {
   return (
     <div className="stack" style={{ gap: "2rem" }}>
       <header>
-        <h1>Admin</h1>
-        <p className="muted">Invite players, manage templates, issue fines.</p>
+        <h1>Fines Admin</h1>
+        <p className="muted">Manage fine templates and issue club fines.</p>
       </header>
       {err && (
         <div className="panel" style={{ color: "var(--danger)" }}>
