@@ -1,0 +1,37 @@
+packages/malvern/src/lib/api-client.ts
+  s_e4db9c8adb5628::t_152664c5ab48ef 47-70,74-81
+  s_e4db9c8adb5628::t_234aab3152dd97 10
+packages/malvern/src/lib/session.ts
+  s_e4db9c8adb5628::t_affddf1aeba75f 17-19
+packages/core/src/auth/auth.ts
+  s_e4db9c8adb5628::t_e27716b87b2ee4 6
+  s_e4db9c8adb5628::t_4909748e7286ea 62-85
+packages/malvern/src/routes/api.auth.$.tsx
+  s_e4db9c8adb5628::t_097ef9f4386dfa 23-25
+packages/api/src/auth/auth.ts
+  s_e4db9c8adb5628::t_ac8f43738128ed 115-129
+  s_e4db9c8adb5628::t_191f46200f015a 83
+packages/malvern/src/routes/onboarding.tsx
+  s_e4db9c8adb5628::t_90066aca4034bf 13,15,28-62
+  s_e4db9c8adb5628::t_32c21b2669c075 91-112
+packages/api/src/test/walkthrough-server.ts
+  s_e4db9c8adb5628::t_9591427f824cf7 1-23,32-60,62-72
+  s_e4db9c8adb5628::t_bca9da0fd45b49 24-31
+  s_e4db9c8adb5628::t_9bb8f32d95ce4e 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "36b62e4d47a0a0b35f36fdb520b70b9252f8cc72",
+  "prompts": {},
+  "sessions": {
+    "s_e4db9c8adb5628": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f8c0493-2514-48d8-9c70-d9a9044ad9de",
+        "model": "claude-fable-5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
