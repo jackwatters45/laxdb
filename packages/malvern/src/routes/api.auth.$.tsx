@@ -20,7 +20,9 @@ const forwardAuthRequest = (request: Request) => {
     const target = new URL(request.url);
     target.protocol = "http:";
     target.host = `localhost:${process.env.API_PORT ?? "1337"}`;
-    return fetch(new Request(target, request));
+    // Pass redirects through to the browser; following them here would
+    // swallow Better Auth's Set-Cookie on the verify 302.
+    return fetch(new Request(target, request), { redirect: "manual" });
   }
 
   // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment

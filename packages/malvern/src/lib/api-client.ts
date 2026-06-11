@@ -7,6 +7,7 @@
  * Only call runApi() from inside createServerFn handlers.
  */
 import { makeApiClientLayer, type ApiClient } from "@laxdb/api/client";
+import { getRequest } from "@tanstack/react-start/server";
 import { type Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 
@@ -43,14 +44,41 @@ function getApiFetch(): { fetch?: typeof fetch; url: string } {
   return { fetch: apiFetch, url: "http://api" };
 }
 
+/** Cookie header of the request currently being served, if any. */
+const incomingCookie = (): string | undefined => {
+  try {
+    return getRequest().headers.get("cookie") ?? undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * The api worker authenticates from request cookies, but service-binding /
+ * plain fetches don't carry the browser's cookies — forward them explicitly
+ * from the incoming request so server fns act as the signed-in user.
+ */
+const withSessionCookie =
+  (base: typeof fetch): typeof fetch =>
+  (input, init) => {
+    const cookie = incomingCookie();
+    if (cookie === undefined) return base(input, init);
+    const request = new Request(input, init);
+    request.headers.set("cookie", cookie);
+    return base(request);
+  };
+
 function buildRuntime() {
   const api = getApiFetch();
 
-  const http = api.fetch
-    ? FetchHttpClient.layer.pipe(
-        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, api.fetch)),
-      )
-    : FetchHttpClient.layer;
+  const http = FetchHttpClient.layer.pipe(
+    Layer.provide(
+      Layer.succeed(
+        FetchHttpClient.Fetch,
+        withSessionCookie(api.fetch ?? fetch),
+      ),
+    ),
+  );
 
   return ManagedRuntime.make(
     makeApiClientLayer(api.url).pipe(Layer.provide(http)),

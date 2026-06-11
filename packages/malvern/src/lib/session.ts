@@ -14,9 +14,10 @@ export const getMe = createServerFn({ method: "GET" }).handler(
         const client = yield* ApiClient;
         return yield* client.Auth.me({ payload: {} });
       }).pipe(
+        // Only "not signed in" becomes null (→ login redirect). Transport or
+        // authorization failures should surface loudly, not masquerade as a
+        // logged-out user.
         Effect.catchTag("AuthenticationError", () => Effect.succeed(null)),
-        // TODO(auth): decide whether authorization/auth transport failures should
-        // also become null once Better Auth integration is finalized.
       ),
     ),
 );

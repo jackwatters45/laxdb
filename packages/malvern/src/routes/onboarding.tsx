@@ -10,9 +10,9 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@laxdb/ui/components/ui/field";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { Spinner } from "@laxdb/ui/components/ui/spinner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { authClient } from "../lib/auth-client";
 
@@ -24,6 +24,42 @@ function Onboarding() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+
+  // A session can land here without an active organization (e.g. sessions
+  // created before the activate-on-login hook). If the user already belongs
+  // to one, re-activate it instead of offering to create a duplicate.
+  const memberships = useQuery({
+    queryKey: ["my-organizations"],
+    queryFn: async () => {
+      const result = await authClient.organization.list();
+      if (result.error) {
+        throw new Error(result.error.message ?? "Failed to load teams");
+      }
+      return result.data ?? [];
+    },
+  });
+
+  const rejoin = useMutation({
+    mutationFn: async (organizationId: string) => {
+      const result = await authClient.organization.setActive({
+        organizationId,
+      });
+      if (result.error) {
+        throw new Error(result.error.message ?? "Failed to rejoin team");
+      }
+    },
+    onSuccess: async () => {
+      await router.invalidate();
+      await router.navigate({ to: "/fines" });
+    },
+  });
+
+  const existingOrg = memberships.data?.[0];
+  const existingOrgId = existingOrg?.id;
+  const { mutate: rejoinMutate } = rejoin;
+  useEffect(() => {
+    if (existingOrgId !== undefined) rejoinMutate(existingOrgId);
+  }, [existingOrgId, rejoinMutate]);
 
   const createTeam = useMutation({
     mutationFn: async (input: { name: string; slug: string }) => {
@@ -51,6 +87,28 @@ function Onboarding() {
     if (!trimmedName || createTeam.isPending) return;
     createTeam.mutate({ name: trimmedName, slug: slug.trim() });
   };
+
+  if (memberships.isPending || existingOrg !== undefined) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col gap-3">
+            <p className="flex items-center gap-2 text-xs/relaxed text-muted-foreground">
+              <Spinner className="size-3.5" />
+              {existingOrg !== undefined
+                ? `Rejoining ${existingOrg.name}…`
+                : "Checking memberships…"}
+            </p>
+            {rejoin.isError && (
+              <Alert variant="destructive">
+                <AlertDescription>{rejoin.error.message}</AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4">

@@ -80,9 +80,7 @@ const deliverAuthEmail = async (
   });
 };
 
-// TODO(auth): this is a direct lift from the fines prototype. Rework into a
-// shared auth service/layer before expanding auth beyond the fines app.
-export const makeAuth = (env: AuthEnv): Auth =>
+const buildAuth = (env: AuthEnv): Auth =>
   createAuth({
     db: env.DB,
     secret: env.BETTER_AUTH_SECRET,
@@ -113,6 +111,21 @@ export const makeAuth = (env: AuthEnv): Auth =>
         link: inviteLink,
       }),
   });
+
+/**
+ * Better Auth instance for the worker environment. Construction builds the
+ * drizzle adapter and plugin chain, so cache per D1 binding (one per worker
+ * isolate) instead of rebuilding on every request.
+ */
+const authCache = new WeakMap<object, Auth>();
+
+export const makeAuth = (env: AuthEnv): Auth => {
+  const cached = authCache.get(env.DB);
+  if (cached !== undefined) return cached;
+  const auth = buildAuth(env);
+  authCache.set(env.DB, auth);
+  return auth;
+};
 
 type AuthServiceImpl = typeof AuthService.Service;
 
