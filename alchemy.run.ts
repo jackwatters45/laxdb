@@ -116,6 +116,9 @@ export default Alchemy.Stack(
       bindings: {
         API: api,
       },
+      env: {
+        IS_LOCAL: (process.env.ALCHEMY_PHASE ?? "plan") === "dev" ? "true" : "",
+      },
     });
 
     if (process.env.PULL_REQUEST) {
