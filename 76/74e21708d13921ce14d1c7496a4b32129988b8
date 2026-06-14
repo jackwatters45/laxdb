@@ -1,0 +1,35 @@
+packages/malvern/src/routes/api.auth.$.tsx
+  s_e4db9c8adb5628::t_c5a723f8f6d835 2,10,12-13
+packages/malvern/src/lib/session.ts
+  s_e4db9c8adb5628::t_a1c1f507394943 6,10-11,26
+  s_e4db9c8adb5628::t_6ab89b6a7ff71f 12-24
+packages/malvern/src/lib/fines.ts
+  s_e4db9c8adb5628::t_6ab89b6a7ff71f 18-28,30-40,43,56,68-78,81,94,114,127,140,155
+  s_e4db9c8adb5628::t_3e618aa44788d3 11,45,47,58,60,83,85,103,105,116,118,129,131,144,146,157,159
+packages/malvern/src/lib/club.ts
+  s_e4db9c8adb5628::t_6ab89b6a7ff71f 16-26,29,49,70,83,96,112,132,144-154,157,170,185
+  s_e4db9c8adb5628::t_3e618aa44788d3 10,38,40,59,61,72,74,85,87,101,103,121,123,134,136,159,161,174,176,187,189
+packages/malvern/src/lib/api-client.ts
+  s_e4db9c8adb5628::t_6ab89b6a7ff71f 25-27
+  s_e4db9c8adb5628::t_27fa4c8312ec0a 4-5,16,20,22-23,28
+  s_e4db9c8adb5628::t_e34363bf296b91 7-12,15,17,31-33,35-40,42-44,46-47,50-51,53-54,60-62,69,72-74
+packages/malvern/src/lib/matches.ts
+  s_e4db9c8adb5628::t_6ab89b6a7ff71f 14,27,40,53,66,79
+  s_e4db9c8adb5628::t_3e618aa44788d3 7,16,18,29,31,42,44,55,57,68,70,90,92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7674e21708d13921ce14d1c7496a4b32129988b8",
+  "prompts": {},
+  "sessions": {
+    "s_e4db9c8adb5628": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f8c0493-2514-48d8-9c70-d9a9044ad9de",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
