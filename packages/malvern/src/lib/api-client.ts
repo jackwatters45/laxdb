@@ -1,103 +1,76 @@
 /**
  * Effect HTTP API client for the api worker.
  *
- * Production: uses the `API` service binding (Worker-to-Worker, no network hop).
- * Local dev: uses fetch to the api dev server (Alchemy runs it separately).
+ * The malvern app runs as a Cloudflare Worker (dev and prod), so it reaches
+ * the api worker through the `API` service binding — no network hop, no port.
  *
- * Only call runApi() from inside createServerFn handlers.
+ * Service-binding fetches don't carry the browser's cookies, so the api can't
+ * see the session. The `apiAuth` middleware captures the incoming request's
+ * cookie at the server-fn boundary and passes it explicitly to `runApi`, which
+ * attaches it to the binding request. No ambient request lookup happens inside
+ * the Effect runtime (which runs on its own fibers, outside the request's
+ * AsyncLocalStorage scope), so auth can't be silently dropped.
  */
 import { makeApiClientLayer, type ApiClient } from "@laxdb/api/client";
-import { getRequest } from "@tanstack/react-start/server";
-import { type Effect, Layer, ManagedRuntime } from "effect";
+import { createMiddleware } from "@tanstack/react-start";
+import { env } from "cloudflare:workers";
+import { Effect, Layer } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 
-const isLocal = process.env.IS_LOCAL === "true";
+type ApiServiceBinding = { readonly fetch: typeof fetch };
 
-type FetchInput = Parameters<typeof fetch>[0];
-type FetchInit = Parameters<typeof fetch>[1];
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === "object" && value !== null;
 
-type ApiServiceBinding = {
-  readonly fetch: typeof fetch;
-};
-
-type CloudflareWorkersModule = {
-  env: { readonly API?: ApiServiceBinding };
-};
-
-const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
-  typeof value === "object" && value !== null && "env" in value;
-
-function getApiFetch(): { fetch?: typeof fetch; url: string } {
-  if (isLocal) {
-    return { url: `http://localhost:${process.env.API_PORT ?? "1337"}` };
-  }
-
-  // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment
-  const workersModule: unknown = require("cloudflare:workers");
-  if (!hasWorkerEnv(workersModule)) {
-    return { url: "http://api" };
-  }
-
-  const apiFetch: typeof fetch = (input: FetchInput, init?: FetchInit) =>
-    workersModule.env.API?.fetch(input, init) ?? fetch(input, init);
-
-  return { fetch: apiFetch, url: "http://api" };
-}
-
-/** Cookie header of the request currently being served, if any. */
-const incomingCookie = (): string | undefined => {
-  try {
-    return getRequest().headers.get("cookie") ?? undefined;
-  } catch {
-    return undefined;
-  }
-};
+const isApiEnv = (
+  value: unknown,
+): value is { readonly API: ApiServiceBinding } =>
+  isRecord(value) && isRecord(value.API) && "fetch" in value.API;
 
 /**
- * The api worker authenticates from request cookies, but service-binding /
- * plain fetches don't carry the browser's cookies — forward them explicitly
- * from the incoming request so server fns act as the signed-in user.
+ * Server-fn middleware that lifts the incoming request's cookie onto
+ * `context.apiCookie`. Runs at the server-fn boundary where the request is
+ * in scope, so the value is captured synchronously and threaded explicitly.
  */
-const withSessionCookie =
-  (base: typeof fetch): typeof fetch =>
+export const apiAuth = createMiddleware().server(async ({ request, next }) =>
+  next({ context: { apiCookie: request.headers.get("cookie") ?? undefined } }),
+);
+
+const apiFetch =
+  (cookie: string | undefined): typeof fetch =>
   (input, init) => {
-    const cookie = incomingCookie();
-    if (cookie === undefined) return base(input, init);
+    if (!isApiEnv(env)) {
+      throw new Error("Malvern worker API binding is invalid");
+    }
     const request = new Request(input, init);
-    request.headers.set("cookie", cookie);
-    return base(request);
+    if (cookie !== undefined) request.headers.set("cookie", cookie);
+    return env.API.fetch(request);
   };
 
-function buildRuntime() {
-  const api = getApiFetch();
-
-  const http = FetchHttpClient.layer.pipe(
+const clientLayer = (cookie: string | undefined) =>
+  makeApiClientLayer("http://api").pipe(
     Layer.provide(
-      Layer.succeed(
-        FetchHttpClient.Fetch,
-        withSessionCookie(api.fetch ?? fetch),
+      FetchHttpClient.layer.pipe(
+        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, apiFetch(cookie))),
       ),
     ),
   );
 
-  return ManagedRuntime.make(
-    makeApiClientLayer(api.url).pipe(Layer.provide(http)),
-  );
-}
-
-let runtime: ReturnType<typeof buildRuntime> | undefined;
-
 /**
- * Run an Effect that depends on the generated HTTP API client.
- * Only call from inside createServerFn handlers.
+ * Run an Effect that depends on the generated HTTP API client, forwarding the
+ * caller's session cookie. Call from a server fn that uses `apiAuth`, passing
+ * `context.apiCookie`.
  *
  * Results are structured-cloned to convert Effect Schema.Class instances into
  * plain objects — seroval (TanStack Start's dehydration serializer) rejects
  * class instances.
  */
 export async function runApi<A, E>(
+  cookie: string | undefined,
   effect: Effect.Effect<A, E, ApiClient>,
 ): Promise<A> {
-  const result = await (runtime ??= buildRuntime()).runPromise(effect);
+  const result = await Effect.runPromise(
+    effect.pipe(Effect.provide(clientLayer(cookie))),
+  );
   return structuredClone(result);
 }

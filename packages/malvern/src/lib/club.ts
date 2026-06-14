@@ -7,22 +7,26 @@ import type {
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 
-import { runApi } from "./api-client";
+import { apiAuth, runApi } from "./api-client";
 
 export type TeamView = typeof ClubTeam.Type;
 export type RosterPlayerView = typeof RosterPlayer.Type;
 export type RecipientView = typeof ReportRecipient.Type;
 
-export const listTeams = createServerFn({ method: "GET" }).handler(() =>
-  runApi(
-    Effect.gen(function* () {
-      const client = yield* ApiClient;
-      return yield* client.Club.listTeams({ payload: {} });
-    }),
-  ),
-);
+export const listTeams = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .handler(({ context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Club.listTeams({ payload: {} });
+      }),
+    ),
+  );
 
 export const createTeam = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator(
     (input: {
       name: string;
@@ -31,8 +35,9 @@ export const createTeam = createServerFn({ method: "POST" })
       coachMemberId?: string | null;
     }) => input,
   )
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.createTeam({ payload: data });
@@ -41,6 +46,7 @@ export const createTeam = createServerFn({ method: "POST" })
   );
 
 export const updateTeam = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator(
     (input: {
       id: string;
@@ -50,8 +56,9 @@ export const updateTeam = createServerFn({ method: "POST" })
       coachMemberId?: string | null;
     }) => input,
   )
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.updateTeam({ payload: data });
@@ -60,9 +67,11 @@ export const updateTeam = createServerFn({ method: "POST" })
   );
 
 export const deleteTeam = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator((input: { id: string }) => input)
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.deleteTeam({ payload: data });
@@ -71,9 +80,11 @@ export const deleteTeam = createServerFn({ method: "POST" })
   );
 
 export const listRoster = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
   .inputValidator((input: { teamId: string }) => input)
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.listRoster({ payload: data });
@@ -82,12 +93,14 @@ export const listRoster = createServerFn({ method: "GET" })
   );
 
 export const addRosterPlayer = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator(
     (input: { teamId: string; name: string; jerseyNumber?: number | null }) =>
       input,
   )
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.addRosterPlayer({ payload: data });
@@ -96,6 +109,7 @@ export const addRosterPlayer = createServerFn({ method: "POST" })
   );
 
 export const updateRosterPlayer = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator(
     (input: {
       id: string;
@@ -104,8 +118,9 @@ export const updateRosterPlayer = createServerFn({ method: "POST" })
       active?: boolean;
     }) => input,
   )
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.updateRosterPlayer({ payload: data });
@@ -114,9 +129,11 @@ export const updateRosterPlayer = createServerFn({ method: "POST" })
   );
 
 export const removeRosterPlayer = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator((input: { id: string }) => input)
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.removeRosterPlayer({ payload: data });
@@ -124,19 +141,24 @@ export const removeRosterPlayer = createServerFn({ method: "POST" })
     ),
   );
 
-export const listRecipients = createServerFn({ method: "GET" }).handler(() =>
-  runApi(
-    Effect.gen(function* () {
-      const client = yield* ApiClient;
-      return yield* client.Club.listRecipients({ payload: {} });
-    }),
-  ),
-);
+export const listRecipients = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .handler(({ context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Club.listRecipients({ payload: {} });
+      }),
+    ),
+  );
 
 export const listRecipientsForTeam = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
   .inputValidator((input: { teamId: string }) => input)
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.listRecipientsForTeam({ payload: data });
@@ -145,11 +167,13 @@ export const listRecipientsForTeam = createServerFn({ method: "GET" })
   );
 
 export const addRecipient = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator(
     (input: { teamId?: string | null; label: string; email: string }) => input,
   )
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.addRecipient({ payload: data });
@@ -158,9 +182,11 @@ export const addRecipient = createServerFn({ method: "POST" })
   );
 
 export const removeRecipient = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
   .inputValidator((input: { id: string }) => input)
-  .handler(({ data }) =>
+  .handler(({ data, context }) =>
     runApi(
+      context.apiCookie,
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Club.removeRecipient({ payload: data });
