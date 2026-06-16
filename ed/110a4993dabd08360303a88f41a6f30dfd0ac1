@@ -1,0 +1,25 @@
+scripts/run-workspace-tests.mjs
+  s_70c4ac6af9af72::t_f6c818890605d6 1,23
+scripts/run-workspace-integration-tests.mjs
+  s_70c4ac6af9af72::t_de4ab18be9cfdc 1-2,19
+packages/core/src/schema.ts
+  s_70c4ac6af9af72::t_3c6234214b3e19 30-31,50-58
+packages/core/src/test/schema.test.ts
+  s_70c4ac6af9af72::t_9b840a20798009 128-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "ed110a4993dabd08360303a88f41a6f30dfd0ac1",
+  "prompts": {},
+  "sessions": {
+    "s_70c4ac6af9af72": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ecbfb-4ab7-7324-8050-44ec778933ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
