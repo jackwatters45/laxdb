@@ -22,6 +22,10 @@ export type AuthConfig = {
   baseURL: string;
   trustedOrigins?: string[] | undefined;
   useSecureCookies?: boolean | undefined;
+  google: {
+    clientId: string;
+    clientSecret: string;
+  };
   extraPlugins?: BetterAuthPlugin[] | undefined;
   sendMagicLink: (args: {
     email: string;
@@ -59,6 +63,9 @@ export const createAuth = (config: AuthConfig) => {
       },
     }),
     emailAndPassword: { enabled: false },
+    socialProviders: {
+      google: config.google,
+    },
     databaseHooks: {
       session: {
         create: {

@@ -19,6 +19,9 @@ export type AuthEnv = {
   readonly TRUSTED_ORIGINS?: string;
   readonly RESEND_API_KEY?: string;
   readonly EMAIL_SENDER?: string;
+  readonly IS_LOCAL?: string;
+  readonly GOOGLE_CLIENT_ID?: string;
+  readonly GOOGLE_CLIENT_SECRET?: string;
 };
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
@@ -62,7 +65,8 @@ const deliverAuthEmail = async (
   },
 ) => {
   const config = emailConfigFromEnv(env);
-  if (config.apiKey === "") {
+  const isLocal = env.IS_LOCAL === "true";
+  if (isLocal || config.apiKey === "") {
     console.log(
       `[email:dev] to=${input.to} subject=${input.subject} link=${input.link}`,
     );
@@ -89,6 +93,10 @@ const buildAuth = (env: AuthEnv): Auth =>
       .map((origin) => origin.trim())
       .filter(Boolean),
     useSecureCookies: !env.BETTER_AUTH_URL.startsWith("http://"),
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
+    },
     sendMagicLink: ({ email, url }) =>
       deliverAuthEmail(env, {
         to: email,

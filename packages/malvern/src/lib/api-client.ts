@@ -1,76 +1,83 @@
 /**
  * Effect HTTP API client for the api worker.
  *
- * The malvern app runs as a Cloudflare Worker (dev and prod), so it reaches
- * the api worker through the `API` service binding — no network hop, no port.
- *
- * Service-binding fetches don't carry the browser's cookies, so the api can't
- * see the session. The `apiAuth` middleware captures the incoming request's
- * cookie at the server-fn boundary and passes it explicitly to `runApi`, which
- * attaches it to the binding request. No ambient request lookup happens inside
- * the Effect runtime (which runs on its own fibers, outside the request's
- * AsyncLocalStorage scope), so auth can't be silently dropped.
+ * Server functions call the api worker with the generated Effect client.
+ * Local dev uses the stable api dev port; deployed workers use the API service
+ * binding. The apiAuth middleware captures the incoming request cookie and
+ * runApi attaches it to the outgoing API request.
  */
 import { makeApiClientLayer, type ApiClient } from "@laxdb/api/client";
 import { createMiddleware } from "@tanstack/react-start";
-import { env } from "cloudflare:workers";
 import { Effect, Layer } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 
 type ApiServiceBinding = { readonly fetch: typeof fetch };
 
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === "object" && value !== null;
+type CloudflareWorkersModule = {
+  readonly env: { readonly API: ApiServiceBinding };
+};
 
-const isApiEnv = (
-  value: unknown,
-): value is { readonly API: ApiServiceBinding } =>
-  isRecord(value) && isRecord(value.API) && "fetch" in value.API;
+const isLocal = process.env.IS_LOCAL === "true";
+const localApiUrl = `http://localhost:${process.env.API_PORT ?? "1337"}`;
+const apiUrl = isLocal ? localApiUrl : "http://api";
 
-/**
- * Server-fn middleware that lifts the incoming request's cookie onto
- * `context.apiCookie`. Runs at the server-fn boundary where the request is
- * in scope, so the value is captured synchronously and threaded explicitly.
- */
+const loadApiBinding = Effect.promise(async () => {
+  const workerModule = "cloudflare:" + "workers";
+  const workers: CloudflareWorkersModule = await import(
+    /* @vite-ignore */ workerModule
+  );
+  return workers.env.API;
+});
+
+const attachCookie = (request: Request, cookie: string | undefined) => {
+  if (cookie !== undefined) request.headers.set("cookie", cookie);
+  return request;
+};
+
+const toLocalApiRequest = (request: Request) => {
+  const source = new URL(request.url);
+  const target = new URL(`${source.pathname}${source.search}`, localApiUrl);
+  return new Request(target, request);
+};
+
+const boundApiFetch =
+  (cookie: string | undefined): typeof fetch =>
+  async (input, init) => {
+    const request = attachCookie(new Request(input, init), cookie);
+    if (isLocal) return fetch(toLocalApiRequest(request));
+
+    const api = await Effect.runPromise(loadApiBinding);
+    return api.fetch(request);
+  };
+
 export const apiAuth = createMiddleware().server(async ({ request, next }) =>
   next({ context: { apiCookie: request.headers.get("cookie") ?? undefined } }),
 );
 
-const apiFetch =
-  (cookie: string | undefined): typeof fetch =>
-  (input, init) => {
-    if (!isApiEnv(env)) {
-      throw new Error("Malvern worker API binding is invalid");
-    }
-    const request = new Request(input, init);
-    if (cookie !== undefined) request.headers.set("cookie", cookie);
-    return env.API.fetch(request);
-  };
-
 const clientLayer = (cookie: string | undefined) =>
-  makeApiClientLayer("http://api").pipe(
+  makeApiClientLayer(apiUrl).pipe(
     Layer.provide(
       FetchHttpClient.layer.pipe(
-        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, apiFetch(cookie))),
+        Layer.provide(
+          Layer.succeed(FetchHttpClient.Fetch, boundApiFetch(cookie)),
+        ),
       ),
     ),
   );
 
-/**
- * Run an Effect that depends on the generated HTTP API client, forwarding the
- * caller's session cookie. Call from a server fn that uses `apiAuth`, passing
- * `context.apiCookie`.
- *
- * Results are structured-cloned to convert Effect Schema.Class instances into
- * plain objects — seroval (TanStack Start's dehydration serializer) rejects
- * class instances.
- */
 export async function runApi<A, E>(
   cookie: string | undefined,
   effect: Effect.Effect<A, E, ApiClient>,
 ): Promise<A> {
   const result = await Effect.runPromise(
-    effect.pipe(Effect.provide(clientLayer(cookie))),
+    effect.pipe(
+      Effect.provide(clientLayer(cookie)),
+      Effect.tapError((error) =>
+        Effect.sync(() => {
+          console.log("[runApi] failed", error);
+        }),
+      ),
+    ),
   );
   return structuredClone(result);
 }

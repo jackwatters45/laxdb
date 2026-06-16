@@ -1,8 +1,9 @@
+import type { D1Database } from "@cloudflare/workers-types";
 import { AuthService } from "@laxdb/core/auth/auth.service";
 import { ClubService } from "@laxdb/core/club/club.service";
 import { DefaultsService } from "@laxdb/core/defaults/defaults.service";
 import { DrillService } from "@laxdb/core/drill/drill.service";
-import { DatabaseLiveFromBindingEffect } from "@laxdb/core/drizzle/drizzle.service";
+import { DatabaseLiveFromBinding } from "@laxdb/core/drizzle/drizzle.service";
 import { EmailService } from "@laxdb/core/email/email.service";
 import { FineService } from "@laxdb/core/fine/fine.service";
 import { MatchService } from "@laxdb/core/match/match.service";
@@ -24,6 +25,15 @@ import { PlaysHandlers } from "./play/play.handlers";
 import { PlayersHandlers } from "./player/player.handlers";
 import { PracticesHandlers } from "./practice/practice.handlers";
 
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === "object" && value !== null;
+
+const isD1Binding = (value: unknown): value is D1Database =>
+  isRecord(value) && typeof value.prepare === "function";
+
+const isD1Env = (value: unknown): value is { readonly DB: D1Database } =>
+  isRecord(value) && isD1Binding(value.DB);
+
 export const CoreServicesLive = Layer.mergeAll(
   AuthService.layer,
   ClubService.layer,
@@ -39,7 +49,12 @@ export const CoreServicesLive = Layer.mergeAll(
 export const DatabaseLive = Layer.unwrap(
   Effect.gen(function* () {
     const env = yield* Cloudflare.WorkerEnvironment;
-    return DatabaseLiveFromBindingEffect(env.DB);
+    if (!isD1Env(env)) {
+      return yield* Effect.die(
+        new Error("Cloudflare D1 binding DB is missing from api worker env"),
+      );
+    }
+    return DatabaseLiveFromBinding(env.DB);
   }),
 );
 

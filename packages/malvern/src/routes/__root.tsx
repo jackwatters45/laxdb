@@ -47,7 +47,7 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-background font-mono text-foreground antialiased">
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <QueryClientProvider client={queryClient}>
           <Outlet />
         </QueryClientProvider>
