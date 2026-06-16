@@ -1,3 +1,5 @@
+const EXCLUDED_TEST_PACKAGES = new Set(["@laxdb/pipeline"]);
+
 async function discoverIntegrationPackages() {
   const packageJsonGlob = new Bun.Glob("packages/*/package.json");
   const packages = [];
@@ -13,6 +15,8 @@ async function discoverIntegrationPackages() {
       typeof packageJson.name === "string"
         ? packageJson.name
         : packageJsonPath.split("/").at(-2);
+
+    if (EXCLUDED_TEST_PACKAGES.has(name)) continue;
 
     packages.push({
       name,

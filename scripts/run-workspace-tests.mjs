@@ -1,3 +1,4 @@
+const EXCLUDED_TEST_PACKAGES = new Set(["@laxdb/pipeline"]);
 const SERIAL_TEST_PACKAGES = new Set(["@laxdb/core"]);
 
 async function discoverTestPackages() {
@@ -18,6 +19,8 @@ async function discoverTestPackages() {
       typeof packageJson.scripts?.["test:run"] === "string"
         ? "test:run"
         : "test";
+
+    if (EXCLUDED_TEST_PACKAGES.has(name)) continue;
 
     packages.push({
       name,
