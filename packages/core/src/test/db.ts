@@ -11,10 +11,12 @@ import {
   users,
   verifications,
 } from "../auth/auth.sql";
+import { clubTeams, reportRecipients, rosterPlayers } from "../club/club.sql";
 import { defaultsTable } from "../defaults/defaults.sql";
 import { drillTable } from "../drill/drill.sql";
 import { DrizzleService, query } from "../drizzle/drizzle.service";
 import { fineEvents, fines, fineTemplates } from "../fine/fine.sql";
+import { fixtures, matchReports } from "../match/match.sql";
 import { playTable } from "../play/play.sql";
 import { playerTable } from "../player/player.sql";
 import {
@@ -23,7 +25,6 @@ import {
   practiceReviewTable,
   practiceTable,
 } from "../practice/practice.sql";
-import { userTable } from "../user/user.sql";
 
 type TestD1Database = Awaited<ReturnType<Miniflare["getD1Database"]>>;
 
@@ -81,6 +82,11 @@ export const truncateAll = Effect.gen(function* () {
   const db = yield* DrizzleService;
 
   yield* query(db.delete(defaultsTable));
+  yield* query(db.delete(matchReports));
+  yield* query(db.delete(fixtures));
+  yield* query(db.delete(rosterPlayers));
+  yield* query(db.delete(reportRecipients));
+  yield* query(db.delete(clubTeams));
   yield* query(db.delete(fineEvents));
   yield* query(db.delete(fines));
   yield* query(db.delete(fineTemplates));
@@ -98,7 +104,6 @@ export const truncateAll = Effect.gen(function* () {
   yield* query(db.delete(accounts));
   yield* query(db.delete(verifications));
   yield* query(db.delete(users));
-  yield* query(db.delete(userTable));
 });
 
 export const disposeTestDatabase = async () => {

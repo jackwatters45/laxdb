@@ -3,7 +3,7 @@ import type { BetterAuthPlugin } from "better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink, organization } from "better-auth/plugins";
-import { count } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
 import {
@@ -22,6 +22,10 @@ export type AuthConfig = {
   baseURL: string;
   trustedOrigins?: string[] | undefined;
   useSecureCookies?: boolean | undefined;
+  google: {
+    clientId: string;
+    clientSecret: string;
+  };
   extraPlugins?: BetterAuthPlugin[] | undefined;
   sendMagicLink: (args: {
     email: string;
@@ -59,6 +63,33 @@ export const createAuth = (config: AuthConfig) => {
       },
     }),
     emailAndPassword: { enabled: false },
+    socialProviders: {
+      google: config.google,
+    },
+    databaseHooks: {
+      session: {
+        create: {
+          // New sessions start with no active organization, which would send
+          // returning members back through onboarding. Activate their first
+          // membership up front.
+          before: async (session) => {
+            const [membership] = await db
+              .select({ organizationId: members.organizationId })
+              .from(members)
+              .where(eq(members.userId, session.userId))
+              .orderBy(asc(members.createdAt))
+              .limit(1);
+            if (membership === undefined) return { data: session };
+            return {
+              data: {
+                ...session,
+                activeOrganizationId: membership.organizationId,
+              },
+            };
+          },
+        },
+      },
+    },
     plugins: [
       magicLink({
         expiresIn: 60 * 15,

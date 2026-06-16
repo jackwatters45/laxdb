@@ -1,12 +1,12 @@
 import { expect, layer } from "@effect/vitest";
 import { Effect, Layer } from "effect";
 
+import { users as userTable } from "../auth/auth.sql";
 import { DrizzleService, query } from "../drizzle/drizzle.service";
 import { TestDatabaseLive, truncateAll } from "../test/db";
 
 import { UserRepo } from "./user.repo";
 import { UserService } from "./user.service";
-import { userTable } from "./user.sql";
 
 const ServiceLayer = Layer.effect(UserService, UserService.make).pipe(
   Layer.provide(Layer.effect(UserRepo, UserRepo.make)),

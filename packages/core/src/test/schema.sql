@@ -286,3 +286,110 @@ CREATE INDEX IF NOT EXISTS `fines_status_due_idx` ON `fines` (`status`,`due_at`)
 CREATE INDEX IF NOT EXISTS `fine_events_fine_idx` ON `fine_events` (`fine_id`);
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `fine_events_at_idx` ON `fine_events` (`at`);
+
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `club_teams` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`name` text NOT NULL,
+	`gameday_comp_id` text,
+	`gameday_team_id` text,
+	`coach_member_id` text,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	CONSTRAINT `fk_club_teams_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_club_teams_coach_member_id_member_id_fk` FOREIGN KEY (`coach_member_id`) REFERENCES `member`(`id`) ON DELETE SET NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `report_recipients` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`team_id` text,
+	`label` text NOT NULL,
+	`email` text NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	CONSTRAINT `fk_report_recipients_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_report_recipients_team_id_club_teams_id_fk` FOREIGN KEY (`team_id`) REFERENCES `club_teams`(`id`) ON DELETE CASCADE
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `roster_players` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`team_id` text NOT NULL,
+	`name` text NOT NULL,
+	`jersey_number` integer,
+	`active` integer DEFAULT true NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	CONSTRAINT `fk_roster_players_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_roster_players_team_id_club_teams_id_fk` FOREIGN KEY (`team_id`) REFERENCES `club_teams`(`id`) ON DELETE CASCADE
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `fixtures` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`team_id` text NOT NULL,
+	`gameday_fixture_id` text NOT NULL,
+	`comp_id` text,
+	`comp_name` text,
+	`round` text,
+	`scheduled_at` integer,
+	`home_team_name` text NOT NULL,
+	`away_team_name` text NOT NULL,
+	`is_home` integer DEFAULT true NOT NULL,
+	`venue_name` text,
+	`match_status` text,
+	`home_score` integer,
+	`away_score` integer,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer,
+	CONSTRAINT `fk_fixtures_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_fixtures_team_id_club_teams_id_fk` FOREIGN KEY (`team_id`) REFERENCES `club_teams`(`id`) ON DELETE CASCADE
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `match_reports` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`fixture_id` text NOT NULL,
+	`team_id` text NOT NULL,
+	`submitted_by_user_id` text,
+	`top_player_1_id` text NOT NULL,
+	`top_player_2_id` text,
+	`top_player_3_id` text,
+	`blurb` text,
+	`sent_to` text DEFAULT '[]' NOT NULL,
+	`sent_at` integer,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer,
+	CONSTRAINT `fk_match_reports_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_match_reports_fixture_id_fixtures_id_fk` FOREIGN KEY (`fixture_id`) REFERENCES `fixtures`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_match_reports_team_id_club_teams_id_fk` FOREIGN KEY (`team_id`) REFERENCES `club_teams`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_match_reports_submitted_by_user_id_user_id_fk` FOREIGN KEY (`submitted_by_user_id`) REFERENCES `user`(`id`) ON DELETE SET NULL,
+	CONSTRAINT `fk_match_reports_top_player_1_id_roster_players_id_fk` FOREIGN KEY (`top_player_1_id`) REFERENCES `roster_players`(`id`) ON DELETE RESTRICT,
+	CONSTRAINT `fk_match_reports_top_player_2_id_roster_players_id_fk` FOREIGN KEY (`top_player_2_id`) REFERENCES `roster_players`(`id`) ON DELETE RESTRICT,
+	CONSTRAINT `fk_match_reports_top_player_3_id_roster_players_id_fk` FOREIGN KEY (`top_player_3_id`) REFERENCES `roster_players`(`id`) ON DELETE RESTRICT
+);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `club_teams_org_idx` ON `club_teams` (`organization_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `club_teams_coach_idx` ON `club_teams` (`coach_member_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `report_recipients_org_idx` ON `report_recipients` (`organization_id`);
+--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `report_recipients_org_team_email_idx` ON `report_recipients` (`organization_id`,`team_id`,`email`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `roster_players_org_idx` ON `roster_players` (`organization_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `roster_players_team_idx` ON `roster_players` (`team_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `fixtures_org_idx` ON `fixtures` (`organization_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `fixtures_team_idx` ON `fixtures` (`team_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `fixtures_scheduled_idx` ON `fixtures` (`scheduled_at`);
+--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `fixtures_team_gameday_idx` ON `fixtures` (`team_id`,`gameday_fixture_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `match_reports_org_idx` ON `match_reports` (`organization_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `match_reports_team_idx` ON `match_reports` (`team_id`);
+--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `match_reports_fixture_idx` ON `match_reports` (`fixture_id`);
