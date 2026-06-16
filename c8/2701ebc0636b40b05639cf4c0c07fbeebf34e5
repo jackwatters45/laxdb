@@ -1,0 +1,29 @@
+packages/malvern/src/routes/__root.tsx
+  s_70c4ac6af9af72::t_a559186ea335c7 12,30,32-36
+packages/malvern/src/routes/_app.fines.tsx
+  s_70c4ac6af9af72::t_feafc18f1a5dfc 92,153-158,201,204
+packages/malvern/src/routes/_app.tsx
+  s_70c4ac6af9af72::t_b19ded66486eaf 3,9,16,28-31,55,119-120
+  s_70c4ac6af9af72::t_a91e435ce9553e 14-15,37-51
+  s_70c4ac6af9af72::t_9e0d0152eadc5d 2,106-114
+  s_70c4ac6af9af72::t_a65b8fcf4cff6f 11,34-36
+  s_70c4ac6af9af72::t_b7fecf716f04a6 116-118
+packages/malvern/src/lib/session.ts
+  s_70c4ac6af9af72::t_40e377c2a965b6 10-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "c82701ebc0636b40b05639cf4c0c07fbeebf34e5",
+  "prompts": {},
+  "sessions": {
+    "s_70c4ac6af9af72": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ecbfb-4ab7-7324-8050-44ec778933ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    }
+  }
+}
