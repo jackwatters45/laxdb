@@ -1,0 +1,21 @@
+packages/core/src/test/schema.test.ts
+  s_70c4ac6af9af72::t_9b840a20798009 128-134
+packages/core/src/schema.ts
+  s_70c4ac6af9af72::t_3c6234214b3e19 30-31,50-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "bc5c4508cb8395c74d6609f0ee01651ec77fe7ad",
+  "prompts": {},
+  "sessions": {
+    "s_70c4ac6af9af72": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ecbfb-4ab7-7324-8050-44ec778933ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
