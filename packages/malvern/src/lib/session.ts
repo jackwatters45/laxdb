@@ -7,6 +7,9 @@ import { apiAuth, runApi } from "./api-client";
 
 export type MeCtx = Me | null;
 
+export const ME_QUERY_KEY = ["me"] as const;
+export const ME_STALE_TIME_MS = 1000 * 60 * 5;
+
 export const getMe = createServerFn({ method: "GET" })
   .middleware([apiAuth])
   .handler(
