@@ -65,6 +65,46 @@ const listCompetitions = HttpApiEndpoint.post(
   },
 );
 
+const listGamedayTeams = HttpApiEndpoint.post(
+  "listGamedayTeams",
+  "/api/gameday/teams",
+  {
+    success: MatchContract.listGamedayTeams.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayTeams,
+  },
+);
+
+const listGamedaySeasons = HttpApiEndpoint.post(
+  "listGamedaySeasons",
+  "/api/gameday/seasons",
+  {
+    success: MatchContract.listGamedaySeasons.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedaySeasons,
+  },
+);
+
+const listGamedayClubs = HttpApiEndpoint.post(
+  "listGamedayClubs",
+  "/api/gameday/clubs",
+  {
+    success: MatchContract.listGamedayClubs.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayClubs,
+  },
+);
+
+const listCompetitionsForClubs = HttpApiEndpoint.post(
+  "listCompetitionsForClubs",
+  "/api/gameday/competitions-for-clubs",
+  {
+    success: MatchContract.listCompetitionsForClubs.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listCompetitionsForClubs,
+  },
+);
+
 const listReports = HttpApiEndpoint.post("listReports", "/api/reports/list", {
   success: MatchContract.listReports.success,
   error: MatchErrors,
@@ -86,5 +126,9 @@ export const MatchesGroup = HttpApiGroup.make("Matches")
   .add(getFixture)
   .add(syncFixtures)
   .add(listCompetitions)
+  .add(listGamedayTeams)
+  .add(listGamedaySeasons)
+  .add(listGamedayClubs)
+  .add(listCompetitionsForClubs)
   .add(listReports)
   .add(submitReport);

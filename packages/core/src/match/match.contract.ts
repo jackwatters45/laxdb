@@ -7,7 +7,14 @@ import {
 } from "@laxdb/core/error";
 import { Schema } from "effect";
 
-import { GamedayCompetition, GamedayError } from "./gameday";
+import {
+  GamedayClub,
+  GamedayCompetition,
+  GamedayError,
+  GamedaySeason,
+  GamedayTeam,
+  GamedayTeamCompetition,
+} from "./gameday";
 import {
   Fixture,
   FixtureByIdInput,
@@ -36,6 +43,17 @@ export const MatchApiPayload = {
   fixtureById: Schema.Struct({ id: Schema.String }),
   syncFixtures: Schema.Struct({ teamId: Schema.String }),
   listCompetitions: Schema.Struct({
+    seasonId: Schema.optional(Schema.String),
+  }),
+  listGamedayTeams: Schema.Struct({
+    compId: Schema.String,
+  }),
+  listGamedaySeasons: Schema.Struct({}),
+  listGamedayClubs: Schema.Struct({
+    seasonId: Schema.optional(Schema.String),
+  }),
+  listCompetitionsForClubs: Schema.Struct({
+    clubNames: Schema.Array(Schema.String),
     seasonId: Schema.optional(Schema.String),
   }),
   listReports: Schema.Struct({
@@ -71,6 +89,26 @@ export const MatchContract = {
     success: Schema.Array(GamedayCompetition),
     error: MatchErrors,
     payload: MatchApiPayload.listCompetitions,
+  },
+  listGamedayTeams: {
+    success: Schema.Array(GamedayTeam),
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayTeams,
+  },
+  listGamedaySeasons: {
+    success: Schema.Array(GamedaySeason),
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedaySeasons,
+  },
+  listGamedayClubs: {
+    success: Schema.Array(GamedayClub),
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayClubs,
+  },
+  listCompetitionsForClubs: {
+    success: Schema.Array(GamedayTeamCompetition),
+    error: MatchErrors,
+    payload: MatchApiPayload.listCompetitionsForClubs,
   },
   listReports: {
     success: Schema.Array(MatchReport),

@@ -1,5 +1,11 @@
 import { ApiClient } from "@laxdb/api/client";
-import type { GamedayCompetition } from "@laxdb/core/match/gameday";
+import type {
+  GamedayClub,
+  GamedayCompetition,
+  GamedaySeason,
+  GamedayTeam,
+  GamedayTeamCompetition,
+} from "@laxdb/core/match/gameday";
 import type { Fixture, MatchReport } from "@laxdb/core/match/match.schema";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
@@ -9,6 +15,10 @@ import { apiAuth, runApi } from "./api-client";
 export type FixtureView = typeof Fixture.Type;
 export type MatchReportView = typeof MatchReport.Type;
 export type CompetitionView = typeof GamedayCompetition.Type;
+export type GamedaySeasonView = typeof GamedaySeason.Type;
+export type GamedayClubView = typeof GamedayClub.Type;
+export type GamedayTeamView = typeof GamedayTeam.Type;
+export type GamedayTeamCompetitionView = typeof GamedayTeamCompetition.Type;
 
 export const listFixtures = createServerFn({ method: "GET" })
   .middleware([apiAuth])
@@ -58,6 +68,59 @@ export const listCompetitions = createServerFn({ method: "GET" })
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Matches.listCompetitions({ payload: data });
+      }),
+    ),
+  );
+
+export const listGamedayTeams = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .inputValidator((input: { compId: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.listGamedayTeams({ payload: data });
+      }),
+    ),
+  );
+
+export const listGamedaySeasons = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .handler(({ context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.listGamedaySeasons({ payload: {} });
+      }),
+    ),
+  );
+
+export const listGamedayClubs = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .inputValidator((input: { seasonId?: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.listGamedayClubs({ payload: data });
+      }),
+    ),
+  );
+
+export const listCompetitionsForClubs = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .inputValidator((input: { clubNames: string[]; seasonId?: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.listCompetitionsForClubs({
+          payload: data,
+        });
       }),
     ),
   );

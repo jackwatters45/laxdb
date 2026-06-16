@@ -48,6 +48,30 @@ export const MatchesHandlers = HttpApiBuilder.group(
           service.listCompetitions(payload),
         );
 
+      const listGamedayTeams = (
+        payload: typeof MatchApiPayload.listGamedayTeams.Type,
+      ) =>
+        withAdminOrganization(authService, () =>
+          service.listGamedayTeams(payload),
+        );
+
+      const listGamedaySeasons = () =>
+        withAdminOrganization(authService, () => service.listGamedaySeasons());
+
+      const listGamedayClubs = (
+        payload: typeof MatchApiPayload.listGamedayClubs.Type,
+      ) =>
+        withAdminOrganization(authService, () =>
+          service.listGamedayClubs(payload),
+        );
+
+      const listCompetitionsForClubs = (
+        payload: typeof MatchApiPayload.listCompetitionsForClubs.Type,
+      ) =>
+        withAdminOrganization(authService, () =>
+          service.listCompetitionsForClubs(payload),
+        );
+
       const listReports = (payload: typeof MatchApiPayload.listReports.Type) =>
         withOrganization(authService, (orgId) =>
           service.listReports({ organizationId: orgId, ...payload }),
@@ -70,6 +94,12 @@ export const MatchesHandlers = HttpApiBuilder.group(
         .handle("getFixture", ({ payload }) => getFixture(payload))
         .handle("syncFixtures", ({ payload }) => syncFixtures(payload))
         .handle("listCompetitions", ({ payload }) => listCompetitions(payload))
+        .handle("listGamedayTeams", ({ payload }) => listGamedayTeams(payload))
+        .handle("listGamedaySeasons", listGamedaySeasons)
+        .handle("listGamedayClubs", ({ payload }) => listGamedayClubs(payload))
+        .handle("listCompetitionsForClubs", ({ payload }) =>
+          listCompetitionsForClubs(payload),
+        )
         .handle("listReports", ({ payload }) => listReports(payload))
         .handle("submitReport", ({ payload }) => submitReport(payload));
     }),

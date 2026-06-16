@@ -5,6 +5,7 @@ import {
   gamedayDate,
   gamedayMatchName,
   gamedayScore,
+  gamedayTeamsFromMatches,
 } from "./gameday";
 
 describe("extractArrayLiteral", () => {
@@ -71,6 +72,32 @@ describe("gamedayScore", () => {
   it("returns null for missing scores", () => {
     expect(gamedayScore("")).toBeNull();
     expect(gamedayScore()).toBeNull();
+  });
+});
+
+describe("gamedayTeamsFromMatches", () => {
+  it("extracts sorted unique teams from home and away sides", () => {
+    expect(
+      gamedayTeamsFromMatches([
+        {
+          FixtureID: "1",
+          HomeID: "27270385",
+          HomeNameFMT: "Malvern&nbsp;Lacrosse Club",
+          AwayID: "27270380",
+          AwayNameFMT: "Altona Lacrosse Club",
+        },
+        {
+          FixtureID: "2",
+          HomeID: "27270380",
+          HomeNameFMT: "Altona Lacrosse Club",
+          AwayID: "27270385",
+          AwayNameFMT: "Malvern&nbsp;Lacrosse Club",
+        },
+      ]),
+    ).toEqual([
+      { teamId: "27270380", name: "Altona Lacrosse Club" },
+      { teamId: "27270385", name: "Malvern Lacrosse Club" },
+    ]);
   });
 });
 

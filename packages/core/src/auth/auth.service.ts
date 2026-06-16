@@ -34,6 +34,9 @@ export class AuthService extends Context.Service<AuthService>()("AuthService", {
           userName: user.name,
           userEmail: user.email,
           activeOrganizationId: session.activeOrganizationId ?? null,
+          activeMemberId: Option.isSome(parsedMember)
+            ? parsedMember.value.id
+            : null,
           memberRole: Option.isSome(parsedMember)
             ? parsedMember.value.role
             : null,

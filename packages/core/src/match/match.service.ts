@@ -251,6 +251,50 @@ export class MatchService extends Context.Service<MatchService>()(
               ),
             ),
 
+        listGamedayTeams: (input: { readonly compId: string }) =>
+          gameday
+            .fetchTeams(input.compId)
+            .pipe(
+              Effect.tapError((e) =>
+                Effect.logError("Failed to list GameDay teams", e),
+              ),
+            ),
+
+        listGamedaySeasons: () =>
+          gameday
+            .fetchSeasons()
+            .pipe(
+              Effect.tapError((e) =>
+                Effect.logError("Failed to list GameDay seasons", e),
+              ),
+            ),
+
+        listGamedayClubs: (input?: {
+          readonly seasonId?: string | undefined;
+        }) =>
+          gameday
+            .fetchClubs(input)
+            .pipe(
+              Effect.tapError((e) =>
+                Effect.logError("Failed to list GameDay clubs", e),
+              ),
+            ),
+
+        listCompetitionsForClubs: (input: {
+          readonly clubNames: readonly string[];
+          readonly seasonId?: string | undefined;
+        }) =>
+          gameday
+            .fetchCompetitionsForClubs(input)
+            .pipe(
+              Effect.tapError((e) =>
+                Effect.logError(
+                  "Failed to list GameDay competitions for clubs",
+                  e,
+                ),
+              ),
+            ),
+
         listReports: (input: SchemaInput<typeof ListReportsInput>) =>
           Effect.gen(function* () {
             const decoded = yield* decodeArguments(ListReportsInput, input);

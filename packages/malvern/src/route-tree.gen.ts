@@ -15,6 +15,8 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
 import { Route as AppRosterRouteImport } from './routes/_app.roster'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPlayerRouteImport } from './routes/_app.player'
 import { Route as AppFixturesRouteImport } from './routes/_app.fixtures'
 import { Route as AppFinesRouteImport } from './routes/_app.fines'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
@@ -49,6 +51,16 @@ const AcceptInvitationIdRoute = AcceptInvitationIdRouteImport.update({
 const AppRosterRoute = AppRosterRouteImport.update({
   id: '/roster',
   path: '/roster',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlayerRoute = AppPlayerRouteImport.update({
+  id: '/player',
+  path: '/player',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFixturesRoute = AppFixturesRouteImport.update({
@@ -90,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
   '/fixtures': typeof AppFixturesRoute
+  '/player': typeof AppPlayerRoute
+  '/profile': typeof AppProfileRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/report/$fixtureId': typeof AppReportFixtureIdRoute
@@ -103,6 +117,8 @@ export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
   '/fixtures': typeof AppFixturesRoute
+  '/player': typeof AppPlayerRoute
+  '/profile': typeof AppProfileRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/report/$fixtureId': typeof AppReportFixtureIdRoute
@@ -118,6 +134,8 @@ export interface FileRoutesById {
   '/_app/audit': typeof AppAuditRoute
   '/_app/fines': typeof AppFinesRoute
   '/_app/fixtures': typeof AppFixturesRoute
+  '/_app/player': typeof AppPlayerRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/_app/report/$fixtureId': typeof AppReportFixtureIdRoute
@@ -133,6 +151,8 @@ export interface FileRouteTypes {
     | '/audit'
     | '/fines'
     | '/fixtures'
+    | '/player'
+    | '/profile'
     | '/roster'
     | '/accept-invitation/$id'
     | '/report/$fixtureId'
@@ -146,6 +166,8 @@ export interface FileRouteTypes {
     | '/audit'
     | '/fines'
     | '/fixtures'
+    | '/player'
+    | '/profile'
     | '/roster'
     | '/accept-invitation/$id'
     | '/report/$fixtureId'
@@ -160,6 +182,8 @@ export interface FileRouteTypes {
     | '/_app/audit'
     | '/_app/fines'
     | '/_app/fixtures'
+    | '/_app/player'
+    | '/_app/profile'
     | '/_app/roster'
     | '/accept-invitation/$id'
     | '/_app/report/$fixtureId'
@@ -219,6 +243,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRosterRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/player': {
+      id: '/_app/player'
+      path: '/player'
+      fullPath: '/player'
+      preLoaderRoute: typeof AppPlayerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/fixtures': {
       id: '/_app/fixtures'
       path: '/fixtures'
@@ -269,6 +307,8 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppFinesRoute: typeof AppFinesRoute
   AppFixturesRoute: typeof AppFixturesRoute
+  AppPlayerRoute: typeof AppPlayerRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppRosterRoute: typeof AppRosterRoute
   AppReportFixtureIdRoute: typeof AppReportFixtureIdRoute
 }
@@ -278,6 +318,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppFinesRoute: AppFinesRoute,
   AppFixturesRoute: AppFixturesRoute,
+  AppPlayerRoute: AppPlayerRoute,
+  AppProfileRoute: AppProfileRoute,
   AppRosterRoute: AppRosterRoute,
   AppReportFixtureIdRoute: AppReportFixtureIdRoute,
 }

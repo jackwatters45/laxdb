@@ -51,6 +51,7 @@ const playerLabel = (player: RosterPlayerView) =>
     : `#${player.jerseyNumber} ${player.name}`;
 
 function ReportForm() {
+  const routeContext = Route.useRouteContext();
   const { fixtureId } = Route.useParams();
 
   const fixtureQuery = useQuery({
@@ -58,22 +59,34 @@ function ReportForm() {
     queryFn: () => getFixture({ data: { id: fixtureId } }),
   });
   const fixture = fixtureQuery.data;
+  const activeMemberId = routeContext.me?.activeMemberId ?? null;
+  const allowedTeamIds = routeContext.isAdmin
+    ? null
+    : new Set(
+        routeContext.teams
+          .filter((team) => team.coachMemberId === activeMemberId)
+          .map((team) => team.id),
+      );
+  const canReport =
+    fixture === undefined ||
+    allowedTeamIds === null ||
+    allowedTeamIds.has(fixture.teamId);
   const teamId = fixture?.teamId ?? "";
 
   const rosterQuery = useQuery({
     queryKey: ["roster", teamId],
     queryFn: () => listRoster({ data: { teamId } }),
-    enabled: teamId !== "",
+    enabled: teamId !== "" && canReport,
   });
   const recipientsQuery = useQuery({
     queryKey: ["recipients", teamId],
     queryFn: () => listRecipientsForTeam({ data: { teamId } }),
-    enabled: teamId !== "",
+    enabled: teamId !== "" && canReport,
   });
   const reportsQuery = useQuery({
     queryKey: ["reports", teamId],
     queryFn: () => listReports({ data: { teamId } }),
-    enabled: teamId !== "",
+    enabled: teamId !== "" && canReport,
   });
 
   const err =
@@ -85,6 +98,30 @@ function ReportForm() {
   const roster = rosterQuery.data;
   const recipients = recipientsQuery.data;
   const reports = reportsQuery.data;
+
+  if (fixture && !canReport) {
+    return (
+      <div className="flex flex-col gap-8">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Match report
+          </h1>
+          <p className="text-sm text-muted-foreground">{matchLabel(fixture)}</p>
+        </header>
+        <Alert variant="destructive">
+          <AlertDescription>
+            You can only submit reports for teams you coach.
+          </AlertDescription>
+        </Alert>
+        <Link
+          to="/fixtures"
+          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+        >
+          Back to fixtures
+        </Link>
+      </div>
+    );
+  }
 
   if (!fixture || !roster || !recipients || !reports) {
     return (

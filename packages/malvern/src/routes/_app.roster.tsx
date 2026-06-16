@@ -83,6 +83,7 @@ function ConfirmDialog({
 }
 
 function Roster() {
+  const routeContext = Route.useRouteContext();
   const queryClient = useQueryClient();
 
   const [pickedTeamId, setPickedTeamId] = useState("");
@@ -94,7 +95,16 @@ function Roster() {
     queryFn: () => listTeams(),
   });
   const teams = teamsQuery.data ?? [];
-  const teamId = pickedTeamId === "" ? (teams.at(0)?.id ?? "") : pickedTeamId;
+  const activeMemberId = routeContext.me?.activeMemberId ?? null;
+  const availableTeams = routeContext.isAdmin
+    ? teams
+    : teams.filter((team) => team.coachMemberId === activeMemberId);
+  const pickedTeamIsAvailable = availableTeams.some(
+    (team) => team.id === pickedTeamId,
+  );
+  const teamId = pickedTeamIsAvailable
+    ? pickedTeamId
+    : (availableTeams.at(0)?.id ?? "");
 
   const rosterQuery = useQuery({
     queryKey: ["roster", teamId],
@@ -156,9 +166,12 @@ function Roster() {
             Players available when submitting match reports.
           </p>
         </div>
-        {teams.length > 1 && (
+        {availableTeams.length > 1 && (
           <Select
-            items={teams.map((team) => ({ value: team.id, label: team.name }))}
+            items={availableTeams.map((team) => ({
+              value: team.id,
+              label: team.name,
+            }))}
             value={teamId}
             onValueChange={(value: string | null) => {
               if (value !== null) setPickedTeamId(value);
@@ -168,7 +181,7 @@ function Roster() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {teams.map((team) => (
+              {availableTeams.map((team) => (
                 <SelectItem key={team.id} value={team.id}>
                   {team.name}
                 </SelectItem>
@@ -184,12 +197,13 @@ function Roster() {
         </Alert>
       )}
 
-      {teamsQuery.isSuccess && teams.length === 0 ? (
+      {teamsQuery.isSuccess && availableTeams.length === 0 ? (
         <Card>
           <CardContent>
             <p className="text-muted-foreground">
-              No teams set up yet. An admin needs to create your team under
-              Admin.
+              {teams.length === 0
+                ? "No teams set up yet. An admin needs to create your team under Admin."
+                : "You are not assigned as coach of any teams yet."}
             </p>
           </CardContent>
         </Card>

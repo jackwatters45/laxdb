@@ -1,4 +1,4 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Option, Schema } from "effect";
 
 /**
  * Client for GameDay (websites.mygameday.app), which hosts Lacrosse Victoria
@@ -47,11 +47,36 @@ export const GamedayMatch = Schema.Struct({
 });
 export type GamedayMatch = typeof GamedayMatch.Type;
 
+export class GamedaySeason extends Schema.Class<GamedaySeason>("GamedaySeason")(
+  {
+    seasonId: Schema.String,
+    name: Schema.String,
+  },
+) {}
+
 export class GamedayCompetition extends Schema.Class<GamedayCompetition>(
   "GamedayCompetition",
 )({
   compId: Schema.String,
   name: Schema.String,
+}) {}
+
+export class GamedayTeam extends Schema.Class<GamedayTeam>("GamedayTeam")({
+  teamId: Schema.String,
+  name: Schema.String,
+}) {}
+
+export class GamedayClub extends Schema.Class<GamedayClub>("GamedayClub")({
+  name: Schema.String,
+}) {}
+
+export class GamedayTeamCompetition extends Schema.Class<GamedayTeamCompetition>(
+  "GamedayTeamCompetition",
+)({
+  compId: Schema.String,
+  compName: Schema.String,
+  teamId: Schema.String,
+  teamName: Schema.String,
 }) {}
 
 /**
@@ -155,81 +180,200 @@ const parseMatches = (html: string, compId: string) =>
 const COMP_ROW_RE =
   /<\/svg>\s*([^<]+?)\s*<\/div>\s*<\/td>\s*<td class="flr-list-nav">[\s\S]*?compID=(\d+)/g;
 
+const SEASON_RE = /seasonID=(\d+)[^>]*>([^<]+)/g;
+
 export class GamedayClient extends Context.Service<GamedayClient>()(
   "GamedayClient",
   {
     make: Effect.gen(function* () {
-      return {
-        /** Competitions for a season (current season when no seasonId). */
-        fetchCompetitions: (options?: {
-          readonly seasonId?: string | undefined;
-        }) =>
-          Effect.gen(function* () {
-            const season =
-              options?.seasonId === undefined
-                ? ""
-                : `&seasonID=${options.seasonId}`;
-            const html = yield* fetchPage(
-              `${BASE_URL}/assoc_page.cgi?c=${LACROSSE_VICTORIA_CLIENT}&a=COMPS${season}`,
+      const fetchCompetitionList = (options?: {
+        readonly seasonId?: string | undefined;
+      }) =>
+        Effect.gen(function* () {
+          const season =
+            options?.seasonId === undefined
+              ? ""
+              : `&seasonID=${options.seasonId}`;
+          const html = yield* fetchPage(
+            `${BASE_URL}/assoc_page.cgi?c=${LACROSSE_VICTORIA_CLIENT}&a=COMPS${season}`,
+          );
+          const comps: GamedayCompetition[] = [];
+          for (const match of html.matchAll(COMP_ROW_RE)) {
+            const name = match[1];
+            const compId = match[2];
+            if (name !== undefined && compId !== undefined) {
+              comps.push(
+                new GamedayCompetition({
+                  compId,
+                  name: decodeEntities(name.trim()),
+                }),
+              );
+            }
+          }
+          if (comps.length === 0) {
+            return yield* Effect.fail(
+              new GamedayError({
+                message: "No competitions found on GameDay page",
+              }),
             );
-            const comps: GamedayCompetition[] = [];
-            for (const match of html.matchAll(COMP_ROW_RE)) {
-              const name = match[1];
-              const compId = match[2];
-              if (name !== undefined && compId !== undefined) {
-                comps.push(
-                  new GamedayCompetition({
-                    compId,
+          }
+          return comps;
+        });
+
+      const fetchFixtureList = (compId: string) =>
+        Effect.gen(function* () {
+          const pageUrl = (round: number) =>
+            `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}`;
+
+          const firstPage = yield* fetchPage(pageUrl(0));
+          const firstMatches = yield* parseMatches(firstPage, compId);
+
+          const rounds = [
+            ...new Set(
+              [...firstPage.matchAll(/round=(\d+)/g)]
+                .map((match) => Number(match[1]))
+                .filter((round) => round > 0),
+            ),
+          ];
+
+          const perRound = yield* Effect.forEach(
+            rounds,
+            (round) =>
+              fetchPage(pageUrl(round)).pipe(
+                Effect.flatMap((html) => parseMatches(html, compId)),
+              ),
+            { concurrency: 4 },
+          );
+
+          const byFixtureId = new Map<string, GamedayMatch>();
+          for (const match of [...perRound.flat(), ...firstMatches]) {
+            byFixtureId.set(match.FixtureID, match);
+          }
+          return [...byFixtureId.values()];
+        });
+
+      return {
+        /** Available GameDay seasons, newest first. */
+        fetchSeasons: () =>
+          Effect.gen(function* () {
+            const html = yield* fetchPage(
+              `${BASE_URL}/assoc_page.cgi?c=${LACROSSE_VICTORIA_CLIENT}&a=COMPS`,
+            );
+            const seasons: GamedaySeason[] = [];
+            const seen = new Set<string>();
+            for (const match of html.matchAll(SEASON_RE)) {
+              const seasonId = match[1];
+              const name = match[2];
+              if (
+                seasonId !== undefined &&
+                name !== undefined &&
+                !seen.has(seasonId)
+              ) {
+                seen.add(seasonId);
+                seasons.push(
+                  new GamedaySeason({
+                    seasonId,
                     name: decodeEntities(name.trim()),
                   }),
                 );
               }
             }
-            if (comps.length === 0) {
-              return yield* Effect.fail(
-                new GamedayError({
-                  message: "No competitions found on GameDay page",
-                }),
-              );
-            }
-            return comps;
+            return seasons;
           }),
+
+        /** Competitions for a season (current season when no seasonId). */
+        fetchCompetitions: fetchCompetitionList,
 
         /**
          * All matches for a competition, every round. Each fixture page only
          * embeds the displayed round, so this sweeps the round links found on
          * the default page and merges the results.
          */
-        fetchFixtures: (compId: string) =>
-          Effect.gen(function* () {
-            const pageUrl = (round: number) =>
-              `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}`;
+        fetchFixtures: fetchFixtureList,
 
-            const firstPage = yield* fetchPage(pageUrl(0));
-            const firstMatches = yield* parseMatches(firstPage, compId);
-
-            const rounds = [
-              ...new Set(
-                [...firstPage.matchAll(/round=(\d+)/g)]
-                  .map((match) => Number(match[1]))
-                  .filter((round) => round > 0),
+        /** Teams appearing in a GameDay competition's fixture list. */
+        fetchTeams: (compId: string) =>
+          Effect.map(
+            Effect.flatMap(
+              fetchPage(
+                `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
               ),
-            ];
+              (html) => parseMatches(html, compId),
+            ),
+            gamedayTeamsFromMatches,
+          ),
 
-            const perRound = yield* Effect.forEach(
-              rounds,
-              (round) =>
-                fetchPage(pageUrl(round)).pipe(
-                  Effect.flatMap((html) => parseMatches(html, compId)),
+        /** Club names appearing anywhere in the visible GameDay season. */
+        fetchClubs: (options?: { readonly seasonId?: string | undefined }) =>
+          Effect.gen(function* () {
+            const comps = yield* fetchCompetitionList(options);
+            const teamsByComp = yield* Effect.forEach(
+              comps,
+              (comp) =>
+                Effect.map(
+                  Effect.flatMap(
+                    fetchPage(
+                      `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
+                    ),
+                    (html) => parseMatches(html, comp.compId),
+                  ).pipe(Effect.option),
+                  (matches) =>
+                    Option.match(matches, {
+                      onNone: () => [],
+                      onSome: gamedayTeamsFromMatches,
+                    }),
                 ),
               { concurrency: 4 },
             );
-
-            const byFixtureId = new Map<string, GamedayMatch>();
-            for (const match of [...perRound.flat(), ...firstMatches]) {
-              byFixtureId.set(match.FixtureID, match);
+            const names = new Set<string>();
+            for (const team of teamsByComp.flat()) {
+              names.add(team.name);
             }
-            return [...byFixtureId.values()];
+            return [...names]
+              .map((name) => new GamedayClub({ name }))
+              .toSorted((a, b) => a.name.localeCompare(b.name));
+          }),
+
+        /** Competition entries where any selected GameDay club/team name appears. */
+        fetchCompetitionsForClubs: (input: {
+          readonly clubNames: readonly string[];
+          readonly seasonId?: string | undefined;
+        }) =>
+          Effect.gen(function* () {
+            const selectedNames = new Set(input.clubNames);
+            const comps = yield* fetchCompetitionList({
+              seasonId: input.seasonId,
+            });
+            const entries = yield* Effect.forEach(
+              comps,
+              (comp) =>
+                Effect.map(
+                  Effect.flatMap(
+                    fetchPage(
+                      `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
+                    ),
+                    (html) => parseMatches(html, comp.compId),
+                  ).pipe(Effect.option),
+                  (matches) =>
+                    Option.match(matches, {
+                      onNone: () => [],
+                      onSome: (value) =>
+                        gamedayTeamsFromMatches(value)
+                          .filter((team) => selectedNames.has(team.name))
+                          .map(
+                            (team) =>
+                              new GamedayTeamCompetition({
+                                compId: comp.compId,
+                                compName: comp.name,
+                                teamId: team.teamId,
+                                teamName: team.name,
+                              }),
+                          ),
+                    }),
+                ),
+              { concurrency: 4 },
+            );
+            return entries.flat();
           }),
       };
     }),
@@ -237,6 +381,23 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
 ) {
   static readonly layer = Layer.effect(this, this.make);
 }
+
+export const gamedayTeamsFromMatches = (
+  matches: readonly GamedayMatch[],
+): GamedayTeam[] => {
+  const teams = new Map<string, string>();
+  for (const match of matches) {
+    if (match.HomeID !== undefined && match.HomeID !== "") {
+      teams.set(match.HomeID, gamedayMatchName(match, "home"));
+    }
+    if (match.AwayID !== undefined && match.AwayID !== "") {
+      teams.set(match.AwayID, gamedayMatchName(match, "away"));
+    }
+  }
+  return [...teams.entries()]
+    .map(([teamId, name]) => new GamedayTeam({ teamId, name }))
+    .toSorted((a, b) => a.name.localeCompare(b.name));
+};
 
 export const gamedayMatchName = (
   match: GamedayMatch,

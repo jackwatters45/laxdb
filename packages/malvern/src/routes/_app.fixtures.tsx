@@ -33,11 +33,16 @@ import {
   listReports,
   syncFixtures,
   type FixtureView,
+  type MatchReportView,
 } from "../lib/matches";
 
 export const Route = createFileRoute("/_app/fixtures")({
   component: Fixtures,
 });
+
+const ALL_TEAMS_FILTER = "__all";
+const MY_TEAMS_FILTER = "__mine";
+type FixtureFilter = string;
 
 const formatKickoff = (fixture: FixtureView) =>
   fixture.scheduledAt === null
@@ -64,35 +69,113 @@ const resultOf = (fixture: FixtureView) => {
 const reportLinkClass =
   "underline underline-offset-2 hover:text-muted-foreground";
 
+const uniqueById = <T extends { readonly id: string }>(items: readonly T[]) => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+};
+
+type SyncRequest = {
+  readonly ids: readonly string[];
+  readonly label: string;
+};
+
 function Fixtures() {
+  const ctx = Route.useRouteContext();
   const queryClient = useQueryClient();
-  const [selectedTeamId, setSelectedTeamId] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(
+    ctx.isAdmin ? ALL_TEAMS_FILTER : MY_TEAMS_FILTER,
+  );
+  const [syncProgress, setSyncProgress] = useState<{
+    readonly label: string;
+    readonly completed: number;
+    readonly total: number;
+  } | null>(null);
 
   const teamsQuery = useQuery({
     queryKey: ["teams"],
     queryFn: () => listTeams(),
   });
   const teams = teamsQuery.data ?? [];
-  const teamId = selectedTeamId !== "" ? selectedTeamId : (teams[0]?.id ?? "");
+  const activeMemberId = ctx.me?.activeMemberId ?? null;
+  const myTeams = useMemo(
+    () =>
+      activeMemberId === null
+        ? []
+        : teams.filter((team) => team.coachMemberId === activeMemberId),
+    [activeMemberId, teams],
+  );
+  const effectiveFilter =
+    !ctx.isAdmin && selectedFilter === ALL_TEAMS_FILTER
+      ? MY_TEAMS_FILTER
+      : selectedFilter;
+  const selectedTeamIds = useMemo(() => {
+    if (effectiveFilter === ALL_TEAMS_FILTER)
+      return teams.map((team) => team.id);
+    if (effectiveFilter === MY_TEAMS_FILTER)
+      return myTeams.map((team) => team.id);
+    return [effectiveFilter];
+  }, [effectiveFilter, myTeams, teams]);
 
   const fixturesQuery = useQuery({
-    queryKey: ["fixtures", teamId],
-    queryFn: () => listFixtures({ data: { teamId } }),
-    enabled: teamId !== "",
+    queryKey: ["fixtures", effectiveFilter, selectedTeamIds],
+    queryFn: async () => {
+      if (effectiveFilter === ALL_TEAMS_FILTER)
+        return listFixtures({ data: {} });
+      const fixtures = await Promise.all(
+        selectedTeamIds.map((teamId) => listFixtures({ data: { teamId } })),
+      );
+      return uniqueById(fixtures.flat());
+    },
+    enabled:
+      effectiveFilter === ALL_TEAMS_FILTER ||
+      (teamsQuery.isSuccess && selectedTeamIds.length > 0),
   });
   const reportsQuery = useQuery({
-    queryKey: ["reports", teamId],
-    queryFn: () => listReports({ data: { teamId } }),
-    enabled: teamId !== "",
+    queryKey: ["reports", effectiveFilter, selectedTeamIds],
+    queryFn: async () => {
+      if (effectiveFilter === ALL_TEAMS_FILTER)
+        return listReports({ data: {} });
+      const reports = await Promise.all(
+        selectedTeamIds.map((teamId) => listReports({ data: { teamId } })),
+      );
+      return uniqueById(reports.flat());
+    },
+    enabled:
+      effectiveFilter === ALL_TEAMS_FILTER ||
+      (teamsQuery.isSuccess && selectedTeamIds.length > 0),
   });
 
   const syncMutation = useMutation({
-    mutationFn: (id: string) => syncFixtures({ data: { teamId: id } }),
+    mutationFn: async (request: SyncRequest) => {
+      setSyncProgress({
+        label: request.label,
+        completed: 0,
+        total: request.ids.length,
+      });
+      const results = [];
+      for (const teamId of request.ids) {
+        const result = await syncFixtures({ data: { teamId } });
+        results.push(result);
+        setSyncProgress((current) =>
+          current === null
+            ? current
+            : { ...current, completed: current.completed + 1 },
+        );
+      }
+      return { label: request.label, results };
+    },
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["fixtures", teamId] }),
-        queryClient.invalidateQueries({ queryKey: ["reports", teamId] }),
+        queryClient.invalidateQueries({ queryKey: ["fixtures"] }),
+        queryClient.invalidateQueries({ queryKey: ["reports"] }),
       ]),
+    onSettled: () => {
+      setSyncProgress(null);
+    },
   });
 
   const err =
@@ -103,13 +186,17 @@ function Fixtures() {
 
   const syncResult = syncMutation.isPending ? undefined : syncMutation.data;
   const syncMsg = syncResult
-    ? `Synced ${syncResult.synced} fixtures${syncResult.compName ? ` from ${syncResult.compName}` : ""}.`
+    ? `Synced ${syncResult.results.reduce((sum, result) => sum + result.synced, 0)} fixtures across ${syncResult.results.length} team${syncResult.results.length === 1 ? "" : "s"}.`
     : null;
 
   const reports = reportsQuery.data ?? [];
   const reportByFixture = useMemo(
     () => new Map(reports.map((report) => [report.fixtureId, report])),
     [reports],
+  );
+  const teamById = useMemo(
+    () => new Map(teams.map((team) => [team.id, team.name])),
+    [teams],
   );
 
   const fixtures = fixturesQuery.data;
@@ -136,7 +223,25 @@ function Fixtures() {
   }, [fixtures, now]);
 
   const fixturesLoading =
-    teamsQuery.isPending || (teamId !== "" && fixturesQuery.isPending);
+    teamsQuery.isPending ||
+    (selectedTeamIds.length > 0 && fixturesQuery.isPending);
+  const showTeamColumn =
+    effectiveFilter === ALL_TEAMS_FILTER || selectedTeamIds.length > 1;
+  const syncableTeamIds = teams
+    .filter(
+      (team) => team.gamedayCompId !== null && team.gamedayTeamId !== null,
+    )
+    .map((team) => team.id);
+  const syncTeamIds = selectedTeamIds.filter((teamId) =>
+    syncableTeamIds.includes(teamId),
+  );
+  const syncAllVisible = ctx.isAdmin && effectiveFilter !== ALL_TEAMS_FILTER;
+  const syncCurrentLabel =
+    effectiveFilter === ALL_TEAMS_FILTER
+      ? "all teams"
+      : effectiveFilter === MY_TEAMS_FILTER
+        ? "my teams"
+        : "this team";
 
   return (
     <div className="flex flex-col gap-8">
@@ -149,21 +254,32 @@ function Fixtures() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {teams.length > 1 && (
+          {teams.length > 0 && (
             <Select
-              items={teams.map((team) => ({
-                value: team.id,
-                label: team.name,
-              }))}
-              value={teamId}
+              items={[
+                ...(ctx.isAdmin
+                  ? [{ value: ALL_TEAMS_FILTER, label: "All teams" }]
+                  : []),
+                ...(myTeams.length > 0
+                  ? [{ value: MY_TEAMS_FILTER, label: "My teams" }]
+                  : []),
+                ...teams.map((team) => ({ value: team.id, label: team.name })),
+              ]}
+              value={effectiveFilter}
               onValueChange={(value) => {
-                if (value !== null) setSelectedTeamId(value);
+                if (value !== null) setSelectedFilter(value);
               }}
             >
-              <SelectTrigger className="min-w-40">
+              <SelectTrigger className="min-w-44">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                {ctx.isAdmin && (
+                  <SelectItem value={ALL_TEAMS_FILTER}>All teams</SelectItem>
+                )}
+                {myTeams.length > 0 && (
+                  <SelectItem value={MY_TEAMS_FILTER}>My teams</SelectItem>
+                )}
                 {teams.map((team) => (
                   <SelectItem key={team.id} value={team.id}>
                     {team.name}
@@ -172,14 +288,37 @@ function Fixtures() {
               </SelectContent>
             </Select>
           )}
-          {teamId !== "" && (
+          {syncTeamIds.length > 0 && (
             <Button
               onClick={() => {
-                syncMutation.mutate(teamId);
+                syncMutation.mutate({
+                  ids: syncTeamIds,
+                  label: syncCurrentLabel,
+                });
               }}
               disabled={syncMutation.isPending}
             >
-              {syncMutation.isPending ? "Syncing…" : "Sync fixtures"}
+              {syncMutation.isPending
+                ? "Syncing…"
+                : effectiveFilter === ALL_TEAMS_FILTER
+                  ? "Sync all"
+                  : syncTeamIds.length === 1
+                    ? "Sync fixtures"
+                    : `Sync ${syncTeamIds.length} teams`}
+            </Button>
+          )}
+          {syncAllVisible && syncableTeamIds.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                syncMutation.mutate({
+                  ids: syncableTeamIds,
+                  label: "all teams",
+                });
+              }}
+              disabled={syncMutation.isPending}
+            >
+              Sync all
             </Button>
           )}
         </div>
@@ -188,6 +327,14 @@ function Fixtures() {
       {err && (
         <Alert variant="destructive">
           <AlertDescription>{err.message}</AlertDescription>
+        </Alert>
+      )}
+      {syncProgress && (
+        <Alert>
+          <AlertDescription>
+            Syncing {syncProgress.label} sequentially… {syncProgress.completed}/
+            {syncProgress.total} complete.
+          </AlertDescription>
         </Alert>
       )}
       {syncMsg && (
@@ -205,36 +352,30 @@ function Fixtures() {
         </Card>
       )}
 
+      {teamsQuery.isSuccess &&
+        effectiveFilter === MY_TEAMS_FILTER &&
+        myTeams.length === 0 && (
+          <Card size="sm">
+            <CardContent className="text-muted-foreground">
+              You are not assigned as coach of any teams yet. An admin can
+              assign you under Admin → Teams.
+            </CardContent>
+          </Card>
+        )}
+
       {upcoming.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Upcoming</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Rd</TableHead>
-                  <TableHead>When</TableHead>
-                  <TableHead>Opponent</TableHead>
-                  <TableHead>Venue</TableHead>
-                  <TableHead>H/A</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {upcoming.map((fixture) => (
-                  <TableRow key={fixture.id}>
-                    <TableCell>{fixture.round ?? "—"}</TableCell>
-                    <TableCell>{formatKickoff(fixture)}</TableCell>
-                    <TableCell>{opponentOf(fixture)}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {fixture.venueName ?? "TBC"}
-                    </TableCell>
-                    <TableCell>{fixture.isHome ? "Home" : "Away"}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <FixtureTable
+              fixtures={upcoming}
+              reportByFixture={reportByFixture}
+              teamById={teamById}
+              showReports={false}
+              showTeamColumn={showTeamColumn}
+            />
           </CardContent>
         </Card>
       )}
@@ -255,58 +396,83 @@ function Fixtures() {
               GameDay.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Rd</TableHead>
-                  <TableHead>When</TableHead>
-                  <TableHead>Opponent</TableHead>
-                  <TableHead>Result</TableHead>
-                  <TableHead>Report</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {played.map((fixture) => {
-                  const report = reportByFixture.get(fixture.id);
-                  return (
-                    <TableRow key={fixture.id}>
-                      <TableCell>{fixture.round ?? "—"}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatKickoff(fixture)}
-                      </TableCell>
-                      <TableCell>{opponentOf(fixture)}</TableCell>
-                      <TableCell>{resultOf(fixture) ?? "—"}</TableCell>
-                      <TableCell>
-                        {report?.sentAt ? (
-                          <Badge className="bg-success/15 text-success">
-                            sent
-                          </Badge>
-                        ) : report ? (
-                          <Link
-                            to="/report/$fixtureId"
-                            params={{ fixtureId: fixture.id }}
-                            className={reportLinkClass}
-                          >
-                            draft — finish
-                          </Link>
-                        ) : (
-                          <Link
-                            to="/report/$fixtureId"
-                            params={{ fixtureId: fixture.id }}
-                            className={reportLinkClass}
-                          >
-                            submit
-                          </Link>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <FixtureTable
+              fixtures={played}
+              reportByFixture={reportByFixture}
+              teamById={teamById}
+              showReports
+              showTeamColumn={showTeamColumn}
+            />
           )}
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function FixtureTable({
+  fixtures,
+  reportByFixture,
+  teamById,
+  showReports,
+  showTeamColumn,
+}: {
+  fixtures: readonly FixtureView[];
+  reportByFixture: ReadonlyMap<string, MatchReportView>;
+  teamById: ReadonlyMap<string, string>;
+  showReports: boolean;
+  showTeamColumn: boolean;
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          {showTeamColumn && <TableHead>Team</TableHead>}
+          <TableHead>Rd</TableHead>
+          <TableHead>When</TableHead>
+          <TableHead>Opponent</TableHead>
+          <TableHead>Venue</TableHead>
+          <TableHead>H/A</TableHead>
+          {showReports && <TableHead>Report</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {fixtures.map((fixture) => {
+          const report = reportByFixture.get(fixture.id);
+          const result = resultOf(fixture);
+          return (
+            <TableRow key={fixture.id}>
+              {showTeamColumn && (
+                <TableCell>{teamById.get(fixture.teamId) ?? "—"}</TableCell>
+              )}
+              <TableCell>{fixture.round ?? "—"}</TableCell>
+              <TableCell>{formatKickoff(fixture)}</TableCell>
+              <TableCell>{opponentOf(fixture)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {fixture.venueName ?? "TBC"}
+              </TableCell>
+              <TableCell>{fixture.isHome ? "Home" : "Away"}</TableCell>
+              {showReports && (
+                <TableCell>
+                  {report ? (
+                    <Badge variant="secondary">Submitted</Badge>
+                  ) : result ? (
+                    <Link
+                      to="/report/$fixtureId"
+                      params={{ fixtureId: fixture.id }}
+                      className={reportLinkClass}
+                    >
+                      Submit report
+                    </Link>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+              )}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
