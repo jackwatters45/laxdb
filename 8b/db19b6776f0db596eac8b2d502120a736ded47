@@ -1,0 +1,87 @@
+packages/malvern/src/routes/api.auth.$.tsx
+  s_70c4ac6af9af72::t_b9d35662edd562 3
+packages/malvern/src/lib/api-client.ts
+  s_70c4ac6af9af72::t_6eb3ce9b2c83e9 17,24-30,32-35,37-42,45-47,49-50
+  s_70c4ac6af9af72::t_2de57ff833ff6f 43
+  s_70c4ac6af9af72::t_532d263ab30ab2 4-7,16,20-22,58,61-63,73-80
+  s_70c4ac6af9af72::t_e8e71a5c273359 18,31,48
+packages/api/src/layers.ts
+  s_70c4ac6af9af72::t_f3a01cacd3ed08 6,52-57
+  s_70c4ac6af9af72::t_b84145814e0058 1,28-35
+alchemy.run.ts
+  s_e4db9c8adb5628::t_ac37331ee68be5 174-176,178
+  s_70c4ac6af9af72::t_7e33550809ea8e 10
+  s_70c4ac6af9af72::t_7d98255e98d84c 154-156
+  s_70c4ac6af9af72::t_4c97709f8dd054 7,124
+  s_70c4ac6af9af72::t_9dbfe0f7bee573 148,159-161,193-194
+  s_70c4ac6af9af72::t_6f3cf4ad18a543 179
+  s_70c4ac6af9af72::t_a5b88c999857fb 111-113,131
+  s_70c4ac6af9af72::t_2d2f972d11346e 57-76,115-123,127-130,132-135
+  s_70c4ac6af9af72::t_ca07d340e04555 114
+  s_70c4ac6af9af72::t_2175da018ad667 138-147
+  s_70c4ac6af9af72::t_af90ff723a1153 12,125-126
+  s_70c4ac6af9af72::t_64ef340695a10a 170-172
+packages/malvern/src/lib/auth-client.ts
+  s_70c4ac6af9af72::t_ba4c2eba576fa0 3
+packages/malvern/src/routes/login.tsx
+  s_70c4ac6af9af72::t_ff95a6f56685f7 111-112
+  s_70c4ac6af9af72::t_3f2c58c43a23bd 26-28,70-72,74,76-77,80,118,122-124
+  s_70c4ac6af9af72::t_3c6d34871fd222 25,35-38,52,64-66,69,73,75,78-79,81-85,87,115-117,119-121
+  s_70c4ac6af9af72::t_2de57ff833ff6f 32-34
+  s_70c4ac6af9af72::t_a7293921162af6 93-94,100-104,107-110,113-114
+packages/malvern/src/routes/__root.tsx
+  s_70c4ac6af9af72::t_f906fc6d766023 50
+packages/malvern/src/lib/server/auth-proxy.ts
+  s_70c4ac6af9af72::t_1c4f7aacf85eda 5-11,75
+  s_70c4ac6af9af72::t_5b7edd531496e2 1-2,27-30,37-43,45,47-55,59-65,68-74
+  s_70c4ac6af9af72::t_7a752d296b40ce 56-58
+  s_70c4ac6af9af72::t_1ef7681665848a 3-4,12-14,19-26,44,46,66-67
+  s_70c4ac6af9af72::t_6a24c015d2b7d6 15-18
+  s_70c4ac6af9af72::t_2de57ff833ff6f 31-36
+packages/core/src/auth/auth.ts
+  s_70c4ac6af9af72::t_370be510262d7f 25-28
+  s_70c4ac6af9af72::t_0f1033cbdefc7f 66-68
+packages/malvern/src/env.ts
+  s_70c4ac6af9af72::t_dcaaedfe1ab56e 1-15
+packages/malvern/vite.config.ts
+  s_70c4ac6af9af72::t_4ef29e463fcde0 10-12
+packages/api/src/index.ts
+  s_70c4ac6af9af72::t_e5a17f3247a0a1 47
+  s_70c4ac6af9af72::t_d377365cbca674 40-42,48-60
+  s_70c4ac6af9af72::t_54f8398551c1ae 15-39,61-62,64-65,70-73
+  s_70c4ac6af9af72::t_e97c3cc53b17a8 87-90
+  s_70c4ac6af9af72::t_2de57ff833ff6f 43-46
+  s_70c4ac6af9af72::t_f43f1c10178ab7 66-69,74-79
+  s_70c4ac6af9af72::t_7c01234455d7e2 82-86,91-93,95,97,99-109
+  s_70c4ac6af9af72::t_548c5d86e9d483 94
+  s_70c4ac6af9af72::t_fad3f4c87c8bdd 96
+  s_e4db9c8adb5628::t_86f6e14642e657 6
+packages/api/src/auth/auth.ts
+  s_70c4ac6af9af72::t_92d8e8ccce71f6 22,68-69
+  s_70c4ac6af9af72::t_06332620b24c4d 23-24
+  s_70c4ac6af9af72::t_7a194997342ce8 96-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "8bdb19b6776f0db596eac8b2d502120a736ded47",
+  "prompts": {},
+  "sessions": {
+    "s_70c4ac6af9af72": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ecbfb-4ab7-7324-8050-44ec778933ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    },
+    "s_e4db9c8adb5628": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f8c0493-2514-48d8-9c70-d9a9044ad9de",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
