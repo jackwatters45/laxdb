@@ -27,8 +27,8 @@ export const PublicIdSchema = {
   publicId: NanoidSchema,
 };
 
-/** Date that serializes as an ISO string over the wire (JSON/NDJSON) */
-export const DateFromString = Schema.String.pipe(
+/** ISO date string that decodes to Date and encodes back to ISO. */
+const DateString = Schema.String.pipe(
   Schema.decodeTo(
     Schema.Date,
     SchemaTransformation.transformOrFail({
@@ -47,7 +47,15 @@ export const DateFromString = Schema.String.pipe(
   ),
 );
 
-/** Date schema — string ↔ Date, annotated for OpenAPI */
+/**
+ * Date that serializes as an ISO string over the wire.
+ *
+ * Drizzle/D1 returns timestamp columns as Date instances, while HTTP payloads
+ * carry ISO strings. Accept both at the domain boundary and encode as strings.
+ */
+export const DateFromString = Schema.Union([DateString, Schema.Date]);
+
+/** Date schema — string/Date ↔ Date, annotated for OpenAPI */
 export const DateSchema = DateFromString.annotate({
   jsonSchema: { type: "string", format: "date-time" },
 });

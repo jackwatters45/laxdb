@@ -125,7 +125,13 @@ describe("DateFromString", () => {
     expect(back).toBe(iso);
   });
 
-  it("rejects non-string input", () => {
+  it("accepts Date input from database rows", () => {
+    const result = decode(new Date("2026-03-12T23:03:56.780Z"));
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe("2026-03-12T23:03:56.780Z");
+  });
+
+  it("rejects non-string/non-Date input", () => {
     expect(() => decode(12345)).toThrow();
   });
 
