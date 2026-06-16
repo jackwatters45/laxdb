@@ -89,6 +89,7 @@ function Board() {
     payMutation.error ??
     forgiveMutation.error;
   const acting = payMutation.isPending || forgiveMutation.isPending;
+  const loadingFines = finesQuery.isPending || membersQuery.isPending;
 
   const fines = finesQuery.data;
   const members = membersQuery.data ?? [];
@@ -149,7 +150,12 @@ function Board() {
           <CardTitle>Leaderboard (unpaid)</CardTitle>
         </CardHeader>
         <CardContent>
-          {totals.length === 0 ? (
+          {loadingFines ? (
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Spinner />
+              Loading fines…
+            </p>
+          ) : totals.length === 0 ? (
             <p className="text-muted-foreground">Nobody owes. For now.</p>
           ) : (
             <Table>
@@ -192,10 +198,10 @@ function Board() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          {finesQuery.isPending ? (
+          {loadingFines ? (
             <p className="flex items-center gap-2 text-muted-foreground">
               <Spinner />
-              Loading…
+              Loading fines…
             </p>
           ) : rows.length === 0 ? (
             <p className="text-muted-foreground">No fines match.</p>

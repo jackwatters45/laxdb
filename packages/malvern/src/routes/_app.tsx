@@ -1,12 +1,17 @@
 import { Button } from "@laxdb/ui/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   createFileRoute,
   Link,
   Outlet,
   useRouter,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { authClient } from "../lib/auth-client";
+import { listTeams } from "../lib/club";
+import { listFines, listMembers } from "../lib/fines";
+import { ME_QUERY_KEY } from "../lib/session";
 
 export const Route = createFileRoute("/_app")({
   component: AppShell,
@@ -18,10 +23,31 @@ const navLinkClass =
 function AppShell() {
   const ctx = Route.useRouteContext();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const me = ctx.me;
+
+  useEffect(() => {
+    queryClient.setQueryData(ME_QUERY_KEY, me);
+  }, [me, queryClient]);
+
+  useEffect(() => {
+    void queryClient.prefetchQuery({
+      queryKey: ["teams"],
+      queryFn: () => listTeams(),
+    });
+    void queryClient.prefetchQuery({
+      queryKey: ["fines"],
+      queryFn: () => listFines(),
+    });
+    void queryClient.prefetchQuery({
+      queryKey: ["fine-members"],
+      queryFn: () => listMembers(),
+    });
+  }, [queryClient]);
 
   const signOut = async () => {
     await authClient.signOut();
+    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
     await router.invalidate();
     await router.navigate({ to: "/login" });
   };
