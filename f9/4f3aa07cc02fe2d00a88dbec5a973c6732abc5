@@ -1,0 +1,28 @@
+packages/malvern/src/routes/_app.tsx
+  s_70c4ac6af9af72::t_a91e435ce9553e 13-14,36-50
+  s_70c4ac6af9af72::t_b7fecf716f04a6 112-114
+  s_70c4ac6af9af72::t_b19ded66486eaf 2,8,15,27-30,54,85-102,104-108,110,115-116
+  s_70c4ac6af9af72::t_a65b8fcf4cff6f 10,33-35
+packages/malvern/src/routes/_app.fines.tsx
+  s_70c4ac6af9af72::t_feafc18f1a5dfc 92,153-158,201,204
+packages/malvern/src/lib/session.ts
+  s_70c4ac6af9af72::t_40e377c2a965b6 10-12
+packages/malvern/src/routes/__root.tsx
+  s_70c4ac6af9af72::t_a559186ea335c7 12,30,32-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "f94f3aa07cc02fe2d00a88dbec5a973c6732abc5",
+  "prompts": {},
+  "sessions": {
+    "s_70c4ac6af9af72": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ecbfb-4ab7-7324-8050-44ec778933ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "jackwatters45 <jack.watters@me.com>"
+    }
+  }
+}
