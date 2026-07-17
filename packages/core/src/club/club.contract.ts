@@ -33,15 +33,11 @@ export const ClubErrors = Schema.Union([
 export const ClubApiPayload = {
   createTeam: Schema.Struct({
     name: Schema.String,
-    gamedayCompId: Schema.optional(Schema.NullOr(Schema.String)),
-    gamedayTeamId: Schema.optional(Schema.NullOr(Schema.String)),
     coachMemberId: Schema.optional(Schema.NullOr(Schema.String)),
   }),
   updateTeam: Schema.Struct({
     id: Schema.String,
     name: Schema.optional(Schema.String),
-    gamedayCompId: Schema.optional(Schema.NullOr(Schema.String)),
-    gamedayTeamId: Schema.optional(Schema.NullOr(Schema.String)),
     coachMemberId: Schema.optional(Schema.NullOr(Schema.String)),
   }),
   byId: Schema.Struct({ id: Schema.String }),

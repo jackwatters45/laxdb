@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
-import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Label } from "@laxdb/ui/components/ui/label";
 import {
   Select,
@@ -22,18 +21,21 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 
 import {
-  listRecipientsForTeam,
   listRoster,
-  type RecipientView,
   type RosterPlayerView,
-} from "../lib/club";
+  type TeamView,
+} from "../../../lib/club";
 import {
+  deleteMatchImage,
   getFixture,
+  listMatchImages,
   listReports,
   submitReport,
+  uploadMatchImage,
   type FixtureView,
+  type MatchImageView,
   type MatchReportView,
-} from "../lib/matches";
+} from "../../../lib/matches";
 
 export const Route = createFileRoute("/_app/report/$fixtureId")({
   component: ReportForm,
@@ -50,6 +52,41 @@ const playerLabel = (player: RosterPlayerView) =>
     ? player.name
     : `#${player.jerseyNumber} ${player.name}`;
 
+const acceptedImageTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
+
+type AcceptedImageType = (typeof acceptedImageTypes)[number];
+
+const acceptedImageType = (value: string): AcceptedImageType | null => {
+  for (const type of acceptedImageTypes) {
+    if (type === value) return type;
+  }
+  return null;
+};
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const result = reader.result;
+      if (typeof result === "string") resolve(result);
+      else reject(new Error("Could not read image file"));
+    });
+    reader.addEventListener("error", () => {
+      reject(reader.error ?? new Error("Could not read image file"));
+    });
+    reader.readAsDataURL(file);
+  });
+
+const imageSizeLabel = (sizeBytes: number) => {
+  if (sizeBytes < 1024 * 1024) return `${Math.ceil(sizeBytes / 1024)}KB`;
+  return `${(sizeBytes / (1024 * 1024)).toFixed(1)}MB`;
+};
+
 function ReportForm() {
   const routeContext = Route.useRouteContext();
   const { fixtureId } = Route.useParams();
@@ -64,8 +101,8 @@ function ReportForm() {
     ? null
     : new Set(
         routeContext.teams
-          .filter((team) => team.coachMemberId === activeMemberId)
-          .map((team) => team.id),
+          .filter((team: TeamView) => team.coachMemberId === activeMemberId)
+          .map((team: TeamView) => team.id),
       );
   const canReport =
     fixture === undefined ||
@@ -78,10 +115,10 @@ function ReportForm() {
     queryFn: () => listRoster({ data: { teamId } }),
     enabled: teamId !== "" && canReport,
   });
-  const recipientsQuery = useQuery({
-    queryKey: ["recipients", teamId],
-    queryFn: () => listRecipientsForTeam({ data: { teamId } }),
-    enabled: teamId !== "" && canReport,
+  const imagesQuery = useQuery({
+    queryKey: ["match-images", fixtureId],
+    queryFn: () => listMatchImages({ data: { fixtureId } }),
+    enabled: fixture !== undefined && canReport,
   });
   const reportsQuery = useQuery({
     queryKey: ["reports", teamId],
@@ -92,11 +129,11 @@ function ReportForm() {
   const err =
     fixtureQuery.error ??
     rosterQuery.error ??
-    recipientsQuery.error ??
+    imagesQuery.error ??
     reportsQuery.error;
 
   const roster = rosterQuery.data;
-  const recipients = recipientsQuery.data;
+  const images = imagesQuery.data;
   const reports = reportsQuery.data;
 
   if (fixture && !canReport) {
@@ -123,7 +160,7 @@ function ReportForm() {
     );
   }
 
-  if (!fixture || !roster || !recipients || !reports) {
+  if (!fixture || !roster || !images || !reports) {
     return (
       <div className="flex flex-col gap-8">
         <header className="space-y-1">
@@ -152,7 +189,7 @@ function ReportForm() {
     <ReportFormInner
       fixture={fixture}
       roster={roster.filter((player) => player.active)}
-      recipients={recipients}
+      images={images}
       existing={reports.find((entry) => entry.fixtureId === fixture.id) ?? null}
     />
   );
@@ -199,13 +236,145 @@ function PlayerPicker(props: {
   );
 }
 
+function MatchImagesCard(props: {
+  readonly fixtureId: string;
+  readonly images: readonly MatchImageView[];
+}) {
+  const { fixtureId, images } = props;
+  const queryClient = useQueryClient();
+  const [clientError, setClientError] = useState<string | null>(null);
+
+  const uploadMutation = useMutation({
+    mutationFn: async (files: readonly File[]) => {
+      for (const file of files) {
+        const contentType = acceptedImageType(file.type);
+        if (contentType === null) {
+          throw new Error("Upload JPEG, PNG, WebP, or GIF images only.");
+        }
+        if (file.size > 10_000_000) {
+          throw new Error(`${file.name} is over the 10MB limit.`);
+        }
+        const dataBase64 = await readFileAsDataUrl(file);
+        await uploadMatchImage({
+          data: {
+            fixtureId,
+            fileName: file.name,
+            contentType,
+            dataBase64,
+          },
+        });
+      }
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["match-images", fixtureId] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteMatchImage({ data: { id } }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["match-images", fixtureId] }),
+  });
+
+  const uploadError =
+    clientError ??
+    (uploadMutation.error instanceof Error
+      ? uploadMutation.error.message
+      : null);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Game images</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div className="rounded-lg border border-dashed border-border bg-muted/35 p-4">
+          <Label className="flex cursor-pointer flex-col gap-2 text-sm">
+            <span className="font-medium">Upload game photos</span>
+            <span className="text-muted-foreground">
+              JPEG, PNG, WebP, or GIF. Up to 10MB each.
+            </span>
+            <input
+              type="file"
+              accept={acceptedImageTypes.join(",")}
+              multiple
+              className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-primary-foreground"
+              disabled={uploadMutation.isPending}
+              onChange={(event) => {
+                const files = [...(event.currentTarget.files ?? [])];
+                event.currentTarget.value = "";
+                setClientError(null);
+                if (files.length === 0) return;
+                uploadMutation.mutate(files);
+              }}
+            />
+          </Label>
+        </div>
+
+        {uploadMutation.isPending && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Spinner /> Uploading images…
+          </p>
+        )}
+        {uploadError && (
+          <Alert variant="destructive">
+            <AlertDescription>{uploadError}</AlertDescription>
+          </Alert>
+        )}
+
+        {images.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No images uploaded for this game yet.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {images.map((image) => (
+              <figure
+                key={image.id}
+                className="overflow-hidden rounded-lg border bg-card"
+              >
+                <img
+                  src={`/api/report-images/${image.id}`}
+                  alt={image.fileName}
+                  className="aspect-[4/3] w-full object-cover"
+                  loading="lazy"
+                />
+                <figcaption className="flex items-center justify-between gap-3 p-3 text-xs">
+                  <span className="min-w-0 truncate" title={image.fileName}>
+                    {image.fileName}
+                  </span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {imageSizeLabel(image.sizeBytes)}
+                  </span>
+                </figcaption>
+                <div className="border-t px-3 py-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={deleteMutation.isPending}
+                    onClick={() => {
+                      deleteMutation.mutate(image.id);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </figure>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function ReportFormInner(props: {
   readonly fixture: FixtureView;
   readonly roster: readonly RosterPlayerView[];
-  readonly recipients: readonly RecipientView[];
+  readonly images: readonly MatchImageView[];
   readonly existing: MatchReportView | null;
 }) {
-  const { fixture, roster, recipients, existing } = props;
+  const { fixture, roster, images, existing } = props;
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -213,9 +382,6 @@ function ReportFormInner(props: {
   const [top2, setTop2] = useState(existing?.topPlayer2Id ?? "");
   const [top3, setTop3] = useState(existing?.topPlayer3Id ?? "");
   const [blurb, setBlurb] = useState(existing?.blurb ?? "");
-  const [selectedRecipients, setSelectedRecipients] = useState(
-    () => new Set(recipients.map((recipient) => recipient.id)),
-  );
 
   const submitMutation = useMutation({
     mutationFn: () =>
@@ -226,7 +392,6 @@ function ReportFormInner(props: {
           topPlayer2Id: top2 || null,
           topPlayer3Id: top3 || null,
           blurb: blurb.trim() || null,
-          recipientIds: [...selectedRecipients],
         },
       }),
     onSuccess: () =>
@@ -238,15 +403,6 @@ function ReportFormInner(props: {
   const busy = submitMutation.isPending;
   const done = submitMutation.data ?? null;
   const err = submitMutation.error;
-
-  const toggleRecipient = (id: string) => {
-    setSelectedRecipients((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -267,11 +423,11 @@ function ReportFormInner(props: {
           <CardContent className="flex flex-col gap-4">
             {done.sentAt ? (
               <p>
-                Emailed to <strong>{done.sentTo.join(", ")}</strong>.
+                Saved and emailed to <strong>{done.sentTo.join(", ")}</strong>.
               </p>
             ) : (
               <p className="text-muted-foreground">
-                Saved without sending — no recipients selected.
+                Saved without sending — no report recipients are configured.
               </p>
             )}
             <div className="flex items-center gap-3">
@@ -369,47 +525,11 @@ function ReportFormInner(props: {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Send to</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            {recipients.length === 0 ? (
-              <p className="text-muted-foreground">
-                No recipients configured. An admin can add them under Admin —
-                you can still save the report without sending.
-              </p>
-            ) : (
-              recipients.map((recipient) => (
-                <Label
-                  key={recipient.id}
-                  className="cursor-pointer font-normal"
-                >
-                  <Checkbox
-                    checked={selectedRecipients.has(recipient.id)}
-                    onCheckedChange={() => {
-                      toggleRecipient(recipient.id);
-                    }}
-                  />
-                  <span>
-                    {recipient.label}{" "}
-                    <span className="text-muted-foreground">
-                      ({recipient.email})
-                    </span>
-                  </span>
-                </Label>
-              ))
-            )}
-          </CardContent>
-        </Card>
+        <MatchImagesCard fixtureId={fixture.id} images={images} />
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={busy || !top1}>
-            {busy
-              ? "Submitting…"
-              : selectedRecipients.size > 0
-                ? "Submit & email"
-                : "Save report"}
+            {busy ? "Submitting…" : "Submit report"}
           </Button>
           <Link
             to="/fixtures"

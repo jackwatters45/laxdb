@@ -7,21 +7,51 @@ import {
   parseSqlError,
   type SchemaInput,
 } from "@laxdb/core/util";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Option } from "effect";
+import { nanoid } from "nanoid";
 
 import {
+  GAMEDAY_BASE_URL,
   GamedayClient,
+  GamedayTeamCompetition,
+  LACROSSE_VICTORIA_CLIENT,
   gamedayDate,
   gamedayMatchName,
   gamedayScore,
+  gamedayTeamsFromMatches,
   type GamedayMatch,
 } from "./gameday";
+import { GamedayRepo } from "./gameday.repo";
+import type { ImportGamedayTeamSelection } from "./gameday.schema";
+import {
+  ImportGamedayTeamsInput,
+  ImportGamedayTeamsResult,
+  LACROSSE_VICTORIA_GAMEDAY_SOURCE_ID,
+  LACROSSE_VICTORIA_GAMEDAY_SOURCE_NAME,
+  SyncGamedayAssociationSeasonInput,
+  SyncGamedayAssociationSeasonResult,
+  UpsertClubTeamGamedayLinkInput,
+  UpsertGamedaySourceInput,
+  UpsertRosterPlayerGamedayLinkInput,
+  UpsertSyncedGamedayCompetitionInput,
+  UpsertSyncedGamedayFixtureInput,
+  UpsertSyncedGamedayPlayerInput,
+  UpsertSyncedGamedayRosterEntryInput,
+  UpsertSyncedGamedaySeasonInput,
+  UpsertSyncedGamedayTeamInput,
+} from "./gameday.schema";
+import type { GamedayFixtureRow } from "./gameday.sql";
 import { MatchRepo, type UpsertFixture } from "./match.repo";
 import {
+  CreateMatchImageInput,
+  DeleteMatchImageInput,
   Fixture,
   FixtureByIdInput,
+  GetMatchImageInput,
   ListFixturesInput,
+  ListMatchImagesInput,
   ListReportsInput,
+  MatchImage,
   MatchReport,
   SubmitReportInput,
   SyncFixturesInput,
@@ -31,55 +61,61 @@ import type { Fixture as FixtureRow } from "./match.sql";
 
 const asFixture = (row: typeof Fixture.Type) => new Fixture(row);
 const asReport = (row: typeof MatchReport.Type) => new MatchReport(row);
+const asImage = (row: typeof MatchImage.Type) => new MatchImage(row);
 
 const notFound = (domain: string, id: string | number) =>
   new NotFoundError({ domain, id });
 
-const involvesTeam = (
-  team: { readonly name: string; readonly gamedayTeamId: string | null },
-  match: GamedayMatch,
-) => {
-  if (team.gamedayTeamId !== null) {
-    return (
-      match.HomeID === team.gamedayTeamId || match.AwayID === team.gamedayTeamId
-    );
-  }
-  const needle = team.name.toLowerCase();
-  return (
-    gamedayMatchName(match, "home").toLowerCase().includes(needle) ||
-    gamedayMatchName(match, "away").toLowerCase().includes(needle)
-  );
-};
+const toSyncedGamedayFixture = (input: {
+  readonly sourceId: string;
+  readonly seasonId: string;
+  readonly compId: string;
+  readonly match: GamedayMatch;
+}) =>
+  new UpsertSyncedGamedayFixtureInput({
+    sourceId: input.sourceId,
+    seasonId: input.seasonId,
+    compId: input.compId,
+    fixtureId: input.match.FixtureID,
+    compName: input.match.CompName?.trim() ?? null,
+    round: input.match.Round ?? null,
+    scheduledAt: gamedayDate(input.match.TimeDateRaw),
+    homeTeamId: input.match.HomeID ?? null,
+    awayTeamId: input.match.AwayID ?? null,
+    homeTeamName: gamedayMatchName(input.match, "home"),
+    awayTeamName: gamedayMatchName(input.match, "away"),
+    venueName: input.match.VenueName ?? null,
+    matchStatus: input.match.MatchStatus ?? null,
+    homeScore: gamedayScore(input.match.HomeScore),
+    awayScore: gamedayScore(input.match.AwayScore),
+  });
 
-const isHomeFor = (
-  team: { readonly name: string; readonly gamedayTeamId: string | null },
-  match: GamedayMatch,
-) =>
-  team.gamedayTeamId !== null
-    ? match.HomeID === team.gamedayTeamId
-    : gamedayMatchName(match, "home")
-        .toLowerCase()
-        .includes(team.name.toLowerCase());
+const localTeamName = (selection: typeof ImportGamedayTeamSelection.Type) =>
+  selection.teamName === "Malvern Lacrosse Club"
+    ? selection.compName
+    : `${selection.compName} — ${selection.teamName}`;
 
-const toUpsertFixture = (
-  team: ClubTeam,
-  compId: string,
-  match: GamedayMatch,
-): UpsertFixture => ({
-  organizationId: team.organizationId,
-  teamId: team.id,
-  gamedayFixtureId: match.FixtureID,
-  compId,
-  compName: match.CompName?.trim() ?? null,
-  round: match.Round ?? null,
-  scheduledAt: gamedayDate(match.TimeDateRaw),
-  homeTeamName: gamedayMatchName(match, "home"),
-  awayTeamName: gamedayMatchName(match, "away"),
-  isHome: isHomeFor(team, match),
-  venueName: match.VenueName ?? null,
-  matchStatus: match.MatchStatus ?? null,
-  homeScore: gamedayScore(match.HomeScore),
-  awayScore: gamedayScore(match.AwayScore),
+const normalizeName = (value: string) => value.trim().toLocaleLowerCase();
+
+const toProjectedFixture = (input: {
+  readonly team: ClubTeam;
+  readonly link: { readonly gamedayTeamId: string };
+  readonly fixture: GamedayFixtureRow;
+}): UpsertFixture => ({
+  organizationId: input.team.organizationId,
+  teamId: input.team.id,
+  gamedayFixtureId: input.fixture.fixtureId,
+  compId: input.fixture.compId,
+  compName: input.fixture.compName,
+  round: input.fixture.round,
+  scheduledAt: input.fixture.scheduledAt,
+  homeTeamName: input.fixture.homeTeamName,
+  awayTeamName: input.fixture.awayTeamName,
+  isHome: input.fixture.homeTeamId === input.link.gamedayTeamId,
+  venueName: input.fixture.venueName,
+  matchStatus: input.fixture.matchStatus,
+  homeScore: input.fixture.homeScore,
+  awayScore: input.fixture.awayScore,
 });
 
 const fixtureResultLine = (fixture: FixtureRow) => {
@@ -98,6 +134,14 @@ const escapeHtml = (value: string) =>
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+
+const safeFileName = (value: string) => {
+  const cleaned = value
+    .trim()
+    .replaceAll(/[^A-Za-z0-9._-]/gu, "-")
+    .replaceAll(/-+/gu, "-");
+  return cleaned === "" ? "image" : cleaned;
+};
 
 const buildReportEmail = (input: {
   readonly team: ClubTeam;
@@ -165,6 +209,7 @@ export class MatchService extends Context.Service<MatchService>()(
       const repo = yield* MatchRepo;
       const clubRepo = yield* ClubRepo;
       const gameday = yield* GamedayClient;
+      const gamedayRepo = yield* GamedayRepo;
       const email = yield* EmailService;
 
       return {
@@ -206,29 +251,56 @@ export class MatchService extends Context.Service<MatchService>()(
                   Effect.fail(notFound("ClubTeam", decoded.teamId)),
                 ),
               );
-
-            const compId = team.gamedayCompId;
-            if (compId === null) {
+            const links = yield* gamedayRepo.listClubTeamLinks({
+              organizationId: decoded.organizationId,
+              clubTeamId: decoded.teamId,
+            });
+            if (links.length === 0) {
               return yield* Effect.fail(
                 new ValidationError({
                   domain: "Fixture",
                   message:
-                    "Team has no GameDay competition id configured — set it in admin before syncing",
+                    "Team is not linked to a GameDay squad — link/import it in admin before syncing fixtures",
                 }),
               );
             }
 
-            const matches = yield* gameday.fetchFixtures(compId);
-            const relevant = matches.filter(
-              (match) => match.isBye !== 1 && involvesTeam(team, match),
-            );
-            const synced = yield* repo.upsertFixtures(
-              relevant.map((match) => toUpsertFixture(team, compId, match)),
+            const projected = yield* Effect.forEach(
+              links,
+              (link) =>
+                Effect.gen(function* () {
+                  const matches = yield* gameday.fetchFixtures(link.compId);
+                  yield* gamedayRepo.upsertFixtures(
+                    matches
+                      .filter((match) => match.isBye !== 1)
+                      .map((match) =>
+                        toSyncedGamedayFixture({
+                          sourceId: link.sourceId,
+                          seasonId: link.seasonId,
+                          compId: link.compId,
+                          match,
+                        }),
+                      ),
+                  );
+                  const syncedFixtures =
+                    yield* gamedayRepo.listFixturesForClubTeamLink({
+                      sourceId: link.sourceId,
+                      seasonId: link.seasonId,
+                      compId: link.compId,
+                      gamedayTeamId: link.gamedayTeamId,
+                    });
+                  return yield* repo.upsertFixtures(
+                    syncedFixtures.map((fixture) =>
+                      toProjectedFixture({ team, link, fixture }),
+                    ),
+                  );
+                }),
+              { concurrency: 2 },
             );
 
             return new SyncFixturesResult({
-              synced,
-              compName: relevant[0]?.CompName?.trim() ?? null,
+              synced: projected.reduce((total, count) => total + count, 0),
+              compName: null,
             });
           }).pipe(
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
@@ -237,6 +309,444 @@ export class MatchService extends Context.Service<MatchService>()(
             ),
             Effect.tapError((e) =>
               Effect.logError("Failed to sync fixtures", e),
+            ),
+          ),
+
+        syncGamedayAssociationSeason: (
+          input: SchemaInput<typeof SyncGamedayAssociationSeasonInput>,
+        ) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(
+              SyncGamedayAssociationSeasonInput,
+              input,
+            );
+            const sourceId =
+              decoded.sourceId ?? LACROSSE_VICTORIA_GAMEDAY_SOURCE_ID;
+            if (sourceId !== LACROSSE_VICTORIA_GAMEDAY_SOURCE_ID) {
+              return yield* Effect.fail(
+                new ValidationError({
+                  domain: "GameDay",
+                  message: `Unsupported GameDay source: ${sourceId}`,
+                }),
+              );
+            }
+
+            const seasons = yield* gameday.fetchSeasons();
+            const selectedSeason =
+              decoded.seasonId === undefined
+                ? seasons[0]
+                : seasons.find(
+                    (season) => season.seasonId === decoded.seasonId,
+                  );
+            if (selectedSeason === undefined) {
+              return yield* Effect.fail(
+                new ValidationError({
+                  domain: "GameDay",
+                  message:
+                    decoded.seasonId === undefined
+                      ? "GameDay did not return any seasons"
+                      : `GameDay season not found: ${decoded.seasonId}`,
+                }),
+              );
+            }
+
+            yield* gamedayRepo.upsertSource(
+              new UpsertGamedaySourceInput({
+                id: sourceId,
+                name: LACROSSE_VICTORIA_GAMEDAY_SOURCE_NAME,
+                clientId: LACROSSE_VICTORIA_CLIENT,
+                baseUrl: GAMEDAY_BASE_URL,
+              }),
+            );
+            yield* gamedayRepo.upsertSeasons(
+              seasons.map(
+                (season) =>
+                  new UpsertSyncedGamedaySeasonInput({
+                    sourceId,
+                    seasonId: season.seasonId,
+                    name: season.name,
+                  }),
+              ),
+            );
+
+            const competitions = yield* gameday.fetchCompetitions({
+              seasonId: selectedSeason.seasonId,
+            });
+            yield* gamedayRepo.upsertCompetitions(
+              competitions.map(
+                (competition) =>
+                  new UpsertSyncedGamedayCompetitionInput({
+                    sourceId,
+                    seasonId: selectedSeason.seasonId,
+                    compId: competition.compId,
+                    name: competition.name,
+                  }),
+              ),
+            );
+
+            const competitionMatches = yield* Effect.forEach(
+              competitions,
+              (competition) =>
+                Effect.map(
+                  gameday.fetchFixtures(competition.compId),
+                  (matches) => ({
+                    competition,
+                    matches,
+                  }),
+                ),
+              { concurrency: 4 },
+            );
+
+            const teamsByKey = new Map<
+              string,
+              typeof UpsertSyncedGamedayTeamInput.Type
+            >();
+            for (const { competition, matches } of competitionMatches) {
+              for (const team of gamedayTeamsFromMatches(matches)) {
+                teamsByKey.set(
+                  `${competition.compId}:${team.teamId}`,
+                  new UpsertSyncedGamedayTeamInput({
+                    sourceId,
+                    seasonId: selectedSeason.seasonId,
+                    compId: competition.compId,
+                    teamId: team.teamId,
+                    name: team.name,
+                  }),
+                );
+              }
+            }
+            const teamRows = [...teamsByKey.values()];
+            const teamsSynced = yield* gamedayRepo.upsertTeams(teamRows);
+
+            const fixtureRows = competitionMatches.flatMap(
+              ({ competition, matches }) =>
+                matches
+                  .filter((match) => match.isBye !== 1)
+                  .map((match) =>
+                    toSyncedGamedayFixture({
+                      sourceId,
+                      seasonId: selectedSeason.seasonId,
+                      compId: competition.compId,
+                      match,
+                    }),
+                  ),
+            );
+            const fixturesSynced =
+              yield* gamedayRepo.upsertFixtures(fixtureRows);
+
+            let playersSynced = 0;
+            let rosterEntriesSynced = 0;
+            if (decoded.includeRosters === true) {
+              const rosters = yield* Effect.forEach(
+                teamRows,
+                (team) =>
+                  gameday
+                    .fetchRoster({ compId: team.compId, teamId: team.teamId })
+                    .pipe(
+                      Effect.option,
+                      Effect.map((playersOption) => ({
+                        team,
+                        players: Option.match(playersOption, {
+                          onNone: () => [],
+                          onSome: (players) => players,
+                        }),
+                      })),
+                    ),
+                { concurrency: 2 },
+              );
+
+              const playersById = new Map<
+                string,
+                typeof UpsertSyncedGamedayPlayerInput.Type
+              >();
+              const rosterRows: (typeof UpsertSyncedGamedayRosterEntryInput.Type)[] =
+                [];
+              for (const roster of rosters) {
+                for (const player of roster.players) {
+                  playersById.set(
+                    player.playerId,
+                    new UpsertSyncedGamedayPlayerInput({
+                      sourceId,
+                      playerId: player.playerId,
+                      name: player.name,
+                    }),
+                  );
+                  rosterRows.push(
+                    new UpsertSyncedGamedayRosterEntryInput({
+                      sourceId,
+                      seasonId: selectedSeason.seasonId,
+                      compId: roster.team.compId,
+                      teamId: roster.team.teamId,
+                      playerId: player.playerId,
+                      playerName: player.name,
+                      gamesPlayed: player.gamesPlayed,
+                      totalAssists: player.totalAssists,
+                      totalScore: player.totalScore,
+                    }),
+                  );
+                }
+              }
+              playersSynced = yield* gamedayRepo.upsertPlayers([
+                ...playersById.values(),
+              ]);
+              rosterEntriesSynced =
+                yield* gamedayRepo.upsertRosterEntries(rosterRows);
+            }
+
+            return new SyncGamedayAssociationSeasonResult({
+              sourceId,
+              sourceName: LACROSSE_VICTORIA_GAMEDAY_SOURCE_NAME,
+              seasonId: selectedSeason.seasonId,
+              seasonName: selectedSeason.name,
+              competitions: competitions.length,
+              teams: teamsSynced,
+              fixtures: fixturesSynced,
+              players: playersSynced,
+              rosterEntries: rosterEntriesSynced,
+            });
+          }).pipe(
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tap((result) =>
+              Effect.log(
+                `Synced ${result.sourceName} ${result.seasonName}: ${result.competitions} comps, ${result.teams} teams, ${result.fixtures} fixtures`,
+              ),
+            ),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to sync GameDay association season", e),
+            ),
+          ),
+
+        importGamedayTeams: (
+          input: SchemaInput<typeof ImportGamedayTeamsInput>,
+        ) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(
+              ImportGamedayTeamsInput,
+              input,
+            );
+            const sourceId = LACROSSE_VICTORIA_GAMEDAY_SOURCE_ID;
+
+            yield* gamedayRepo.upsertSource(
+              new UpsertGamedaySourceInput({
+                id: sourceId,
+                name: LACROSSE_VICTORIA_GAMEDAY_SOURCE_NAME,
+                clientId: LACROSSE_VICTORIA_CLIENT,
+                baseUrl: GAMEDAY_BASE_URL,
+              }),
+            );
+
+            let links = 0;
+            let fixtures = 0;
+            let rosterPlayers = 0;
+            let rosterLinks = 0;
+
+            for (const selection of decoded.teams) {
+              yield* gamedayRepo.upsertCompetitions([
+                new UpsertSyncedGamedayCompetitionInput({
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  name: selection.compName,
+                }),
+              ]);
+              yield* gamedayRepo.upsertTeams([
+                new UpsertSyncedGamedayTeamInput({
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  teamId: selection.teamId,
+                  name: selection.teamName,
+                }),
+              ]);
+
+              const existingLink =
+                yield* gamedayRepo.getClubTeamLinkForExternal({
+                  organizationId: decoded.organizationId,
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  gamedayTeamId: selection.teamId,
+                });
+              const linkedTeam = existingLink[0]
+                ? yield* clubRepo.getTeam({
+                    organizationId: decoded.organizationId,
+                    id: existingLink[0].clubTeamId,
+                  })
+                : undefined;
+              const team =
+                linkedTeam ??
+                (yield* clubRepo.createTeam({
+                  organizationId: decoded.organizationId,
+                  name: localTeamName(selection),
+                }));
+
+              yield* gamedayRepo.upsertClubTeamLink(
+                new UpsertClubTeamGamedayLinkInput({
+                  organizationId: decoded.organizationId,
+                  clubTeamId: team.id,
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  gamedayTeamId: selection.teamId,
+                }),
+              );
+              links += 1;
+
+              let syncedFixtures =
+                yield* gamedayRepo.listFixturesForClubTeamLink({
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  gamedayTeamId: selection.teamId,
+                });
+              if (syncedFixtures.length === 0) {
+                const matches = yield* gameday.fetchFixtures(selection.compId);
+                yield* gamedayRepo.upsertFixtures(
+                  matches
+                    .filter((match) => match.isBye !== 1)
+                    .map((match) =>
+                      toSyncedGamedayFixture({
+                        sourceId,
+                        seasonId: decoded.seasonId,
+                        compId: selection.compId,
+                        match,
+                      }),
+                    ),
+                );
+                syncedFixtures = yield* gamedayRepo.listFixturesForClubTeamLink(
+                  {
+                    sourceId,
+                    seasonId: decoded.seasonId,
+                    compId: selection.compId,
+                    gamedayTeamId: selection.teamId,
+                  },
+                );
+              }
+              fixtures += yield* repo.upsertFixtures(
+                syncedFixtures.map((fixture) =>
+                  toProjectedFixture({
+                    team,
+                    link: { gamedayTeamId: selection.teamId },
+                    fixture,
+                  }),
+                ),
+              );
+
+              const rosterOption = yield* gameday
+                .fetchRoster({
+                  compId: selection.compId,
+                  teamId: selection.teamId,
+                })
+                .pipe(Effect.option);
+              const fetchedRoster = Option.match(rosterOption, {
+                onNone: () => [],
+                onSome: (players) => players,
+              });
+              if (fetchedRoster.length > 0) {
+                yield* gamedayRepo.upsertPlayers(
+                  fetchedRoster.map(
+                    (player) =>
+                      new UpsertSyncedGamedayPlayerInput({
+                        sourceId,
+                        playerId: player.playerId,
+                        name: player.name,
+                      }),
+                  ),
+                );
+                yield* gamedayRepo.upsertRosterEntries(
+                  fetchedRoster.map(
+                    (player) =>
+                      new UpsertSyncedGamedayRosterEntryInput({
+                        sourceId,
+                        seasonId: decoded.seasonId,
+                        compId: selection.compId,
+                        teamId: selection.teamId,
+                        playerId: player.playerId,
+                        playerName: player.name,
+                        gamesPlayed: player.gamesPlayed,
+                        totalAssists: player.totalAssists,
+                        totalScore: player.totalScore,
+                      }),
+                  ),
+                );
+              }
+
+              const rosterEntries =
+                yield* gamedayRepo.listRosterEntriesForClubTeamLink({
+                  sourceId,
+                  seasonId: decoded.seasonId,
+                  compId: selection.compId,
+                  gamedayTeamId: selection.teamId,
+                });
+              const localRoster = yield* clubRepo.listRoster({
+                organizationId: decoded.organizationId,
+                teamId: team.id,
+              });
+              const localByName = new Map(
+                localRoster.map((player) => [
+                  normalizeName(player.name),
+                  player,
+                ]),
+              );
+
+              for (const entry of rosterEntries) {
+                const existingPlayerLink =
+                  yield* gamedayRepo.getRosterPlayerLinkForExternal({
+                    organizationId: decoded.organizationId,
+                    sourceId,
+                    seasonId: decoded.seasonId,
+                    compId: selection.compId,
+                    gamedayTeamId: selection.teamId,
+                    gamedayPlayerId: entry.playerId,
+                  });
+                if (existingPlayerLink.length > 0) continue;
+
+                const localPlayer =
+                  localByName.get(normalizeName(entry.playerName)) ??
+                  (yield* clubRepo.addRosterPlayer({
+                    organizationId: decoded.organizationId,
+                    teamId: team.id,
+                    name: entry.playerName,
+                    jerseyNumber: null,
+                  }));
+                if (!localByName.has(normalizeName(localPlayer.name))) {
+                  localByName.set(normalizeName(localPlayer.name), localPlayer);
+                  rosterPlayers += 1;
+                }
+                yield* gamedayRepo.upsertRosterPlayerLink(
+                  new UpsertRosterPlayerGamedayLinkInput({
+                    organizationId: decoded.organizationId,
+                    rosterPlayerId: localPlayer.id,
+                    sourceId,
+                    seasonId: decoded.seasonId,
+                    compId: selection.compId,
+                    gamedayTeamId: selection.teamId,
+                    gamedayPlayerId: entry.playerId,
+                  }),
+                );
+                rosterLinks += 1;
+              }
+            }
+
+            return new ImportGamedayTeamsResult({
+              teams: decoded.teams.length,
+              links,
+              fixtures,
+              rosterPlayers,
+              rosterLinks,
+            });
+          }).pipe(
+            Effect.catchTag("NoSuchElementError", () =>
+              Effect.fail(notFound("ClubTeam", "gameday-link")),
+            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tap((result) =>
+              Effect.log(
+                `Imported ${result.teams} GameDay teams, projected ${result.fixtures} fixtures, added ${result.rosterPlayers} roster players`,
+              ),
+            ),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to import GameDay teams", e),
             ),
           ),
 
@@ -284,16 +794,50 @@ export class MatchService extends Context.Service<MatchService>()(
           readonly clubNames: readonly string[];
           readonly seasonId?: string | undefined;
         }) =>
-          gameday
-            .fetchCompetitionsForClubs(input)
-            .pipe(
-              Effect.tapError((e) =>
-                Effect.logError(
-                  "Failed to list GameDay competitions for clubs",
-                  e,
-                ),
+          Effect.gen(function* () {
+            const sourceId = LACROSSE_VICTORIA_GAMEDAY_SOURCE_ID;
+            if (input.seasonId !== undefined) {
+              const syncedTeams = yield* gamedayRepo.listTeams({
+                sourceId,
+                seasonId: input.seasonId,
+              });
+              if (syncedTeams.length > 0) {
+                const selectedNames = new Set(input.clubNames);
+                const competitions = yield* gamedayRepo.listCompetitions({
+                  sourceId,
+                  seasonId: input.seasonId,
+                });
+                const competitionsById = new Map(
+                  competitions.map((competition) => [
+                    competition.compId,
+                    competition,
+                  ]),
+                );
+                return syncedTeams
+                  .filter((team) => selectedNames.has(team.name))
+                  .map(
+                    (team) =>
+                      new GamedayTeamCompetition({
+                        compId: team.compId,
+                        compName:
+                          competitionsById.get(team.compId)?.name ??
+                          team.compId,
+                        teamId: team.teamId,
+                        teamName: team.name,
+                      }),
+                  );
+              }
+            }
+            return yield* gameday.fetchCompetitionsForClubs(input);
+          }).pipe(
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tapError((e) =>
+              Effect.logError(
+                "Failed to list GameDay competitions for clubs",
+                e,
               ),
             ),
+          ),
 
         listReports: (input: SchemaInput<typeof ListReportsInput>) =>
           Effect.gen(function* () {
@@ -304,6 +848,95 @@ export class MatchService extends Context.Service<MatchService>()(
             Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
             Effect.tapError((e) =>
               Effect.logError("Failed to list match reports", e),
+            ),
+          ),
+
+        listMatchImages: (input: SchemaInput<typeof ListMatchImagesInput>) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(ListMatchImagesInput, input);
+            return yield* repo.listMatchImages(decoded);
+          }).pipe(
+            Effect.map((rows) => rows.map(asImage)),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to list match images", e),
+            ),
+          ),
+
+        getMatchImage: (input: SchemaInput<typeof GetMatchImageInput>) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(GetMatchImageInput, input);
+            return yield* repo.getMatchImage(decoded);
+          }).pipe(
+            Effect.map(asImage),
+            Effect.catchTag("NoSuchElementError", () =>
+              Effect.fail(notFound("MatchImage", input.id)),
+            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to get match image", e),
+            ),
+          ),
+
+        createMatchImage: (input: SchemaInput<typeof CreateMatchImageInput>) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(
+              CreateMatchImageInput,
+              input,
+            );
+            const fixture = yield* repo
+              .getFixture({
+                organizationId: decoded.organizationId,
+                id: decoded.fixtureId,
+              })
+              .pipe(
+                Effect.catchTag("NoSuchElementError", () =>
+                  Effect.fail(notFound("Fixture", decoded.fixtureId)),
+                ),
+              );
+            const id = nanoid();
+            const objectKey = [
+              "match-images",
+              decoded.organizationId,
+              fixture.id,
+              `${id}-${safeFileName(decoded.fileName)}`,
+            ].join("/");
+            return yield* repo.createMatchImage({
+              id,
+              organizationId: decoded.organizationId,
+              fixtureId: fixture.id,
+              uploadedByUserId: decoded.uploadedByUserId ?? null,
+              objectKey,
+              fileName: decoded.fileName,
+              contentType: decoded.contentType,
+              sizeBytes: decoded.sizeBytes,
+            });
+          }).pipe(
+            Effect.map(asImage),
+            Effect.catchTag("NoSuchElementError", () =>
+              Effect.fail(notFound("MatchImage", "create")),
+            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to create match image", e),
+            ),
+          ),
+
+        deleteMatchImage: (input: SchemaInput<typeof DeleteMatchImageInput>) =>
+          Effect.gen(function* () {
+            const decoded = yield* decodeArguments(
+              DeleteMatchImageInput,
+              input,
+            );
+            return yield* repo.deleteMatchImage(decoded);
+          }).pipe(
+            Effect.map(asImage),
+            Effect.catchTag("NoSuchElementError", () =>
+              Effect.fail(notFound("MatchImage", input.id)),
+            ),
+            Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+            Effect.tapError((e) =>
+              Effect.logError("Failed to delete match image", e),
             ),
           ),
 
@@ -387,9 +1020,9 @@ export class MatchService extends Context.Service<MatchService>()(
                 ),
               );
 
-            const recipients = yield* repo.getRecipients({
+            const recipients = yield* repo.getRecipientsForTeam({
               organizationId: decoded.organizationId,
-              ids: decoded.recipientIds,
+              teamId: fixture.teamId,
             });
             if (recipients.length === 0) return asReport(report);
 
@@ -430,6 +1063,11 @@ export class MatchService extends Context.Service<MatchService>()(
   // EmailService is intentionally not provided here — the API layer supplies
   // it from the worker environment (see EmailLive in @laxdb/api layers).
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide([MatchRepo.layer, ClubRepo.layer, GamedayClient.layer]),
+    Layer.provide([
+      MatchRepo.layer,
+      ClubRepo.layer,
+      GamedayClient.layer,
+      GamedayRepo.layer,
+    ]),
   );
 }

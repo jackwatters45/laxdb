@@ -1,6 +1,5 @@
 import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
 import { Badge } from "@laxdb/ui/components/ui/badge";
-import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
   CardContent,
@@ -23,18 +22,17 @@ import {
   TableHeader,
   TableRow,
 } from "@laxdb/ui/components/ui/table";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
-import { listTeams } from "../lib/club";
+import { listTeams } from "../../lib/club";
 import {
   listFixtures,
   listReports,
-  syncFixtures,
   type FixtureView,
   type MatchReportView,
-} from "../lib/matches";
+} from "../../lib/matches";
 
 export const Route = createFileRoute("/_app/fixtures")({
   component: Fixtures,
@@ -78,22 +76,11 @@ const uniqueById = <T extends { readonly id: string }>(items: readonly T[]) => {
   });
 };
 
-type SyncRequest = {
-  readonly ids: readonly string[];
-  readonly label: string;
-};
-
 function Fixtures() {
   const ctx = Route.useRouteContext();
-  const queryClient = useQueryClient();
   const [selectedFilter, setSelectedFilter] = useState(
     ctx.isAdmin ? ALL_TEAMS_FILTER : MY_TEAMS_FILTER,
   );
-  const [syncProgress, setSyncProgress] = useState<{
-    readonly label: string;
-    readonly completed: number;
-    readonly total: number;
-  } | null>(null);
 
   const teamsQuery = useQuery({
     queryKey: ["teams"],
@@ -149,45 +136,7 @@ function Fixtures() {
       (teamsQuery.isSuccess && selectedTeamIds.length > 0),
   });
 
-  const syncMutation = useMutation({
-    mutationFn: async (request: SyncRequest) => {
-      setSyncProgress({
-        label: request.label,
-        completed: 0,
-        total: request.ids.length,
-      });
-      const results = [];
-      for (const teamId of request.ids) {
-        const result = await syncFixtures({ data: { teamId } });
-        results.push(result);
-        setSyncProgress((current) =>
-          current === null
-            ? current
-            : { ...current, completed: current.completed + 1 },
-        );
-      }
-      return { label: request.label, results };
-    },
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["fixtures"] }),
-        queryClient.invalidateQueries({ queryKey: ["reports"] }),
-      ]),
-    onSettled: () => {
-      setSyncProgress(null);
-    },
-  });
-
-  const err =
-    teamsQuery.error ??
-    fixturesQuery.error ??
-    reportsQuery.error ??
-    syncMutation.error;
-
-  const syncResult = syncMutation.isPending ? undefined : syncMutation.data;
-  const syncMsg = syncResult
-    ? `Synced ${syncResult.results.reduce((sum, result) => sum + result.synced, 0)} fixtures across ${syncResult.results.length} team${syncResult.results.length === 1 ? "" : "s"}.`
-    : null;
+  const err = teamsQuery.error ?? fixturesQuery.error ?? reportsQuery.error;
 
   const reports = reportsQuery.data ?? [];
   const reportByFixture = useMemo(
@@ -227,21 +176,6 @@ function Fixtures() {
     (selectedTeamIds.length > 0 && fixturesQuery.isPending);
   const showTeamColumn =
     effectiveFilter === ALL_TEAMS_FILTER || selectedTeamIds.length > 1;
-  const syncableTeamIds = teams
-    .filter(
-      (team) => team.gamedayCompId !== null && team.gamedayTeamId !== null,
-    )
-    .map((team) => team.id);
-  const syncTeamIds = selectedTeamIds.filter((teamId) =>
-    syncableTeamIds.includes(teamId),
-  );
-  const syncAllVisible = ctx.isAdmin && effectiveFilter !== ALL_TEAMS_FILTER;
-  const syncCurrentLabel =
-    effectiveFilter === ALL_TEAMS_FILTER
-      ? "all teams"
-      : effectiveFilter === MY_TEAMS_FILTER
-        ? "my teams"
-        : "this team";
 
   return (
     <div className="flex flex-col gap-8">
@@ -288,58 +222,12 @@ function Fixtures() {
               </SelectContent>
             </Select>
           )}
-          {syncTeamIds.length > 0 && (
-            <Button
-              onClick={() => {
-                syncMutation.mutate({
-                  ids: syncTeamIds,
-                  label: syncCurrentLabel,
-                });
-              }}
-              disabled={syncMutation.isPending}
-            >
-              {syncMutation.isPending
-                ? "Syncing…"
-                : effectiveFilter === ALL_TEAMS_FILTER
-                  ? "Sync all"
-                  : syncTeamIds.length === 1
-                    ? "Sync fixtures"
-                    : `Sync ${syncTeamIds.length} teams`}
-            </Button>
-          )}
-          {syncAllVisible && syncableTeamIds.length > 0 && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                syncMutation.mutate({
-                  ids: syncableTeamIds,
-                  label: "all teams",
-                });
-              }}
-              disabled={syncMutation.isPending}
-            >
-              Sync all
-            </Button>
-          )}
         </div>
       </header>
 
       {err && (
         <Alert variant="destructive">
           <AlertDescription>{err.message}</AlertDescription>
-        </Alert>
-      )}
-      {syncProgress && (
-        <Alert>
-          <AlertDescription>
-            Syncing {syncProgress.label} sequentially… {syncProgress.completed}/
-            {syncProgress.total} complete.
-          </AlertDescription>
-        </Alert>
-      )}
-      {syncMsg && (
-        <Alert>
-          <AlertDescription>{syncMsg}</AlertDescription>
         </Alert>
       )}
 
@@ -392,8 +280,8 @@ function Fixtures() {
             </p>
           ) : played.length === 0 ? (
             <p className="text-muted-foreground">
-              No past fixtures yet. Use “Sync fixtures” to pull the season from
-              GameDay.
+              No past fixtures yet. Ask an admin to sync Lacrosse Victoria and
+              link your squad under Admin.
             </p>
           ) : (
             <FixtureTable

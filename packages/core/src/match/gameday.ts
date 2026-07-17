@@ -17,8 +17,9 @@ export class GamedayError extends Schema.TaggedErrorClass<GamedayError>()(
 
 /** Lacrosse Victoria association client id on GameDay. */
 export const LACROSSE_VICTORIA_CLIENT = "0-1064-0-0-0";
+export const GAMEDAY_BASE_URL = "https://websites.mygameday.app";
 
-const BASE_URL = "https://websites.mygameday.app";
+const BASE_URL = GAMEDAY_BASE_URL;
 
 // GameDay 403s default fetch user agents; a browser UA is required.
 const REQUEST_HEADERS = {
@@ -78,6 +79,16 @@ export class GamedayTeamCompetition extends Schema.Class<GamedayTeamCompetition>
   teamId: Schema.String,
   teamName: Schema.String,
 }) {}
+
+export class GamedayPlayer extends Schema.Class<GamedayPlayer>("GamedayPlayer")(
+  {
+    playerId: Schema.String,
+    name: Schema.String,
+    gamesPlayed: Schema.NullOr(Schema.Number),
+    totalAssists: Schema.NullOr(Schema.Number),
+    totalScore: Schema.NullOr(Schema.Number),
+  },
+) {}
 
 /**
  * Extract a balanced JSON array literal that starts right after `marker`.
@@ -178,9 +189,61 @@ const parseMatches = (html: string, compId: string) =>
   });
 
 const COMP_ROW_RE =
-  /<\/svg>\s*([^<]+?)\s*<\/div>\s*<\/td>\s*<td class="flr-list-nav">[\s\S]*?compID=(\d+)/g;
+  /<\/svg>\s*([^<]+?)\s*<\/div>\s*<\/td>\s*<td class="flr-list-nav">[\s\S]*?compID=(\d+)/gu;
 
-const SEASON_RE = /seasonID=(\d+)[^>]*>([^<]+)/g;
+const SEASON_RE = /seasonID=(\d+)[^>]*>([^<]+)/gu;
+
+const PLAYER_LINK_RE = /<a[^>]+pID=(\d+)[^>]*>([^<]+)<\/a>/gu;
+const STATS_ROW_RE = /<tr class="(?:odd|even)">([\s\S]*?)<\/tr>/gu;
+const CELL_RE = /<td[^>]*>([\s\S]*?)<\/td>/gu;
+
+const stripTags = (value: string) =>
+  decodeEntities(value.replaceAll(/<[^>]+>/gu, "")).trim();
+
+const parseOptionalInt = (value: string): number | null => {
+  const parsed = Number.parseInt(value.trim(), 10);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const parsePlayerLinks = (html: string) => {
+  const players = new Map<string, string>();
+  for (const match of html.matchAll(PLAYER_LINK_RE)) {
+    const playerId = match[1];
+    const name = match[2];
+    if (playerId !== undefined && name !== undefined) {
+      players.set(playerId, decodeEntities(name).trim());
+    }
+  }
+  return players;
+};
+
+const parseStatsRows = (html: string) => {
+  const stats = new Map<
+    string,
+    {
+      readonly fallbackName: string;
+      readonly gamesPlayed: number | null;
+      readonly totalAssists: number | null;
+      readonly totalScore: number | null;
+    }
+  >();
+  for (const row of html.matchAll(STATS_ROW_RE)) {
+    const rowHtml = row[1];
+    if (rowHtml === undefined) continue;
+    const playerId = rowHtml.match(/pID=(\d+)/u)?.[1];
+    if (playerId === undefined) continue;
+    const cells = [...rowHtml.matchAll(CELL_RE)].map((cell) =>
+      stripTags(cell[1] ?? ""),
+    );
+    stats.set(playerId, {
+      fallbackName: cells[0] ?? "",
+      gamesPlayed: parseOptionalInt(cells[2] ?? ""),
+      totalAssists: parseOptionalInt(cells[4] ?? ""),
+      totalScore: parseOptionalInt(cells[5] ?? ""),
+    });
+  }
+  return stats;
+};
 
 export class GamedayClient extends Context.Service<GamedayClient>()(
   "GamedayClient",
@@ -226,11 +289,18 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}`;
 
           const firstPage = yield* fetchPage(pageUrl(0));
-          const firstMatches = yield* parseMatches(firstPage, compId);
+          const firstMatchesOption = yield* parseMatches(
+            firstPage,
+            compId,
+          ).pipe(Effect.option);
+          const firstMatches = Option.match(firstMatchesOption, {
+            onNone: () => [],
+            onSome: (matches) => matches,
+          });
 
           const rounds = [
             ...new Set(
-              [...firstPage.matchAll(/round=(\d+)/g)]
+              [...firstPage.matchAll(/round=(\d+)/gu)]
                 .map((match) => Number(match[1]))
                 .filter((round) => round > 0),
             ),
@@ -241,6 +311,13 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             (round) =>
               fetchPage(pageUrl(round)).pipe(
                 Effect.flatMap((html) => parseMatches(html, compId)),
+                Effect.option,
+                Effect.map((matchesOption) =>
+                  Option.match(matchesOption, {
+                    onNone: () => [],
+                    onSome: (matches) => matches,
+                  }),
+                ),
               ),
             { concurrency: 4 },
           );
@@ -302,6 +379,39 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             ),
             gamedayTeamsFromMatches,
           ),
+
+        /** Roster and basic player stats for a GameDay team. */
+        fetchRoster: (input: {
+          readonly compId: string;
+          readonly teamId: string;
+        }) =>
+          Effect.gen(function* () {
+            const base = `${BASE_URL}/team_info.cgi?id=${input.teamId}&c=${LACROSSE_VICTORIA_CLIENT.replace("-0-0-0", `-0-${input.compId}-0`)}`;
+            const playersHtml = yield* fetchPage(`${base}&a=PLAYERS`);
+            const statsHtml = yield* fetchPage(`${base}&a=STATS`).pipe(
+              Effect.option,
+            );
+            const names = parsePlayerLinks(playersHtml);
+            const stats = Option.match(statsHtml, {
+              onNone: () => parseStatsRows(""),
+              onSome: parseStatsRows,
+            });
+            const playerIds = new Set([...names.keys(), ...stats.keys()]);
+            return [...playerIds]
+              .map((playerId) => {
+                const stat = stats.get(playerId);
+                const name = names.get(playerId) ?? stat?.fallbackName ?? "";
+                return new GamedayPlayer({
+                  playerId,
+                  name: decodeEntities(name).trim(),
+                  gamesPlayed: stat?.gamesPlayed ?? null,
+                  totalAssists: stat?.totalAssists ?? null,
+                  totalScore: stat?.totalScore ?? null,
+                });
+              })
+              .filter((player) => player.name !== "")
+              .toSorted((a, b) => a.name.localeCompare(b.name));
+          }),
 
         /** Club names appearing anywhere in the visible GameDay season. */
         fetchClubs: (options?: { readonly seasonId?: string | undefined }) =>

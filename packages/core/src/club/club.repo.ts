@@ -76,8 +76,6 @@ export class ClubRepo extends Context.Service<ClubRepo>()("ClubRepo", {
               id: nanoid(),
               organizationId: input.organizationId,
               name: input.name,
-              gamedayCompId: input.gamedayCompId ?? null,
-              gamedayTeamId: input.gamedayTeamId ?? null,
               coachMemberId: input.coachMemberId ?? null,
               createdAt: new Date(),
             })
@@ -90,12 +88,6 @@ export class ClubRepo extends Context.Service<ClubRepo>()("ClubRepo", {
             .update(clubTeams)
             .set({
               ...(input.name !== undefined && { name: input.name }),
-              ...(input.gamedayCompId !== undefined && {
-                gamedayCompId: input.gamedayCompId,
-              }),
-              ...(input.gamedayTeamId !== undefined && {
-                gamedayTeamId: input.gamedayTeamId,
-              }),
               ...(input.coachMemberId !== undefined && {
                 coachMemberId: input.coachMemberId,
               }),

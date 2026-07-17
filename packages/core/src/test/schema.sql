@@ -345,6 +345,21 @@ CREATE TABLE IF NOT EXISTS `fixtures` (
 	CONSTRAINT `fk_fixtures_team_id_club_teams_id_fk` FOREIGN KEY (`team_id`) REFERENCES `club_teams`(`id`) ON DELETE CASCADE
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `match_images` (
+	`id` text PRIMARY KEY,
+	`organization_id` text NOT NULL,
+	`fixture_id` text NOT NULL,
+	`uploaded_by_user_id` text,
+	`object_key` text NOT NULL UNIQUE,
+	`file_name` text NOT NULL,
+	`content_type` text NOT NULL,
+	`size_bytes` integer NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	CONSTRAINT `fk_match_images_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_match_images_fixture_id_fixtures_id_fk` FOREIGN KEY (`fixture_id`) REFERENCES `fixtures`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_match_images_uploaded_by_user_id_user_id_fk` FOREIGN KEY (`uploaded_by_user_id`) REFERENCES `user`(`id`) ON DELETE SET NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS `match_reports` (
 	`id` text PRIMARY KEY,
 	`organization_id` text NOT NULL,
@@ -387,6 +402,10 @@ CREATE INDEX IF NOT EXISTS `fixtures_team_idx` ON `fixtures` (`team_id`);
 CREATE INDEX IF NOT EXISTS `fixtures_scheduled_idx` ON `fixtures` (`scheduled_at`);
 --> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS `fixtures_team_gameday_idx` ON `fixtures` (`team_id`,`gameday_fixture_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `match_images_org_idx` ON `match_images` (`organization_id`);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `match_images_fixture_idx` ON `match_images` (`fixture_id`);
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `match_reports_org_idx` ON `match_reports` (`organization_id`);
 --> statement-breakpoint

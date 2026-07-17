@@ -13,8 +13,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { authClient } from "../lib/auth-client";
-import { ME_QUERY_KEY, type MeCtx } from "../lib/session";
+import { authClient } from "../../lib/auth-client";
+import { ME_QUERY_KEY, type MeCtx } from "../../lib/session";
 
 export const Route = createFileRoute("/_app/profile")({
   component: Profile,

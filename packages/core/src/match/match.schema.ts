@@ -7,6 +7,23 @@ const Score = Schema.Number.check(
   Schema.isInt({ message: "Score must be a whole number" }),
 );
 
+const MatchImageContentTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] satisfies readonly ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+export const MatchImageContentType = Schema.Literals(MatchImageContentTypes);
+
+const ImageSizeBytes = Schema.Number.check(
+  Schema.isInt({ message: "Image size must be a whole number" }),
+  Schema.isGreaterThan(0, { message: "Image cannot be empty" }),
+  Schema.isLessThanOrEqualTo(10_000_000, {
+    message: "Image must be 10MB or smaller",
+  }),
+);
+
 export class Fixture extends Schema.Class<Fixture>("Fixture")({
   id: Id,
   organizationId: Id,
@@ -25,6 +42,18 @@ export class Fixture extends Schema.Class<Fixture>("Fixture")({
   awayScore: Schema.NullOr(Score),
   createdAt: Schema.Date,
   updatedAt: Schema.NullOr(Schema.Date),
+}) {}
+
+export class MatchImage extends Schema.Class<MatchImage>("MatchImage")({
+  id: Id,
+  organizationId: Id,
+  fixtureId: Id,
+  uploadedByUserId: NullableId,
+  objectKey: Id,
+  fileName: Schema.String,
+  contentType: MatchImageContentType,
+  sizeBytes: ImageSizeBytes,
+  createdAt: Schema.Date,
 }) {}
 
 export class MatchReport extends Schema.Class<MatchReport>("MatchReport")({
@@ -82,7 +111,6 @@ export class SubmitReportInput extends Schema.Class<SubmitReportInput>(
   topPlayer2Id: Schema.optional(NullableId),
   topPlayer3Id: Schema.optional(NullableId),
   blurb: Schema.optional(Schema.NullOr(Schema.String)),
-  recipientIds: Schema.Array(Id),
 }) {}
 
 export class ListReportsInput extends Schema.Class<ListReportsInput>(
@@ -90,4 +118,38 @@ export class ListReportsInput extends Schema.Class<ListReportsInput>(
 )({
   organizationId: Id,
   teamId: Schema.optional(Id),
+}) {}
+
+export class ListMatchImagesInput extends Schema.Class<ListMatchImagesInput>(
+  "ListMatchImagesInput",
+)({
+  organizationId: Id,
+  fixtureId: Id,
+}) {}
+
+export class GetMatchImageInput extends Schema.Class<GetMatchImageInput>(
+  "GetMatchImageInput",
+)({
+  organizationId: Id,
+  id: Id,
+}) {}
+
+export class CreateMatchImageInput extends Schema.Class<CreateMatchImageInput>(
+  "CreateMatchImageInput",
+)({
+  organizationId: Id,
+  fixtureId: Id,
+  uploadedByUserId: Schema.optional(NullableId),
+  fileName: Schema.String.check(
+    Schema.isMinLength(1, { message: "Image filename is required" }),
+  ),
+  contentType: MatchImageContentType,
+  sizeBytes: ImageSizeBytes,
+}) {}
+
+export class DeleteMatchImageInput extends Schema.Class<DeleteMatchImageInput>(
+  "DeleteMatchImageInput",
+)({
+  organizationId: Id,
+  id: Id,
 }) {}

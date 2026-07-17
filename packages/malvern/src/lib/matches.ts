@@ -6,7 +6,12 @@ import type {
   GamedayTeam,
   GamedayTeamCompetition,
 } from "@laxdb/core/match/gameday";
-import type { Fixture, MatchReport } from "@laxdb/core/match/match.schema";
+import type { SyncGamedayAssociationSeasonResult } from "@laxdb/core/match/gameday.schema";
+import type {
+  Fixture,
+  MatchImage,
+  MatchReport,
+} from "@laxdb/core/match/match.schema";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 
@@ -14,11 +19,14 @@ import { apiAuth, runApi } from "./api-client";
 
 export type FixtureView = typeof Fixture.Type;
 export type MatchReportView = typeof MatchReport.Type;
+export type MatchImageView = typeof MatchImage.Type;
 export type CompetitionView = typeof GamedayCompetition.Type;
 export type GamedaySeasonView = typeof GamedaySeason.Type;
 export type GamedayClubView = typeof GamedayClub.Type;
 export type GamedayTeamView = typeof GamedayTeam.Type;
 export type GamedayTeamCompetitionView = typeof GamedayTeamCompetition.Type;
+export type SyncGamedayAssociationSeasonView =
+  typeof SyncGamedayAssociationSeasonResult.Type;
 
 export const listFixtures = createServerFn({ method: "GET" })
   .middleware([apiAuth])
@@ -55,6 +63,41 @@ export const syncFixtures = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Matches.syncFixtures({ payload: data });
+      }),
+    ),
+  );
+
+export const syncGamedayAssociationSeason = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
+  .inputValidator(
+    (input: { seasonId?: string; includeRosters?: boolean }) => input,
+  )
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.syncGamedayAssociationSeason({
+          payload: data,
+        });
+      }),
+    ),
+  );
+
+export const importGamedayTeams = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
+  .inputValidator(
+    (input: {
+      seasonId: string;
+      teams: readonly GamedayTeamCompetitionView[];
+    }) => input,
+  )
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.importGamedayTeams({ payload: data });
       }),
     ),
   );
@@ -147,7 +190,6 @@ export const submitReport = createServerFn({ method: "POST" })
       topPlayer2Id?: string | null;
       topPlayer3Id?: string | null;
       blurb?: string | null;
-      recipientIds: string[];
     }) => input,
   )
   .handler(({ data, context }) =>
@@ -156,6 +198,52 @@ export const submitReport = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Matches.submitReport({ payload: data });
+      }),
+    ),
+  );
+
+export const listMatchImages = createServerFn({ method: "GET" })
+  .middleware([apiAuth])
+  .inputValidator((input: { fixtureId: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.listMatchImages({ payload: data });
+      }),
+    ),
+  );
+
+export const uploadMatchImage = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
+  .inputValidator(
+    (input: {
+      fixtureId: string;
+      fileName: string;
+      contentType: "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+      dataBase64: string;
+    }) => input,
+  )
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.uploadMatchImage({ payload: data });
+      }),
+    ),
+  );
+
+export const deleteMatchImage = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.deleteMatchImage({ payload: data });
       }),
     ),
   );

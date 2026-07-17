@@ -106,8 +106,6 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
           const decoded = yield* decodeArguments(UpdateTeamInput, input);
           if (
             decoded.name === undefined &&
-            decoded.gamedayCompId === undefined &&
-            decoded.gamedayTeamId === undefined &&
             decoded.coachMemberId === undefined
           ) {
             return yield* Effect.fail(emptyUpdate("ClubTeam"));

@@ -19,13 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
-import { Checkbox } from "@laxdb/ui/components/ui/checkbox";
 import { Input } from "@laxdb/ui/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@laxdb/ui/components/ui/popover";
+import { MultiSearchCombobox } from "@laxdb/ui/components/ui/search-combobox";
 import {
   Select,
   SelectContent,
@@ -47,10 +42,9 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 
-import { authClient } from "../lib/auth-client";
+import { authClient } from "../../lib/auth-client";
 import {
   addRecipient,
-  createTeam,
   deleteTeam,
   listRecipients,
   listTeams,
@@ -58,15 +52,16 @@ import {
   updateTeam,
   type RecipientView,
   type TeamView,
-} from "../lib/club";
-import { listMembers, type Member } from "../lib/fines";
+} from "../../lib/club";
+import { listMembers, type Member } from "../../lib/fines";
 import {
+  importGamedayTeams,
   listCompetitionsForClubs,
   listGamedayClubs,
   listGamedaySeasons,
-  syncFixtures,
+  syncGamedayAssociationSeason,
   type GamedayTeamCompetitionView,
-} from "../lib/matches";
+} from "../../lib/matches";
 
 export const Route = createFileRoute("/_app/admin")({
   beforeLoad: ({ context }) => {
@@ -342,8 +337,6 @@ function Invite({
 type TeamUpdate = {
   id: string;
   name?: string;
-  gamedayCompId?: string | null;
-  gamedayTeamId?: string | null;
   coachMemberId?: string | null;
 };
 
@@ -361,8 +354,6 @@ function Teams({
   const [selectedClubNames, setSelectedClubNames] = useState<readonly string[]>(
     [],
   );
-  const [clubSearch, setClubSearch] = useState("");
-  const [clubPickerOpen, setClubPickerOpen] = useState(false);
 
   const seasonsQuery = useQuery({
     queryKey: ["gameday-seasons"],
@@ -391,14 +382,6 @@ function Teams({
       return true;
     });
   }, [clubsQuery.data]);
-  const visibleGamedayClubs = useMemo(() => {
-    const search = clubSearch.trim().toLocaleLowerCase();
-    if (search === "") return gamedayClubs;
-    return gamedayClubs.filter((club) =>
-      club.name.toLocaleLowerCase().includes(search),
-    );
-  }, [clubSearch, gamedayClubs]);
-
   const competitionsQuery = useQuery({
     queryKey: [
       "gameday-competitions-for-clubs",
@@ -428,14 +411,6 @@ function Teams({
                 id: team.id,
                 organizationId: team.organizationId,
                 name: vars.name ?? team.name,
-                gamedayCompId:
-                  vars.gamedayCompId === undefined
-                    ? team.gamedayCompId
-                    : vars.gamedayCompId,
-                gamedayTeamId:
-                  vars.gamedayTeamId === undefined
-                    ? team.gamedayTeamId
-                    : vars.gamedayTeamId,
                 coachMemberId:
                   vars.coachMemberId === undefined
                     ? team.coachMemberId
@@ -464,55 +439,41 @@ function Teams({
       ]),
   });
 
-  const importMutation = useMutation({
-    mutationFn: async (vars: {
-      competitions: readonly GamedayTeamCompetitionView[];
-    }) => {
-      await Promise.all(
-        vars.competitions.map((competition) => {
-          const existing = teams.find(
-            (team) =>
-              team.gamedayCompId === competition.compId &&
-              team.gamedayTeamId === competition.teamId,
-          );
-          const name =
-            competition.teamName === "Malvern Lacrosse Club"
-              ? competition.compName
-              : `${competition.compName} — ${competition.teamName}`;
-          const data = {
-            name,
-            gamedayCompId: competition.compId,
-            gamedayTeamId: competition.teamId,
-          };
-          if (existing) {
-            return updateTeam({ data: { id: existing.id, ...data } });
-          }
-          return createTeam({ data });
-        }),
-      );
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["teams"] }),
+  const associationSyncMutation = useMutation({
+    mutationFn: (vars: { seasonId?: string; includeRosters?: boolean }) =>
+      syncGamedayAssociationSeason({ data: vars }),
   });
 
-  const syncMutation = useMutation({
-    mutationFn: (vars: { teamId: string }) => syncFixtures({ data: vars }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fixtures"] }),
+  const importMutation = useMutation({
+    mutationFn: (vars: {
+      seasonId: string;
+      competitions: readonly GamedayTeamCompetitionView[];
+    }) =>
+      importGamedayTeams({
+        data: {
+          seasonId: vars.seasonId,
+          teams: vars.competitions.map((competition) => ({
+            compId: competition.compId,
+            compName: competition.compName,
+            teamId: competition.teamId,
+            teamName: competition.teamName,
+          })),
+        },
+      }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["teams"] }),
+        queryClient.invalidateQueries({ queryKey: ["fixtures"] }),
+        queryClient.invalidateQueries({ queryKey: ["roster"] }),
+      ]),
   });
 
   const competitions = competitionsQuery.data ?? [];
-  const importableCompetitions = competitions.filter(
-    (competition) =>
-      !teams.some(
-        (team) =>
-          team.gamedayCompId === competition.compId &&
-          team.gamedayTeamId === competition.teamId,
-      ),
-  );
-  const syncMsg = syncMutation.data
-    ? `Synced ${syncMutation.data.synced} fixtures${syncMutation.data.compName ? ` from ${syncMutation.data.compName}` : ""}.`
+  const syncMsg = associationSyncMutation.data
+    ? `Synced ${associationSyncMutation.data.sourceName} ${associationSyncMutation.data.seasonName}: ${associationSyncMutation.data.competitions} comps, ${associationSyncMutation.data.teams} teams, ${associationSyncMutation.data.fixtures} fixtures.`
     : null;
-  const importMsg = importMutation.isSuccess
-    ? "Squads imported from GameDay."
+  const importMsg = importMutation.data
+    ? `Linked ${importMutation.data.teams} squads, projected ${importMutation.data.fixtures} fixtures, and added ${importMutation.data.rosterPlayers} roster players.`
     : null;
   const err =
     seasonsQuery.error ??
@@ -520,17 +481,16 @@ function Teams({
     competitionsQuery.error ??
     updateMutation.error ??
     deleteMutation.error ??
-    importMutation.error ??
-    syncMutation.error;
+    associationSyncMutation.error ??
+    importMutation.error;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Teams</CardTitle>
         <CardDescription>
-          Select the GameDay season and every club/combined-team name Malvern
-          participates in, import those competitions as squads, then assign
-          coaches and sync fixtures.
+          Sync Lacrosse Victoria for the season, then link/import the GameDay
+          squads Malvern appears under and assign local coaches.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -575,46 +535,50 @@ function Teams({
                 <span className="text-xs text-muted-foreground">
                   GameDay clubs/combined teams
                 </span>
-                <Popover open={clubPickerOpen} onOpenChange={setClubPickerOpen}>
-                  <PopoverTrigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full justify-between text-left font-normal"
-                        disabled={clubsQuery.isFetching && !clubsQuery.data}
-                      />
-                    }
-                  >
-                    <span className="truncate">
-                      {selectedClubNames.length === 0
-                        ? "Search/select GameDay names"
-                        : `${selectedClubNames.length} GameDay name${
-                            selectedClubNames.length === 1 ? "" : "s"
-                          } selected`}
+                <MultiSearchCombobox
+                  items={gamedayClubs}
+                  selectedValues={selectedClubNames}
+                  onSelectedValuesChange={setSelectedClubNames}
+                  getItemValue={(club) => club.name}
+                  getItemLabel={(club) => club.name}
+                  label="GameDay clubs/combined teams"
+                  description="Select every GameDay name that Malvern appears under this season."
+                  placeholder="Search/select GameDay names"
+                  searchPlaceholder="Search GameDay names, e.g. Malvern or Brunswick"
+                  loading={clubsQuery.isFetching && !clubsQuery.data}
+                  loadingMessage={
+                    <span className="flex items-center gap-2">
+                      <Spinner />
+                      Loading GameDay clubs…
                     </span>
-                    <span className="text-muted-foreground">⌄</span>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    className="w-[min(36rem,calc(100vw-2rem))] gap-2 p-3"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Input
-                        autoFocus
-                        value={clubSearch}
-                        onChange={(event) => {
-                          setClubSearch(event.currentTarget.value);
-                        }}
-                        placeholder="Search GameDay names, e.g. Malvern or Brunswick"
-                      />
+                  }
+                  emptyMessage="Select a season to load GameDay club names."
+                  noResultsMessage={(query) =>
+                    `No GameDay names match “${query}”.`
+                  }
+                  disabled={clubsQuery.isFetching && !clubsQuery.data}
+                  selectedSummary={(values) =>
+                    values.length === 0
+                      ? "Search/select GameDay names"
+                      : `${values.length} GameDay name${
+                          values.length === 1 ? "" : "s"
+                        } selected`
+                  }
+                  footerSummary={(values) =>
+                    values.length === 0
+                      ? "No GameDay names selected."
+                      : `${values.length} selected.`
+                  }
+                  renderFooterActions={({ searchQuery, close }) => (
+                    <>
                       {gamedayClubs.length > 0 && (
                         <Button
                           type="button"
                           variant="outline"
-                          className="shrink-0"
+                          size="sm"
+                          className="h-7 px-2 text-xs"
                           onClick={() => {
-                            const search = clubSearch.trim();
+                            const search = searchQuery.trim();
                             const matcher = search === "" ? "malvern" : search;
                             setSelectedClubNames(
                               gamedayClubs
@@ -630,126 +594,76 @@ function Teams({
                           Select matches
                         </Button>
                       )}
-                    </div>
-                    <div className="max-h-64 overflow-auto rounded-md border bg-background p-2">
-                      {clubsQuery.isFetching && !clubsQuery.data ? (
-                        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Spinner />
-                          Loading GameDay clubs…
-                        </p>
-                      ) : gamedayClubs.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                          Select a season to load GameDay club names.
-                        </p>
-                      ) : visibleGamedayClubs.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                          No GameDay names match “{clubSearch.trim()}”.
-                        </p>
-                      ) : (
-                        <div className="grid gap-1 md:grid-cols-2">
-                          {visibleGamedayClubs.map((club) => {
-                            const checked = selectedClubNames.includes(
-                              club.name,
-                            );
-                            return (
-                              <label
-                                key={club.name}
-                                className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-muted"
-                              >
-                                <Checkbox
-                                  checked={checked}
-                                  onCheckedChange={() => {
-                                    setSelectedClubNames((current) =>
-                                      current.includes(club.name)
-                                        ? current.filter(
-                                            (name) => name !== club.name,
-                                          )
-                                        : [...current, club.name],
-                                    );
-                                  }}
-                                />
-                                <span>{club.name}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                      <span>
-                        {selectedClubNames.length === 0
-                          ? "No GameDay names selected."
-                          : `${selectedClubNames.length} selected.`}
-                      </span>
-                      <div className="flex gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 px-2 text-xs"
-                          onClick={() => {
-                            setSelectedClubNames([]);
-                          }}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-7 px-2 text-xs"
-                          onClick={() => {
-                            setClubPickerOpen(false);
-                          }}
-                        >
-                          Done
-                        </Button>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => {
+                          setSelectedClubNames([]);
+                        }}
+                      >
+                        Clear
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={close}
+                      >
+                        Done
+                      </Button>
+                    </>
+                  )}
+                />
               </div>
 
-              <Button
-                type="button"
-                onClick={() => {
-                  importMutation.mutate({ competitions });
-                }}
-                disabled={
-                  competitionsQuery.isFetching ||
-                  importMutation.isPending ||
-                  competitions.length === 0
-                }
-              >
-                {importMutation.isPending
-                  ? "Importing…"
-                  : importableCompetitions.length === 0 &&
-                      competitions.length > 0
-                    ? "Refresh squads"
-                    : `Import ${importableCompetitions.length} squads`}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    associationSyncMutation.mutate({
+                      ...(selectedSeasonId !== "" && {
+                        seasonId: selectedSeasonId,
+                      }),
+                      includeRosters: false,
+                    });
+                  }}
+                  disabled={
+                    selectedSeasonId === "" || associationSyncMutation.isPending
+                  }
+                >
+                  {associationSyncMutation.isPending
+                    ? "Syncing league…"
+                    : "Sync Lacrosse Victoria"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    importMutation.mutate({
+                      seasonId: selectedSeasonId,
+                      competitions,
+                    });
+                  }}
+                  disabled={
+                    competitionsQuery.isFetching ||
+                    importMutation.isPending ||
+                    selectedSeasonId === "" ||
+                    competitions.length === 0
+                  }
+                >
+                  {importMutation.isPending
+                    ? "Importing…"
+                    : competitionsQuery.isFetching
+                      ? "Loading squads…"
+                      : competitions.length > 0
+                        ? `Link/import ${competitions.length} squads`
+                        : "Link/import squads"}
+                </Button>
+              </div>
             </div>
 
-            {seasonsQuery.isFetching && seasons.length === 0 && (
-              <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Spinner />
-                Loading GameDay seasons…
-              </p>
-            )}
-            {clubsQuery.isFetching &&
-              selectedSeasonId !== "" &&
-              !clubsQuery.data && (
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Spinner />
-                  Loading GameDay clubs…
-                </p>
-              )}
-            {competitionsQuery.isFetching && selectedClubNames.length > 0 && (
-              <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Spinner />
-                Loading squads for {selectedClubNames.length} selected GameDay
-                name{selectedClubNames.length === 1 ? "" : "s"}…
-              </p>
-            )}
             {syncMsg && (
               <p className="text-xs text-muted-foreground">{syncMsg}</p>
             )}
@@ -777,13 +691,6 @@ function Teams({
                       key={team.id}
                       team={team}
                       members={members}
-                      syncing={
-                        syncMutation.isPending &&
-                        syncMutation.variables.teamId === team.id
-                      }
-                      onSync={() => {
-                        syncMutation.mutate({ teamId: team.id });
-                      }}
                       onUpdate={(vars) => {
                         updateMutation.mutate(vars);
                       }}
@@ -815,15 +722,11 @@ const memberRoleLabel = (member: Member, teams: readonly TeamView[]) => {
 function TeamRow({
   team,
   members,
-  syncing,
-  onSync,
   onUpdate,
   onDelete,
 }: {
   team: TeamView;
   members: readonly Member[];
-  syncing: boolean;
-  onSync: () => void;
   onUpdate: (vars: TeamUpdate) => void;
   onDelete: () => void;
 }) {
@@ -860,13 +763,6 @@ function TeamRow({
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-1">
-          <Button
-            variant="outline"
-            onClick={onSync}
-            disabled={syncing || !team.gamedayCompId || !team.gamedayTeamId}
-          >
-            {syncing ? "Syncing…" : "Sync"}
-          </Button>
           <ConfirmDialog
             title={`Delete ${team.name}?`}
             description="Fixtures go with it."
@@ -911,6 +807,14 @@ function Recipients({
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["recipients"] }),
   });
+
+  const teamOptions = useMemo(
+    () => [
+      { value: "", label: "All teams" },
+      ...teams.map((team) => ({ value: team.id, label: team.name })),
+    ],
+    [teams],
+  );
 
   const teamName = (id: string | null) =>
     id === null
@@ -959,10 +863,7 @@ function Recipients({
             className="min-w-40 flex-1"
           />
           <Select
-            items={[
-              { value: "", label: "All teams" },
-              ...teams.map((team) => ({ value: team.id, label: team.name })),
-            ]}
+            items={teamOptions}
             value={teamId}
             onValueChange={(value: string | null) => {
               setTeamId(value ?? "");
@@ -971,7 +872,10 @@ function Recipients({
             <SelectTrigger className="min-w-36">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              align="end"
+              className="w-max min-w-(--anchor-width) max-w-[min(44rem,calc(100vw-2rem))]"
+            >
               <SelectItem value="">All teams</SelectItem>
               {teams.map((team) => (
                 <SelectItem key={team.id} value={team.id}>

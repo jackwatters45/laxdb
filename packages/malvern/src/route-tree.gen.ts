@@ -14,15 +14,16 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
-import { Route as AppRosterRouteImport } from './routes/_app.roster'
-import { Route as AppProfileRouteImport } from './routes/_app.profile'
-import { Route as AppPlayerRouteImport } from './routes/_app.player'
-import { Route as AppFixturesRouteImport } from './routes/_app.fixtures'
-import { Route as AppFinesRouteImport } from './routes/_app.fines'
-import { Route as AppAuditRouteImport } from './routes/_app.audit'
-import { Route as AppAdminRouteImport } from './routes/_app.admin'
-import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
-import { Route as AppReportFixtureIdRouteImport } from './routes/_app.report.$fixtureId'
+import { Route as AppRosterRouteImport } from './routes/_app/roster'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppPlayerRouteImport } from './routes/_app/player'
+import { Route as AppFixturesRouteImport } from './routes/_app/fixtures'
+import { Route as AppFinesRouteImport } from './routes/_app/fines'
+import { Route as AppAuditRouteImport } from './routes/_app/audit'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as ApiReportImagesImageIdRouteImport } from './routes/api/report-images/$imageId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppReportFixtureIdRouteImport } from './routes/_app/report/$fixtureId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -83,6 +84,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiReportImagesImageIdRoute = ApiReportImagesImageIdRouteImport.update({
+  id: '/api/report-images/$imageId',
+  path: '/api/report-images/$imageId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/_app/report/$fixtureId': typeof AppReportFixtureIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/accept-invitation/$id'
     | '/report/$fixtureId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/accept-invitation/$id'
     | '/report/$fixtureId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
   id:
     | '__root__'
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/accept-invitation/$id'
     | '/_app/report/$fixtureId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   AcceptInvitationIdRoute: typeof AcceptInvitationIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiReportImagesImageIdRoute: typeof ApiReportImagesImageIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/report-images/$imageId': {
+      id: '/api/report-images/$imageId'
+      path: '/api/report-images/$imageId'
+      fullPath: '/api/report-images/$imageId'
+      preLoaderRoute: typeof ApiReportImagesImageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -333,6 +353,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   AcceptInvitationIdRoute: AcceptInvitationIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiReportImagesImageIdRoute: ApiReportImagesImageIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

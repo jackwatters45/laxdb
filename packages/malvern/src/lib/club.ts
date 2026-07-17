@@ -28,12 +28,7 @@ export const listTeams = createServerFn({ method: "GET" })
 export const createTeam = createServerFn({ method: "POST" })
   .middleware([apiAuth])
   .inputValidator(
-    (input: {
-      name: string;
-      gamedayCompId?: string | null;
-      gamedayTeamId?: string | null;
-      coachMemberId?: string | null;
-    }) => input,
+    (input: { name: string; coachMemberId?: string | null }) => input,
   )
   .handler(({ data, context }) =>
     runApi(
@@ -48,13 +43,8 @@ export const createTeam = createServerFn({ method: "POST" })
 export const updateTeam = createServerFn({ method: "POST" })
   .middleware([apiAuth])
   .inputValidator(
-    (input: {
-      id: string;
-      name?: string;
-      gamedayCompId?: string | null;
-      gamedayTeamId?: string | null;
-      coachMemberId?: string | null;
-    }) => input,
+    (input: { id: string; name?: string; coachMemberId?: string | null }) =>
+      input,
   )
   .handler(({ data, context }) =>
     runApi(

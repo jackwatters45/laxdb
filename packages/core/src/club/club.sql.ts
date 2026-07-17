@@ -18,8 +18,6 @@ export const clubTeams = sqliteTable(
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    gamedayCompId: text("gameday_comp_id"),
-    gamedayTeamId: text("gameday_team_id"),
     coachMemberId: text("coach_member_id").references(() => members.id, {
       onDelete: "set null",
     }),

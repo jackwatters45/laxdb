@@ -16,10 +16,20 @@ import {
   GamedayTeamCompetition,
 } from "./gameday";
 import {
+  ImportGamedayTeamSelection,
+  ImportGamedayTeamsResult,
+  SyncGamedayAssociationSeasonResult,
+} from "./gameday.schema";
+import {
+  CreateMatchImageInput,
+  DeleteMatchImageInput,
   Fixture,
   FixtureByIdInput,
   ListFixturesInput,
+  ListMatchImagesInput,
   ListReportsInput,
+  MatchImage,
+  MatchImageContentType,
   MatchReport,
   SubmitReportInput,
   SyncFixturesInput,
@@ -42,6 +52,14 @@ export const MatchApiPayload = {
   }),
   fixtureById: Schema.Struct({ id: Schema.String }),
   syncFixtures: Schema.Struct({ teamId: Schema.String }),
+  syncGamedayAssociationSeason: Schema.Struct({
+    seasonId: Schema.optional(Schema.String),
+    includeRosters: Schema.optional(Schema.Boolean),
+  }),
+  importGamedayTeams: Schema.Struct({
+    seasonId: Schema.String,
+    teams: Schema.Array(ImportGamedayTeamSelection),
+  }),
   listCompetitions: Schema.Struct({
     seasonId: Schema.optional(Schema.String),
   }),
@@ -65,7 +83,18 @@ export const MatchApiPayload = {
     topPlayer2Id: Schema.optional(Schema.NullOr(Schema.String)),
     topPlayer3Id: Schema.optional(Schema.NullOr(Schema.String)),
     blurb: Schema.optional(Schema.NullOr(Schema.String)),
-    recipientIds: Schema.Array(Schema.String),
+  }),
+  listMatchImages: Schema.Struct({
+    fixtureId: Schema.String,
+  }),
+  uploadMatchImage: Schema.Struct({
+    fixtureId: Schema.String,
+    fileName: Schema.String,
+    contentType: MatchImageContentType,
+    dataBase64: Schema.String,
+  }),
+  deleteMatchImage: Schema.Struct({
+    id: Schema.String,
   }),
 } as const;
 
@@ -84,6 +113,16 @@ export const MatchContract = {
     success: SyncFixturesResult,
     error: MatchErrors,
     payload: SyncFixturesInput,
+  },
+  syncGamedayAssociationSeason: {
+    success: SyncGamedayAssociationSeasonResult,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayAssociationSeason,
+  },
+  importGamedayTeams: {
+    success: ImportGamedayTeamsResult,
+    error: MatchErrors,
+    payload: MatchApiPayload.importGamedayTeams,
   },
   listCompetitions: {
     success: Schema.Array(GamedayCompetition),
@@ -119,5 +158,20 @@ export const MatchContract = {
     success: MatchReport,
     error: MatchErrors,
     payload: SubmitReportInput,
+  },
+  listMatchImages: {
+    success: Schema.Array(MatchImage),
+    error: MatchErrors,
+    payload: ListMatchImagesInput,
+  },
+  uploadMatchImage: {
+    success: MatchImage,
+    error: MatchErrors,
+    payload: CreateMatchImageInput,
+  },
+  deleteMatchImage: {
+    success: MatchImage,
+    error: MatchErrors,
+    payload: DeleteMatchImageInput,
   },
 } as const;

@@ -20,8 +20,6 @@ export class ClubTeam extends Schema.Class<ClubTeam>("ClubTeam")({
   id: Id,
   organizationId: Id,
   name: Schema.String,
-  gamedayCompId: NullableId,
-  gamedayTeamId: NullableId,
   coachMemberId: NullableId,
   createdAt: Schema.Date,
 }) {}
@@ -72,8 +70,6 @@ export class CreateTeamInput extends Schema.Class<CreateTeamInput>(
 )({
   organizationId: Id,
   name: Schema.String.check(Schema.isMinLength(1), Schema.isTrimmed()),
-  gamedayCompId: Schema.optional(NullableId),
-  gamedayTeamId: Schema.optional(NullableId),
   coachMemberId: Schema.optional(NullableId),
 }) {}
 
@@ -85,8 +81,6 @@ export class UpdateTeamInput extends Schema.Class<UpdateTeamInput>(
   name: Schema.optional(
     Schema.String.check(Schema.isMinLength(1), Schema.isTrimmed()),
   ),
-  gamedayCompId: Schema.optional(NullableId),
-  gamedayTeamId: Schema.optional(NullableId),
   coachMemberId: Schema.optional(NullableId),
 }) {}
 

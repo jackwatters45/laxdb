@@ -16,7 +16,7 @@ import { defaultsTable } from "../defaults/defaults.sql";
 import { drillTable } from "../drill/drill.sql";
 import { DrizzleService, query } from "../drizzle/drizzle.service";
 import { fineEvents, fines, fineTemplates } from "../fine/fine.sql";
-import { fixtures, matchReports } from "../match/match.sql";
+import { fixtures, matchImages, matchReports } from "../match/match.sql";
 import { playTable } from "../play/play.sql";
 import { playerTable } from "../player/player.sql";
 import {
@@ -82,6 +82,7 @@ export const truncateAll = Effect.gen(function* () {
   const db = yield* DrizzleService;
 
   yield* query(db.delete(defaultsTable));
+  yield* query(db.delete(matchImages));
   yield* query(db.delete(matchReports));
   yield* query(db.delete(fixtures));
   yield* query(db.delete(rosterPlayers));

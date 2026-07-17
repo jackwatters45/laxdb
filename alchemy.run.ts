@@ -131,6 +131,7 @@ export default Alchemy.Stack(
       GOOGLE_CLIENT_SECRET: secrets.googleClientSecret,
       RESEND_API_KEY: isLocal ? Redacted.make("") : secrets.resendApiKey,
       TRUSTED_ORIGINS: trustedOrigins,
+      STORAGE: bucket,
     });
 
     // const marketing = yield* Cloudflare.Vite("marketing", {

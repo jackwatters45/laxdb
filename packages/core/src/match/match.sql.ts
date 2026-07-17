@@ -49,6 +49,35 @@ export const fixtures = sqliteTable(
   ],
 );
 
+export const matchImages = sqliteTable(
+  "match_images",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    fixtureId: text("fixture_id")
+      .notNull()
+      .references(() => fixtures.id, { onDelete: "cascade" }),
+    uploadedByUserId: text("uploaded_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    objectKey: text("object_key").notNull().unique(),
+    fileName: text("file_name").notNull(),
+    contentType: text("content_type")
+      .$type<"image/jpeg" | "image/png" | "image/webp" | "image/gif">()
+      .notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    createdAt: timestamp("created_at")
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+  },
+  (table) => [
+    index("match_images_org_idx").on(table.organizationId),
+    index("match_images_fixture_idx").on(table.fixtureId),
+  ],
+);
+
 export const matchReports = sqliteTable(
   "match_reports",
   {
@@ -94,5 +123,7 @@ export const matchReports = sqliteTable(
 
 export type Fixture = typeof fixtures.$inferSelect;
 export type NewFixture = typeof fixtures.$inferInsert;
+export type MatchImage = typeof matchImages.$inferSelect;
+export type NewMatchImage = typeof matchImages.$inferInsert;
 export type MatchReport = typeof matchReports.$inferSelect;
 export type NewMatchReport = typeof matchReports.$inferInsert;

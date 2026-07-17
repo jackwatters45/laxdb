@@ -40,7 +40,7 @@ import {
   listTeams,
   removeRosterPlayer,
   updateRosterPlayer,
-} from "../lib/club";
+} from "../../lib/club";
 
 export const Route = createFileRoute("/_app/roster")({
   component: Roster,

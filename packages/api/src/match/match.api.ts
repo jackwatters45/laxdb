@@ -55,6 +55,26 @@ const syncFixtures = HttpApiEndpoint.post(
   },
 );
 
+const syncGamedayAssociationSeason = HttpApiEndpoint.post(
+  "syncGamedayAssociationSeason",
+  "/api/gameday/sync-association-season",
+  {
+    success: MatchContract.syncGamedayAssociationSeason.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayAssociationSeason,
+  },
+);
+
+const importGamedayTeams = HttpApiEndpoint.post(
+  "importGamedayTeams",
+  "/api/gameday/import-teams",
+  {
+    success: MatchContract.importGamedayTeams.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.importGamedayTeams,
+  },
+);
+
 const listCompetitions = HttpApiEndpoint.post(
   "listCompetitions",
   "/api/gameday/competitions",
@@ -121,14 +141,49 @@ const submitReport = HttpApiEndpoint.post(
   },
 );
 
+const listMatchImages = HttpApiEndpoint.post(
+  "listMatchImages",
+  "/api/match-images/list",
+  {
+    success: MatchContract.listMatchImages.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listMatchImages,
+  },
+);
+
+const uploadMatchImage = HttpApiEndpoint.post(
+  "uploadMatchImage",
+  "/api/match-images/upload",
+  {
+    success: MatchContract.uploadMatchImage.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.uploadMatchImage,
+  },
+);
+
+const deleteMatchImage = HttpApiEndpoint.post(
+  "deleteMatchImage",
+  "/api/match-images/delete",
+  {
+    success: MatchContract.deleteMatchImage.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.deleteMatchImage,
+  },
+);
+
 export const MatchesGroup = HttpApiGroup.make("Matches")
   .add(listFixtures)
   .add(getFixture)
   .add(syncFixtures)
+  .add(syncGamedayAssociationSeason)
+  .add(importGamedayTeams)
   .add(listCompetitions)
   .add(listGamedayTeams)
   .add(listGamedaySeasons)
   .add(listGamedayClubs)
   .add(listCompetitionsForClubs)
   .add(listReports)
-  .add(submitReport);
+  .add(submitReport)
+  .add(listMatchImages)
+  .add(uploadMatchImage)
+  .add(deleteMatchImage);
