@@ -69,9 +69,7 @@ const stackSecrets = Config.all({
   resendApiKey: Config.redacted("RESEND_API_KEY").pipe(
     Config.withDefault(Redacted.make("")),
   ),
-  trustedOrigins: Config.string("TRUSTED_ORIGINS").pipe(
-    Config.withDefault(""),
-  ),
+  trustedOrigins: Config.string("TRUSTED_ORIGINS").pipe(Config.withDefault("")),
 });
 
 export default Alchemy.Stack(
@@ -146,6 +144,16 @@ export default Alchemy.Stack(
     //   },
     // });
 
+    const rulesWiki = yield* Cloudflare.Vite("rules-wiki", {
+      rootDir: "./packages/rules-wiki",
+      url: true,
+      domain: `rules.${baseDomain}`,
+      dev: {
+        port: 1341,
+        strictPort: true,
+      },
+    });
+
     const practicePlanner = yield* Cloudflare.Vite("practice-planner", {
       rootDir: "./packages/practice-planner",
       url: true,
@@ -192,6 +200,7 @@ export default Alchemy.Stack(
 
          **🥍 Practice Planner:** ${practicePlanner.url}
          **🦅 Malvern:** ${malvern.url}
+         **Women’s Rules Wiki:** ${rulesWiki.url}
 
          Built from commit ${process.env.GITHUB_SHA?.slice(0, 7) ?? "unknown"}
 
@@ -204,6 +213,7 @@ export default Alchemy.Stack(
       domain: baseDomain,
       practicePlanner: practicePlanner.url,
       malvern: malvern.url,
+      rulesWiki: rulesWiki.url,
       api: api.url,
       db: db.databaseId,
       kv: kvNamespace.namespaceId,
