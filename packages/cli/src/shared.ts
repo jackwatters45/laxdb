@@ -16,7 +16,7 @@ export const prettyFlag = Flag.boolean("pretty").pipe(
 
 export const baseUrlFlag = Flag.string("base-url").pipe(
   Flag.withDescription("API base URL"),
-  Flag.withDefault(process.env.LAXDB_API_URL ?? "http://localhost:1337"),
+  Flag.withDefault(process.env.LAXDB_API_URL ?? "http://localhost:1437"),
 );
 
 export const output = (data: unknown, pretty: boolean) =>

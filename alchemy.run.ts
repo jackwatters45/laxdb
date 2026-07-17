@@ -108,14 +108,14 @@ export default Alchemy.Stack(
     const baseDomain = baseDomainForStage(stage);
     const isLocal = stage !== config.stages.prod;
     const malvernOrigin = isLocal
-      ? "http://localhost:1338"
+      ? "http://localhost:1438"
       : `https://malvern.${baseDomain}`;
     const secrets = yield* stackSecrets;
     const trustedOrigins =
       secrets.trustedOrigins === ""
         ? [
             malvernOrigin,
-            "http://localhost:1337",
+            "http://localhost:1437",
             `https://malvern.${baseDomain}`,
           ].join(",")
         : secrets.trustedOrigins;
@@ -139,7 +139,7 @@ export default Alchemy.Stack(
     //   domain: baseDomain,
     //   compatibility: { flags: ["nodejs_compat"] },
     //   dev: {
-    //     port: 1339,
+    //     port: 1439,
     //     strictPort: true,
     //   },
     // });
@@ -149,7 +149,7 @@ export default Alchemy.Stack(
       url: true,
       domain: `rules.${baseDomain}`,
       dev: {
-        port: 1341,
+        port: 1441,
         strictPort: true,
       },
     });
@@ -160,12 +160,12 @@ export default Alchemy.Stack(
       domain: `planner.${baseDomain}`,
       compatibility: { flags: ["nodejs_compat"] },
       dev: {
-        port: 1340,
+        port: 1440,
         strictPort: true,
       },
       env: {
         API: api,
-        API_PORT: "1337",
+        API_PORT: "1437",
         IS_LOCAL: isLocal ? "true" : "",
       },
     });
@@ -176,7 +176,7 @@ export default Alchemy.Stack(
       domain: `malvern.${baseDomain}`,
       compatibility: { flags: ["nodejs_compat"] },
       dev: {
-        port: 1338,
+        port: 1438,
         strictPort: true,
       },
       // Service binding to the api worker. In v2 bindings go under `env`

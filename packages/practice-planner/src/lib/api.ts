@@ -33,7 +33,7 @@ const hasWorkerEnv = (value: unknown): value is CloudflareWorkersModule =>
 
 function getApiFetch(): { fetch?: typeof fetch; url: string } {
   if (isLocal) {
-    return { url: `http://localhost:${process.env.API_PORT ?? "1337"}` };
+    return { url: `http://localhost:${process.env.API_PORT ?? "1437"}` };
   }
 
   // oxlint-disable-next-line @typescript-eslint/no-require-imports -- Cloudflare exposes workers bindings via require in this environment
