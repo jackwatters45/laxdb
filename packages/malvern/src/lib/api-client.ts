@@ -18,7 +18,7 @@ type CloudflareWorkersModule = {
 };
 
 const isLocal = process.env.IS_LOCAL === "true";
-const localApiUrl = `http://localhost:${process.env.API_PORT ?? "1337"}`;
+const localApiUrl = `http://localhost:${process.env.API_PORT ?? "1437"}`;
 const apiUrl = isLocal ? localApiUrl : "http://api";
 
 const loadApiBinding = Effect.promise(async () => {

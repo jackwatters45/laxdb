@@ -85,7 +85,7 @@ export const makeApiWorker = (env: Cloudflare.WorkerBindingProps = {}) =>
     {
       main: import.meta.filename,
       dev: {
-        port: 1337,
+        port: 1437,
         strictPort: true,
       },
       env: {

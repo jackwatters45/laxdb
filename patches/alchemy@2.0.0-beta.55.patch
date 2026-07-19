@@ -1,0 +1,105 @@
+diff --git a/src/Cloudflare/Workers/Vite.ts b/src/Cloudflare/Workers/Vite.ts
+--- a/src/Cloudflare/Workers/Vite.ts
++++ b/src/Cloudflare/Workers/Vite.ts
+@@ -4,9 +4,42 @@
+ import * as Effect from "effect/Effect";
+ import * as Redacted from "effect/Redacted";
+ import { createRequire } from "node:module";
++import * as NodeNet from "node:net";
+ import path from "node:path";
+ import { pathToFileURL } from "node:url";
+ import type * as vite from "vite";
++
++const reservedVitePorts = new Set<number>();
++const viteServerPorts = new WeakMap<vite.ViteDevServer, number>();
++
++const reserveAvailableVitePort = async (): Promise<number> => {
++  while (true) {
++    const port = await new Promise<number>((resolve, reject) => {
++      const server = NodeNet.createServer();
++      server.once("error", reject);
++      server.listen(
++        { host: "127.0.0.1", port: 0, exclusive: true },
++        () => {
++          const address = server.address();
++          if (!address || typeof address === "string") {
++            server.close(() =>
++              reject(new Error("Failed to allocate a Vite development port")),
++            );
++            return;
++          }
++          server.close((error) =>
++            error ? reject(error) : resolve(address.port),
++          );
++        },
++      );
++      server.unref();
++    });
++    if (!reservedVitePorts.has(port)) {
++      reservedVitePorts.add(port);
++      return port;
++    }
++  }
++};
+ 
+ export const viteDev = (
+   rootDir: string = process.cwd(),
+@@ -16,19 +49,48 @@
+ ) =>
+   Effect.acquireRelease(
+     Effect.promise(async () => {
+-      const vite = await loadVite(rootDir);
+-      const devServer = await vite.createServer({
+-        root: rootDir,
+-        define: getDefine(env),
+-        plugins: [cloudflare(pluginOptions)],
+-        server: serverOptions,
+-      });
+-      await devServer.listen();
+-      return devServer;
++      const reservedPort =
++        serverOptions.port === 0
++          ? await reserveAvailableVitePort()
++          : undefined;
++      try {
++        const vite = await loadVite(rootDir);
++        const devServer = await vite.createServer({
++          root: rootDir,
++          define: getDefine(env),
++          plugins: [cloudflare(pluginOptions)],
++          server:
++            reservedPort === undefined
++              ? serverOptions
++              : {
++                  ...serverOptions,
++                  host: "127.0.0.1",
++                  port: reservedPort,
++                  strictPort: true,
++                },
++        });
++        await devServer.listen();
++        if (reservedPort !== undefined) {
++          viteServerPorts.set(devServer, reservedPort);
++        }
++        return devServer;
++      } catch (error) {
++        if (reservedPort !== undefined) {
++          reservedVitePorts.delete(reservedPort);
++        }
++        throw error;
++      }
+     }),
+     (devServer) =>
+       Effect.promise(async () => {
+-        await devServer.close();
++        const reservedPort = viteServerPorts.get(devServer);
++        try {
++          await devServer.close();
++        } finally {
++          if (reservedPort !== undefined) {
++            reservedVitePorts.delete(reservedPort);
++          }
++        }
+       }),
+   );
+ 

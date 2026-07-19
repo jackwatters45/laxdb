@@ -8,7 +8,7 @@ const isLocalRequest = (request: Request) => {
 };
 
 const apiOrigin = (request: Request) =>
-  isLocalRequest(request) ? "http://localhost:1337" : "http://api";
+  isLocalRequest(request) ? "http://localhost:1437" : "http://api";
 
 const toApiRequest = (request: Request) => {
   const source = new URL(request.url);
