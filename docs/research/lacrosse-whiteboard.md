@@ -19,6 +19,12 @@ Normalized coordinates keep persisted tactics independent of responsive SVG pixe
 
 V1 does not include freehand ink, curved path handles, text/zone annotations, formation presets, roster binding, pan/zoom, multi-select, conditional reads, per-actor timing, export, share links, comments, live collaboration, version recovery, video telestration, 3D, or automated tactical validation. These capabilities broaden interaction and persistence substantially; the first release prioritizes reliable play construction, semantic round trips, tablet operation, and useful playback.
 
+## Live walkthrough follow-up
+
+The live walkthrough remains semantic rather than becoming a screen or video recording. **Capture stage** clones the current editable board, while recording turns each completed player movement or drawn action into a timed stage using the existing normalized frame model. This keeps demonstrations editable, compact, accessible to playback controls, and compatible with the version-1 persisted diagram.
+
+Recording intentionally locks structural setup such as field templates and actor creation while leaving selection, player movement, lacrosse actions, stage capture, and action deletion available. Visible keyboard shortcuts support a coach working at presentation speed: `V` selects, `O`/`D`/`B` add actors before recording, `C` cuts, `G` carries, `P` passes, `K` signals a pick, `X` shoots, `S` slides, `R` recovers, `N` captures a stage, and `Shift+R` starts or stops recording. Audio narration remains out of scope.
+
 ## Residual rationale
 
 Formation labels vary by program and counting direction, so v1 never derives coordinates or player counts from a formation name. NCAA geometry is identified as a template rather than treated as universal, leaving room for NFHS, youth, box, Sixes, and custom templates in later schema versions. The board’s action legend combines line pattern, weight, end cap, and color so meaning is not color-only.

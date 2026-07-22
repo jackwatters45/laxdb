@@ -68,6 +68,7 @@ function PlayDetailPage() {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [boardRecording, setBoardRecording] = useState(false);
 
   // Edit form state
   const [name, setName] = useState(play.name);
@@ -96,10 +97,12 @@ function PlayDetailPage() {
 
   const handleCancel = () => {
     resetForm();
+    setBoardRecording(false);
     setEditing(false);
   };
 
   const handleSave = async () => {
+    if (boardRecording) return;
     setSaving(true);
     const parsedTags = tags
       .split(",")
@@ -152,6 +155,8 @@ function PlayDetailPage() {
         videoUrl={videoUrl}
         setVideoUrl={setVideoUrl}
         saving={saving}
+        boardRecording={boardRecording}
+        setBoardRecording={setBoardRecording}
         onSave={voidAsync(handleSave)}
         onCancel={handleCancel}
       />
@@ -313,6 +318,8 @@ interface PlayEditViewProps extends PlayFormFieldsProps {
   diagram: PlayDiagram | null;
   setDiagram: (diagram: PlayDiagram | null) => void;
   saving: boolean;
+  boardRecording: boolean;
+  setBoardRecording: (recording: boolean) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -338,7 +345,12 @@ function PlayEditView(props: PlayEditViewProps) {
             </Button>
             <Button
               onClick={props.onSave}
-              disabled={props.saving || !props.name}
+              disabled={props.saving || props.boardRecording || !props.name}
+              title={
+                props.boardRecording
+                  ? "Stop the live recording before saving"
+                  : undefined
+              }
             >
               {props.saving ? <Loader2 className="animate-spin" /> : <Check />}
               {props.saving ? "Saving…" : "Save"}
@@ -361,6 +373,7 @@ function PlayEditView(props: PlayEditViewProps) {
               <PlayWhiteboard
                 diagram={props.diagram}
                 onChange={props.setDiagram}
+                onRecordingChange={props.setBoardRecording}
               />
             ) : (
               <div className="flex min-h-72 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border-strong bg-muted/30 p-8 text-center">
