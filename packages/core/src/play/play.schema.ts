@@ -87,6 +87,7 @@ export const PlayDiagramActor = Schema.Struct({
   kind: PlayDiagramActorKind,
   side: PlayDiagramSide,
   label: Schema.NullOr(Schema.String),
+  name: Schema.optional(Schema.String),
 });
 
 export const PlayDiagramActorState = Schema.Struct({

@@ -35,7 +35,15 @@ const diagram = {
     template: "mens-full",
     orientation: "attack-up",
   },
-  actors: [{ id: "player-1", kind: "player", side: "offense", label: "A1" }],
+  actors: [
+    {
+      id: "player-1",
+      kind: "player",
+      side: "offense",
+      label: "A1",
+      name: "Ava",
+    },
+  ],
   frames: [
     {
       id: "frame-1",

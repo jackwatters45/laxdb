@@ -8,6 +8,7 @@ import type {
   PlayDiagramValue,
 } from "@laxdb/core/play/play.schema";
 import { Button } from "@laxdb/ui/components/ui/button";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { cn } from "@laxdb/ui/lib/utils";
 import {
   ChevronLeft,
@@ -91,7 +92,13 @@ const isActionMode = (mode: BoardMode): mode is PlayDiagramActionTypeValue =>
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const ACTION_DRAG_THRESHOLD_PX = 8;
+const PLAYER_NAME_MAX_LENGTH = 24;
+const PLAYER_NAME_DISPLAY_LENGTH = 16;
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
+const compactPlayerName = (name: string) =>
+  name.length > PLAYER_NAME_DISPLAY_LENGTH
+    ? `${name.slice(0, PLAYER_NAME_DISPLAY_LENGTH - 1)}…`
+    : name;
 
 export const createEmptyPlayDiagram = (): PlayDiagramValue => ({
   version: 1,
@@ -294,6 +301,7 @@ export function PlayWhiteboard({
     clientY: number;
   } | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [playerNameDraft, setPlayerNameDraft] = useState("");
   const svgRef = useRef<SVGSVGElement>(null);
   const markerPrefix = useId().replaceAll(":", "");
   const currentDiagram = history.present;
@@ -302,6 +310,12 @@ export function PlayWhiteboard({
   const lastFrameIndex = currentDiagram.frames.length - 1;
   const activeFrameIndex = Math.min(Math.max(frameIndex, 0), lastFrameIndex);
   const currentFrame = currentDiagram.frames[activeFrameIndex];
+  const selectedActor =
+    selection?.kind === "actor"
+      ? currentDiagram.actors.find((actor) => actor.id === selection.id)
+      : undefined;
+  const selectedPlayer =
+    selectedActor?.kind === "player" ? selectedActor : undefined;
 
   const clearPointerGesture = useCallback(() => {
     setDrag(null);
@@ -327,6 +341,10 @@ export function PlayWhiteboard({
   useEffect(() => {
     onChange?.(history.present);
   }, [history.present, onChange]);
+
+  useEffect(() => {
+    setPlayerNameDraft(selectedPlayer?.name ?? "");
+  }, [selectedPlayer?.id, selectedPlayer?.name]);
 
   useEffect(() => {
     if (frameIndex !== activeFrameIndex) {
@@ -373,6 +391,20 @@ export function PlayWhiteboard({
       present: next,
       future: [],
     }));
+  };
+
+  const commitPlayerName = () => {
+    if (selectedPlayer === undefined) return;
+    const name = playerNameDraft.trim();
+    if ((selectedPlayer.name ?? "") === name) return;
+    commit({
+      ...currentDiagram,
+      actors: currentDiagram.actors.map((actor) =>
+        actor.id === selectedPlayer.id
+          ? { ...actor, name: name === "" ? undefined : name }
+          : actor,
+      ),
+    });
   };
 
   const pointFromEvent = (
@@ -783,7 +815,7 @@ export function PlayWhiteboard({
               lacrosse action, then drag across the field.
             </p>
           </div>
-          <div className="flex items-center justify-between gap-2 border-b border-border bg-card p-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-card p-2">
             <div className="flex gap-1">
               <Button
                 type="button"
@@ -808,16 +840,43 @@ export function PlayWhiteboard({
                 <Redo2 />
               </Button>
             </div>
-            <Button
-              type="button"
-              variant="destructive"
-              size="xl"
-              className="min-h-11"
-              disabled={selection === null}
-              onClick={deleteSelection}
-            >
-              <Trash2 /> Delete selected
-            </Button>
+            <div className="flex min-w-0 items-center gap-2">
+              {selectedPlayer !== undefined && (
+                <label className="flex h-11 items-center gap-2 rounded-md border border-border bg-muted/40 px-2">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Name
+                  </span>
+                  <Input
+                    value={playerNameDraft}
+                    onChange={(event) => {
+                      setPlayerNameDraft(event.target.value);
+                    }}
+                    onBlur={commitPlayerName}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") event.currentTarget.blur();
+                      if (event.key === "Escape") {
+                        event.preventDefault();
+                        setPlayerNameDraft(selectedPlayer.name ?? "");
+                      }
+                    }}
+                    maxLength={PLAYER_NAME_MAX_LENGTH}
+                    aria-label="Selected player name"
+                    placeholder="Add name"
+                    className="h-8 w-28 border-0 bg-card px-2 text-sm shadow-none sm:w-36"
+                  />
+                </label>
+              )}
+              <Button
+                type="button"
+                variant="destructive"
+                size="xl"
+                className="min-h-11"
+                disabled={selection === null}
+                onClick={deleteSelection}
+              >
+                <Trash2 /> Delete selected
+              </Button>
+            </div>
           </div>
         </>
       )}
@@ -1011,7 +1070,7 @@ export function PlayWhiteboard({
                   readOnly ? undefined : "group cursor-grab outline-none"
                 }
                 role={readOnly ? undefined : "button"}
-                aria-label={`${offense ? "Offense" : "Defense"} player ${actor.label ?? ""}`}
+                aria-label={`${offense ? "Offense" : "Defense"} player ${actor.label ?? ""}${actor.name === undefined ? "" : `, ${actor.name}`}`}
                 tabIndex={readOnly ? undefined : 0}
                 onPointerDown={(event) => {
                   startActorDrag(event, actor.id);
@@ -1057,6 +1116,21 @@ export function PlayWhiteboard({
                 >
                   {actor.label}
                 </text>
+                {actor.name !== undefined && actor.name !== "" && (
+                  <text
+                    y="39"
+                    textAnchor="middle"
+                    fill="var(--color-background)"
+                    stroke="var(--color-foreground)"
+                    strokeWidth="4"
+                    paintOrder="stroke"
+                    fontSize="13"
+                    fontWeight="700"
+                    className="pointer-events-none"
+                  >
+                    {compactPlayerName(actor.name)}
+                  </text>
+                )}
               </g>
             );
           })}

@@ -44,7 +44,13 @@ export const validPlayDiagram = (): PlayDiagramValue => ({
     orientation: "attack-up",
   },
   actors: [
-    { id: "attack-7", kind: "player", side: "offense", label: "7" },
+    {
+      id: "attack-7",
+      kind: "player",
+      side: "offense",
+      label: "7",
+      name: "Ava",
+    },
     { id: "defense-2", kind: "player", side: "defense", label: "2" },
     { id: "ball", kind: "ball", side: "neutral", label: null },
   ],
