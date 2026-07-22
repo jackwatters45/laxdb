@@ -2,6 +2,8 @@ import { index, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { ids, timestamps } from "../drizzle/drizzle.type";
 
+import type { PlayDiagramValue } from "./play.schema";
+
 export const playTable = sqliteTable(
   "play",
   {
@@ -31,7 +33,8 @@ export const playTable = sqliteTable(
       .notNull()
       .$defaultFn(() => []),
 
-    // Media
+    // Board and media
+    diagram: text("diagram", { mode: "json" }).$type<PlayDiagramValue | null>(),
     diagramUrl: text("diagram_url"),
     videoUrl: text("video_url"),
 

@@ -27,12 +27,141 @@ beforeEach(async () => {
   await truncateAllTables();
 });
 
+const diagram = {
+  version: 1,
+  field: {
+    discipline: "mens",
+    view: "full",
+    template: "mens-full",
+    orientation: "attack-up",
+  },
+  actors: [{ id: "player-1", kind: "player", side: "offense", label: "A1" }],
+  frames: [
+    {
+      id: "frame-1",
+      name: "Set",
+      durationMs: 1_000,
+      actorStates: [{ actorId: "player-1", position: { x: 0.5, y: 0.75 } }],
+      actions: [
+        {
+          id: "cut-1",
+          type: "cut",
+          start: { x: 0.5, y: 0.75 },
+          end: { x: 0.4, y: 0.5 },
+          actorId: "player-1",
+          targetActorId: null,
+        },
+      ],
+    },
+  ],
+};
+
+const invalidDiagramCases = () => {
+  const frame = diagram.frames[0];
+  const actor = diagram.actors[0];
+  const action = frame?.actions[0];
+  const actorState = frame?.actorStates[0];
+  if (
+    frame === undefined ||
+    actor === undefined ||
+    action === undefined ||
+    actorState === undefined
+  ) {
+    throw new Error("The valid diagram fixture must contain diagram entities");
+  }
+
+  return [
+    {
+      name: "duplicate actor id",
+      value: { ...diagram, actors: [...diagram.actors, { ...actor }] },
+    },
+    {
+      name: "duplicate frame id",
+      value: {
+        ...diagram,
+        frames: [
+          ...diagram.frames,
+          {
+            ...frame,
+            name: "Second set",
+            actions: frame.actions.map((item) => ({
+              ...item,
+              id: `${item.id}-second`,
+            })),
+          },
+        ],
+      },
+    },
+    {
+      name: "duplicate action id",
+      value: {
+        ...diagram,
+        frames: diagram.frames.map((item) => ({
+          ...item,
+          actions: [...item.actions, { ...action }],
+        })),
+      },
+    },
+    {
+      name: "duplicate actor state",
+      value: {
+        ...diagram,
+        frames: diagram.frames.map((item) => ({
+          ...item,
+          actorStates: [...item.actorStates, { ...actorState }],
+        })),
+      },
+    },
+    {
+      name: "dangling actor state reference",
+      value: {
+        ...diagram,
+        frames: diagram.frames.map((item) => ({
+          ...item,
+          actorStates: item.actorStates.map((state, index) =>
+            index === 0 ? { ...state, actorId: "missing-actor" } : state,
+          ),
+        })),
+      },
+    },
+    {
+      name: "dangling action actor reference",
+      value: {
+        ...diagram,
+        frames: diagram.frames.map((item) => ({
+          ...item,
+          actions: item.actions.map((itemAction, index) =>
+            index === 0
+              ? { ...itemAction, actorId: "missing-actor" }
+              : itemAction,
+          ),
+        })),
+      },
+    },
+    {
+      name: "dangling target actor reference",
+      value: {
+        ...diagram,
+        frames: diagram.frames.map((item) => ({
+          ...item,
+          actions: item.actions.map((itemAction, index) =>
+            index === 0
+              ? { ...itemAction, targetActorId: "missing-target" }
+              : itemAction,
+          ),
+        })),
+      },
+    },
+  ];
+};
+
 const minimalPlay = {
   name: "Invert 2-3-1",
   category: "offense",
   formation: null,
   description: null,
   personnelNotes: null,
+  diagram: null,
   diagramUrl: null,
   videoUrl: null,
 };
@@ -56,6 +185,8 @@ describe("POST /api/plays", () => {
 
     expect(status).toBe(200);
     expect(data).toHaveLength(2);
+    const plays = data.map(expectRecord);
+    expect(plays.every((play) => !("diagram" in play))).toBe(true);
   });
 });
 
@@ -83,6 +214,7 @@ describe("POST /api/plays/create", () => {
       description: "Jump the first pass.",
       personnelNotes: "Long-stick middie triggers.",
       tags: ["pressure", "sideline"],
+      diagram,
       diagramUrl: "https://example.com/ride.png",
       videoUrl: "https://example.com/ride.mp4",
     });
@@ -93,7 +225,20 @@ describe("POST /api/plays/create", () => {
     expect(play.category).toBe("ride");
     expect(play.formation).toBe("10-man");
     expect(play.tags).toEqual(["pressure", "sideline"]);
+    expect(play.diagram).toEqual(diagram);
   });
+
+  it.each(invalidDiagramCases())(
+    "rejects $name",
+    async ({ value: invalidDiagram }) => {
+      const { status } = await post(s.url, "/api/plays/create", {
+        ...minimalPlay,
+        diagram: invalidDiagram,
+      });
+
+      expect(status).toBe(400);
+    },
+  );
 
   it("returns error for empty name", async () => {
     const { status } = await post(s.url, "/api/plays/create", {
@@ -143,6 +288,7 @@ describe("POST /api/plays/update", () => {
       name: "Updated Play",
       category: "transition",
       tags: ["fast-break"],
+      diagram,
     });
 
     expect(status).toBe(200);
@@ -150,6 +296,7 @@ describe("POST /api/plays/update", () => {
     expect(play.name).toBe("Updated Play");
     expect(play.category).toBe("transition");
     expect(play.tags).toEqual(["fast-break"]);
+    expect(play.diagram).toEqual(diagram);
   });
 
   it("returns error for nonexistent play", async () => {

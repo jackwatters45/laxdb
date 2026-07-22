@@ -7,16 +7,20 @@ import { voidAsync } from "@laxdb/ui/lib/void-async";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Effect, Schema } from "effect";
-import { Check, Loader2, Pencil } from "lucide-react";
+import { Check, Loader2, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
 import {
   PlayFormFields,
   type PlayFormFieldsProps,
 } from "@/components/play-form-fields";
+import {
+  createEmptyPlayDiagram,
+  PlayWhiteboard,
+} from "@/components/play-whiteboard";
 import { runApi } from "@/lib/api";
 import { PLAY_CATEGORY_COLORS } from "@/lib/play-definitions";
-import type { PlayCategory } from "@/types";
+import type { PlayCategory, PlayDiagram } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -74,6 +78,7 @@ function PlayDetailPage() {
     play.personnelNotes ?? "",
   );
   const [tags, setTags] = useState(play.tags.join(", "));
+  const [diagram, setDiagram] = useState(play.diagram);
   const [diagramUrl, setDiagramUrl] = useState(play.diagramUrl ?? "");
   const [videoUrl, setVideoUrl] = useState(play.videoUrl ?? "");
 
@@ -84,6 +89,7 @@ function PlayDetailPage() {
     setDescription(play.description ?? "");
     setPersonnelNotes(play.personnelNotes ?? "");
     setTags(play.tags.join(", "));
+    setDiagram(play.diagram);
     setDiagramUrl(play.diagramUrl ?? "");
     setVideoUrl(play.videoUrl ?? "");
   };
@@ -109,6 +115,7 @@ function PlayDetailPage() {
         description: description || null,
         personnelNotes: personnelNotes || null,
         tags: parsedTags,
+        diagram,
         diagramUrl: diagramUrl || null,
         videoUrl: videoUrl || null,
       },
@@ -138,6 +145,8 @@ function PlayDetailPage() {
         setPersonnelNotes={setPersonnelNotes}
         tags={tags}
         setTags={setTags}
+        diagram={diagram}
+        setDiagram={setDiagram}
         diagramUrl={diagramUrl}
         setDiagramUrl={setDiagramUrl}
         videoUrl={videoUrl}
@@ -188,6 +197,37 @@ function PlayDetailPage() {
         </div>
 
         <Separator />
+
+        <section className="space-y-3" aria-labelledby="play-board-heading">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2
+                id="play-board-heading"
+                className="text-sm font-semibold text-foreground"
+              >
+                Play board
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {play.diagram
+                  ? "Step through the saved phases or play the sequence."
+                  : "No field board has been built for this play yet."}
+              </p>
+            </div>
+            {!play.diagram && (
+              <Button
+                variant="default"
+                size="xl"
+                onClick={() => {
+                  setDiagram(createEmptyPlayDiagram());
+                  setEditing(true);
+                }}
+              >
+                <Plus /> Build board
+              </Button>
+            )}
+          </div>
+          {play.diagram && <PlayWhiteboard diagram={play.diagram} readOnly />}
+        </section>
 
         {/* Description */}
         {play.description && (
@@ -270,6 +310,8 @@ function PlayDetailPage() {
 // ---------------------------------------------------------------------------
 
 interface PlayEditViewProps extends PlayFormFieldsProps {
+  diagram: PlayDiagram | null;
+  setDiagram: (diagram: PlayDiagram | null) => void;
   saving: boolean;
   onSave: () => void;
   onCancel: () => void;
@@ -278,7 +320,7 @@ interface PlayEditViewProps extends PlayFormFieldsProps {
 function PlayEditView(props: PlayEditViewProps) {
   return (
     <div className="min-h-dvh bg-background">
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+      <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -304,7 +346,49 @@ function PlayEditView(props: PlayEditViewProps) {
           </div>
         </div>
 
-        <PlayFormFields {...props} />
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.75fr)]">
+          <section className="space-y-3 lg:sticky lg:top-4">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">
+                Play board
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Build one phase at a time. Board changes are saved with the
+                play.
+              </p>
+            </div>
+            {props.diagram ? (
+              <PlayWhiteboard
+                diagram={props.diagram}
+                onChange={props.setDiagram}
+              />
+            ) : (
+              <div className="flex min-h-72 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border-strong bg-muted/30 p-8 text-center">
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    Start on a lacrosse field
+                  </h3>
+                  <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                    Add players, the ball, coaching actions, and duplicate
+                    phases to show progression.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="xl"
+                  onClick={() => {
+                    props.setDiagram(createEmptyPlayDiagram());
+                  }}
+                >
+                  <Plus /> Build board
+                </Button>
+              </div>
+            )}
+          </section>
+          <div className="space-y-8 rounded-xl border border-border bg-card p-5">
+            <PlayFormFields {...props} />
+          </div>
+        </div>
       </div>
     </div>
   );

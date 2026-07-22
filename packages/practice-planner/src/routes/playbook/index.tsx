@@ -20,7 +20,7 @@ import {
   PLAY_CATEGORY_FILTER_OPTIONS,
   type PlayCategoryFilter,
 } from "@/lib/play-definitions";
-import type { Play } from "@/types";
+import type { PlaySummary } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Server functions
@@ -96,7 +96,7 @@ function PlaybookListPage() {
       if (matching.length > 0) acc.push({ label: cat.label, plays: matching });
       return acc;
     },
-    [] as { label: string; plays: readonly Play[] }[],
+    [] as { label: string; plays: readonly PlaySummary[] }[],
   );
 
   return (
@@ -209,7 +209,7 @@ function PlayGroup({
   plays,
 }: {
   title: string;
-  plays: readonly Play[];
+  plays: readonly PlaySummary[];
 }) {
   return (
     <section>
@@ -227,7 +227,7 @@ function PlayGroup({
   );
 }
 
-function PlayCard({ play }: { play: Play }) {
+function PlayCard({ play }: { play: PlaySummary }) {
   const router = useRouter();
 
   const handleDelete = async () => {

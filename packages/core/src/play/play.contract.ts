@@ -12,6 +12,7 @@ import {
   DeletePlayInput,
   GetPlayInput,
   Play,
+  PlaySummary,
   UpdatePlayInput,
 } from "./play.schema";
 
@@ -24,7 +25,7 @@ export const PlayErrors = Schema.Union([
 
 export const PlayContract = {
   list: {
-    success: Schema.Array(Play),
+    success: Schema.Array(PlaySummary),
     error: PlayErrors,
     payload: Schema.NullOr(Schema.Void),
   },
