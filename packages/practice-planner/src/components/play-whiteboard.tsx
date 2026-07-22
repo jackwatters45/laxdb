@@ -95,6 +95,9 @@ const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const ACTION_DRAG_THRESHOLD_PX = 8;
 const PLAYER_NAME_MAX_LENGTH = 24;
 const PLAYER_NAME_DISPLAY_LENGTH = 16;
+const MANUAL_FRAME_TRANSITION_MS = 420;
+const MIN_PLAYBACK_TRANSITION_MS = 280;
+const MAX_PLAYBACK_TRANSITION_MS = 800;
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 const compactPlayerName = (name: string) =>
   name.length > PLAYER_NAME_DISPLAY_LENGTH
@@ -117,6 +120,11 @@ const playerLabelModeText = (mode: PlayDiagramPlayerLabelModeValue) => {
   }
   throw new Error("Unknown player label mode");
 };
+const playbackTransitionDuration = (frameDurationMs: number) =>
+  Math.min(
+    MAX_PLAYBACK_TRANSITION_MS,
+    Math.max(MIN_PLAYBACK_TRANSITION_MS, frameDurationMs * 0.6),
+  );
 const nextPlayerLabelMode = (
   mode: PlayDiagramPlayerLabelModeValue,
 ): PlayDiagramPlayerLabelModeValue => {
@@ -343,6 +351,9 @@ export function PlayWhiteboard({
   const lastFrameIndex = currentDiagram.frames.length - 1;
   const activeFrameIndex = Math.min(Math.max(frameIndex, 0), lastFrameIndex);
   const currentFrame = currentDiagram.frames[activeFrameIndex];
+  const actorTransitionDurationMs = playing
+    ? playbackTransitionDuration(currentFrame?.durationMs ?? 0)
+    : MANUAL_FRAME_TRANSITION_MS;
   const selectedActor =
     selection?.kind === "actor"
       ? currentDiagram.actors.find((actor) => actor.id === selection.id)
@@ -990,9 +1001,10 @@ export function PlayWhiteboard({
                 role={readOnly ? undefined : "button"}
                 aria-label={`${action.type.replace("-", " ")} action`}
                 tabIndex={readOnly ? undefined : 0}
-                className={
-                  readOnly ? undefined : "group cursor-pointer outline-none"
-                }
+                className={cn(
+                  "animate-in fade-in duration-300 motion-reduce:animate-none",
+                  readOnly ? undefined : "group cursor-pointer outline-none",
+                )}
                 onPointerDown={(event) => {
                   event.stopPropagation();
                   if (!readOnly) {
@@ -1071,9 +1083,16 @@ export function PlayWhiteboard({
                 <g
                   key={actor.id}
                   transform={`translate(${point.x} ${point.y})`}
-                  className={
-                    readOnly ? undefined : "group cursor-grab outline-none"
-                  }
+                  style={{
+                    transitionDuration: `${actorTransitionDurationMs}ms`,
+                    transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
+                  className={cn(
+                    drag?.actorId === actor.id
+                      ? "transition-none"
+                      : "transition-transform motion-reduce:transition-none",
+                    readOnly ? undefined : "group cursor-grab outline-none",
+                  )}
                   role={readOnly ? undefined : "button"}
                   aria-label="Ball"
                   tabIndex={readOnly ? undefined : 0}
@@ -1119,9 +1138,16 @@ export function PlayWhiteboard({
               <g
                 key={actor.id}
                 transform={`translate(${point.x} ${point.y})`}
-                className={
-                  readOnly ? undefined : "group cursor-grab outline-none"
-                }
+                style={{
+                  transitionDuration: `${actorTransitionDurationMs}ms`,
+                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
+                className={cn(
+                  drag?.actorId === actor.id
+                    ? "transition-none"
+                    : "transition-transform motion-reduce:transition-none",
+                  readOnly ? undefined : "group cursor-grab outline-none",
+                )}
                 role={readOnly ? undefined : "button"}
                 aria-label={`${offense ? "Offense" : "Defense"} player ${actor.label ?? ""}${playerName === "" ? "" : `, ${playerName}`}`}
                 tabIndex={readOnly ? undefined : 0}
