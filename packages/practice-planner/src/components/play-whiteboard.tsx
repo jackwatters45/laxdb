@@ -210,9 +210,6 @@ function MensField({ full }: { full: boolean }) {
           <path d={`M 276 ${goalY} Q 300 ${goalY + 34} 324 ${goalY}`} />
         </g>
       ))}
-      <text x="300" y={full ? 438 : 348} textAnchor="middle">
-        MIDFIELD / RESTRAINING LINE
-      </text>
     </>
   );
 }
