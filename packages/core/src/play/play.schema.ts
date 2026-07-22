@@ -29,6 +29,11 @@ export const PlayDiagramOrientation = Schema.Literals([
   "attack-up",
   "attack-down",
 ]);
+export const PlayDiagramPlayerLabelMode = Schema.Literals([
+  "numbers",
+  "initials",
+  "names",
+]);
 export const PlayDiagramActorKind = Schema.Literals(["player", "ball"]);
 export const PlayDiagramSide = Schema.Literals([
   "offense",
@@ -200,6 +205,7 @@ const playDiagramReferencesAreValid = Schema.makeFilter<{
 
 export const PlayDiagram = Schema.Struct({
   version: Schema.Literal(1),
+  playerLabelMode: Schema.optional(PlayDiagramPlayerLabelMode),
   field: PlayDiagramField,
   actors: Schema.Array(PlayDiagramActor),
   frames: Schema.Array(PlayDiagramFrame).check(Schema.isMinLength(1)),
@@ -212,6 +218,8 @@ export type PlayDiagramFrameValue = typeof PlayDiagramFrame.Type;
 export type PlayDiagramActionValue = typeof PlayDiagramAction.Type;
 export type PlayDiagramActionTypeValue = typeof PlayDiagramActionType.Type;
 export type PlayDiagramTemplateValue = typeof PlayDiagramTemplate.Type;
+export type PlayDiagramPlayerLabelModeValue =
+  typeof PlayDiagramPlayerLabelMode.Type;
 
 // ---------------------------------------------------------------------------
 // Domain schemas

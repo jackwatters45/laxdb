@@ -37,6 +37,7 @@ export const validCreateDrill = (
 
 export const validPlayDiagram = (): PlayDiagramValue => ({
   version: 1,
+  playerLabelMode: "initials",
   field: {
     discipline: "womens",
     view: "half",

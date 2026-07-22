@@ -29,6 +29,7 @@ beforeEach(async () => {
 
 const diagram = {
   version: 1,
+  playerLabelMode: "initials",
   field: {
     discipline: "mens",
     view: "full",

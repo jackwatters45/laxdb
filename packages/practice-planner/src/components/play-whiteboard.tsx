@@ -3,6 +3,7 @@ import type {
   PlayDiagramActionValue,
   PlayDiagramActorValue,
   PlayDiagramFrameValue,
+  PlayDiagramPlayerLabelModeValue,
   PlayDiagramPointValue,
   PlayDiagramTemplateValue,
   PlayDiagramValue,
@@ -99,9 +100,40 @@ const compactPlayerName = (name: string) =>
   name.length > PLAYER_NAME_DISPLAY_LENGTH
     ? `${name.slice(0, PLAYER_NAME_DISPLAY_LENGTH - 1)}…`
     : name;
+const playerInitials = (name: string) => {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.charAt(0) ?? "";
+  const last = parts.length > 1 ? (parts.at(-1)?.charAt(0) ?? "") : "";
+  return `${first}${last}`.toUpperCase();
+};
+const playerLabelModeText = (mode: PlayDiagramPlayerLabelModeValue) => {
+  switch (mode) {
+    case "numbers":
+      return "IDs";
+    case "initials":
+      return "Initials";
+    case "names":
+      return "Names";
+  }
+  throw new Error("Unknown player label mode");
+};
+const nextPlayerLabelMode = (
+  mode: PlayDiagramPlayerLabelModeValue,
+): PlayDiagramPlayerLabelModeValue => {
+  switch (mode) {
+    case "names":
+      return "initials";
+    case "initials":
+      return "numbers";
+    case "numbers":
+      return "names";
+  }
+  throw new Error("Unknown player label mode");
+};
 
 export const createEmptyPlayDiagram = (): PlayDiagramValue => ({
   version: 1,
+  playerLabelMode: "names",
   field: {
     discipline: "mens",
     view: "half",
@@ -305,6 +337,7 @@ export function PlayWhiteboard({
   const svgRef = useRef<SVGSVGElement>(null);
   const markerPrefix = useId().replaceAll(":", "");
   const currentDiagram = history.present;
+  const playerLabelMode = currentDiagram.playerLabelMode ?? "names";
   const full = currentDiagram.field.view === "full";
   const boardHeight = full ? 900 : 540;
   const lastFrameIndex = currentDiagram.frames.length - 1;
@@ -750,6 +783,21 @@ export function PlayWhiteboard({
               >
                 <FlipVertical2 /> Flip attack
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="xl"
+                className="min-h-11 shrink-0 px-3"
+                aria-label={`Player labels: ${playerLabelModeText(playerLabelMode)}. Change to ${playerLabelModeText(nextPlayerLabelMode(playerLabelMode))}`}
+                onClick={() => {
+                  commit({
+                    ...currentDiagram,
+                    playerLabelMode: nextPlayerLabelMode(playerLabelMode),
+                  });
+                }}
+              >
+                Labels: {playerLabelModeText(playerLabelMode)}
+              </Button>
             </div>
           </div>
           <div className="border-b border-border p-3">
@@ -1062,6 +1110,11 @@ export function PlayWhiteboard({
               );
             }
             const offense = actor.side === "offense";
+            const playerName = actor.name?.trim() ?? "";
+            const markerLabel =
+              playerLabelMode === "initials" && playerName !== ""
+                ? playerInitials(playerName)
+                : actor.label;
             return (
               <g
                 key={actor.id}
@@ -1070,7 +1123,7 @@ export function PlayWhiteboard({
                   readOnly ? undefined : "group cursor-grab outline-none"
                 }
                 role={readOnly ? undefined : "button"}
-                aria-label={`${offense ? "Offense" : "Defense"} player ${actor.label ?? ""}${actor.name === undefined ? "" : `, ${actor.name}`}`}
+                aria-label={`${offense ? "Offense" : "Defense"} player ${actor.label ?? ""}${playerName === "" ? "" : `, ${playerName}`}`}
                 tabIndex={readOnly ? undefined : 0}
                 onPointerDown={(event) => {
                   startActorDrag(event, actor.id);
@@ -1114,9 +1167,9 @@ export function PlayWhiteboard({
                   fontSize="15"
                   fontWeight="700"
                 >
-                  {actor.label}
+                  {markerLabel}
                 </text>
-                {actor.name !== undefined && actor.name !== "" && (
+                {playerLabelMode === "names" && playerName !== "" && (
                   <text
                     y="39"
                     textAnchor="middle"
@@ -1128,7 +1181,7 @@ export function PlayWhiteboard({
                     fontWeight="700"
                     className="pointer-events-none"
                   >
-                    {compactPlayerName(actor.name)}
+                    {compactPlayerName(playerName)}
                   </text>
                 )}
               </g>
