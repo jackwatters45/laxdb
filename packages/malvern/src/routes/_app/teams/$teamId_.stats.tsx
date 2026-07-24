@@ -52,7 +52,6 @@ function TeamStatsPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Team statistics"
         description="Current-season team record and player totals, with local entries kept separate from GameDay."

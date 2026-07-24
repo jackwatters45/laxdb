@@ -73,7 +73,6 @@ function TeamPhotosPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Photos"
         description="Match photos grouped by fixture. Open a game to add or remove images."

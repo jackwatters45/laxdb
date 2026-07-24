@@ -155,7 +155,6 @@ function TeamRosterPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Roster"
         description="Sync GameDay players, then add or edit local roster details whenever needed."

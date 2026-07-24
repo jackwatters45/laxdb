@@ -67,7 +67,6 @@ function TeamReportsPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Reports"
         description="Submitted match reports for this squad. Open a game to create or edit its report."

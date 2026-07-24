@@ -46,7 +46,6 @@ function TeamStandingsPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Standings"
         description="The published GameDay ladder for this team's current competition."

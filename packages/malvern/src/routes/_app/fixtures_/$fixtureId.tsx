@@ -70,14 +70,7 @@ const fixtureKickoff = (fixture: FixtureView) =>
 function FixtureSummary({ fixture }: { readonly fixture: FixtureView }) {
   const completed = fixture.homeScore !== null && fixture.awayScore !== null;
   return (
-    <div className="space-y-4">
-      <Link
-        to="/teams/$teamId"
-        params={{ teamId: fixture.teamId }}
-        className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
-      >
-        ← Back to team
-      </Link>
+    <div id="details" className="scroll-mt-24 space-y-4">
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -298,24 +291,10 @@ function FixtureDetail() {
   return (
     <div className="flex flex-col gap-8">
       <FixtureSummary fixture={fixture} />
-      <nav
-        aria-label="Fixture sections"
-        className="flex flex-wrap gap-x-5 gap-y-2 border-b pb-3 text-sm"
-      >
-        <a href="#stats" className="underline-offset-4 hover:underline">
-          Game statistics
-        </a>
-        <a href="#report" className="underline-offset-4 hover:underline">
-          Match report
-        </a>
-        <a href="#photos" className="underline-offset-4 hover:underline">
-          Photos ({images.length})
-        </a>
-      </nav>
-      <section id="stats" className="scroll-mt-6">
+      <section id="stats" className="scroll-mt-24">
         <FixtureStatsForm fixture={fixture} roster={activeRoster} />
       </section>
-      <section id="report" className="scroll-mt-6">
+      <section id="report" className="scroll-mt-24">
         <ReportFormInner
           fixture={fixture}
           roster={activeRoster}
@@ -921,7 +900,7 @@ function ReportFormInner(props: {
           </CardContent>
         </Card>
 
-        <div id="photos" className="scroll-mt-6">
+        <div id="photos" className="scroll-mt-24">
           <MatchImagesCard fixtureId={fixture.id} images={images} />
         </div>
 

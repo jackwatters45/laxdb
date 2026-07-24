@@ -1,14 +1,23 @@
-import { Button } from "@laxdb/ui/components/ui/button";
+import { Separator } from "@laxdb/ui/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@laxdb/ui/components/ui/sidebar";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   createFileRoute,
-  Link,
   Outlet,
   redirect,
   useRouter,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import {
+  AppBreadcrumbs,
+  AppTopNavigation,
+} from "../components/app-breadcrumbs";
+import { AppSidebar } from "../components/app-sidebar";
 import { authClient } from "../lib/auth-client";
 import { listTeams } from "../lib/club";
 import { ME_QUERY_KEY } from "../lib/session";
@@ -41,15 +50,14 @@ export const Route = createFileRoute("/_app")({
   component: AppShell,
 });
 
-const navLinkClass =
-  "-mb-px border-b-2 border-transparent pb-2 text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground data-[status=active]:border-primary data-[status=active]:text-foreground";
-
 function AppShell() {
   const ctx = Route.useRouteContext();
   const router = useRouter();
   const queryClient = useQueryClient();
   const me = ctx.me;
   const canUseTeamApp = ctx.isAdmin || ctx.isCoach;
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   useEffect(() => {
     queryClient.setQueryData(ME_QUERY_KEY, me);
@@ -57,77 +65,72 @@ function AppShell() {
   }, [ctx.teams, me, queryClient]);
 
   const signOut = async () => {
-    await authClient.signOut();
-    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
-    await router.invalidate();
-    await router.navigate({ to: "/login" });
+    setIsSigningOut(true);
+    setSignOutError(null);
+
+    try {
+      const result = await authClient.signOut();
+      if (result.error) {
+        setSignOutError(result.error.message ?? "Unable to sign out.");
+        setIsSigningOut(false);
+        return;
+      }
+
+      queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
+      await router.navigate({ to: "/login" });
+      await router.invalidate();
+    } catch (cause) {
+      setSignOutError(
+        cause instanceof Error ? cause.message : "Unable to sign out.",
+      );
+      setIsSigningOut(false);
+    }
   };
 
   if (!me) return null;
 
   const roleLabel = ctx.isAdmin
-    ? me.memberRole
+    ? (me.memberRole ?? "admin")
     : ctx.isCoach
       ? "coach"
       : "player";
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <strong className="text-sm font-semibold tracking-tight">
-          Malvern Lacrosse
-        </strong>
-        <div className="flex items-center gap-3">
-          <Link
-            to="/profile"
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-          >
-            {me.userName.trim() === "" ? me.userEmail : me.userName} ·{" "}
-            {roleLabel}
-          </Link>
-          <Button
-            variant="outline"
-            onClick={() => {
-              void signOut();
-            }}
-          >
-            Sign out
-          </Button>
+    <SidebarProvider>
+      <a
+        className="sr-only z-50 rounded-md bg-background px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <AppSidebar
+        canUseTeamApp={canUseTeamApp}
+        isAdmin={ctx.isAdmin}
+        isSigningOut={isSigningOut}
+        me={me}
+        onSignOut={() => {
+          void signOut();
+        }}
+        roleLabel={roleLabel}
+        signOutError={signOutError}
+      />
+      <SidebarInset id="main-content" tabIndex={-1}>
+        <header className="sticky top-0 z-10 flex shrink-0 flex-col border-b border-border bg-background">
+          <div className="flex h-10 w-full min-w-0 items-center">
+            <div className="flex h-10 w-11 shrink-0 items-center justify-center">
+              <SidebarTrigger size="icon-lg" />
+            </div>
+            <Separator orientation="vertical" />
+            <div className="flex min-w-0 flex-1 items-center px-3 sm:px-4">
+              <AppBreadcrumbs teams={ctx.teams} />
+            </div>
+          </div>
+          <AppTopNavigation teams={ctx.teams} />
+        </header>
+        <div className="w-full flex-1 px-3 py-6 sm:px-4 lg:px-5">
+          <Outlet />
         </div>
-      </header>
-
-      <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border">
-        {canUseTeamApp ? (
-          <>
-            <Link to="/teams" className={navLinkClass}>
-              Teams
-            </Link>
-            <Link to="/fixtures" className={navLinkClass}>
-              Fixtures
-            </Link>
-            <Link to="/reports" className={navLinkClass}>
-              Reports
-            </Link>
-            <Link to="/photos" className={navLinkClass}>
-              Photos
-            </Link>
-            <Link to="/roster" className={navLinkClass}>
-              Roster
-            </Link>
-            {ctx.isAdmin && (
-              <Link to="/admin" className={navLinkClass}>
-                Admin
-              </Link>
-            )}
-          </>
-        ) : (
-          <Link to="/player" className={navLinkClass}>
-            Player
-          </Link>
-        )}
-      </nav>
-
-      <Outlet />
-    </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

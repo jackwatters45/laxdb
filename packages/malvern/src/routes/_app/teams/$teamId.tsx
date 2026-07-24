@@ -146,7 +146,6 @@ function TeamOverviewPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team.name}
         description="The operational home for this squad. Open a section to manage fixtures, reports, photos, roster, standings, or stats."
         actions={
