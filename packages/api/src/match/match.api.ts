@@ -55,6 +55,36 @@ const syncFixtures = HttpApiEndpoint.post(
   },
 );
 
+const syncGamedayRoster = HttpApiEndpoint.post(
+  "syncGamedayRoster",
+  "/api/gameday/sync-roster",
+  {
+    success: MatchContract.syncGamedayRoster.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayRoster,
+  },
+);
+
+const syncGamedayAssociationSeason = HttpApiEndpoint.post(
+  "syncGamedayAssociationSeason",
+  "/api/gameday/sync-association-season",
+  {
+    success: MatchContract.syncGamedayAssociationSeason.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayAssociationSeason,
+  },
+);
+
+const importGamedayTeams = HttpApiEndpoint.post(
+  "importGamedayTeams",
+  "/api/gameday/import-teams",
+  {
+    success: MatchContract.importGamedayTeams.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.importGamedayTeams,
+  },
+);
+
 const listCompetitions = HttpApiEndpoint.post(
   "listCompetitions",
   "/api/gameday/competitions",
@@ -62,6 +92,46 @@ const listCompetitions = HttpApiEndpoint.post(
     success: MatchContract.listCompetitions.success,
     error: MatchErrors,
     payload: MatchApiPayload.listCompetitions,
+  },
+);
+
+const listGamedayTeams = HttpApiEndpoint.post(
+  "listGamedayTeams",
+  "/api/gameday/teams",
+  {
+    success: MatchContract.listGamedayTeams.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayTeams,
+  },
+);
+
+const listGamedaySeasons = HttpApiEndpoint.post(
+  "listGamedaySeasons",
+  "/api/gameday/seasons",
+  {
+    success: MatchContract.listGamedaySeasons.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedaySeasons,
+  },
+);
+
+const listGamedayClubs = HttpApiEndpoint.post(
+  "listGamedayClubs",
+  "/api/gameday/clubs",
+  {
+    success: MatchContract.listGamedayClubs.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listGamedayClubs,
+  },
+);
+
+const listCompetitionsForClubs = HttpApiEndpoint.post(
+  "listCompetitionsForClubs",
+  "/api/gameday/competitions-for-clubs",
+  {
+    success: MatchContract.listCompetitionsForClubs.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listCompetitionsForClubs,
   },
 );
 
@@ -81,10 +151,50 @@ const submitReport = HttpApiEndpoint.post(
   },
 );
 
+const listMatchImages = HttpApiEndpoint.post(
+  "listMatchImages",
+  "/api/match-images/list",
+  {
+    success: MatchContract.listMatchImages.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.listMatchImages,
+  },
+);
+
+const uploadMatchImage = HttpApiEndpoint.post(
+  "uploadMatchImage",
+  "/api/match-images/upload",
+  {
+    success: MatchContract.uploadMatchImage.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.uploadMatchImage,
+  },
+);
+
+const deleteMatchImage = HttpApiEndpoint.post(
+  "deleteMatchImage",
+  "/api/match-images/delete",
+  {
+    success: MatchContract.deleteMatchImage.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.deleteMatchImage,
+  },
+);
+
 export const MatchesGroup = HttpApiGroup.make("Matches")
   .add(listFixtures)
   .add(getFixture)
   .add(syncFixtures)
+  .add(syncGamedayRoster)
+  .add(syncGamedayAssociationSeason)
+  .add(importGamedayTeams)
   .add(listCompetitions)
+  .add(listGamedayTeams)
+  .add(listGamedaySeasons)
+  .add(listGamedayClubs)
+  .add(listCompetitionsForClubs)
   .add(listReports)
-  .add(submitReport);
+  .add(submitReport)
+  .add(listMatchImages)
+  .add(uploadMatchImage)
+  .add(deleteMatchImage);

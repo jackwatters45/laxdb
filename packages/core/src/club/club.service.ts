@@ -106,8 +106,6 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
           const decoded = yield* decodeArguments(UpdateTeamInput, input);
           if (
             decoded.name === undefined &&
-            decoded.gamedayCompId === undefined &&
-            decoded.gamedayTeamId === undefined &&
             decoded.coachMemberId === undefined
           ) {
             return yield* Effect.fail(emptyUpdate("ClubTeam"));
@@ -146,6 +144,21 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
           Effect.map((rows) => rows.map(asPlayer)),
           Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
           Effect.tapError((e) => Effect.logError("Failed to list roster", e)),
+        ),
+
+      getRosterPlayer: (input: SchemaInput<typeof RosterPlayerByIdInput>) =>
+        Effect.gen(function* () {
+          const decoded = yield* decodeArguments(RosterPlayerByIdInput, input);
+          return yield* repo.getRosterPlayer(decoded);
+        }).pipe(
+          Effect.map(asPlayer),
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(notFound("RosterPlayer", input.id)),
+          ),
+          Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+          Effect.tapError((e) =>
+            Effect.logError("Failed to get roster player", e),
+          ),
         ),
 
       addRosterPlayer: (input: SchemaInput<typeof AddRosterPlayerInput>) =>

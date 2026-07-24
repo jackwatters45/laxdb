@@ -10,7 +10,7 @@ import {
 } from "@laxdb/ui/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@laxdb/ui/components/ui/popover";
 import { cn } from "@laxdb/ui/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronDownIcon, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
 type SearchComboboxContextValue<TItem> = {
@@ -46,7 +46,6 @@ type SearchComboboxProviderProps<TItem> = {
   children: React.ReactNode;
 };
 
-// FIX: needs work when we need a multi-select
 function SearchComboboxProvider<TItem>({
   items,
   isLoading = false,
@@ -254,7 +253,223 @@ function SearchComboboxAction({ onSelect, children }: SearchComboboxActionProps)
   );
 }
 
+type MultiSearchComboboxFooterContext = {
+  searchQuery: string;
+  selectedValues: readonly string[];
+  setSelectedValues: (values: readonly string[]) => void;
+  close: () => void;
+};
+
+type MultiSearchComboboxProps<TItem> = {
+  items: readonly TItem[];
+  selectedValues: readonly string[];
+  onSelectedValuesChange: (values: readonly string[]) => void;
+  getItemValue: (item: TItem) => string;
+  getItemLabel: (item: TItem) => string;
+  renderItem?: (item: TItem, isSelected: boolean) => React.ReactNode;
+  selectedSummary?: (selectedValues: readonly string[]) => React.ReactNode;
+  footerSummary?: (selectedValues: readonly string[]) => React.ReactNode;
+  renderFooterActions?: (context: MultiSearchComboboxFooterContext) => React.ReactNode;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
+  placeholder?: React.ReactNode;
+  searchPlaceholder?: string;
+  loading?: boolean;
+  loadingMessage?: React.ReactNode;
+  emptyMessage?: React.ReactNode;
+  noResultsMessage?: (query: string) => React.ReactNode;
+  disabled?: boolean;
+  className?: string;
+  triggerClassName?: string;
+  contentClassName?: string;
+  listClassName?: string;
+  align?: "start" | "center" | "end";
+};
+
+function MultiSearchCombobox<TItem>({
+  items,
+  selectedValues,
+  onSelectedValuesChange,
+  getItemValue,
+  getItemLabel,
+  renderItem,
+  selectedSummary,
+  footerSummary,
+  renderFooterActions,
+  label,
+  description,
+  placeholder = "Search/select options",
+  searchPlaceholder = "Search...",
+  loading = false,
+  loadingMessage = "Loading…",
+  emptyMessage = "No options available.",
+  noResultsMessage = (query) => `No results match “${query}”.`,
+  disabled = false,
+  className,
+  triggerClassName,
+  contentClassName,
+  listClassName,
+  align = "start",
+}: MultiSearchComboboxProps<TItem>) {
+  const [open, setOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const listboxId = React.useId();
+
+  const normalizedSearch = searchQuery.trim().toLocaleLowerCase();
+  const visibleItems = React.useMemo(() => {
+    if (normalizedSearch === "") return items;
+    return items.filter((item) =>
+      getItemLabel(item).toLocaleLowerCase().includes(normalizedSearch),
+    );
+  }, [getItemLabel, items, normalizedSearch]);
+
+  const toggleValue = React.useCallback(
+    (value: string) => {
+      onSelectedValuesChange(
+        selectedValues.includes(value)
+          ? selectedValues.filter((selectedValue) => selectedValue !== value)
+          : [...selectedValues, value],
+      );
+    },
+    [onSelectedValuesChange, selectedValues],
+  );
+
+  const close = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const triggerContent = selectedSummary
+    ? selectedSummary(selectedValues)
+    : selectedValues.length === 0
+      ? placeholder
+      : `${selectedValues.length} selected`;
+
+  const footerContent = footerSummary
+    ? footerSummary(selectedValues)
+    : selectedValues.length === 0
+      ? "No selections."
+      : `${selectedValues.length} selected.`;
+
+  return (
+    <div className={className}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger
+          render={
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              role="combobox"
+              aria-controls={listboxId}
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              className={cn("w-full justify-between text-left font-normal", triggerClassName)}
+              disabled={disabled}
+            />
+          }
+        >
+          <span className={cn("truncate", selectedValues.length === 0 && "text-muted-foreground")}>
+            {triggerContent}
+          </span>
+          <ChevronDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        </PopoverTrigger>
+        <PopoverContent
+          align={align}
+          role="presentation"
+          className={cn("w-[min(38rem,calc(100vw-2rem))] gap-2 p-2", contentClassName)}
+        >
+          {(label || description) && (
+            <div className="space-y-1 px-1 pt-1">
+              {label && <p className="text-xs font-medium text-foreground">{label}</p>}
+              {description && (
+                <p className="text-[0.6875rem]/relaxed text-muted-foreground">{description}</p>
+              )}
+            </div>
+          )}
+          <Command shouldFilter={false}>
+            <CommandInput
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+              placeholder={searchPlaceholder}
+            />
+            <CommandList
+              id={listboxId}
+              role="listbox"
+              aria-multiselectable="true"
+              className={cn("max-h-80 rounded-lg border bg-background p-1", listClassName)}
+            >
+              {loading ? (
+                <div className="px-3 py-6 text-xs text-muted-foreground">{loadingMessage}</div>
+              ) : items.length === 0 ? (
+                <div className="px-3 py-6 text-center text-xs/relaxed text-muted-foreground">
+                  {emptyMessage}
+                </div>
+              ) : visibleItems.length === 0 ? (
+                <div className="px-3 py-6 text-center text-xs/relaxed text-muted-foreground">
+                  {noResultsMessage(searchQuery.trim())}
+                </div>
+              ) : (
+                visibleItems.map((item) => {
+                  const value = getItemValue(item);
+                  const isSelected = selectedValues.includes(value);
+                  return (
+                    <CommandItem
+                      key={value}
+                      value={value}
+                      role="option"
+                      aria-selected={isSelected}
+                      data-checked={isSelected}
+                      onSelect={() => {
+                        toggleValue(value);
+                      }}
+                    >
+                      <span className="min-w-0 flex-1">
+                        {renderItem ? renderItem(item, isSelected) : getItemLabel(item)}
+                      </span>
+                    </CommandItem>
+                  );
+                })
+              )}
+            </CommandList>
+          </Command>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
+            <span>{footerContent}</span>
+            <div className="flex flex-wrap gap-1">
+              {renderFooterActions ? (
+                renderFooterActions({
+                  searchQuery,
+                  selectedValues,
+                  setSelectedValues: onSelectedValuesChange,
+                  close,
+                })
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => {
+                      onSelectedValuesChange([]);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                  <Button type="button" size="sm" className="h-7 px-2 text-xs" onClick={close}>
+                    Done
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
 export {
+  MultiSearchCombobox,
   SearchComboboxProvider,
   SearchComboboxRoot,
   SearchComboboxTrigger,

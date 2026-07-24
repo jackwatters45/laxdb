@@ -14,13 +14,26 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
-import { Route as AppRosterRouteImport } from './routes/_app.roster'
-import { Route as AppFixturesRouteImport } from './routes/_app.fixtures'
-import { Route as AppFinesRouteImport } from './routes/_app.fines'
-import { Route as AppAuditRouteImport } from './routes/_app.audit'
-import { Route as AppAdminRouteImport } from './routes/_app.admin'
-import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
-import { Route as AppReportFixtureIdRouteImport } from './routes/_app.report.$fixtureId'
+import { Route as AppRosterRouteImport } from './routes/_app/roster'
+import { Route as AppReportsRouteImport } from './routes/_app/reports'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppPlayerRouteImport } from './routes/_app/player'
+import { Route as AppPhotosRouteImport } from './routes/_app/photos'
+import { Route as AppFixturesRouteImport } from './routes/_app/fixtures'
+import { Route as AppFinesRouteImport } from './routes/_app/fines'
+import { Route as AppAuditRouteImport } from './routes/_app/audit'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppTeamsIndexRouteImport } from './routes/_app/teams/index'
+import { Route as ApiReportImagesImageIdRouteImport } from './routes/api/report-images/$imageId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppTeamsTeamIdRouteImport } from './routes/_app/teams/$teamId'
+import { Route as AppFixturesFixtureIdRouteImport } from './routes/_app/fixtures_/$fixtureId'
+import { Route as AppTeamsTeamIdStatsRouteImport } from './routes/_app/teams/$teamId_.stats'
+import { Route as AppTeamsTeamIdStandingsRouteImport } from './routes/_app/teams/$teamId_.standings'
+import { Route as AppTeamsTeamIdRosterRouteImport } from './routes/_app/teams/$teamId_.roster'
+import { Route as AppTeamsTeamIdReportsRouteImport } from './routes/_app/teams/$teamId_.reports'
+import { Route as AppTeamsTeamIdPhotosRouteImport } from './routes/_app/teams/$teamId_.photos'
+import { Route as AppTeamsTeamIdFixturesRouteImport } from './routes/_app/teams/$teamId_.fixtures'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -51,6 +64,26 @@ const AppRosterRoute = AppRosterRouteImport.update({
   path: '/roster',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlayerRoute = AppPlayerRouteImport.update({
+  id: '/player',
+  path: '/player',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPhotosRoute = AppPhotosRouteImport.update({
+  id: '/photos',
+  path: '/photos',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFixturesRoute = AppFixturesRouteImport.update({
   id: '/fixtures',
   path: '/fixtures',
@@ -71,14 +104,59 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeamsIndexRoute = AppTeamsIndexRouteImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiReportImagesImageIdRoute = ApiReportImagesImageIdRouteImport.update({
+  id: '/api/report-images/$imageId',
+  path: '/api/report-images/$imageId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppReportFixtureIdRoute = AppReportFixtureIdRouteImport.update({
-  id: '/report/$fixtureId',
-  path: '/report/$fixtureId',
+const AppTeamsTeamIdRoute = AppTeamsTeamIdRouteImport.update({
+  id: '/teams/$teamId',
+  path: '/teams/$teamId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFixturesFixtureIdRoute = AppFixturesFixtureIdRouteImport.update({
+  id: '/fixtures_/$fixtureId',
+  path: '/fixtures/$fixtureId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdStatsRoute = AppTeamsTeamIdStatsRouteImport.update({
+  id: '/teams/$teamId_/stats',
+  path: '/teams/$teamId/stats',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdStandingsRoute = AppTeamsTeamIdStandingsRouteImport.update({
+  id: '/teams/$teamId_/standings',
+  path: '/teams/$teamId/standings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdRosterRoute = AppTeamsTeamIdRosterRouteImport.update({
+  id: '/teams/$teamId_/roster',
+  path: '/teams/$teamId/roster',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdReportsRoute = AppTeamsTeamIdReportsRouteImport.update({
+  id: '/teams/$teamId_/reports',
+  path: '/teams/$teamId/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdPhotosRoute = AppTeamsTeamIdPhotosRouteImport.update({
+  id: '/teams/$teamId_/photos',
+  path: '/teams/$teamId/photos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamsTeamIdFixturesRoute = AppTeamsTeamIdFixturesRouteImport.update({
+  id: '/teams/$teamId_/fixtures',
+  path: '/teams/$teamId/fixtures',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -90,10 +168,23 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
   '/fixtures': typeof AppFixturesRoute
+  '/photos': typeof AppPhotosRoute
+  '/player': typeof AppPlayerRoute
+  '/profile': typeof AppProfileRoute
+  '/reports': typeof AppReportsRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/report/$fixtureId': typeof AppReportFixtureIdRoute
+  '/fixtures/$fixtureId': typeof AppFixturesFixtureIdRoute
+  '/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
+  '/teams/': typeof AppTeamsIndexRoute
+  '/teams/$teamId/fixtures': typeof AppTeamsTeamIdFixturesRoute
+  '/teams/$teamId/photos': typeof AppTeamsTeamIdPhotosRoute
+  '/teams/$teamId/reports': typeof AppTeamsTeamIdReportsRoute
+  '/teams/$teamId/roster': typeof AppTeamsTeamIdRosterRoute
+  '/teams/$teamId/standings': typeof AppTeamsTeamIdStandingsRoute
+  '/teams/$teamId/stats': typeof AppTeamsTeamIdStatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -103,10 +194,23 @@ export interface FileRoutesByTo {
   '/audit': typeof AppAuditRoute
   '/fines': typeof AppFinesRoute
   '/fixtures': typeof AppFixturesRoute
+  '/photos': typeof AppPhotosRoute
+  '/player': typeof AppPlayerRoute
+  '/profile': typeof AppProfileRoute
+  '/reports': typeof AppReportsRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/report/$fixtureId': typeof AppReportFixtureIdRoute
+  '/fixtures/$fixtureId': typeof AppFixturesFixtureIdRoute
+  '/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
+  '/teams': typeof AppTeamsIndexRoute
+  '/teams/$teamId/fixtures': typeof AppTeamsTeamIdFixturesRoute
+  '/teams/$teamId/photos': typeof AppTeamsTeamIdPhotosRoute
+  '/teams/$teamId/reports': typeof AppTeamsTeamIdReportsRoute
+  '/teams/$teamId/roster': typeof AppTeamsTeamIdRosterRoute
+  '/teams/$teamId/standings': typeof AppTeamsTeamIdStandingsRoute
+  '/teams/$teamId/stats': typeof AppTeamsTeamIdStatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -118,10 +222,23 @@ export interface FileRoutesById {
   '/_app/audit': typeof AppAuditRoute
   '/_app/fines': typeof AppFinesRoute
   '/_app/fixtures': typeof AppFixturesRoute
+  '/_app/photos': typeof AppPhotosRoute
+  '/_app/player': typeof AppPlayerRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/reports': typeof AppReportsRoute
   '/_app/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/_app/report/$fixtureId': typeof AppReportFixtureIdRoute
+  '/_app/fixtures_/$fixtureId': typeof AppFixturesFixtureIdRoute
+  '/_app/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
+  '/_app/teams/': typeof AppTeamsIndexRoute
+  '/_app/teams/$teamId_/fixtures': typeof AppTeamsTeamIdFixturesRoute
+  '/_app/teams/$teamId_/photos': typeof AppTeamsTeamIdPhotosRoute
+  '/_app/teams/$teamId_/reports': typeof AppTeamsTeamIdReportsRoute
+  '/_app/teams/$teamId_/roster': typeof AppTeamsTeamIdRosterRoute
+  '/_app/teams/$teamId_/standings': typeof AppTeamsTeamIdStandingsRoute
+  '/_app/teams/$teamId_/stats': typeof AppTeamsTeamIdStatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -133,10 +250,23 @@ export interface FileRouteTypes {
     | '/audit'
     | '/fines'
     | '/fixtures'
+    | '/photos'
+    | '/player'
+    | '/profile'
+    | '/reports'
     | '/roster'
     | '/accept-invitation/$id'
-    | '/report/$fixtureId'
+    | '/fixtures/$fixtureId'
+    | '/teams/$teamId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
+    | '/teams/'
+    | '/teams/$teamId/fixtures'
+    | '/teams/$teamId/photos'
+    | '/teams/$teamId/reports'
+    | '/teams/$teamId/roster'
+    | '/teams/$teamId/standings'
+    | '/teams/$teamId/stats'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -146,10 +276,23 @@ export interface FileRouteTypes {
     | '/audit'
     | '/fines'
     | '/fixtures'
+    | '/photos'
+    | '/player'
+    | '/profile'
+    | '/reports'
     | '/roster'
     | '/accept-invitation/$id'
-    | '/report/$fixtureId'
+    | '/fixtures/$fixtureId'
+    | '/teams/$teamId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
+    | '/teams'
+    | '/teams/$teamId/fixtures'
+    | '/teams/$teamId/photos'
+    | '/teams/$teamId/reports'
+    | '/teams/$teamId/roster'
+    | '/teams/$teamId/standings'
+    | '/teams/$teamId/stats'
   id:
     | '__root__'
     | '/'
@@ -160,10 +303,23 @@ export interface FileRouteTypes {
     | '/_app/audit'
     | '/_app/fines'
     | '/_app/fixtures'
+    | '/_app/photos'
+    | '/_app/player'
+    | '/_app/profile'
+    | '/_app/reports'
     | '/_app/roster'
     | '/accept-invitation/$id'
-    | '/_app/report/$fixtureId'
+    | '/_app/fixtures_/$fixtureId'
+    | '/_app/teams/$teamId'
     | '/api/auth/$'
+    | '/api/report-images/$imageId'
+    | '/_app/teams/'
+    | '/_app/teams/$teamId_/fixtures'
+    | '/_app/teams/$teamId_/photos'
+    | '/_app/teams/$teamId_/reports'
+    | '/_app/teams/$teamId_/roster'
+    | '/_app/teams/$teamId_/standings'
+    | '/_app/teams/$teamId_/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -173,6 +329,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   AcceptInvitationIdRoute: typeof AcceptInvitationIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiReportImagesImageIdRoute: typeof ApiReportImagesImageIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -219,6 +376,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRosterRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/reports': {
+      id: '/_app/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/player': {
+      id: '/_app/player'
+      path: '/player'
+      fullPath: '/player'
+      preLoaderRoute: typeof AppPlayerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/photos': {
+      id: '/_app/photos'
+      path: '/photos'
+      fullPath: '/photos'
+      preLoaderRoute: typeof AppPhotosRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/fixtures': {
       id: '/_app/fixtures'
       path: '/fixtures'
@@ -247,6 +432,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/teams/': {
+      id: '/_app/teams/'
+      path: '/teams'
+      fullPath: '/teams/'
+      preLoaderRoute: typeof AppTeamsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/report-images/$imageId': {
+      id: '/api/report-images/$imageId'
+      path: '/api/report-images/$imageId'
+      fullPath: '/api/report-images/$imageId'
+      preLoaderRoute: typeof ApiReportImagesImageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -254,11 +453,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/report/$fixtureId': {
-      id: '/_app/report/$fixtureId'
-      path: '/report/$fixtureId'
-      fullPath: '/report/$fixtureId'
-      preLoaderRoute: typeof AppReportFixtureIdRouteImport
+    '/_app/teams/$teamId': {
+      id: '/_app/teams/$teamId'
+      path: '/teams/$teamId'
+      fullPath: '/teams/$teamId'
+      preLoaderRoute: typeof AppTeamsTeamIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/fixtures_/$fixtureId': {
+      id: '/_app/fixtures_/$fixtureId'
+      path: '/fixtures/$fixtureId'
+      fullPath: '/fixtures/$fixtureId'
+      preLoaderRoute: typeof AppFixturesFixtureIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/stats': {
+      id: '/_app/teams/$teamId_/stats'
+      path: '/teams/$teamId/stats'
+      fullPath: '/teams/$teamId/stats'
+      preLoaderRoute: typeof AppTeamsTeamIdStatsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/standings': {
+      id: '/_app/teams/$teamId_/standings'
+      path: '/teams/$teamId/standings'
+      fullPath: '/teams/$teamId/standings'
+      preLoaderRoute: typeof AppTeamsTeamIdStandingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/roster': {
+      id: '/_app/teams/$teamId_/roster'
+      path: '/teams/$teamId/roster'
+      fullPath: '/teams/$teamId/roster'
+      preLoaderRoute: typeof AppTeamsTeamIdRosterRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/reports': {
+      id: '/_app/teams/$teamId_/reports'
+      path: '/teams/$teamId/reports'
+      fullPath: '/teams/$teamId/reports'
+      preLoaderRoute: typeof AppTeamsTeamIdReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/photos': {
+      id: '/_app/teams/$teamId_/photos'
+      path: '/teams/$teamId/photos'
+      fullPath: '/teams/$teamId/photos'
+      preLoaderRoute: typeof AppTeamsTeamIdPhotosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teams/$teamId_/fixtures': {
+      id: '/_app/teams/$teamId_/fixtures'
+      path: '/teams/$teamId/fixtures'
+      fullPath: '/teams/$teamId/fixtures'
+      preLoaderRoute: typeof AppTeamsTeamIdFixturesRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -269,8 +517,20 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppFinesRoute: typeof AppFinesRoute
   AppFixturesRoute: typeof AppFixturesRoute
+  AppPhotosRoute: typeof AppPhotosRoute
+  AppPlayerRoute: typeof AppPlayerRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppReportsRoute: typeof AppReportsRoute
   AppRosterRoute: typeof AppRosterRoute
-  AppReportFixtureIdRoute: typeof AppReportFixtureIdRoute
+  AppFixturesFixtureIdRoute: typeof AppFixturesFixtureIdRoute
+  AppTeamsTeamIdRoute: typeof AppTeamsTeamIdRoute
+  AppTeamsIndexRoute: typeof AppTeamsIndexRoute
+  AppTeamsTeamIdFixturesRoute: typeof AppTeamsTeamIdFixturesRoute
+  AppTeamsTeamIdPhotosRoute: typeof AppTeamsTeamIdPhotosRoute
+  AppTeamsTeamIdReportsRoute: typeof AppTeamsTeamIdReportsRoute
+  AppTeamsTeamIdRosterRoute: typeof AppTeamsTeamIdRosterRoute
+  AppTeamsTeamIdStandingsRoute: typeof AppTeamsTeamIdStandingsRoute
+  AppTeamsTeamIdStatsRoute: typeof AppTeamsTeamIdStatsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -278,8 +538,20 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppFinesRoute: AppFinesRoute,
   AppFixturesRoute: AppFixturesRoute,
+  AppPhotosRoute: AppPhotosRoute,
+  AppPlayerRoute: AppPlayerRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppReportsRoute: AppReportsRoute,
   AppRosterRoute: AppRosterRoute,
-  AppReportFixtureIdRoute: AppReportFixtureIdRoute,
+  AppFixturesFixtureIdRoute: AppFixturesFixtureIdRoute,
+  AppTeamsTeamIdRoute: AppTeamsTeamIdRoute,
+  AppTeamsIndexRoute: AppTeamsIndexRoute,
+  AppTeamsTeamIdFixturesRoute: AppTeamsTeamIdFixturesRoute,
+  AppTeamsTeamIdPhotosRoute: AppTeamsTeamIdPhotosRoute,
+  AppTeamsTeamIdReportsRoute: AppTeamsTeamIdReportsRoute,
+  AppTeamsTeamIdRosterRoute: AppTeamsTeamIdRosterRoute,
+  AppTeamsTeamIdStandingsRoute: AppTeamsTeamIdStandingsRoute,
+  AppTeamsTeamIdStatsRoute: AppTeamsTeamIdStatsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -291,6 +563,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   AcceptInvitationIdRoute: AcceptInvitationIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiReportImagesImageIdRoute: ApiReportImagesImageIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

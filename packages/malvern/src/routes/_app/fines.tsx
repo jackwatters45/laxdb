@@ -32,7 +32,7 @@ import {
   listMembers,
   payFine,
   type FineView,
-} from "../lib/fines";
+} from "../../lib/fines";
 
 const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
 const formatDate = (value: Date | string | number) =>

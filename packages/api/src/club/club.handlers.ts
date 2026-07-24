@@ -1,15 +1,23 @@
 import { AuthService } from "@laxdb/core/auth/auth.service";
 import type { ClubApiPayload } from "@laxdb/core/club/club.contract";
 import { ClubService } from "@laxdb/core/club/club.service";
+import { MatchService } from "@laxdb/core/match/match.service";
 import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { withAdminOrganization, withOrganization } from "../auth/auth";
+import {
+  requireTeamManager,
+  withAdminOrganization,
+  withMemberSession,
+  withOrganization,
+} from "../auth/auth";
 import { LaxdbApi } from "../definition";
+import { deleteMatchImageObjects } from "../match/match-images";
 
 export const ClubHandlers = HttpApiBuilder.group(LaxdbApi, "Club", (handlers) =>
   Effect.gen(function* () {
     const authService = yield* AuthService;
+    const matchService = yield* MatchService;
     const service = yield* ClubService;
 
     const listTeams = () =>
@@ -28,46 +36,116 @@ export const ClubHandlers = HttpApiBuilder.group(LaxdbApi, "Club", (handlers) =>
       );
 
     const deleteTeam = (payload: typeof ClubApiPayload.byId.Type) =>
-      withAdminOrganization(authService, (orgId) =>
-        service.deleteTeam({ organizationId: orgId, id: payload.id }),
+      withAdminOrganization(authService, (organizationId) =>
+        Effect.gen(function* () {
+          const fixtures = yield* matchService.listFixtures({
+            organizationId,
+            teamId: payload.id,
+          });
+          const imageGroups = yield* Effect.forEach(
+            fixtures,
+            (fixture) =>
+              matchService.listMatchImages({
+                organizationId,
+                fixtureId: fixture.id,
+              }),
+            { concurrency: 4 },
+          );
+          // Remove objects before cascading metadata. R2 deletion is
+          // idempotent, so a later database failure remains retryable.
+          yield* deleteMatchImageObjects(
+            imageGroups.flat().map((image) => image.objectKey),
+          );
+          return yield* service.deleteTeam({
+            organizationId,
+            id: payload.id,
+          });
+        }),
       );
 
+    const authorizeTeam = (
+      session: Parameters<typeof requireTeamManager>[0],
+      teamId: string,
+    ) =>
+      Effect.gen(function* () {
+        const team = yield* service.getTeam({
+          organizationId: session.organizationId,
+          id: teamId,
+        });
+        yield* requireTeamManager(session, team.coachMemberId);
+      });
+
     const listRoster = (payload: typeof ClubApiPayload.teamScoped.Type) =>
-      withOrganization(authService, (orgId) =>
-        service.listRoster({ organizationId: orgId, teamId: payload.teamId }),
+      withMemberSession(authService, (session) =>
+        Effect.gen(function* () {
+          yield* authorizeTeam(session, payload.teamId);
+          return yield* service.listRoster({
+            organizationId: session.organizationId,
+            teamId: payload.teamId,
+          });
+        }),
       );
 
     const addRosterPlayer = (
       payload: typeof ClubApiPayload.addRosterPlayer.Type,
     ) =>
-      withOrganization(authService, (orgId) =>
-        service.addRosterPlayer({ organizationId: orgId, ...payload }),
+      withMemberSession(authService, (session) =>
+        Effect.gen(function* () {
+          yield* authorizeTeam(session, payload.teamId);
+          return yield* service.addRosterPlayer({
+            organizationId: session.organizationId,
+            ...payload,
+          });
+        }),
       );
 
     const updateRosterPlayer = (
       payload: typeof ClubApiPayload.updateRosterPlayer.Type,
     ) =>
-      withOrganization(authService, (orgId) =>
-        service.updateRosterPlayer({ organizationId: orgId, ...payload }),
+      withMemberSession(authService, (session) =>
+        Effect.gen(function* () {
+          const player = yield* service.getRosterPlayer({
+            organizationId: session.organizationId,
+            id: payload.id,
+          });
+          yield* authorizeTeam(session, player.teamId);
+          return yield* service.updateRosterPlayer({
+            organizationId: session.organizationId,
+            ...payload,
+          });
+        }),
       );
 
     const removeRosterPlayer = (payload: typeof ClubApiPayload.byId.Type) =>
-      withOrganization(authService, (orgId) =>
-        service.removeRosterPlayer({ organizationId: orgId, id: payload.id }),
+      withMemberSession(authService, (session) =>
+        Effect.gen(function* () {
+          const player = yield* service.getRosterPlayer({
+            organizationId: session.organizationId,
+            id: payload.id,
+          });
+          yield* authorizeTeam(session, player.teamId);
+          return yield* service.removeRosterPlayer({
+            organizationId: session.organizationId,
+            id: payload.id,
+          });
+        }),
       );
 
     const listRecipients = () =>
-      withOrganization(authService, (orgId) =>
-        service.listRecipients({ organizationId: orgId }),
+      withAdminOrganization(authService, (organizationId) =>
+        service.listRecipients({ organizationId }),
       );
 
     const listRecipientsForTeam = (
       payload: typeof ClubApiPayload.teamScoped.Type,
     ) =>
-      withOrganization(authService, (orgId) =>
-        service.listRecipientsForTeam({
-          organizationId: orgId,
-          teamId: payload.teamId,
+      withMemberSession(authService, (session) =>
+        Effect.gen(function* () {
+          yield* authorizeTeam(session, payload.teamId);
+          return yield* service.listRecipientsForTeam({
+            organizationId: session.organizationId,
+            teamId: payload.teamId,
+          });
         }),
       );
 

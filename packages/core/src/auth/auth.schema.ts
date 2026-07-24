@@ -31,6 +31,7 @@ export const Me = Schema.Struct({
   userName: Schema.String,
   userEmail: Schema.String,
   activeOrganizationId: Schema.NullOr(Schema.String),
+  activeMemberId: Schema.NullOr(Schema.String),
   memberRole: Schema.NullOr(Role),
 });
 export type Me = typeof Me.Type;

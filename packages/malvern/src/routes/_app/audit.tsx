@@ -18,7 +18,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Schema } from "effect";
 import { useMemo, useState } from "react";
 
-import { listAudit, listMembers, type AuditEntry } from "../lib/fines";
+import { listAudit, listMembers, type AuditEntry } from "../../lib/fines";
 
 const formatCents = Schema.decodeSync(DisplayCurrencyFromCents);
 

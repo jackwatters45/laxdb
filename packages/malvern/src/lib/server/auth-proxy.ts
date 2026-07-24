@@ -64,12 +64,15 @@ export const traceResponse = (
     ),
   );
 
-export const forwardAuthRequest = (request: Request) =>
+export const forwardApiRequest = (request: Request) =>
   traceResponse(
-    "api.auth",
+    "api.proxy",
     Effect.promise(() =>
       isLocalRequest(request)
         ? fetch(toApiRequest(request))
         : env.API.fetch(toApiRequest(request)),
     ),
   );
+
+export const forwardAuthRequest = (request: Request) =>
+  forwardApiRequest(request);
