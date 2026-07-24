@@ -90,6 +90,33 @@ export class GamedayPlayer extends Schema.Class<GamedayPlayer>("GamedayPlayer")(
   },
 ) {}
 
+export class GamedayLadderRow extends Schema.Class<GamedayLadderRow>(
+  "GamedayLadderRow",
+)({
+  position: Schema.Number,
+  teamId: Schema.NullOr(Schema.String),
+  teamName: Schema.String,
+  played: Schema.Number,
+  wins: Schema.Number,
+  losses: Schema.Number,
+  draws: Schema.Number,
+  byes: Schema.Number,
+  forfeitsFor: Schema.Number,
+  forfeitsGiven: Schema.Number,
+  goalsFor: Schema.Number,
+  goalsAgainst: Schema.Number,
+  goalDifference: Schema.Number,
+  percentage: Schema.Number,
+  premiershipPoints: Schema.Number,
+}) {}
+
+export class GamedayLadder extends Schema.Class<GamedayLadder>("GamedayLadder")(
+  {
+    sourceUploadedAt: Schema.NullOr(Schema.String),
+    rows: Schema.Array(GamedayLadderRow),
+  },
+) {}
+
 /**
  * Extract a balanced JSON array literal that starts right after `marker`.
  * Bracket-counts through strings/escapes — the array contains HTML snippets
@@ -161,6 +188,7 @@ const parseMatches = (html: string, compId: string) =>
   Effect.gen(function* () {
     const literal = extractArrayLiteral(html, "var matches =");
     if (literal === null) {
+      if (/class=["'][^"']*\bno-fixtures\b[^"']*["']/u.test(html)) return [];
       return yield* Effect.fail(
         new GamedayError({
           message: `No matches payload on GameDay fixture page for comp ${compId}`,
@@ -194,8 +222,6 @@ const COMP_ROW_RE =
 const SEASON_RE = /seasonID=(\d+)[^>]*>([^<]+)/gu;
 
 const PLAYER_LINK_RE = /<a[^>]+pID=(\d+)[^>]*>([^<]+)<\/a>/gu;
-const STATS_ROW_RE = /<tr class="(?:odd|even)">([\s\S]*?)<\/tr>/gu;
-const CELL_RE = /<td[^>]*>([\s\S]*?)<\/td>/gu;
 
 const stripTags = (value: string) =>
   decodeEntities(value.replaceAll(/<[^>]+>/gu, "")).trim();
@@ -204,6 +230,145 @@ const parseOptionalInt = (value: string): number | null => {
   const parsed = Number.parseInt(value.trim(), 10);
   return Number.isNaN(parsed) ? null : parsed;
 };
+
+const TABLE_RE = /<table[^>]*>([\s\S]*?)<\/table>/giu;
+const TABLE_ROW_RE = /<tr[^>]*>([\s\S]*?)<\/tr>/giu;
+const TABLE_CELL_RE = /<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/giu;
+
+const normalizedHeading = (value: string) =>
+  stripTags(value).replaceAll(/\s+/gu, " ").toLocaleUpperCase();
+
+const requiredLadderHeadings = [
+  "POS",
+  "TEAM",
+  "P",
+  "W",
+  "L",
+  "D",
+  "B",
+  "FF",
+  "FG",
+  "FOR",
+  "AGST",
+  "GD",
+  "%",
+  "PTS",
+] as const;
+
+export const parseLadder = (html: string, compId: string) =>
+  Effect.gen(function* () {
+    for (const tableMatch of html.matchAll(TABLE_RE)) {
+      const tableHtml = tableMatch[1];
+      if (tableHtml === undefined) continue;
+      const rows = [...tableHtml.matchAll(TABLE_ROW_RE)];
+      const headerIndex = rows.findIndex((row) => {
+        const rowHtml = row[1] ?? "";
+        const headings = new Set(
+          [...rowHtml.matchAll(TABLE_CELL_RE)].map((cell) =>
+            normalizedHeading(cell[1] ?? ""),
+          ),
+        );
+        return requiredLadderHeadings.every((heading) => headings.has(heading));
+      });
+      if (headerIndex === -1) continue;
+
+      const headerHtml = rows[headerIndex]?.[1] ?? "";
+      const headings = [...headerHtml.matchAll(TABLE_CELL_RE)].map((cell) =>
+        normalizedHeading(cell[1] ?? ""),
+      );
+      const column = (heading: string) => headings.indexOf(heading);
+      const parsedRows: GamedayLadderRow[] = [];
+
+      for (const row of rows.slice(headerIndex + 1)) {
+        const rowHtml = row[1];
+        if (rowHtml === undefined) continue;
+        const cells = [...rowHtml.matchAll(TABLE_CELL_RE)].map((cell) =>
+          stripTags(cell[1] ?? ""),
+        );
+        const value = (heading: string) => cells[column(heading)] ?? "";
+        const position = parseOptionalInt(value("POS"));
+        const teamName = value("TEAM");
+        if (position === null || teamName === "") continue;
+        const integer = (heading: string) => parseOptionalInt(value(heading));
+        const played = integer("P");
+        const wins = integer("W");
+        const losses = integer("L");
+        const draws = integer("D");
+        const byes = integer("B");
+        const forfeitsFor = integer("FF");
+        const forfeitsGiven = integer("FG");
+        const goalsFor = integer("FOR");
+        const goalsAgainst = integer("AGST");
+        const goalDifference = integer("GD");
+        const premiershipPoints = integer("PTS");
+        if (
+          played === null ||
+          wins === null ||
+          losses === null ||
+          draws === null ||
+          byes === null ||
+          forfeitsFor === null ||
+          forfeitsGiven === null ||
+          goalsFor === null ||
+          goalsAgainst === null ||
+          goalDifference === null ||
+          premiershipPoints === null
+        ) {
+          return yield* Effect.fail(
+            new GamedayError({
+              message: `GameDay ladder for comp ${compId} contained a malformed numeric row`,
+            }),
+          );
+        }
+        const percentage = Number.parseFloat(value("%"));
+        if (Number.isNaN(percentage)) {
+          return yield* Effect.fail(
+            new GamedayError({
+              message: `GameDay ladder for comp ${compId} contained a malformed percentage`,
+            }),
+          );
+        }
+        const teamId =
+          rowHtml.match(/team_info\.cgi[^>]*?c=(?:\d+-){4}(\d+)/iu)?.[1] ??
+          rowHtml.match(/team_info\.cgi[^>]*?[?&]id=(\d+)/iu)?.[1] ??
+          rowHtml.match(/[?&](?:amp;)?teamID=(\d+)/iu)?.[1] ??
+          null;
+        parsedRows.push(
+          new GamedayLadderRow({
+            position,
+            teamId,
+            teamName,
+            played,
+            wins,
+            losses,
+            draws,
+            byes,
+            forfeitsFor,
+            forfeitsGiven,
+            goalsFor,
+            goalsAgainst,
+            goalDifference,
+            percentage,
+            premiershipPoints,
+          }),
+        );
+      }
+      if (parsedRows.length > 0) {
+        const sourceUploadedAt =
+          stripTags(
+            html.match(
+              /Last Uploaded\s*:?\s*(?:<\/[^>]+>\s*)?([^<]+)/iu,
+            )?.[1] ?? "",
+          ) || null;
+        return new GamedayLadder({ sourceUploadedAt, rows: parsedRows });
+      }
+    }
+    return yield* Effect.fail(
+      new GamedayError({
+        message: `No valid ladder table on GameDay page for comp ${compId}`,
+      }),
+    );
+  });
 
 const parsePlayerLinks = (html: string) => {
   const players = new Map<string, string>();
@@ -217,7 +382,7 @@ const parsePlayerLinks = (html: string) => {
   return players;
 };
 
-const parseStatsRows = (html: string) => {
+export const parseStatsRows = (html: string) => {
   const stats = new Map<
     string,
     {
@@ -227,20 +392,49 @@ const parseStatsRows = (html: string) => {
       readonly totalScore: number | null;
     }
   >();
-  for (const row of html.matchAll(STATS_ROW_RE)) {
-    const rowHtml = row[1];
-    if (rowHtml === undefined) continue;
-    const playerId = rowHtml.match(/pID=(\d+)/u)?.[1];
-    if (playerId === undefined) continue;
-    const cells = [...rowHtml.matchAll(CELL_RE)].map((cell) =>
-      stripTags(cell[1] ?? ""),
-    );
-    stats.set(playerId, {
-      fallbackName: cells[0] ?? "",
-      gamesPlayed: parseOptionalInt(cells[2] ?? ""),
-      totalAssists: parseOptionalInt(cells[4] ?? ""),
-      totalScore: parseOptionalInt(cells[5] ?? ""),
+  for (const tableMatch of html.matchAll(TABLE_RE)) {
+    const tableHtml = tableMatch[1];
+    if (tableHtml === undefined) continue;
+    const rows = [...tableHtml.matchAll(TABLE_ROW_RE)];
+    const headerIndex = rows.findIndex((row) => {
+      const headings = new Set(
+        [...(row[1] ?? "").matchAll(TABLE_CELL_RE)].map((cell) =>
+          normalizedHeading(cell[1] ?? ""),
+        ),
+      );
+      return (
+        headings.has("M") &&
+        headings.has("TA") &&
+        (headings.has("TSC") || headings.has("SCORE"))
+      );
     });
+    if (headerIndex === -1) continue;
+    const headings = [
+      ...(rows[headerIndex]?.[1] ?? "").matchAll(TABLE_CELL_RE),
+    ].map((cell) => normalizedHeading(cell[1] ?? ""));
+    const nameIndex = headings.findIndex((heading) =>
+      heading.includes("PLAYER"),
+    );
+    const gamesIndex = headings.indexOf("M");
+    const assistsIndex = headings.indexOf("TA");
+    const scoreIndex = headings.includes("TSC")
+      ? headings.indexOf("TSC")
+      : headings.indexOf("SCORE");
+    for (const row of rows.slice(headerIndex + 1)) {
+      const rowHtml = row[1];
+      if (rowHtml === undefined) continue;
+      const playerId = rowHtml.match(/pID=(\d+)/u)?.[1];
+      if (playerId === undefined) continue;
+      const cells = [...rowHtml.matchAll(TABLE_CELL_RE)].map((cell) =>
+        stripTags(cell[1] ?? ""),
+      );
+      stats.set(playerId, {
+        fallbackName: cells[nameIndex] ?? "",
+        gamesPlayed: parseOptionalInt(cells[gamesIndex] ?? ""),
+        totalAssists: parseOptionalInt(cells[assistsIndex] ?? ""),
+        totalScore: parseOptionalInt(cells[scoreIndex] ?? ""),
+      });
+    }
   }
   return stats;
 };
@@ -285,31 +479,56 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
 
       const fetchFixtureList = (compId: string) =>
         Effect.gen(function* () {
-          const pageUrl = (round: number) =>
-            `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}`;
+          const pageUrl = (round: number, pool?: string) =>
+            `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}${pool === undefined ? "" : `&pool=${pool}`}`;
 
           const firstPage = yield* fetchPage(pageUrl(0));
-          const firstMatches = yield* parseMatches(firstPage, compId);
-
-          const rounds = [
+          const poolIds = [
             ...new Set(
-              [...firstPage.matchAll(/round=(\d+)/gu)]
-                .map((match) => Number(match[1]))
-                .filter((round) => round > 0),
+              [...firstPage.matchAll(/[?&](?:amp;)?pool=(\d+)/gu)].flatMap(
+                (match) => (match[1] === undefined ? [] : [match[1]]),
+              ),
             ),
           ];
-
-          const perRound = yield* Effect.forEach(
-            rounds,
-            (round) =>
-              fetchPage(pageUrl(round)).pipe(
-                Effect.flatMap((html) => parseMatches(html, compId)),
-              ),
+          const poolPages = yield* Effect.forEach(
+            poolIds,
+            (pool) =>
+              Effect.map(fetchPage(pageUrl(0, pool)), (html) => ({
+                html,
+                pool,
+              })),
+            { concurrency: 4 },
+          );
+          const pages = [{ html: firstPage, pool: undefined }, ...poolPages];
+          const pageMatches = yield* Effect.forEach(
+            pages,
+            ({ html, pool }) =>
+              Effect.gen(function* () {
+                const initial = yield* parseMatches(html, compId);
+                const rounds = [
+                  ...new Set(
+                    [...html.matchAll(/round=(\d+)/gu)]
+                      .map((match) => Number(match[1]))
+                      .filter((round) => round > 0),
+                  ),
+                ];
+                const perRound = yield* Effect.forEach(
+                  rounds,
+                  (round) =>
+                    fetchPage(pageUrl(round, pool)).pipe(
+                      Effect.flatMap((roundHtml) =>
+                        parseMatches(roundHtml, compId),
+                      ),
+                    ),
+                  { concurrency: 4 },
+                );
+                return [...initial, ...perRound.flat()];
+              }),
             { concurrency: 4 },
           );
 
           const byFixtureId = new Map<string, GamedayMatch>();
-          for (const match of [...perRound.flat(), ...firstMatches]) {
+          for (const match of pageMatches.flat()) {
             byFixtureId.set(match.FixtureID, match);
           }
           return [...byFixtureId.values()];
@@ -354,17 +573,15 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
          */
         fetchFixtures: fetchFixtureList,
 
+        /** Published competition ladder, parsed by table headings. */
+        fetchLadder: (compId: string) =>
+          fetchPage(
+            `${BASE_URL}/comp_info.cgi?a=LADDER&c=${LACROSSE_VICTORIA_CLIENT}&compID=${compId}`,
+          ).pipe(Effect.flatMap((html) => parseLadder(html, compId))),
+
         /** Teams appearing in a GameDay competition's fixture list. */
         fetchTeams: (compId: string) =>
-          Effect.map(
-            Effect.flatMap(
-              fetchPage(
-                `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
-              ),
-              (html) => parseMatches(html, compId),
-            ),
-            gamedayTeamsFromMatches,
-          ),
+          Effect.map(fetchFixtureList(compId), gamedayTeamsFromMatches),
 
         /** Roster and basic player stats for a GameDay team. */
         fetchRoster: (input: {
@@ -407,12 +624,7 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
               comps,
               (comp) =>
                 Effect.map(
-                  Effect.flatMap(
-                    fetchPage(
-                      `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
-                    ),
-                    (html) => parseMatches(html, comp.compId),
-                  ),
+                  fetchFixtureList(comp.compId),
                   gamedayTeamsFromMatches,
                 ),
               { concurrency: 4 },
@@ -439,25 +651,18 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             const entries = yield* Effect.forEach(
               comps,
               (comp) =>
-                Effect.map(
-                  Effect.flatMap(
-                    fetchPage(
-                      `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
+                Effect.map(fetchFixtureList(comp.compId), (matches) =>
+                  gamedayTeamsFromMatches(matches)
+                    .filter((team) => selectedNames.has(team.name))
+                    .map(
+                      (team) =>
+                        new GamedayTeamCompetition({
+                          compId: comp.compId,
+                          compName: comp.name,
+                          teamId: team.teamId,
+                          teamName: team.name,
+                        }),
                     ),
-                    (html) => parseMatches(html, comp.compId),
-                  ),
-                  (matches) =>
-                    gamedayTeamsFromMatches(matches)
-                      .filter((team) => selectedNames.has(team.name))
-                      .map(
-                        (team) =>
-                          new GamedayTeamCompetition({
-                            compId: comp.compId,
-                            compName: comp.name,
-                            teamId: team.teamId,
-                            teamName: team.name,
-                          }),
-                      ),
                 ),
               { concurrency: 4 },
             );

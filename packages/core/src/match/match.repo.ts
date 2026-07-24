@@ -109,6 +109,8 @@ export class MatchRepo extends Context.Service<MatchRepo>()("MatchRepo", {
                   .onConflictDoUpdate({
                     target: [fixtures.teamId, fixtures.gamedayFixtureId],
                     set: {
+                      sourceId: row.sourceId,
+                      seasonId: row.seasonId,
                       compId: row.compId,
                       compName: row.compName,
                       round: row.round,
@@ -147,16 +149,31 @@ export class MatchRepo extends Context.Service<MatchRepo>()("MatchRepo", {
 
       listMatchImages: (input: ListMatchImagesInput) =>
         query(
-          db
-            .select(imageColumns)
-            .from(matchImages)
-            .where(
-              and(
-                eq(matchImages.organizationId, input.organizationId),
-                eq(matchImages.fixtureId, input.fixtureId),
-              ),
-            )
-            .orderBy(asc(matchImages.createdAt)),
+          input.teamId === undefined
+            ? db
+                .select(imageColumns)
+                .from(matchImages)
+                .where(
+                  input.fixtureId === undefined
+                    ? eq(matchImages.organizationId, input.organizationId)
+                    : and(
+                        eq(matchImages.organizationId, input.organizationId),
+                        eq(matchImages.fixtureId, input.fixtureId),
+                      ),
+                )
+                .orderBy(asc(matchImages.createdAt))
+            : db
+                .select(imageColumns)
+                .from(matchImages)
+                .innerJoin(fixtures, eq(fixtures.id, matchImages.fixtureId))
+                .where(
+                  and(
+                    eq(matchImages.organizationId, input.organizationId),
+                    eq(fixtures.organizationId, input.organizationId),
+                    eq(fixtures.teamId, input.teamId),
+                  ),
+                )
+                .orderBy(asc(matchImages.createdAt)),
         ),
 
       getMatchImage: (input: GetMatchImageInput) =>

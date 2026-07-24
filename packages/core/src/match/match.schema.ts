@@ -29,6 +29,8 @@ export class Fixture extends Schema.Class<Fixture>("Fixture")({
   organizationId: Id,
   teamId: Id,
   gamedayFixtureId: Id,
+  sourceId: NullableId,
+  seasonId: NullableId,
   compId: NullableId,
   compName: Schema.NullOr(Schema.String),
   round: Schema.NullOr(Schema.String),
@@ -124,7 +126,8 @@ export class ListMatchImagesInput extends Schema.Class<ListMatchImagesInput>(
   "ListMatchImagesInput",
 )({
   organizationId: Id,
-  fixtureId: Id,
+  fixtureId: Schema.optional(Id),
+  teamId: Schema.optional(Id),
 }) {}
 
 export class GetMatchImageInput extends Schema.Class<GetMatchImageInput>(

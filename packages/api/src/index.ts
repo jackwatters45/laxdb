@@ -177,6 +177,8 @@ const MatchImageRoute = HttpRouter.use((router) =>
   ),
 );
 
+export const GAMEDAY_FIXTURE_SYNC_CRON = "15 19 * * *";
+
 const routes = Layer.mergeAll(
   HttpApiRouter,
   DocsRoute,
@@ -204,6 +206,21 @@ export const makeApiWorker = (env: Cloudflare.WorkerBindingProps = {}) =>
       },
     },
     Effect.gen(function* () {
+      yield* Cloudflare.cron(GAMEDAY_FIXTURE_SYNC_CRON)
+        .subscribe(() =>
+          Effect.gen(function* () {
+            const matchService = yield* MatchService;
+            yield* matchService.syncAllLinkedFixtures();
+          }).pipe(Effect.provide(ServicesLive)),
+        )
+        .pipe(
+          Effect.provide(
+            Cloudflare.CronEventSourceLive.pipe(
+              Layer.provide(Cloudflare.CronEventSourcePolicyLive),
+            ),
+          ),
+        );
+
       return {
         fetch: routes.pipe(
           Layer.provide(HttpServer.layerServices),

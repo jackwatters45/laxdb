@@ -22,6 +22,8 @@ export const fixtures = sqliteTable(
       .notNull()
       .references(() => clubTeams.id, { onDelete: "cascade" }),
     gamedayFixtureId: text("gameday_fixture_id").notNull(),
+    sourceId: text("source_id"),
+    seasonId: text("season_id"),
     compId: text("comp_id"),
     compName: text("comp_name"),
     round: text("round"),
@@ -41,6 +43,7 @@ export const fixtures = sqliteTable(
   (table) => [
     index("fixtures_org_idx").on(table.organizationId),
     index("fixtures_team_idx").on(table.teamId),
+    index("fixtures_team_season_idx").on(table.teamId, table.seasonId),
     index("fixtures_scheduled_idx").on(table.scheduledAt),
     uniqueIndex("fixtures_team_gameday_idx").on(
       table.teamId,

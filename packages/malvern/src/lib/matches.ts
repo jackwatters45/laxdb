@@ -6,7 +6,10 @@ import type {
   GamedayTeam,
   GamedayTeamCompetition,
 } from "@laxdb/core/match/gameday";
-import type { SyncGamedayAssociationSeasonResult } from "@laxdb/core/match/gameday.schema";
+import type {
+  SyncGamedayAssociationSeasonResult,
+  SyncGamedayRosterResult,
+} from "@laxdb/core/match/gameday.schema";
 import type {
   Fixture,
   MatchImage,
@@ -27,6 +30,7 @@ export type GamedayTeamView = typeof GamedayTeam.Type;
 export type GamedayTeamCompetitionView = typeof GamedayTeamCompetition.Type;
 export type SyncGamedayAssociationSeasonView =
   typeof SyncGamedayAssociationSeasonResult.Type;
+export type SyncGamedayRosterView = typeof SyncGamedayRosterResult.Type;
 
 export const listFixtures = createServerFn({ method: "GET" })
   .middleware([apiAuth])
@@ -63,6 +67,19 @@ export const syncFixtures = createServerFn({ method: "POST" })
       Effect.gen(function* () {
         const client = yield* ApiClient;
         return yield* client.Matches.syncFixtures({ payload: data });
+      }),
+    ),
+  );
+
+export const syncGamedayRoster = createServerFn({ method: "POST" })
+  .middleware([apiAuth])
+  .inputValidator((input: { teamId: string }) => input)
+  .handler(({ data, context }) =>
+    runApi(
+      context.apiCookie,
+      Effect.gen(function* () {
+        const client = yield* ApiClient;
+        return yield* client.Matches.syncGamedayRoster({ payload: data });
       }),
     ),
   );
@@ -204,7 +221,7 @@ export const submitReport = createServerFn({ method: "POST" })
 
 export const listMatchImages = createServerFn({ method: "GET" })
   .middleware([apiAuth])
-  .inputValidator((input: { fixtureId: string }) => input)
+  .inputValidator((input: { fixtureId?: string; teamId?: string }) => input)
   .handler(({ data, context }) =>
     runApi(
       context.apiCookie,

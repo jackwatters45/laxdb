@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import {
   index,
   integer,
+  real,
   sqliteTable,
   text,
   uniqueIndex,
@@ -139,6 +140,52 @@ export const gamedayFixtures = sqliteTable(
       table.seasonId,
       table.compId,
       table.fixtureId,
+    ),
+  ],
+);
+
+export const gamedayLadderRows = sqliteTable(
+  "gameday_ladder_rows",
+  {
+    id: text("id").primaryKey(),
+    sourceId: text("source_id")
+      .notNull()
+      .references(() => gamedaySources.id, { onDelete: "cascade" }),
+    seasonId: text("season_id").notNull(),
+    compId: text("comp_id").notNull(),
+    position: integer("position").notNull(),
+    gamedayTeamId: text("gameday_team_id"),
+    teamName: text("team_name").notNull(),
+    played: integer("played").notNull(),
+    wins: integer("wins").notNull(),
+    losses: integer("losses").notNull(),
+    draws: integer("draws").notNull(),
+    byes: integer("byes").notNull(),
+    forfeitsFor: integer("forfeits_for").notNull(),
+    forfeitsGiven: integer("forfeits_given").notNull(),
+    goalsFor: integer("goals_for").notNull(),
+    goalsAgainst: integer("goals_against").notNull(),
+    goalDifference: integer("goal_difference").notNull(),
+    percentage: real("percentage").notNull(),
+    premiershipPoints: integer("premiership_points").notNull(),
+    sourceUploadedAt: text("source_uploaded_at"),
+    fetchedAt: timestamp("fetched_at").notNull(),
+    createdAt: timestamp("created_at")
+      .default(sql`(unixepoch() * 1000)`)
+      .notNull(),
+    updatedAt: timestamp("updated_at"),
+  },
+  (table) => [
+    index("gameday_ladder_rows_scope_idx").on(
+      table.sourceId,
+      table.seasonId,
+      table.compId,
+    ),
+    uniqueIndex("gameday_ladder_rows_team_idx").on(
+      table.sourceId,
+      table.seasonId,
+      table.compId,
+      table.teamName,
     ),
   ],
 );

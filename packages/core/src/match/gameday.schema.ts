@@ -267,6 +267,23 @@ export class ImportGamedayTeamsResult extends Schema.Class<ImportGamedayTeamsRes
   rosterLinks: Count,
 }) {}
 
+export class SyncGamedayRosterInput extends Schema.Class<SyncGamedayRosterInput>(
+  "SyncGamedayRosterInput",
+)({
+  organizationId: GamedayId,
+  teamId: GamedayId,
+}) {}
+
+export class SyncGamedayRosterResult extends Schema.Class<SyncGamedayRosterResult>(
+  "SyncGamedayRosterResult",
+)({
+  fetched: Count,
+  created: Count,
+  linked: Count,
+  existing: Count,
+  unresolved: Count,
+}) {}
+
 export class SyncGamedayAssociationSeasonInput extends Schema.Class<SyncGamedayAssociationSeasonInput>(
   "SyncGamedayAssociationSeasonInput",
 )({

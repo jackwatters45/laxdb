@@ -334,11 +334,27 @@ function FixtureTable({
           return (
             <TableRow key={fixture.id}>
               {showTeamColumn && (
-                <TableCell>{teamById.get(fixture.teamId) ?? "—"}</TableCell>
+                <TableCell>
+                  <Link
+                    to="/teams/$teamId"
+                    params={{ teamId: fixture.teamId }}
+                    className="underline underline-offset-2 hover:text-muted-foreground"
+                  >
+                    {teamById.get(fixture.teamId) ?? "—"}
+                  </Link>
+                </TableCell>
               )}
               <TableCell>{fixture.round ?? "—"}</TableCell>
               <TableCell>{formatKickoff(fixture)}</TableCell>
-              <TableCell>{opponentOf(fixture)}</TableCell>
+              <TableCell>
+                <Link
+                  to="/fixtures/$fixtureId"
+                  params={{ fixtureId: fixture.id }}
+                  className="font-medium underline-offset-4 hover:underline"
+                >
+                  {opponentOf(fixture)}
+                </Link>
+              </TableCell>
               <TableCell className="text-muted-foreground">
                 {fixture.venueName ?? "TBC"}
               </TableCell>
@@ -347,16 +363,18 @@ function FixtureTable({
                 <TableCell>
                   {report ? (
                     <Link
-                      to="/report/$fixtureId"
+                      to="/fixtures/$fixtureId"
                       params={{ fixtureId: fixture.id }}
+                      hash="report"
                       className={reportLinkClass}
                     >
                       <Badge variant="secondary">Submitted · edit</Badge>
                     </Link>
                   ) : result ? (
                     <Link
-                      to="/report/$fixtureId"
+                      to="/fixtures/$fixtureId"
                       params={{ fixtureId: fixture.id }}
+                      hash="report"
                       className={reportLinkClass}
                     >
                       Submit report

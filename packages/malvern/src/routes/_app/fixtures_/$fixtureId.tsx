@@ -1,11 +1,14 @@
 import { Alert, AlertDescription } from "@laxdb/ui/components/ui/alert";
+import { Badge } from "@laxdb/ui/components/ui/badge";
 import { Button } from "@laxdb/ui/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
+import { Input } from "@laxdb/ui/components/ui/input";
 import { Label } from "@laxdb/ui/components/ui/label";
 import {
   Select,
@@ -18,7 +21,7 @@ import { Spinner } from "@laxdb/ui/components/ui/spinner";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   listRoster,
@@ -36,16 +39,78 @@ import {
   type MatchImageView,
   type MatchReportView,
 } from "../../../lib/matches";
+import {
+  getFixtureStats,
+  upsertFixtureStats,
+  type FixtureStatSheetView,
+} from "../../../lib/stats";
 
-export const Route = createFileRoute("/_app/report/$fixtureId")({
-  component: ReportForm,
+export const Route = createFileRoute("/_app/fixtures_/$fixtureId")({
+  component: FixtureDetail,
 });
 
 const matchLabel = (fixture: FixtureView) => {
   const opponent = fixture.isHome ? fixture.awayTeamName : fixture.homeTeamName;
   const round = fixture.round === null ? "" : ` · Round ${fixture.round}`;
-  return `vs ${opponent}${round}`;
+  return `${fixture.isHome ? "vs" : "at"} ${opponent}${round}`;
 };
+
+const fixtureKickoff = (fixture: FixtureView) =>
+  fixture.scheduledAt === null
+    ? "Date and time TBC"
+    : new Date(fixture.scheduledAt).toLocaleString(undefined, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+function FixtureSummary({ fixture }: { readonly fixture: FixtureView }) {
+  const completed = fixture.homeScore !== null && fixture.awayScore !== null;
+  return (
+    <div className="space-y-4">
+      <Link
+        to="/teams/$teamId"
+        params={{ teamId: fixture.teamId }}
+        className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+      >
+        ← Back to team
+      </Link>
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle>
+                {fixture.homeTeamName} {completed ? fixture.homeScore : ""} –{" "}
+                {completed ? fixture.awayScore : ""} {fixture.awayTeamName}
+              </CardTitle>
+              <CardDescription>{fixtureKickoff(fixture)}</CardDescription>
+            </div>
+            <Badge variant={completed ? "secondary" : "outline"}>
+              {completed ? "Completed" : (fixture.matchStatus ?? "Upcoming")}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-3 text-sm sm:grid-cols-3">
+          <div>
+            <div className="text-muted-foreground">Competition</div>
+            <div>{fixture.compName ?? "—"}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Round</div>
+            <div>{fixture.round ?? "—"}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Venue</div>
+            <div>{fixture.venueName ?? "—"}</div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 const playerLabel = (player: RosterPlayerView) =>
   player.jerseyNumber === null
@@ -87,7 +152,7 @@ const imageSizeLabel = (sizeBytes: number) => {
   return `${(sizeBytes / (1024 * 1024)).toFixed(1)}MB`;
 };
 
-function ReportForm() {
+function FixtureDetail() {
   const routeContext = Route.useRouteContext();
   const { fixtureId } = Route.useParams();
 
@@ -109,21 +174,30 @@ function ReportForm() {
     allowedTeamIds === null ||
     allowedTeamIds.has(fixture.teamId);
   const teamId = fixture?.teamId ?? "";
+  const completed =
+    fixture !== undefined &&
+    fixture.homeScore !== null &&
+    fixture.awayScore !== null;
+  const played =
+    completed ||
+    (fixture?.scheduledAt !== null &&
+      fixture?.scheduledAt !== undefined &&
+      new Date(fixture.scheduledAt).getTime() <= Date.now());
 
   const rosterQuery = useQuery({
     queryKey: ["roster", teamId],
     queryFn: () => listRoster({ data: { teamId } }),
-    enabled: teamId !== "" && canReport,
+    enabled: teamId !== "" && canReport && played,
   });
   const imagesQuery = useQuery({
     queryKey: ["match-images", fixtureId],
     queryFn: () => listMatchImages({ data: { fixtureId } }),
-    enabled: fixture !== undefined && canReport,
+    enabled: fixture !== undefined && canReport && completed,
   });
   const reportsQuery = useQuery({
     queryKey: ["reports", teamId],
     queryFn: () => listReports({ data: { teamId } }),
-    enabled: teamId !== "" && canReport,
+    enabled: teamId !== "" && canReport && completed,
   });
 
   const err =
@@ -136,62 +210,385 @@ function ReportForm() {
   const images = imagesQuery.data;
   const reports = reportsQuery.data;
 
-  if (fixture && !canReport) {
+  if (fixture === undefined) {
+    return err ? (
+      <Alert variant="destructive">
+        <AlertDescription>{err.message}</AlertDescription>
+      </Alert>
+    ) : (
+      <p className="flex items-center gap-2 text-muted-foreground">
+        <Spinner /> Loading fixture…
+      </p>
+    );
+  }
+
+  if (!canReport) {
     return (
       <div className="flex flex-col gap-8">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Match report
-          </h1>
-          <p className="text-sm text-muted-foreground">{matchLabel(fixture)}</p>
-        </header>
+        <FixtureSummary fixture={fixture} />
         <Alert variant="destructive">
           <AlertDescription>
-            You can only submit reports for teams you coach.
+            You can only view managed fixture details for teams you coach.
           </AlertDescription>
         </Alert>
-        <Link
-          to="/fixtures"
-          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-        >
-          Back to fixtures
-        </Link>
       </div>
     );
   }
 
-  if (!fixture || !roster || !images || !reports) {
+  if (!played) {
     return (
       <div className="flex flex-col gap-8">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Match report
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {fixture ? matchLabel(fixture) : "Loading fixture…"}
-          </p>
-        </header>
+        <FixtureSummary fixture={fixture} />
+        <Card size="sm">
+          <CardContent className="text-sm text-muted-foreground">
+            Match tools become available after this fixture has been played.
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!completed) {
+    return roster === undefined ? (
+      <div className="flex flex-col gap-8">
+        <FixtureSummary fixture={fixture} />
+        <p className="flex items-center gap-2 text-muted-foreground">
+          <Spinner /> Loading game statistics…
+        </p>
+      </div>
+    ) : (
+      <div className="flex flex-col gap-8">
+        <FixtureSummary fixture={fixture} />
+        <FixtureStatsForm
+          fixture={fixture}
+          roster={roster.filter((player) => player.active)}
+        />
+        <Card size="sm">
+          <CardContent className="text-sm text-muted-foreground">
+            Enter paired score overrides above when GameDay is missing the
+            result. Reports and photos become available after a completed score
+            is synced.
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!roster || !images || !reports) {
+    return (
+      <div className="flex flex-col gap-8">
+        <FixtureSummary fixture={fixture} />
         {err ? (
           <Alert variant="destructive">
             <AlertDescription>{err.message}</AlertDescription>
           </Alert>
         ) : (
           <p className="flex items-center gap-2 text-muted-foreground">
-            <Spinner />
-            Loading…
+            <Spinner /> Loading match tools…
           </p>
         )}
       </div>
     );
   }
 
+  const activeRoster = roster.filter((player) => player.active);
+  const existingReport =
+    reports.find((entry) => entry.fixtureId === fixture.id) ?? null;
+
   return (
-    <ReportFormInner
-      fixture={fixture}
-      roster={roster.filter((player) => player.active)}
-      images={images}
-      existing={reports.find((entry) => entry.fixtureId === fixture.id) ?? null}
-    />
+    <div className="flex flex-col gap-8">
+      <FixtureSummary fixture={fixture} />
+      <nav
+        aria-label="Fixture sections"
+        className="flex flex-wrap gap-x-5 gap-y-2 border-b pb-3 text-sm"
+      >
+        <a href="#stats" className="underline-offset-4 hover:underline">
+          Game statistics
+        </a>
+        <a href="#report" className="underline-offset-4 hover:underline">
+          Match report
+        </a>
+        <a href="#photos" className="underline-offset-4 hover:underline">
+          Photos ({images.length})
+        </a>
+      </nav>
+      <section id="stats" className="scroll-mt-6">
+        <FixtureStatsForm fixture={fixture} roster={activeRoster} />
+      </section>
+      <section id="report" className="scroll-mt-6">
+        <ReportFormInner
+          fixture={fixture}
+          roster={activeRoster}
+          images={images}
+          existing={existingReport}
+        />
+      </section>
+    </div>
+  );
+}
+
+type PlayerStatDraft = {
+  readonly recorded: boolean;
+  readonly goals: string;
+  readonly assists: string;
+  readonly shots: string;
+  readonly saves: string;
+};
+
+const optionalCount = (value: string) =>
+  value.trim() === "" ? null : Number(value);
+
+function FixtureStatsForm(props: {
+  readonly fixture: FixtureView;
+  readonly roster: readonly RosterPlayerView[];
+}) {
+  const { fixture, roster } = props;
+  const queryClient = useQueryClient();
+  const statsQuery = useQuery({
+    queryKey: ["fixture-stats", fixture.id],
+    queryFn: () => getFixtureStats({ data: { fixtureId: fixture.id } }),
+  });
+  const [goalsForOverride, setGoalsForOverride] = useState("");
+  const [goalsAgainstOverride, setGoalsAgainstOverride] = useState("");
+  const [assistedGoals, setAssistedGoals] = useState("0");
+  const [shots, setShots] = useState("");
+  const [saves, setSaves] = useState("");
+  const [players, setPlayers] = useState<
+    Readonly<Record<string, PlayerStatDraft>>
+  >({});
+
+  useEffect(() => {
+    const sheet = statsQuery.data;
+    if (sheet === undefined) return;
+    setGoalsForOverride(sheet.team?.goalsForOverride?.toString() ?? "");
+    setGoalsAgainstOverride(sheet.team?.goalsAgainstOverride?.toString() ?? "");
+    setAssistedGoals(sheet.team?.assistedGoals.toString() ?? "0");
+    setShots(sheet.team?.shots?.toString() ?? "");
+    setSaves(sheet.team?.saves?.toString() ?? "");
+    const existingByPlayer = new Map(
+      sheet.players.map((player) => [player.rosterPlayerId, player]),
+    );
+    setPlayers(
+      Object.fromEntries(
+        roster.map((player) => {
+          const existing = existingByPlayer.get(player.id);
+          return [
+            player.id,
+            {
+              recorded: existing !== undefined,
+              goals: existing?.goals.toString() ?? "0",
+              assists: existing?.assists.toString() ?? "0",
+              shots: existing?.shots?.toString() ?? "",
+              saves: existing?.saves?.toString() ?? "",
+            },
+          ];
+        }),
+      ),
+    );
+  }, [roster, statsQuery.data]);
+
+  const updatePlayer = (
+    playerId: string,
+    update: (current: PlayerStatDraft) => PlayerStatDraft,
+  ) => {
+    setPlayers((current) => {
+      const draft = current[playerId] ?? {
+        recorded: false,
+        goals: "0",
+        assists: "0",
+        shots: "",
+        saves: "",
+      };
+      return { ...current, [playerId]: update(draft) };
+    });
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: () =>
+      upsertFixtureStats({
+        data: {
+          fixtureId: fixture.id,
+          goalsForOverride: optionalCount(goalsForOverride),
+          goalsAgainstOverride: optionalCount(goalsAgainstOverride),
+          assistedGoals: Number(assistedGoals || "0"),
+          shots: optionalCount(shots),
+          saves: optionalCount(saves),
+          players: roster.flatMap((player) => {
+            const draft = players[player.id];
+            return draft?.recorded === true
+              ? [
+                  {
+                    rosterPlayerId: player.id,
+                    goals: Number(draft.goals || "0"),
+                    assists: Number(draft.assists || "0"),
+                    shots: optionalCount(draft.shots),
+                    saves: optionalCount(draft.saves),
+                  },
+                ]
+              : [];
+          }),
+        },
+      }),
+    onSuccess: (sheet: FixtureStatSheetView) =>
+      Promise.all([
+        queryClient.setQueryData(["fixture-stats", fixture.id], sheet),
+        queryClient.invalidateQueries({
+          queryKey: ["team-summary", fixture.teamId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["team-player-stats", fixture.teamId],
+        }),
+      ]),
+  });
+
+  if (statsQuery.isPending) {
+    return (
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner /> Loading game statistics…
+      </p>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Game statistics</CardTitle>
+        <CardDescription>
+          Saved separately from the match report. Blank shots and saves mean
+          they were not tracked; local totals are never added to GameDay totals.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {(statsQuery.error ?? saveMutation.error) && (
+          <Alert variant="destructive">
+            <AlertDescription>
+              {(statsQuery.error ?? saveMutation.error)?.message}
+            </AlertDescription>
+          </Alert>
+        )}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <StatInput
+            label="Goals for override"
+            value={goalsForOverride}
+            placeholder={String(
+              fixture.isHome ? fixture.homeScore : fixture.awayScore,
+            )}
+            onChange={setGoalsForOverride}
+          />
+          <StatInput
+            label="Goals against override"
+            value={goalsAgainstOverride}
+            placeholder={String(
+              fixture.isHome ? fixture.awayScore : fixture.homeScore,
+            )}
+            onChange={setGoalsAgainstOverride}
+          />
+          <StatInput
+            label="Assisted goals"
+            value={assistedGoals}
+            onChange={setAssistedGoals}
+          />
+          <StatInput label="Shots" value={shots} onChange={setShots} />
+          <StatInput label="Saves" value={saves} onChange={setSaves} />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Leave both score overrides blank to use the GameDay result. Set both
+          when correcting a missing or incorrect score.
+        </p>
+
+        <div className="space-y-2">
+          <div className="grid grid-cols-[minmax(10rem,1fr)_repeat(4,minmax(4rem,0.45fr))] gap-2 text-xs text-muted-foreground">
+            <div>Player</div>
+            <div>Goals</div>
+            <div>Assists</div>
+            <div>Shots</div>
+            <div>Saves</div>
+          </div>
+          {roster.map((player) => {
+            const draft = players[player.id] ?? {
+              recorded: false,
+              goals: "0",
+              assists: "0",
+              shots: "",
+              saves: "",
+            };
+            return (
+              <div
+                key={player.id}
+                className="grid grid-cols-[minmax(10rem,1fr)_repeat(4,minmax(4rem,0.45fr))] items-center gap-2"
+              >
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={draft.recorded}
+                    onChange={(event) => {
+                      updatePlayer(player.id, (current) => ({
+                        ...current,
+                        recorded: event.currentTarget.checked,
+                      }));
+                    }}
+                  />
+                  <span className="truncate">{playerLabel(player)}</span>
+                </Label>
+                {(["goals", "assists", "shots", "saves"] as const).map(
+                  (field) => (
+                    <Input
+                      key={field}
+                      type="number"
+                      min="0"
+                      value={draft[field]}
+                      disabled={!draft.recorded}
+                      aria-label={`${player.name} ${field}`}
+                      onChange={(event) => {
+                        updatePlayer(player.id, (current) => ({
+                          ...current,
+                          [field]: event.currentTarget.value,
+                        }));
+                      }}
+                    />
+                  ),
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <Button
+          type="button"
+          disabled={saveMutation.isPending}
+          onClick={() => {
+            saveMutation.mutate();
+          }}
+        >
+          {saveMutation.isPending ? "Saving statistics…" : "Save statistics"}
+        </Button>
+        {saveMutation.isSuccess && (
+          <span className="ml-3 text-sm text-muted-foreground">Saved.</span>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatInput(props: {
+  readonly label: string;
+  readonly value: string;
+  readonly placeholder?: string;
+  readonly onChange: (value: string) => void;
+}) {
+  return (
+    <Label className="space-y-1">
+      <span className="text-xs text-muted-foreground">{props.label}</span>
+      <Input
+        type="number"
+        min="0"
+        value={props.value}
+        placeholder={props.placeholder}
+        onChange={(event) => {
+          props.onChange(event.currentTarget.value);
+        }}
+      />
+    </Label>
   );
 }
 
@@ -432,10 +829,10 @@ function ReportFormInner(props: {
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => {
-                  void router.navigate({ to: "/fixtures" });
+                  void router.navigate({ to: "/reports" });
                 }}
               >
-                Back to fixtures
+                View submitted reports
               </Button>
             </div>
           </CardContent>
@@ -524,7 +921,9 @@ function ReportFormInner(props: {
           </CardContent>
         </Card>
 
-        <MatchImagesCard fixtureId={fixture.id} images={images} />
+        <div id="photos" className="scroll-mt-6">
+          <MatchImagesCard fixtureId={fixture.id} images={images} />
+        </div>
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={busy || !top1}>

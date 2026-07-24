@@ -55,6 +55,16 @@ const syncFixtures = HttpApiEndpoint.post(
   },
 );
 
+const syncGamedayRoster = HttpApiEndpoint.post(
+  "syncGamedayRoster",
+  "/api/gameday/sync-roster",
+  {
+    success: MatchContract.syncGamedayRoster.success,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayRoster,
+  },
+);
+
 const syncGamedayAssociationSeason = HttpApiEndpoint.post(
   "syncGamedayAssociationSeason",
   "/api/gameday/sync-association-season",
@@ -175,6 +185,7 @@ export const MatchesGroup = HttpApiGroup.make("Matches")
   .add(listFixtures)
   .add(getFixture)
   .add(syncFixtures)
+  .add(syncGamedayRoster)
   .add(syncGamedayAssociationSeason)
   .add(importGamedayTeams)
   .add(listCompetitions)

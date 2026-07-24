@@ -1,7 +1,18 @@
 import { DrizzleService, query } from "@laxdb/core/drizzle/drizzle.service";
-import { and, asc, eq, getColumns, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  getColumns,
+  inArray,
+  isNotNull,
+  isNull,
+  notInArray,
+  or,
+} from "drizzle-orm";
 import { Context, Effect, Layer } from "effect";
 
+import type { GamedayLadder } from "./gameday";
 import type {
   UpsertClubTeamGamedayLinkInput,
   UpsertGamedaySourceInput,
@@ -17,6 +28,7 @@ import {
   clubTeamGamedayLinks,
   gamedayCompetitions,
   gamedayFixtures,
+  gamedayLadderRows,
   gamedayPlayers,
   gamedayRosterEntries,
   gamedaySeasons,
@@ -24,6 +36,7 @@ import {
   gamedayTeams,
   rosterPlayerGamedayLinks,
 } from "./gameday.sql";
+import { fixtures } from "./match.sql";
 
 const seasonRowId = (sourceId: string, seasonId: string) =>
   `${sourceId}:season:${seasonId}`;
@@ -83,6 +96,7 @@ export class GamedayRepo extends Context.Service<GamedayRepo>()("GamedayRepo", {
     const competitionColumns = getColumns(gamedayCompetitions);
     const teamColumns = getColumns(gamedayTeams);
     const fixtureColumns = getColumns(gamedayFixtures);
+    const ladderColumns = getColumns(gamedayLadderRows);
     const rosterEntryColumns = getColumns(gamedayRosterEntries);
     const clubTeamLinkColumns = getColumns(clubTeamGamedayLinks);
     const rosterPlayerLinkColumns = getColumns(rosterPlayerGamedayLinks);
@@ -328,6 +342,111 @@ export class GamedayRepo extends Context.Service<GamedayRepo>()("GamedayRepo", {
           return rows.length;
         }),
 
+      replaceLadder: (input: {
+        readonly sourceId: string;
+        readonly seasonId: string;
+        readonly compId: string;
+        readonly ladder: GamedayLadder;
+      }) =>
+        Effect.gen(function* () {
+          const now = new Date();
+          yield* Effect.forEach(
+            input.ladder.rows,
+            (row) =>
+              query(
+                db
+                  .insert(gamedayLadderRows)
+                  .values({
+                    id: `${input.sourceId}:season:${input.seasonId}:comp:${input.compId}:ladder:${row.teamName}`,
+                    sourceId: input.sourceId,
+                    seasonId: input.seasonId,
+                    compId: input.compId,
+                    position: row.position,
+                    gamedayTeamId: row.teamId,
+                    teamName: row.teamName,
+                    played: row.played,
+                    wins: row.wins,
+                    losses: row.losses,
+                    draws: row.draws,
+                    byes: row.byes,
+                    forfeitsFor: row.forfeitsFor,
+                    forfeitsGiven: row.forfeitsGiven,
+                    goalsFor: row.goalsFor,
+                    goalsAgainst: row.goalsAgainst,
+                    goalDifference: row.goalDifference,
+                    percentage: row.percentage,
+                    premiershipPoints: row.premiershipPoints,
+                    sourceUploadedAt: input.ladder.sourceUploadedAt,
+                    fetchedAt: now,
+                    createdAt: now,
+                  })
+                  .onConflictDoUpdate({
+                    target: [
+                      gamedayLadderRows.sourceId,
+                      gamedayLadderRows.seasonId,
+                      gamedayLadderRows.compId,
+                      gamedayLadderRows.teamName,
+                    ],
+                    set: {
+                      position: row.position,
+                      gamedayTeamId: row.teamId,
+                      played: row.played,
+                      wins: row.wins,
+                      losses: row.losses,
+                      draws: row.draws,
+                      byes: row.byes,
+                      forfeitsFor: row.forfeitsFor,
+                      forfeitsGiven: row.forfeitsGiven,
+                      goalsFor: row.goalsFor,
+                      goalsAgainst: row.goalsAgainst,
+                      goalDifference: row.goalDifference,
+                      percentage: row.percentage,
+                      premiershipPoints: row.premiershipPoints,
+                      sourceUploadedAt: input.ladder.sourceUploadedAt,
+                      fetchedAt: now,
+                      updatedAt: now,
+                    },
+                  }),
+              ),
+            { discard: true },
+          );
+          const teamNames = input.ladder.rows.map((row) => row.teamName);
+          if (teamNames.length > 0) {
+            yield* query(
+              db
+                .delete(gamedayLadderRows)
+                .where(
+                  and(
+                    eq(gamedayLadderRows.sourceId, input.sourceId),
+                    eq(gamedayLadderRows.seasonId, input.seasonId),
+                    eq(gamedayLadderRows.compId, input.compId),
+                    notInArray(gamedayLadderRows.teamName, teamNames),
+                  ),
+                ),
+            );
+          }
+          return input.ladder.rows.length;
+        }),
+
+      listLadder: (input: {
+        readonly sourceId: string;
+        readonly seasonId: string;
+        readonly compId: string;
+      }) =>
+        query(
+          db
+            .select(ladderColumns)
+            .from(gamedayLadderRows)
+            .where(
+              and(
+                eq(gamedayLadderRows.sourceId, input.sourceId),
+                eq(gamedayLadderRows.seasonId, input.seasonId),
+                eq(gamedayLadderRows.compId, input.compId),
+              ),
+            )
+            .orderBy(asc(gamedayLadderRows.position)),
+        ),
+
       upsertPlayers: (
         rows: readonly (typeof UpsertSyncedGamedayPlayerInput.Type)[],
       ) =>
@@ -464,6 +583,7 @@ export class GamedayRepo extends Context.Service<GamedayRepo>()("GamedayRepo", {
       listClubTeamLinks: (input: {
         readonly organizationId: string;
         readonly clubTeamId: string;
+        readonly seasonId?: string;
       }) =>
         query(
           db
@@ -473,9 +593,75 @@ export class GamedayRepo extends Context.Service<GamedayRepo>()("GamedayRepo", {
               and(
                 eq(clubTeamGamedayLinks.organizationId, input.organizationId),
                 eq(clubTeamGamedayLinks.clubTeamId, input.clubTeamId),
+                ...(input.seasonId === undefined
+                  ? []
+                  : [eq(clubTeamGamedayLinks.seasonId, input.seasonId)]),
               ),
             )
             .orderBy(asc(clubTeamGamedayLinks.seasonId)),
+        ),
+
+      listLinkedClubTeams: (input: {
+        readonly sourceId: string;
+        readonly seasonId: string;
+      }) =>
+        query(
+          db
+            .selectDistinct({
+              organizationId: clubTeamGamedayLinks.organizationId,
+              clubTeamId: clubTeamGamedayLinks.clubTeamId,
+            })
+            .from(clubTeamGamedayLinks)
+            .where(
+              and(
+                eq(clubTeamGamedayLinks.sourceId, input.sourceId),
+                inArray(clubTeamGamedayLinks.seasonId, [
+                  input.seasonId,
+                  "legacy",
+                ]),
+              ),
+            )
+            .orderBy(
+              asc(clubTeamGamedayLinks.organizationId),
+              asc(clubTeamGamedayLinks.clubTeamId),
+            ),
+        ),
+
+      listUnlinkedClubTeamsWithFixtures: (input: {
+        readonly sourceId: string;
+        readonly seasonId: string;
+      }) =>
+        query(
+          db
+            .selectDistinct({
+              organizationId: fixtures.organizationId,
+              clubTeamId: fixtures.teamId,
+              compId: fixtures.compId,
+            })
+            .from(fixtures)
+            .leftJoin(
+              clubTeamGamedayLinks,
+              and(
+                eq(
+                  clubTeamGamedayLinks.organizationId,
+                  fixtures.organizationId,
+                ),
+                eq(clubTeamGamedayLinks.clubTeamId, fixtures.teamId),
+                eq(clubTeamGamedayLinks.sourceId, input.sourceId),
+                inArray(clubTeamGamedayLinks.seasonId, [
+                  input.seasonId,
+                  "legacy",
+                ]),
+              ),
+            )
+            .where(
+              and(isNotNull(fixtures.compId), isNull(clubTeamGamedayLinks.id)),
+            )
+            .orderBy(
+              asc(fixtures.organizationId),
+              asc(fixtures.teamId),
+              asc(fixtures.compId),
+            ),
         ),
 
       upsertClubTeamLink: (input: typeof UpsertClubTeamGamedayLinkInput.Type) =>

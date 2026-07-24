@@ -9,6 +9,7 @@ import { MatchesGroup } from "./match/match.api";
 import { PlaysGroup } from "./play/play.api";
 import { PlayersGroup } from "./player/player.api";
 import { PracticesGroup } from "./practice/practice.api";
+import { StatsGroup } from "./stats/stats.api";
 
 export class LaxdbApi extends HttpApi.make("LaxdbApi")
   .add(AuthGroup)
@@ -19,4 +20,5 @@ export class LaxdbApi extends HttpApi.make("LaxdbApi")
   .add(MatchesGroup)
   .add(PlaysGroup)
   .add(PlayersGroup)
-  .add(PracticesGroup) {}
+  .add(PracticesGroup)
+  .add(StatsGroup) {}

@@ -19,6 +19,7 @@ import {
   ImportGamedayTeamSelection,
   ImportGamedayTeamsResult,
   SyncGamedayAssociationSeasonResult,
+  SyncGamedayRosterResult,
 } from "./gameday.schema";
 import {
   CreateMatchImageInput,
@@ -52,6 +53,7 @@ export const MatchApiPayload = {
   }),
   fixtureById: Schema.Struct({ id: Schema.String }),
   syncFixtures: Schema.Struct({ teamId: Schema.String }),
+  syncGamedayRoster: Schema.Struct({ teamId: Schema.String }),
   syncGamedayAssociationSeason: Schema.Struct({
     seasonId: Schema.optional(Schema.String),
     includeRosters: Schema.optional(Schema.Boolean),
@@ -85,7 +87,8 @@ export const MatchApiPayload = {
     blurb: Schema.optional(Schema.NullOr(Schema.String)),
   }),
   listMatchImages: Schema.Struct({
-    fixtureId: Schema.String,
+    fixtureId: Schema.optional(Schema.String),
+    teamId: Schema.optional(Schema.String),
   }),
   uploadMatchImage: Schema.Struct({
     fixtureId: Schema.String,
@@ -117,6 +120,11 @@ export const MatchContract = {
     success: SyncFixturesResult,
     error: MatchErrors,
     payload: SyncFixturesInput,
+  },
+  syncGamedayRoster: {
+    success: SyncGamedayRosterResult,
+    error: MatchErrors,
+    payload: MatchApiPayload.syncGamedayRoster,
   },
   syncGamedayAssociationSeason: {
     success: SyncGamedayAssociationSeasonResult,

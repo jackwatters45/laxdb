@@ -10,6 +10,7 @@ import { MatchService } from "@laxdb/core/match/match.service";
 import { PlayService } from "@laxdb/core/play/play.service";
 import { PlayerService } from "@laxdb/core/player/player.service";
 import { PracticeService } from "@laxdb/core/practice/practice.service";
+import { StatsService } from "@laxdb/core/stats/stats.service";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Layer } from "effect";
 import * as Effect from "effect/Effect";
@@ -24,6 +25,7 @@ import { MatchesHandlers } from "./match/match.handlers";
 import { PlaysHandlers } from "./play/play.handlers";
 import { PlayersHandlers } from "./player/player.handlers";
 import { PracticesHandlers } from "./practice/practice.handlers";
+import { StatsHandlers } from "./stats/stats.handlers";
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
   typeof value === "object" && value !== null;
@@ -44,6 +46,7 @@ export const CoreServicesLive = Layer.mergeAll(
   PlayService.layer,
   PlayerService.layer,
   PracticeService.layer,
+  StatsService.layer,
 );
 
 export const DatabaseLive = Layer.unwrap(
@@ -79,6 +82,7 @@ export const HttpGroups = Layer.mergeAll(
   PlaysHandlers,
   PlayersHandlers,
   PracticesHandlers,
+  StatsHandlers,
 );
 
 // Test/server harness wiring: Config-based EmailService (log-only without a

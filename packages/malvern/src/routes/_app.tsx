@@ -96,11 +96,20 @@ function AppShell() {
         </div>
       </header>
 
-      <nav className="flex items-center gap-5 border-b border-border">
+      <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border">
         {canUseTeamApp ? (
           <>
+            <Link to="/teams" className={navLinkClass}>
+              Teams
+            </Link>
             <Link to="/fixtures" className={navLinkClass}>
               Fixtures
+            </Link>
+            <Link to="/reports" className={navLinkClass}>
+              Reports
+            </Link>
+            <Link to="/photos" className={navLinkClass}>
+              Photos
             </Link>
             <Link to="/roster" className={navLinkClass}>
               Roster

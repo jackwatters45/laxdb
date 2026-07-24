@@ -142,6 +142,16 @@ export const MatchesHandlers = HttpApiBuilder.group(
           }),
         );
 
+      const syncGamedayRoster = (
+        payload: typeof MatchApiPayload.syncGamedayRoster.Type,
+      ) =>
+        withAdminOrganization(authService, (organizationId) =>
+          service.syncGamedayRoster({
+            organizationId,
+            teamId: payload.teamId,
+          }),
+        );
+
       const syncGamedayAssociationSeason = (
         payload: typeof MatchApiPayload.syncGamedayAssociationSeason.Type,
       ) =>
@@ -222,7 +232,13 @@ export const MatchesHandlers = HttpApiBuilder.group(
       ) =>
         withMemberSession(authService, (session) =>
           Effect.gen(function* () {
-            yield* authorizeFixture(session, payload.fixtureId);
+            if (payload.fixtureId !== undefined) {
+              yield* authorizeFixture(session, payload.fixtureId);
+            } else if (payload.teamId !== undefined) {
+              yield* authorizeTeam(session, payload.teamId);
+            } else {
+              yield* requireTeamManager(session, null);
+            }
             return yield* service.listMatchImages({
               organizationId: session.organizationId,
               ...payload,
@@ -305,6 +321,9 @@ export const MatchesHandlers = HttpApiBuilder.group(
         .handle("listFixtures", ({ payload }) => listFixtures(payload))
         .handle("getFixture", ({ payload }) => getFixture(payload))
         .handle("syncFixtures", ({ payload }) => syncFixtures(payload))
+        .handle("syncGamedayRoster", ({ payload }) =>
+          syncGamedayRoster(payload),
+        )
         .handle("syncGamedayAssociationSeason", ({ payload }) =>
           syncGamedayAssociationSeason(payload),
         )

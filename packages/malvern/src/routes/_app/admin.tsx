@@ -181,7 +181,9 @@ function Admin() {
         </Alert>
       )}
 
-      <Teams
+      <Teams teams={teams} loading={teamsQuery.isPending} />
+
+      <Coaches
         teams={teams}
         members={members}
         loading={teamsQuery.isPending || membersQuery.isPending}
@@ -340,13 +342,122 @@ type TeamUpdate = {
   coachMemberId?: string | null;
 };
 
-function Teams({
+function Coaches({
   teams,
   members,
   loading,
 }: {
   teams: readonly TeamView[];
   members: readonly Member[];
+  loading: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const updateMutation = useMutation({
+    mutationFn: (vars: TeamUpdate) => updateTeam({ data: vars }),
+    onMutate: async (vars) => {
+      await queryClient.cancelQueries({ queryKey: ["teams"] });
+      const previous = queryClient.getQueryData<readonly TeamView[]>(["teams"]);
+      queryClient.setQueryData<readonly TeamView[]>(["teams"], (current) =>
+        current?.map((team) =>
+          team.id === vars.id
+            ? new ClubTeam({
+                id: team.id,
+                organizationId: team.organizationId,
+                name: vars.name ?? team.name,
+                coachMemberId:
+                  vars.coachMemberId === undefined
+                    ? team.coachMemberId
+                    : vars.coachMemberId,
+                createdAt: team.createdAt,
+              })
+            : team,
+        ),
+      );
+      return { previous };
+    },
+    onError: (_error, _vars, context) => {
+      queryClient.setQueryData(["teams"], context?.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["teams"] }),
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Coaches</CardTitle>
+        <CardDescription>
+          Assign one coach to each squad. Invite them under People first if they
+          are not listed here.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <SectionError error={updateMutation.error} />
+        {loading ? (
+          <p className="flex items-center gap-2 text-muted-foreground">
+            <Spinner /> Loading coaches…
+          </p>
+        ) : teams.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Import a squad before assigning its coach.
+          </p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Squad</TableHead>
+                <TableHead>Assigned coach</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teams.map((team) => (
+                <TableRow key={team.id}>
+                  <TableCell>{team.name}</TableCell>
+                  <TableCell>
+                    <Select
+                      items={[
+                        { value: "", label: "Unassigned" },
+                        ...members.map((member) => ({
+                          value: member.id,
+                          label: memberLabel(member),
+                        })),
+                      ]}
+                      value={team.coachMemberId ?? ""}
+                      onValueChange={(value: string | null) => {
+                        updateMutation.mutate({
+                          id: team.id,
+                          coachMemberId:
+                            value === null || value === "" ? null : value,
+                        });
+                      }}
+                    >
+                      <SelectTrigger className="w-full max-w-72">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Unassigned</SelectItem>
+                        {members.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            {memberLabel(member)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function Teams({
+  teams,
+  loading,
+}: {
+  teams: readonly TeamView[];
   loading: boolean;
 }) {
   const queryClient = useQueryClient();
@@ -397,35 +508,6 @@ function Teams({
       }),
     enabled: selectedSeasonId !== "" && selectedClubNames.length > 0,
     staleTime: 1000 * 60 * 10,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (vars: TeamUpdate) => updateTeam({ data: vars }),
-    onMutate: async (vars) => {
-      await queryClient.cancelQueries({ queryKey: ["teams"] });
-      const previous = queryClient.getQueryData<readonly TeamView[]>(["teams"]);
-      queryClient.setQueryData<readonly TeamView[]>(["teams"], (current) =>
-        current?.map((team) =>
-          team.id === vars.id
-            ? new ClubTeam({
-                id: team.id,
-                organizationId: team.organizationId,
-                name: vars.name ?? team.name,
-                coachMemberId:
-                  vars.coachMemberId === undefined
-                    ? team.coachMemberId
-                    : vars.coachMemberId,
-                createdAt: team.createdAt,
-              })
-            : team,
-        ),
-      );
-      return { previous };
-    },
-    onError: (_error, _vars, context) => {
-      queryClient.setQueryData(["teams"], context?.previous);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["teams"] }),
   });
 
   const deleteMutation = useMutation({
@@ -479,7 +561,6 @@ function Teams({
     seasonsQuery.error ??
     clubsQuery.error ??
     competitionsQuery.error ??
-    updateMutation.error ??
     deleteMutation.error ??
     associationSyncMutation.error ??
     importMutation.error;
@@ -684,7 +765,6 @@ function Teams({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Squad</TableHead>
-                    <TableHead>Coach</TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
@@ -693,10 +773,6 @@ function Teams({
                     <TeamRow
                       key={team.id}
                       team={team}
-                      members={members}
-                      onUpdate={(vars) => {
-                        updateMutation.mutate(vars);
-                      }}
                       onDelete={() => {
                         deleteMutation.mutate({ id: team.id });
                       }}
@@ -722,48 +798,10 @@ const memberRoleLabel = (member: Member, teams: readonly TeamView[]) => {
     : "player";
 };
 
-function TeamRow({
-  team,
-  members,
-  onUpdate,
-  onDelete,
-}: {
-  team: TeamView;
-  members: readonly Member[];
-  onUpdate: (vars: TeamUpdate) => void;
-  onDelete: () => void;
-}) {
+function TeamRow({ team, onDelete }: { team: TeamView; onDelete: () => void }) {
   return (
     <TableRow>
       <TableCell>{team.name}</TableCell>
-      <TableCell>
-        <Select
-          items={[
-            { value: "", label: "— coach —" },
-            ...members.map((member) => ({
-              value: member.id,
-              label: memberLabel(member),
-            })),
-          ]}
-          value={team.coachMemberId ?? ""}
-          onValueChange={(value: string | null) => {
-            const coachMemberId = value === null || value === "" ? null : value;
-            onUpdate({ id: team.id, coachMemberId });
-          }}
-        >
-          <SelectTrigger className="w-full max-w-56">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">— coach —</SelectItem>
-            {members.map((member) => (
-              <SelectItem key={member.id} value={member.id}>
-                {memberLabel(member)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-1">
           <ConfirmDialog

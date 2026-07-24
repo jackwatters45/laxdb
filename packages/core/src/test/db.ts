@@ -16,6 +16,16 @@ import { defaultsTable } from "../defaults/defaults.sql";
 import { drillTable } from "../drill/drill.sql";
 import { DrizzleService, query } from "../drizzle/drizzle.service";
 import { fineEvents, fines, fineTemplates } from "../fine/fine.sql";
+import {
+  clubTeamGamedayLinks,
+  gamedayCompetitions,
+  gamedayFixtures,
+  gamedayLadderRows,
+  gamedayPlayers,
+  gamedayRosterEntries,
+  gamedaySources,
+  rosterPlayerGamedayLinks,
+} from "../match/gameday.sql";
 import { fixtures, matchImages, matchReports } from "../match/match.sql";
 import { playTable } from "../play/play.sql";
 import { playerTable } from "../player/player.sql";
@@ -25,6 +35,7 @@ import {
   practiceReviewTable,
   practiceTable,
 } from "../practice/practice.sql";
+import { fixturePlayerStats, fixtureTeamStats } from "../stats/stats.sql";
 
 type TestD1Database = Awaited<ReturnType<Miniflare["getD1Database"]>>;
 
@@ -84,7 +95,17 @@ export const truncateAll = Effect.gen(function* () {
   yield* query(db.delete(defaultsTable));
   yield* query(db.delete(matchImages));
   yield* query(db.delete(matchReports));
+  yield* query(db.delete(fixturePlayerStats));
+  yield* query(db.delete(fixtureTeamStats));
   yield* query(db.delete(fixtures));
+  yield* query(db.delete(clubTeamGamedayLinks));
+  yield* query(db.delete(rosterPlayerGamedayLinks));
+  yield* query(db.delete(gamedayRosterEntries));
+  yield* query(db.delete(gamedayPlayers));
+  yield* query(db.delete(gamedayFixtures));
+  yield* query(db.delete(gamedayLadderRows));
+  yield* query(db.delete(gamedayCompetitions));
+  yield* query(db.delete(gamedaySources));
   yield* query(db.delete(rosterPlayers));
   yield* query(db.delete(reportRecipients));
   yield* query(db.delete(clubTeams));
