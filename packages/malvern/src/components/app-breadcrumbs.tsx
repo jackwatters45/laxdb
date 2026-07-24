@@ -31,7 +31,6 @@ const teamIdFromPath = (pathname: string) => {
 
 const fixtureIdFromPath = (pathname: string) => {
   const segments = pathSegments(pathname);
-  if (segments[0] === "fixtures") return segments[1] ?? null;
   if (segments[0] === "teams" && segments[2] === "fixtures")
     return segments[3] ?? null;
   return null;
@@ -55,7 +54,6 @@ const teamSectionLabel = (section: string) => {
 const pageLabel = (pathname: string) => {
   if (pathname === "/teams" || pathname === "/teams/") return "Teams";
   if (pathname === "/fixtures") return "Fixtures";
-  if (pathname.startsWith("/fixtures/")) return "Fixture";
   if (pathname === "/reports") return "Reports";
   if (pathname === "/photos") return "Photos";
   if (pathname === "/roster") return "Roster";

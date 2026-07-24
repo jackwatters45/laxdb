@@ -27,7 +27,6 @@ import { Route as AppTeamsIndexRouteImport } from './routes/_app/teams/index'
 import { Route as ApiReportImagesImageIdRouteImport } from './routes/api/report-images/$imageId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppTeamsTeamIdRouteImport } from './routes/_app/teams/$teamId'
-import { Route as AppFixturesFixtureIdRouteImport } from './routes/_app/fixtures_/$fixtureId'
 import { Route as AppTeamsTeamIdStatsRouteImport } from './routes/_app/teams/$teamId_.stats'
 import { Route as AppTeamsTeamIdStandingsRouteImport } from './routes/_app/teams/$teamId_.standings'
 import { Route as AppTeamsTeamIdRosterRouteImport } from './routes/_app/teams/$teamId_.roster'
@@ -125,11 +124,6 @@ const AppTeamsTeamIdRoute = AppTeamsTeamIdRouteImport.update({
   path: '/teams/$teamId',
   getParentRoute: () => AppRoute,
 } as any)
-const AppFixturesFixtureIdRoute = AppFixturesFixtureIdRouteImport.update({
-  id: '/fixtures_/$fixtureId',
-  path: '/fixtures/$fixtureId',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppTeamsTeamIdStatsRoute = AppTeamsTeamIdStatsRouteImport.update({
   id: '/teams/$teamId_/stats',
   path: '/teams/$teamId/stats',
@@ -181,7 +175,6 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AppReportsRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/fixtures/$fixtureId': typeof AppFixturesFixtureIdRoute
   '/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
@@ -208,7 +201,6 @@ export interface FileRoutesByTo {
   '/reports': typeof AppReportsRoute
   '/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/fixtures/$fixtureId': typeof AppFixturesFixtureIdRoute
   '/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
@@ -237,7 +229,6 @@ export interface FileRoutesById {
   '/_app/reports': typeof AppReportsRoute
   '/_app/roster': typeof AppRosterRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
-  '/_app/fixtures_/$fixtureId': typeof AppFixturesFixtureIdRoute
   '/_app/teams/$teamId': typeof AppTeamsTeamIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/report-images/$imageId': typeof ApiReportImagesImageIdRoute
@@ -266,7 +257,6 @@ export interface FileRouteTypes {
     | '/reports'
     | '/roster'
     | '/accept-invitation/$id'
-    | '/fixtures/$fixtureId'
     | '/teams/$teamId'
     | '/api/auth/$'
     | '/api/report-images/$imageId'
@@ -293,7 +283,6 @@ export interface FileRouteTypes {
     | '/reports'
     | '/roster'
     | '/accept-invitation/$id'
-    | '/fixtures/$fixtureId'
     | '/teams/$teamId'
     | '/api/auth/$'
     | '/api/report-images/$imageId'
@@ -321,7 +310,6 @@ export interface FileRouteTypes {
     | '/_app/reports'
     | '/_app/roster'
     | '/accept-invitation/$id'
-    | '/_app/fixtures_/$fixtureId'
     | '/_app/teams/$teamId'
     | '/api/auth/$'
     | '/api/report-images/$imageId'
@@ -473,13 +461,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamsTeamIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/fixtures_/$fixtureId': {
-      id: '/_app/fixtures_/$fixtureId'
-      path: '/fixtures/$fixtureId'
-      fullPath: '/fixtures/$fixtureId'
-      preLoaderRoute: typeof AppFixturesFixtureIdRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/teams/$teamId_/stats': {
       id: '/_app/teams/$teamId_/stats'
       path: '/teams/$teamId/stats'
@@ -542,7 +523,6 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppReportsRoute: typeof AppReportsRoute
   AppRosterRoute: typeof AppRosterRoute
-  AppFixturesFixtureIdRoute: typeof AppFixturesFixtureIdRoute
   AppTeamsTeamIdRoute: typeof AppTeamsTeamIdRoute
   AppTeamsIndexRoute: typeof AppTeamsIndexRoute
   AppTeamsTeamIdFixturesRoute: typeof AppTeamsTeamIdFixturesRoute
@@ -564,7 +544,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppReportsRoute: AppReportsRoute,
   AppRosterRoute: AppRosterRoute,
-  AppFixturesFixtureIdRoute: AppFixturesFixtureIdRoute,
   AppTeamsTeamIdRoute: AppTeamsTeamIdRoute,
   AppTeamsIndexRoute: AppTeamsIndexRoute,
   AppTeamsTeamIdFixturesRoute: AppTeamsTeamIdFixturesRoute,

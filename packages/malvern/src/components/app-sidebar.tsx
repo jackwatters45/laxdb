@@ -140,7 +140,6 @@ const teamIdFromPath = (pathname: string) => {
 
 const fixtureIdFromPath = (pathname: string) => {
   const segments = pathSegments(pathname);
-  if (segments[0] === "fixtures") return segments[1] ?? null;
   if (segments[0] === "teams" && segments[2] === "fixtures")
     return segments[3] ?? null;
   return null;
