@@ -20,14 +20,19 @@ import {
 import { Spinner } from "@laxdb/ui/components/ui/spinner";
 import { Textarea } from "@laxdb/ui/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import {
   listRoster,
   type RosterPlayerView,
   type TeamView,
-} from "../../../lib/club";
+} from "../../../../lib/club";
 import {
   deleteMatchImage,
   getFixture,
@@ -38,14 +43,28 @@ import {
   type FixtureView,
   type MatchImageView,
   type MatchReportView,
-} from "../../../lib/matches";
+} from "../../../../lib/matches";
 import {
   getFixtureStats,
   upsertFixtureStats,
   type FixtureStatSheetView,
-} from "../../../lib/stats";
+} from "../../../../lib/stats";
 
-export const Route = createFileRoute("/_app/fixtures_/$fixtureId")({
+export const Route = createFileRoute(
+  "/_app/teams/$teamId_/fixtures_/$fixtureId",
+)({
+  beforeLoad: async ({ context, params }) => {
+    const fixture = await context.queryClient.ensureQueryData({
+      queryKey: ["fixture", params.fixtureId],
+      queryFn: () => getFixture({ data: { id: params.fixtureId } }),
+    });
+    if (fixture.teamId !== params.teamId) {
+      throw redirect({
+        href: `/teams/${fixture.teamId}/fixtures/${fixture.id}`,
+        replace: true,
+      });
+    }
+  },
   component: FixtureDetail,
 });
 

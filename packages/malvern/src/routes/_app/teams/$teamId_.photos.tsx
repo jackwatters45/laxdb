@@ -102,8 +102,11 @@ function TeamPhotosPage() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <Link
-                        to="/fixtures/$fixtureId"
-                        params={{ fixtureId: fixture.id }}
+                        to="/teams/$teamId/fixtures/$fixtureId"
+                        params={{
+                          teamId: fixture.teamId,
+                          fixtureId: fixture.id,
+                        }}
                         className="font-medium underline-offset-4 hover:underline"
                       >
                         {fixture.isHome ? "vs" : "at"} {opponentOf(fixture)}

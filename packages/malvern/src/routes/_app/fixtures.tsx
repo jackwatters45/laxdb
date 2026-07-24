@@ -348,8 +348,8 @@ function FixtureTable({
               <TableCell>{formatKickoff(fixture)}</TableCell>
               <TableCell>
                 <Link
-                  to="/fixtures/$fixtureId"
-                  params={{ fixtureId: fixture.id }}
+                  to="/teams/$teamId/fixtures/$fixtureId"
+                  params={{ teamId: fixture.teamId, fixtureId: fixture.id }}
                   className="font-medium underline-offset-4 hover:underline"
                 >
                   {opponentOf(fixture)}
@@ -363,8 +363,8 @@ function FixtureTable({
                 <TableCell>
                   {report ? (
                     <Link
-                      to="/fixtures/$fixtureId"
-                      params={{ fixtureId: fixture.id }}
+                      to="/teams/$teamId/fixtures/$fixtureId"
+                      params={{ teamId: fixture.teamId, fixtureId: fixture.id }}
                       hash="report"
                       className={reportLinkClass}
                     >
@@ -372,8 +372,8 @@ function FixtureTable({
                     </Link>
                   ) : result ? (
                     <Link
-                      to="/fixtures/$fixtureId"
-                      params={{ fixtureId: fixture.id }}
+                      to="/teams/$teamId/fixtures/$fixtureId"
+                      params={{ teamId: fixture.teamId, fixtureId: fixture.id }}
                       hash="report"
                       className={reportLinkClass}
                     >
