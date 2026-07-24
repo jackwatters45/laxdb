@@ -90,7 +90,6 @@ function TeamFixturesPage() {
   return (
     <div className="flex flex-col gap-8">
       <TeamPageHeader
-        teamId={teamId}
         teamName={team?.name ?? "Team"}
         title="Fixtures"
         description="Upcoming games and completed results for this squad."

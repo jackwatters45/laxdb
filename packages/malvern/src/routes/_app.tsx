@@ -13,7 +13,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { AppBreadcrumbs } from "../components/app-breadcrumbs";
+import {
+  AppBreadcrumbs,
+  AppTopNavigation,
+} from "../components/app-breadcrumbs";
 import { AppSidebar } from "../components/app-sidebar";
 import { authClient } from "../lib/auth-client";
 import { listTeams } from "../lib/club";
@@ -112,12 +115,19 @@ function AppShell() {
         signOutError={signOutError}
       />
       <SidebarInset id="main-content" tabIndex={-1}>
-        <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 border-b border-border bg-background px-3 sm:px-4">
-          <SidebarTrigger size="icon-lg" className="-ml-1" />
-          <Separator orientation="vertical" />
-          <AppBreadcrumbs />
+        <header className="sticky top-0 z-10 flex shrink-0 flex-col border-b border-border bg-background">
+          <div className="flex h-10 w-full min-w-0 items-center">
+            <div className="flex h-10 w-11 shrink-0 items-center justify-center">
+              <SidebarTrigger size="icon-lg" />
+            </div>
+            <Separator orientation="vertical" />
+            <div className="flex min-w-0 flex-1 items-center px-3 sm:px-4">
+              <AppBreadcrumbs teams={ctx.teams} />
+            </div>
+          </div>
+          <AppTopNavigation teams={ctx.teams} />
         </header>
-        <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="w-full flex-1 px-3 py-6 sm:px-4 lg:px-5">
           <Outlet />
         </div>
       </SidebarInset>
