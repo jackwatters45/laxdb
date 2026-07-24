@@ -12,13 +12,15 @@ import { Button } from "@laxdb/ui/components/ui/button";
 import { Input } from "@laxdb/ui/components/ui/input";
 import { cn } from "@laxdb/ui/lib/utils";
 import {
+  Camera,
   ChevronLeft,
   ChevronRight,
-  Copy,
+  Circle,
   FlipVertical2,
   Pause,
   Play,
   Redo2,
+  Square,
   Trash2,
   Undo2,
 } from "lucide-react";
@@ -55,6 +57,7 @@ interface HistoryState {
 interface PlayWhiteboardProps {
   diagram: PlayDiagramValue;
   onChange?: (diagram: PlayDiagramValue) => void;
+  onRecordingChange?: (recording: boolean) => void;
   readOnly?: boolean;
   className?: string;
 }
@@ -62,14 +65,15 @@ interface PlayWhiteboardProps {
 const ACTION_TOOLS: ReadonlyArray<{
   value: PlayDiagramActionTypeValue;
   label: string;
+  shortcut: string;
 }> = [
-  { value: "cut", label: "Cut" },
-  { value: "dodge-carry", label: "Dodge / carry" },
-  { value: "pass", label: "Pass" },
-  { value: "pick-screen", label: "Pick / screen" },
-  { value: "shot", label: "Shot" },
-  { value: "slide", label: "Slide" },
-  { value: "recover", label: "Recover" },
+  { value: "cut", label: "Cut", shortcut: "C" },
+  { value: "dodge-carry", label: "Dodge / carry", shortcut: "G" },
+  { value: "pass", label: "Pass", shortcut: "P" },
+  { value: "pick-screen", label: "Pick / screen", shortcut: "K" },
+  { value: "shot", label: "Shot", shortcut: "X" },
+  { value: "slide", label: "Slide", shortcut: "S" },
+  { value: "recover", label: "Recover", shortcut: "R" },
 ];
 
 const TEMPLATE_OPTIONS: ReadonlyArray<{
@@ -98,6 +102,9 @@ const PLAYER_NAME_DISPLAY_LENGTH = 16;
 const MANUAL_FRAME_TRANSITION_MS = 420;
 const MIN_PLAYBACK_TRANSITION_MS = 280;
 const MAX_PLAYBACK_TRANSITION_MS = 800;
+const DEFAULT_RECORDED_STAGE_DURATION_MS = 1_000;
+const MIN_RECORDED_STAGE_DURATION_MS = 250;
+const MAX_RECORDED_STAGE_DURATION_MS = 10_000;
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 const compactPlayerName = (name: string) =>
   name.length > PLAYER_NAME_DISPLAY_LENGTH
@@ -125,6 +132,70 @@ const playbackTransitionDuration = (frameDurationMs: number) =>
     MAX_PLAYBACK_TRANSITION_MS,
     Math.max(MIN_PLAYBACK_TRANSITION_MS, frameDurationMs * 0.6),
   );
+const recordedStageDuration = (elapsedMs: number) =>
+  Math.min(
+    MAX_RECORDED_STAGE_DURATION_MS,
+    Math.max(MIN_RECORDED_STAGE_DURATION_MS, Math.round(elapsedMs)),
+  );
+const cloneFrameAsStage = (
+  frame: PlayDiagramFrameValue,
+  stageNumber: number,
+  durationMs = DEFAULT_RECORDED_STAGE_DURATION_MS,
+): PlayDiagramFrameValue => ({
+  ...frame,
+  id: newId("frame"),
+  name: `Stage ${stageNumber}`,
+  durationMs,
+  actions: frame.actions.map((action) => ({
+    ...action,
+    id: newId("action"),
+  })),
+});
+const generatedStageNamePattern = /^Stage \d+$/u;
+const normalizeGeneratedStageNames = (
+  frames: ReadonlyArray<PlayDiagramFrameValue>,
+): ReadonlyArray<PlayDiagramFrameValue> =>
+  frames.map((frame, index) =>
+    generatedStageNamePattern.test(frame.name)
+      ? { ...frame, name: `Stage ${index + 1}` }
+      : frame,
+  );
+const boardModeFromHotkey = (key: string): BoardMode | null => {
+  switch (key) {
+    case "v":
+      return "select";
+    case "o":
+      return "offense";
+    case "d":
+      return "defense";
+    case "b":
+      return "ball";
+    case "c":
+      return "cut";
+    case "g":
+      return "dodge-carry";
+    case "p":
+      return "pass";
+    case "k":
+      return "pick-screen";
+    case "x":
+      return "shot";
+    case "s":
+      return "slide";
+    case "r":
+      return "recover";
+    default:
+      return null;
+  }
+};
+const eventUsesTextInput = (target: EventTarget | null) =>
+  target instanceof Element &&
+  target.closest(
+    'input, textarea, select, [contenteditable]:not([contenteditable="false"])',
+  ) !== null;
+const eventUsesInteractiveControl = (target: EventTarget | null) =>
+  target instanceof Element &&
+  target.closest('button, a, [role="button"]') !== null;
 const nextPlayerLabelMode = (
   mode: PlayDiagramPlayerLabelModeValue,
 ): PlayDiagramPlayerLabelModeValue => {
@@ -210,11 +281,13 @@ const actionAppearance = (type: PlayDiagramActionTypeValue) => {
 function ToolButton({
   active,
   children,
+  disabled = false,
   label,
   onClick,
 }: {
   active: boolean;
   children: ReactNode;
+  disabled?: boolean;
   label: string;
   onClick: () => void;
 }) {
@@ -226,6 +299,7 @@ function ToolButton({
       className="min-h-11 shrink-0 px-3"
       aria-label={label}
       aria-pressed={active}
+      disabled={disabled}
       onClick={onClick}
     >
       {children}
@@ -315,6 +389,7 @@ function WomensField({ full }: { full: boolean }) {
 export function PlayWhiteboard({
   diagram,
   onChange,
+  onRecordingChange,
   readOnly = false,
   className,
 }: PlayWhiteboardProps) {
@@ -329,6 +404,8 @@ export function PlayWhiteboard({
   const [drag, setDrag] = useState<{
     actorId: string;
     pointerId: number;
+    clientX: number;
+    clientY: number;
   } | null>(null);
   const [dragPoint, setDragPoint] = useState<PlayDiagramPointValue | null>(
     null,
@@ -341,7 +418,9 @@ export function PlayWhiteboard({
     clientY: number;
   } | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [recording, setRecording] = useState(false);
   const [playerNameDraft, setPlayerNameDraft] = useState("");
+  const recordingEventAtRef = useRef<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const markerPrefix = useId().replaceAll(":", "");
   const currentDiagram = history.present;
@@ -382,9 +461,95 @@ export function PlayWhiteboard({
     [clearPointerGesture, currentDiagram.frames.length],
   );
 
+  const startRecording = useCallback(() => {
+    setPlaying(false);
+    setSelection(null);
+    setMode((currentMode) =>
+      currentMode === "offense" ||
+      currentMode === "defense" ||
+      currentMode === "ball"
+        ? "select"
+        : currentMode,
+    );
+    clearPointerGesture();
+    recordingEventAtRef.current = performance.now();
+    setRecording(true);
+  }, [clearPointerGesture]);
+
+  const finishRecording = useCallback(() => {
+    setRecording(false);
+    const previousEventAt = recordingEventAtRef.current;
+    recordingEventAtRef.current = null;
+    if (previousEventAt === null || currentFrame === undefined) return;
+    const durationMs = recordedStageDuration(
+      performance.now() - previousEventAt,
+    );
+    if (durationMs === currentFrame.durationMs) return;
+    const finishedDiagram = {
+      ...currentDiagram,
+      frames: currentDiagram.frames.map((frame, index) =>
+        index === activeFrameIndex ? { ...frame, durationMs } : frame,
+      ),
+    };
+    setHistory((state) => ({
+      past: [...state.past, state.present].slice(-50),
+      present: finishedDiagram,
+      future: [],
+    }));
+  }, [activeFrameIndex, currentDiagram, currentFrame]);
+
+  const captureStage = useCallback(() => {
+    if (readOnly || currentFrame === undefined) return;
+    const capturedAt = performance.now();
+    const previousEventAt = recordingEventAtRef.current;
+    const sourceFrame =
+      recording && previousEventAt !== null
+        ? {
+            ...currentFrame,
+            durationMs: recordedStageDuration(capturedAt - previousEventAt),
+          }
+        : currentFrame;
+    const capturedFrame = cloneFrameAsStage(
+      currentFrame,
+      activeFrameIndex + 2,
+      recording ? DEFAULT_RECORDED_STAGE_DURATION_MS : currentFrame.durationMs,
+    );
+    const frames = [...currentDiagram.frames];
+    frames[activeFrameIndex] = sourceFrame;
+    frames.splice(activeFrameIndex + 1, 0, capturedFrame);
+    const capturedDiagram = {
+      ...currentDiagram,
+      frames: normalizeGeneratedStageNames(frames),
+    };
+    setPlaying(false);
+    setHistory((state) => ({
+      past: [...state.past, state.present].slice(-50),
+      present: capturedDiagram,
+      future: [],
+    }));
+    setFrameIndex(activeFrameIndex + 1);
+    setSelection(null);
+    clearPointerGesture();
+    if (recording) recordingEventAtRef.current = capturedAt;
+  }, [
+    activeFrameIndex,
+    clearPointerGesture,
+    currentDiagram,
+    currentFrame,
+    readOnly,
+    recording,
+  ]);
+
   useEffect(() => {
     onChange?.(history.present);
   }, [history.present, onChange]);
+
+  useEffect(() => {
+    onRecordingChange?.(recording);
+    return () => {
+      if (recording) onRecordingChange?.(false);
+    };
+  }, [onRecordingChange, recording]);
 
   useEffect(() => {
     setPlayerNameDraft(selectedPlayer?.name ?? "");
@@ -425,11 +590,120 @@ export function PlayWhiteboard({
     [currentFrame?.actorStates],
   );
 
+  useEffect(() => {
+    const handleHotkey = (event: globalThis.KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        eventUsesTextInput(event.target)
+      ) {
+        return;
+      }
+      const key = event.key.toLowerCase();
+      if (
+        !readOnly &&
+        event.shiftKey &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        key === "r"
+      ) {
+        event.preventDefault();
+        if (recording) finishRecording();
+        else startRecording();
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+        return;
+      }
+      if (!readOnly && event.key === " ") {
+        if (eventUsesInteractiveControl(event.target)) return;
+        event.preventDefault();
+        if (recording) return;
+        if (playing) {
+          setPlaying(false);
+          return;
+        }
+        navigateToFrame(
+          activeFrameIndex >= lastFrameIndex ? 0 : activeFrameIndex,
+          true,
+        );
+        setPlaying(true);
+        return;
+      }
+      if (readOnly) return;
+      if (key === "n") {
+        event.preventDefault();
+        captureStage();
+        return;
+      }
+      const nextMode = boardModeFromHotkey(key);
+      if (
+        nextMode === null ||
+        (recording &&
+          (nextMode === "offense" ||
+            nextMode === "defense" ||
+            nextMode === "ball"))
+      ) {
+        return;
+      }
+      event.preventDefault();
+      setPlaying(false);
+      clearPointerGesture();
+      setMode(nextMode);
+    };
+    window.addEventListener("keydown", handleHotkey);
+    return () => {
+      window.removeEventListener("keydown", handleHotkey);
+    };
+  }, [
+    activeFrameIndex,
+    captureStage,
+    clearPointerGesture,
+    finishRecording,
+    lastFrameIndex,
+    navigateToFrame,
+    playing,
+    readOnly,
+    recording,
+    startRecording,
+  ]);
+
   if (currentFrame === undefined) return null;
 
   const commit = (next: PlayDiagramValue) => {
     setPlaying(false);
     clearPointerGesture();
+    if (recording) {
+      const recordedAt = performance.now();
+      const previousEventAt = recordingEventAtRef.current ?? recordedAt;
+      const nextFrame = next.frames[activeFrameIndex];
+      if (nextFrame !== undefined) {
+        const frames = [...next.frames];
+        frames[activeFrameIndex] = {
+          ...currentFrame,
+          durationMs: recordedStageDuration(recordedAt - previousEventAt),
+        };
+        frames.splice(
+          activeFrameIndex + 1,
+          0,
+          cloneFrameAsStage(nextFrame, activeFrameIndex + 2),
+        );
+        const recordedDiagram = {
+          ...next,
+          frames: normalizeGeneratedStageNames(frames),
+        };
+        setHistory((state) => ({
+          past: [...state.past, state.present].slice(-50),
+          present: recordedDiagram,
+          future: [],
+        }));
+        setFrameIndex(activeFrameIndex + 1);
+        setSelection(null);
+        recordingEventAtRef.current = recordedAt;
+        return;
+      }
+    }
     setHistory((state) => ({
       past: [...state.past, state.present].slice(-50),
       present: next,
@@ -550,7 +824,14 @@ export function PlayWhiteboard({
   };
 
   const handleBoardPointerMove = (event: PointerEvent<SVGSVGElement>) => {
-    if (drag === null || drag.pointerId !== event.pointerId) return;
+    if (
+      drag === null ||
+      drag.pointerId !== event.pointerId ||
+      Math.hypot(event.clientX - drag.clientX, event.clientY - drag.clientY) <
+        ACTION_DRAG_THRESHOLD_PX
+    ) {
+      return;
+    }
     const point = pointFromEvent(event);
     if (point !== null) setDragPoint(point);
   };
@@ -561,7 +842,13 @@ export function PlayWhiteboard({
     if (!draggingActor && !drawingAction) return;
 
     const point = pointFromEvent(event);
-    if (draggingActor && drag !== null && point !== null) {
+    if (
+      draggingActor &&
+      drag !== null &&
+      point !== null &&
+      Math.hypot(event.clientX - drag.clientX, event.clientY - drag.clientY) >=
+        ACTION_DRAG_THRESHOLD_PX
+    ) {
       commit(
         replaceFrame(currentDiagram, currentFrame.id, (frame) => ({
           ...frame,
@@ -634,7 +921,12 @@ export function PlayWhiteboard({
     }
     if (mode !== "select") return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    setDrag({ actorId, pointerId: event.pointerId });
+    setDrag({
+      actorId,
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
     setDragPoint(pointFromEvent(event));
   };
 
@@ -707,24 +999,8 @@ export function PlayWhiteboard({
     navigateToFrame(activeFrameIndex, false, next.frames.length);
   };
 
-  const duplicateFrame = () => {
-    const duplicate: PlayDiagramFrameValue = {
-      ...currentFrame,
-      id: newId("frame"),
-      name: `Phase ${currentDiagram.frames.length + 1}`,
-      actions: currentFrame.actions.map((action) => ({
-        ...action,
-        id: newId("action"),
-      })),
-    };
-    const frames = [...currentDiagram.frames];
-    frames.splice(activeFrameIndex + 1, 0, duplicate);
-    commit({ ...currentDiagram, frames });
-    navigateToFrame(activeFrameIndex + 1, false, frames.length);
-  };
-
   const deleteFrame = () => {
-    if (currentDiagram.frames.length <= 1) return;
+    if (recording || currentDiagram.frames.length <= 1) return;
     commit({
       ...currentDiagram,
       frames: currentDiagram.frames.filter(
@@ -762,6 +1038,7 @@ export function PlayWhiteboard({
                 <ToolButton
                   key={option.value}
                   active={currentDiagram.field.template === option.value}
+                  disabled={recording}
                   label={`Use ${option.label} field`}
                   onClick={() => {
                     const field = fieldFromTemplate(option.value);
@@ -779,6 +1056,7 @@ export function PlayWhiteboard({
                 variant="outline"
                 size="xl"
                 className="min-h-11 shrink-0 px-3"
+                disabled={recording}
                 onClick={() => {
                   commit({
                     ...currentDiagram,
@@ -799,6 +1077,7 @@ export function PlayWhiteboard({
                 variant="outline"
                 size="xl"
                 className="min-h-11 shrink-0 px-3"
+                disabled={recording}
                 aria-label={`Player labels: ${playerLabelModeText(playerLabelMode)}. Change to ${playerLabelModeText(nextPlayerLabelMode(playerLabelMode))}`}
                 onClick={() => {
                   commit({
@@ -828,61 +1107,90 @@ export function PlayWhiteboard({
                 }}
               >
                 Select / move
+                <kbd className="ml-1 text-[0.65rem] opacity-60">V</kbd>
               </ToolButton>
               <ToolButton
                 active={mode === "offense"}
+                disabled={recording}
                 label="Add an offense player"
                 onClick={() => {
                   chooseMode("offense");
                 }}
               >
                 + Offense
+                <kbd className="ml-1 text-[0.65rem] opacity-60">O</kbd>
               </ToolButton>
               <ToolButton
                 active={mode === "defense"}
+                disabled={recording}
                 label="Add a defense player"
                 onClick={() => {
                   chooseMode("defense");
                 }}
               >
                 + Defense
+                <kbd className="ml-1 text-[0.65rem] opacity-60">D</kbd>
               </ToolButton>
               <ToolButton
                 active={mode === "ball"}
+                disabled={recording}
                 label="Add or move the ball"
                 onClick={() => {
                   chooseMode("ball");
                 }}
               >
                 + Ball
+                <kbd className="ml-1 text-[0.65rem] opacity-60">B</kbd>
               </ToolButton>
               {ACTION_TOOLS.map((tool) => (
                 <ToolButton
                   key={tool.value}
                   active={mode === tool.value}
-                  label={`Draw ${tool.label}`}
+                  label={`Draw ${tool.label} (${tool.shortcut})`}
                   onClick={() => {
                     chooseMode(tool.value);
                   }}
                 >
                   {tool.label}
+                  <kbd className="ml-1 text-[0.65rem] opacity-60">
+                    {tool.shortcut}
+                  </kbd>
                 </ToolButton>
               ))}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               Place players with one tap. Select and drag to move. Choose a
-              lacrosse action, then drag across the field.
+              lacrosse action, then drag across the field. Press N to capture a
+              stage or Shift+R to record a live walkthrough.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-card p-2">
             <div className="flex gap-1">
               <Button
                 type="button"
+                variant={recording ? "destructive" : "outline"}
+                size="xl"
+                className={cn(
+                  "min-h-11",
+                  recording ? undefined : "text-destructive",
+                )}
+                aria-label={
+                  recording ? "Stop live recording" : "Start live recording"
+                }
+                aria-pressed={recording}
+                onClick={recording ? finishRecording : startRecording}
+              >
+                {recording ? <Square /> : <Circle className="fill-current" />}
+                {recording ? "Stop" : "Record"}
+                <kbd className="ml-1 text-[0.65rem] opacity-60">⇧R</kbd>
+              </Button>
+              <Button
+                type="button"
                 variant="ghost"
                 size="icon-xl"
                 className="size-11"
                 aria-label="Undo board change"
-                disabled={history.past.length === 0}
+                disabled={recording || history.past.length === 0}
                 onClick={undo}
               >
                 <Undo2 />
@@ -893,7 +1201,7 @@ export function PlayWhiteboard({
                 size="icon-xl"
                 className="size-11"
                 aria-label="Redo board change"
-                disabled={history.future.length === 0}
+                disabled={recording || history.future.length === 0}
                 onClick={redo}
               >
                 <Redo2 />
@@ -907,6 +1215,7 @@ export function PlayWhiteboard({
                   </span>
                   <Input
                     value={playerNameDraft}
+                    disabled={recording}
                     onChange={(event) => {
                       setPlayerNameDraft(event.target.value);
                     }}
@@ -930,7 +1239,10 @@ export function PlayWhiteboard({
                 variant="destructive"
                 size="xl"
                 className="min-h-11"
-                disabled={selection === null}
+                disabled={
+                  selection === null ||
+                  (recording && selection.kind === "actor")
+                }
                 onClick={deleteSelection}
               >
                 <Trash2 /> Delete selected
@@ -940,12 +1252,22 @@ export function PlayWhiteboard({
         </>
       )}
 
+      {recording && (
+        <div
+          role="status"
+          className="flex items-center justify-center gap-2 border-b border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive"
+        >
+          <span className="size-2 animate-pulse rounded-full bg-destructive motion-reduce:animate-none" />
+          Recording live walkthrough — each move or action becomes a timed stage
+        </div>
+      )}
+
       <div className="bg-[#2f684d] p-2 sm:p-4">
         <svg
           ref={svgRef}
           viewBox={`0 0 600 ${boardHeight}`}
           role={readOnly ? "img" : undefined}
-          aria-label={`${currentDiagram.field.discipline === "mens" ? "Men’s" : "Women’s"} ${full ? "full" : "half"} lacrosse field, frame ${activeFrameIndex + 1}`}
+          aria-label={`${currentDiagram.field.discipline === "mens" ? "Men’s" : "Women’s"} ${full ? "full" : "half"} lacrosse field, stage ${activeFrameIndex + 1}`}
           className={cn(
             "mx-auto block max-h-[70dvh] w-full select-none bg-[#397b59]",
             readOnly ? "cursor-default" : "touch-none cursor-crosshair",
@@ -993,6 +1315,11 @@ export function PlayWhiteboard({
             const start = toSvg(action.start);
             const end = toSvg(action.end);
             const appearance = actionAppearance(action.type);
+            const actionLength = Math.hypot(end.x - start.x, end.y - start.y);
+            const pickBarX =
+              actionLength === 0 ? 0 : (-(end.y - start.y) / actionLength) * 15;
+            const pickBarY =
+              actionLength === 0 ? 15 : ((end.x - start.x) / actionLength) * 15;
             const selected =
               selection?.kind === "action" && selection.id === action.id;
             return (
@@ -1054,15 +1381,26 @@ export function PlayWhiteboard({
                   }
                 />
                 {action.type === "pick-screen" && (
-                  <line
-                    x1={end.x - 13}
-                    y1={end.y}
-                    x2={end.x + 13}
-                    y2={end.y}
-                    stroke={appearance.stroke}
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
+                  <>
+                    <line
+                      x1={end.x - pickBarX}
+                      y1={end.y - pickBarY}
+                      x2={end.x + pickBarX}
+                      y2={end.y + pickBarY}
+                      stroke="var(--color-background)"
+                      strokeWidth="12"
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1={end.x - pickBarX}
+                      y1={end.y - pickBarY}
+                      x2={end.x + pickBarX}
+                      y2={end.y + pickBarY}
+                      stroke={appearance.stroke}
+                      strokeWidth="7"
+                      strokeLinecap="round"
+                    />
+                  </>
                 )}
               </g>
             );
@@ -1224,8 +1562,8 @@ export function PlayWhiteboard({
               variant="outline"
               size="icon-xl"
               className="size-11"
-              aria-label="Previous frame"
-              disabled={activeFrameIndex === 0}
+              aria-label="Previous stage"
+              disabled={recording || activeFrameIndex === 0}
               onClick={() => {
                 navigateToFrame(activeFrameIndex - 1);
               }}
@@ -1237,7 +1575,8 @@ export function PlayWhiteboard({
               variant="outline"
               size="icon-xl"
               className="size-11"
-              aria-label={playing ? "Pause playback" : "Play frames"}
+              aria-label={playing ? "Pause playback" : "Play stages"}
+              disabled={recording}
               onClick={() => {
                 if (playing) {
                   setPlaying(false);
@@ -1257,8 +1596,8 @@ export function PlayWhiteboard({
               variant="outline"
               size="icon-xl"
               className="size-11"
-              aria-label="Next frame"
-              disabled={activeFrameIndex >= lastFrameIndex}
+              aria-label="Next stage"
+              disabled={recording || activeFrameIndex >= lastFrameIndex}
               onClick={() => {
                 navigateToFrame(activeFrameIndex + 1);
               }}
@@ -1271,7 +1610,7 @@ export function PlayWhiteboard({
               {currentFrame.name}
             </p>
             <p className="text-xs text-muted-foreground">
-              Frame {activeFrameIndex + 1} of {currentDiagram.frames.length}
+              Stage {activeFrameIndex + 1} of {currentDiagram.frames.length}
             </p>
           </div>
           {!readOnly && (
@@ -1281,17 +1620,18 @@ export function PlayWhiteboard({
                 variant="outline"
                 size="xl"
                 className="min-h-11"
-                onClick={duplicateFrame}
+                onClick={captureStage}
               >
-                <Copy /> Duplicate frame
+                <Camera /> Capture stage
+                <kbd className="ml-1 text-[0.65rem] opacity-60">N</kbd>
               </Button>
               <Button
                 type="button"
                 variant="destructive"
                 size="icon-xl"
                 className="size-11"
-                aria-label="Delete current frame"
-                disabled={currentDiagram.frames.length <= 1}
+                aria-label="Delete current stage"
+                disabled={recording || currentDiagram.frames.length <= 1}
                 onClick={deleteFrame}
               >
                 <Trash2 />
@@ -1301,25 +1641,26 @@ export function PlayWhiteboard({
         </div>
         <div
           className="mt-3 flex gap-2 overflow-x-auto pb-1"
-          aria-label="Play phases"
+          aria-label="Play stages"
         >
           {currentDiagram.frames.map((frame, index) => (
             <button
               key={frame.id}
               type="button"
               className={cn(
-                "min-h-11 min-w-24 rounded-md border px-3 text-left text-xs font-medium",
+                "min-h-11 min-w-24 rounded-md border px-3 text-left text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50",
                 index === activeFrameIndex
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-card text-foreground hover:border-border-strong",
               )}
               aria-current={index === activeFrameIndex ? "step" : undefined}
+              disabled={recording}
               onClick={() => {
                 navigateToFrame(index);
               }}
             >
               <span className="block text-[0.65rem] uppercase opacity-70">
-                Phase {index + 1}
+                Stage {index + 1}
               </span>
               {frame.name}
             </button>

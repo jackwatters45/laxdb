@@ -103,3 +103,40 @@ diff --git a/src/Cloudflare/Workers/Vite.ts b/src/Cloudflare/Workers/Vite.ts
        }),
    );
  
+diff --git a/src/Bundle/Bundle.ts b/src/Bundle/Bundle.ts
+--- a/src/Bundle/Bundle.ts
++++ b/src/Bundle/Bundle.ts
+@@ -264,16 +264,29 @@
+   bundle: rolldown.OutputBundle,
+ ): Effect.Effect<BundleOutput, BundleError> {
+   const files = Object.values(bundle);
+-  // These are sanity checks - with rolldown, the first file is always an entry chunk.
+-  if (!files[0] || files[0].type !== "chunk" || !files[0].isEntry) {
++  const entryIndex = files.findIndex(
++    (file) => file.type === "chunk" && file.isEntry,
++  );
++  const entry = files[entryIndex];
++  if (entryIndex === -1 || !entry || entry.type !== "chunk") {
+     return Effect.fail(
+       new BundleError({
+-        message: "Invalid bundle output",
++        message: "Invalid bundle output: no entry chunk found",
+       }),
+     );
+   }
++  // Vite/Rolldown may emit assets before the entry chunk. Cloudflare expects
++  // the worker entry to be the first file in the normalized bundle.
++  const orderedFiles =
++    entryIndex === 0
++      ? files
++      : [
++          entry,
++          ...files.slice(0, entryIndex),
++          ...files.slice(entryIndex + 1),
++        ];
+   return Effect.forEach(
+-    files as [
++    orderedFiles as [
+       rolldown.OutputChunk,
+       ...(rolldown.OutputChunk | rolldown.OutputAsset)[],
+     ],
