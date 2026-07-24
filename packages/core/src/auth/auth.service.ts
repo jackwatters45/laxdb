@@ -29,17 +29,20 @@ export class AuthService extends Context.Service<AuthService>()("AuthService", {
 
         const parsedMember = Option.flatMap(rawMember, decodeMember);
 
+        const activeMember = Option.getOrNull(parsedMember);
+
         return {
           userId: user.id,
           userName: user.name,
           userEmail: user.email,
-          activeOrganizationId: session.activeOrganizationId ?? null,
-          activeMemberId: Option.isSome(parsedMember)
-            ? parsedMember.value.id
-            : null,
-          memberRole: Option.isSome(parsedMember)
-            ? parsedMember.value.role
-            : null,
+          // Fail closed: an active organization is only trusted when Better Auth
+          // confirms the user still has an active membership in it.
+          activeOrganizationId:
+            activeMember === null
+              ? null
+              : (session.activeOrganizationId ?? null),
+          activeMemberId: activeMember?.id ?? null,
+          memberRole: activeMember?.role ?? null,
         } satisfies Me;
       }),
   }),

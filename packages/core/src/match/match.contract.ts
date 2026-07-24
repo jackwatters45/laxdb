@@ -91,7 +91,11 @@ export const MatchApiPayload = {
     fixtureId: Schema.String,
     fileName: Schema.String,
     contentType: MatchImageContentType,
-    dataBase64: Schema.String,
+    dataBase64: Schema.String.check(
+      Schema.isMaxLength(13_500_000, {
+        message: "Encoded image must be 10MB or smaller",
+      }),
+    ),
   }),
   deleteMatchImage: Schema.Struct({
     id: Schema.String,

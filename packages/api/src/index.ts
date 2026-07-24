@@ -1,5 +1,5 @@
-import type { R2Bucket } from "@cloudflare/workers-types";
 import { AuthService } from "@laxdb/core/auth/auth.service";
+import { ClubService } from "@laxdb/core/club/club.service";
 import {
   AuthenticationError,
   AuthorizationError,
@@ -20,39 +20,20 @@ import * as HttpApiBuilder from "effect/unstable/httpapi/HttpApiBuilder";
 import * as HttpApiScalar from "effect/unstable/httpapi/HttpApiScalar";
 
 import {
-  currentSession,
+  currentMemberSession,
   isAuthEnv,
   makeAuth,
-  organizationId,
+  requireTeamManager,
 } from "./auth/auth";
 import { LaxdbApi } from "./definition";
 import { HttpGroups, ServicesLive } from "./layers";
+import { matchImagesBucket } from "./match/match-images";
 
 const HttpApiRouter = HttpApiBuilder.layer(LaxdbApi).pipe(
   Layer.provide(HttpGroups.pipe(Layer.provide(ServicesLive))),
 );
 
 const DocsRoute = HttpApiScalar.layer(LaxdbApi);
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === "object" && value !== null;
-
-const isR2Bucket = (value: unknown): value is R2Bucket =>
-  isRecord(value) &&
-  typeof value.put === "function" &&
-  typeof value.get === "function" &&
-  typeof value.delete === "function";
-
-const matchImagesBucket = Effect.gen(function* () {
-  const env = yield* Cloudflare.WorkerEnvironment;
-  if (!isRecord(env) || !isR2Bucket(env.STORAGE)) {
-    return yield* new DatabaseError({
-      domain: "MatchImage",
-      message: "R2 binding STORAGE is missing from api worker env",
-    });
-  }
-  return env.STORAGE;
-});
 
 const errorResponse = (error: unknown) => {
   if (error instanceof AuthenticationError) {
@@ -143,13 +124,22 @@ const MatchImageRoute = HttpRouter.use((router) =>
       }
 
       const authService = yield* AuthService;
+      const clubService = yield* ClubService;
       const matchService = yield* MatchService;
-      const session = yield* currentSession(authService);
-      const orgId = yield* organizationId(session);
+      const session = yield* currentMemberSession(authService);
       const image = yield* matchService.getMatchImage({
-        organizationId: orgId,
+        organizationId: session.organizationId,
         id,
       });
+      const fixture = yield* matchService.getFixture({
+        organizationId: session.organizationId,
+        id: image.fixtureId,
+      });
+      const team = yield* clubService.getTeam({
+        organizationId: session.organizationId,
+        id: fixture.teamId,
+      });
+      yield* requireTeamManager(session, team.coachMemberId);
       const bucket = yield* matchImagesBucket;
       const object = yield* Effect.tryPromise({
         try: () => bucket.get(image.objectKey),
@@ -168,6 +158,7 @@ const MatchImageRoute = HttpRouter.use((router) =>
           headers: {
             "cache-control": "private, max-age=300",
             "content-type": image.contentType,
+            "x-content-type-options": "nosniff",
           },
         }),
       );

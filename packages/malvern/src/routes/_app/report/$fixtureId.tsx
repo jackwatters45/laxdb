@@ -265,7 +265,7 @@ function MatchImagesCard(props: {
         });
       }
     },
-    onSuccess: () =>
+    onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["match-images", fixtureId] }),
   });
 
@@ -280,6 +280,8 @@ function MatchImagesCard(props: {
     (uploadMutation.error instanceof Error
       ? uploadMutation.error.message
       : null);
+  const deleteError =
+    deleteMutation.error instanceof Error ? deleteMutation.error.message : null;
 
   return (
     <Card>
@@ -315,9 +317,9 @@ function MatchImagesCard(props: {
             <Spinner /> Uploading images…
           </p>
         )}
-        {uploadError && (
+        {(uploadError ?? deleteError) && (
           <Alert variant="destructive">
-            <AlertDescription>{uploadError}</AlertDescription>
+            <AlertDescription>{uploadError ?? deleteError}</AlertDescription>
           </Alert>
         )}
 
@@ -394,10 +396,7 @@ function ReportFormInner(props: {
           blurb: blurb.trim() || null,
         },
       }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ["reports", fixture.teamId],
-      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reports"] }),
   });
 
   const busy = submitMutation.isPending;

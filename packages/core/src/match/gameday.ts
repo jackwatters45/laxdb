@@ -289,14 +289,7 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=${round}`;
 
           const firstPage = yield* fetchPage(pageUrl(0));
-          const firstMatchesOption = yield* parseMatches(
-            firstPage,
-            compId,
-          ).pipe(Effect.option);
-          const firstMatches = Option.match(firstMatchesOption, {
-            onNone: () => [],
-            onSome: (matches) => matches,
-          });
+          const firstMatches = yield* parseMatches(firstPage, compId);
 
           const rounds = [
             ...new Set(
@@ -311,13 +304,6 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
             (round) =>
               fetchPage(pageUrl(round)).pipe(
                 Effect.flatMap((html) => parseMatches(html, compId)),
-                Effect.option,
-                Effect.map((matchesOption) =>
-                  Option.match(matchesOption, {
-                    onNone: () => [],
-                    onSome: (matches) => matches,
-                  }),
-                ),
               ),
             { concurrency: 4 },
           );
@@ -426,12 +412,8 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
                       `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
                     ),
                     (html) => parseMatches(html, comp.compId),
-                  ).pipe(Effect.option),
-                  (matches) =>
-                    Option.match(matches, {
-                      onNone: () => [],
-                      onSome: gamedayTeamsFromMatches,
-                    }),
+                  ),
+                  gamedayTeamsFromMatches,
                 ),
               { concurrency: 4 },
             );
@@ -463,23 +445,19 @@ export class GamedayClient extends Context.Service<GamedayClient>()(
                       `${BASE_URL}/comp_info.cgi?a=FIXTURE&compID=${comp.compId}&c=${LACROSSE_VICTORIA_CLIENT}&round=0`,
                     ),
                     (html) => parseMatches(html, comp.compId),
-                  ).pipe(Effect.option),
+                  ),
                   (matches) =>
-                    Option.match(matches, {
-                      onNone: () => [],
-                      onSome: (value) =>
-                        gamedayTeamsFromMatches(value)
-                          .filter((team) => selectedNames.has(team.name))
-                          .map(
-                            (team) =>
-                              new GamedayTeamCompetition({
-                                compId: comp.compId,
-                                compName: comp.name,
-                                teamId: team.teamId,
-                                teamName: team.name,
-                              }),
-                          ),
-                    }),
+                    gamedayTeamsFromMatches(matches)
+                      .filter((team) => selectedNames.has(team.name))
+                      .map(
+                        (team) =>
+                          new GamedayTeamCompetition({
+                            compId: comp.compId,
+                            compName: comp.name,
+                            teamId: team.teamId,
+                            teamName: team.name,
+                          }),
+                      ),
                 ),
               { concurrency: 4 },
             );

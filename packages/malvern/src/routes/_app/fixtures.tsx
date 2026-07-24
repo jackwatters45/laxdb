@@ -197,7 +197,10 @@ function Fixtures() {
                 ...(myTeams.length > 0
                   ? [{ value: MY_TEAMS_FILTER, label: "My teams" }]
                   : []),
-                ...teams.map((team) => ({ value: team.id, label: team.name })),
+                ...(ctx.isAdmin ? teams : myTeams).map((team) => ({
+                  value: team.id,
+                  label: team.name,
+                })),
               ]}
               value={effectiveFilter}
               onValueChange={(value) => {
@@ -214,7 +217,7 @@ function Fixtures() {
                 {myTeams.length > 0 && (
                   <SelectItem value={MY_TEAMS_FILTER}>My teams</SelectItem>
                 )}
-                {teams.map((team) => (
+                {(ctx.isAdmin ? teams : myTeams).map((team) => (
                   <SelectItem key={team.id} value={team.id}>
                     {team.name}
                   </SelectItem>
@@ -343,7 +346,13 @@ function FixtureTable({
               {showReports && (
                 <TableCell>
                   {report ? (
-                    <Badge variant="secondary">Submitted</Badge>
+                    <Link
+                      to="/report/$fixtureId"
+                      params={{ fixtureId: fixture.id }}
+                      className={reportLinkClass}
+                    >
+                      <Badge variant="secondary">Submitted · edit</Badge>
+                    </Link>
                   ) : result ? (
                     <Link
                       to="/report/$fixtureId"

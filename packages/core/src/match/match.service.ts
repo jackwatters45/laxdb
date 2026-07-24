@@ -442,16 +442,7 @@ export class MatchService extends Context.Service<MatchService>()(
                 (team) =>
                   gameday
                     .fetchRoster({ compId: team.compId, teamId: team.teamId })
-                    .pipe(
-                      Effect.option,
-                      Effect.map((playersOption) => ({
-                        team,
-                        players: Option.match(playersOption, {
-                          onNone: () => [],
-                          onSome: (players) => players,
-                        }),
-                      })),
-                    ),
+                    .pipe(Effect.map((players) => ({ team, players }))),
                 { concurrency: 2 },
               );
 
@@ -567,17 +558,38 @@ export class MatchService extends Context.Service<MatchService>()(
                   compId: selection.compId,
                   gamedayTeamId: selection.teamId,
                 });
-              const linkedTeam = existingLink[0]
+              const legacyLink =
+                existingLink.length === 0
+                  ? yield* gamedayRepo.getLegacyClubTeamLinkForExternal({
+                      organizationId: decoded.organizationId,
+                      sourceId,
+                      compId: selection.compId,
+                      gamedayTeamId: selection.teamId,
+                    })
+                  : [];
+              const reusableLink = existingLink[0] ?? legacyLink[0];
+              const linkedTeam = reusableLink
                 ? yield* clubRepo.getTeam({
                     organizationId: decoded.organizationId,
-                    id: existingLink[0].clubTeamId,
+                    id: reusableLink.clubTeamId,
                   })
                 : undefined;
+              const importedTeamName = localTeamName(selection);
+              const existingLocalTeam = linkedTeam
+                ? undefined
+                : (yield* clubRepo.listTeams({
+                    organizationId: decoded.organizationId,
+                  })).find(
+                    (candidate) =>
+                      normalizeName(candidate.name) ===
+                      normalizeName(importedTeamName),
+                  );
               const team =
                 linkedTeam ??
+                existingLocalTeam ??
                 (yield* clubRepo.createTeam({
                   organizationId: decoded.organizationId,
-                  name: localTeamName(selection),
+                  name: importedTeamName,
                 }));
 
               yield* gamedayRepo.upsertClubTeamLink(
@@ -590,6 +602,9 @@ export class MatchService extends Context.Service<MatchService>()(
                   gamedayTeamId: selection.teamId,
                 }),
               );
+              if (legacyLink[0] !== undefined) {
+                yield* gamedayRepo.deleteClubTeamLink(legacyLink[0].id);
+              }
               links += 1;
 
               let syncedFixtures =
@@ -632,15 +647,9 @@ export class MatchService extends Context.Service<MatchService>()(
                 ),
               );
 
-              const rosterOption = yield* gameday
-                .fetchRoster({
-                  compId: selection.compId,
-                  teamId: selection.teamId,
-                })
-                .pipe(Effect.option);
-              const fetchedRoster = Option.match(rosterOption, {
-                onNone: () => [],
-                onSome: (players) => players,
+              const fetchedRoster = yield* gameday.fetchRoster({
+                compId: selection.compId,
+                teamId: selection.teamId,
               });
               if (fetchedRoster.length > 0) {
                 yield* gamedayRepo.upsertPlayers(
@@ -688,6 +697,14 @@ export class MatchService extends Context.Service<MatchService>()(
                   player,
                 ]),
               );
+              const externalNameCounts = new Map<string, number>();
+              for (const entry of rosterEntries) {
+                const name = normalizeName(entry.playerName);
+                externalNameCounts.set(
+                  name,
+                  (externalNameCounts.get(name) ?? 0) + 1,
+                );
+              }
 
               for (const entry of rosterEntries) {
                 const existingPlayerLink =
@@ -701,8 +718,13 @@ export class MatchService extends Context.Service<MatchService>()(
                   });
                 if (existingPlayerLink.length > 0) continue;
 
+                const normalizedEntryName = normalizeName(entry.playerName);
+                const uniquelyNamedLocalPlayer =
+                  externalNameCounts.get(normalizedEntryName) === 1
+                    ? localByName.get(normalizedEntryName)
+                    : undefined;
                 const localPlayer =
-                  localByName.get(normalizeName(entry.playerName)) ??
+                  uniquelyNamedLocalPlayer ??
                   (yield* clubRepo.addRosterPlayer({
                     organizationId: decoded.organizationId,
                     teamId: team.id,

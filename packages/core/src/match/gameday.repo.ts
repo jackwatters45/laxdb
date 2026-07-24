@@ -433,6 +433,34 @@ export class GamedayRepo extends Context.Service<GamedayRepo>()("GamedayRepo", {
             ),
         ),
 
+      getLegacyClubTeamLinkForExternal: (input: {
+        readonly organizationId: string;
+        readonly sourceId: string;
+        readonly compId: string;
+        readonly gamedayTeamId: string;
+      }) =>
+        query(
+          db
+            .select(clubTeamLinkColumns)
+            .from(clubTeamGamedayLinks)
+            .where(
+              and(
+                eq(clubTeamGamedayLinks.organizationId, input.organizationId),
+                eq(clubTeamGamedayLinks.sourceId, input.sourceId),
+                eq(clubTeamGamedayLinks.seasonId, "legacy"),
+                eq(clubTeamGamedayLinks.compId, input.compId),
+                eq(clubTeamGamedayLinks.gamedayTeamId, input.gamedayTeamId),
+              ),
+            ),
+        ),
+
+      deleteClubTeamLink: (id: string) =>
+        query(
+          db
+            .delete(clubTeamGamedayLinks)
+            .where(eq(clubTeamGamedayLinks.id, id)),
+        ),
+
       listClubTeamLinks: (input: {
         readonly organizationId: string;
         readonly clubTeamId: string;

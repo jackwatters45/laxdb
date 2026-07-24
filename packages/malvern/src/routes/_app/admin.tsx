@@ -631,7 +631,9 @@ function Teams({
                     });
                   }}
                   disabled={
-                    selectedSeasonId === "" || associationSyncMutation.isPending
+                    selectedSeasonId === "" ||
+                    associationSyncMutation.isPending ||
+                    importMutation.isPending
                   }
                 >
                   {associationSyncMutation.isPending
@@ -649,6 +651,7 @@ function Teams({
                   disabled={
                     competitionsQuery.isFetching ||
                     importMutation.isPending ||
+                    associationSyncMutation.isPending ||
                     selectedSeasonId === "" ||
                     competitions.length === 0
                   }

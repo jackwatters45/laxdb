@@ -1,5 +1,5 @@
-import type { R2Bucket } from "@cloudflare/workers-types";
 import { AuthService } from "@laxdb/core/auth/auth.service";
+import { ClubService } from "@laxdb/core/club/club.service";
 import { DatabaseError, ValidationError } from "@laxdb/core/error";
 import type { MatchApiPayload } from "@laxdb/core/match/match.contract";
 import { MatchService } from "@laxdb/core/match/match.service";
@@ -8,31 +8,14 @@ import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import {
+  requireTeamManager,
   withAdminOrganization,
   withMemberSession,
-  withOrganization,
+  type MemberSessionContext,
 } from "../auth/auth";
 import { LaxdbApi } from "../definition";
 
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === "object" && value !== null;
-
-const isR2Bucket = (value: unknown): value is R2Bucket =>
-  isRecord(value) &&
-  typeof value.put === "function" &&
-  typeof value.get === "function" &&
-  typeof value.delete === "function";
-
-const matchImagesBucket = Effect.gen(function* () {
-  const env = yield* Cloudflare.WorkerEnvironment;
-  if (!isRecord(env) || !isR2Bucket(env.STORAGE)) {
-    return yield* new DatabaseError({
-      domain: "MatchImage",
-      message: "R2 binding STORAGE is missing from api worker env",
-    });
-  }
-  return env.STORAGE;
-});
+import { matchImagesBucket } from "./match-images";
 
 const base64Payload = (value: string) => {
   const commaIndex = value.indexOf(",");
@@ -43,7 +26,7 @@ const decodeBase64Bytes = (value: string) =>
   Effect.try({
     try: () => {
       const binary = globalThis.atob(base64Payload(value));
-      return Uint8Array.from(binary, (char) => char.codePointAt(0));
+      return Uint8Array.from(binary, (char) => char.codePointAt(0) ?? 0);
     },
     catch: (cause) =>
       new ValidationError({
@@ -53,32 +36,108 @@ const decodeBase64Bytes = (value: string) =>
       }),
   });
 
+const bytesMatchContentType = (
+  bytes: Uint8Array,
+  contentType: (typeof MatchApiPayload.uploadMatchImage.Type)["contentType"],
+) => {
+  switch (contentType) {
+    case "image/jpeg":
+      return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    case "image/png":
+      return (
+        bytes[0] === 0x89 &&
+        bytes[1] === 0x50 &&
+        bytes[2] === 0x4e &&
+        bytes[3] === 0x47 &&
+        bytes[4] === 0x0d &&
+        bytes[5] === 0x0a &&
+        bytes[6] === 0x1a &&
+        bytes[7] === 0x0a
+      );
+    case "image/webp":
+      return (
+        String.fromCodePoint(...bytes.slice(0, 4)) === "RIFF" &&
+        String.fromCodePoint(...bytes.slice(8, 12)) === "WEBP"
+      );
+    case "image/gif": {
+      const signature = String.fromCodePoint(...bytes.slice(0, 6));
+      return signature === "GIF87a" || signature === "GIF89a";
+    }
+  }
+};
+
+const validateImageBytes = (
+  bytes: Uint8Array,
+  contentType: (typeof MatchApiPayload.uploadMatchImage.Type)["contentType"],
+) =>
+  bytesMatchContentType(bytes, contentType)
+    ? Effect.void
+    : Effect.fail(
+        new ValidationError({
+          domain: "MatchImage",
+          message: "Image bytes do not match the declared content type",
+        }),
+      );
+
 export const MatchesHandlers = HttpApiBuilder.group(
   LaxdbApi,
   "Matches",
   (handlers) =>
     Effect.gen(function* () {
       const authService = yield* AuthService;
+      const clubService = yield* ClubService;
       const service = yield* MatchService;
+
+      const authorizeTeam = (session: MemberSessionContext, teamId: string) =>
+        Effect.gen(function* () {
+          const team = yield* clubService.getTeam({
+            organizationId: session.organizationId,
+            id: teamId,
+          });
+          yield* requireTeamManager(session, team.coachMemberId);
+        });
+
+      const authorizeFixture = (
+        session: MemberSessionContext,
+        fixtureId: string,
+      ) =>
+        Effect.gen(function* () {
+          const fixture = yield* service.getFixture({
+            organizationId: session.organizationId,
+            id: fixtureId,
+          });
+          yield* authorizeTeam(session, fixture.teamId);
+          return fixture;
+        });
 
       const listFixtures = (
         payload: typeof MatchApiPayload.listFixtures.Type,
       ) =>
-        withOrganization(authService, (orgId) =>
-          service.listFixtures({ organizationId: orgId, ...payload }),
+        withMemberSession(authService, (session) =>
+          Effect.gen(function* () {
+            if (payload.teamId === undefined) {
+              yield* requireTeamManager(session, null);
+            } else {
+              yield* authorizeTeam(session, payload.teamId);
+            }
+            return yield* service.listFixtures({
+              organizationId: session.organizationId,
+              ...payload,
+            });
+          }),
         );
 
       const getFixture = (payload: typeof MatchApiPayload.fixtureById.Type) =>
-        withOrganization(authService, (orgId) =>
-          service.getFixture({ organizationId: orgId, id: payload.id }),
+        withMemberSession(authService, (session) =>
+          authorizeFixture(session, payload.id),
         );
 
       const syncFixtures = (
         payload: typeof MatchApiPayload.syncFixtures.Type,
       ) =>
-        withOrganization(authService, (orgId) =>
+        withAdminOrganization(authService, (organizationId) =>
           service.syncFixtures({
-            organizationId: orgId,
+            organizationId,
             teamId: payload.teamId,
           }),
         );
@@ -129,35 +188,60 @@ export const MatchesHandlers = HttpApiBuilder.group(
         );
 
       const listReports = (payload: typeof MatchApiPayload.listReports.Type) =>
-        withOrganization(authService, (orgId) =>
-          service.listReports({ organizationId: orgId, ...payload }),
+        withMemberSession(authService, (session) =>
+          Effect.gen(function* () {
+            if (payload.teamId === undefined) {
+              yield* requireTeamManager(session, null);
+            } else {
+              yield* authorizeTeam(session, payload.teamId);
+            }
+            return yield* service.listReports({
+              organizationId: session.organizationId,
+              ...payload,
+            });
+          }),
         );
 
       const submitReport = (
         payload: typeof MatchApiPayload.submitReport.Type,
       ) =>
-        withMemberSession(authService, ({ organizationId, userId, userName }) =>
-          service.submitReport({
-            organizationId,
-            submittedByUserId: userId,
-            submitterName: userName,
-            ...payload,
+        withMemberSession(authService, (session) =>
+          Effect.gen(function* () {
+            yield* authorizeFixture(session, payload.fixtureId);
+            return yield* service.submitReport({
+              organizationId: session.organizationId,
+              submittedByUserId: session.userId,
+              submitterName: session.userName,
+              ...payload,
+            });
           }),
         );
 
       const listMatchImages = (
         payload: typeof MatchApiPayload.listMatchImages.Type,
       ) =>
-        withOrganization(authService, (organizationId) =>
-          service.listMatchImages({ organizationId, ...payload }),
+        withMemberSession(authService, (session) =>
+          Effect.gen(function* () {
+            yield* authorizeFixture(session, payload.fixtureId);
+            return yield* service.listMatchImages({
+              organizationId: session.organizationId,
+              ...payload,
+            });
+          }),
         );
 
       const uploadMatchImage = (
         payload: typeof MatchApiPayload.uploadMatchImage.Type,
       ) =>
-        withMemberSession(authService, ({ organizationId, userId }) =>
+        withMemberSession(authService, (session) =>
           Effect.gen(function* () {
+            const { organizationId, userId } = session;
+            yield* authorizeFixture(session, payload.fixtureId);
             const bytes = yield* decodeBase64Bytes(payload.dataBase64);
+            yield* validateImageBytes(bytes, payload.contentType);
+            // Resolve the binding before inserting metadata so a missing R2
+            // binding cannot create a broken database row.
+            const bucket = yield* matchImagesBucket;
             const image = yield* service.createMatchImage({
               organizationId,
               fixtureId: payload.fixtureId,
@@ -166,7 +250,6 @@ export const MatchesHandlers = HttpApiBuilder.group(
               contentType: payload.contentType,
               sizeBytes: bytes.byteLength,
             });
-            const bucket = yield* matchImagesBucket;
             yield* Effect.tryPromise({
               try: () =>
                 bucket.put(image.objectKey, bytes, {
@@ -178,7 +261,13 @@ export const MatchesHandlers = HttpApiBuilder.group(
                   message: "Failed to write image to R2",
                   cause,
                 }),
-            });
+            }).pipe(
+              Effect.catchTag("DatabaseError", (error) =>
+                service
+                  .deleteMatchImage({ organizationId, id: image.id })
+                  .pipe(Effect.flatMap(() => Effect.fail(error))),
+              ),
+            );
             return image;
           }),
         );
@@ -186,13 +275,16 @@ export const MatchesHandlers = HttpApiBuilder.group(
       const deleteMatchImage = (
         payload: typeof MatchApiPayload.deleteMatchImage.Type,
       ) =>
-        withMemberSession(authService, ({ organizationId }) =>
+        withMemberSession(authService, (session) =>
           Effect.gen(function* () {
-            const image = yield* service.deleteMatchImage({
-              organizationId,
+            const image = yield* service.getMatchImage({
+              organizationId: session.organizationId,
               id: payload.id,
             });
+            yield* authorizeFixture(session, image.fixtureId);
             const bucket = yield* matchImagesBucket;
+            // Delete R2 first. R2 deletion is idempotent, so a later database
+            // failure leaves the operation safely retryable.
             yield* Effect.tryPromise({
               try: () => bucket.delete(image.objectKey),
               catch: (cause) =>
@@ -202,7 +294,10 @@ export const MatchesHandlers = HttpApiBuilder.group(
                   cause,
                 }),
             });
-            return image;
+            return yield* service.deleteMatchImage({
+              organizationId: session.organizationId,
+              id: payload.id,
+            });
           }),
         );
 

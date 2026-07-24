@@ -189,23 +189,50 @@ export const withAdminOrganization = <A, E, R>(
     Effect.flatMap(useOrganization),
   );
 
-export const withMemberSession = <A, E, R>(
-  authService: AuthServiceImpl,
-  useSession: (context: {
-    readonly organizationId: string;
-    readonly userId: string;
-    readonly userName: string;
-  }) => Effect.Effect<A, E, R>,
+export type MemberSessionContext = {
+  readonly organizationId: string;
+  readonly userId: string;
+  readonly userName: string;
+  readonly activeMemberId: string;
+  readonly memberRole: NonNullable<Me["memberRole"]>;
+};
+
+export const requireTeamManager = (
+  session: MemberSessionContext,
+  coachMemberId: string | null,
 ) =>
+  session.memberRole === "owner" ||
+  session.memberRole === "admin" ||
+  coachMemberId === session.activeMemberId
+    ? Effect.void
+    : Effect.fail(
+        new AuthorizationError({
+          message: "admin role or assigned team coach required",
+        }),
+      );
+
+export const currentMemberSession = (authService: AuthServiceImpl) =>
   Effect.gen(function* () {
     const session = yield* currentSession(authService);
     const orgId = yield* organizationId(session);
-    return yield* useSession({
+    if (session.activeMemberId === null || session.memberRole === null) {
+      return yield* new AuthorizationError({
+        message: "active organization membership required",
+      });
+    }
+    return {
       organizationId: orgId,
       userId: session.userId,
       userName: session.userName,
-    });
+      activeMemberId: session.activeMemberId,
+      memberRole: session.memberRole,
+    } satisfies MemberSessionContext;
   });
+
+export const withMemberSession = <A, E, R>(
+  authService: AuthServiceImpl,
+  useSession: (context: MemberSessionContext) => Effect.Effect<A, E, R>,
+) => currentMemberSession(authService).pipe(Effect.flatMap(useSession));
 
 export const withAdminSession = <A, E, R>(
   authService: AuthServiceImpl,

@@ -146,6 +146,21 @@ export class ClubService extends Context.Service<ClubService>()("ClubService", {
           Effect.tapError((e) => Effect.logError("Failed to list roster", e)),
         ),
 
+      getRosterPlayer: (input: SchemaInput<typeof RosterPlayerByIdInput>) =>
+        Effect.gen(function* () {
+          const decoded = yield* decodeArguments(RosterPlayerByIdInput, input);
+          return yield* repo.getRosterPlayer(decoded);
+        }).pipe(
+          Effect.map(asPlayer),
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(notFound("RosterPlayer", input.id)),
+          ),
+          Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
+          Effect.tapError((e) =>
+            Effect.logError("Failed to get roster player", e),
+          ),
+        ),
+
       addRosterPlayer: (input: SchemaInput<typeof AddRosterPlayerInput>) =>
         Effect.gen(function* () {
           const decoded = yield* decodeArguments(AddRosterPlayerInput, input);
