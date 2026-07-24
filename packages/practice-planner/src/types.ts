@@ -9,6 +9,8 @@ import type {
 import type {
   PlayCategory as PlayCategorySchema,
   Play as DbPlay,
+  PlayDiagramValue,
+  PlaySummary as DbPlaySummary,
 } from "@laxdb/core/play/play.schema";
 import type {
   PracticeItemType as PracticeItemTypeSchema,
@@ -52,7 +54,12 @@ export type Drill = Omit<typeof DbDrill.Type, "createdAt" | "updatedAt">;
 // ---------------------------------------------------------------------------
 
 export type PlayCategory = Schema.Schema.Type<typeof PlayCategorySchema>;
+export type PlayDiagram = PlayDiagramValue;
 export type Play = Omit<typeof DbPlay.Type, "createdAt" | "updatedAt">;
+export type PlaySummary = Omit<
+  typeof DbPlaySummary.Type,
+  "createdAt" | "updatedAt"
+>;
 
 // ---------------------------------------------------------------------------
 // Practice graph — canvas editor model (NOT the DB Practice)

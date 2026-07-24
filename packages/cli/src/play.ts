@@ -116,6 +116,7 @@ const createCommand = Command.make(
           description: Option.getOrNull(opts.description),
           personnelNotes: Option.getOrNull(opts.personnelNotes),
           tags: Option.getOrUndefined(tagValues),
+          diagram: null,
           diagramUrl: Option.getOrNull(opts.diagramUrl),
           videoUrl: Option.getOrNull(opts.videoUrl),
         },

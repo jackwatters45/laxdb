@@ -1,5 +1,5 @@
 import type { CreateDrillInput } from "../drill/drill.schema";
-import type { CreatePlayInput } from "../play/play.schema";
+import type { CreatePlayInput, PlayDiagramValue } from "../play/play.schema";
 import type { CreatePlayerInput } from "../player/player.schema";
 import type {
   AddItemInput,
@@ -35,6 +35,50 @@ export const validCreateDrill = (
   ...overrides,
 });
 
+export const validPlayDiagram = (): PlayDiagramValue => ({
+  version: 1,
+  playerLabelMode: "initials",
+  field: {
+    discipline: "womens",
+    view: "half",
+    template: "womens-half",
+    orientation: "attack-up",
+  },
+  actors: [
+    {
+      id: "attack-7",
+      kind: "player",
+      side: "offense",
+      label: "7",
+      name: "Ava",
+    },
+    { id: "defense-2", kind: "player", side: "defense", label: "2" },
+    { id: "ball", kind: "ball", side: "neutral", label: null },
+  ],
+  frames: [
+    {
+      id: "frame-1",
+      name: "Set",
+      durationMs: 1_000,
+      actorStates: [
+        { actorId: "attack-7", position: { x: 0.5, y: 0.72 } },
+        { actorId: "defense-2", position: { x: 0.5, y: 0.5 } },
+        { actorId: "ball", position: { x: 0.53, y: 0.72 } },
+      ],
+      actions: [
+        {
+          id: "action-1",
+          type: "dodge-carry",
+          start: { x: 0.5, y: 0.72 },
+          end: { x: 0.38, y: 0.42 },
+          actorId: "attack-7",
+          targetActorId: null,
+        },
+      ],
+    },
+  ],
+});
+
 export const validCreatePlay = (
   overrides?: Partial<CreatePlayInput>,
 ): CreatePlayInput => ({
@@ -43,6 +87,7 @@ export const validCreatePlay = (
   formation: null,
   description: null,
   personnelNotes: null,
+  diagram: null,
   diagramUrl: null,
   videoUrl: null,
   ...overrides,

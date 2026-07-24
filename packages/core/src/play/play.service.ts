@@ -9,10 +9,12 @@ import {
   DeletePlayInput,
   GetPlayInput,
   Play,
+  PlaySummary,
   UpdatePlayInput,
 } from "./play.schema";
 
 const asPlay = Schema.decodeUnknownSync(Play);
+const asPlaySummary = Schema.decodeUnknownSync(PlaySummary);
 
 export class PlayService extends Context.Service<PlayService>()("PlayService", {
   make: Effect.gen(function* () {
@@ -21,7 +23,7 @@ export class PlayService extends Context.Service<PlayService>()("PlayService", {
     return {
       list: () =>
         repo.list().pipe(
-          Effect.map((rows) => rows.map((row) => asPlay(row))),
+          Effect.map((rows) => rows.map((row) => asPlaySummary(row))),
           Effect.catchTag("SqlError", (e) => Effect.fail(parseSqlError(e))),
           Effect.tapError(Effect.logError),
         ),

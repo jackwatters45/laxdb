@@ -1,0 +1,1 @@
+ALTER TABLE `play` ADD `diagram` text;

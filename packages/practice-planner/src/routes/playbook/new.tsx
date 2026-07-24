@@ -72,6 +72,7 @@ function NewPlayPage() {
         description: description || null,
         personnelNotes: personnelNotes || null,
         tags: parsedTags,
+        diagram: null,
         diagramUrl: diagramUrl || null,
         videoUrl: videoUrl || null,
       },

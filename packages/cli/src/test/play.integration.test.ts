@@ -150,6 +150,7 @@ describe("Play HTTP API", () => {
 
     expect(createdPlays).toHaveLength(2);
     expect(listedPlays).toHaveLength(2);
+    expect(listedPlays.every((play) => !("diagram" in play))).toBe(true);
   });
 
   it("lists all plays", async () => {

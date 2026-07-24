@@ -16,10 +16,11 @@ export class PlayRepo extends Context.Service<PlayRepo>()("PlayRepo", {
     const db = yield* DrizzleService;
 
     const { id: _, ...publicColumns } = getColumns(playTable);
+    const { diagram: _diagram, ...summaryColumns } = publicColumns;
 
     return {
       list: () =>
-        query(db.select(publicColumns).from(playTable)).pipe(
+        query(db.select(summaryColumns).from(playTable)).pipe(
           Effect.tapError(Effect.logError),
         ),
 
@@ -42,6 +43,7 @@ export class PlayRepo extends Context.Service<PlayRepo>()("PlayRepo", {
               description: input.description,
               personnelNotes: input.personnelNotes,
               tags: [...(input.tags ?? [])],
+              diagram: input.diagram ?? null,
               diagramUrl: input.diagramUrl,
               videoUrl: input.videoUrl,
             })
@@ -67,6 +69,9 @@ export class PlayRepo extends Context.Service<PlayRepo>()("PlayRepo", {
                 personnelNotes: input.personnelNotes,
               }),
               ...(input.tags !== undefined && { tags: [...input.tags] }),
+              ...(input.diagram !== undefined && {
+                diagram: input.diagram,
+              }),
               ...(input.diagramUrl !== undefined && {
                 diagramUrl: input.diagramUrl,
               }),

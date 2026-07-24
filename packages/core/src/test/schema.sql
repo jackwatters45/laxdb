@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `play` (
   `description` text,
   `personnel_notes` text,
   `tags` text NOT NULL,
+  `diagram` text,
   `diagram_url` text,
   `video_url` text,
   `created_at` integer NOT NULL,
