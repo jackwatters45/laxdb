@@ -82,6 +82,7 @@ jobs:
     if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.head.repo.fork == false) }}
     name: Deploy
     runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'pull_request' && 'staging' || 'prod' }}
     needs:
       - lint-format
       - typecheck
@@ -240,6 +241,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     name: Cleanup preview
     runs-on: ubuntu-latest
+    environment: staging
     permissions:
       contents: read
       pull-requests: write
@@ -265,3 +267,4 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PULL_REQUEST: ${{ github.event.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
