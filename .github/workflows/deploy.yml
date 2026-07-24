@@ -117,7 +117,7 @@ jobs:
             exit 1
           fi
 
-          bun alchemy deploy --stage ${{ env.STAGE }}
+          bun alchemy deploy --stage ${{ env.STAGE }} --yes
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -262,7 +262,7 @@ jobs:
           fi
 
       - name: Destroy preview environment
-        run: bun alchemy destroy --stage ${{ env.STAGE }}
+        run: bun alchemy destroy --stage ${{ env.STAGE }} --yes
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
