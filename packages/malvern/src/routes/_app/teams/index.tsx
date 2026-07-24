@@ -5,11 +5,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@laxdb/ui/components/ui/card";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 
 import type { TeamView } from "../../../lib/club";
 
 export const Route = createFileRoute("/_app/teams/")({
+  beforeLoad: ({ context }) => {
+    if (context.isAdmin) return;
+    const activeMemberId = context.me?.activeMemberId ?? null;
+    const assignedTeams = context.teams.filter(
+      (team) => team.coachMemberId === activeMemberId,
+    );
+    if (assignedTeams.length === 1) {
+      const team = assignedTeams[0];
+      if (team !== undefined) {
+        throw redirect({
+          to: "/teams/$teamId",
+          params: { teamId: team.id },
+        });
+      }
+    }
+  },
   component: TeamsIndex,
 });
 

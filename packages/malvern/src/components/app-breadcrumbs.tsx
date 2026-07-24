@@ -80,19 +80,47 @@ export function AppBreadcrumbs({ teams }: TeamNavigationProps) {
         : getFixture({ data: { id: fixtureId } }),
     enabled: isFixture,
   });
-  const fixtureLabel = fixtureQuery.data
-    ? `${fixtureQuery.data.homeTeamName} vs ${fixtureQuery.data.awayTeamName}`
+  const fixture = fixtureQuery.data;
+  const fixtureTeam = teams.find((entry) => entry.id === fixture?.teamId);
+  const fixtureLabel = fixture
+    ? `${fixture.homeTeamName} vs ${fixture.awayTeamName}`
     : "Fixture";
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {teamId === null ? (
+        {isFixture ? (
           <>
-            {isFixture ? (
+            <BreadcrumbItem>
+              {fixtureTeam ? (
+                <BreadcrumbLink
+                  render={
+                    <Link
+                      to="/teams/$teamId"
+                      params={{ teamId: fixtureTeam.id }}
+                    />
+                  }
+                >
+                  {fixtureTeam.name}
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbLink render={<Link to="/fixtures" />}>
+                  Fixtures
+                </BreadcrumbLink>
+              )}
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            {fixtureTeam ? (
               <>
                 <BreadcrumbItem>
-                  <BreadcrumbLink render={<Link to="/fixtures" />}>
+                  <BreadcrumbLink
+                    render={
+                      <Link
+                        to="/teams/$teamId/fixtures"
+                        params={{ teamId: fixtureTeam.id }}
+                      />
+                    }
+                  >
                     Fixtures
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -101,44 +129,34 @@ export function AppBreadcrumbs({ teams }: TeamNavigationProps) {
             ) : null}
             <BreadcrumbItem>
               <BreadcrumbPage
-                className={
-                  isFixture ? "max-w-[min(60vw,32rem)] truncate" : undefined
-                }
-                title={isFixture ? fixtureLabel : undefined}
+                className="max-w-[min(50vw,28rem)] truncate"
+                title={fixtureLabel}
               >
-                {isFixture ? fixtureLabel : pageLabel(pathname)}
+                {fixtureLabel}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </>
+        ) : teamId === null ? (
+          <BreadcrumbItem>
+            <BreadcrumbPage>{pageLabel(pathname)}</BreadcrumbPage>
+          </BreadcrumbItem>
+        ) : teamSection === null ? (
+          <BreadcrumbItem>
+            <BreadcrumbPage>{teamName}</BreadcrumbPage>
+          </BreadcrumbItem>
         ) : (
           <>
             <BreadcrumbItem>
-              <BreadcrumbLink render={<Link to="/teams" />}>
-                Teams
+              <BreadcrumbLink
+                render={<Link to="/teams/$teamId" params={{ teamId }} />}
+              >
+                {teamName}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            {teamSection === null ? (
-              <BreadcrumbItem>
-                <BreadcrumbPage>{teamName}</BreadcrumbPage>
-              </BreadcrumbItem>
-            ) : (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    render={<Link to="/teams/$teamId" params={{ teamId }} />}
-                  >
-                    {teamName}
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>
-                    {teamSectionLabel(teamSection)}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </>
-            )}
+            <BreadcrumbItem>
+              <BreadcrumbPage>{teamSectionLabel(teamSection)}</BreadcrumbPage>
+            </BreadcrumbItem>
           </>
         )}
       </BreadcrumbList>
@@ -226,72 +244,8 @@ function FixtureTopNavigation({ pathname }: { readonly pathname: string }) {
   );
 }
 
-export function AppTopNavigation({ teams }: TeamNavigationProps) {
+export function AppTopNavigation() {
   const { pathname } = useLocation();
-  const teamId = teamIdFromPath(pathname);
-  const isFixture = pathname.startsWith("/fixtures/");
-  if (teamId === null && !isFixture) return null;
-
-  if (isFixture) return <FixtureTopNavigation pathname={pathname} />;
-
-  const activeTeamId = teamId ?? "";
-  const team = teams.find((entry) => entry.id === activeTeamId);
-
-  return (
-    <nav
-      aria-label={`${team?.name ?? "Team"} sections`}
-      className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto border-t border-border px-3 py-2 sm:px-4"
-    >
-      <Link
-        to="/teams/$teamId"
-        params={{ teamId: activeTeamId }}
-        activeOptions={{ exact: true }}
-        className={teamNavLinkClass}
-      >
-        Overview
-      </Link>
-      <Link
-        to="/teams/$teamId/fixtures"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Fixtures
-      </Link>
-      <Link
-        to="/teams/$teamId/reports"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Reports
-      </Link>
-      <Link
-        to="/teams/$teamId/photos"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Photos
-      </Link>
-      <Link
-        to="/teams/$teamId/roster"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Roster
-      </Link>
-      <Link
-        to="/teams/$teamId/standings"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Standings
-      </Link>
-      <Link
-        to="/teams/$teamId/stats"
-        params={{ teamId: activeTeamId }}
-        className={teamNavLinkClass}
-      >
-        Stats
-      </Link>
-    </nav>
-  );
+  if (!pathname.startsWith("/fixtures/")) return null;
+  return <FixtureTopNavigation pathname={pathname} />;
 }

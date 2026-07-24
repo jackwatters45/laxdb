@@ -113,6 +113,7 @@ function AppShell() {
         }}
         roleLabel={roleLabel}
         signOutError={signOutError}
+        teams={ctx.teams}
       />
       <SidebarInset id="main-content" tabIndex={-1}>
         <header className="sticky top-0 z-10 flex shrink-0 flex-col border-b border-border bg-background">
@@ -125,7 +126,7 @@ function AppShell() {
               <AppBreadcrumbs teams={ctx.teams} />
             </div>
           </div>
-          <AppTopNavigation teams={ctx.teams} />
+          <AppTopNavigation />
         </header>
         <div className="w-full flex-1 px-3 py-6 sm:px-4 lg:px-5">
           <Outlet />
