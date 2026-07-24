@@ -106,7 +106,7 @@ export default Alchemy.Stack(
     const bucket = yield* storage;
 
     const baseDomain = baseDomainForStage(stage);
-    const isLocal = stage !== config.stages.prod;
+    const isLocal = stage === config.stages.dev;
     const malvernOrigin = isLocal
       ? "http://localhost:1438"
       : `https://malvern.${baseDomain}`;
@@ -189,7 +189,7 @@ export default Alchemy.Stack(
       },
     });
 
-    if (process.env.PULL_REQUEST) {
+    if (process.env.GITHUB_ACTIONS === "true" && process.env.PULL_REQUEST) {
       yield* GitHub.Comment("preview-comment", {
         owner: "jackwatters45",
         repository: "laxdb",
