@@ -31,7 +31,10 @@ const teamIdFromPath = (pathname: string) => {
 
 const fixtureIdFromPath = (pathname: string) => {
   const segments = pathSegments(pathname);
-  return segments[0] === "fixtures" ? (segments[1] ?? null) : null;
+  if (segments[0] === "fixtures") return segments[1] ?? null;
+  if (segments[0] === "teams" && segments[2] === "fixtures")
+    return segments[3] ?? null;
+  return null;
 };
 
 const teamSectionFromPath = (pathname: string) => {
@@ -246,6 +249,6 @@ function FixtureTopNavigation({ pathname }: { readonly pathname: string }) {
 
 export function AppTopNavigation() {
   const { pathname } = useLocation();
-  if (!pathname.startsWith("/fixtures/")) return null;
+  if (fixtureIdFromPath(pathname) === null) return null;
   return <FixtureTopNavigation pathname={pathname} />;
 }

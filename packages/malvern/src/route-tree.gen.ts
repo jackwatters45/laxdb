@@ -34,6 +34,7 @@ import { Route as AppTeamsTeamIdRosterRouteImport } from './routes/_app/teams/$t
 import { Route as AppTeamsTeamIdReportsRouteImport } from './routes/_app/teams/$teamId_.reports'
 import { Route as AppTeamsTeamIdPhotosRouteImport } from './routes/_app/teams/$teamId_.photos'
 import { Route as AppTeamsTeamIdFixturesRouteImport } from './routes/_app/teams/$teamId_.fixtures'
+import { Route as AppTeamsTeamIdFixturesFixtureIdRouteImport } from './routes/_app/teams/$teamId_.fixtures_/$fixtureId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -159,6 +160,12 @@ const AppTeamsTeamIdFixturesRoute = AppTeamsTeamIdFixturesRouteImport.update({
   path: '/teams/$teamId/fixtures',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeamsTeamIdFixturesFixtureIdRoute =
+  AppTeamsTeamIdFixturesFixtureIdRouteImport.update({
+    id: '/teams/$teamId_/fixtures_/$fixtureId',
+    path: '/teams/$teamId/fixtures/$fixtureId',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/teams/$teamId/roster': typeof AppTeamsTeamIdRosterRoute
   '/teams/$teamId/standings': typeof AppTeamsTeamIdStandingsRoute
   '/teams/$teamId/stats': typeof AppTeamsTeamIdStatsRoute
+  '/teams/$teamId/fixtures/$fixtureId': typeof AppTeamsTeamIdFixturesFixtureIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/teams/$teamId/roster': typeof AppTeamsTeamIdRosterRoute
   '/teams/$teamId/standings': typeof AppTeamsTeamIdStandingsRoute
   '/teams/$teamId/stats': typeof AppTeamsTeamIdStatsRoute
+  '/teams/$teamId/fixtures/$fixtureId': typeof AppTeamsTeamIdFixturesFixtureIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -239,6 +248,7 @@ export interface FileRoutesById {
   '/_app/teams/$teamId_/roster': typeof AppTeamsTeamIdRosterRoute
   '/_app/teams/$teamId_/standings': typeof AppTeamsTeamIdStandingsRoute
   '/_app/teams/$teamId_/stats': typeof AppTeamsTeamIdStatsRoute
+  '/_app/teams/$teamId_/fixtures_/$fixtureId': typeof AppTeamsTeamIdFixturesFixtureIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId/roster'
     | '/teams/$teamId/standings'
     | '/teams/$teamId/stats'
+    | '/teams/$teamId/fixtures/$fixtureId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId/roster'
     | '/teams/$teamId/standings'
     | '/teams/$teamId/stats'
+    | '/teams/$teamId/fixtures/$fixtureId'
   id:
     | '__root__'
     | '/'
@@ -320,6 +332,7 @@ export interface FileRouteTypes {
     | '/_app/teams/$teamId_/roster'
     | '/_app/teams/$teamId_/standings'
     | '/_app/teams/$teamId_/stats'
+    | '/_app/teams/$teamId_/fixtures_/$fixtureId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -509,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamsTeamIdFixturesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/teams/$teamId_/fixtures_/$fixtureId': {
+      id: '/_app/teams/$teamId_/fixtures_/$fixtureId'
+      path: '/teams/$teamId/fixtures/$fixtureId'
+      fullPath: '/teams/$teamId/fixtures/$fixtureId'
+      preLoaderRoute: typeof AppTeamsTeamIdFixturesFixtureIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -531,6 +551,7 @@ interface AppRouteChildren {
   AppTeamsTeamIdRosterRoute: typeof AppTeamsTeamIdRosterRoute
   AppTeamsTeamIdStandingsRoute: typeof AppTeamsTeamIdStandingsRoute
   AppTeamsTeamIdStatsRoute: typeof AppTeamsTeamIdStatsRoute
+  AppTeamsTeamIdFixturesFixtureIdRoute: typeof AppTeamsTeamIdFixturesFixtureIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -552,6 +573,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTeamsTeamIdRosterRoute: AppTeamsTeamIdRosterRoute,
   AppTeamsTeamIdStandingsRoute: AppTeamsTeamIdStandingsRoute,
   AppTeamsTeamIdStatsRoute: AppTeamsTeamIdStatsRoute,
+  AppTeamsTeamIdFixturesFixtureIdRoute: AppTeamsTeamIdFixturesFixtureIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

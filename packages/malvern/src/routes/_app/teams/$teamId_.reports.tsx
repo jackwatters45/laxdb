@@ -99,8 +99,8 @@ function TeamReportsPage() {
                       </p>
                     </div>
                     <Link
-                      to="/fixtures/$fixtureId"
-                      params={{ fixtureId: fixture.id }}
+                      to="/teams/$teamId/fixtures/$fixtureId"
+                      params={{ teamId: fixture.teamId, fixtureId: fixture.id }}
                       hash="report"
                       className="text-sm font-medium underline underline-offset-2 hover:text-muted-foreground"
                     >
@@ -136,8 +136,11 @@ function TeamReportsPage() {
                         </p>
                       </div>
                       <Link
-                        to="/fixtures/$fixtureId"
-                        params={{ fixtureId: report.fixtureId }}
+                        to="/teams/$teamId/fixtures/$fixtureId"
+                        params={{
+                          teamId: report.teamId,
+                          fixtureId: report.fixtureId,
+                        }}
                         hash="report"
                         className="shrink-0 text-sm underline underline-offset-2 hover:text-muted-foreground"
                       >

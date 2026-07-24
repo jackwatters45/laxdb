@@ -268,8 +268,11 @@ function Reports() {
                       </TableCell>
                       <TableCell className="text-right">
                         <Link
-                          to="/fixtures/$fixtureId"
-                          params={{ fixtureId: report.fixtureId }}
+                          to="/teams/$teamId/fixtures/$fixtureId"
+                          params={{
+                            teamId: report.teamId,
+                            fixtureId: report.fixtureId,
+                          }}
                           hash="report"
                           className="text-sm underline underline-offset-2 hover:text-muted-foreground"
                         >

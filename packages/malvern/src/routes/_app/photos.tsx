@@ -304,8 +304,11 @@ function Photos() {
                             ))}
                           </div>
                           <Link
-                            to="/fixtures/$fixtureId"
-                            params={{ fixtureId: fixture.id }}
+                            to="/teams/$teamId/fixtures/$fixtureId"
+                            params={{
+                              teamId: fixture.teamId,
+                              fixtureId: fixture.id,
+                            }}
                             className="mt-4 inline-block text-sm underline underline-offset-2 hover:text-muted-foreground"
                           >
                             Open game report · manage photos

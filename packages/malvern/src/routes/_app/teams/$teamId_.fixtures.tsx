@@ -140,8 +140,8 @@ function FixtureTable(props: {
                   <TableCell>{fixtureDate(fixture)}</TableCell>
                   <TableCell>
                     <Link
-                      to="/fixtures/$fixtureId"
-                      params={{ fixtureId: fixture.id }}
+                      to="/teams/$teamId/fixtures/$fixtureId"
+                      params={{ teamId: fixture.teamId, fixtureId: fixture.id }}
                       className="font-medium underline-offset-4 hover:underline"
                     >
                       {fixture.isHome ? "vs" : "at"} {opponentOf(fixture)}
@@ -153,8 +153,11 @@ function FixtureTable(props: {
                       {fixture.homeScore !== null &&
                         fixture.awayScore !== null && (
                           <Link
-                            to="/fixtures/$fixtureId"
-                            params={{ fixtureId: fixture.id }}
+                            to="/teams/$teamId/fixtures/$fixtureId"
+                            params={{
+                              teamId: fixture.teamId,
+                              fixtureId: fixture.id,
+                            }}
                             hash="report"
                             className="text-xs underline underline-offset-2 hover:text-muted-foreground"
                           >

@@ -244,8 +244,11 @@ function FixtureSpotlight(props: {
           <p className="text-sm text-muted-foreground">No fixture available.</p>
         ) : (
           <Link
-            to="/fixtures/$fixtureId"
-            params={{ fixtureId: props.fixture.id }}
+            to="/teams/$teamId/fixtures/$fixtureId"
+            params={{
+              teamId: props.fixture.teamId,
+              fixtureId: props.fixture.id,
+            }}
             className="block space-y-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="font-medium underline-offset-4 hover:underline">
